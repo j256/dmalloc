@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.140 2000/03/21 01:38:19 gray Exp $
+ * $Id: malloc.c,v 1.141 2000/03/21 01:51:23 gray Exp $
  */
 
 /*
@@ -75,38 +75,17 @@
 #include "heap.h"
 #include "dmalloc_loc.h"
 #include "dmalloc_lp.h"
+#include "malloc.h"
 #include "return.h"
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.140 2000/03/21 01:38:19 gray Exp $";
+#ident "$Id: malloc.c,v 1.141 2000/03/21 01:51:23 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.140 2000/03/21 01:38:19 gray Exp $";
+  "$Id: malloc.c,v 1.141 2000/03/21 01:51:23 gray Exp $";
 #endif
 #endif
-
-/* local routines */
-void		_dmalloc_shutdown(void);
-DMALLOC_PNT	_loc_malloc(const char *file, const int line,
-			    const DMALLOC_SIZE size, const int func_id,
-			    const DMALLOC_SIZE alignment);
-DMALLOC_PNT	_loc_realloc(const char *file, const int line,
-			     DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
-			     const int func_id);
-int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt);
-void	_dmalloc_log_heap_map(const char *file, const int line);
-void	_dmalloc_log_stats(const char *file, const int line);
-void	_dmalloc_log_unfreed(const char *file, const int line);
-int	_dmalloc_verify(const DMALLOC_PNT pnt);
-void	_dmalloc_debug(const int flags);
-int	_dmalloc_debug_current(void);
-int	_dmalloc_examine(const char *file, const int line,
-			 const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
-			 char **file_p, unsigned int *line_p,
-			 DMALLOC_PNT *ret_attr_p);
-void	_dmalloc_track(const dmalloc_track_t track_func);
-const char	*_dmalloc_strerror(const int error_num);
 
 /* local variables */
 static	int		enabled_b = FALSE;	/* have we started yet? */

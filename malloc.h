@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.26 1999/10/14 14:18:06 gray Exp $
+ * $Id: malloc.h,v 1.27 2000/03/21 01:51:24 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -176,9 +176,11 @@ extern
 int	_dmalloc_verify(const DMALLOC_PNT pnt);
 
 /*
- * set the global debug functionality FLAGS (0 to disable all
- * debugging).  NOTE: after this module has started up, you cannot set
- * certain flags such as fence-post or free-space checking.
+ * Set the global debug functionality FLAGS (0 to disable all
+ * debugging).
+ *
+ * NOTE: you cannot set certain flags such as fence-post or free-space
+ * checking with this function.
  */
 extern
 void	_dmalloc_debug(const int flags);
