@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.16 1993/01/30 18:47:02 gray Exp $";
+  "$Id: malloc.c,v 1.17 1993/02/12 04:50:03 gray Exp $";
 #endif
 
 /*
@@ -101,7 +101,7 @@ LOCAL	long	hex_to_int(char * str)
  * a call to the alloc routines has been made, check the debug variables
  * returns [NO]ERROR.
  */
-LOCAL	int	check_debug_vars(char * file, int line)
+LOCAL	int	check_debug_vars(const char * file, const int line)
 {
   static int	iterc = 0;
   
@@ -452,8 +452,8 @@ EXPORT	int	malloc_debug(long debug)
  * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-EXPORT	int	malloc_examine(char * pnt, unsigned int * size, char ** file,
-			       unsigned int * line)
+EXPORT	int	malloc_examine(char * pnt, unsigned int * size,
+			       char ** file, unsigned int * line)
 {
   int		ret;
   

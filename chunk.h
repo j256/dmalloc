@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.13 1992/11/14 21:19:24 gray Exp $
+ * $Id: chunk.h,v 1.14 1993/02/12 04:50:00 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -57,18 +57,19 @@ IMPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
 /*
  * get a SIZE chunk of memory for FILE at LINE
  */
-IMPORT	char	*_chunk_malloc(char * file, unsigned int line,
+IMPORT	char	*_chunk_malloc(const char * file, const unsigned int line,
 			       unsigned int size);
 
 /*
  * frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR
  */
-IMPORT	int	_chunk_free(char * file, unsigned int line, char * pnt);
+IMPORT	int	_chunk_free(const char * file, const unsigned int line,
+			    char * pnt);
 
 /*
  * reallocate a section of memory
  */
-IMPORT	char	*_chunk_realloc(char * file, unsigned int line,
+IMPORT	char	*_chunk_realloc(const char * file, const unsigned int line,
 				char * oldp, unsigned int new_size);
 
 /*

@@ -1,4 +1,4 @@
-\input texinfo  @c -*-texinfo-*-
+\input texinfo @c -*-texinfo-*-
 @c %**start of header
 @setfilename malloc.info
 @settitle Malloc Tutorial
@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.6 1993/01/02 00:17:13 gray Exp $
+@c $Id: dmalloc.texi,v 1.7 1993/02/12 04:50:12 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -36,9 +36,9 @@ notice identical to this one except for the removal of this paragraph
 @end ignore
 Permission is granted to copy and distribute modified versions of this
 manual under the conditions for verbatim copying, provided also that the
-section entitled ``Copying'' are included exactly as in the original, and
-provided that the entire resulting derived work is distributed under the
-terms of a permission notice identical to this one.
+section entitled ``Copying'' are included exactly as in the original,
+and provided that the entire resulting derived work is distributed under
+the terms of a permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
@@ -48,12 +48,12 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Malloc Library
-@author Gray Watson @samp{<gray.watson@antaire.com>}
+@author Gray Watson @samp{<gray.watson@@antaire.com>}
 
 @page
 Copyright @copyright{} 1992 by Gray Watson and the Antaire Corporation.
 
-Published by Gray Watson @samp{<gray.watson@antaire.com>}
+Published by Gray Watson @samp{<gray.watson@@antaire.com>}
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -61,9 +61,9 @@ preserved on all copies.
 
 Permission is granted to copy and distribute modified versions of this
 manual under the conditions for verbatim copying, provided also that the
-section entitled ``Copying'' are included exactly as in the original, and
-provided that the entire resulting derived work is distributed under the
-terms of a permission notice identical to this one.
+section entitled ``Copying'' are included exactly as in the original,
+and provided that the entire resulting derived work is distributed under
+the terms of a permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
@@ -94,16 +94,16 @@ version of this manual to save space so let me know if you want a copy.
 Gray Watson, Antaire Corporation.
 
 @menu
-* Copying::                     Library copying conditions.
-* Allocation Basics::           Basic description of terms and functions.
-* Features::                    Description of the benefits of the library.
-* Usage::                       How to run programs with the library.
-* Code::                        Information on the source and general concerns.
-* Plugs::                       A couple soapbox comments.
+* Copying::             Library copying conditions.
+* Allocation Basics::   Basic description of terms and functions.
+* Features::            Description of the benefits of the library.
+* Usage::               How to run programs with the library.
+* Code::                Information on the source and general concerns.
+* Plugs::               A couple soapbox comments.
 @end menu
 
 @node Copying, Allocation Basics, Top, Top
-@section Library copying conditions.
+@chapter Library Copying Conditions.
 
 This package is covered by the GNU Library Public License.  See the file
 @file{COPYING-LIB} for details.  If you would like to do something with
@@ -162,7 +162,7 @@ that any problems introduced by others will not reflect on the original
 authors' reputations.
 
 @node Allocation Basics, Features, Copying, Top
-@section Basic description of terms and functions.
+@chapter Basic Description of Terms and Functions.
 
 This section provides a basic definition of terms used throughout the
 manual as well as a brief overview of the basic malloc functions and
@@ -170,12 +170,12 @@ examples of their use.  It is quite unnecessary for you to read this
 section if you are familiar with using the heap allocation functions.
 
 @menu
-* Basic definitions::           For defining general terms and concepts.
-* Malloc functions::            Functionality supported by all malloc libs.
+* Basic definitions::   For defining general terms and concepts.
+* Malloc functions::    Functionality supported by all malloc libs.
 @end menu
 
 @node Basic definitions, Malloc functions,  , Allocation Basics
-@subsection For defining general terms and concepts.
+@section For Defining General Terms and Concepts.
 
 Any program can be divided into 2 logical parts: text and data.  Text is
 the actual program code in machine-readable format and data is the
@@ -250,7 +250,7 @@ necessary for the job and you will be guaranteed that your program can
 handle any sized file.
 
 @node Malloc functions,  , Basic definitions, Allocation Basics
-@subsection Functionality supported by all malloc libraries.
+@section Functionality Supported by all Malloc Libraries.
 
 All malloc libraries support 4 basic memory allocation commands.  These
 include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.
@@ -263,8 +263,8 @@ The malloc routine is the basic memory allocation routine.  It allocates
 an area of size bytes.  It will return a pointer to the space requested.
 
 @item calloc
-Usage: @code{pnt = (pointer-type)calloc(unsigned int number,
-unsigned int size);}
+Usage: @code{pnt = (pointer-type)calloc(unsigned int number, unsigned
+int size);}
 
 The calloc routine allocates a certain number of items, each of size
 bytes, and returns a pointer to the space.  It is appropriate to pass in
@@ -274,8 +274,8 @@ Also, calloc nulls the space that it returns, assuring that the memory
 is all zeros.
 
 @item realloc
-Usage: @code{new_pnt = (pointer-type)realloc(void * old_pnt, unsigned int
-new_size);}
+Usage: @code{new_pnt = (pointer-type)realloc(void * old_pnt, unsigned
+int new_size);}
 
 The realloc function expands or shrinks the memory allocation in old_pnt
 to new_size number of bytes.  Realloc copies the information in old_pnt
@@ -302,7 +302,7 @@ that is returned by malloc libraries has already been cleared.
 @emph{Only} the calloc routine will zero the memory space it returns.
 
 @node Features, Usage, Allocation Basics, Top
-@section Description of the benefits of the library.
+@chapter Description of the Benefits of the Library.
 
 @menu
 * Overview::                    General debugging concepts.
@@ -313,7 +313,7 @@ that is returned by malloc libraries has already been cleared.
 @end menu
 
 @node Overview, Environment variables,  , Features
-@subsection General debugging concepts.
+@section General Debugging Concepts.
 
 The features of this library are controlled through a set of
 environmental variables.  They enable the memory debugging features
@@ -361,10 +361,10 @@ long time to do this.  It is suitable to enable this only during
 development and debugging sessions.
 
 @emph{NOTE}: the heap checking routines cannot guarantee that the tests
-will not cause a segmentation-fault if the heap administration structures
-are properly (or improperly if you will) overwritten.  In other words,
-they will verify that everything is okay but may not inform the user of
-problems in a graceful manner.
+will not cause a segmentation-fault if the heap administration
+structures are properly (or improperly if you will) overwritten.  In
+other words, they will verify that everything is okay but may not inform
+the user of problems in a graceful manner.
 
 @item logging statistics
 One of the initial reasons why I personally wanted malloc-debug
@@ -415,7 +415,7 @@ to the conclusion that the localtime call, included in SunOS release
 4.1, was overwriting one of its fence-post markers.
 
 @node Environment variables, malloc_dbg program, Overview, Features
-@subsection The variable names and their features.
+@section The Variable Names and Their Features.
 
 @dfn{Environment variables} are variables that are part of the user's
 working environment and are shared by all the programs.  The below
@@ -484,17 +484,16 @@ after a certain point in a program.
 
 @samp{MALLOC_START} also has the format file:line.  For instance, if it
 is set to @samp{malloc_t.c:126} malloc will start checking the heap
-after it sees a malloc call from the @file{malloc_t.c} file, line
-number 126.  If line number is 0 then malloc will start checking the
-heap after it sees a call from anywhere in the @file{malloc_t.c}
-file.
+after it sees a malloc call from the @file{malloc_t.c} file, line number
+126.  If line number is 0 then malloc will start checking the heap after
+it sees a call from anywhere in the @file{malloc_t.c} file.
 
-This allows the intensive debugging to be started after a certain routine or
-file has been reached in the program.
+This allows the intensive debugging to be started after a certain
+routine or file has been reached in the program.
 @end table
 
 @node malloc_dbg program, RC file, Environment variables, Features
-@subsection Env variable setting utility.
+@section Env Variable Setting Utility.
 
 The malloc_dbg program is designed to assist in the setting of the
 environmental variables, especially @samp{MALLOC_DEBUG}
@@ -517,9 +516,9 @@ their @file{.cshrc} file:
 This allows the user to execute @code{malloc args...} and the debugging
 variables will be set automatically.
 
-The most basic usage for the program is @code{malloc_dbg [-b] tag}.
-The -b flag is for generating Bourne-shell type commands (C-shell type
-are the default).  The tag argument should match a line from the user's
+The most basic usage for the program is @code{malloc_dbg [-b] tag}.  The
+-b flag is for generating Bourne-shell type commands (C-shell type are
+the default).  The tag argument should match a line from the user's
 run-time configuration file @xref{RC file}.
 
 Here is a detailed list of the flags that can passed to malloc_dbg:
@@ -563,7 +562,7 @@ file:line).
 @end table
 
 @node RC file, Debug tokens, malloc_dbg program, Features
-@subsection Format of the run-time configuration file.
+@section Format of the Run-Time Configuration File.
 
 The name of default @dfn{RC file} (or run-time configuration file) is
 @file{$HOME/.mallocrc}.  The @samp{$HOME} environmental variable should
@@ -571,7 +570,7 @@ be set by the system to point to your home-directory.
 
 The file contains lines in the general form of:
 
-        @code{tag   token1, token2, ...}
+        @code{tag token1, token2, ...}
 
 tag is to be matched with the tag argument passed to the malloc_dbg
 program @xref{malloc_dbg program}.  token1, token2, ... are debug
@@ -584,22 +583,19 @@ with empty lines.
 I have the below contents in my @file{.mallocrc} file:
 
 @example
-#
-# Malloc run-time configuration file for our malloc-debug library
-#
+# # Malloc run-time configuration file for our malloc-debug library #
 
-# no debugging
-none	none
+# no debugging none	none
 
-# basic debugging
-debug1	log-stats, log-non-free, log-perror, log-bad-pnt, check-fence
+# basic debugging debug1	log-stats, log-non-free, log-perror,
+log-bad-pnt, check-fence
 
-# more logging and some heap checking
-debug2	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+# more logging and some heap checking debug2	log-stats, log-non-free,
+log-perror, log-trans, log-bad-pnt, \
 	check-fence, check-heap, check-lists, error-abort
 
-# good utilities
-debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+# good utilities debug3	log-stats, log-non-free, log-perror, log-trans,
+log-bad-pnt, \
 	log-admin, check-fence, check-heap, check-lists, realloc-copy, \
 	free-blank, error-abort
 
@@ -611,11 +607,11 @@ enable the logging of statistics, the logging of non-freed memory,
 logging of errors, logging of bad pointer information, and the checking
 of fence-post memory areas.
 
-When I say @code{eval `malloc_dbg none`}, all memory debugging
-features will be disabled.
+When I say @code{eval `malloc_dbg none`}, all memory debugging features
+will be disabled.
 
 @node Debug tokens,  , RC file, Features
-@subsection Description of the debugging token flags.
+@section Description of the Debugging Token Flags.
 
 The below tokens and their corresponding descriptions are for the
 setting of the @samp{MALLOC_DEBUG} environmental variable
@@ -686,7 +682,7 @@ log any errors and messages to the screen via standard-error
 @end table
 
 @node Usage, Code, Features, Top
-@section How to run programs with the library.
+@chapter How to Run Programs With the Library.
 
 @menu
 * Allocation macros::           For providing file/line debugging information.
@@ -695,7 +691,7 @@ log any errors and messages to the screen via standard-error
 @end menu
 
 @node Allocation macros, Extensions,  , Usage
-@subsection For providing file/line debugging information.
+@section For Providing File/Line Debugging Information.
 
 The library attempts to provide file and line information so memory
 problems can be debugged faster.  In every .c source file that allocates
@@ -720,16 +716,16 @@ characters only.  It means allocate space for 1000 characters.
 Usage: @code{infp = CALLOC(struct info_st, 100);}.  This means allocate
 space for 100 info_st structures and zero them all.
 
-@emph{NOTE}: the arguments for the CALLOC macro are sort of reversed from
-calloc(unsigned int count, unsigned int size).
+@emph{NOTE}: the arguments for the CALLOC macro are sort of reversed
+from calloc(unsigned int count, unsigned int size).
 
 @item REALLOC(pnt, type, count)
 Usage: @code{long_pnt = REALLOC(old_pnt, long, 10);}.  This takes
 old_pnt and and changes its size to accommodate 10 longs.
 
 @item REMALLOC(pnt, size)
-Usage: @code{char_pnt = REMALLOC(char_pnt, 100);}.  This is like REALLOC but
-for characters only.  It takes char_pnt and changes its size to 100
+Usage: @code{char_pnt = REMALLOC(char_pnt, 100);}.  This is like REALLOC
+but for characters only.  It takes char_pnt and changes its size to 100
 characters.
 
 @item FREE(pnt)
@@ -765,15 +761,15 @@ line-number where the above memory macros are located.  This gives this
 library the ability to produce verbose reports on memory not freed:
 
 @example
-	dblock:   0x38410 (      22 bytes) from 'malloc_t.c:92' not freed
-	bblock:   0x38600 (   10232 bytes) from 'malloc_t.c:104' not freed
+	dblock: 0x38410 ( 22 bytes) from 'malloc_t.c:92' not freed
+	bblock: 0x38600 ( 10232 bytes) from 'malloc_t.c:104' not freed
 @end example
 	
-These lines from a log file shows that two allocations were not freed.  A
-@dfn{dblock} or small divided-block allocation was not freed at address
-0x38410 of size 22 bytes in source file @file{malloc_t.c} at line 92
-and a @dfn{bblock} or basic-block allocation was not freed at address
-0x38600 of size 10232 bytes at line 104 of @file{malloc_t.c}.
+These lines from a log file shows that two allocations were not freed.
+A @dfn{dblock} or small divided-block allocation was not freed at
+address 0x38410 of size 22 bytes in source file @file{malloc_t.c} at
+line 92 and a @dfn{bblock} or basic-block allocation was not freed at
+address 0x38600 of size 10232 bytes at line 104 of @file{malloc_t.c}.
 
 In the above macro list, I have also included a STRDUP and a BDUP macro.
 STRDUP, for those who are not familiar with the strdup function, takes a
@@ -796,15 +792,15 @@ a superior compiler and future releases of this library may require its
 use.
 
 @node Extensions, Disabling the Library, Allocation macros, Usage
-@subsection Additional non-standard routines.
+@section Additional Non-Standard Routines.
 
 The library has a number of variables and routines that are not a
 standard part of most malloc libraries:
 
 @table @code
 @item char *malloc_logpath;
-This variable can be used to set the malloc log filename.  The
-env variable MALLOC_LOGFILE overrides this variable.
+This variable can be used to set the malloc log filename.  The env
+variable MALLOC_LOGFILE overrides this variable.
 
 @item int malloc_errno;
 This variable stores the internal malloc library error number like errno
@@ -869,7 +865,7 @@ the logging of more verbose memory error messages.
 For some more information, refer to the @file{malloc.h} header file.
 
 @node Disabling the Library,  , Extensions, Usage
-@subsection How to compile/link without the library.
+@section How to Compile/Link Without the Library.
 
 When you are finished with the development and debugging sessions, you
 may want to disable the malloc-debug library and put in its place either
@@ -914,16 +910,16 @@ you can then relink with another malloc library without the file
 @end example
 
 @node Code, Plugs, Usage, Top
-@section Information on the source and general concerns.
+@chapter Information on the Source and General Concerns.
 
 @menu
-* Definitions::                 Some terms and other information.
-* Compatibility::               General compatibility concerns.
-* Portability::                 Issues important for porting the library.
+* Definitions::         Some terms and other information.
+* Compatibility::       General compatibility concerns.
+* Portability::         Issues important for porting the library.
 @end menu
 
 @node Definitions, Compatibility,  , Code
-@subsection Some terms and other information.
+@section Some Terms and Other Information.
 
 Here are a couple definitions and other information for those interested
 in "picking the brain" of the library.  The code is a little ugly here
@@ -938,8 +934,8 @@ basic block containing 2 ^ BASIC_BLOCK bytes of info
 administration for a set of basic blocks
 
 @item dblock
-divided block containing some base 2 number of blocks smaller
-than a basic block.
+divided block containing some base 2 number of blocks smaller than a
+basic block.
 
 @item dblock_adm
 administration for a set of divided blocks
@@ -950,12 +946,12 @@ some anonymous amount of memory
 @end table
 
 @node Compatibility, Portability, Definitions, Code
-@subsection General compatibility concerns.
+@section General Compatibility Concerns.
 
 @itemize @bullet
 @item
-Realloc() backwards compatibility with being able to realloc from the last
-freed block is @emph{not} supported.
+Realloc() backwards compatibility with being able to realloc from the
+last freed block is @emph{not} supported.
 
 @item
 The library does @emph{not} provide memalign() nor valloc() support as
@@ -971,7 +967,7 @@ attention.
 @end itemize
 
 @node Portability,  , Compatibility, Code
-@subsection Issues important for porting the library.
+@section Issues Important for Porting the Library.
 
 General compatibility issues center around:
 
@@ -989,7 +985,7 @@ system I would be interested in talking with you.
 @end itemize
 
 @node Plugs,  , Code, Top
-@section A couple soapbox comments.
+@chapter Soapbox Comments.
 
 Since I have your attention I would like to talk for a second about a
 couple of things that I feel strongly about.  If you would like any more
@@ -1007,14 +1003,15 @@ benefited from the movement.  Please consider supporting it.
 
 @item Berkeley Software Design, Inc. <bsdi-info@@bsdi.com>
 We at the Antaire Corporation are the proud and enthusiastic
-owners/resellers of the BSD/386 operating system.  The system is still at
-pre-production status although we have yet to have a major problem with
-our 486/33 that has been running for a number of months now.  For $1k
-you get a @emph{complete} BSD-flavor operating system with @emph{full
-source} for 386 and 486 systems (binary licenses are available).  Along
-with the obvious benefits of full source code come excellent customer
-support/service and system features such as a MS-DOG runtime
-environment, nfs/tcp-ip, full software development utilities, X, etc.
+owners/resellers of the BSD/386 operating system.  The system is still
+at pre-production status although we have yet to have a major problem
+with our 486/33 that has been running for a number of months now.  For
+$1k you get a @emph{complete} BSD-flavor operating system with
+@emph{full source} for 386 and 486 systems (binary licenses are
+available).  Along with the obvious benefits of full source code come
+excellent customer support/service and system features such as a MS-DOG
+runtime environment, nfs/tcp-ip, full software development utilities, X,
+etc.
 
 @contents
 @bye

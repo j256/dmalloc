@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.8 1993/01/04 18:32:57 gray Exp $
+# $Id: Makefile.in,v 1.9 1993/02/12 04:49:45 gray Exp $
 #
 
 HFLS	= malloc.h malloc_lp.h
@@ -24,8 +24,8 @@ PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
 	COPYING-LIB ChangeLog Manifest NOTES README TTD \
 	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
 	error.[ch] error_str.h heap.[ch] malloc.[ch] mallocrc malloc.info \
-	malloc_dbg.c malloc_err.h malloc_lp.[ch] malloc_loc.h malloc_t.c \
-	sample.c version.h
+	malloc.texi malloc_dbg.c malloc_err.h malloc_lp.[ch] malloc_loc.h \
+	malloc_t.c sample.c version.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)

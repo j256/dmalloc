@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.14 1993/01/02 00:17:09 gray Exp $
+ * $Id: malloc.h,v 1.15 1993/02/12 04:50:06 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -258,8 +258,8 @@ IMPORT	int	malloc_debug(long debug);
  * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-IMPORT	int	malloc_examine(char * pnt, unsigned int * size, char ** file,
-			       unsigned int * line);
+IMPORT	int	malloc_examine(char * pnt, unsigned int * size,
+			       char ** file, unsigned int * line);
 
 /*
  * malloc version of strerror to return the string version of ERRNUM
