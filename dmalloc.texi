@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.155 1998/11/16 17:22:08 gray Exp $
+@c $Id: dmalloc.texi,v 1.156 1998/11/16 17:44:30 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -670,11 +670,11 @@ you will have to try @kbd{make noansi}.  This will run the
 
 If it doesn't work you may have to do Deansify.pl's job by hand.
 
-@item Typing @kbd{make threads} should be enough to build
-@file{libdmallocth.a} which is the threaded version of the library.
-This may or may not work depending on the configuration scripts ability
-to detect your local thread functionality.  Feel free to send me mail
-with improvements.
+@item If you use threads, typing @kbd{make threads} should be enough
+to build @file{libdmallocth.a} which is the threaded version of the
+library.  This may or may not work depending on the configuration
+scripts ability to detect your local thread functionality.  Feel free to
+send me mail with improvements.
 
 See the ``Using With Threads'' section for more information about the
 operation of the library with your threaded program.  @xref{Using With
@@ -701,8 +701,9 @@ heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 
 @item Typing @kbd{make install} should install the @file{libdmalloc.a} 
 and @file{libdmalloc_lp.a} library files in @file{/usr/local/lib}, the
-@file{dmalloc} utility in @file{/usr/local/bin}, and the
-@file{dmalloc.info} documentation file in @file{/usr/local/info}.
+@file{dmalloc.h} include file in @file{/usr/local/include}, and the
+@file{dmalloc} utility in @file{/usr/local/bin}.  You may also want to
+type @kbd{make installth} to install the thread libraries into place.
 
 You may have specified a @samp{--prefix=PATH} option to configure in
 which case @samp{/usr/local} will have been replaced with @samp{PATH}.
