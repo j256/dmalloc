@@ -491,7 +491,7 @@ static	int	expand_buf(const void *buf, const int buf_size,
       if (out_p + 2 >= max_p) {
 	break;
       }
-      (void)sprintf(out_p, "\\%c", *(spec_p - 1));
+      (void)loc_snprintf(out_p, max_p - out_p, "\\%c", *(spec_p - 1));
       out_p += 2;
       continue;
     }
@@ -508,7 +508,7 @@ static	int	expand_buf(const void *buf, const int buf_size,
       if (out_p + 4 >= max_p) {
 	break;
       }
-      (void)sprintf(out_p, "\\%03o", *buf_p);
+      (void)loc_snprintf(out_p, max_p - out_p, "\\%03o", *buf_p);
       out_p += 4;
     }
   }
@@ -1531,42 +1531,42 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
     break;
     
   case ARGV_SHORT:
-    (void)sprintf(buf, "%d", *(short *)var);
+    (void)loc_snprintf(buf, buf_size, "%d", *(short *)var);
     len = strlen(buf);
     break;
     
   case ARGV_U_SHORT:
-    (void)sprintf(buf, "%d", *(unsigned short *)var);
+    (void)loc_snprintf(buf, buf_size, "%d", *(unsigned short *)var);
     len = strlen(buf);
     break;
     
   case ARGV_INT:
-    (void)sprintf(buf, "%d", *(int *)var);
+    (void)loc_snprintf(buf, buf_size, "%d", *(int *)var);
     len = strlen(buf);
     break;
     
   case ARGV_U_INT:
-    (void)sprintf(buf, "%u", *(unsigned int *)var);
+    (void)loc_snprintf(buf, buf_size, "%u", *(unsigned int *)var);
     len = strlen(buf);
     break;
     
   case ARGV_LONG:
-    (void)sprintf(buf, "%ld", *(long *)var);
+    (void)loc_snprintf(buf, buf_size, "%ld", *(long *)var);
     len = strlen(buf);
     break;
     
   case ARGV_U_LONG:
-    (void)sprintf(buf, "%lu", *(unsigned long *)var);
+    (void)loc_snprintf(buf, buf_size, "%lu", *(unsigned long *)var);
     len = strlen(buf);
     break;
     
   case ARGV_FLOAT:
-    (void)sprintf(buf, "%f", *(float *)var);
+    (void)loc_snprintf(buf, buf_size, "%f", *(float *)var);
     len = strlen(buf);
     break;
     
   case ARGV_DOUBLE:
-    (void)sprintf(buf, "%f", *(double *)var);
+    (void)loc_snprintf(buf, buf_size, "%f", *(double *)var);
     len = strlen(buf);
     break;
     
@@ -1574,12 +1574,14 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
   case ARGV_BIN:
     {
       int	bit_c, bit, first_b = ARGV_FALSE;
-      char	binary[2 + 128 + 1], *bin_p = binary;
+      char	binary[2 + 128 + 1], *bounds, *bin_p;
       
       if (*(int *)var == 0) {
 	strncpy(buf, "0", buf_size);
       }
       else {
+	bin_p = binary;
+	bounds = binary + sizeof(binary);
 	
 	/* initially write binary number into tmp buffer, then copy into out */
 	*bin_p++ = '0';
@@ -1600,7 +1602,7 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
 	}
 	
 	/* add on the decimal equivalent */ 
-	(void)sprintf(bin_p, " (%d)", *(int *)var);
+	(void)loc_snprintf(bin_p, bounds - bin_p, " (%d)", *(int *)var);
 	/* find the \0 at end */ 
 	for (; *bin_p != '\0'; bin_p++) {
 	}
@@ -1620,7 +1622,7 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
       buf[buf_size - 1] = '\0';
     }
     else {
-      (void)sprintf(buf, "%#o (%d)", *(int *)var, *(int *)var);
+      (void)loc_snprintf(buf, buf_size, "%#o (%d)", *(int *)var, *(int *)var);
     }
     len = strlen(buf);
     break;
@@ -1630,13 +1632,13 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
       (void)strcpy(buf, "0");
     }
     else {
-      (void)sprintf(buf, "%#x (%d)", *(int *)var, *(int *)var);
+      (void)loc_snprintf(buf, buf_size, "%#x (%d)", *(int *)var, *(int *)var);
     }
     len = strlen(buf);
     break;
     
   case ARGV_INCR:
-    (void)sprintf(buf, "%d", *(int *)var);
+    (void)loc_snprintf(buf, buf_size, "%d", *(int *)var);
     len = strlen(buf);
     break;
     
@@ -1649,18 +1651,18 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
       }
       else if (val % (1024 * 1024 * 1024) == 0) {
 	morf = val / (1024 * 1024 * 1024);
-	(void)sprintf(buf, "%ldg (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%ldg (%ld)", morf, val);
       }
       else if (val % (1024 * 1024) == 0) {
 	morf = val / (1024 * 1024);
-	(void)sprintf(buf, "%ldm (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%ldm (%ld)", morf, val);
       }
       else if (val % 1024 == 0) {
 	morf = val / 1024;
-	(void)sprintf(buf, "%ldk (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%ldk (%ld)", morf, val);
       }
       else {
-	(void)sprintf(buf, "%ld", val);
+	(void)loc_snprintf(buf, buf_size, "%ld", val);
       }
       
       len = strlen(buf);
@@ -1676,18 +1678,18 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
       }
       else if (val % (1024 * 1024 * 1024) == 0) {
 	morf = val / (1024 * 1024 * 1024);
-	(void)sprintf(buf, "%ldg (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%ldg (%ld)", morf, val);
       }
       else if (val % (1024 * 1024) == 0) {
 	morf = val / (1024 * 1024);
-	(void)sprintf(buf, "%ldm (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%ldm (%ld)", morf, val);
       }
       else if (val % 1024 == 0) {
 	morf = val / 1024;
-	(void)sprintf(buf, "%ldk (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%ldk (%ld)", morf, val);
       }
       else {
-	(void)sprintf(buf, "%ld", val);
+	(void)loc_snprintf(buf, buf_size, "%ld", val);
       }
       
       len = strlen(buf);
@@ -3615,7 +3617,8 @@ int	argv_value_string(const argv_t *argv_entry_p, char *buf,
 	ret = len;
       }
       else {
-	(void)sprintf(details, " (1st of %d entries)", arr_p->aa_entry_n);
+	(void)loc_snprintf(details, sizeof(details), " (1st of %d entries)",
+			   arr_p->aa_entry_n);
 	strncpy(buf + len, details, buf_size - len);
 	buf[buf_size - 1] = '\0';
 	ret = strlen(buf);
