@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.113 1998/11/10 20:28:07 gray Exp $
+# $Id: Makefile.in,v 1.114 1998/11/12 21:42:21 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -12,7 +12,7 @@ OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
-DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
+DOCS	= dmalloc.texi dmalloc.info dmalloc.ps dmalloc.html dmalloc_toc.html
 
 DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
@@ -39,7 +39,7 @@ INFOFILE= dmalloc.info
 #
 FLS	=  conf.h.in configure.in config.help \
 	ChangeLog Manifest INSTALL PERMISSIONS NEWS NOTES README TODO \
-	dmallocrc dmalloc.texi $(INFOFILE) \
+	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html dmalloc_toc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
@@ -52,7 +52,8 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/dmalloc_summarize.pl contrib/next_notes contrib/ra_info.pl \
 	contrib/stratus_ftx_notes
 
-DOCFLS	= dmalloc.ps texinfo.tex
+DOCFLS	= README INSTALL dmalloc.texi $(INFOFILE) dmalloc.html \
+	dmalloc_toc.html dmalloc.ps texinfo.tex
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -93,11 +94,11 @@ installftp :: README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 
 # put situation specific lines here
-dmalloc.h.2 : configure
-	$(SHELL) configure -v
+dmalloc.h.2 : config.status
+	$(SHELL) config.status
 
-settings.h : $(srcdir)/settings.dist $(srcdir)/configure
-	$(SHELL) $(srcdir)/configure -v
+settings.h : $(srcdir)/settings.dist config.status
+	$(SHELL) config.status
 
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 	rm -f $(.TARGET) $(.TARGET).t
@@ -165,16 +166,21 @@ continuous :: $(TEST)
 			$(TEST) -n -t 100000 ;\
 		); done
 
-port :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
+port :: $(FLS) $(CONTFLS) Makefile.all.in
 	@ answer 'Is it okay to remove the $(.TARGET) directory? '
 	rm -rf $(.TARGET)
 	mkdir $(.TARGET) $(.TARGET)/contrib
 	cp $(FLS) Makefile.all.in $(.TARGET)
-	cp $(DOCFLS) $(.TARGET)
 	cp $(CONTFLS) $(.TARGET)/contrib
 	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
+
+portdocs :: $(DOCFLS)
+	@ answer 'Is it okay to remove the $(.TARGET) directory? '
+	rm -rf $(.TARGET)
+	mkdir $(.TARGET)
+	cp $(DOCFLS) $(.TARGET)
 
 dmalloc.ps : dmalloc.texi
 	rm -rf work
@@ -182,6 +188,10 @@ dmalloc.ps : dmalloc.texi
 	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; \
 		dvips -o ../$(.TARGET) dmalloc.dvi )
 	rm -rf work
+
+dmalloc.html : $(srcdir)/dmalloc.texi
+	rm -f $@
+	texi2html -menu -glossary -verbose $(srcdir)/dmalloc.texi
 
 dmalloc.dvi : dmalloc.texi
 	rm -rf work
@@ -250,10 +260,10 @@ $(INFOFILE) : $(srcdir)/dmalloc.texi
 #
 # auto configure settings
 #
-Makefile : $(srcdir)/Makefile.in
+Makefile : $(srcdir)/Makefile.in config.status
 	$(SHELL) config.status
 
-conf.h : $(srcdir)/conf.h.in
+conf.h : $(srcdir)/conf.h.in config.status
 	$(SHELL) config.status
 
 config.status : $(srcdir)/configure
