@@ -1,5 +1,7 @@
 2003-06-10  Gray Watson  <gray@outside.256.com>
 
+	* Releasing version 5.2.0.
+
 	* Renamed the "max memory space wasted" to "max unused memory
 	space" to indicate that it is not the users fault.
 
@@ -20,8 +22,8 @@
 	* Added new logfile process with %h hostname, %t time, %p
 	process-id, and %i for thread-id.
 
-	* Removed the old logfile % processing.  %d, %l, or %u no long
-	expand to the pid.
+	* Removed the old logfile % processing.  %d, %l, or %u no longer
+	expands to the pid.
 
 	* Added LOG_PID to drop the pid on each line of the logfile.
 
@@ -1997,5 +1999,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.298 2003/06/10 18:46:59 gray Exp $
+$Id: ChangeLog,v 1.299 2003/06/10 19:44:48 gray Exp $
 -------------------------------------------------------------------------------

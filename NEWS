@@ -1,6 +1,27 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.107 2003/06/08 21:26:17 gray Exp $
+$Id: NEWS,v 1.108 2003/06/10 19:44:48 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.2.0:
+
+	* Renamed the "max memory space wasted" to "max unused memory space".
+	* Added PDF documentation files to the installation.
+	* Fixed a problem with the global Makefile and dmalloc_t.  Thanks Bert.
+	* Added new logfile expansion of %u as getuid() output.
+	* Added new logfile expansion of %h as gethostname() output.
+	* Added new logfile expansion of %t as time() output.
+	* Added new logfile expansion of %p as getpid() output.
+	* Added new logfile expansion of %i as thread-id output.
+	* Removed the old logfile % processing.  %d no longer expands to pid.
+	* Added LOG_PID to settings.dist to log pid on each line of logfile.
+	* Added LOG_REOPEN to reopen log if pid changes (fork).  Thanks James.
+	* Renamed LOG_ITERATION_COUNT to LOG_ITERATION in settings.dist.
+	* Renamed STORE_SEEN_COUNT to LOG_PNT_SEEN_COUNT in settings.dist.
+	* Renamed STORE_ITERATION_COUNT to LOG_PNT_ITERATION in settings.dist.
+	* Renamed STORE_TIME to LOG_PNT_TIME in settings.dist.
+	* Renamed STORE_TIMEVAL to LOG_PNT_TIMEVAL in settings.dist.
+	* Renamed LOG_THREAD_ID to LOG_PNT_THREAD_ID in settings.dist.
+	* Improved the log_stats and log_changed output a bit.
 
 Version 5.1.0:
 

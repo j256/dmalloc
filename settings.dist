@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.61 2003/06/10 00:24:43 gray Exp $
+ * $Id: settings.dist,v 1.62 2003/06/10 19:44:49 gray Exp $
  */
 
 /*
@@ -241,8 +241,10 @@
  * If the getpid() function is available, notice when the pid of the
  * process changes and reopen the logfile.  This is handy when you are
  * using dmalloc with a program which forks and you want the separate
- * forked programs to have separate logs.  Use with the %p pid
- * expansion in the logfile name.
+ * forked programs to have separate logs.
+ *
+ * NOTE: This only works if the %p string is in the logfile name
+ * otherwise the log might reopen and clobber the existing log.
  */
 #define LOG_REOPEN 1
 

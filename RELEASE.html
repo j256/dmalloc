@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.0.2 </title>
+<title> Dmalloc Release Notes - 5.2.0 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.1.0 <br />
+Version: Release 5.2.0 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.0.2.html">5.0.2</a> <br />
-Date: June 8, 2003
+Last-Version: <a href="dmalloc-5.1.0.html">5.1.0</a> <br />
+Date: June 10, 2003
 </h4>
 
 <p>
@@ -26,22 +26,42 @@ Date: June 8, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Mostly a bug fix release but I made some changes to the
-dmalloc_examine arguments so a minor release it is. </p>
+<p> Quick feature release here to fold in a couple of changes in the
+last couple of days.  Added the ability to put %p, %t, and other %
+strings in the logfile path and have then be expanded to
+<tt>getpid()</tt> and <tt>time()</tt> output respectively.  More
+documentation online. </p>
 
 <h3><a name="func"> New Functionality </a></h3>
 
 <ul>
 
-<li> Expanded the dmalloc_examine function to be able to return more
-information about a pointer.  This breaks the API for this function
-unfortunately. </li>
+<li> <p> Added new expansion of the -l --logfile environment setting.
+%h as gethostname(), %p as getpid(), %t as time(), %u as getuid(), and
+%i as thread-id.  So you can, for example, use <tt> dmalloc -l
+log.%u.%t </tt> and get logfiles in the form of: <tt>
+log.1001.1055273186 </tt> where 1001 is your user-id (under Unix) and
+1055273186 is the time in seconds. </p>
 
-<li> Improved the statistics output to the logfile. </li>
+<p> NOTE: You must install the 5.2.0 version of the dmalloc utility
+for this to work. </p>
+</li>
 
-<li> Added the tsecs perl script to the contrib/ subdirectory.  The
-tsecs script converts time in epoch-seconds (which is by default
-written into the logfile) into a readable time/date string. </li>
+<li> Added LOG_PID to the settings.dist config file.  Set to 1 to have
+dmalloc log the PID on each line of the logfile. q</li>
+
+<li><p> Added LOG_REOPEN to the settings.dist config file.  If set to 1
+(the default) it will reopen the logfile if the process-id changes.
+This will happen when the process forks.  It will only open the
+logfile if the %p string is in the logpath otherwise the reopened
+logfile might overwrite the initial one. </p>
+
+<p> NOTE: I removed the old logfile % processing.  %d no long expands
+to the process id. </p>
+</li>
+
+<li> Improved the dmalloc_log_stats, dmalloc_log_unfreed, and
+dmalloc_log_changed output. </li>
 
 </ul>
 
@@ -49,8 +69,7 @@ written into the logfile) into a readable time/date string. </li>
 
 <ul>
 
-<li> The check-lists debug token has been removed since it is no
-longer valid with the new memory admin structures. </li>
+<li> The -l --logfile argument now takes special % strings.  See above. </li>
 
 </ul>
 
@@ -58,8 +77,15 @@ longer valid with the new memory admin structures. </li>
 
 <ul>
 
-<li> Removed the PROTECT_BLOCKS entry because it was unused and
-unimplemented. </li>
+<li> Added LOG_PID setting.  See above. </li>
+<li> Added LOG_REOPEN setting.  See above. </li>
+
+<li> Renamed LOG_ITERATION_COUNT to LOG_ITERATION. </li>
+<li> Renamed STORE_SEEN_COUNT to LOG_PNT_SEEN_COUNT. </li>
+<li> Renamed STORE_ITERATION_COUNT to LOG_PNT_ITERATION. </li>
+<li> Renamed STORE_TIME to LOG_PNT_TIME. </li>
+<li> Renamed STORE_TIMEVAL to LOG_PNT_TIMEVAL. </li>
+<li> Renamed LOG_THREAD_ID to LOG_PNT_THREAD_ID. </li>
 
 </ul>
 
@@ -71,24 +97,16 @@ None.
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
-<ul>
-
-<li> The arguments to dmalloc_examine were changed to allow this
-function to return more information about a pointer.  This was done to
-help the test program probe various information about a pointer. </li>
-
-<li> Greatly expanded the dmalloc_t program to test specific bugs as
-they were found.  Hope this will become a good regression test
-utility. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <h3><a name="env"> Environmental Variable Changes </a></h3>
 
 <ul>
 
-<li> The check-lists debug token has been removed since it is no
-longer valid with the new memory admin structures. </li>
+<li> The log=... section now takes special % strings.  See
+above. </li>
 
 </ul>
 
@@ -96,21 +114,9 @@ longer valid with the new memory admin structures. </li>
 
 <ul>
 
-<li> Fixed the FREED_POINTER_DELAY functionality where pointers that
-have just been freed can not be reused until a certain number of
-malloc calls have been made. </li>
-
-<li> Fixed the never-reuse feature where pointers will never be reused
-once freed. </li>
-
-<li> Fixed a problem where a call to dmalloc_log_changed would wipe
-out allocate table information. </li>
-
-<li> Found and fixed a problem where the last-used mark was not being
-set properly. </li>
-
-<li> Found and fixed a bad problem where the leaked memory was not
-being reported correctly.  Very bad. </li>
+<li> Fixed a problem with the global Makefile and dmalloc_t where some
+architectures would pick up the old shared libraries while building
+the new test program. </li>
 
 </ul>
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.108 2003/06/10 14:33:40 gray Exp $
+ * $Id: error.c,v 1.109 2003/06/10 19:44:49 gray Exp $
  */
 
 /*
@@ -129,6 +129,7 @@ static	int	outfile_fd = -1;		/* output file descriptor */
 /* the following are here to reduce stack overhead */
 static	char	error_str[1024];		/* error string buffer */
 static	char	message_str[1024];		/* message string buffer */
+static	char	log__str[1024];		/* message string buffer */
 
 /*
  * void _dmalloc_open_log
@@ -500,7 +501,9 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   }
   
 #if HAVE_GETPID && LOG_REOPEN
-  {
+  if (dmalloc_logpath != NULL) {
+    char	*log_p;
+    
     /*
      * This static pid will be checked to make sure it doesn't change.
      * We make it long in case it's big and we hope it will promote if
@@ -513,9 +516,17 @@ void	_dmalloc_vmessage(const char *format, va_list args)
     if (new_pid != current_pid) {
       /* NOTE: we need to do this _before_ the reopen otherwise we recurse */
       current_pid = new_pid;
+      
+      /* if the new pid doesn't match the old one then reopen it */
       if (current_pid >= 0) {
-	/* if the new pid doesn't match the old one then reopen it */
-	_dmalloc_reopen_log();
+	
+	/* this only works if there is a %p in the logpath */
+	for (log_p = dmalloc_logpath; *log_p != '\0'; log_p++) {
+	  if (*log_p == '%' && *(log_p + 1) == 'p') {
+	    _dmalloc_reopen_log();
+	    break;
+	  }
+	}
       }
     }
   }
