@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.45 1997/12/08 09:34:46 gray Exp $
+ * $Id: chunk_loc.h,v 1.46 1997/12/08 09:50:52 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -55,7 +55,7 @@
 #define BLANK_CHAR		'\305'		/* to blank free space with */
 
 /* log-bad-space info */
-#define SPECIAL_CHARS		"e\033^^\"\"''\\\\n\nr\rt\tb\bf\fa\007"
+#define SPECIAL_CHARS		"\"\"''\\\\n\nr\rt\tb\bf\fa\007"
 
 /*
  * the default smallest allowable allocations in bits.  this is
