@@ -1,3 +1,15 @@
+Fri Sep 18 13:37:23 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added recalloc support into the library.  Thanks to Nick
+        Albright for suggesting it.
+
+	* Cleaned up the calloc special handling and accounting.
+        Simplified the local malloc functions in malloc.c.
+
+	* Added valloc support to the library after it was determined that
+        OSF thread libraries still use the function.  memalign will be
+        much harder to add.
+
 Thu Sep 17 08:42:14 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Improved the pthread autoconfiguration and the code.  Removed
@@ -10,12 +22,12 @@ Thu Sep 17 08:42:14 1998  Gray Watson  <gray@burger.letters.com>
 	the race conditions there and improved the handling of default
 	values.
 
-	* Added FTX return.h information.  Thanks Wim.
+	* Added FTX return.h information.  Thanks to Wim van Duuren.
 
 Wed Sep 16 16:28:49 1998  Gray Watson  <gray@burger.letters.com>
 
-	* Added strdup ifdef in the dmalloc.h and assocated leap
-	functions.
+	* Added direct strdup support to the library with the assocated
+	leap functions.
 
 Tue Feb 10 21:12:40 1998  Gray Watson  <gray@burger.letters.com>
 
@@ -1256,5 +1268,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.185 1998/09/17 16:08:37 gray Exp $
+$Id: ChangeLog,v 1.186 1998/09/18 23:33:19 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.104 1998/09/17 15:23:35 gray Exp $
+# $Id: Makefile.in,v 1.105 1998/09/18 23:33:20 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -8,8 +8,10 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
-	malloc.o
+OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o
+MALLOC_OBJ = malloc.o
+MALLOC_TH_OBJ = malloc_th.o
+
 # NOTE:
 # not argv.c because from argv module
 # not compat.c because of HAVE_...,
@@ -18,7 +20,8 @@ FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c heap.c malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
-	-DHAVE_STRING_H=@HAVE_STRING_H@
+	-DHAVE_STRING_H=@HAVE_STRING_H@ \
+	$(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
 
@@ -29,6 +32,7 @@ LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= /usr/local/local
 TEST	= dmalloc_t
 LIBRARY	= libdmalloc.a
+LIB_TH	= libdmallocth.a
 LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
 INFOFILE= dmalloc.info
@@ -61,7 +65,7 @@ all :: $(LIBRARY) $(LIB_DIS) $(UTIL)
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL) $(INFOFILE)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL) $(INFOFILE)
 	rm -f part.? dmalloc.h
 	rm -f INSTALL PERMISSIONS README README_ftp
 
@@ -80,6 +84,10 @@ installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
 
 install :: installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
+	@ echo "To install thread version of library type 'make installth'"
+
+installth ::
+	install -cevr -m 644 $(LIB_TH) $(DESTDIR)/lib
 
 installftp :: README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README.txt
@@ -100,18 +108,30 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 		$(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-$(LIBRARY) : $(OBJS)
-	ar cr $(LIBRARY) $?
+$(LIBRARY) : $(OBJS) $(MALLOC_OBJ)
+	ar cr $(.TARGET) $?
+	ranlib $(.TARGET)
+
+$(LIB_TH) : $(OBJS) $(MALLOC_TH_OBJ)
+	ar cr $(.TARGET) $?
 	ranlib $(.TARGET)
 
 $(LIB_DIS) : dmalloc_lp.o
-	ar cr $(LIB_DIS) $?
+	ar cr $(.TARGET) $?
 	ranlib $(.TARGET)
 
 $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 	rm -f $(.TARGET)
 	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
 	mv a.out $(.TARGET)
+
+threads : $(LIB_TH)
+
+# special _th version of malloc.o with the LOCK_THREAD variable defined to 1
+malloc_th.o : malloc.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
+		-c malloc.c -o $(.TARGET)
 
 port :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
 	@ answer 'Is it okay to remove the $(.TARGET) directory? '

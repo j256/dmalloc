@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.71 1998/09/17 15:23:38 gray Exp $
+# $Id: Makefile.all.in,v 1.72 1998/09/18 23:33:20 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -30,9 +30,13 @@ LIBNAME	= dmalloc
 LIBRARY	= lib$(LIBNAME).a
 SHLIBRARY = lib$(LIBNAME).so
 
+# thread version of the library
+LIB_TH	= lib$(LIBNAME)th.a
+SHLIB_TH = lib$(LIBNAME)th.so
+
 # library with dmalloc disabled
-LIB_DIS	= libdmalloclp.a
-SHLIB_DIS = libdmalloclp.so
+LIB_DIS	= lib$(LIBNAME)lp.a
+SHLIB_DIS = lib$(LIBNAME)lp.so
 
 UTIL = dmalloc
 INFOFILE = dmalloc.info
@@ -51,16 +55,19 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = dmalloc.h
-OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o malloc.o
+OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o
+MALLOC_OBJ = malloc.o
+MALLOC_TH_OBJ = malloc_th.o
 
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
 
 all : $(LIBRARY) $(LIB_DIS) $(UTIL)
+	@echo "To make the thread version of the library type 'make threads'"
 
 clean :
 	rm -f a.out core *.o *.t
-	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL) dmalloc.h
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL) dmalloc.h
 
 realclean : clean
 
@@ -88,7 +95,12 @@ install : installdirs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
+	@echo "Enter 'make installth' to install thread library versions"
 	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
+
+installth : $(LIB_TH)
+	$(srcdir)/mkinstalldirs $(libdir)
+	$(INSTALL_DATA) $(LIB_TH) $(libdir)
 
 installinfo : $(INFOFILE)
 	$(srcdir)/mkinstalldirs $(infodir)
@@ -117,12 +129,16 @@ ${SHLIBRARY} : $(LIBRARY)
 	ld -shared -o $@.t -all $(LIBRARY) -all -soname $@ -none -lc
 	mv $@.t $@
 
-$(LIBRARY) : $(OBJS)
-	ar cr $(LIBRARY) $?
+$(LIBRARY) : $(OBJS) $(MALLOC_OBJ)
+	ar cr $@ $?
 	@RANLIB@ $@
 
+$(LIB_TH) : $(OBJS) $(MALLOC_TH_OBJ)
+	ar cr $@ $?
+	ranlib $@
+
 $(LIB_DIS) : dmalloc_lp.o
-	ar cr $(LIB_DIS) $?
+	ar cr $@ $?
 	@RANLIB@ $@
 
 noansi : dmalloc.h Deansify.pl
@@ -134,6 +150,14 @@ $(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o
 	rm -f $@
 	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
 	mv a.out $@
+
+threads : $(LIB_TH)
+
+# special _th version of malloc.o with the LOCK_THREADS variable defined to 1
+$(MALLOC_TH_OBJ) : malloc.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
+		-c malloc.c -o ./$@
 
 tests : $(TEST)
 
@@ -162,18 +186,19 @@ heavy : $(TEST) light
 	makeinfo --no-split $<
 
 #
-# auto configure settings
+# auto configure settings - uncomment if you are doing configure
+# development on the library
 #
-Makefile : $(srcdir)/Makefile.in
-	$(SHELL) config.status
 
-conf.h : $(srcdir)/conf.h.in
-	$(SHELL) config.status
+#Makefile : $(srcdir)/Makefile.in
+#	$(SHELL) config.status
 
-config.status : $(srcdir)/configure
-	$(SHELL) config.status --recheck
+#conf.h : $(srcdir)/conf.h.in
+#	$(SHELL) config.status
 
-# Uncomment if you are playing with the configure script
+#config.status : $(srcdir)/configure
+#	$(SHELL) config.status --recheck
+
 # $(srcdir)/configure : $(srcdir)/configure.in
 #	cd $(srcdir); autoconf
 
@@ -203,5 +228,8 @@ error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
 heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h error.h error_val.h heap.h
 malloc.o: malloc.c conf.h settings.h return.h dmalloc.h chunk.h \
+ compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
+ error_val.h heap.h dmalloc_lp.h
+malloc_th.o: malloc.c conf.h settings.h return.h dmalloc.h chunk.h \
  compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
  error_val.h heap.h dmalloc_lp.h
