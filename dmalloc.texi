@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.107 1995/09/02 20:05:36 gray Exp $
+@c $Id: dmalloc.texi,v 1.108 1995/09/02 20:48:24 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -160,10 +160,11 @@ Permission to use, copy, and modify this software for any
 granted.
 
 Although only commercial users are required to license the software,
-@emph{all} user registrations are greatly appreciated.  Licensees get a
+@emph{all} registrations are greatly appreciated.  Licensees get a
 registration file for the software (which cannot be distributed), a
 letter documenting their registered status, as well as product support
-and notification of free-upgrades.  @xref{Commercial License}.
+and notification of free-upgrades.  For more information about
+registration see the following section.  @xref{Commercial License}.
 
 @node Commercial License, Printed Manuals, Non-Commercial License, Copying
 @section Commercial License
