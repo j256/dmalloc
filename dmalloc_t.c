@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.66 1998/10/15 15:31:16 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.67 1998/10/15 15:33:27 gray Exp $";
 #endif
 
 /* external routines */
@@ -835,9 +835,8 @@ int	main(int argc, char **argv)
   argv_cleanup(arg_list);
   
   ret = malloc_verify(NULL);
-  if (! silent_b) {
-    (void)printf("Final malloc_verify returned '%s'\n",
-		 (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
+  if (ret != DMALLOC_VERIFY_NOERROR) {
+    (void)fprintf(stderr, "Final malloc_verify returned failure.\n");
   }
   
   if (dmalloc_errno == ERROR_NONE) {
