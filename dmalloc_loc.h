@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_loc.h,v 1.37 1997/12/05 21:09:42 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.38 1998/09/17 13:30:59 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -72,7 +72,13 @@
 #define	STDERR		2		/* fileno(stderr) */
 
 /*
- * min/max macros
+ * Default values for the file and line variables.
+ */
+#define DMALLOC_DEFAULT_FILE	0L
+#define DMALLOC_DEFAULT_LINE	0
+
+/*
+ * Min/max macros
  *
  * WARNING: these use their arguments multiple times which may be bad
  */
@@ -94,7 +100,7 @@
 #define BIT_IS_SET(v,f)		((v) & (f))
 
 /*
- * global malloc defines
+ * Global malloc defines
  */
 #define BLOCK_SIZE		(int)(1 << BASIC_BLOCK)	/* size of a block */
 
