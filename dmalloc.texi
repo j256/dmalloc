@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.104 1995/07/14 21:00:50 gray Exp $
+@c $Id: dmalloc.texi,v 1.105 1995/08/14 14:56:31 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -716,7 +716,7 @@ Macros}.
 @item Enable the debugging features by typing @kbd{dmalloc -l logfile
 -i 100 low} (for example).  This will:
 
-@itemize
+@itemize @bullet
 
 @item set the malloc log path to @file{logfile} (@kbd{-l logfile})
 
@@ -1304,13 +1304,16 @@ display the unfreed memory as:
 not freed: '0x45008|s3' (12 bytes) from 'ra=0x1f8f4'
 @end example
 
-In the above example, @samp{0x45008} was seen @samp{3} times.  The last
-time it was allocated, it was not freed.  How can a pointer be ``seen''
-3 times?  Let say you @code{strdup} a string of 12 characters and get
-address @samp{0x45008} -- this is #1 time the pointer is seen.  You then
-free the pointer (seen #2) but later @code{strdup} another 12 character
-string and it gets the @samp{0x45008} address from the free list (seen
-#3).
+The @code{STORE_SEEN_COUNT} option adds a @samp{|s#} qualifier to the
+address.  This means that the address in question was seen @samp{#} many
+times.  In the above example, the address @samp{0x45008} was seen
+@samp{3} times.  The last time it was allocated, it was not freed.
+
+How can a pointer be ``seen'' 3 times?  Let say you @code{strdup} a
+string of 12 characters and get address @samp{0x45008} -- this is #1
+time the pointer is seen.  You then free the pointer (seen #2) but later
+@code{strdup} another 12 character string and it gets the @samp{0x45008}
+address from the free list (seen #3).
 
 So to find out who is allocating this particular 12 bytes the 3rd time,
 try @samp{dmalloc -a 0x45008:3}.  The library will stop the program the
@@ -1318,6 +1321,12 @@ third time it sees the @samp{0x45008} address.  You then enter a
 debugger and put a break point at @code{dmalloc_error}.  Run the program
 and when the breakpoint is reached you can examine the stack frame to
 determine who called @code{strdup} to allocate the pointer.
+
+To not bother with the @code{STORE_SEEN_COUNT} feature, you can also run
+your program with the @samp{never-reuse} token enabled.  This token will
+cause the library to never reuse memory that has been freed.  Unique
+addresses are always generated.  This should be used with caution since
+it may cause your program to run out of memory.
 
 @node Fence-Post Overruns,  , Memory Leaks, Using a Debugger
 @subsection Diagnosing Fence-Post Overwritten Memory
@@ -1598,19 +1607,18 @@ space from sbrk
 
 @item never-reuse
 have the heap never use space that has been used before and freed.
-@emph{WARNING}: This should be used with caution since you may run out
-of heap space.
+@xref{Memory Leaks}.  @emph{WARNING}: This should be used with caution
+since you may run out of heap space.
 
 @item allow-nonlinear
 have the heap not complain when additional program functionality seems
-to have made use of the system's heap-allocation routines directly.
+to have made use of the system's heap-allocation routine @code{sbrk}
+directly.  This is now enabled by default since an increasing number of
+operating system functions seem to be doing this -- one example is the
+pthreads package.
 
 @emph{WARNING}: This should be used with caution since it may hide
 certain heap problems.
-
-@emph{NOTE}: If you are using the pthreads package, you will probably
-have to enable this since it seems to employ sbrk directly for some
-reason.
 
 @item allow-zero
 the library will not generate errors when a program asks for a 0 byte
