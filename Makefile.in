@@ -1,6 +1,8 @@
 #
-# $Id: Makefile.in,v 1.77 1995/06/20 22:37:09 gray Exp $
+# $Id: Makefile.in,v 1.78 1995/06/21 16:32:13 gray Exp $
 #
+
+SHELL	= /bin/sh
 
 HFLS	= dmalloc.h
 OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
@@ -29,7 +31,7 @@ UTIL	= dmalloc
 MANFILE	= dmalloc.info
 
 FLS	=  conf.h.in configure configure.in config.help \
-	ChangeLog Manifest INSTALL NEWS NOTES README TODO dmallocrc \
+	ChangeLog Manifest INSTALL LICENSE NEWS NOTES README TODO dmallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
@@ -51,7 +53,7 @@ clean ::
 	$(CLEAN)
 	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f part.? dmalloc.info dmalloc.h
-	rm -f INSTALL README README_ftp
+	rm -f INSTALL LICENSE README README_ftp
 
 distclean :: clean
 	rm -f configure config.status config.log config.cache conf.h
