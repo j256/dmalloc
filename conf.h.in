@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: conf.h.in,v 1.69 1999/03/04 16:49:54 gray Exp $
+ * $Id: conf.h.in,v 1.70 1999/03/04 17:22:48 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -162,6 +162,7 @@
 #define HAVE_TIME 0
 #define HAVE_CTIME 0
 #define HAVE_RANDOM 0
+#define HAVE_VPRINTF 0
 
 #define HAVE_RECALLOC 0
 #define HAVE_MEMALIGN 0

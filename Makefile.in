@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.116 1998/11/16 17:01:28 gray Exp $
+# $Id: Makefile.in,v 1.117 1999/03/04 17:22:36 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -12,7 +12,8 @@ OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
-DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
+DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
+	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
 	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ \
 	$(DEFINES)
