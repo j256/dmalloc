@@ -1,5 +1,9 @@
 Mon Mar  8 10:50:12 1999  Gray Watson  <gray@burger.letters.com>
 
+	* Releasing dmalloc version 4.2.0.
+
+	* Fixed long standing problem with the NEVER-REUSE token.
+
 	* Added memory tracking function so the user can register a
 	callback function to be run whenever a memory transaction occurs.
 
@@ -1418,5 +1422,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.211 1999/03/08 15:56:55 gray Exp $
+$Id: ChangeLog,v 1.212 1999/03/08 17:52:56 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,6 +1,19 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.84 1998/12/11 05:06:38 gray Exp $
+$Id: NEWS,v 1.85 1999/03/08 17:52:57 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.2.0:
+
+	* Added memory tracking function to be called on each mem transaction.
+	* Added DUMP_UNFREED_SUMMARY_ONLY variable to settings.dist.
+	* Added MEMORY_TABLE_SIZE and MEMORY_TABLE_LOG vars to settings.dist.
+	* Fixed problem with valloc exposed by moving to random().
+	* Fixed long standing problem with the NEVER-REUSE token.
+	* Added memory table code for grouping of allocated and non-freed mem.
+	* Removed a number of static variables for string buffers.
+	* Removed PERMISSION file and all references to commercial-ness.
+	* Moved to internal sprintf code for snprintf, etc..
+	* Added dmalloc_message to the exported list of functions.
 
 Version 4.1.2:
 

@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.162 1999/03/04 19:16:41 gray Exp $
+@c $Id: dmalloc.texi,v 1.163 1999/03/08 17:52:58 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -50,8 +50,8 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 4.1.2
-@subtitle November 1998
+@subtitle Version 4.2.0
+@subtitle March 1999
 @author Gray Watson
 
 @page
@@ -79,7 +79,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 4.1.2 -- December 1998
+Version 4.2.0 -- March 1999
 @end ifinfo
 
 @cindex introduction
@@ -101,10 +101,10 @@ support for the debugging of threaded programs.  @xref{Using With
 Threads}.
 
 The package includes the library, configuration scripts, debug utility
-application, test program, and extensive documentation (formats: text,
-texi, info, and ps).  Online documentation as well as the full source is
-available at URL @code{http://www.dmalloc.com/}.  Details on the
-library's mailing list are available there as well.
+application, test program, and documentation.  Online documentation as
+well as the full source is available at URL
+@code{http://www.dmalloc.com/}.  Details on the library's mailing list
+are available there as well.
 
 My contact information is available on the web page.  I can be reached
 with any questions or feedback.  Please include the version number of
