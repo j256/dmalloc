@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.35 1993/09/07 04:57:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.36 1993/09/10 21:16:09 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -575,7 +575,8 @@ verify heap administrative structure
 examine internal heap linked-lists
 
 @item check-free
-check to see if free space has been overwritten
+check to see if free space has been overwritten.  NOTE: this enabled
+free-blank also.
 
 @item check-funcs
 check the arguments of some functions (mostly string operations) looking

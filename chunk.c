@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.48 1993/09/07 05:01:39 gray Exp $";
+  "$Id: chunk.c,v 1.49 1993/09/10 21:16:03 gray Exp $";
 #endif
 
 /* checking information */
@@ -119,7 +119,7 @@ LOCAL	char	*expand_buf(const void * buf, const int size)
   char	 	*outp;
   
   for (sizec = 0, outp = out, bufp = (void *)buf; sizec < size;
-       sizec++, ((char *)bufp)++) {
+       sizec++, bufp = (char *)bufp + 1) {
     char	*specp;
     
     /* handle special chars */
@@ -617,7 +617,8 @@ LOCAL	void	*get_dblock(const int bitc, dblock_t ** admp)
     free_space_count	+= 1 << bitc;
   }
   
-  if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+  if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)
+      || BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE))
     (void)memset((char *)pnt + (1 << bitc), FREE_CHAR,
 		 BLOCK_SIZE - (1 << bitc));
   
@@ -1178,8 +1179,7 @@ EXPORT	int	_chunk_heap_check(void)
 	      (1 << dblockp->db_bblock->bb_bitc);
 	  
 	  /* should we verify that we have a block of FREE_CHAR? */
-	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)
-	      && BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)) {
 	    for (bytep = (char *)pnt;
 		 bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitc);
 		 bytep++)
@@ -1287,8 +1287,7 @@ EXPORT	int	_chunk_heap_check(void)
       freec--;
       
       /* should we verify that we have a block of FREE_CHAR? */
-      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)
-	  && BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)) {
 	for (bytep = (char *)bblockp->bb_mem;
 	     bytep < (char *)bblockp->bb_mem + BLOCK_SIZE; bytep++)
 	  if (*bytep != FREE_CHAR) {
@@ -1979,7 +1978,8 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     free_space_count	+= 1 << bitc;
     
     /* should we set free memory with FREE_CHAR? */
-    if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+    if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)
+	|| BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE))
       (void)memset(pnt, FREE_CHAR, 1 << bitc);
     
     return FREE_NOERROR;
@@ -2064,7 +2064,8 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     bblockp->bb_next	= first;
     
     /* should we set free memory with FREE_CHAR? */
-    if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+    if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)
+	|| BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE))
       (void)memset(pnt, FREE_CHAR, BLOCK_SIZE);
   }
   
