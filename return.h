@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.14 1997/03/22 17:29:10 gray Exp $
+ * $Id: return.h,v 1.15 1997/11/05 16:26:10 gray Exp $
  */
 
 /*
@@ -178,6 +178,21 @@
 #endif /* m88k */
 
 #endif /* USE_RET_ADDRESS */
+
+/*
+ * SGI compilers implement a C level method of accessing the return
+ * address by simply referencing the __return_address symbol. -- James
+ * Bonfield <jkb@mrc-lmb.cam.ac.uk>
+ */
+#if defined(__sgi)
+
+#define SET_RET_ADDR(file, line)	\
+  do { \
+    if (file == DMALLOC_DEFAULT_FILE) \
+      file = (void *)__return_address; \
+  } while(0)
+
+#endif /* __sgi */
 
 /********************************** default **********************************/
 
