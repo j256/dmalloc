@@ -34,13 +34,13 @@
 #include "conf.h"
 
 #include "compat.h"
-#include "dbg_values.h"
+#include "debug_val.h"
 #include "error.h"
 #include "malloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.33 1993/11/23 09:04:03 gray Exp $";
+  "$Id: error.c,v 1.34 1993/12/20 19:15:36 gray Exp $";
 #endif
 
 /*

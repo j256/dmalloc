@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.12 1993/12/20 07:28:49 gray Exp $
+$Id: NEWS,v 1.13 1993/12/20 19:15:20 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.0:
 
+	* Renamed dbg_tokens.h -> debug_tok.h and dbg_values.h -> debug_val.h
 	* Added -V option to malloc_dbg and desc field for debug-token list.
 	* Added a debugging section to the manual.
 	* Added light and heavy makefile targets for automatic testing.

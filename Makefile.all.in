@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.31 1993/11/23 09:37:12 gray Exp $
+# $Id: Makefile.all.in,v 1.32 1993/12/20 19:15:17 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -140,18 +140,17 @@ heavy : $(TEST) light
 # These dependencies are automatically generated.  Do not edit by hand.
 #
 
-arg_check.o : arg_check.c malloc_dbg.h conf.h chunk.h malloc_loc.h dbg_values.h \
+arg_check.o : arg_check.c malloc_dbg.h conf.h chunk.h malloc_loc.h debug_val.h \
   error.h arg_check.h 
 chunk.o : chunk.c malloc_dbg.h conf.h chunk.h malloc_loc.h chunk_loc.h compat.h \
-  dbg_values.h error.h error_val.h heap.h version.h 
+  debug_val.h error.h error_val.h heap.h version.h 
 compat.o : compat.c malloc_dbg.h conf.h compat.h malloc_loc.h 
-error.o : error.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
-  error.h 
-heap.o : heap.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
+error.o : error.c malloc_dbg.h conf.h compat.h malloc_loc.h debug_val.h error.h 
+heap.o : heap.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h debug_val.h \
   error.h error_val.h heap.h 
-malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
+malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h debug_val.h \
   error.h error_str.h error_val.h heap.h malloc_lp.h return.h 
 malloc_dbg.o : malloc_dbg.c argv/argv.h malloc_dbg.h conf.h compat.h malloc_loc.h \
-  dbg_tokens.h dbg_values.h version.h 
-malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h 
-malloc_t.o : malloc_t.c malloc_dbg.h 
+  debug_tok.h debug_val.h error_str.h error_val.h version.h 
+malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h malloc_lp.h 
+malloc_t.o : malloc_t.c argv/argv.h malloc_dbg.h conf.h 

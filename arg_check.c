@@ -31,14 +31,14 @@
 #include "conf.h"
 
 #include "chunk.h"
-#include "dbg_values.h"
+#include "debug_val.h"
 #include "error.h"
 #include "malloc_loc.h"
 #include "arg_check.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: arg_check.c,v 1.5 1993/11/23 07:41:11 gray Exp $";
+  "$Id: arg_check.c,v 1.6 1993/12/20 19:15:22 gray Exp $";
 #endif
 
 #if HAVE_BCMP

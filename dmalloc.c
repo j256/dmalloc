@@ -38,7 +38,7 @@
 #include "conf.h"
 
 #include "compat.h"
-#include "dbg_tokens.h"
+#include "debug_tok.h"
 #include "error_str.h"
 #include "error_val.h"
 #include "malloc_loc.h"
@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.32 1993/12/20 07:28:58 gray Exp $";
+  "$Id: dmalloc.c,v 1.33 1993/12/20 19:15:52 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */

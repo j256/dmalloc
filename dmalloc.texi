@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.43 1993/12/20 07:44:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.44 1993/12/20 19:15:45 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1014,7 +1014,7 @@ been.
 @menu
 * Malloc_dbg Program::          Env variable setting utility.
 * RC File::                     Format of the run-time configuration file.
-* Debugging with the Library::  How to debug problems with the library
+* Debugging with the Library::  How to debug problems with the library.
 @end menu
 
 @node Malloc_dbg Program, RC File,  , Running
@@ -1315,9 +1315,7 @@ program given the right circumstances.
 not freed: 0x45008 (      12 bytes) from 'ra=0x1f8f4'
 not freed: 0x45028 (      12 bytes) from 'unknown'
 not freed: 0x45048 (      10 bytes) from 'argv.c:1077'
-not freed: 0x46008 (      40 bytes) from 'argv.c:1088'
-...
-  known memory not freed: 2 pointers, 50 bytes
+  known memory not freed: 1 pointer, 10 bytes
 unknown memory not freed: 2 pointers, 24 bytes
 @end example
 
@@ -1329,15 +1327,16 @@ originated from.  To get more information from the return-address,
 @xref{Return Address}.
 
 The systems which cannot provide return-address information show
-@samp{unknown} instead like the 2nd line from the sample.
+@samp{unknown} instead as in the 2nd line from the sample above.
 
-The 3rd and 4th lines are when you use the uppercase macros from
-@file{malloc_dbg.h}.  These allow specific file/line information to be
-included which makes the debugging easy.
+The @samp{argv.c:@dots{}} information from the 3rd line comes from the
+calls which used the uppercase macros from @file{malloc_dbg.h}.  These
+allow specific file/line information to be included which makes the
+locating of the callers much easier.
 
 At the bottom of the sample it totals the memory for you and breaks it
-down to known memory (that which supplied the file/line information) and
-unknown (the rest).
+down to known memory (those calls which supplied the file/line
+information) and unknown (the rest).
 
 @node Fence-Post Overruns,  , Memory Leaks, Debugging with the Library
 @subsection Diagnosing fence-post overwritten memory.

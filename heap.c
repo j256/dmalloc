@@ -31,7 +31,7 @@
 
 #include "chunk.h"
 #include "compat.h"
-#include "dbg_values.h"
+#include "debug_val.h"
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.31 1993/11/23 07:41:45 gray Exp $";
+  "$Id: heap.c,v 1.32 1993/12/20 19:15:39 gray Exp $";
 #endif
 
 /* external routines */

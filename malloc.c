@@ -32,7 +32,7 @@
 
 #include "chunk.h"
 #include "compat.h"
-#include "dbg_values.h"
+#include "debug_val.h"
 #include "error.h"
 #include "error_str.h"
 #include "error_val.h"
@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.54 1993/12/20 04:38:03 gray Exp $";
+  "$Id: malloc.c,v 1.55 1993/12/20 19:15:41 gray Exp $";
 #endif
 
 /*

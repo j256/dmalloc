@@ -34,7 +34,7 @@
 #include "chunk.h"
 #include "chunk_loc.h"
 #include "compat.h"
-#include "dbg_values.h"
+#include "debug_val.h"
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.64 1993/12/06 06:21:28 gray Exp $";
+  "$Id: chunk.c,v 1.65 1993/12/20 19:15:26 gray Exp $";
 #endif
 
 /*

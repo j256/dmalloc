@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.40 1993/12/20 06:30:17 gray Exp $
+# $Id: Makefile.in,v 1.41 1993/12/20 19:15:19 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -28,8 +28,8 @@ MANFILE	= malloc.info
 PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
 	configure.help \
 	ChangeLog Manifest NEWS NOTES README TODO mallocrc \
-	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
-	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
+	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
+	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
 	malloc_dbg.c malloc_dbg.[12] malloc_lp.[ch] malloc_loc.h return.h \
 	version.h malloc_t.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
@@ -43,8 +43,8 @@ SHAR1	= conf.h.in const.h.in Makefile.in configure configure.in \
 	ChangeLog Manifest
 SHAR2	= chunk.[ch] chunk_loc.h
 SHAR3	= NEWS NOTES README TODO mallocrc \
-	arg_check.[ch] compat.[ch] dbg_tokens.h \
-	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] \
+	arg_check.[ch] compat.[ch] debug_tok.h \
+	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc_lp.c
 SHAR4	= malloc_lp.h malloc_loc.h return.h \
 	version.h malloc_t.c malloc.info
