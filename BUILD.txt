@@ -10,15 +10,17 @@ library gets released.
 
 3) Update the RELEASE.html file.
 
-4) cvs tag the release with dmalloc_release_X_X_X[_bX]
+4) Check in all files.
 
-5) make port
+5) cvs tag the release with dmalloc_release_X_X_X[_bX]
 
-6) Rename the port directory to be dmalloc-X.X.X[-betaX]
+6) make port
 
-7) Tarzip the dmalloc-X.X.X[-betaX] directory.
+7) Rename the port directory to be dmalloc-X.X.X[-betaX]
 
-8) Copy down to Linux, OSF, FreeBSD, other operation systems and run
+8) Tarzip the dmalloc-X.X.X[-betaX] directory.
+
+9) Copy down to Linux, OSF, FreeBSD, other operation systems and run
 tests.
 
 	- [ maybe mkdir x ; cd x ]
