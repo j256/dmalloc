@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.107 2003/05/16 16:06:24 gray Exp $
+ * $Id: dmalloc.c,v 1.108 2003/05/20 04:00:47 gray Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ static	argv_t	args[] = {
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
     "token(s)",			"del tokens from current debug" },
   { LIMIT_ARG,	"memory-limit",	ARGV_U_SIZE,	&limit_arg,
-    "value",			"limit allocates to this amount" },
+    "value",			"limit allocations to this amount" },
   { 'n',	"no-changes",	ARGV_BOOL_NEG,	&make_changes_b,
     NULL,			"make no changes to the env" },
   { THREAD_LOCK_ON_ARG, "lock-on", ARGV_INT,	&thread_lock_on,
