@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.14 1994/03/03 03:50:19 gray Exp $
+$Id: TODO,v 1.15 1994/03/17 05:34:40 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -53,6 +53,15 @@ CHECKING:
 
 -------------------------------------------------------------------------------
 
+DOCUMENTATION:
+
+- add more to the debugging section:
+	- use of MALLOC_START because a failure is found at some point
+		to find the last malloc call
+	- use of MALLOC_FUNC_CHECK by inserting malloc_dbg.h and FUNC_CHECK on
+
+-------------------------------------------------------------------------------
+
 GENERAL:
 
 - maybe have some sort of memory-stack support:
@@ -61,6 +70,10 @@ GENERAL:
 	- have a maximum ~100 entry stack
 	- count how deep we are and if we go over don't store but track	so
 		when we drop below 100 it will be correct info
+	- if we are at an unknown spot, display the top of the stack
+- print out the iteration-count for help with the MALLOC_START variable.
+	- if an error happens you can set malloc_start to one less to break
+		before the error happens and step forward
 - maybe some sort of cheap crc on memory in non-freed memory sections so
 	you can see what portions of memory changed (check tripwire)
 - maybe provide support for reference counts on allocations:
