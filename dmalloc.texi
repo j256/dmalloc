@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.124 1997/11/06 14:15:39 gray Exp $
+@c $Id: dmalloc.texi,v 1.125 1997/11/06 14:20:27 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -2117,7 +2117,7 @@ The EFF is a organization committed to ensuring that the rules,
 regulations, and laws being applied to emerging communications
 technologies are in keeping with our society's highest traditions of the
 free and open flow of ideas and information while protecting personal
-privacy.  <eff@@eff.org>
+privacy.  http://www.eff.org/
 
 @item Computer Professionals for Social Responsibility (CPSR)
 @cindex CPSR
@@ -2126,7 +2126,7 @@ CPSR is a public-interest alliance of computer scientists and others
 interested in the impact of computer technology on society.  We work to
 influence decisions regarding the development and use of computers
 because those decisions have far-reaching consequences and reflect basic
-values and priorities.  <cpsr@@csli.stanford.edu>
+values and priorities.  http://www.cpsr.org/
 
 @item Berkeley Software Design, Inc. (BSDI)
 @cindex BSDI
