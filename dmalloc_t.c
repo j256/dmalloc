@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.60 1997/12/08 04:15:20 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.61 1997/12/08 09:32:56 gray Exp $";
 #endif
 
 /* external routines */
@@ -572,8 +572,6 @@ static	void	do_interactive(void)
     
 #if HAVE_STRDUP
     if (strncmp(line, "strdup", len) == 0) {
-      int	size;
-      
       (void)printf("Enter a string to strdup: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
@@ -608,7 +606,7 @@ static	void	do_interactive(void)
     }
     
     if (strncmp(line, "overwrite", len) == 0) {
-      char	*overwrite = "WOW!";
+      char	*overwrite = "OVERWRITTEN";
       
       pnt = get_address();
       memcpy((char *)pnt, overwrite, strlen(overwrite));
