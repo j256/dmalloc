@@ -1,13 +1,16 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.9 1992/11/14 21:19:16 gray Exp $
+$Id: NOTES,v 1.10 1992/11/14 21:45:12 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNING:
-	- watch for heaps growing up or down (all subtraction or other position
-		dependent code must be changed to macros in heap.h) >,<,-,+,etc
-	- watch for bounds checking assuming + or - code.
+
+- watch for heaps growing up or down (all subtraction or other position
+	dependent code must be changed to macros in heap.h) >,<,-,+,etc
+- watch for bounds checking assuming + or - code.
 
 -------------------------------------------------------------------------------
+
+GENERAL:
 
 - dumping core on errors and then continuing did not look to be a problem to
 	implement.  However it became "not recommended" as soon as it was
@@ -50,6 +53,18 @@ DBLOCK METHOD:
 - the bblock tells you of the number of bits in the chunk, etc.
 - have some way to run through the dblock admin slot blocks to verify that
 	crc's have not been overwritten.
+
+-------------------------------------------------------------------------------
+
+NEW ALGORITHMS:
+
+- maybe have some sort of bitmask for free space/used space like BSD disk
+	blocks
+- look in your free_list for first block.
+	- if NULL then move up a bin and try to divide
+	- continue until up X blocks then sbrk a new smaller block
+- maybe try a finite number of free_bins above the one you want to limit
+	fragmentation, test this thing
 
 -------------------------------------------------------------------------------
 

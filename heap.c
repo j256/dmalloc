@@ -41,8 +41,10 @@
 #include "heap.h"
 #include "malloc_errno.h"
 
+#if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.12 1992/11/14 21:19:34 gray Exp $";
+  "$Id: heap.c,v 1.13 1992/11/14 21:45:28 gray Exp $";
+#endif
 
 /* exported variables */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */

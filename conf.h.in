@@ -21,8 +21,32 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.4 1992/11/14 21:19:26 gray Exp $
+ * $Id: conf.h.in,v 1.5 1992/11/14 21:45:24 gray Exp $
  */
+
+/*
+ ************************************************************************
+ * USER SETTINGS:
+ ************************************************************************
+ */
+
+/*
+ * include the RCS ids in the .c files and the installed library
+ */
+#define INCLUDE_RCS_IDS 1
+
+/*
+ * should we allow zero length allocations or should be registered as errors.
+ * WARNING: this has not been tested although some code does exist for it.
+ */
+#define ALLOW_ALLOC_ZERO_SIZE 0
+
+/*
+ * should we allow realloc of a NULL pointer.  this is useful when you are
+ * extending an array in a loop and do not want to allocate it specially the
+ * first time.
+ */
+#define ALLOW_REALLOC_NULL 1
 
 /*
  ************************************************************************
@@ -53,19 +77,6 @@
  * NOTE: this is not necessarily the smallest possible allocated memory chunk
  */
 #define ALLOCATION_ALIGNMENT_IN_BITS 3
-
-/*
- * should we allow zero length allocations or should be registered as errors.
- * WARNING: this has not been tested although some code does exist for it.
- */
-#define ALLOW_ALLOC_ZERO_SIZE 0
-
-/*
- * should we allow realloc of a NULL pointer.  this is useful when you are
- * extending an array in a loop and do not want to allocate it specially the
- * first time.
- */
-#define ALLOW_REALLOC_NULL 1
 
 /*
  ************************************************************************

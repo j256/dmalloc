@@ -37,8 +37,10 @@
 #include "debug_values.h"
 #include "error.h"
 
+#if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.9 1992/11/14 21:19:33 gray Exp $";
+  "$Id: error.c,v 1.10 1992/11/14 21:45:26 gray Exp $";
+#endif
 
 /*
  * exported variables

@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.12 1992/11/14 21:19:44 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.13 1992/11/14 21:45:37 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -48,6 +48,18 @@
 #define START_ENVIRON		"MALLOC_START"
 
 /******************************* useful defines ******************************/
+
+/*
+ * global variable and procedure scoping for code readability
+ */
+#undef	EXPORT
+#define	EXPORT
+
+#undef	IMPORT
+#define	IMPORT		extern
+
+#undef	LOCAL
+#define	LOCAL		static
 
 /*
  * standard int return codes

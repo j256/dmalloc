@@ -30,8 +30,10 @@
 #include "compat.h"
 #include "conf.h"
 
+#if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.3 1992/11/11 23:14:42 gray Exp $";
+  "$Id: compat.c,v 1.4 1992/11/14 21:45:22 gray Exp $";
+#endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
 /*

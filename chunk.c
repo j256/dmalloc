@@ -42,8 +42,10 @@
 #include "malloc_errno.h"
 #include "version.h"
 
+#if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.16 1992/11/14 21:19:21 gray Exp $";
+  "$Id: chunk.c,v 1.17 1992/11/14 21:45:19 gray Exp $";
+#endif
 
 /* checking information */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */

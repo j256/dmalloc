@@ -37,8 +37,10 @@
 #include "malloc_errno.h"
 #include "malloc_leap.h"
 
+#if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.9 1992/11/14 21:19:36 gray Exp $";
+  "$Id: malloc.c,v 1.10 1992/11/14 21:45:30 gray Exp $";
+#endif
 
 /*
  * exported variables
