@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.29 2001/07/12 22:47:34 gray Exp $
+ * $Id: env.c,v 1.30 2001/11/30 23:50:46 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: env.c,v 1.29 2001/07/12 22:47:34 gray Exp $"
+#ident "$Id: env.c,v 1.30 2001/11/30 23:50:46 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.29 2001/07/12 22:47:34 gray Exp $";
+  "$Id: env.c,v 1.30 2001/11/30 23:50:46 gray Exp $";
 #endif
 #endif
 
@@ -256,8 +256,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     
     /* need to check the short/long debug options */
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
-      if (strcmp(this_p, attr_p->at_string) == 0
-	  || strcmp(this_p, attr_p->at_short) == 0) {
+      if (strcmp(this_p, attr_p->at_string) == 0) {
 	flags |= attr_p->at_value;
 	break;
       }
@@ -284,7 +283,6 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
  */
 void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const int long_tokens_b,
-			     const int short_tokens_b,
 			     const DMALLOC_PNT address,
 			     const unsigned long addr_count,
 			     const unsigned int debug,
@@ -295,19 +293,13 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
   char	*buf_p = buf, *bounds_p = buf + buf_size;
   
   if (debug > 0) {
-    if (short_tokens_b || long_tokens_b) {
+    if (long_tokens_b) {
       attr_t	*attr_p;
       
       for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
 	if (debug & attr_p->at_value) {
-	  if (short_tokens_b) {
-	    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s,",
-				  attr_p->at_short);
-	  }
-	  else {
-	    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s,",
-				  attr_p->at_string);
-	  }
+	  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s,",
+				attr_p->at_string);
 	}
       }
     }

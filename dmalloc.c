@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.102 2001/11/30 16:04:02 gray Exp $
+ * $Id: dmalloc.c,v 1.103 2001/11/30 23:50:58 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.102 2001/11/30 16:04:02 gray Exp $"
+#ident "$Id: dmalloc.c,v 1.103 2001/11/30 23:50:58 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.102 2001/11/30 16:04:02 gray Exp $";
+  "$Id: dmalloc.c,v 1.103 2001/11/30 23:50:58 gray Exp $";
 #endif
 #endif
 
@@ -141,7 +141,6 @@ static	argv_array_t	minus;			/* tokens to remove */
 static	int	make_changes_b = 1;		/* make no changes to env */
 static	argv_array_t	plus;			/* tokens to add */
 static	int	remove_auto_b = 0;		/* auto-remove settings */
-static	int	short_tokens_b = 0;		/* short-tok output */
 static	char	*start = NULL;			/* for START settings */
 static	int	usage_b = 0;			/* usage messages */
 static	int	verbose_b = 0;			/* verbose flag */
@@ -160,9 +159,6 @@ static	argv_t	args[] = {
   
   { 'L',	"long-tokens",	ARGV_BOOL_INT,	&long_tokens_b,
     NULL,			"output long-tokens not 0x..." },
-  { ARGV_OR },
-  { 'S',	"short-tokens",	ARGV_BOOL_INT,	&short_tokens_b,
-    NULL,			"output short-tokens not 0x..." },
   
   { 'a',	"address",	ARGV_CHAR_P,	&address,
     "address:#",		"stop when malloc sees address" },
@@ -270,18 +266,12 @@ static	void	dump_debug(const unsigned long val)
       }
       
       if (very_verbose_b) {
-	(void)fprintf(stderr, "%s (%s) -- %s (%#lx)\n",
-		      attr_p->at_string, attr_p->at_short, attr_p->at_desc,
-		      attr_p->at_value);
+	(void)fprintf(stderr, "%s -- %s (%#lx)\n",
+		      attr_p->at_string, attr_p->at_desc, attr_p->at_value);
 	col_c = 0;
       }
       else {
-	if (short_tokens_b) {
-	  str = attr_p->at_short;
-	}
-	else {
-	  str = attr_p->at_string;
-	}
+	str = attr_p->at_string;
 	len = strlen(str);
 	if (col_c + len + 2 > LINE_WIDTH) {
 	  (void)fprintf(stderr, "\n");
@@ -323,8 +313,7 @@ static	long	token_to_value(const char *tok)
   
   /* find the matching attribute string */
   for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
-    if (strcmp(tok, attr_p->at_string) == 0
-	|| strcmp(tok, attr_p->at_short) == 0) {
+    if (strcmp(tok, attr_p->at_string) == 0) {
       break;
     }
   }
@@ -1004,14 +993,12 @@ int	main(int argc, char **argv)
 	continue;
       }
       if (very_verbose_b) {
-	(void)fprintf(stderr, "%s (%s) -- %s (%#lx)\n",
-		      attr_p->at_string, attr_p->at_short, attr_p->at_desc,
-		      attr_p->at_value);
+	(void)fprintf(stderr, "%s -- %s (%#lx)\n",
+		      attr_p->at_string, attr_p->at_desc, attr_p->at_value);
       }
       else if (verbose_b) {
 	(void)fprintf(stderr, "%s -- %s\n",
-		      (short_tokens_b ? attr_p->at_short : attr_p->at_string),
-		      attr_p->at_desc);
+		      attr_p->at_string, attr_p->at_desc);
       }
       else {
 	(void)fprintf(stderr, "%s\n", attr_p->at_string);
@@ -1021,9 +1008,8 @@ int	main(int argc, char **argv)
   }
   
   if (clear_b || set_b) {
-    _dmalloc_environ_set(buf, sizeof(buf), long_tokens_b, short_tokens_b,
-			 addr, addr_count, debug, inter, lock_on, lpath,
-			 sfile, sline, scount);
+    _dmalloc_environ_set(buf, sizeof(buf), long_tokens_b, addr, addr_count,
+			 debug, inter, lock_on, lpath, sfile, sline, scount);
     set_variable(OPTIONS_ENVIRON, buf);
   }
   else if (errno_to_print == 0

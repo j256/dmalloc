@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.21 2001/07/12 22:47:34 gray Exp $
+ * $Id: env.h,v 1.22 2001/11/30 23:50:47 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -68,7 +68,6 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 extern
 void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const int long_tokens_b,
-			     const int short_tokens_b,
 			     const DMALLOC_PNT address,
 			     const unsigned long addr_count,
 			     const unsigned int debug,
