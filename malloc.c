@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.120 1999/03/02 17:41:55 gray Exp $
+ * $Id: malloc.c,v 1.121 1999/03/03 16:05:20 gray Exp $
  */
 
 /*
@@ -81,10 +81,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.120 1999/03/02 17:41:55 gray Exp $";
+#ident "$Id: malloc.c,v 1.121 1999/03/03 16:05:20 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.120 1999/03/02 17:41:55 gray Exp $";
+  "$Id: malloc.c,v 1.121 1999/03/03 16:05:20 gray Exp $";
 #endif
 #endif
 
@@ -413,6 +413,7 @@ static	int	dmalloc_startup(void)
   _dmalloc_debug_func = _dmalloc_debug;
   _dmalloc_debug_current_func = _dmalloc_debug_current;
   _dmalloc_examine_func = _dmalloc_examine;
+  _dmalloc_vmessage_func = _dmalloc_vmessage;
   _dmalloc_strerror_func = _dmalloc_strerror;
   
   /*
