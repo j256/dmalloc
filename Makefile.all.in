@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.102 2000/11/14 20:34:48 gray Exp $
+# $Id: Makefile.all.in,v 1.103 2000/11/14 21:02:29 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -266,9 +266,14 @@ heavy : $(TEST) light
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
 
-.cc.o :
+#
+# .cc.o auto-target doesn't work on some systems. 
+# also, $? did not work on OSF for the -c, grrr
+#
+dmallocc.o : $(srcdir)/dmallocc.cc
 	rm -f $@
-	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
+	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $(srcdir)/dmallocc.cc \
+		-o ./$@
 
 .texi.info :
 	makeinfo --no-split $<
