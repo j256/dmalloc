@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.180 2003/05/15 05:35:24 gray Exp $
+ * $Id: chunk.c,v 1.181 2003/05/16 00:10:47 gray Exp $
  */
 
 /*
@@ -149,7 +149,9 @@ static	unsigned long	func_realloc_c = 0;	/* count the reallocs */
 static	unsigned long	func_recalloc_c = 0;	/* count the reallocs */
 static	unsigned long	func_memalign_c = 0;	/* count the memaligns */
 static	unsigned long	func_valloc_c = 0;	/* count the veallocs */
+static	unsigned long	func_new_c = 0;		/* count the news */
 static	unsigned long	func_free_c = 0;	/* count the frees */
+static	unsigned long	func_delete_c = 0;	/* count the deletes */
 
 /**************************** skip list routines *****************************/
 
@@ -494,8 +496,6 @@ static	void	*alloc_slots(const int level_n, void **extern_mem_pp,
     entry_free_list[level_n] = new_p;
     new_c++;
   }
-  
-  dmalloc_message("created %d new entries for level %d", new_c, level_n);
   
   /* extern pointer information set in _dmalloc_heap_alloc */
   return block_p;
@@ -1546,14 +1546,32 @@ static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
     return 0;
   }
   
+  /* check our size */
+  if (slot_p->sa_user_size > LARGEST_ALLOCATION) {
+    dmalloc_errno = ERROR_BAD_SIZE;
+    return 0;
+  }
+  
+  /* check our total block size */
+  if (slot_p->sa_total_size > BLOCK_SIZE / 2
+      && slot_p->sa_total_size % BLOCK_SIZE != 0) {
+    dmalloc_errno = ERROR_BAD_SIZE;
+    return 0;
+  }
+  
   /*
    * If we have a valloc allocation then the _user_ pnt should be
    * block aligned otherwise the chunk_pnt should be.
    */
-  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC)
-      && (! ON_BLOCK(pnt_info.pi_user_start))) {
-    dmalloc_errno = ERROR_NOT_ON_BLOCK;
-    return 0;
+  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC)) {
+    if (! ON_BLOCK(pnt_info.pi_user_start)) {
+      dmalloc_errno = ERROR_NOT_ON_BLOCK;
+      return 0;
+    }
+    if (slot_p->sa_total_size < BLOCK_SIZE) {
+      dmalloc_errno = ERROR_SLOT_CORRUPT;
+      return 0;
+    }
   }
   
   /* check out the fence-posts */
@@ -1583,7 +1601,7 @@ static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
     }
     if (name_p >= bounds_p
 	|| name_p < file + MIN_FILE_LENGTH) {
-      dmalloc_errno = ERROR_BAD_FILEP;
+      dmalloc_errno = ERROR_BAD_FILE;
       return 0;
     }
   }
@@ -1606,6 +1624,9 @@ static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
  *
  * user_pnt -> Pointer we are tracking.
  *
+ * update_p -> Pointer to the skip_alloc entry we are using to hold
+ * the update pointers.
+ *
  * prev_pp <- Pointer to a slot which, if not NULL, will be set to the
  * slot right before the one found.
  *
@@ -1613,17 +1634,16 @@ static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
  * slot right after the one found.
  */
 static	skip_alloc_t	*find_slot(const void *user_pnt,
+				   skip_alloc_t *update_p,
 				   skip_alloc_t **prev_pp,
 				   skip_alloc_t **next_pp)
 {
-  skip_alloc_t	*slot_p, *update_p;
+  skip_alloc_t	*slot_p;
   
   if (user_pnt == NULL) {
     dmalloc_errno = ERROR_IS_NULL;
     return NULL;
   }
-  
-  update_p = skip_update;
   
   /* try to find the address with loose match */
   slot_p = find_address(user_pnt, 0 /* loose check */, update_p);
@@ -2001,323 +2021,6 @@ int	_dmalloc_chunk_heap_check(void)
     }
   }
   
-#if 0    
-  if (1) {
-    /*
-     * check for different types
-     */
-    block_type = BBLOCK_FLAG_TYPE(bblock_p->bb_flags);
-    switch (block_type) {
-      
-      /* check a starting user-block */
-    case BBLOCK_START_USER:
-      
-      /* check X blocks in a row */
-      if (bblock_c != 0) {
-	dmalloc_errno = ERROR_USER_NON_CONTIG;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      fence_b = BIT_IS_SET(bblock_p->bb_flags, BBLOCK_FENCE);
-      
-      /* mark the size in bits */
-      NUM_BITS(bblock_p->bb_size, bit_c);
-      bblock_c = NUM_BLOCKS(bblock_p->bb_size);
-      /* valloc basic blocks gets 1 extra block below for any fence info */
-      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC) && fence_b) {
-	bblock_c++;
-      }
-      start = 1;
-      
-      /* check fence-posts for memory chunk */
-      if (fence_b) {
-	pnt = BLOCK_POINTER(this_adm_p->ba_pos_n +
-			    (bblock_p - this_adm_p->ba_blocks));
-	/* if we have valloc block and there is fence info then shift pnt up */
-	if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)) {
-	  pnt = (char *)pnt + (BLOCK_SIZE - FENCE_BOTTOM_SIZE);
-	}
-	if (! fence_read(pnt, bblock_p->bb_size)) {
-	  log_error_info(NULL, NULL, bblock_p->bb_file, bblock_p->bb_line,
-			 pnt, bblock_p->bb_size, NULL, "heap-check");
-	  dmalloc_error("_dmalloc_chunk_heap_check");
-	  return 0;
-	}
-      }
-      /* NOTE: NO BREAK HERE ON PURPOSE */
-      
-    case BBLOCK_USER:
-      
-      fence_b = BIT_IS_SET(bblock_p->bb_flags, BBLOCK_FENCE);
-      
-      /* check line number */
-      if (bblock_p->bb_line > MAX_LINE_NUMBER) {
-	dmalloc_errno = ERROR_BAD_LINE;
-	log_error_info(NULL, NULL, bblock_p->bb_file, bblock_p->bb_line, NULL,
-		       0, NULL, "heap-check");
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      /*
-       * Check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take
-       * over.  If we have a valloc then the size might be small.
-       */
-      if (((! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC))
-	   && bblock_p->bb_size <= BLOCK_SIZE / 2)
-	  || bblock_p->bb_size > (1 << LARGEST_BLOCK)) {
-	dmalloc_errno = ERROR_BAD_SIZE;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      /* check file pointer */
-      if (bblock_p->bb_file != DMALLOC_DEFAULT_FILE
-	  && bblock_p->bb_line != DMALLOC_DEFAULT_LINE) {
-	len = strlen(bblock_p->bb_file);
-	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
-	  dmalloc_errno = ERROR_BAD_FILEP;
-	  dmalloc_error("_dmalloc_chunk_heap_check");
-	  return 0;
-	}
-      }
-      
-      /* check X blocks in a row */
-      if (bblock_c == 0) {
-	dmalloc_errno = ERROR_USER_NON_CONTIG;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      if (start == 0
-	  && (prev_bblock_p == NULL
-	      || ((! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_START_USER))
-		  && (! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_USER)))
-	      || bblock_p->bb_file != prev_bblock_p->bb_file
-	      || bblock_p->bb_line != prev_bblock_p->bb_line
-	      || bblock_p->bb_size != prev_bblock_p->bb_size)) {
-	dmalloc_errno = ERROR_USER_NON_CONTIG;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      bblock_c--;
-      /* NOTE: we should check above the allocated space if alloc_blank on */
-      break;
-      
-    case BBLOCK_DBLOCK:
-      
-      /* check out bit_c */
-      if (bblock_p->bb_bit_n >= BASIC_BLOCK) {
-	dmalloc_errno = ERROR_BAD_DBLOCK_SIZE;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      /* check out dblock pointer */
-      if (! IS_IN_HEAP(bblock_p->bb_dblock)) {
-	dmalloc_errno = ERROR_BAD_DBLOCK_POINTER;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      /* verify mem pointer */
-      if (bblock_p->bb_mem != BLOCK_POINTER(this_adm_p->ba_pos_n +
-					    (bblock_p -
-					     this_adm_p->ba_blocks))) {
-	dmalloc_errno = ERROR_BAD_DBLOCK_MEM;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      /* check dblock entry very closely if necessary */
-      for (dblock_c = 0, dblock_p = bblock_p->bb_dblock;
-	   dblock_p < bblock_p->bb_dblock +
-	     (1 << (BASIC_BLOCK - bblock_p->bb_bit_n));
-	   dblock_c++, dblock_p++) {
-	
-	/* check out dblock entry to see if it is not free */
-	if (dblock_p->db_flags == DBLOCK_FREE) {
-	  
-	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
-	    dblock_t	*dblist_p;
-	    
-	    /* find the free block in the free list */
-	    for (dblist_p = free_dblock[bblock_p->bb_bit_n];
-		 dblist_p != NULL;
-		 dblist_p = dblist_p->db_next) {
-	      if (dblist_p == dblock_p) {
-		break;
-	      }
-	    }
-	    
-	    /* did we not find it and we are reusing pointers */
-	    if (dblist_p == NULL) {
-	      dmalloc_errno = ERROR_BAD_FREE_LIST;
-	      dmalloc_error("_dmalloc_chunk_heap_check");
-	      return 0;
-	    }
-	    else {
-	      free_dblock_c[bblock_p->bb_bit_n]--;
-	    }
-	  }
-	  
-	  continue;
-	}
-	
-	/*
-	 * check out size, better be less than BLOCK_SIZE / 2 I have to
-	 * check this twice.  Yick.
-	 */
-	if ((int)dblock_p->db_size > BLOCK_SIZE / 2) {
-	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
-	  log_error_info(NULL, NULL, dblock_p->db_file, dblock_p->db_line,
-			 NULL, 0, NULL, "heap-check");
-	  dmalloc_error("_dmalloc_chunk_heap_check");
-	  return 0;
-	}
-	
-	if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE)) {
-	  pnt = (char *)bblock_p->bb_mem +
-	    dblock_c * (1 << bblock_p->bb_bit_n);
-	  if (! fence_read(pnt, dblock_p->db_size)) {
-	    return 0;
-	  }
-	}
-      }
-      break;
-      
-    case BBLOCK_START_FREE:
-      
-      /* check X blocks in a row */
-      if (free_c != 0) {
-	dmalloc_errno = ERROR_USER_NON_CONTIG;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      
-      free_c = bblock_p->bb_block_n;
-      
-      if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
-	
-	/* find the free block in the free list */
-	for (bblist_p = free_bblock[bblock_p->bb_bit_n];
-	     bblist_p != NULL;
-	     bblist_p = bblist_p->bb_next) {
-	  if (bblist_p == bblock_p) {
-	    break;
-	  }
-	}
-	
-	/* did we find it? */
-	if (bblist_p == NULL) {
-	  dmalloc_errno = ERROR_BAD_FREE_LIST;
-	  dmalloc_error("_dmalloc_chunk_heap_check");
-	  return 0;
-	}
-	else {
-	  free_bblock_c[bblock_p->bb_bit_n]--;
-	}
-      }
-      /* NOTE: NO BREAK HERE ON PURPOSE */
-      
-    case BBLOCK_FREE:
-      
-      /* NOTE: check out free_lists, depending on debug value? */
-      
-      if (block_type == BBLOCK_FREE) {
-	if (prev_bblock_p == NULL
-	    || (prev_bblock_p->bb_flags != BBLOCK_FREE
-		&& prev_bblock_p->bb_flags != BBLOCK_START_FREE)
-	    || bblock_p->bb_bit_n != prev_bblock_p->bb_bit_n) {
-	  dmalloc_errno = ERROR_FREE_NON_CONTIG;
-	  dmalloc_error("_dmalloc_chunk_heap_check");
-	  return 0;
-	}
-      }
-      free_c--;
-      
-      /* should we verify that we have a block of freed chars? */
-      if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-	pnt = BLOCK_POINTER(this_adm_p->ba_pos_n +
-			    (bblock_p - this_adm_p->ba_blocks));
-	for (byte_p = (char *)pnt;
-	     byte_p < (char *)pnt + BLOCK_SIZE;
-	     byte_p++) {
-	  if (*byte_p != FREE_BLANK_CHAR) {
-	    dmalloc_errno = ERROR_FREE_NON_BLANK;
-	    log_error_info(NULL, NULL, bblock_p->bb_file, bblock_p->bb_line,
-			   byte_p, 0, NULL, "heap-check");
-	    dmalloc_error("_dmalloc_chunk_heap_check");
-	    /* continue to check the rest of the free list */
-	    break;
-	  }
-	}
-      }
-      break;
-      
-      /* externally used block */
-    case BBLOCK_EXTERNAL:
-      /* nothing much to check */
-      break;
-      
-      /* pointer to first free slot */
-    case BBLOCK_ADMIN_FREE:
-      /* better be the last block and the count should match undef */
-      if (bblock_p != this_adm_p->ba_blocks + (BB_PER_ADMIN - 1)
-	  || bblock_p->bb_free_n != (BB_PER_ADMIN - 1) - undef) {
-	dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-      break;
-      
-    default:
-      dmalloc_errno = ERROR_BAD_FLAG;
-      dmalloc_error("_dmalloc_chunk_heap_check");
-      return 0;
-      /* NOTREACHED */
-      break;
-    }
-  }
-  
-  /*
-   * any left over contiguous counters?
-   */
-  if (bblock_c > 0) {
-    dmalloc_errno = ERROR_USER_NON_CONTIG;
-    dmalloc_error("_dmalloc_chunk_heap_check");
-    return 0;
-  }
-  if (free_c > 0) {
-    dmalloc_errno = ERROR_FREE_NON_CONTIG;
-    dmalloc_error("_dmalloc_chunk_heap_check");
-    return 0;
-  }
-  
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
-    
-    /* any free bblock entries not accounted for? */
-    for (bit_c = 0; bit_c < MAX_SLOTS; bit_c++) {
-      if (free_bblock_c[bit_c] != 0) {
-	dmalloc_errno = ERROR_BAD_FREE_LIST;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-    }
-    
-    /* any free dblock entries not accounted for? */
-    for (bit_c = 0; bit_c < BASIC_BLOCK; bit_c++) {
-      if (free_dblock_c[bit_c] != 0) {
-	dmalloc_errno = ERROR_BAD_FREE_LIST;
-	dmalloc_error("_dmalloc_chunk_heap_check");
-	return 0;
-      }
-    }
-  }
-#endif
-  
   return 1;
 }
 
@@ -2357,7 +2060,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   }
   
   /* find our slot which does a lot of other checking */
-  slot_p = find_slot(user_pnt, NULL /* prev */, NULL /* next */);
+  slot_p = find_slot(user_pnt, skip_update, NULL /* prev */, NULL /* next */);
   if (slot_p == NULL) {
     if (exact_b || dmalloc_errno == ERROR_NOT_FOUND) {
       log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, "pointer-check");
@@ -2448,6 +2151,9 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   else if (alignment > 0) {
     func_memalign_c++;
     memalign_b = 1;
+  }
+  else if (func_id == DMALLOC_FUNC_NEW) {
+    func_new_c++;
   }
   else if (func_id != DMALLOC_FUNC_REALLOC
 	   && func_id != DMALLOC_FUNC_RECALLOC) {
@@ -2606,17 +2312,24 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
  *
  * user_pnt -> Pointer we are freeing.
  *
- * realloc_b -> Set to 1 if realloc is calling free.
+ * func_id -> Function ID
  */
 int	_dmalloc_chunk_free(const char *file, const unsigned int line,
-		       void *user_pnt, const int realloc_b)
+			    void *user_pnt, const int func_id)
 {
   char		where_buf[MAX_FILE_LENGTH + 64];
   char		where_buf2[MAX_FILE_LENGTH + 64], disp_buf[64];
-  skip_alloc_t	*slot_p, *prev_p, *next_p;
+  skip_alloc_t	*slot_p, *update_p;
   
   /* counts calls to free */
-  if (! realloc_b) {
+  if (func_id == DMALLOC_FUNC_DELETE) {
+    func_delete_c++;
+  }
+  else if (func_id == DMALLOC_FUNC_REALLOC
+	   || func_id == DMALLOC_FUNC_RECALLOC) {
+    /* ignore these because they will alredy be accounted for in realloc */
+  }
+  else {
     func_free_c++;
   }
   
@@ -2650,12 +2363,19 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 #endif
   }
   
+  update_p = skip_update;
+  
   /* find which block it is in */
-  slot_p = find_slot(user_pnt, &prev_p, &next_p);
+  slot_p = find_slot(user_pnt, update_p, NULL /* no prev_p */,
+		     NULL /* no next_p */);
   if (slot_p == NULL) {
     /* errno set in find_block */
     log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
     dmalloc_error("_dmalloc_chunk_free");
+    return FREE_ERROR;
+  }
+  if (! remove_slot(slot_p, update_p)) {
+    /* error set and dumped in remove_slot */
     return FREE_ERROR;
   }
   
@@ -2677,7 +2397,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   }
   
 #if MEMORY_TABLE_LOG
-  if (! realloc_b) {
+  if (func_id != DMALLOC_FUNC_REALLOC
+      && func_id != DMALLOC_FUNC_RECALLOC) {
     _dmalloc_table_free(slot_p->sa_file, slot_p->sa_line,
 			slot_p->sa_user_size);
   }
@@ -2695,7 +2416,9 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   }
   
   /*
-   * XXX: should we do this?  it will screwup the seen counter.
+   * The question is should we combine multiple free chunks together
+   * into one.  This would help we with fragmentation but it would
+   * screwup the seen counter.
    *
    * Check above and below the free bblock looking for neighbors that
    * are free so we can add them together and put them in a different
@@ -2705,17 +2428,12 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
    * because we are encorporating in this newly freed block.
    */
   
-  if (prev_p != NULL && BIT_IS_SET(prev_p->sa_flags, ALLOC_FLAG_FREE)) {
-    /*
-     * XXX: we remove slot because we already have update1 filled with
-     * the proper information
-     */
-    /* combine the two slots */
+  /* update the slot flags, and put on free list */
+  slot_p->sa_flags = ALLOC_FLAG_FREE;
+  if (! insert_slot(slot_p, 0 /* used list */)) {
+    /* error dumped in insert_slot */
+    return FREE_ERROR;
   }
-  if (next_p != NULL && BIT_IS_SET(next_p->sa_flags, ALLOC_FLAG_FREE)) {
-  }
-  
-  /* XXX update the slot flags, and put on free list */
   
   return FREE_NOERROR;
 }
@@ -2823,7 +2541,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
     
     /* free old pointer */
     if (_dmalloc_chunk_free(file, line, old_user_pnt,
-		       1 /* from realloc */) != FREE_NOERROR) {
+			    func_id) != FREE_NOERROR) {
       return REALLOC_ERROR;
     }
   }
@@ -2941,6 +2659,8 @@ void	_dmalloc_chunk_log_stats(void)
 		  func_malloc_c, func_calloc_c, func_realloc_c, func_free_c);
   dmalloc_message("alloc calls: recalloc %lu, memalign %lu, valloc %lu",
 		  func_recalloc_c, func_memalign_c, func_valloc_c);
+  dmalloc_message("alloc calls: new %lu, delete %lu",
+		  func_new_c, func_delete_c);
   dmalloc_message(" currently in use: %lu bytes (%lu pnts)",
 		  alloc_current, alloc_cur_pnts);
   dmalloc_message(" total memory allocated: %lu bytes (%lu pnts)",
