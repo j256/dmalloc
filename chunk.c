@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $
+ * $Id: chunk.c,v 1.159 2000/05/15 15:42:36 gray Exp $
  */
 
 /*
@@ -62,25 +62,31 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
+#ident "$Id: chunk.c,v 1.159 2000/05/15 15:42:36 gray Exp $";
+#ident "@(#) $Id: chunk.c,v 1.159 2000/05/15 15:42:36 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
+  "$Id: chunk.c,v 1.159 2000/05/15 15:42:36 gray Exp $";
+static	char	*rcs_id_w =
+  "@(#) $Id: chunk.c,v 1.159 2000/05/15 15:42:36 gray Exp $";
 #endif
 #endif
 
+/*
+ * Library Copyright and URL information for ident and what programs
+ */
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
+#ident "$Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
 #ident "@(#) Dmalloc package Copyright 2000 by Gray Watson";
-#ident "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
+#ident "$URL: Source for dmalloc available from http://dmalloc.com/ $";
 #ident "@(#) Source for dmalloc available from http://dmalloc.com/";
 #else
 static	char	*copyright =
-  "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
+  "$Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
 static	char	*copyright_w =
   "@(#) Dmalloc package Copyright 2000 by Gray Watson";
 static	char	*source_url =
-  "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
+  "$URL: Source for dmalloc available from http://dmalloc.com/ $";
 static	char	*source_url_w =
   "@(#) Source for dmalloc available from http://dmalloc.com/";
 #endif
