@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.67 2004/07/11 05:45:36 gray Exp $
+ * $Id: heap.c,v 1.68 2004/10/12 19:38:57 gray Exp $
  */
 
 /*
@@ -79,10 +79,6 @@ static	void	*heap_extend(const int incr)
   void	*ret = SBRK_ERROR;
   char	*high;
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
-    dmalloc_message("extending heap space by %d bytes", incr);
-  }
-  
 #if INTERNAL_MEMORY_SPACE
   {
     static char	block_o_bytes[INTERNAL_MEMORY_SPACE];
@@ -135,7 +131,13 @@ static	void	*heap_extend(const int incr)
   if (high > (char *)_dmalloc_heap_high) {
     _dmalloc_heap_high = high;
   }
-
+  
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
+    dmalloc_message("extended heap space by %d bytes [%#lx, %#lx]",
+		    incr, (unsigned long)_dmalloc_heap_low,
+		    (unsigned long)_dmalloc_heap_high);
+  }
+  
   return ret;
 }
 
@@ -184,6 +186,12 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
 {
   void	*heap_new, *heap_diff;
   long	diff;
+  
+  if (size == 0) {
+    dmalloc_errno = ERROR_BAD_SIZE;
+    dmalloc_error("_dmalloc_heap_alloc");
+    return HEAP_ALLOC_ERROR;
+  }
   
   while (1) {
     

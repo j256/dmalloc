@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.115 2004/07/10 03:49:52 gray Exp $
+ * $Id: dmalloc_t.c,v 1.116 2004/10/12 19:38:57 gray Exp $
  */
 
 /*
@@ -446,7 +446,7 @@ static	int	do_random(const int iter_n)
     case 5:
       /* do it less often then the other functions */
       which = _dmalloc_rand() % 5;
-      if (which == 3) {
+      if (which == 3 && amount > 0) {
 	void	*mem;
 	
 	mem = _dmalloc_heap_alloc(amount);
@@ -454,8 +454,9 @@ static	int	do_random(const int iter_n)
 	  (void)printf("%d: heap alloc %d of max %d bytes.  got %#lx\n",
 		       iter_c + 1, amount, max_avail, (long)mem);
 	}
-	/* don't store the memory */
+	iter_c++;
       }
+      /* don't store the memory */
       continue;
       break;
       
