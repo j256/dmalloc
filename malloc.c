@@ -61,7 +61,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.86 1995/09/06 17:39:44 gray Exp $";
+  "$Id: malloc.c,v 1.87 1995/09/06 20:16:26 gray Exp $";
 #endif
 
 /*
@@ -124,9 +124,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
     /*NOTREACHED*/
   }
   
-#if LOCK_THREADS
   THREAD_LOCK;
-#endif  
   
   in_alloc = TRUE;
   
@@ -300,9 +298,7 @@ EXPORT	void	_dmalloc_shutdown(void)
   
   in_alloc = TRUE;
   
-#if LOCK_THREADS
   THREAD_LOCK;
-#endif  
   
   /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
@@ -337,9 +333,7 @@ EXPORT	void	_dmalloc_shutdown(void)
   
   in_alloc = FALSE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
   /* NOTE: do not set enabled to false here */
 }
@@ -374,9 +368,7 @@ EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
   return newp;
 }
@@ -442,9 +434,7 @@ EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
   return newp;
 }
@@ -489,9 +479,7 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
 #if defined(__STDC__) && __STDC__ == 1
 #else
@@ -535,9 +523,7 @@ EXPORT	void	_dmalloc_log_heap_map(void)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
 }
 
 /*
@@ -559,9 +545,7 @@ EXPORT	void	_dmalloc_log_stats(void)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
 }
 
 /*
@@ -585,9 +569,7 @@ EXPORT	void	_dmalloc_log_unfreed(void)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
 }
 
 /*
@@ -616,9 +598,7 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
   
   in_alloc = TRUE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
   if (pnt == NULL)
     ret = _chunk_check();
@@ -630,9 +610,7 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
   if (ret == NOERROR)
     return DMALLOC_VERIFY_NOERROR;
@@ -706,9 +684,7 @@ EXPORT	int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
-#if LOCK_THREADS
   THREAD_UNLOCK;
-#endif  
   
   if (ret == NOERROR) {
     if (size != NULL)

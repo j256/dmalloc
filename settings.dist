@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.7 1995/09/06 17:37:53 gray Exp $
+ * $Id: settings.dist,v 1.8 1995/09/06 20:16:27 gray Exp $
  */
 
 /*
@@ -204,9 +204,14 @@
  * enough to work with your thread package.
  */
 #define LOCK_THREADS 0
+#if LOCK_THREADS
 #define THREAD_LOCK			pthread_lock_global_np()
 #define THREAD_UNLOCK			pthread_unlock_global_np()
 #define THREAD_INCLUDE			<pthread.h>
+#else
+#define THREAD_LOCK
+#define THREAD_UNLOCK
+#endif
 
 /*
  * For those threaded programs, this logs the thread ID that allocated
