@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.30 1995/03/03 17:37:55 gray Exp $
+ * $Id: chunk_loc.h,v 1.31 1995/05/05 16:50:34 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -113,7 +113,7 @@
 #define BBLOCK_DBLOCK_ADMIN	0x0010		/* pointing to dblock admin */
 #define BBLOCK_FREE		0x0020		/* block is free */
 #define BBLOCK_EXTERNAL		0x0040		/* externally used block */
-#define BBLOCK_ADMIN_FREE	0x0080		/* ba_count pnt to free slot */
+#define BBLOCK_ADMIN_FREE	0x0080		/* ba_freen pnt to free slot */
 
 /*
  * single divided-block administrative structure
@@ -129,9 +129,9 @@ struct dblock_st {
   } db_info;
   
   /* to reference union and struct elements as db elements */
-#define db_bblock	db_info.in_bblock	/* F */
-#define db_size		db_info.in_nums.nu_size	/* U */
-#define db_line		db_info.in_nums.nu_line	/* U */
+#define db_bblock	db_info.in_bblock	/* Free */
+#define db_size		db_info.in_nums.nu_size	/* Used */
+#define db_line		db_info.in_nums.nu_line	/* Used */
   
   union {
     struct dblock_st	*pn_next;		/* next in the free list */
@@ -139,9 +139,24 @@ struct dblock_st {
   } db_pnt;
   
   /* to reference union elements as db elements */
-#define db_next		db_pnt.pn_next		/* F */
-#define db_file		db_pnt.pn_file		/* U */
+#define db_next		db_pnt.pn_next		/* Free */
+#define db_file		db_pnt.pn_file		/* Used */
   
+  /*
+   * configured overhead additions
+   */
+#if STORE_POINTER_COUNT
+  int		db_seenc;		/* times pointer was seen */
+#endif
+#if STORE_ITERATION_COUNT
+  long		db_iter;		/* interation when pointer alloced */
+#endif
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+  long		db_time;		/* time when pointer alloced */
+#endif
+#if STORE_THREAD_ID
+  int		db_thread_id;		/* thread id which allocaed pnt */
+#endif
 };
 typedef struct dblock_st	dblock_t;
 
@@ -152,26 +167,26 @@ struct bblock_st {
   unsigned short	bb_flags;		/* what it is */
   
   union {
-    unsigned short	nu_bitn;		/* chunk size */
+    unsigned short	nu_bitn;		/* chunk bit size */
     unsigned short	nu_line;		/* line where it was alloced */
-  } bb_num;
+  } bb_nums;
   
   /* to reference union elements as bb elements */
-#define bb_bitn		bb_num.nu_bitn		/* DF */
-#define bb_line		bb_num.nu_line		/* U */
+#define bb_bitn		bb_nums.nu_bitn		/* User-dblock, Free */
+#define bb_line		bb_nums.nu_line		/* User-bblock */
   
   union {
-    unsigned int	in_count;		/* admin count number */
+    unsigned int	in_freen;		/* admin count number */
     dblock_t		*in_dblock;		/* pointer to dblock info */
     unsigned int	in_blockn;		/* number of blocks */
     unsigned int	in_size;		/* size of allocation */
   } bb_info;
   
   /* to reference union elements as bb elements */
-#define bb_count	bb_info.in_count	/* A */
-#define	bb_dblock	bb_info.in_dblock	/* D */
-#define	bb_blockn	bb_info.in_blockn	/* F */
-#define	bb_size		bb_info.in_size		/* U */
+#define bb_freen	bb_info.in_freen	/* BBlock-admin */
+#define	bb_dblock	bb_info.in_dblock	/* User-dblock */
+#define	bb_blockn	bb_info.in_blockn	/* Free */
+#define	bb_size		bb_info.in_size		/* User-bblock */
   
   union {
     struct dblock_adm_st	*pn_slotp;	/* pointer to db_admin block */
@@ -182,12 +197,29 @@ struct bblock_st {
   } bb_pnt;
   
   /* to reference union elements as bb elements */
-#define	bb_slotp	bb_pnt.pn_slotp		/* a */
-#define	bb_adminp	bb_pnt.pn_adminp	/* A */
-#define	bb_mem		bb_pnt.pn_mem		/* DE (and tmp) */
-#define	bb_next		bb_pnt.pn_next		/* F */
-#define	bb_file		bb_pnt.pn_file		/* U */
+#define	bb_slotp	bb_pnt.pn_slotp		/* DBlock-admin */
+#define	bb_adminp	bb_pnt.pn_adminp	/* BBlock-admin */
+#define	bb_mem		bb_pnt.pn_mem		/* User-dblock, Extern (+tmp)*/
+#define	bb_next		bb_pnt.pn_next		/* Free */
+#define	bb_file		bb_pnt.pn_file		/* User-bblock */
   
+  /*
+   * configured overhead additions
+   */
+#if STORE_POINTER_COUNT
+  int		bb_seenc;		/* times pointer was seen */
+#endif
+#if STORE_ITERATION_COUNT
+  long		bb_iter;		/* interation when pointer alloced */
+#endif
+#if HAVE_TIME
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+  long		bb_time;		/* time when pointer alloced */
+#endif
+#endif
+#if STORE_THREAD_ID
+  int		bb_thread_id;		/* thread id which allocaed pnt */
+#endif
 };
 typedef struct bblock_st	bblock_t;
 
@@ -196,7 +228,7 @@ typedef struct bblock_st	bblock_t;
  */
 struct bblock_adm_st {
   long			ba_magic1;		/* bottom magic number */
-  int			ba_count;		/* position in bblock array */
+  int			ba_posn;		/* position in bblock array */
   bblock_t		ba_blocks[BB_PER_ADMIN]; /* bblock admin info */
   struct bblock_adm_st	*ba_next;		/* next bblock adm struct */
   long			ba_magic2;		/* top magic number */
