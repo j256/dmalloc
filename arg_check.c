@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.35 2004/01/31 16:19:34 gray Exp $
+ * $Id: arg_check.c,v 1.36 2005/01/11 18:27:05 gray Exp $
  */
 
 /*
@@ -36,8 +36,8 @@
 # include <stdlib.h>
 #endif
 
-#include "dmalloc.h"
 #include "conf.h"
+#include "dmalloc.h"
 
 #include "chunk.h"
 #include "debug_tok.h"

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.55 2004/01/31 16:19:47 gray Exp $
+ * $Id: compat.c,v 1.56 2005/01/11 18:27:05 gray Exp $
  */
 
 /*
@@ -34,8 +34,8 @@
 
 #define DMALLOC_DISABLE
 
-#include "dmalloc.h"
 #include "conf.h"
+#include "dmalloc.h"
 
 #include "compat.h"
 #include "dmalloc_loc.h"

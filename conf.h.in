@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.96 2004/07/10 03:49:52 gray Exp $
+ * $Id: conf.h.in,v 1.97 2005/01/11 18:26:31 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -187,6 +187,11 @@
 /*
  * LIBRARY DEFINES:
  */
+
+/*
+ * Whether the compiler and OS has standard C headers.
+ */
+#undef STDC_HEADERS
 
 /*
  * Some systems have functions which can register routines to be

@@ -1,3 +1,11 @@
+2005-01-11  Gray Watson  <gray@outside.256.com>
+
+	* Added some fixes for Compaq's C compiler.  Thanks Burl.
+
+2004-12-03  Gray Watson  <gray@outside.256.com>
+
+	* Improved dmalloc_t to better detect and test a small heap area.
+
 2004-10-19  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.4.2.
@@ -2250,5 +2258,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.327 2004/10/19 14:50:51 gray Exp $
+$Id: ChangeLog,v 1.328 2005/01/11 18:27:04 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.68 2004/10/12 19:38:57 gray Exp $
+ * $Id: heap.c,v 1.69 2005/01/11 18:27:05 gray Exp $
  */
 
 /*
@@ -38,8 +38,8 @@
 
 #define DMALLOC_DISABLE
 
-#include "dmalloc.h"
 #include "conf.h"
+#include "dmalloc.h"
 
 #include "chunk.h"
 #include "compat.h"
