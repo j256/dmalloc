@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.164 2003/05/19 18:14:16 gray Exp $
+ * $Id: malloc.c,v 1.165 2003/05/20 03:59:14 gray Exp $
  */
 
 /*
@@ -1522,6 +1522,30 @@ unsigned long	dmalloc_mark(void)
   }
   
   return _dmalloc_iter_c;
+}
+
+/*
+ * unsigned int dmalloc_page_size
+ *
+ * DESCRIPTION:
+ *
+ * Get the page-size being used by dmalloc.
+ *
+ * RETURNS:
+ *
+ * Page size.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+unsigned int	dmalloc_page_size(void)
+{
+  if (! enabled_b) {
+    (void)dmalloc_startup(NULL);
+  }
+  
+  return BLOCK_SIZE;
 }
 
 /*

@@ -571,6 +571,24 @@ extern
 unsigned long	dmalloc_mark(void);
 
 /*
+ * unsigned int dmalloc_page_size
+ *
+ * DESCRIPTION:
+ *
+ * Get the page-size being used by dmalloc.
+ *
+ * RETURNS:
+ *
+ * Page size.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+extern
+unsigned int	dmalloc_page_size(void);
+
+/*
  * void dmalloc_log_status
  *
  * DESCRIPTION:
