@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.103 2001/11/30 23:50:58 gray Exp $
+ * $Id: dmalloc.c,v 1.104 2003/05/13 16:38:44 gray Exp $
  */
 
 /*
@@ -52,17 +52,16 @@
 #include "debug_tok.h"
 #include "debug_val.h"
 #include "env.h"
-#include "error_str.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.103 2001/11/30 23:50:58 gray Exp $"
+#ident "$Id: dmalloc.c,v 1.104 2003/05/13 16:38:44 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.103 2001/11/30 23:50:58 gray Exp $";
+  "$Id: dmalloc.c,v 1.104 2003/05/13 16:38:44 gray Exp $";
 #endif
 #endif
 
@@ -104,8 +103,7 @@ typedef struct {
 			 DEBUG_CHECK_BLANK | DEBUG_CHECK_FUNCS)
 #define ALL_FLAGS	(HIGH_FLAGS | \
 			 DEBUG_LOG_TRANS | DEBUG_LOG_ADMIN | \
-			 DEBUG_LOG_BLOCKS | \
-			 DEBUG_HEAP_CHECK_MAP | DEBUG_NEVER_REUSE)
+			 DEBUG_NEVER_REUSE)
 /* NOTE: print-messages is not in this list because it is special */
 
 static	default_t	defaults[] = {
@@ -689,11 +687,12 @@ static	void	dump_current(void)
   
   /* get the options flag */
   env_str = getenv(OPTIONS_ENVIRON);
-  if (env_str != NULL) {
-    _dmalloc_environ_process(env_str, &addr, &addr_count, &flags,
-			     &inter, &lock_on, &lpath,
-			     &start_file, &start_line, &start_count);
+  if (env_str == NULL) {
+    env_str = "";
   }
+  _dmalloc_environ_process(env_str, &addr, &addr_count, &flags,
+			   &inter, &lock_on, &lpath,
+			   &start_file, &start_line, &start_count);
   
   if (flags == 0) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
@@ -866,10 +865,11 @@ int	main(int argc, char **argv)
   
   /* get the current debug information from the env variable */
   env_str = getenv(OPTIONS_ENVIRON);
-  if (env_str != NULL) {
-    _dmalloc_environ_process(env_str, &addr, &addr_count, &flags, &inter,
-			     &lock_on, &lpath, &sfile, &sline, &scount);
+  if (env_str == NULL) {
+    env_str = "";
   }
+  _dmalloc_environ_process(env_str, &addr, &addr_count, &flags, &inter,
+			   &lock_on, &lpath, &sfile, &sline, &scount);
   
   /*
    * So, if a tag was specified on the command line then we set the

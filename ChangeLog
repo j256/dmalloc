@@ -1,6 +1,27 @@
-2002-02-14  Gray Watson  <gray@outside.256.com>
+2003-05-13  Gray Watson  <gray@outside.256.com>
 
-	* Releasing dmalloc 5.0.0.
+	* Deprecated log-blocks and heap-check-map debug tokens.
+
+	* Removed dmalloc_lp.[ch] stuff.
+
+	* Getting ready for a huge checkin after a good bunch of work.
+
+2002-06-06  Gray Watson  <gray@outside.256.com>
+
+	* Added a currently in use stats to log-stats.  Thanks Bernard.
+
+2002-02-27  Gray Watson  <gray@outside.256.com>
+
+	* Fixed some literal ranlib entries in the Makefile.in thanks to
+	Ralf Fassel.
+
+2002-02-24  Gray Watson  <gray@outside.256.com>
+
+	* Removed the USE_DMALLOC_LEAP functionality.  This was causing
+	pains internally and I needed to simplify some of the sections.  I
+	apologize for those folks who used this a lot.
+
+2002-02-14  Gray Watson  <gray@outside.256.com>
 
 	* Added a function to close and re-open the dmalloc logfile when
 	you process a new set of environmental flags.
@@ -1831,5 +1852,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.278 2002/02/14 23:42:52 gray Exp $
+$Id: ChangeLog,v 1.279 2003/05/13 16:38:42 gray Exp $
 -------------------------------------------------------------------------------

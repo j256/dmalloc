@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.153 2003/05/13 14:58:41 gray Exp $
+# $Id: Makefile.in,v 1.154 2003/05/13 16:38:43 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -74,7 +74,7 @@ FLS	=  conf.h.in configure.in config.help \
 	ChangeLog.1 Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
 	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
-	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
+	debug_val.h env.[ch] error.[ch] error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h \
 	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc_funcs.h \
 	protect.[ch] return.h version.h \

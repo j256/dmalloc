@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.35 2000/03/21 20:08:15 gray Exp $
+$Id: Manifest,v 1.36 2003/05/13 16:38:43 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
@@ -91,9 +91,8 @@ env.[ch]		Environmental variable processing routines.
 error.[ch]		Debugging routines and others that provide
 			user output.
 
-error_str.h		Strings that correspond to dmalloc error codes.
-
-error_val.h		General error codes for the dmalloc module.
+error_val.h		General error codes and associated strings for the
+			dmalloc module.
 
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.

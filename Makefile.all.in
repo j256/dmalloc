@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.108 2003/05/13 14:52:51 gray Exp $
+# $Id: Makefile.all.in,v 1.109 2003/05/13 16:38:43 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -382,8 +382,8 @@ chunk.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
  heap.h protect.h
 compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
 dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
- compat.h debug_tok.h dmalloc_loc.h debug_val.h env.h error_str.h \
- error_val.h version.h
+ compat.h debug_tok.h dmalloc_loc.h debug_val.h env.h error_val.h \
+ version.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
  dmalloc_argv_loc.h compat.h
 dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h dmalloc.h \
@@ -398,8 +398,8 @@ error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
 heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h error.h error_val.h heap.h
 malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
- debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
- heap.h malloc_funcs.h return.h
+ debug_val.h dmalloc_loc.h env.h error.h error_val.h heap.h \
+ malloc_funcs.h return.h
 protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
  heap.h protect.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
@@ -408,5 +408,5 @@ chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
 error_th.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
  dmalloc_loc.h env.h error.h error_val.h version.h
 malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
- debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
- heap.h malloc_funcs.h return.h
+ debug_val.h dmalloc_loc.h env.h error.h error_val.h heap.h \
+ malloc_funcs.h return.h
