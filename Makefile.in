@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.139 2000/07/21 21:00:39 gray Exp $
+# $Id: Makefile.in,v 1.140 2000/07/24 19:47:04 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -32,6 +32,8 @@ SHLIBRARY = lib$(MODULE).so
 # thread version of the library
 LIB_TH	= lib$(MODULE)th.a
 SHLIB_TH = lib$(MODULE)th.so
+@TH_ON@BUILD_TH = $(LIB_TH)
+@TH_ON@INSTALL_TH = installth
 
 # C++ version of the library
 LIB_CXX	= lib$(MODULE)xx.a
@@ -70,7 +72,7 @@ FLS	=  conf.h.in configure.in config.help \
 	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc.h protect.[ch] \
 	return.h version.h \
 	settings.dist dmalloc_argv.[ch] dmalloc_argv_loc.h dmallocc.cc \
-	install-sh mkinstalldirs dmalloc.rpm \
+	install-sh mkinstalldirs dmalloc.spec \
 	configure
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
@@ -83,9 +85,9 @@ DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi texinfo.tex
 # NOTE: the wc level should be below 90k due to shar overhead
 SHARSIZE= 85k
 
-all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX)
+all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
 @CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
-	@echo "To make the thread version of the library type 'make threads'"
+@TH_OFF@	@echo "To make the thread version of the library type 'make threads'"
 
 clean ::
 	$(CLEAN)
@@ -104,11 +106,11 @@ installincs :: $(HFLS)
 installcxx :: $(LIB_CXX)
 	install -cevr -m 644 $(LIB_CXX) $(DESTDIR)/lib
 
-installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX)
+installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
-	@echo "Enter 'make installth' to install thread library"
+@TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
 install :: installlibs $(UTIL) $(INFOFILE)
 	install -cev $(UTIL) $(DESTDIR)/bin

@@ -1,3 +1,8 @@
+Mon Jul 24 15:30:04 2000  Gray Watson  <gray@256.com>
+
+	* Added support for --disable-cxx and --enable-threads for turning
+ 	on or off C++ and thread support.
+
 Fri Jul 21 17:00:25 2000  Gray Watson  <gray@256.com>
 
 	* Added autoconfiguration code to see if the return macros work
@@ -1651,5 +1656,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.256 2000/07/21 22:41:21 gray Exp $
+$Id: ChangeLog,v 1.257 2000/07/24 19:47:04 gray Exp $
 -------------------------------------------------------------------------------
