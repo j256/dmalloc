@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.100 2003/06/04 23:45:07 gray Exp $
+ * $Id: dmalloc_t.c,v 1.101 2003/06/06 19:04:16 gray Exp $
  */
 
 /*
@@ -308,7 +308,7 @@ static	int	do_random(const int iter_n)
     }
 #endif
     
-    which_func = _dmalloc_rand() % 6;
+    which_func = _dmalloc_rand() % 7;
     
     switch (which_func) {
       
@@ -461,6 +461,22 @@ static	int	do_random(const int iter_n)
       continue;
       break;
       
+      /* heap check in the middle */
+    case 6:
+      /* do it less often then the other functions */
+      which = _dmalloc_rand() % 20;
+      if (which == 7) {
+	if (malloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
+	  if (! silent_b) {
+	    (void)printf("%d: ERROR malloc_verify failed\n", iter_c + 1);
+	  }
+	  final = 0;
+	}
+	iter_c++;
+      }
+      continue;
+      break;
+      
     default:
       continue;
       break;
@@ -518,8 +534,11 @@ static	int	check_special(void)
   /* get our page size */
   page_size = dmalloc_page_size();
   
+  dmalloc_message("-------------------------------------------------------\n");
+  dmalloc_message("NOTE: ignore any errors until the next ------\n");
+  
   /********************/
-
+  
   if (! silent_b) {
     (void)printf("  Trying to realloc a 0L pointer.\n");
   }
@@ -840,7 +859,115 @@ static	int	check_special(void)
   }
   
   /********************/
-
+  
+  {
+    char		*loc_file, *ex_file;
+    unsigned int	amount, loc_line, ex_line;
+    unsigned long	loc_mark, ex_mark, old_seen, ex_seen;
+    DMALLOC_SIZE	ex_user_size, ex_tot_size;
+    int			iter_c;
+    
+    if (! silent_b) {
+      (void)printf("  Checking dmalloc_examine information\n");
+    }
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      amount = _dmalloc_rand() % (page_size * 2);
+      /* we need 2 because we are doing a 2-1 below */
+      if (amount < 2) {
+	amount = 2;
+      }
+      pnt = malloc(amount); loc_file = __FILE__; loc_line = __LINE__;
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      /* record the mark */
+      loc_mark = dmalloc_mark();
+      
+      /* check out the pointer */
+      if (dmalloc_examine(pnt, &ex_user_size, &ex_tot_size, &ex_file, &ex_line,
+			  NULL /* no return address */, &ex_mark,
+			  &ex_seen) != DMALLOC_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: examining pointer %lx failed.\n",
+		       (unsigned long)pnt);
+	}
+	final = 0;
+      }
+      else if (ex_user_size != amount
+	       || ex_file == NULL
+	       || strcmp(ex_file, loc_file) != 0
+	       || ex_line != loc_line
+	       || ex_mark <= 0
+	       || ex_mark != loc_mark
+	       || ex_tot_size < ex_user_size
+	       || ex_seen < 1) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: examined pointer info invalid.\n");
+	}
+	final = 0;
+      }
+      old_seen = ex_seen;
+      
+      /*
+       * Now realloc the pointer again and make sure that the mark and
+       * the seen increment by 1.  We decrement instead of
+       * incrementing because the library will never reposition an
+       * allocation if shrinking.
+       */
+      pnt = realloc(pnt, amount - 1);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
+		       amount + 1);
+	}
+	final = 0;
+	continue;
+      }
+      
+      /* check out the pointer */
+      if (dmalloc_examine(pnt, &ex_user_size, NULL, NULL, NULL,
+			  NULL, &ex_mark, &ex_seen) != DMALLOC_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: examining pointer %lx failed.\n",
+		       (unsigned long)pnt);
+	}
+	final = 0;
+      }
+      else if (ex_user_size != amount - 1
+	       /* +2 on the mark because of the examine */
+	       || ex_mark != loc_mark + 2
+	       /* +2 on seen because realloc counts it in and out */
+	       || ex_seen != old_seen + 2) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: examined realloced pointer info invalid.\n");
+	}
+	final = 0;
+      }
+      
+      free(pnt);
+      
+      /* this should fail now that we freed the pointer */
+      if (dmalloc_examine(pnt, NULL, NULL, NULL, NULL, NULL, NULL,
+			  NULL) != DMALLOC_ERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: examining freed pointer %lx did not fail.\n",
+		       (unsigned long)pnt);
+	}
+	final = 0;
+      }
+    }
+  }
+  
+  /********************/
+  
+  dmalloc_message("NOTE: ignore the errors from the above ----- to here.\n");
+  dmalloc_message("-------------------------------------------------------\n");
+  
   dmalloc_errno = errno_hold;
   return final;
 }
