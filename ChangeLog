@@ -1,3 +1,12 @@
+2004-01-31  Gray Watson  <gray@outside.256.com>
+
+	* Added compat and arg_checking of atoi, atol, and memmove.
+	Thanks to Guy (guyresh) for pointing out the omissions.
+
+	* Added arg checking to internal strdup functions.
+
+	* Moved argv.c code to use loc_snprintf.
+
 2004-01-28  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.3.0.
@@ -2149,5 +2158,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.316 2004/01/28 14:51:35 gray Exp $
+$Id: ChangeLog,v 1.317 2004/01/31 16:26:30 gray Exp $
 -------------------------------------------------------------------------------

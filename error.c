@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.111 2003/11/17 22:21:53 gray Exp $
+ * $Id: error.c,v 1.112 2004/01/31 16:26:10 gray Exp $
  */
 
 /*
@@ -27,7 +27,7 @@
  */
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
-#include <stdio.h>				/* for sprintf */
+#include <stdio.h>
 
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for message vsprintf */
