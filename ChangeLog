@@ -1,3 +1,10 @@
+Mon May  8 08:19:45 2000  Gray Watson  <gray@256.com>
+
+	* Renamed dmalloc.cc to dmallocc.cc and added the building of
+ 	libdmalloc++.a per Dimitri's comments.
+
+	* Renamed rpm.spec to dmalloc.rpm per Dimitri's comments.
+
 Mon May  1 20:34:18 2000  Gray Watson  <gray@256.com>
 
 	* Fixed some more function headers.
@@ -1582,5 +1589,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.245 2000/05/02 00:34:55 gray Exp $
+$Id: ChangeLog,v 1.246 2000/05/08 12:27:51 gray Exp $
 -------------------------------------------------------------------------------

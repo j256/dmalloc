@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.87 2000/03/21 20:24:44 gray Exp $
+# $Id: Makefile.all.in,v 1.88 2000/05/08 12:27:52 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -36,6 +36,10 @@ SHLIBRARY = lib$(LIBNAME).so
 LIB_TH	= lib$(LIBNAME)th.a
 SHLIB_TH = lib$(LIBNAME)th.so
 
+# C++ version of the library
+LIB_CC	= lib$(LIBNAME)++.a
+SHLIB_CC = lib$(LIBNAME)++.so
+
 # library with dmalloc disabled
 LIB_DIS	= lib$(LIBNAME)lp.a
 SHLIB_DIS = lib$(LIBNAME)lp.so
@@ -60,16 +64,19 @@ HFLS = dmalloc.h
 OBJS = arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
+CC_OBJS = dmallocc.o
 
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
 
 all : dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL)
 	@echo "To make the thread version of the library type 'make threads'"
+	@echo "To make the C++ version of the library type 'make cc'"
 
 clean :
 	rm -f a.out core *.o *.t
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL) dmalloc.h
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CC) $(LIB_DIS) $(TEST) $(UTIL)
+	rm -f dmalloc.h
 
 realclean : clean
 
@@ -97,12 +104,17 @@ install : installdirs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
-	@echo "Enter 'make installth' to install thread library versions"
+	@echo "Enter 'make installth' to install thread library version"
+	@echo "Enter 'make installcc' to install the C++ library version"
 	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
 
 installth : $(LIB_TH)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIB_TH) $(libdir)
+
+installcc : $(LIB_CC)
+	$(srcdir)/mkinstalldirs $(libdir)
+	$(INSTALL_DATA) $(LIB_CC) $(libdir)
 
 installinfo : $(INFOFILE)
 	$(srcdir)/mkinstalldirs $(infodir)
@@ -139,9 +151,17 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
+$(LIB_CC) : $(OBJS) $(NORMAL_OBJS) $(CC_OBJS)
+	ar cr $@ $?
+	ranlib $@
+
 $(LIB_DIS) : dmalloc_lp.o
 	ar cr $@ $?
 	@RANLIB@ $@
+
+threads : $(LIB_TH)
+
+cc : $(LIB_CC)
 
 utils : $(UTIL)
 
@@ -149,8 +169,6 @@ $(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o
 	rm -f $@
 	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
 	mv a.out $@
-
-threads : $(LIB_TH)
 
 # special _th versions of objects with the LOCK_THREADS variable defined to 1
 chunk_th.o : $(srcdir)/chunk.c

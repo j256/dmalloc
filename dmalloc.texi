@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.183 2000/05/02 00:34:55 gray Exp $
+@c $Id: dmalloc.texi,v 1.184 2000/05/08 12:27:52 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -477,7 +477,7 @@ from the home page @uref{http://dmalloc.com/}.
 
 @item You probably will want to edit the settings in
 @file{settings.dist} to tune specific features of the library.  The
-below @file{configure} script will copy this file to @file{settings.h}
+@file{configure} script will copy this file to @file{settings.h}
 which is where you should be adding per-architecture settings.
 
 @cindex configure script
@@ -503,7 +503,7 @@ tune the library to the local architecture.  This file contains relevant
 settings if you are using pthreads or another thread library.
 @xref{Using With Threads}.  The @file{configure} script created this
 file from the @file{settings.dist} file.  Any permanent changes to these
-settings should made to the dist file.  You then can run
+settings should made to the @file{settings.dist} file.  You then can run
 @file{config.status} to re-create the @file{settings.h} file.
 
 @cindex DMALLOC_SIZE variable
@@ -544,11 +544,13 @@ See the ``Using With Threads'' section for more information about the
 operation of the library with your threaded program.  @xref{Using With
 Threads}.
 
-@item See the @file{dmalloc.cc} C++ file which contains basic code to
-overload the @code{new}, @code{new[]}, and @code{delete} C++ operators.
-You may want to compile and include this object file in the dmalloc
-libraries.  My apologies on the minimal C++ support.  I am still living
-in a mostly C world.
+@item If you use C++, typing @kbd{make cc} should be enough to build
+@file{libdmalloc++.a} which is the C++ version of the library.  See the
+@file{dmallocc.cc} C++ file which contains basic code to overload the
+@code{new}, @code{new[]}, @code{delete}, and @code{delete[]} C++
+operators.  My apologies on the minimal C++ support.  I am still living
+in a mostly C world.  Any help improving this interface without
+sacrificing portability would be appreciated.
 
 @cindex testing the library
 @cindex dmalloc_t test program
@@ -567,7 +569,8 @@ heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 and @file{libdmalloc_lp.a} library files in @file{/usr/local/lib}, the
 @file{dmalloc.h} include file in @file{/usr/local/include}, and the
 @file{dmalloc} utility in @file{/usr/local/bin}.  You may also want to
-type @kbd{make installth} to install the thread libraries into place.
+type @kbd{make installth} to install the thread library into place or
+@kbd{make installcc} to install the C++ library into place.
 
 You may have specified a @samp{--prefix=PATH} option to configure in
 which case @samp{/usr/local} will have been replaced with @samp{PATH}.
