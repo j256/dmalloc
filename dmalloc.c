@@ -39,6 +39,7 @@
 
 #include "compat.h"
 #include "debug_tok.h"
+#include "debug_val.h"
 #include "env.h"
 #include "error_str.h"
 #include "error_val.h"
@@ -47,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.45 1994/10/12 17:07:16 gray Exp $";
+  "$Id: dmalloc.c,v 1.46 1994/10/14 01:53:24 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -57,6 +58,44 @@ LOCAL	char	*rcs_id =
 
 #define NO_VALUE		(-1)		/* no value ... value */
 #define TOKENS_PER_LINE		5		/* num debug toks per line */
+
+/*
+ * default flag information
+ */
+typedef struct {
+  char		*de_string;			/* default name */
+  long		de_flags;			/* default settings */
+} default_t;
+
+#define DEFAULT_FLAGS	(DEBUG_LOG_STATS | DEBUG_LOG_NONFREE | \
+			 DEBUG_LOG_ERROR | DEBUG_LOG_BAD_SPACE | \
+			 DEBUG_LOG_UNKNOWN | \
+			 DEBUG_CHECK_FENCE | \
+			 DEBUG_CATCH_NULL)
+#define LOW_FLAGS	(DEFAULT_FLAGS | \
+			 DEBUG_FREE_BLANK | DEBUG_ERROR_ABORT | \
+			 DEBUG_ALLOC_BLANK)
+#define MEDIUM_FLAGS	(LOW_FLAGS | \
+			 DEBUG_CHECK_HEAP | DEBUG_CHECK_LISTS | \
+			 DEBUG_REALLOC_COPY)
+#define HIGH_FLAGS	(MEDIUM_FLAGS | \
+			 DEBUG_CHECK_BLANK | DEBUG_CHECK_FUNCS)
+#define ALL_FLAGS	(HIGH_FLAGS | \
+			 DEBUG_LOG_TRANS | DEBUG_LOG_STAMP | \
+			 DEBUG_LOG_ADMIN | DEBUG_LOG_BLOCKS | \
+			 DEBUG_HEAP_CHECK_MAP | DEBUG_NEVER_REUSE)
+/* NOTE: print-error is not in this list because it is special */
+
+LOCAL	default_t	defaults[] = {
+  { "default",		DEFAULT_FLAGS },
+  { "def",		DEFAULT_FLAGS },
+  { "low",		LOW_FLAGS },
+  { "med",		MEDIUM_FLAGS },
+  { "medium",		MEDIUM_FLAGS },
+  { "high",		HIGH_FLAGS },
+  { "all",		ALL_FLAGS },
+  { NULL }
+};
 
 /* argument variables */
 LOCAL	char	*address	= NULL;		/* for ADDRESS */
@@ -247,7 +286,7 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   char		path[1024], buf[1024];
   const char	*homep;
   char		found, cont;
-  int		new_debug = 0;
+  long		new_debug = 0;
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -346,9 +385,18 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       *strp = "unknown";
   }
   else if (! found && tag_find != NULL) {
-    (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		  argv_program, tag_find, inpath);
-    exit(1);
+    default_t	*defp;
+    
+    for (defp = defaults; defp->de_string != NULL; defp++) {
+      if (strcmp(tag_find, defp->de_string) == 0)
+	break;
+    }
+    if (defp->de_string == NULL) {
+      (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
+		    argv_program, tag_find, inpath);
+      exit(1);
+    }
+    new_debug = defp->de_flags;
   }
   
   return new_debug;
