@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.25 1998/10/08 15:06:03 gray Exp $
+ * $Id: settings.dist,v 1.26 1998/10/21 22:58:25 gray Exp $
  */
 
 /*
@@ -66,11 +66,11 @@
 
 /*
  * Should we allow the free of a NULL pointer and if it happens,
- * should a message be generated to that effect?  I don't see how this
- * would be useful but some systems can, and I guess require this --
- * especially X11 spaghetti code.  I would recommend at least using
- * the message to point out the offenders because I would guess that
- * this is not a portable feature of most malloc libraries.
+ * should a message be generated to that effect.  Some programs,
+ * unfortunately, depend on this.  I hear that this can be common in
+ * X11 and/or Motif spaghetti code.  If your program requires it to
+ * work, I would recommend at least using the message to point out the
+ * offenders.
  *
  * You can also enable the 'allow-zero' token which will not cause an
  * error when the user asks for 0 bytes and will not barf when it sees
