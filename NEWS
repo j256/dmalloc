@@ -1,6 +1,12 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.67 1995/12/29 01:39:53 gray Exp $
+$Id: NEWS,v 1.68 1997/01/16 20:47:15 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.2.0:
+
+	* Updated the GNU support scripts and configure.
+	* Fixed the locking for pthread programs.  Dumb errors.
+	* Ran new fillproto on h-files.  IMPORT -> extern.
 
 Version 3.1.3:
 
