@@ -1,3 +1,12 @@
+Wed Jun 28 19:48:47 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Encorporated new configed argv files.
+
+	* Improved header file configurations immensely.  Removed all
+        casts and other dumb coding assumptions for 64 bit machines.
+
+	* Fixed dumb sparc preprocesser error.
+
 Tue Jun 20 13:56:02 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Added commercial license restrictions to library.
@@ -998,5 +1007,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.152 1995/06/21 17:12:33 gray Exp $
+$Id: ChangeLog,v 1.153 1995/06/28 23:58:22 gray Exp $
 -------------------------------------------------------------------------------
