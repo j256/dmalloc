@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.57 1997/01/17 19:24:39 gray Exp $
+ * $Id: conf.h.in,v 1.58 1997/07/07 08:11:58 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -121,6 +121,9 @@
  */
 #define HAVE_ATEXIT 0
 #define HAVE_ON_EXIT 0
+
+/* Is the DMALLOC_SIZE type unsigned? */
+#define DMALLOC_SIZE_UNSIGNED 0
 
 /*
  * The dmalloc library provides its own versions of the following
