@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.159 1998/12/11 05:06:39 gray Exp $
+@c $Id: dmalloc.texi,v 1.160 1999/03/03 16:17:51 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -94,28 +94,24 @@ detection, file/line number reporting, and general logging of
 statistics.
 
 The library is reasonably portable having been run successfully on at
-least the following operating systems: AIX, BSDI, DG/UX, FreeBSD, HPUX,
-Irix, Linux, MS-DOG, NeXT, OSF, SCO, Solaris, SunOS, Ultrix, Unixware,
-Windoze and even Unicos on a Cray Y-MP.  It also provides support for
-the debugging of threaded programs.  @xref{Using With Threads}.
+least the following operating systems: AIX, BSD/OS, DG/UX, FreeBSD,
+HPUX, Irix, Linux, MS-DOG, NeXT, OSF, SCO, Solaris, SunOS, Ultrix,
+Unixware, Windoze and even Unicos on a Cray Y-MP.  It also provides
+support for the debugging of threaded programs.  @xref{Using With
+Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
-texi, info, and ps).  Documentation is available online at URL
-@code{http://www.letters.com/dmalloc/}.
+texi, info, and ps).  The library and associated documentation is
+available online at URL @code{http://www.dmalloc.com/}.  A new mailing
+list for the library has been created recently and is available as a
+resource for posting questions and problems.  See the home page for more
+details.
 
-The library is available via ftp from @samp{ftp.letters.com} in the
-@file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached via
-my web page @samp{http://www.letters.com/~gray/} with any questions or
-feedback.  Please include the version number of the library that you are
-using as well as your machine and operating system types.
-
-A new mailing list for the library has been created recently.  See the
-library is available via ftp from @samp{ftp.letters.com} in the
-@file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached via
-my web page @samp{http://www.letters.com/~gray/} with any questions or
-feedback.  Please include the version number of the library that you are
-using as well as your machine and operating system types.
+I can be reached via my web page @samp{http://www.256.com/~gray/} with
+any questions or feedback.  Please include the version number of the
+library that you are using as well as your machine and operating system
+types.
 
 Gray Watson.
 
@@ -124,7 +120,6 @@ Gray Watson.
 * Overview::                    Description of features and how to get started.
 * Details::                     Details about how to use the library.
 * Source Code::                 Information on the source and general concerns.
-* Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
 @ifinfo
 * Full Node Listing::           Listing of all the nodes in the manual.
@@ -257,7 +252,6 @@ USA
 @menu
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    The general features of the library.
-* How To Get::                  How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
 @end menu
@@ -445,7 +439,7 @@ appropriate pointer type for the variable being assigned.
 is returned by malloc libraries has already been cleared.  @emph{Only}
 the @code{calloc} routine will zero the memory space it returns.
 
-@node Features, How To Get, Allocation Basics, Overview
+@node Features, Installation, Allocation Basics, Overview
 @section Features of the Library
 
 @cindex features
@@ -556,34 +550,7 @@ your system's routines.  It took me hours to finally come to the
 conclusion that the localtime call, included in SunOS release 4.1,
 overwrites one of its fence-post markers.
 
-@node How To Get, Installation, Features, Overview
-@section How to get the library.
-
-@cindex downloading the library
-@cindex getting the source
-
-@table @asis
-@item Standard Repository:
-
-The newest versions of the dmalloc library are available via anonymous
-ftp from @samp{ftp.letters.com} in the @file{/src/dmalloc} directory.
-
-@cindex anonymous ftp
-@cindex ftp
-
-To use anonymous ftp, you ftp to the site and when the system prompts
-you for a login-id or username you enter @kbd{anonymous}.  When it
-prompts you for a password you enter your email address.  You then can
-change-directory (cd) into @file{/src/dmalloc} and get the @file{README}
-and @file{dmalloc.tar.gz} files.
-
-The versions in this repository include such stuff as a postscript
-version of the manual and other large files which may not have been
-included in the distribution you received.
-
-@end table
-
-@node Installation, Getting Started, How To Get, Overview
+@node Installation, Getting Started, Features, Overview
 @section Installation of the Library
 
 @cindex installing the library
@@ -741,9 +708,8 @@ library:
 
 @enumerate
 
-@item Make sure you have the latest version of the library.  It is
-available via anonymous ftp from @samp{ftp.letters.com} in the
-@file{/src/dmalloc} directory.  @xref{How To Get}.
+@item Make sure you have the latest version of the library available
+from the home page @samp{http://www.dmalloc.com/}.
 
 @item Please examine the @file{PERMISSIONS} file.  If you are using
 the library in a commercial setting, please consider paying for a
@@ -1504,12 +1470,18 @@ Always copy data to a new pointer when realloc.
 @cindex overwriting memory
 @cindex clearing memory
 @cindex decimal 197
+@cindex 197
 @cindex octal 305
+@cindex 305
+@cindex 0305
 @cindex hex 0xc5
+@cindex 0xc5
+@cindex c5
 @cindex free-blank
 @item free-blank
 Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is freed.
+it is freed.  The same bytes are written when memory is allocated if
+alloc-blank is enabled.
 
 @cindex dump core
 @cindex core dump
@@ -1522,12 +1494,18 @@ Abort the program (and dump core) on errors.  See @code{error-dump} below.
 @cindex overwriting memory
 @cindex clearing memory
 @cindex decimal 197
+@cindex 197
 @cindex octal 305
+@cindex 305
+@cindex 0305
 @cindex hex 0xc5
+@cindex 0xc5
+@cindex c5
 @cindex alloc-blank
 @item alloc-blank
 Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is allocated.
+it is allocated.  The same bytes are written when memory is freed if
+free-blank is enabled.
 
 @cindex heap-check-map
 @item heap-check-map
@@ -1716,7 +1694,7 @@ this.
 To find out the usage for the debug malloc program try @samp{dmalloc
 --usage-long}.  The standardized usage message that will be displayed is
 one of the many features of the argv library included with this package.
-It is available via ftp from @samp{ftp.letters.com} in the
+It is available via ftp from @samp{ftp.256.com} in the
 @file{/src/argv} directory.  See @file{argv.info} there for more
 information.
 
@@ -2126,7 +2104,7 @@ So that's it.  If you have any specific questions or would like addition
 information posted in this section, please let me know.  Experienced
 thread programmers only please.
 
-@node Source Code, Plugs, Details, Top
+@node Source Code, Index of Concepts, Details, Top
 @chapter Source Code Information
 
 @cindex source code
@@ -2254,53 +2232,7 @@ main()
 
 @end itemize
 
-@node Plugs, Index of Concepts, Source Code, Top
-@chapter Plugs and Soapbox Comments
-
-@cindex plugs
-@cindex soapbox comments
-
-The author would like to bring the following organizations to your
-attention.  If you would like any more information about the below,
-please mail to the supplied addresses or drop the author a line with any
-questions.
-
-@table @asis
-@item The Electronic Frontier Foundation (EFF)
-@cindex EFF
-@cindex Electronic Frontier Foundation
-The EFF is a organization committed to ensuring that the rules,
-regulations, and laws being applied to emerging communications
-technologies are in keeping with our society's highest traditions of the
-free and open flow of ideas and information while protecting personal
-privacy.  http://www.eff.org/
-
-@item Computer Professionals for Social Responsibility (CPSR)
-@cindex CPSR
-@cindex Computer Professionals for Social Responsibility
-CPSR is a public-interest alliance of computer scientists and others
-interested in the impact of computer technology on society.  We work to
-influence decisions regarding the development and use of computers
-because those decisions have far-reaching consequences and reflect basic
-values and priorities.  http://www.cpsr.org/
-
-@item Berkeley Software Design, Inc. (BSDI)
-@cindex BSDI
-@cindex BSD/386
-@cindex BSD/OS
-@cindex Berkeley Software Design, Inc.
-The author has been a proud and enthusiastic owner and user of the
-BSD/OS operating system for some time now.  For around $1k you get a
-@emph{complete} BSD-flavor operating system with @emph{full source} for
-Intel class systems (binary licenses are available).  Along with the
-obvious benefits of full source code come excellent customer
-support/service and system features such as a MS-DOG runtime
-environment, SCO binary compatibility, complete tcp/ip networking
-facilities including nfs, full software development utilities, X, etc.
-<bsdi-info@@bsdi.com>
-@end table
-
-@node Index of Concepts, Full Node Listing, Plugs, Top
+@node Index of Concepts, Full Node Listing, Source Code, Top
 @unnumbered Index of Concepts
 
 @printindex cp
@@ -2318,7 +2250,6 @@ Top.
 * Overview::                    Description of features and how to get started.
 * Details::                     Details about how to use the library.
 * Source Code::                 Information on the source and general concerns.
-* Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
 * Full Node Listing::           Listing of all the nodes in the manual.
 
@@ -2333,7 +2264,6 @@ Overview.
 
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    The general features of the library.
-* How To Get::                  How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
 * Using With Threads::          Using the library with a thread package.
