@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.56 1994/09/16 18:52:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.57 1994/09/20 18:57:58 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -284,20 +284,20 @@ the calloc routine will zero the memory space it returns.
 
 @menu
 * Overview::                    General debugging concepts.
-* Environment Variables::       The variable names and their features.
+* Environment Variable::        The variable name and its features.
 * Debug Tokens::                Description of the debugging token flags.
 * Argument Checking::           Special checking of function arguments.
 @end menu
 
-@node Overview, Environment Variables,  , Features
+@node Overview, Environment Variable,  , Features
 @section Overview of General Debugging Concepts.
 
 @cindex debugging concepts
 
-The features of this library are controlled by a number of environmental
-variables.  They enable the memory debugging features at runtime to help
+The features of this library are controlled by an environmental
+variable.  It enables the memory debugging features at runtime to help
 locate problems, chart memory leaks, provide basic bounds checking, log
-statistics, etc.. @xref{Environment Variables}.
+statistics, etc.. @xref{Environment Variable}.
 
 The debugging features that are available can be divided into a couple
 basic classifications:
@@ -409,70 +409,75 @@ your system's library routines.  It took me hours to finally come to the
 conclusion that the localtime call, included in SunOS release 4.1,
 overwrites one of its fence-post markers.
 
-@node Environment Variables, Debug Tokens, Overview, Features
-@section Environment Variables - Their Names and Features.
+@node Environment Variable, Debug Tokens, Overview, Features
+@section Environment Variable - Its Name and Features.
 
-@cindex environment variables
+@cindex environment variable
 @cindex setenv
 @cindex export
 
-@dfn{Environment variables} are variables that are part of the user's
-working environment and are shared by all the programs.  The below
-variables are used by the dmalloc library to enable or disable the memory
-debugging features, at runtime.
+An @dfn{environment variable} is a variable that is part of the user's
+working environment and are shared by all the programs.  The
+@samp{DMALLOC_OPTIONS} variable is used by the dmalloc library to enable
+or disable the memory debugging features, at runtime.  It can be set
+either by hand or with the help of the dmalloc program.  @xref{Dmalloc
+Program}.
 
-They can be set either by hand or with the help of the dmalloc
-program.  @xref{Dmalloc Program}.
-
-To set them by hand, C shell (csh or tcsh) users need to invoke:
+To set it by hand, C shell (csh or tcsh) users need to invoke:
 
 @example
-setenv variable value;
+setenv DMALLOC_OPTIONS value;
 @end example
 
 Bourne shell (sh, bash, ksh, or zsh) users should use:
 
 @example
-variable=value;
-export variable;
+DMALLOC_OPTIONS=value;
+export DMALLOC_OPTIONS;
 @end example
 
+The @samp{DMALLOC_OPTIONS} variable is a comma separated list of tokens
+with a value.  Each of the tokens is described below:
+
 @table @samp
-@item DMALLOC_DEBUG
-@cindex DMALLOC_DEBUG variable
-This env variable should be set to a value in hexadecimal which
-corresponds to the functionality token values added together.
-@xref{Debug Tokens}.  For instance, if the user wanted to enable the
-logging of memory transactions (value @samp{0x008}) and wanted to check
-fence-post memory (value @samp{0x400}) then @samp{DMALLOC_DEBUG} should
-be set to @samp{0x408} (@samp{0x008} + @samp{0x400}).
+@item debug
+@cindex debug setting
+This should be set to a value in hexadecimal which corresponds to the
+functionality token values added together.  @xref{Debug Tokens}.  For
+instance, if the user wanted to enable the logging of memory
+transactions (value @samp{0x008}) and wanted to check fence-post memory
+(value @samp{0x400}) then @samp{debug} should be set to @samp{0x408}
+(@samp{0x008} + @samp{0x400}).
 
 @emph{NOTE}: You don't have to worry about remembering all the hex
 values of the tokens because the dmalloc program automates the setting
 of this variable especially.
 
-@item DMALLOC_LOGFILE
-@cindex DMALLOC_LOGFILE variable
+@emph{NOTE}: You can also specify the debug tokens directly separate by
+commas.  @xref{Debug Tokens}.  If @samp{debug} and the tokens are both
+used, the token values will be added to the debug value.
+
+@item log
+@cindex logfile setting
 @cindex logging information to disk
-Set this variable to a filename so that if @samp{DMALLOC_DEBUG} has
-logging enabled, the library can log transactions, administration
-information, and/or errors to the file so memory problems and usage can
-be tracked.
+Set this to a filename so that if @samp{debug} has logging enabled, the
+library can log transactions, administration information, and/or errors
+to the file so memory problems and usage can be tracked.
 
 To get different logfiles for different processes, you can assign
-@samp{DMALLOC_LOGFILE} to a string with @code{%d} in it (for instance
+@samp{log} to a string with @code{%d} in it (for instance
 @samp{logfile.%d}).  This will be replaced with the pid of the running
 process (for instance @samp{logfile.2451}).
 
 @emph{WARNING}: it is easy to core dump any program with dmalloc, if
 you send in a format with arguments other than the one @code{%d}.
 
-@item DMALLOC_ADDRESS
-@cindex DMALLOC_ADDRESS variable
+@item addr
+@cindex address setting
 @cindex address locating
-When this env variable is set to a hex address (taken from the dmalloc
-log-file for instance) dmalloc will abort when it finds itself either
-allocating or freeing that address.
+When this is set to a hex address (taken from the dmalloc log-file for
+instance) dmalloc will abort when it finds itself either allocating or
+freeing that address.
 
 The address can also have an @samp{:number} argument.  For instance, if
 it was set it to @samp{0x3e45:10}, the library will kill itself the 10th
@@ -485,26 +490,25 @@ This makes it easier to track down specific addresses not being freed.
 @emph{NOTE}: dmalloc will also log all activity on this address along
 with a count.
 
-@item DMALLOC_INTERVAL
-@cindex DMALLOC_INTERVAL variable
-By setting this env variable to a number X, dmalloc will only check the
-heap every X times.  This means a number of @samp{DMALLOC_DEBUG} features
-can be enabled while still running the program within a finite amount of
-time.
+@item inter
+@cindex inter setting
+By setting this to a number X, dmalloc will only check the heap every X
+times.  This means a number of debugging features can be enabled while
+still running the program within a finite amount of time.
 
 I have found that a setting of @samp{100} works well with reasonably
 memory intensive programs.  This of course means that the library will
 not catch errors exactly when they happen but possibly 100 library calls
 later.
 
-@item DMALLOC_START
-@cindex DMALLOC_START variable
-Set this env variable to a number X and dmalloc will begin checking the
-heap after X times.  This means the intensive debugging can be started
-after a certain point in a program.
+@item start
+@cindex start setting
+Set this to a number X and dmalloc will begin checking the heap after X
+times.  This means the intensive debugging can be started after a
+certain point in a program.
 
-@samp{DMALLOC_START} also has the format file:line.  For instance, if it
-is set to 
+@samp{start} also has the format file:line.  For instance, if it is set
+to
 @iftex
 @*
 @end iftex
@@ -518,14 +522,28 @@ This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.
 @end table
 
-@node Debug Tokens, Argument Checking, Environment Variables, Features
+Some examples are:
+
+@example
+# turn on transaction and stats logging and set 'malloc' as the log-file
+setenv DMALLOC_OPTIONS log-trans,log-stats,log=malloc
+
+# enable heap-checking and set the interval to be 100
+setenv DMALLOC_OPTIONS check-heap,log=malloc
+
+# enable 'malloc' as the log-file, watch for address '0x1234', and start
+# checking when we see file.c line 123
+setenv DMALLOC_OPTIONS log=malloc,addr=0x1234,start=file.c:123
+@end example
+
+@node Debug Tokens, Argument Checking, Environment Variable, Features
 @section Debugging Tokens.
 
 @cindex debug tokens
 
 The below tokens and their corresponding descriptions are for the
-setting of the @samp{DMALLOC_DEBUG} environmental variable
-@xref{Environment Variables}.  They should be specified in the user's
+setting of the @samp{debug} part of the @samp{DMALLOC_OPTIONS} variable.
+@xref{Environment Variable}.  They should be specified in the user's
 @file{.dmallocrc} file @xref{RC File}.
 
 Each token, when specified, enables a specific debugging feature.  For
@@ -860,10 +878,10 @@ allocating or freeing by the library.
 
 @item int dmalloc_address_count;
 @cindex dmalloc_address_count variable
-This variable hold the argument to the @code{dmalloc_address} variable.
-If it is set to a greater than 0 value then after the library has seen
-the @code{dmalloc_address} address this many times, it will call
-@code{dmalloc_error()}.
+This variable hold the argument to the @samp{addr} part of the
+@samp{DMALLOC_OPTIONS} variable.  If it is set to a greater than 0 value
+then after the library has seen the @samp{addr} address this many times,
+it will call @code{dmalloc_error()}.
 
 @item void dmalloc_shutdown(void);
 @cindex dmalloc_shutdown function
@@ -907,16 +925,17 @@ DMALLOC_VERIFY_NOERROR.
 
 @emph{NOTE}: @samp{dmalloc_verify()} can only check the heap with the
 functions that have been enabled.  For example, if fence-post checking
-is not enabled in the @samp{DMALLOC_DEBUG} variable,
+is not enabled in the @samp{DMALLOC_OPTIONS} variable,
 @samp{dmalloc_verify()} cannot check the fence-post areas in the heap.
 
 @item void dmalloc_debug(long debug);
 @cindex dmalloc_debug function
-With this routine, the value in the @samp{DMALLOC_DEBUG} variable can be
-overridden and the library debugging features set explicitly.  For
-instance, if debugging should never be enabled for a program, a call to
-@code{dmalloc_debug(0);} as the first call in @code{main()} will disable
-all the memory debugging from that point on.
+With this routine, the value in the @samp{debug} part of the
+@samp{DMALLOC_OPTIONS} variable can be overridden and the library
+debugging features set explicitly.  For instance, if debugging should
+never be enabled for a program, a call to @code{dmalloc_debug(0);} as
+the first call in @code{main()} will disable all the memory debugging
+from that point on.
 
 One problem however is that some systems make calls to memory allocation
 functions @emph{before} @code{main()} is reached therefore before
@@ -925,9 +944,9 @@ may be generated regardless.
 
 @item int dmalloc_debug_current(void);
 @cindex dmalloc_debug_current function
-This routine returns the current value in the @samp{DMALLOC_DEBUG}
-variable.  This allows you to save a copy of the debug dmalloc settings
-to be changed and then restored later.
+This routine returns the current value in the @samp{debug} part of the
+@samp{DMALLOC_OPTIONS} variable.  This allows you to save a copy of the
+debug dmalloc settings to be changed and then restored later.
 
 @item int dmalloc_examine(char * pnt, int * size, char ** file, int * line,
 void ** ret_address);
@@ -1063,12 +1082,12 @@ been.
 @cindex dmalloc program
 
 The dmalloc program is designed to assist in the setting of the
-environmental variables, especially @samp{DMALLOC_DEBUG}.
-@xref{Environment Variables}.  It is designed to print the shell
-commands necessary to make the appropriate changes to the environment.
-Unfortunately, it cannot make the changes on its own so the output from
-dmalloc should be sent through the @code{eval} shell command which
-will do the commands.
+environmental variable @samp{DMALLOC_OPTIONS}, especially the
+@samp{debug} part.  @xref{Environment Variable}.  It is designed to
+print the shell commands necessary to make the appropriate changes to
+the environment.  Unfortunately, it cannot make the changes on its own
+so the output from dmalloc should be sent through the @code{eval} shell
+command which will do the commands.
 
 With shells that have aliasing or macro capabilities: csh, bash, ksh,
 tcsh, zsh, etc., setting up an alias to dmalloc to do the eval call
@@ -1086,20 +1105,20 @@ Zsh users on the other hand should put the following in their
 dmalloc() @{ eval `command dmalloc -b $*` @}
 @end example
 
-This allows the user to execute @code{dmalloc args}.
+This allows the user to execute @samp{dmalloc args}.
 
-The most basic usage for the program is @code{dmalloc [-bC] tag}.
-The -b or -C flags are for generating Bourne or C shell type commands
+The most basic usage for the program is @samp{dmalloc [-bC] tag}.  The
+-b or -C flags are for generating Bourne or C shell type commands
 respectively.  dmalloc will try and use the @code{SHELL} environment
 variable to determine whether bourne or c shell commands should be
 generated but you may want to explicitly specify -b or -C.
 
-The tag argument to dmalloc should match a line from the user's
-run-time configuration file.  @xref{RC File}.  If no tag is specified
-and no other option-commands used, dmalloc will display the current
-settings of the environmental variables.
+The tag argument to dmalloc should match a line from the user's run-time
+configuration file.  @xref{RC File}.  If no tag is specified and no
+other option-commands used, dmalloc will display the current settings of
+the environmental variable.
 
-To find out the usage for the debug malloc program try @code{dmalloc
+To find out the usage for the debug malloc program try @samp{dmalloc
 --usage-all}.  This is one of the many features of the argv library
 included with this package.  It is available from ftp.antaire.com in the
 @file{antaire/src/argv} directory (URL
@@ -1110,8 +1129,8 @@ Here is a detailed list of the flags that can passed to dmalloc:
 
 @table @samp
 @item -a address
-Set the @samp{DMALLOC_ADDRESS} variable to address (or alternatively
-address:number).
+Set the @samp{addr} part of the @samp{DMALLOC_OPTIONS} variable to
+address (or alternatively address:number).
 
 @item -b
 Output Bourne shell type commands.
@@ -1120,14 +1139,15 @@ Output Bourne shell type commands.
 Output C shell type commands.
 
 @item -c
-Clear/unset all of the variables not specified with other arguments.
+Clear/unset all of the settings not specified with other arguments.
 
-@emph{NOTE}: clear will never unset the @samp{DMALLOC_DEBUG} variable.
-Use @samp{-d 0} or a tag to @samp{none} to achieve this.
+@emph{NOTE}: clear will never unset the @samp{debug} setting.  Use
+@samp{-d 0} or a tag to @samp{none} to achieve this.
 
 @item -d bitmask
-Set the @samp{DMALLOC_DEBUG} variable to the bitmask value which should
-be in hex.  This is overridden (and unnecessary) if a tag is specified.
+Set the @samp{debug} part of the @samp{DMALLOC_OPTIONS} env variable to
+the bitmask value which should be in hex.  This is overridden (and
+unnecessary) if a tag is specified.
 
 @item -e errno
 Print the dmalloc error string that corresponds to errno.
@@ -1137,13 +1157,15 @@ Use this configuration file instead of the RC file
 @file{$HOME/.dmallocrc}.
 
 @item -i number
-Set the @samp{DMALLOC_INTERVAL} env variable to number.
+Set the @samp{inter} part of the @samp{DMALLOC_OPTIONS} env variable to
+number.
 
 @item -k
-Keep the variables set when setting a tag.  This overrides -r.
+Keep the settings when using a tag.  This overrides -r.
 
 @item -l filename
-Set the @samp{DMALLOC_LOGFILE} env variable to filename.
+Set the @samp{log} part of the @samp{DMALLOC_OPTIONS} env variable to
+filename.
 
 @item -L
 List all of the tags in the rc-file.  Useful with -v.
@@ -1163,14 +1185,14 @@ setting or to the selected tag (or -d value).  Multiple -p's can be
 specified.
 
 @item -r
-Remove (unset) all variables when setting a tag.  This is useful when
-you are returning to a standard development tag and want the logfile,
-address, and interval variables to be cleared automatically.  I put this
+Remove (unset) all settings when using a tag.  This is useful when you
+are returning to a standard development tag and want the logfile,
+address, and interval settings to be cleared automatically.  I put this
 by default in my dmalloc alias.
 
 @item -s number
-Set the @samp{DMALLOC_START} env variable to number (alternatively
-@samp{file:line}).
+Set the @samp{start} part of the @samp{DMALLOC_OPTIONS} env variable to
+number (alternatively @samp{file:line}).
 
 @item -T
 List all of the debug-tokens.  Useful for getting a token to use with -p
@@ -1182,27 +1204,27 @@ listing all of the tags.
 @end table
 
 If no arguments are specified, dmalloc dumps out the current settings
-that you have for the dmalloc environmental variables.  For example:
+that you have for the environmental variable.  For example:
 
 @example
-DMALLOC_DEBUG == '0x4000417 (runtime)
-DMALLOC_ADDRESS not set
-DMALLOC_INTERVAL not set
-DMALLOC_LOGFILE == 'dmalloc'
-DMALLOC_START not set
+Debug-Flags  '0x40005c7' (runtime)
+Address      0x1f008
+Interval     100
+Logpath      'malloc'
+Start-File   not-set
 @end example
 
 With a -v option and no arguments, dmalloc dumps out the current
 settings in a verbose manner.  For example:
 
 @example
-DMALLOC_DEBUG == '0x4000417' (unknown)
-        log-stats, log-non-free, log-error,
-        check-fence, catch-null
-DMALLOC_ADDRESS not set
-DMALLOC_INTERVAL == '100'
-DMALLOC_LOGFILE not set
-DMALLOC_START not set
+Debug-Flags  '0x40005c7' (runtime)
+   log-stats, log-non-free, log-error, log-blocks, log-unknown, 
+   log-bad-space, check-fence, catch-null
+Address      0x1f008, count = 10
+Interval     100
+Logpath      'malloc'
+Start-File   not-set
 @end example
 
 Here are some examples of dmalloc usage:
@@ -1220,7 +1242,7 @@ dmalloc -e 20
 dmalloc -a 0x34238:6
 
 # return to the normal 'runtime' settings and clear out all
-# other variables
+# other settings
 dmalloc -c runtime
 
 # enable basic settings (1) plus (-p) the logging of
@@ -1232,6 +1254,9 @@ dmalloc -V
 
 # list the available debug malloc tokens with Very-verbose output
 dmalloc -TV
+
+# list the available tags from the rc file with verbose output
+dmalloc -Lv
 @end example
 
 @node RC File, Debugging with the Library, Dmalloc Program, Running
@@ -1305,10 +1330,11 @@ are disabled.
 Here are a number of possible scenarios for using the dmalloc library
 to track down problems with your program.
 
-In all cases, you should first have @samp{DMALLOC_LOGFILE} defined to a
-filename (I use @file{dmalloc}).  You can use @samp{dmalloc -l dmalloc}
-to accomplish this.  If you are interested in have the error messages be
-printed to stderr instead, enable the @samp{print-error} token.
+In all cases, you should first have @samp{log} part of the
+@samp{DMALLOC_OPTIONS} variable defined to a filename (I use
+@file{dmalloc}).  You can use @samp{dmalloc -l dmalloc} to accomplish
+this.  If you are interested in have the error messages be printed to
+stderr instead, enable the @samp{print-error} token.
 
 You should at least enable the following tokens: @samp{log-stats},
 @samp{log-non-free}, @samp{log-error}, and @samp{log-bad-space}.  This
@@ -1345,7 +1371,7 @@ been executed was naughty.
 
 To get more information about the problem, first print dmalloc_errno to
 get the heap's error code.  You can suspend your debugger and run
-@code{dmalloc -e value-returned-from-print} to get an english
+@samp{dmalloc -e value-returned-from-print} to get an english
 translation of the error.  A number of the error messages are designed
 to diagnose specific problems with the heap and may not be
 user-friendly.
@@ -1353,10 +1379,11 @@ user-friendly.
 If the problem was due to the arguments or system allocations then the
 source of the problem has been found.  However, if some code did
 something wrong, you have more work to do.  The @code{check-heap} token
-should be enabled and the @samp{DMALLOC_INTERVAL} un-set or set to a low
-value so that the library can find the problem as close as possible to
-its source.  The code before the call to the library which stopped can
-then be examined closely for irregularities.
+should be enabled and the @samp{inter} part of the
+@samp{DMALLOC_OPTIONS} variable un-set or set to a low value so that the
+library can find the problem as close as possible to its source.  The
+code before the call to the library which stopped can then be examined
+closely for irregularities.
 
 @node Memory Leaks, Fence-Post Overruns, General, Debugging with the Library
 @subsection Tracking down non-freed memory.
@@ -1416,9 +1443,9 @@ fence-post area overwritten.  This means that the code wrote below the
 bottom of the address or above the address right below this one.  In the
 sample, the string that did it was @samp{WOW!}.
 
-By enabling the @code{check-heap} and setting a low
-@samp{DMALLOC_INTERVAL}, you should be able to locate approximately when
-this happened.
+By enabling the @code{check-heap} and setting the @samp{inter} part of
+the @samp{DMALLOC_OPTIONS} variable to a low number, you should be able
+to locate approximately when this happened.
 
 @node Source Code, Plugs, Running, Top
 @chapter Information on the Source and General Concerns.
@@ -1618,7 +1645,7 @@ Allocation Basics.
 Features.
 
 * Overview::                    General debugging concepts.
-* Environment Variables::       The variable names and their features.
+* Environment Variable::        The variable names and their features.
 * Debug Tokens::                Description of the debugging token flags.
 * Argument Checking::           Special checking of function arguments.
 
