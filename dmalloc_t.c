@@ -37,19 +37,26 @@
 #include "dmalloc.h"
 
 /*
- * NOTE: this is only needed to test certain features of the library.
+ * NOTE: these are only needed to test certain features of the library.
  */
 #include "conf.h"
+#include "debug_val.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.49 1995/08/18 18:43:21 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.50 1995/09/06 18:07:16 gray Exp $";
+#endif
+
+/* external routines */
+#if HAVE_SBRK
+IMPORT	char		*sbrk(const int incr);	/* to extend the heap */
 #endif
 
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
 #define MAX_POINTERS		1024
 #define MAX_ALLOC		(1024 * 1024)
+#define MIN_AVAIL		10
 
 #define RANDOM_VALUE(x)		((rand() % ((x) * 10)) / 10)
 
@@ -73,6 +80,7 @@ static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
 static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
 static	char		random_debug = ARGV_FALSE;	/* random flag */
 static	char		silent = ARGV_FALSE;		/* silent flag */
+static	unsigned int	seed_random = -1;		/* random seed */
 static	char		verbose = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
@@ -88,6 +96,8 @@ static	argv_t		arg_list[] = {
       NULL,			"randomly change debug flag" },
   { 's',	"silent",		ARGV_BOOL,		&silent,
       NULL,			"do not display messages" },
+  { 'S',	"seed-random",		ARGV_U_INT,		&seed_random,
+      "number",			"seed for random function" },
   { 't',	"times",		ARGV_INT,		&default_itern,
       "number",			"number of iterations to run" },
   { 'v',	"verbose",		ARGV_BOOL,		&verbose,
@@ -147,7 +157,7 @@ static	void	*get_address(void)
  */
 static	int	do_random(const int itern)
 {
-  int		iterc, last, amount, max = max_alloc, flags;
+  int		iterc, last, amount, max = max_alloc, flags, freec;
   pnt_info_t	*freep, *usedp = NULL;
   pnt_info_t	*pntp, *lastp, *thisp;
   
@@ -170,6 +180,7 @@ static	int	do_random(const int itern)
   }
   /* redo the last next pointer */
   (pntp - 1)->pi_next = NULL;
+  freec = max_pointers;
   
   for (iterc = 0; iterc < itern;) {
     int		which;
@@ -188,25 +199,39 @@ static	int	do_random(const int itern)
       dmalloc_debug(flags);
     }
     
-    which = RANDOM_VALUE(2);
+    /* special case when doing non-linear stuff, sbrk took all memory */
+    if (max < MIN_AVAIL && freec == max_pointers)
+      break;
+    
+    if (freec < max_pointers && usedp == NULL) {
+      (void)fprintf(stderr, "%s: problem with test program free list\n",
+		    argv_program);
+      exit(1);
+    }
+    
+    /* decide whether to malloc a new pointer or free/realloc an existing */
+    which = RANDOM_VALUE(4);
     
     /*
-     * < 10 means alloc as long as we have enough memory and there are
-     * free slots else we free
+     * < MIN_AVAIL means alloc as long as we have enough memory and
+     * there are free slots we do an allocation, else we free
      */
-    if (which == 0 && max > 10 && freep != NULL) {
-      for (;;) {
-	amount = RANDOM_VALUE(max / 2);
-	if (amount > 0)
-	  break;
-#if ALLOW_ALLOC_ZERO_SIZE
-	if (amount == 0)
-	  break;
+    if (freec == max_pointers
+	|| (freec > 0 && which < 3 && max >= MIN_AVAIL)) {
+      amount = RANDOM_VALUE(max / 2);
+#if ALLOW_ALLOC_ZERO_SIZE == 0
+      if (amount == 0)
+	amount = 1;
 #endif
-      }
       
-      which = RANDOM_VALUE(3);
-      if (which == 0) {
+      if (flags & DEBUG_ALLOW_NONLINEAR)
+	which = RANDOM_VALUE(10);
+      else
+	which = RANDOM_VALUE(9);
+      
+      switch (which) {
+
+      case 0: case 1: case 2:
 	pntp = freep;
 	pntp->pi_pnt = CALLOC(char, amount);
 	
@@ -214,8 +239,9 @@ static	int	do_random(const int itern)
 	  (void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
 		       iterc + 1, amount, max, pntp - pointer_grid,
 		       (long)pntp->pi_pnt);
-      }
-      else if (which == 1) {
+	break;
+
+      case 3: case 4: case 5:
 	pntp = freep;
 	pntp->pi_pnt = MALLOC(amount);
 	
@@ -223,11 +249,15 @@ static	int	do_random(const int itern)
 	  (void)printf("%d: malloc %d of max %d into slot %d.  got %#lx\n",
 		       iterc + 1, amount, max, pntp - pointer_grid,
 		       (long)pntp->pi_pnt);
-      }
-      else {
-	pntp = pointer_grid + RANDOM_VALUE(max_pointers);
-	if (pntp->pi_pnt == NULL)
+	break;
+	
+      case 6: case 7: case 8:
+	if (freec == max_pointers)
 	  continue;
+	
+	which = RANDOM_VALUE(max_pointers - freec);
+	for (pntp = usedp; which > 0; which--)
+	  pntp = pntp->pi_next;
 	
 	pntp->pi_pnt = REMALLOC(pntp->pi_pnt, amount);
 	max += pntp->pi_size;
@@ -236,23 +266,43 @@ static	int	do_random(const int itern)
 	  (void)printf("%d: realloc %d from %d of max %d slot %d.  got %#lx\n",
 		       iterc + 1, pntp->pi_size, amount, max,
 		       pntp - pointer_grid, (long)pntp->pi_pnt);
-      }
-      
-      if (pntp->pi_pnt == NULL) {
-	if (! silent)
-	  (void)printf("allocation of %d returned error on iteration #%d\n",
-		       amount, iterc + 1);
-	iterc++;
+	break;
+	
+      default:
+#if HAVE_SBRK
+	{
+	  void	*mem;
+	  
+	  mem = sbrk(amount);
+	  if (verbose)
+	    (void)printf("%d: sbrk'd %d of max %d bytes.  got %#lx\n",
+			 iterc + 1, amount, max, (long)mem);
+	  pntp = NULL;
+	}
+	break;
+#else
 	continue;
+#endif
       }
       
-      /* set the size and take it off the free-list and put on used list */
-      pntp->pi_size = amount;
-      
-      if (pntp == freep) {
-	freep = pntp->pi_next;
-	pntp->pi_next = usedp;
-	usedp = pntp;
+      if (pntp != NULL) {
+	if (pntp->pi_pnt == NULL) {
+	  if (! silent)
+	    (void)printf("allocation of %d returned error on iteration #%d\n",
+			 amount, iterc + 1);
+	  iterc++;
+	  continue;
+	}
+	
+	/* set the size and take it off the free-list and put on used list */
+	pntp->pi_size = amount;
+	
+	if (pntp == freep) {
+	  freep = pntp->pi_next;
+	  pntp->pi_next = usedp;
+	  usedp = pntp;
+	  freec--;
+	}
       }
       
       max -= amount;
@@ -263,9 +313,9 @@ static	int	do_random(const int itern)
     /*
      * choose a rand slot to free and make sure it is not a free-slot
      */
-    pntp = pointer_grid + RANDOM_VALUE(max_pointers);
-    if (pntp->pi_pnt == NULL)
-      continue;
+    which = RANDOM_VALUE(max_pointers - freec);
+    for (pntp = usedp; which > 0; which--)
+      pntp = pntp->pi_next;
     
     FREE(pntp->pi_pnt);
     
@@ -277,7 +327,7 @@ static	int	do_random(const int itern)
     pntp->pi_pnt = NULL;
     
     /* find pnt in the used list */
-    for (thisp = usedp, lastp = NULL; lastp != NULL;
+    for (thisp = usedp, lastp = NULL; thisp != NULL;
 	 lastp = thisp, thisp = thisp->pi_next)
       if (thisp == pntp)
 	break;
@@ -288,6 +338,7 @@ static	int	do_random(const int itern)
     
     pntp->pi_next = freep;
     freep = pntp;
+    freec++;
     
     max += pntp->pi_size;
     iterc++;
@@ -565,7 +616,12 @@ int	main(int argc, char ** argv)
   if (silent && (verbose || interactive))
     silent = ARGV_FALSE;
   
-  (void)srand(time(0) ^ 0xDEADBEEF);
+  if (seed_random == (-1))
+    seed_random = time(0) ^ 0xDEABEEF;
+  (void)srand(seed_random);
+  
+  if (! silent)
+    (void)printf("Random seed = %u\n", seed_random);
   
   if (interactive)
     do_interactive();
