@@ -21,9 +21,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.4 2003/05/21 04:33:31 gray Exp $
+# $Id: configure.ac,v 1.5 2003/05/21 15:59:46 gray Exp $
 #
-AC_REVISION($Revision: 1.4 $)
+AC_REVISION($Revision: 1.5 $)
 AC_INIT(dmalloc, 5.0.1, [http://dmalloc.org/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -57,17 +57,6 @@ AC_MSG_NOTICE([build utilities])
 
 AC_PROG_CC
 AC_PROG_CXX
-
-# cxx support
-AC_SUBST(CXX_ON)
-AC_SUBST(CXX_OFF)
-# thread support
-AC_SUBST(TH_ON)
-AC_SUBST(TH_OFF)
-
-# NOTE: shlib enabled handled below
-
-##########################################
 
 # hopefully we have a stdc c-compiler
 if test "$if ac_cv_prog_cc_stdc" = "no" ; then
@@ -159,39 +148,37 @@ AC_SUBST(shlinkargs)
 
 AC_MSG_CHECKING([C++ support])
 if test "$enable_cxx" = "yes"; then
-	CXX_ON=
-	CXX_OFF=#
+	AC_SUBST([CXX_ON],[])
+	AC_SUBST([CXX_OFF],[#])
 	AC_MSG_RESULT([enabled])
 else
-	CXX_ON=#
-	CXX_OFF=
+	AC_SUBST([CXX_ON],[#])
+	AC_SUBST([CXX_OFF],[])
 	AC_MSG_RESULT([disabled])
 fi
 
 AC_MSG_CHECKING([thread support])
 if test "$enable_threads" = "yes"; then
-	TH_ON=
-	TH_OFF=#
+	AC_SUBST([TH_ON],[])
+	AC_SUBST([TH_OFF],[#])
 	AC_MSG_RESULT([enabled])
 else
-	TH_ON=#
-	TH_OFF=
+	AC_SUBST([TH_ON],[#])
+	AC_SUBST([TH_OFF],[])
 	AC_MSG_RESULT([disabled])
 fi
 
 # shlib support
 AC_MSG_CHECKING(shlib support)
 if test "$enable_shlib" = "yes"; then
-    SL_ON=
-    SL_OFF=#
-    AC_MSG_RESULT(enabled)
+	AC_SUBST([SL_ON],[])
+	AC_SUBST([SL_OFF],[#])
+	AC_MSG_RESULT(enabled)
 else
-    SL_ON=#
-    SL_OFF=
-    AC_MSG_RESULT(disabled)
+	AC_SUBST([SL_ON],[#])
+	AC_SUBST([SL_OFF],[])
+	AC_MSG_RESULT(disabled)
 fi
-AC_SUBST(SL_ON)
-AC_SUBST(SL_OFF)
 
 ###############################################################################
 #
@@ -199,9 +186,9 @@ AC_SUBST(SL_OFF)
 #
 AC_TYPE_SIZE_T
 if test "$ac_cv_type_size_t" = "yes"; then
-  AC_DEFINE(DMALLOC_SIZE,size_t)
+	AC_DEFINE(DMALLOC_SIZE,size_t)
 else
-  AC_DEFINE(DMALLOC_SIZE,unsigned long)
+	AC_DEFINE(DMALLOC_SIZE,unsigned long)
 fi
 
 #
@@ -427,7 +414,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.4 2003/05/21 04:33:31 gray Exp $"
+#ident "$Id: configure.ac,v 1.5 2003/05/21 15:59:46 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -575,11 +562,11 @@ else
 fi
 echo '' >> $newfile.t
 if cmp -s $newfile $newfile.t 2>/dev/null; then
-  AC_MSG_NOTICE([$newfile is unchanged])
-  rm -f $newfile.t
+	AC_MSG_NOTICE([$newfile is unchanged])
+	rm -f $newfile.t
 else
-  rm -f $newfile
-  mv $newfile.t $newfile
+	rm -f $newfile
+	mv $newfile.t $newfile
 fi
 ],
 [
@@ -603,11 +590,11 @@ echo '' >> $newfile.t
 cat $srcdir/settings.dist >> $newfile.t
 
 if cmp -s $newfile.t $newfile 2>/dev/null; then
-  AC_MSG_NOTICE([$newfile is unchanged])
-  rm -f $newfile.t
+	AC_MSG_NOTICE([$newfile is unchanged])
+	rm -f $newfile.t
 else
-  rm -f $newfile
-  mv $newfile.t $newfile
+	rm -f $newfile
+	mv $newfile.t $newfile
 fi
 ])
 AC_OUTPUT
