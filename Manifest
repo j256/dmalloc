@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.28 1995/06/13 21:34:38 gray Exp $
+$Id: Manifest,v 1.29 1995/06/20 18:02:46 gray Exp $
 -------------------------------------------------------------------------------
-Description of the files in the malloc package.
+Description of the files in the debug-malloc package.
 
 Changelog		Log entries detailing major module changes.
 
@@ -17,7 +17,7 @@ Manifest		This file.
 NEWS			File with a condensed view of the module's
 			ChangeLog entries per version.
 
-NOTES			General Notes of the malloc routines and
+NOTES			General Notes of the debug-malloc routines and
 			associated algorithms.
 
 README			Quick startup notes.
@@ -64,26 +64,26 @@ dmalloc.c		Program that assists in the setting of the
 
 dmalloc.cc		C++ routines to help using library with C++ code.
 
-dmalloc.h		Installed malloc .h file to be included in
+dmalloc.h		Installed dmalloc .h file to be included in
 			those .c files where file and line debugging
 			information is required.
 
 dmalloc.h.[123]		Used to create dmalloc.h.
 
-dmalloc.info		User-level gnu info manual file for the malloc
+dmalloc.info		User-level gnu info manual file for the dmalloc
 			routines.  Suitable as a text manual also.
 
-dmalloc.ps		Possible postscript file for TeX-less folks.
+dmalloc.ps		Postscript file for TeX-less folks.
 
-dmalloc.texi		Texinfo user manual for generating TeX or Info
+dmalloc.texi		Texinfo user manual for generating Info or dvi
 			formats.
 
-dmalloc_loc.h		Local defines for all of the malloc routines.
+dmalloc_loc.h		Local defines for all of the dmalloc routines.
 
 dmalloc_lp.[ch]		Leap-frog routines to provide file/line info
 			to lib.
 
-dmalloc_t.c		Meager test program for testing the malloc
+dmalloc_t.c		Meager test program for testing the dmalloc
 			routines.
 
 dmallocrc		Sample RC file that is used to set the debug
@@ -94,9 +94,9 @@ env.[ch]		Environmental variable processing routines.
 error.[ch]		Debugging routines and others that provide
 			user output.
 
-error_str.h		Strings that correspond to malloc error codes.
+error_str.h		Strings that correspond to dmalloc error codes.
 
-error_val.h		General error codes for the malloc module.
+error_val.h		General error codes for the dmalloc module.
 
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.
