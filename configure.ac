@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.24 2004/01/28 14:51:36 gray Exp $
+# $Id: configure.ac,v 1.25 2004/01/31 16:21:27 gray Exp $
 #
-AC_REVISION($Revision: 1.24 $)
+AC_REVISION($Revision: 1.25 $)
 AC_INIT(dmalloc, 5.3.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -556,7 +556,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.24 2004/01/28 14:51:36 gray Exp $"
+#ident "$Id: configure.ac,v 1.25 2004/01/31 16:21:27 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -629,25 +629,30 @@ AC_CHECK_FUNCS(fork gethostname getpid getuid time ctime)
 AC_CHECK_FUNCS(vprintf snprintf vsnprintf)
 AC_CHECK_FUNCS(recalloc memalign valloc)
 
-# required
-AC_CHECK_FUNCS(memcmp memcpy memset)
+# required although we have code for them in compat.c
+AC_CHECK_FUNCS(memcmp memcpy memmove memset)
 AC_CHECK_FUNCS(strchr strrchr)
 AC_CHECK_FUNCS(strlen strcmp strcpy strsep)
 
 ##############################################################################
 AC_MSG_NOTICE([various functions for argv files])
 
-# NOTE: rest handled above
-AC_CHECK_FUNCS(strncmp strncpy)
+# NOTE: some duplicated from above
+AC_CHECK_FUNCS(atoi atol getenv)
+AC_CHECK_FUNCS(strchr strcmp strcpy strlen strncmp strncpy strsep)
 
 ##############################################################################
 AC_MSG_NOTICE([various functions for argument checking])
 
+# NOTE: some duplicated from above
+AC_CHECK_FUNCS(atoi atol)
 AC_CHECK_FUNCS(bcmp bcopy bzero)
-AC_CHECK_FUNCS(memccpy memchr)
-# we have the escape index because it is a m4/autoconf command
-AC_CHECK_FUNCS([[index]] rindex strcasecmp strncasecmp)
-AC_CHECK_FUNCS(strcat strdup strspn strcspn strncat strpbrk strstr strtok)
+AC_CHECK_FUNCS([[index]])
+AC_CHECK_FUNCS(memccpy memchr memcmp memcpy memmove memset)
+AC_CHECK_FUNCS(rindex)
+AC_CHECK_FUNCS(strcasecmp strcat strchr strcmp strcpy strcspn strlen)
+AC_CHECK_FUNCS(strncasecmp strncat strncmp strncpy)
+AC_CHECK_FUNCS(strpbrk strrchr strspn strstr strtok)
 
 AC_CONFIG_FILES(Makefile)
 
