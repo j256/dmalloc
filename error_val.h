@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.28 2003/05/13 18:16:49 gray Exp $
+ * $Id: error_val.h,v 1.29 2003/05/15 02:43:10 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -53,45 +53,21 @@
 #define ERROR_USER_NON_CONTIG		42	/* user space not contiguous */
 #define ERROR_ALLOC_FAILED		43	/* could not get more space */
 #define ERROR_ALLOC_NONLINEAR		44	/* no linear address space */
-#define ERROR_BAD_SIZE_INFO		45	/* info doesn't match size */
-#define ERROR_EXTERNAL_HUGE		46	/* external allocation big */
-#define ERROR_OVER_LIMIT		47	/* over allocation limit */
+#define ERROR_OVER_LIMIT		45	/* over allocation limit */
 
 /* free errors */
 #define ERROR_NOT_ON_BLOCK		60	/* not on block boundary */
 #define ERROR_ALREADY_FREE		61	/* already in free list */
-#define ERROR_NOT_START_USER		62	/* not start of user alloc */
 #define ERROR_NOT_USER			63	/* not user allocated */
-#define ERROR_BAD_FREE_LIST		64	/* free-list mess-up */
+#define ERROR_FREE_LIST			64	/* free-list mess-up */
 #define ERROR_FREE_NON_CONTIG		65	/* free space not contiguous */
-#define ERROR_BAD_FREE_MEM		66	/* bad memory pointer */
+#define ERROR_FREE_MEM			66	/* bad memory pointer */
 #define ERROR_FREE_NON_BLANK		67	/* free space should be 0's */
 
-/* dblock errors */
-#if 0
-#define ERROR_BAD_DBLOCK_SIZE		80	/* dblock bad size */
-#define ERROR_BAD_DBLOCK_POINTER	81	/* bad dblock pointer */
-#define ERROR_BAD_DBLOCK_MEM		82	/* bad memory pointer */
-#define ERROR_BAD_DBADMIN_POINTER	83	/* bad dblock admin pointer */
-#define ERROR_BAD_DBADMIN_MAGIC		84	/* bad dblock admin pointer */
-#define ERROR_BAD_DBADMIN_SLOT		85	/* bad dblock slot info */
-#endif
-
 /* administrative errors */
-#define ERROR_BAD_ADMIN_P		90	/* admin value out of bounds */
-#define ERROR_BAD_ADMIN_LIST		91	/* list pnt out of bounds */
-#define ERROR_BAD_ADMIN_MAGIC		92	/* bad magic numbers */
-#define ERROR_BAD_ADMIN_COUNT		93	/* bad count number */
-#define ERROR_BAD_BLOCK_ADMIN_P		94	/* bblock adminp bad */
-#define ERROR_BAD_BLOCK_ADMIN_C		95	/* bblock adminp->count bad */
-
-/* heap check verification errors */
-#define ERROR_BAD_BLOCK_ORDER		100	/* block allocation bad */
-#define ERROR_BAD_FLAG			101	/* bad basic-block flag */
-
-/* memory table errors */
-#define ERROR_TABLE_CORRUPT		102	/* memory table corruption */
-#define ERROR_ADDRESS_LIST		103	/* invalid address list */
+#define ERROR_ADMIN_LIST		70	/* list pnt out of bounds */
+#define ERROR_TABLE_CORRUPT		71	/* memory table corruption */
+#define ERROR_ADDRESS_LIST		72	/* invalid address list */
 
 #define INVALID_ERROR		"errno value is not valid"
 
@@ -132,43 +108,19 @@ __attribute__ ((unused))
   { ERROR_USER_NON_CONTIG,	"user allocated space contiguous block error"},
   { ERROR_ALLOC_FAILED,		"could not grow heap by allocating memory" },
   { ERROR_ALLOC_NONLINEAR,	"heap failed to produce linear address space"},
-  { ERROR_BAD_SIZE_INFO,	"bad size in information structure" },
-  { ERROR_EXTERNAL_HUGE,	"external sbrk too large, cannot be handled" },
   { ERROR_OVER_LIMIT,		"over user specified allocation limit" },
   
   /* free errors */
   { ERROR_NOT_ON_BLOCK,	 	"pointer is not on block boundary" },
   { ERROR_ALREADY_FREE,		"tried to free previously freed pointer" },
-  { ERROR_NOT_START_USER,	"pointer does not start at user-alloc space" },
   { ERROR_NOT_USER,		"pointer does not point to user-alloc space" },
-  { ERROR_BAD_FREE_LIST,	"inconsistency with free linked-list" },
+  { ERROR_FREE_LIST,		"inconsistency with free linked-list" },
   { ERROR_FREE_NON_CONTIG,	"free space contiguous block error" },
-  { ERROR_BAD_FREE_MEM,		"bad basic-block mem pointer in free-list" },
+  { ERROR_FREE_MEM,		"bad basic-block mem pointer in free-list" },
   { ERROR_FREE_NON_BLANK,	"free space has been overwritten" },
   
-  /* dblock errors */
-#if 0
-  { ERROR_BAD_DBLOCK_SIZE,	"bad divided-block chunk size" },
-  { ERROR_BAD_DBLOCK_POINTER,	"bad divided-block pointer" },
-  { ERROR_BAD_DBLOCK_MEM,     "bad basic-block mem pointer in dblock struct" },
-  { ERROR_BAD_DBADMIN_POINTER,	"bad divided-block admin pointer" },
-  { ERROR_BAD_DBADMIN_MAGIC,	"bad divided-block admin magic numbers" },
-  { ERROR_BAD_DBADMIN_SLOT,	"bad divided-block chunk admin info struct" },
-#endif
-  
   /* administrative errors */
-  { ERROR_BAD_ADMIN_P,		"admin structure pointer out of bounds" },
-  { ERROR_BAD_ADMIN_LIST,	"bad admin structure list" },
-  { ERROR_BAD_ADMIN_MAGIC,	"bad magic number in admin structure" },
-  { ERROR_BAD_ADMIN_COUNT,	"bad basic-block count value in admin struct"},
-  { ERROR_BAD_BLOCK_ADMIN_P,	"bad basic-block administration pointer" },
-  { ERROR_BAD_BLOCK_ADMIN_C,	"bad basic-block administration counter" },
-  
-  /* heap check verification */
-  { ERROR_BAD_BLOCK_ORDER,	"bad basic-block allocation order" },
-  { ERROR_BAD_FLAG,		"basic-block has bad flag value" },
-  
-  /* memory table errors */
+  { ERROR_ADMIN_LIST,		"bad admin structure list" },
   { ERROR_TABLE_CORRUPT,	"internal memory table corruption" },
   { ERROR_ADDRESS_LIST,		"internal address list corruption" }
 };
