@@ -1,4 +1,10 @@
+2003-05-22  Gray Watson  <gray@outside.256.com>
+
+	* Removed protection filler to not confuse stuff.
+
 2003-05-21  Gray Watson  <gray@outside.256.com>
+
+	* Improved some of the configure script internals.
 
 	* Added support for a.exe and other cc output forms.
 
@@ -1898,5 +1904,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.290 2003/05/23 02:48:30 gray Exp $
+$Id: ChangeLog,v 1.291 2003/05/23 03:05:19 gray Exp $
 -------------------------------------------------------------------------------

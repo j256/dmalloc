@@ -1,5 +1,5 @@
 /*
- * version string for the library
+ * Version string for the library
  *
  * Copyright 2000 by Gray Watson
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.111 2003/05/23 02:48:30 gray Exp $
+ * $Id: version.h,v 1.112 2003/05/23 03:05:19 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -36,12 +36,12 @@
  *	dmalloc.spec
  *	dmalloc.texi (2 places)
  *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
- *      ports/*/Makefile and ports/*/distfile files
+ *      ports/.../Makefile and ports/.../distfile files
  *
  * Make sure to also cvs tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.0.1" ;
+static	char	*dmalloc_version = "5.0.2" ;
 
-/* Version Date: $Date: 2003/05/23 02:48:30 $ */
+/* Version Date: $Date: 2003/05/23 03:05:19 $ */
 
 #endif /* ! __VERSION_H__ */
