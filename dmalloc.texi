@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.261 2004/08/13 21:55:36 gray Exp $
+@c $Id: dmalloc.texi,v 1.262 2004/09/13 05:13:46 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -825,7 +825,7 @@ like to pass on.
 When diagnosing a problem, if possible, always make sure you are running
 the most up to date version of Dmalloc available from the home page at
 URL @uref{http://dmalloc.com/}.  Problems are often fixed and a new
-release is published before people encounter them.
+release can be published before people encounter them.
 
 @table @samp
 
@@ -833,10 +833,11 @@ release is published before people encounter them.
 
 @cindex check-heap
 This library has never been (and maybe never will be) optimized for
-space nor speed.  Some of its features make it unable to use some of the
-organizational methods of other more efficient heap libraries.  If you
-have the @code{check-heap} token enabled, see the @kbd{-i} option to the
-dmalloc utility.  @xref{Dmalloc Program}.
+space nor speed.  Some of its features make it unable to use some of
+the organizational methods of other more efficient heap libraries.  If
+you have the @code{check-heap} token enabled, see the @kbd{-i} option
+to the dmalloc utility to have the library check itself less
+frequently.  @xref{Dmalloc Program}.
 
 @cindex logfile not produced
 @cindex no logfile produced
