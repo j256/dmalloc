@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.42 1997/03/18 20:34:15 gray Exp $
+ * $Id: chunk_loc.h,v 1.43 1997/03/21 14:33:08 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -72,7 +72,7 @@
 #define MAX_ADMIN_STORE		100
 
 #define BITS(type)		(sizeof(type) * 8)	/* # bits in TYPE */
-#define MAX_SLOTS		(BITS(long) - 1)	/* # of bit slots */
+#define MAX_SLOTS		(int)(BITS(long) - 1)	/* # of bit slots */
 
 /* pointer to the start of the block which holds PNT */
 #define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
@@ -88,20 +88,20 @@
  * number of ba_block entries is a bblock_adm_t which must fit in a
  * basic block
  */
-#define BB_PER_ADMIN	((BLOCK_SIZE - \
-			  (sizeof(long) + \
-			   sizeof(int) + \
-			   sizeof(struct bblock_adm_st *) + \
-			   sizeof(long))) \
-			 / sizeof(bblock_t))
+#define BB_PER_ADMIN	(int)((BLOCK_SIZE - \
+			       (sizeof(long) + \
+				sizeof(int) + \
+				sizeof(struct bblock_adm_st *) + \
+				sizeof(long))) \
+			      / sizeof(bblock_t))
 
 /*
  * number of da_block entries in a dblock_adm_t which must fit in a
  * basic block
  */
-#define DB_PER_ADMIN	((BLOCK_SIZE - \
-			  (sizeof(long) + sizeof(long))) \
-			 / sizeof(dblock_t))
+#define DB_PER_ADMIN	(int)((BLOCK_SIZE - \
+			       (sizeof(long) + sizeof(long))) \
+			      / sizeof(dblock_t))
 
 /*
  * calculate the number of bits in SIZE and put in ANS
@@ -286,7 +286,7 @@ typedef struct bblock_st	bblock_t;
  */
 struct bblock_adm_st {
   long			ba_magic1;		/* bottom magic number */
-  int			ba_posn;		/* position in bblock array */
+  unsigned int		ba_posn;		/* position in bblock array */
   bblock_t		ba_blocks[BB_PER_ADMIN]; /* bblock admin info */
   struct bblock_adm_st	*ba_next;		/* next bblock adm struct */
   long			ba_magic2;		/* top magic number */

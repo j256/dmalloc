@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.104 1997/01/18 05:24:04 gray Exp $";
+  "$Id: chunk.c,v 1.105 1997/03/21 14:33:17 gray Exp $";
 #endif
 
 /*
@@ -67,7 +67,7 @@ LOCAL	dblock_t	*free_dblock[BASIC_BLOCK];
 /* administrative structures */
 LOCAL	bblock_adm_t	*bblock_adm_head = NULL; /* pointer to 1st bb_admin */
 LOCAL	bblock_adm_t	*bblock_adm_tail = NULL; /* pointer to last bb_admin */
-LOCAL	int		smallest_block	= 0;	/* smallest size in bits */
+LOCAL	unsigned int	smallest_block	= 0;	/* smallest size in bits */
 LOCAL	unsigned int	bits[MAX_SLOTS];
 LOCAL	char		fence_bottom[FENCE_BOTTOM], fence_top[FENCE_TOP];
 
@@ -81,7 +81,7 @@ LOCAL	long		alloc_maximum	= 0;	/* maximum memory usage  */
 LOCAL	long		alloc_cur_given	= 0;	/* current mem given */
 LOCAL	long		alloc_max_given	= 0;	/* maximum mem given  */
 LOCAL	long		alloc_total	= 0;	/* total allocation */
-LOCAL	long		alloc_one_max	= 0;	/* maximum at once */
+LOCAL	unsigned long	alloc_one_max	= 0;	/* maximum at once */
 LOCAL	int		free_space_count = 0;	/* count the free bytes */
 
 /* pointer stats */
@@ -449,7 +449,7 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
  * such a slot in RETP or NULL if none.
  * returns [NO]ERROR
  */
-LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
+LOCAL	int	find_free_bblocks(const unsigned int many, bblock_t ** retp)
 {
   bblock_t	*bblockp, *prevp;
   bblock_t	*bestp = NULL, *best_prevp = NULL;
@@ -787,7 +787,7 @@ LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
 				     bblock_t ** nextp)
 {
   void		*tmp;
-  int		bblockc, bblockn;
+  unsigned int	bblockc, bblockn;
   bblock_t	*last = NULL, *this;
   bblock_adm_t	*bblock_admp;
   
@@ -1048,11 +1048,11 @@ EXPORT	int	_chunk_check(void)
   bblock_adm_t	*this_admp, *aheadp;
   bblock_t	*bblockp, *bblistp, *last_bblockp;
   dblock_t	*dblockp;
-  int		undef = 0, start = 0;
+  unsigned int	undef = 0, start = 0;
   char		*bytep;
   void		*pnt;
   int		bitc, dblockc = 0, bblockc = 0, freec = 0;
-  int		bbc = 0, len;
+  unsigned int	bbc = 0, len;
   int		free_bblockc[MAX_SLOTS];
   int		free_dblockc[BASIC_BLOCK];
   
@@ -1599,7 +1599,8 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
-  int		len, diff, min = min_size;
+  int		diff;
+  unsigned int	len, min = min_size;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
     _dmalloc_message("checking pointer '%#lx'", pnt);
