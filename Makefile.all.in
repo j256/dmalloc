@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.40 1994/03/25 06:20:07 gray Exp $
+# $Id: Makefile.all.in,v 1.41 1994/03/30 06:28:58 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -152,7 +152,7 @@ configure : configure.in
 
 arg_check.o : arg_check.c malloc_dbg.h conf.h chunk.h malloc_loc.h debug_val.h \
   error.h arg_check.h 
-argv.o : argv.c conf.h argv.h argv_loc.h version.h malloc_loc.h 
+argv.o : argv.c conf.h argv.h argv_loc.h 
 chunk.o : chunk.c malloc_dbg.h conf.h chunk.h malloc_loc.h chunk_loc.h compat.h \
   debug_val.h error.h error_val.h heap.h version.h 
 compat.o : compat.c malloc_dbg.h conf.h compat.h malloc_loc.h 
@@ -165,4 +165,3 @@ malloc_dbg.o : malloc_dbg.c argv.h malloc_dbg.h conf.h compat.h malloc_loc.h \
   debug_tok.h debug_val.h error_str.h error_val.h version.h 
 malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h malloc_lp.h 
 malloc_t.o : malloc_t.c argv.h malloc_dbg.h conf.h 
-prot.o : prot.c 
