@@ -10,59 +10,58 @@
  */
 #define DMALLOC_DISABLE
 
-#include "dmalloc.h"
 #include "conf.h"
-
+#include "dmalloc.h"
+#include "dmalloc_loc.h"
 #include "dmalloc_lp.h"
 #include "return.h"
 
 #define DO_XT_ENTRY_POINTS 1
 #if DO_XT_ENTRY_POINTS
 
-static _XtAllocError(char * name)
+static	void	_XtAllocError(const char *name)
 {
-  write(2,"Xt Error: ",10);
-  write(2,name,strlen(name));
-  write(1,"\n");
+  (void)write(STDERR, "Xt Error: ", 10);
+  (void)write(STDERR, name, strlen(name));
+  (void)write(STDERR, "\n", 1);
   exit(1);
 }
 
-EXPORT	char	*XtMalloc(unsigned size)
+char	*XtMalloc(unsigned size)
 {
-  char	*ptr;
+  char	*file, *ptr;
   
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  GET_RET_ADDR(file);
   
-  ptr = malloc(size > 0 ? size : 1);
-  if (ptr == NULL)
+  ptr = _malloc_leap(size > 0 ? size : 1, file, 0);
+  if (ptr == NULL) {
     _XtAllocError("malloc");
+  }
   
   return ptr;
 }
 
-/*
- * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
- * depending on whether STDC is defined by your compiler.
- */
-EXPORT	void	XtFree(char * pnt)
+void	XtFree(char *pnt)
 {
-  char	*ptr;
+  char	*file;
   
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  GET_RET_ADDR(file);
   
-  if (ptr)
-    free(pnt);
+  if (ptr != NULL) {
+    _free_leap(pnt, file, 0);
+  }
 }
 
-EXPORT	char	*XtCalloc(unsigned num_elements, unsigned size)
+char	*XtCalloc(unsigned num_elements, unsigned size)
 {
-  char	*ptr;
+  char	*file;
   
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  GET_RET_ADDR(file);
   
-  ptr = calloc(num_elements, size ? size : 1);
-  if (ptr == NULL)
+  ptr = _calloc_leap(num_elements, size ? size : 1, file, 0);
+  if (ptr == NULL) {
     _XtAllocError("calloc");
+  }
   
   return ptr;
 }
@@ -71,16 +70,16 @@ EXPORT	char	*XtCalloc(unsigned num_elements, unsigned size)
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
  * all of OLD_PNT to the new area or truncating.  returns 0L on error.
  */
-EXPORT	char	*XtRealloc(char * ptr, unsigned size)
+char	*XtRealloc(char *ptr, unsigned size)
 {
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  char	*file;
   
-  if (ptr == NULL)
-    return malloc(size > 0 ? size : 1);
+  GET_RET_ADDR(file);
   
-  ptr = realloc(ptr, size > 0 ? size : 1);
-  if (ptr == NULL)
+  ptr = _realloc_leap(ptr, size > 0 ? size : 1, file, 0);
+  if (ptr == NULL) {
     _XtAllocError("realloc");
+  }
   
   return ptr;
 }
