@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.39 1995/06/21 18:19:00 gray Exp $
+ * $Id: chunk_loc.h,v 1.40 1995/09/06 17:40:45 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -64,6 +64,12 @@
  */
 #define DEFAULT_SMALLEST_BLOCK	4
 
+/*
+ * definition of admin overhead during race condition clearing with
+ * admin, needed, and external block handling.
+ */
+#define MAX_ADMIN_STORE		100
+
 #define BITS(type)		(sizeof(type) * 8)	/* # bits in TYPE */
 #define MAX_SLOTS		(BITS(long) - 1)	/* # of bit slots */
 
@@ -82,7 +88,8 @@
  * basic block
  */
 #define BB_PER_ADMIN	((BLOCK_SIZE - \
-			  (sizeof(long) + sizeof(int) + \
+			  (sizeof(long) + \
+			   sizeof(int) + \
 			   sizeof(struct bblock_adm_st *) + \
 			   sizeof(long))) \
 			 / sizeof(bblock_t))
@@ -237,7 +244,8 @@ struct bblock_st {
 #define bb_line		bb_nums.nu_line		/* User-bblock */
   
   union {
-    unsigned long	in_freen;		/* admin count number */
+    unsigned long	in_freen;		/* admin free number */
+    unsigned long	in_posn;		/* admin block position */
     unsigned long	in_blockn;		/* number of blocks */
     unsigned long	in_size;		/* size of allocation */
     /* NOTE: this pointer and the longs may be of a different type */
@@ -245,7 +253,8 @@ struct bblock_st {
   } bb_info;
   
   /* to reference union elements as bb elements */
-#define bb_freen	bb_info.in_freen	/* BBlock-admin */
+#define bb_freen	bb_info.in_freen	/* BBlock-admin-free */
+#define	bb_posn		bb_info.in_posn		/* BBlock-admin */
 #define	bb_blockn	bb_info.in_blockn	/* Free */
 #define	bb_size		bb_info.in_size		/* User-bblock */
 #define	bb_dblock	bb_info.in_dblock	/* User-dblock */
@@ -261,7 +270,7 @@ struct bblock_st {
   /* to reference union elements as bb elements */
 #define	bb_slotp	bb_pnt.pn_slotp		/* DBlock-admin */
 #define	bb_adminp	bb_pnt.pn_adminp	/* BBlock-admin */
-#define	bb_mem		bb_pnt.pn_mem		/* User-dblock, Extern (+tmp)*/
+#define	bb_mem		bb_pnt.pn_mem		/* User-dblock, External */
 #define	bb_next		bb_pnt.pn_next		/* Free */
 #define	bb_file		bb_pnt.pn_file		/* User-bblock */
   
