@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.76 1994/05/30 21:26:36 gray Exp $";
+  "$Id: chunk.c,v 1.77 1994/07/21 19:01:37 gray Exp $";
 #endif
 
 /*
@@ -138,7 +138,7 @@ EXPORT	int	_chunk_startup(void)
   for (binc = 0; binc < BASIC_BLOCK; binc++)
     free_dblock[binc] = NULL;
   
-  /* make array for NUM_BITS calculation */ 
+  /* make array for NUM_BITS calculation */
   bits[0] = 1;
   for (binc = 1, value = 2; binc < MAX_SLOTS; binc++, value *= 2)
     bits[binc] = value;
@@ -156,7 +156,7 @@ EXPORT	int	_chunk_startup(void)
   {
     char	*posp, *topp;
     
-    value = FENCE_MAGIC_BOTTOM;  
+    value = FENCE_MAGIC_BOTTOM;
     topp = fence_bottom + FENCE_BOTTOM;
     for (posp = fence_bottom; posp < topp; posp += sizeof(long)) {
       if (posp + sizeof(long) < topp)
@@ -165,7 +165,7 @@ EXPORT	int	_chunk_startup(void)
 	bcopy((char *)&value, posp, topp - posp);
     }
     
-    value = FENCE_MAGIC_TOP;  
+    value = FENCE_MAGIC_TOP;
     topp = fence_top + FENCE_TOP;
     for (posp = fence_top; posp < topp; posp += sizeof(long)) {
       if (posp + sizeof(long) < topp)
@@ -229,20 +229,29 @@ LOCAL	char	*expand_buf(const void * buf, const int size)
 }
 
 /*
- * display a bad pointer with FILE and LINE information
+ * describe pnt from its FILE, LINE into BUF
  */
-EXPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line)
+LOCAL	void	desc_pnt(char * buf, const char * file,
+			 const unsigned int line)
 {
-  static char	buf[256];
-  
   if ((file == MALLOC_DEFAULT_FILE || file == _malloc_unknown_file)
       && line == MALLOC_DEFAULT_LINE)
     (void)sprintf(buf, "%s", _malloc_unknown_file);
   else if (line == MALLOC_DEFAULT_LINE)
     (void)sprintf(buf, "ra=%#lx", (long)file);
+  else if (file == MALLOC_DEFAULT_FILE)
+    (void)sprintf(buf, "ra=ERROR(line=%u)", line);
   else
     (void)sprintf(buf, "%s:%u", file, line);
-  
+}
+
+/*
+ * display a bad pointer with FILE and LINE information
+ */
+EXPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line)
+{
+  static char	buf[256];
+  desc_pnt(buf, file, line);
   return buf;
 }
 
@@ -253,15 +262,7 @@ EXPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line)
 LOCAL	char	*chunk_display_pnt2(const char * file, const unsigned int line)
 {
   static char	buf[256];
-  
-  if ((file == MALLOC_DEFAULT_FILE || file == _malloc_unknown_file)
-      && line == MALLOC_DEFAULT_LINE)
-    (void)sprintf(buf, "%s", _malloc_unknown_file);
-  else if (line == MALLOC_DEFAULT_LINE)
-    (void)sprintf(buf, "ra=%#lx", (long)file);
-  else
-    (void)sprintf(buf, "%s:%u", file, line);
-  
+  desc_pnt(buf, file, line);
   return buf;
 }
 
@@ -663,9 +664,11 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
 /*
  * find the bblock entry for PNT
  */
-LOCAL	bblock_t	*find_bblock(const void * pnt)
+LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
+				     bblock_t ** nextp)
 {
   int		bblockc;
+  bblock_t	*last = NULL, *next, *this;
   bblock_adm_t	*bblock_admp;
   
   if (pnt == NULL) {
@@ -690,6 +693,7 @@ LOCAL	bblock_t	*find_bblock(const void * pnt)
     if (bblockc < BB_PER_ADMIN)
       break;
     
+    last = bblock_admp->ba_blocks + (BB_PER_ADMIN - 1);
     bblockc -= BB_PER_ADMIN;
   }
   
@@ -698,7 +702,24 @@ LOCAL	bblock_t	*find_bblock(const void * pnt)
     return NULL;
   }
   
-  return &bblock_admp->ba_blocks[bblockc];
+  this = bblock_admp->ba_blocks + bblockc;
+  if (bblockc > 0)
+    last = bblock_admp->ba_blocks + (bblockc - 1);
+  if (bblockc + 1 < BB_PER_ADMIN)
+    next = bblock_admp->ba_blocks + (bblockc + 1);
+  else {
+    if (bblock_admp->ba_next == NULL)
+      next = NULL;
+    else
+      next = bblock_admp->ba_next->ba_blocks;
+  }
+  
+  if (lastp != NULL)
+    *lastp = last;
+  if (nextp != NULL)
+    *nextp = next;
+  
+  return this;
 }
 
 /*
@@ -1443,7 +1464,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
     min += pnt_total_adm;
   
   /* find which block it is in */
-  bblockp = find_bblock(pnt);
+  bblockp = find_bblock(pnt, NULL, NULL);
   if (bblockp == NULL) {
     if (BIT_IS_SET(check, CHUNK_PNT_LOOSE)) {
       /* the pointer might not be the heap or might be NULL */
@@ -1650,7 +1671,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
   pnt = USER_TO_CHUNK(pnt);
   
   /* find which block it is in */
-  bblockp = find_bblock(pnt);
+  bblockp = find_bblock(pnt, NULL, NULL);
   if (bblockp == NULL) {
     log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
 		   CHUNK_TO_USER(pnt), "not in heap", FALSE);
@@ -1751,7 +1772,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
   /* NOTE: pnt is already in chunk-space */
   
   /* find which block it is in */
-  bblockp = find_bblock(pnt);
+  bblockp = find_bblock(pnt, NULL, NULL);
   if (bblockp == NULL) {
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt), "not in heap", FALSE);
     /* errno set in find_bblock */
@@ -2083,7 +2104,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
 			    void * pnt)
 {
   unsigned int	bitn, blockn, given;
-  bblock_t	*bblockp;
+  bblock_t	*bblockp, *last, *next;
   dblock_t	*dblockp;
   
   /* counts calls to free */
@@ -2100,7 +2121,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   pnt = USER_TO_CHUNK(pnt);
   
   /* find which block it is in */
-  bblockp = find_bblock(pnt);
+  bblockp = find_bblock(pnt, &last, &next);
   if (bblockp == NULL) {
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt), "not in heap", FALSE);
     /* errno set in find_bblock */
@@ -2225,10 +2246,17 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   free_space_count += given;
   
   /*
-   * TODO: here we should be checking above and below the free bblock
-   * looking for neighbors that are free so we can add them together
-   * and put them maybe in a different free slot.
+   * check above and below the free bblock looking for neighbors that
+   * are free so we can add them together and put them in a different
+   * free slot.
    */
+  
+  if (last != NULL && BIT_IS_SET(last->bb_flags, BBLOCK_FREE)) {
+    _malloc_message("block %#lx is free and last is free", pnt);
+  }
+  if (next != NULL && BIT_IS_SET(next->bb_flags, BBLOCK_FREE)) {
+    _malloc_message("block %#lx is free and next is free", pnt);
+  }
   
   /* set the information for the bblock(s) */
   set_bblock_admin(blockn, bblockp, BBLOCK_FREE, bitn, 0, bblockp->bb_next);
@@ -2332,7 +2360,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     free_count--;
   }
   else {
-    /* 
+    /*
      * monitor current allocation level
      *
      * NOTE: we do this here since the malloc/free used above take care
