@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.92 2001/05/21 22:43:20 gray Exp $
+ * $Id: dmalloc_t.c,v 1.93 2001/07/12 23:10:00 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_t.c,v 1.92 2001/05/21 22:43:20 gray Exp $"
+#ident "$Id: dmalloc_t.c,v 1.93 2001/07/12 23:10:00 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.92 2001/05/21 22:43:20 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.93 2001/07/12 23:10:00 gray Exp $";
 #endif
 #endif
 
@@ -391,10 +391,13 @@ static	int	do_random(const int iter_n)
 	    (void)printf("%d: sbrk'd %d of max %d bytes.  got %#lx\n",
 			 iter_c + 1, amount, max, (long)mem);
 	  }
+	  /* don't store the memory */
 	  pnt_p = NULL;
 	}
-	break;
+#else
+	pnt_p = NULL;
 #endif
+	break;
 	
       default:
 	pnt_p = NULL;
@@ -586,7 +589,7 @@ static	void	do_interactive(void)
   
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
   
-  for (;;) {
+  while (1) {
     (void)printf("> ");
     if (fgets(line, sizeof(line), stdin) == NULL) {
       break;
