@@ -17,7 +17,7 @@
 # temporary file.  This temporary file will then be read by gdb and
 # deleted afterwards.
 #
-# November 10, 1998 - Jens Krinke <j.krinke@gmx.net>
+# November 10, 1998 - Jens Krinke
 #
 define dmalloc
   echo Enter dmalloc options: 

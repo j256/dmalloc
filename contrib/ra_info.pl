@@ -3,7 +3,7 @@
 # script to run gdb on return-addresses
 # Usage: $0 malloc-log-file binary
 #
-# Copyright 1995 by Gray Watson
+# Copyright 2000 by Gray Watson
 #
 # This file is part of the dmalloc package.
 #
@@ -18,9 +18,9 @@
 # software described herein for any purpose.  It is provided "as is"
 # without express or implied warranty.
 #
-# The author may be contacted at gray.watson@letters.com
+# The author may be contacted via http://dmalloc.com/
 #
-# $Id: ra_info.pl,v 1.5 1999/08/25 12:34:52 gray Exp $
+# $Id: ra_info.pl,v 1.6 2000/03/21 20:13:02 gray Exp $
 #
 
 #

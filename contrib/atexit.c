@@ -2,7 +2,7 @@
  *
  * Copyright (c) 1994, Textil Computer Design GmbH, Dresden
  *
- * Author: J"org Wunsch <joerg_wunsch@tcd-dresden.de>
+ * Author: J"org Wunsch
  *
  * Dumb atexit() implementation. It is far from being elegant. It is
  * only here to provide a workaround for systems where the existing
