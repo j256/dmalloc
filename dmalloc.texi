@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.28 1993/08/18 02:06:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.29 1993/08/24 22:17:23 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -713,6 +713,9 @@ Keep the variables set when setting a tag.  This overrides -r.
 @item -l filename
 Set the @samp{MALLOC_LOGFILE} env variable to filename.
 
+@item -L
+List all of the tags in the rc-file.  Useful with -v.
+
 @item -r
 Remove (unset) all variables when setting a tag.  This is useful when
 you are returning to a standard development tag and want the logfile,
@@ -727,7 +730,8 @@ Set the @samp{MALLOC_START} env variable to number (alternatively
 Set the @samp{MALLOC_TRACE} variable to address.
 
 @item -v
-Give verbose output.  Especially useful when dumping current settings.
+Give verbose output.  Especially useful when dumping current settings or
+listing all of the tags.
 @end table
 
 If no arguments are specified, malloc_dbg dumps out the current settings

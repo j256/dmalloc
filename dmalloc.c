@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.24 1993/08/18 02:06:30 gray Exp $";
+  "$Id: dmalloc.c,v 1.25 1993/08/24 22:17:20 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -68,6 +68,7 @@ LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
 LOCAL	char	*inpath		= NULL;		/* for config-file path */
 LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	keep		= FALSE;	/* keep settings override -r */
+LOCAL	char	list		= FALSE;	/* list rc tokens */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
@@ -90,13 +91,15 @@ LOCAL	argv_t	args[] = {
   { 'e',	"errno",	ARGV_INT,	&errno_to_print,
       "errno",			"print error string for errno" },
   { 'f',	"file",		ARGV_CHARP,	&inpath,
-      "path",			"configs if not ~/.mallocrc" },
+      "path",			"config if not ~/.mallocrc" },
   { 'i',	"interval",	ARGV_INT,	&interval,
       "value",			"check heap every number times" },
   { 'k',	"keep",		ARGV_BOOL,	&keep,
       NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHARP,	&logpath,
       "path",			"file to log messages to" },
+  { 'L',	"list",		ARGV_BOOL,	&list,
+      NULL,			"list tokens in rc file" },
   { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHARP,	&start,
@@ -174,11 +177,46 @@ LOCAL	long	hex_to_long(char * str)
 }
 
 /*
- * process the user configuration looking for the tag.  if tag is null then
- * look for DEBUG_VALUE in the file and return the token for it in STR.
- * routine returns the new debug value matching tag.
+ * dump the current flags set in the debug variable VAL
  */
-LOCAL	long	process(const long debug_value, char ** strp)
+LOCAL	void	dump_debug(const int val)
+{
+  attr_t	*attrp;
+  int		tokc = 0, work = val;
+  
+  if (val == 0) {
+    (void)fprintf(stderr, "   none\n");
+    return;
+  }
+  
+  for (attrp = attributes; attrp->at_string != NULL; attrp++) {
+    if (attrp->at_value != 0 && (work & attrp->at_value) == attrp->at_value) {
+      if (tokc == 0)
+	(void)fprintf(stderr, "   %s", attrp->at_string);
+      else if (tokc == TOKENS_PER_LINE - 1)
+	(void)fprintf(stderr, ", %s\n", attrp->at_string);
+      else
+	(void)fprintf(stderr, ", %s", attrp->at_string);
+      tokc = (tokc + 1) % TOKENS_PER_LINE;
+      work &= ~attrp->at_value;
+    }
+  }
+  
+  if (tokc != 0)
+    (void)fprintf(stderr, "\n");
+  
+  if (work != 0)
+    (void)fprintf(stderr, "%s: warning, unknown debug flags: %#x\n",
+		  argv_program, work);
+}
+
+/*
+ * process the user configuration looking for the TAG_FIND.  if it is
+ * null then look for DEBUG_VALUE in the file and return the token for
+ * it in STRP.  routine returns the new debug value matching tag.
+ */
+LOCAL	long	process(const long debug_value, const char * tag_find,
+			char ** strp)
 {
   static char	token[128];
   FILE		*infile = NULL;
@@ -233,7 +271,7 @@ LOCAL	long	process(const long debug_value, char ** strp)
       (void)strcpy(token, tokp);
       new_debug = 0;
       
-      if (tag != NULL && strcmp(tag, tokp) == 0)
+      if (tag_find != NULL && strcmp(tag_find, tokp) == 0)
 	found = TRUE;
       
       tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
@@ -249,7 +287,7 @@ LOCAL	long	process(const long debug_value, char ** strp)
       }
       
       /* are we processing the tag of choice? */
-      if (found || tag == NULL) {
+      if (found || tag_find == NULL) {
 	for (attrc = 0; attributes[attrc].at_string != NULL; attrc++) {
 	  if (strcmp(tokp, attributes[attrc].at_string) == 0)
 	    break;
@@ -266,11 +304,18 @@ LOCAL	long	process(const long debug_value, char ** strp)
       tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
     } while (tokp != NULL);
     
-    if (tag == NULL && ! cont && new_debug == debug_value) {
+    if (list && ! cont) {
+      if (verbose) {
+	(void)fprintf(stderr, "%s:\n", token);
+	dump_debug(new_debug);
+      }
+      else
+	(void)fprintf(stderr, "%s\n", token);
+    }
+    else if (tag_find == NULL && ! cont && new_debug == debug_value) {
       found = TRUE;
       if (strp != NULL)
 	*strp = token;
-      break;
     }
     
     /* are we done? */
@@ -281,46 +326,17 @@ LOCAL	long	process(const long debug_value, char ** strp)
   (void)fclose(infile);
   
   /* did we find the correct value in the file? */
-  if (tag == NULL && ! found) {
+  if (tag_find == NULL && ! found) {
     if (strp != NULL)
       *strp = "unknown";
   }
-  else if (! found && tag != NULL) {
+  else if (! found && tag_find != NULL) {
     (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		  argv_program, tag, inpath);
+		  argv_program, tag_find, inpath);
     exit(1);
   }
   
   return new_debug;
-}
-
-/*
- * dump the current flags set in the debug variable VAL
- */
-LOCAL	void	dump_debug(const int val)
-{
-  attr_t	*attrp;
-  int		tokc = 0, work = val;
-  
-  for (attrp = attributes; attrp->at_string != NULL; attrp++) {
-    if (attrp->at_value != 0 && (work & attrp->at_value) == attrp->at_value) {
-      if (tokc == 0)
-	(void)fprintf(stderr, "   %s", attrp->at_string);
-      else if (tokc == TOKENS_PER_LINE - 1)
-	(void)fprintf(stderr, ", %s\n", attrp->at_string);
-      else
-	(void)fprintf(stderr, ", %s", attrp->at_string);
-      tokc = (tokc + 1) % TOKENS_PER_LINE;
-      work &= ~attrp->at_value;
-    }
-  }
-  
-  if (tokc != 0)
-    (void)fprintf(stderr, "\n");
-  
-  if (work != 0)
-    (void)fprintf(stderr, "%s: warning, unknown debug flags: %#x\n",
-		  argv_program, work);
 }
 
 /*
@@ -336,7 +352,7 @@ LOCAL	void	dump_current(void)
     (void)fprintf(stderr, "%s not set\n", DEBUG_ENVIRON);
   else {
     num = hex_to_long(str);
-    (void)process(num, &str);
+    (void)process(num, NULL, &str);
     (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
     
     if (verbose)
@@ -438,7 +454,7 @@ EXPORT	int	main(int argc, char ** argv)
     if (debug != NO_VALUE)
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
-    debug = process(0L, NULL);
+    debug = process(0L, tag, NULL);
   }
   
   if (debug != NO_VALUE) {
@@ -484,7 +500,9 @@ EXPORT	int	main(int argc, char ** argv)
     printed = TRUE;
   }
   
-  if (! printed)
+  if (list)
+    process(0L, NULL, NULL);
+  else if (! printed)
     dump_current();
   
   exit(0);

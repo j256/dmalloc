@@ -1,5 +1,7 @@
 Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Added -L or --list to malloc_dbg to list all the rc-file tags.
+
 	* Fixed some problems in chunk.c via Dave Hill's feedback and
 	renamed malloc_str.[ch] to be arg_check.[ch].
 
