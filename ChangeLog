@@ -1,3 +1,7 @@
+Sat Oct 15 13:55:16 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Added a startup message with the debug flags used to logfile.
+
 Fri Oct 14 18:40:59 1994  Gray Watson  (gray at toaster.antaire.com)
 
 	* Fixed dumb errors with FUNC_CHECK code.  Thanks Dave.
@@ -860,5 +864,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.124 1994/10/14 22:41:33 gray Exp $
+$Id: ChangeLog,v 1.125 1994/10/15 17:55:57 gray Exp $
 -------------------------------------------------------------------------------

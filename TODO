@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.22 1994/09/26 16:14:00 gray Exp $
+$Id: TODO,v 1.23 1994/10/15 17:55:15 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -92,6 +92,11 @@ option of having it generate one of the three above formats.
 
 CHECKING:
 
+- maybe have a type as the first argument to message
+	- can be error,trans,admin,debug,etc.
+	- this spits out a starting label to all messages:
+		trans: checking heap
+		admin: need 1 bblocks
 - check in heap_check the cleared space above each allocation instead of
 	only the fence posts
 - maybe add another debug level which stores crc information about internal

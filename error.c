@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.46 1994/10/15 17:01:52 gray Exp $";
+  "$Id: error.c,v 1.47 1994/10/15 17:55:21 gray Exp $";
 #endif
 
 /*
@@ -59,8 +59,7 @@ EXPORT	unsigned long	_dmalloc_iterc = 0;
 EXPORT	void	_dmalloc_message(const char * format, ...)
 {
   static int	outfile = -1;
-  static char	str[1024];
-  char		*strp = str;
+  char		str[1024], *strp = str;
   int		len;
   va_list	args;
   
@@ -124,6 +123,13 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
 	dmalloc_logpath = LOGPATH_INIT;
 	return;
       }
+      
+      /*
+       * NOTE: this makes it go recursive once but it will never get
+       * back here
+       */
+      _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
+		       dmalloc_logpath, _dmalloc_flags, dmalloc_address);
     }
     
     /* write str to the outfile */
