@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.21 1998/02/25 14:35:37 gray Exp $
+ * $Id: settings.dist,v 1.22 1998/09/17 15:22:55 gray Exp $
  */
 
 /*
@@ -263,40 +263,12 @@
  * default.  Please send me mail if these definitions are configurable
  * enough to work with your thread package.
  */
+
+#ifndef LOCK_THREADS
 #define LOCK_THREADS 0
+#endif
+
 #if LOCK_THREADS
-
-#define THREAD_INCLUDE			<pthread.h>
-
-/* define a global variable we use as a lock counter */
-#define THREAD_LOCK_GLOBAL	static pthread_mutex_t dmalloc_mutex;
-#define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, \
-						   THREAD_LOCK_INIT_VAL);
-
-/*
- * The problem is that the pthreads library uses malloc itself.  If we
- * attempt to call the global lock while inside of the pthreads
- * initialization code, the pthread library may core dump.  So we have
- * the dmalloc library not do the lock the first X times with the
- * lock-on dmalloc program env setting (dmalloc -o X).  This is a
- * HACK, however necessary.
- *
- * You will have to play with the lock-on value.  Too many will cause two
- * threads to march into the dmalloc code generating a ERROR_IN_TWICE
- * -- the library is not thread safe.  Too few and you will get a core
- * dump in the pthreads init code.  Weeee!
- *
- * The pthreads library does not like to go recursive (I mean who does).
- * There are two places where this might happen.  One is for dmalloc
- * to try an mutex-lock when pthreads is starting up in a shaky state.
- * We hopefully solve this with the lock-on setting above.  The other
- * is when we go to initialize our mutex-lock.  Chances are that we
- * may cause a recursive call with this.  Below you will see that the
- * LOCK_INIT is called when the lock-on setting gets down to 2 -- not
- * 0.  0 is when the lock will be used so if we init then, the
- * recursive call into dmalloc will try to use a non-initialized lock
- * causing a seg-fault -- at least in OSF.  Sigh.
- */
 
 /*
  * As we approach the time when we start mutex locking the library, we
@@ -305,24 +277,6 @@
  * the init itself might generate a call into the library.  Ugh.
  */
 #define THREAD_INIT_LOCK	2
-
-#define THREAD_LOCK		do { \
-				  if (thread_lock_on == 0) { \
-				    pthread_mutex_lock(&dmalloc_mutex); \
-				  } \
-				} while (0)
-#define THREAD_UNLOCK		do { \
-				  if (thread_lock_on > 0) { \
-				    thread_lock_on--; \
-				    if (thread_lock_on == THREAD_INIT_LOCK) { \
-				      /* we init here to avoid recursion */ \
-				      THREAD_LOCK_INIT; \
-				    } \
-				  } \
-				  else if (thread_lock_on == 0) { \
-				    pthread_mutex_unlock(&dmalloc_mutex); \
-				  } \
-				} while (0)
 
 /*
  * For those threaded programs, this logs the thread ID that allocated

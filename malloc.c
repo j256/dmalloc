@@ -39,8 +39,11 @@
 #endif
 
 #if LOCK_THREADS
-#ifdef THREAD_INCLUDE
-#include THREAD_INCLUDE
+#if HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+#if HAVE_PTHREADS_H
+#include <pthreads.h>
 #endif
 #endif
 
@@ -65,7 +68,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.103 1998/09/17 13:31:55 gray Exp $";
+  "$Id: malloc.c,v 1.104 1998/09/17 15:22:20 gray Exp $";
 #endif
 
 /*
@@ -106,17 +109,85 @@ static	int		enabled_b	= FALSE; /* have we started yet? */
 static	int		in_alloc_b	= FALSE; /* can't be here twice */
 static	int		do_shutdown_b	= FALSE; /* execute shutdown soon */
 
-#ifdef THREAD_LOCK_GLOBAL
-/* define the global thread-lock variable(s) if needed */
-THREAD_LOCK_GLOBAL
-#endif
-
 /* debug variables */
 static	char		*start_file = START_FILE_INIT; /* file to start at */
 static	int		start_line = START_LINE_INIT; /* line to start */
 static	int		start_count = START_COUNT_INIT; /* start after X */
 static	int		check_interval = INTERVAL_INIT; /* check every X */
 static	int		thread_lock_on = LOCK_ON_INIT;	/* turn locking on */
+
+/****************************** thread locking *******************************/
+
+#if LOCK_THREADS
+#ifdef THREAD_MUTEX_T
+/* define a global variable we use as a lock counter */
+static THREAD_MUTEX_T dmalloc_mutex;
+#else
+#error We need to have THREAD_MUTEX_T defined by the configure script
+#endif
+#endif
+
+/*
+ * The problem is that the pthreads library uses malloc itself.  If we
+ * attempt to call the global lock while inside of the pthreads
+ * initialization code, the pthread library may core dump.  So we have
+ * the dmalloc library not do the lock the first X times with the
+ * lock-on dmalloc program env setting (dmalloc -o X).  This is a
+ * HACK, however necessary.
+ *
+ * You will have to play with the lock-on value.  Too many will cause
+ * two threads to march into the dmalloc code generating a
+ * ERROR_IN_TWICE -- the library is not thread safe.  Too few and you
+ * will get a core dump in the pthreads init code.  Weeee!
+ *
+ * The pthreads library does not like to go recursive (I mean who
+ * does).  There are two places where this might happen.  One is when
+ * we try to mutex-lock when pthreads is starting up in a shaky state
+ * as defined above.  We hopefully solve this with the lock-on setting
+ * above.  The other is when we go to initialize our mutex-lock.
+ * Chances are that we may cause a recursive call with this.  The
+ * LOCK_INIT variable defines that the initialization happens when the
+ * lock-on setting gets down to 2 -- not 0.  0 is when the lock will
+ * be used so if we init then, the recursive call into dmalloc will
+ * try to use a non-initialized lock causing a seg-fault -- at least
+ * in OSF.  Sigh.
+ */
+
+/* mutex lock the malloc library */
+static	void	thread_lock(void)
+{
+#if LOCK_THREADS
+  /* we only lock if the lock-on counter has reached 0 */
+  if (thread_lock_on == 0) {
+    pthread_mutex_lock(&dmalloc_mutex);
+  }
+#endif
+}
+
+/* mutex unlock the malloc library */
+static	void	thread_unlock(void)
+{
+#if LOCK_THREADS
+  /* if the lock-on counter has not reached 0 then count it down */
+  if (thread_lock_on > 0) {
+    thread_lock_on--;
+    /*
+     * As we approach the time when we start mutex locking the
+     * library, we need to init the mutex variable.  This sets how
+     * many times before we start locking should we init the variable
+     * taking in account that the init itself might generate a call
+     * into the library.  Ugh.
+     */
+    if (thread_lock_on == THREAD_INIT_LOCK) {
+      /* we init instead of the lock point to avoid recursion */
+      pthread_mutex_init(&dmalloc_mutex, THREAD_LOCK_INIT_VAL);
+    }
+  }
+  else if (thread_lock_on == 0) {
+    pthread_mutex_unlock(&dmalloc_mutex);
+  }
+#endif
+}
 
 /****************************** local utilities ******************************/
 
@@ -141,7 +212,7 @@ static	int	check_debug_vars(const char *file, const int line)
     }
   }
   
-  THREAD_LOCK;
+  thread_lock();
   
   if (in_alloc_b) {
     dmalloc_errno = ERROR_IN_TWICE;
@@ -362,7 +433,7 @@ void	_dmalloc_shutdown(void)
     return;
   }
   
-  THREAD_LOCK;
+  thread_lock();
   
   /* if we've died in dmalloc somewhere then leave fast and quietly */
   if (in_alloc_b) {
@@ -408,7 +479,7 @@ void	_dmalloc_shutdown(void)
   
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   /* NOTE: do not set enabled_b to false here */
 }
@@ -453,7 +524,7 @@ DMALLOC_PNT	_loc_malloc(DMALLOC_SIZE size,
   
   check_pnt(file, line, new_p, "malloc");
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -537,7 +608,7 @@ DMALLOC_PNT	_loc_realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
     check_pnt(file, line, new_p, "realloc-out");
   }
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -581,7 +652,7 @@ DMALLOC_FREE_RET	_loc_free(DMALLOC_PNT pnt,
   
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -688,7 +759,7 @@ void	_dmalloc_log_heap_map(const char *file, const int line)
   
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -710,7 +781,7 @@ void	_dmalloc_log_stats(const char *file, const int line)
   
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -735,7 +806,7 @@ void	_dmalloc_log_unfreed(const char *file, const int line)
   
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -757,7 +828,7 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
     return DMALLOC_VERIFY_ERROR;
   }
   
-  THREAD_LOCK;
+  thread_lock();
   
   if (in_alloc_b) {
     dmalloc_errno = ERROR_IN_TWICE;
@@ -778,7 +849,7 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
   
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
@@ -848,7 +919,7 @@ int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
 			 "dmalloc_examine", NULL);
   in_alloc_b = FALSE;
   
-  THREAD_UNLOCK;
+  thread_unlock();
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
