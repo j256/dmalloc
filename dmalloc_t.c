@@ -33,7 +33,7 @@
 # include <string.h>
 #endif
 
-#include "argv.h"
+#include "dmalloc_argv.h"
 #include "dmalloc.h"
 
 /*
@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.56 1997/07/07 06:44:14 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.57 1997/11/05 16:29:23 gray Exp $";
 #endif
 
 /* external routines */

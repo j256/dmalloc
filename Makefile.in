@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.96 1997/07/07 08:14:50 gray Exp $
+# $Id: Makefile.in,v 1.97 1997/11/05 16:27:17 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -45,7 +45,7 @@ FLS	=  conf.h.in configure.in config.help \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
 	dmalloc_t.c return.h settings.dist version.h \
-	argv.[ch] argv_loc.h dmalloc.cc \
+	dmalloc_argv.[ch] dmalloc_argv_loc.h dmalloc.cc \
 	install-sh mkinstalldirs Deansify.pl \
 	configure $(INFOFILE)
 CFGFLS	= contrib/README contrib/Xmalloc.c contrib/atexit.c \
@@ -108,9 +108,9 @@ $(LIB_DIS) : dmalloc_lp.o
 	ar cr $(LIB_DIS) $?
 	ranlib $(.TARGET)
 
-$(UTIL) : dmalloc.o argv.o compat.o env.o
+$(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 	rm -f $(.TARGET)
-	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
+	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
 	mv a.out $(.TARGET)
 
 port :: $(FLS) $(DOCFLS) $(CFGFLS) Makefile.all.in
@@ -132,9 +132,9 @@ fill :: $(FILLFLS)
 
 tests :: $(TEST)
 
-$(TEST) : $(TEST).o argv.o $(LIBRARY)
+$(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $(.TARGET)
-	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
+	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) $(LIBRARY)
 	mv a.out $(.TARGET)
 
 check light :: $(TEST)

@@ -1,4 +1,18 @@
+Wed Nov  5 11:25:09 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Renamed argv.[ch] to be dmalloc_argv.[ch] to not clash with argv
+        files.
+
+Sun Jul 20 00:40:53 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Added return address handling for SGI.  Thanks James.
+
 Mon Jul  7 03:12:28 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Added better C++ overload functions.  From whom off the Net did
+        I get this from?
+
+	* Added test for DMALLOC_SIZE unsigned-ness.
 
 	* Added a FINI_DMALLOC setting to the settings.dist file to
         support the OSF __fini_ stuff.
@@ -1185,5 +1199,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.176 1997/07/07 07:25:25 gray Exp $
+$Id: ChangeLog,v 1.177 1997/11/05 16:27:16 gray Exp $
 -------------------------------------------------------------------------------

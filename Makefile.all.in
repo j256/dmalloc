@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.64 1997/07/07 07:13:36 gray Exp $
+# $Id: Makefile.all.in,v 1.65 1997/11/05 16:29:22 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -116,16 +116,16 @@ noansi : dmalloc.h Deansify.pl
 
 utils : $(UTIL)
 
-$(UTIL) : $(UTIL).o argv.o compat.o env.o
+$(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
+	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
 	mv a.out $@
 
 tests : $(TEST)
 
-$(TEST) : $(TEST).o argv.o $(LIBRARY)
+$(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) -l$(LIBNAME)
+	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) -l$(LIBNAME)
 	mv a.out $@
 
 check light : $(TEST)
@@ -168,23 +168,27 @@ config.status : $(srcdir)/configure
 # These dependencies are automatically generated.  Do not edit by hand.
 #
 
-arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h dmalloc_loc.h \
-  debug_val.h error.h arg_check.h
-argv.o: argv.c argv.h argv_loc.h
-chunk.o: chunk.c dmalloc.h conf.h settings.h chunk.h dmalloc_loc.h chunk_loc.h \
-  compat.h debug_val.h error.h error_str.h error_val.h heap.h
+arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h \
+ debug_val.h dmalloc_loc.h error.h arg_check.h
+chunk.o: chunk.c dmalloc.h conf.h settings.h chunk.h chunk_loc.h \
+ dmalloc_loc.h compat.h debug_val.h error.h error_str.h error_val.h \
+ heap.h
 compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
 crc.o: crc.c
-dmalloc.o: dmalloc.c argv.h conf.h settings.h dmalloc.h compat.h dmalloc_loc.h \
-  debug_tok.h debug_val.h env.h error_str.h error_val.h version.h
+dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
+ compat.h debug_tok.h dmalloc_loc.h debug_val.h env.h error_str.h \
+ error_val.h version.h
+dmalloc_argv.o: dmalloc_argv.c dmalloc_argv.h dmalloc_argv_loc.h
 dmalloc_lp.o: dmalloc_lp.c dmalloc.h conf.h settings.h dmalloc_loc.h \
-  dmalloc_lp.h
-dmalloc_t.o: dmalloc_t.c argv.h dmalloc.h conf.h settings.h
-env.o: env.c conf.h settings.h dmalloc.h dmalloc_loc.h debug_tok.h debug_val.h \
-  env.h error.h
-error.o: error.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h debug_val.h \
-  env.h error.h error_val.h version.h
-heap.o: heap.c dmalloc.h conf.h settings.h chunk.h dmalloc_loc.h compat.h \
-  debug_val.h error.h error_val.h heap.h
-malloc.o: malloc.c conf.h settings.h return.h dmalloc.h chunk.h dmalloc_loc.h \
-  compat.h debug_val.h env.h error.h error_str.h error_val.h heap.h dmalloc_lp.h
+ dmalloc_lp.h
+dmalloc_t.o: dmalloc_t.c dmalloc_argv.h dmalloc.h conf.h settings.h \
+ debug_val.h dmalloc_loc.h
+env.o: env.c conf.h settings.h dmalloc.h dmalloc_loc.h debug_tok.h \
+ debug_val.h env.h error.h
+error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
+ dmalloc_loc.h env.h error.h error_val.h version.h
+heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
+ debug_val.h dmalloc_loc.h error.h error_val.h heap.h
+malloc.o: malloc.c conf.h settings.h return.h dmalloc.h chunk.h \
+ compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
+ error_val.h heap.h dmalloc_lp.h

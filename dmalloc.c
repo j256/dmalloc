@@ -37,7 +37,7 @@
 
 #define DMALLOC_DISABLE
 
-#include "argv.h"				/* for argument processing */
+#include "dmalloc_argv.h"			/* for argument processing */
 
 #if HAVE_STRING_H
 # include <string.h>
@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.68 1997/07/07 07:13:07 gray Exp $";
+  "$Id: dmalloc.c,v 1.69 1997/11/05 16:29:22 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
