@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.84 1995/03/10 19:43:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.85 1995/03/23 15:34:29 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -481,16 +481,36 @@ or generate the @file{Makefile} and @file{conf.h} files by hand.
 it did its job correctly.  Examine the manual settings section of
 @file{conf.h} to tune some specific features of the library.
 
-@item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
-@file{libdmalloclp.a}, and @file{dmalloc} program.
-
-@emph{NOTE}: non-ANSI folks see the GENERAL section of the README
-file for more information.
-
-@emph{WARNING}: I was unable to auto-configure to my satisfaction the
+@item I was unable to auto-configure to my satisfaction the
 @code{DMALLOC_SIZE} variable in @file{dmalloc.h.3}.  You may have to
-hand edit this file and remake to get things to stop complaining about
-the size arguments to malloc routines.
+edit this line to get things to stop complaining when you go to compile
+about the size arguments to malloc routines.
+
+@item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
+@file{libdmalloclp.a}, and @file{dmalloc} program.  If it does not work,
+please see if there are any notes in the contrib directory about your
+system-type.  If not and you figure your problem out, please send me
+some notes so future users can profit from your experiences.  In general
+64 bit systems usally have lots of warnings about int to pointer
+promotion.
+
+@emph{NOTE}: The dmalloc code is pretty dependent on a good ANSI-C
+compiler like gcc.  If the configure script gives the @samp{WARNING}
+that you do not have an ANSI-C compiler, you may still be able to add
+some sort of option to your compiler to make it ANSI.  If there is an
+option, let me know and I will add it to the configure script.
+Otherwise, you will have to try @kbd{make noansi}.  This will run the
+@file{Deansify.pl} perl script on the code which:
+
+@itemize
+@item @emph{WARNING}: modifies the source code in place
+@item changes @file{stdarg.h} and @code{...} to @file{varargs.h} and
+@code{va_alist}
+@item changes all @code{void *} references to @code{char *}.
+@item fixes all functions to remove @code{foo(char * var)} declarations.
+@end itemize
+
+If it doesn't work you may have to do Deansify.pl's job by hand.
 
 @item Typing @kbd{make tests} should build the @file{dmalloc_t} test
 program.
@@ -498,7 +518,7 @@ program.
 @item Typing @kbd{make light} should run the @file{dmalloc_t} test
 program through a set of light trials.  By default this will execute
 @file{dmalloc_t} 5 times -- each time will execute 10,000 malloc
-operations in a very random manner.  Very anal folks can type @kbd{make
+operations in a very random manner.  Anal folks can type @kbd{make
 heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 @file{dmalloc_t} options.
 
@@ -506,6 +526,11 @@ heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 
 See the Getting Started section to get up and running with the library.
 @xref{Getting Started}.
+
+@emph{NOTE}: This library has never been (and maybe never will be)
+optimized for space nor speed.  in fact, some of its features make it
+unable to use some of the organizational methods of other more efficient
+heap libraries.
 
 @node Getting Started, Using a Debugger, Installation, Overview
 @section Getting Started with the Library
