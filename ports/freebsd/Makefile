@@ -1,6 +1,8 @@
+# New ports collection makefile for:	dmalloc
+# Date created:			7 December 2000
+# Whom:				Jeremy Shaffner <jeremy@external.org>
 #
-# $Id: Makefile,v 1.12 2004/07/11 03:08:39 gray Exp $
-#
+# $FreeBSD: ports/devel/dmalloc/Makefile,v 1.8 2004/02/23 17:50:05 krion Exp $
 
 PORTNAME=	dmalloc
 PORTVERSION=	5.4.0
@@ -9,41 +11,37 @@ MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	dmalloc
 EXTRACT_SUFX=	.tgz
 
-# Thanks much to Jeremy Shaffner <jeremy@external.org>
-MAINTAINER=	http://256.com/gray/email.html
-COMMENT=	Portable heap memory debugging library.
+MAINTAINER=	jeremy@external.org
+COMMENT=	Portable debug memory allocation library
 
-INSTALLS_SHLIB=	YES
-GNU_CONFIGURE=	YES
+GNU_CONFIGURE=	yes
+CONFIGURE_TARGET=--build=${MACHINE_ARCH}-portbld-freebsd${OSREL}
+CONFIGURE_ARGS=	--enable-threads --enable-shlib
+CFLAGS+=	-fPIC
 USE_REINPLACE=	yes
-CONFIGURE_ARGS+=--enable-threads --enable-shlib
+INSTALLS_SHLIB=	yes
 
-# NOTE: we make the test program first because otherwise it screws up
-# and tried to use the .so instead of the .a for some stupid reason
-ALL_TARGET=	dmalloc_t all light
+ALL_TARGET=	all heavy
+INSTALL_TARGET=	install
+
+INFO=	dmalloc
+
+.if !defined(NOPORTDOCS)
+INSTALL_TARGET+=installdocs installinfo
+.endif
 
 pre-patch:
 	@${REINPLACE_CMD} -e 's|-lpthread|${PTHREAD_LIBS}|g' ${WRKSRC}/configure
-
-do-install:
-	${INSTALL_PROGRAM} ${WRKSRC}/dmalloc ${PREFIX}/bin
-	${INSTALL_DATA} ${WRKSRC}/dmalloc.h ${PREFIX}/include
-	${INSTALL_DATA} ${WRKSRC}/libdmallocthcxx.so ${PREFIX}/lib/libdmallocthcxx.so.1
-	@${LN} -sf ${PREFIX}/lib/libdmallocthcxx.so.1 ${PREFIX}/lib/libdmallocthcxx.so
-	${INSTALL_DATA} ${WRKSRC}/libdmallocthcxx.a ${PREFIX}/lib
-	${INSTALL_DATA} ${WRKSRC}/libdmallocth.so ${PREFIX}/lib/libdmallocth.so.1
-	@${LN} -sf ${PREFIX}/lib/libdmallocth.so.1 ${PREFIX}/lib/libdmallocth.so
-	${INSTALL_DATA} ${WRKSRC}/libdmallocth.a ${PREFIX}/lib
-	${INSTALL_DATA} ${WRKSRC}/libdmalloc.so ${PREFIX}/lib/libdmalloc.so.1
-	@${LN} -sf ${PREFIX}/lib/libdmalloc.so.1 ${PREFIX}/lib/libdmalloc.so
-	${INSTALL_DATA} ${WRKSRC}/libdmalloc.a ${PREFIX}/lib
-.if !defined(NOPORTDOCS)
-	@${MKDIR} ${PREFIX}/share/doc/dmalloc
-	${INSTALL_DATA} ${WRKSRC}/docs/dmalloc.html ${PREFIX}/share/doc/dmalloc
-.endif
+	@${REINPLACE_CMD} -e 's|\.so|\.so.1|' ${WRKSRC}/Makefile.in
 
 post-install:
-	${INSTALL_DATA} ${WRKSRC}/docs/dmalloc.info ${PREFIX}/info
+	@(cd ${PREFIX}/lib; \
+		${LN} -sf ${PREFIX}/lib/libdmalloc.so.1 ${PREFIX}/lib/libdmalloc.so; \
+		${LN} -sf ${PREFIX}/lib/libdmallocxx.so.1 ${PREFIX}/lib/libdmallocxx.so; \
+		${LN} -sf ${PREFIX}/lib/libdmallocth.so.1 ${PREFIX}/lib/libdmallocth.so; \
+		${LN} -sf ${PREFIX}/lib/libdmallocthcxx.so.1 ${PREFIX}/lib/libdmallocthcxx.so)
+.if !defined(NOPORTDOCS)
 	@install-info ${PREFIX}/info/dmalloc.info ${PREFIX}/info/dir
+.endif
 
 .include <bsd.port.mk>
