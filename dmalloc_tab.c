@@ -18,14 +18,14 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.11 2000/03/21 18:19:12 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.12 2000/03/24 21:56:38 gray Exp $
  */
 
 /*
  * This file contains routines used to maintain and display a memory
  * table by file and line number of memory usage.
  *
- * Inspired by code from PSM <psm @ sics.se>.  Thanks much.
+ * Inspired by code from PSM.  Thanks much.
  */
 
 #if HAVE_STDLIB_H
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.11 2000/03/21 18:19:12 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.12 2000/03/24 21:56:38 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.11 2000/03/21 18:19:12 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.12 2000/03/24 21:56:38 gray Exp $";
 #endif
 #endif
 
@@ -755,7 +755,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   
   /* is the table empty */
   if (table_entry_c == 0) {
-    _dmalloc_message("  memory table is empty");
+    _dmalloc_message(" memory table is empty");
     return;
   }
   
