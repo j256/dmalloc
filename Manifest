@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.27 1994/11/08 23:54:42 gray Exp $
+$Id: Manifest,v 1.28 1995/06/13 21:34:38 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -41,7 +41,7 @@ chunk_loc.h		Local defines specific to the chunk routines
 compat.[ch]		System compatibility routines if missing
 			functionality.
 
-conf.h			File of library defines produced by configure.
+conf.h			File of defines for the library produced by configure.
 
 conf.h.in		Used by configure to create the conf.h file.
 
@@ -110,6 +110,8 @@ malloc.c		Higher level alloc routines including malloc,
 mkinstalldirs		A script that makes the directories to install into.
 
 return.h		Defines to get the return-address for non-malloc calls.
+
+settings.h		File included by conf.h which contains manual defines.
 
 texinfo.tex		File included to allow tex output from the
 			malloc.texi file.

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.91 1995/05/16 02:17:18 gray Exp $
+@c $Id: dmalloc.texi,v 1.92 1995/06/13 21:34:41 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -479,8 +479,10 @@ often, you may need to either get GNU's tr (in their textutils package)
 or generate the @file{Makefile} and @file{conf.h} files by hand.
 
 @item You may want to examine the files created by configure to make sure
-it did its job correctly.  Examine the manual settings section of
-@file{conf.h} to tune some specific features of the library.
+it did its job correctly.
+
+@item Examine the manual settings in @file{settings.h} to tune specific
+features of the library.
 
 @item I was unable to auto-configure to my satisfaction the
 @code{DMALLOC_SIZE} variable in @file{dmalloc.h.3}.  You may have to

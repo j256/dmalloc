@@ -1,3 +1,7 @@
+Tue Jun 13 17:34:02 1995  Gray Watson  <gray@burger.letters.com>
+
+	* pulled manual settings out of conf.h to settings.h.
+
 Tue May 30 10:30:59 1995  Gray Watson  (gray@burger.letters.com)
 
 	* Fixed problem with conf.h references before included.
@@ -982,5 +986,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.148 1995/05/30 15:10:25 gray Exp $
+$Id: ChangeLog,v 1.149 1995/06/13 21:34:46 gray Exp $
 -------------------------------------------------------------------------------

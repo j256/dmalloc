@@ -1,0 +1,192 @@
+/*
+ * manual configuration flags
+ *
+ * Copyright 1995 by Gray Watson
+ *
+ * This file is part of the dmalloc package.
+ *
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
+ *
+ * Gray Watson makes no representations about the suitability of the
+ * software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
+ *
+ * The author may be contacted at gray.watson@letters.com
+ *
+ * $Id: settings.dist,v 1.1 1995/06/13 21:34:44 gray Exp $
+ */
+
+#ifndef __SETTINGS_H__
+#define __SETTINGS_H__
+
+/*
+ * should we include the RCS ids in the .c files and the installed
+ * library?
+ */
+#define INCLUDE_RCS_IDS 1
+
+/*
+ * should we allow zero length allocations?  this will generate the
+ * smallest possible allocation.
+ *
+ * FYI: if fence post checking is requested, the top and bottom of the
+ * fence post information will be touching.
+ */
+#define ALLOW_ALLOC_ZERO_SIZE 0
+
+/*
+ * should we allow realloc of a NULL pointer?  if set to one, this
+ * will call malloc when 0L is realloced.  this is useful when you are
+ * extending an array in a loop and do not want to allocate it
+ * specially the first time.
+ */
+#define ALLOW_REALLOC_NULL 1
+
+/*
+ * should we allow the free of a NULL pointer and if it happens,
+ * should a message be generated to that effect?  I don't see how this
+ * would be useful but some systems can, and I guess require this.  I
+ * would recommend at least using the message to point out the
+ * offenders because I would guess that this is not a portable feature
+ * of most malloc libraries.
+ *
+ * You can also enable the 'allow-zero' token which will not cause an
+ * error when the user asks for 0 bytes and will not barf when it sees
+ * a free(0L).
+ */
+#define ALLOW_FREE_NULL 0
+#define ALLOW_FREE_NULL_MESSAGE 1
+
+/*
+ * should we use the ra-address macros in return.h.  These are system
+ * specific macros designed to return the return-address for logging
+ * callers (i.e. possible offenders) of malloc routines.  You should
+ * only want to disable them if you are storing code which makes calls
+ * to the dmalloc functions *from* the heap.  This is unlikely but
+ * will confuse the library.  Please mail me if you have any questions
+ * or if you indeed have this problem.
+ */
+#define USE_RET_ADDRESS 1
+
+/*
+ * the largest allowable allocations in bits.  This is only for
+ * verification purposes.  Any allocation larger than this (in bits)
+ * will generate a ERROR_TOO_BIG error (#15).  the default (24)
+ * indicates that an allocation of more than 16mb (2^24) will generate
+ * an error.
+ */
+#define LARGEST_BLOCK 24
+
+/*
+ * although I don't know why you would want to tune this since this is
+ * pretty dependent on my general heap mechanisms, here are some
+ * options to use general first, best, and worst fit algorithms.  if
+ * you don't know what these are, then DON'T TOUCH.
+ *
+ * NOTES: they may go away in the future and/or be replaced by
+ * debug-tokens.  I've tested all three and have not noticed any large
+ * differences.  Also, they only apply for allocations > basic-block
+ * (page) size.
+ */
+#define FIRST_FIT 1
+#define BEST_FIT 0
+#define WORST_FIT 0
+
+/*
+ * automatically call dmalloc_shutdown if on_exit or atexit is
+ * available.  See below for whether configure found on_exit or atexit
+ * calls.  If neither is available, take a look at atexit.c in the
+ * contrib directory which may provide this useful functionality for
+ * your system.
+ */
+#define AUTO_SHUTDOWN 1
+
+/*
+ * the USE_ABORT is auto-configured but may have to be tuned.  On some
+ * OS's, abort calls fclose() which may want to free memory making the
+ * library go recursive.  The configure script tries to test for this
+ * but may have failed.
+ *
+ * In these cased, set USE_ABORT to 0 and set KILL_PROCESS to the
+ * proper way to stop the program.  Killing the current process (id 0)
+ * with SIGABRT works on a number of Unix systems.  You may have to
+ * define some include file to get the value for the SIGABRT signal.
+ */
+#define USE_ABORT		0
+#define KILL_PROCESS		(void)kill(0,SIGABRT)
+#define SIGNAL_INCLUDE		<signal.h>
+
+/*
+ * number of bytes to write at the top of allocations (if fence-post
+ * checking is enabled).  A larger number means more memory space used
+ * up but better protection against fence overruns.  See the manual
+ * for more information.
+ */
+#define FENCE_TOP 4
+
+/*
+ * write the iteration count at the start of every log entry.  This is
+ * handy when you are using the DMALLOC_START variable and want to
+ * begin the tough debugging at a certain point.
+ */
+#define LOG_ITERATION_COUNT 1
+
+/*
+ * Store the number of times a pointer is "seen" being allocated or
+ * freed -- it shows up as a s# (for seen) in the logfile.  This is
+ * useful for tracking of unfreed memory.  See the docs for more
+ * information.
+ * NOTE: This creates a certain amount of memory overhead.
+ */
+#define STORE_SEEN_COUNT 1
+
+/*
+ * Store the interation count or when a pointer is allocated -- it
+ * shows up as a i# (for iteration) in the logfile.  This is to give
+ * you some idea when during program execution, a pointer was
+ * allocated but not freed.
+ * NOTE: This creates a certain amount of memory overhead.
+ */
+#define STORE_ITERATION_COUNT 0
+
+/*
+ * Store the time (in seconds) or timeval (in seconds and
+ * microseconds) when a pointer is allocated -- it shows up as a w#
+ * (for when) in the logfile.  This is to give you some idea when a
+ * pointer was allocated but not freed.  The library will log the
+ * starting and the ending time if either of these flags is set.
+ * TIMEVAL_INCLUDE is the include file to define struct timeval and
+ * GET_TIMEVAL does the actual reading of the current time of day.
+ *
+ * WARNING: only TIME _or_ TIMEVAL can be defined at one time.
+ * NOTE: This creates a certain amount of memory overhead.
+ */
+#define STORE_TIME 0
+#define STORE_TIMEVAL 0
+#define TIMEVAL_INCLUDE		<sys/time.h>
+#define GET_TIMEVAL(t)		(void)gettimeofday(&(t), NULL)
+
+/*
+ * For those systems that have threaded programs, this logs the thread
+ * ID that allocated the pointer -- it shows up as a t... (for
+ * thread-id) in the logfile.  ... is determined by the
+ * THREAD_ID_TO_STRING macro below.  THREAD_TYPE defines the type of
+ * id storage field.  THREAD_INCLUDE will be included if necessary and
+ * GET_THREAD_ID returns the current thread id.
+ *
+ * NOTE: You may have to change the GET_THREAD_ID macro which is
+ * supposed to return the thread-id integer to be stored in the
+ * pointer structures.
+ */
+#define STORE_THREAD_ID 0
+#define THREAD_TYPE			int
+#define THREAD_INCLUDE			<pthread.h>
+#define GET_THREAD_ID			gettid()
+#define THREAD_ID_TO_STRING(b, t)	(void)sprintf((b), "%d", (int)(t))
+
+#endif /* ! __SETTINGS_H__ */
