@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.109 1995/09/06 20:24:49 gray Exp $
+@c $Id: dmalloc.texi,v 1.110 1995/09/06 20:37:06 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -172,7 +172,7 @@ registration see the following section.  @xref{Commercial License}.
 @cindex commercial license
 
 In order to fund maintenance and continued development of this product,
-I have added the requirement that commercial entities license the
+the requirement has been added that commercial entities license the
 software for a nominal fee.  There is a thirty (30) day free evaluation
 period but if your organization uses the software after this time period
 expires, please consider purchasing a registered copy.  This allows me
@@ -613,11 +613,11 @@ file from the @file{settings.dist} file.
 
 @cindex DMALLOC_SIZE variable
 
-@item I am auto-configuring the @code{DMALLOC_SIZE} variable in
-@file{dmalloc.h.2} but I am not sure it is doing what it should.  You
-may have to alter the definitions in this file to get things to stop
-complaining when you go to compile about the size arguments to malloc
-routines.  Comments on this please.
+@item The @code{DMALLOC_SIZE} variable gets auto-configured in
+@file{dmalloc.h.2} but it may not generate correct settings for all
+systems.  You may have to alter the definitions in this file to get
+things to stop complaining when you go to compile about the size
+arguments to malloc routines.  Comments on this please.
 
 @item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
 @file{libdmalloclp.a}, and @file{dmalloc} program.  If it does not work,
@@ -633,10 +633,10 @@ promotion.
 @emph{NOTE}: The code is pretty dependent on a good ANSI-C compiler like
 gcc.  If the configure script gives the @samp{WARNING} that you do not
 have an ANSI-C compiler, you may still be able to add some sort of
-option to your compiler to make it ANSI.  If there is an option, let me
-know and I will add it to the configure script.  Otherwise, you will
-have to try @kbd{make noansi}.  This will run the @file{Deansify.pl}
-perl script on the code which:
+option to your compiler to make it ANSI.  If there such is an option,
+please send it to the author so it can be added to the configure script.
+Otherwise, you will have to try @kbd{make noansi}.  This will run the
+@file{Deansify.pl} perl script on the code which:
 
 @itemize @bullet
 @item @emph{WARNING}: modifies the source code in place
@@ -814,9 +814,8 @@ This line from a log file shows that memory was not freed from file
 @file{dmalloc_t.c} line 92.  @xref{Memory Leaks}.
 
 Along with the above leap functionality, @file{dmalloc.h} also adds the
-following macros which I have been using for all our memory allocation
-needs for some time now.  They take care of all the type-casting and
-make the code look much cleaner (IMHO).
+following macros which take care of all the type-casting and make the
+code look much cleaner (IMHO).
 
 @deftypefun void * ALLOC(@var{type}, int @var{count})
 
@@ -1133,8 +1132,8 @@ effectively redirects @code{new} to the more familiar @code{malloc} and
 @code{delete} to the more familiar @code{free}.  Compile and link this
 file in with the C++ program you want to debug.
 
-@emph{NOTE}: I am not a C++ hacker so feedback in the form of other
-hints and ideas for C++ users would be much appreciated.
+@emph{NOTE}: The author is not a C++ hacker so feedback in the form of
+other hints and ideas for C++ users would be much appreciated.
 
 @node Disabling the Library,  , C++ and the Library, Programming
 @subsection Disabling the Library
@@ -1143,13 +1142,13 @@ hints and ideas for C++ users would be much appreciated.
 
 When you are finished with the development and debugging sessions, you
 may want to disable the dmalloc library and put in its place either the
-system's memory-allocation routines, gnu-malloc, or maybe your own.  I
-have tried to make this a reasonably painless process.  The ease of the
-extraction depends heavily on how many of the library's features your
-made use of during your coding.
+system's memory-allocation routines, gnu-malloc, or maybe your own.
+Attempts have been made to make this a reasonably painless process.  The
+ease of the extraction depends heavily on how many of the library's
+features your made use of during your coding.
 
-I am open to any reasonable suggestions as to how to improve this
-process while maintaining the effectiveness of the debugging.
+Reasonable suggestions are welcome as to how to improve this process
+while maintaining the effectiveness of the debugging.
 
 @itemize @bullet
 @item
@@ -1265,9 +1264,9 @@ problem faster by checking the library's structures at that point.
 @cindex memory leaks
 
 So you've run your program, examined the log-file and discovered (to
-your horror) some un-freed memory.  I tend to be anal about memory leaks
-since even the smallest and most insignificant leak can starve the
-program given the right circumstances.
+your horror) some un-freed memory.  Memory leaks can become large
+problems since even the smallest and most insignificant leak can starve
+the program given the right circumstances.
 
 @example
 not freed: '0x45008' (12 bytes) from 'ra=0x1f8f4'
@@ -1469,10 +1468,9 @@ By setting this to a number X, dmalloc will only check the heap every X
 times.  This means a number of debugging features can be enabled while
 still running the program within a finite amount of time.
 
-I have found that a setting of @samp{100} works well with reasonably
-memory intensive programs.  This of course means that the library will
-not catch errors exactly when they happen but possibly 100 library calls
-later.
+A setting of @samp{100} works well with reasonably memory intensive
+programs.  This of course means that the library will not catch errors
+exactly when they happen but possibly 100 library calls later.
 
 @item start
 @cindex start setting
@@ -1731,8 +1729,7 @@ debug1} after setting up your shell alias.  @xref{Dmalloc Program}.
 This enables the logging of statistics, the logging of non-freed memory,
 and the checking of fence-post memory areas.
 
-When I say @code{dmalloc none}, all memory debugging features are
-disabled.
+Enter @code{dmalloc none} to disable all memory debugging features.
 
 @node Dmalloc Program,  , RC File, Details
 @section Dmalloc Utility Program
@@ -1854,8 +1851,8 @@ specified.
 @item -r
 Remove (unset) all settings when using a tag.  This is useful when you
 are returning to a standard development tag and want the logfile,
-address, and interval settings to be cleared automatically.  I put this
-by default in my dmalloc alias.
+address, and interval settings to be cleared automatically.  If you want
+this behavior by default, this can be put into the dmalloc alias.
 
 @item -s number
 Set the @samp{start} part of the @samp{DMALLOC_OPTIONS} env variable to
@@ -1979,8 +1976,8 @@ comments from @file{chunk_loc.h}.
 @itemize @bullet
 @item
 Realloc() backwards compatibility with being able to realloc from the
-last freed block is @emph{not} supported.  I would be interested to know
-who is using this (cough, cough) feature and for what reason.
+last freed block is @emph{not} supported.  The author is interested to
+know who is using this (cough, cough) feature and for what reason.
 
 @item
 Realloc() of a NULL pointer is supported in which case the library will
@@ -1989,14 +1986,14 @@ manual compilation option in the @file{conf.h} file.
 
 @item
 The library does @emph{not} provide memalign() nor valloc() support as
-of yet, but may in future releases.  I would be interested to know who
-is using these functions and for what reason.
+of yet, but may in future releases.  The author is interested to know
+who is using these functions and for what reason.
 
 @item
-Some systems allow free(0) to not be an error for some reason (idiotic
-IMHO).  Since 0 is not a valid address returned by the malloc call, I
-don't see why free(0) should be allowed.  See @file{conf.h} for some
-manual compilation options to handle this.
+Some systems allow free(0) to not be an error for some reason.  Since 0
+is not a valid address returned by the malloc call, it is debatable that
+this should be allowed.  See @file{conf.h} for some manual compilation
+options to handle this.
 
 @item
 Aside from possibly being slower than the system's memory allocation
@@ -2023,9 +2020,9 @@ Whether the systems' heap grows towards high or low memory.  The chunk.c
 code is designed (loosely) around the fact that consecutive calls to
 sbrk should give higher memory addresses.
 
-I have not been able to test the library on a system whose heap grows
-towards low memory.  If you are trying to run the library on such a
-system I would be interested in talking with you.
+The library has not been tested on a system whose heap grows towards low
+memory.  If you are trying to run the library on such a system please
+contact the author.
 
 @item
 @cindex return-address
@@ -2062,10 +2059,10 @@ main()
 @cindex plugs
 @cindex soapbox comments
 
-Since I have your attention I would like to talk for a second about a
-couple of things that I feel strongly about.  If you would like any more
-information about the below, please mail to the supplied addresses or
-drop me a line with any questions.
+The author would like to bring the following organizations to your
+attention.  If you would like any more information about the below,
+please mail to the supplied addresses or drop the author a line with any
+questions.
 
 @table @asis
 @item The Electronic Frontier Foundation (EFF)
@@ -2090,14 +2087,14 @@ values and priorities.  <cpsr@@csli.stanford.edu>
 @cindex BSDI
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
-I am a proud and enthusiastic owner and user of the BSD/386 operating
-system.  For around $1k you get a @emph{complete} BSD-flavor operating
-system with @emph{full source} for 386 and 486 systems (binary licenses
-are available).  Along with the obvious benefits of full source code
-come excellent customer support/service and system features such as a
-MS-DOG runtime environment, complete tcp/ip networking facilities
-including nfs, full software development utilities, X, etc.
-<bsdi-info@@bsdi.com>
+The author has been a proud and enthusiastic owner and user of the
+BSD/386 operating system for some time now.  For around $1k you get a
+@emph{complete} BSD-flavor operating system with @emph{full source} for
+386 and 486 systems (binary licenses are available).  Along with the
+obvious benefits of full source code come excellent customer
+support/service and system features such as a MS-DOG runtime
+environment, complete tcp/ip networking facilities including nfs, full
+software development utilities, X, etc.  <bsdi-info@@bsdi.com>
 @end table
 
 @node Index of Concepts, Full Node Listing, Plugs, Top
