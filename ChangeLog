@@ -1,3 +1,12 @@
+Sun Oct  4 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Released dmalloc version 4.0.0.
+
+	* Updated the manual a bit.
+
+	* Made a small change to the solaris return.h code.  Thanks
+        Alexandre.
+
 Tue Sep 29 09:26:50 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.0.0 beta2. 
@@ -1288,5 +1297,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.190 1998/09/29 13:43:19 gray Exp $
+$Id: ChangeLog,v 1.191 1998/10/05 03:01:09 gray Exp $
 -------------------------------------------------------------------------------

@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.141 1998/10/05 02:47:20 gray Exp $
+@c $Id: dmalloc.texi,v 1.142 1998/10/05 03:01:11 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -50,8 +50,8 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 4.0.0-beta2
-@subtitle September 1998
+@subtitle Version 4.0.0
+@subtitle October 1998
 @author Gray Watson
 
 @page
@@ -79,7 +79,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 4.0.0-beta2 -- September 1998
+Version 4.0.0 -- October 1998
 @end ifinfo
 
 @cindex introduction
