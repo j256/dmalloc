@@ -1,7 +1,12 @@
+Mon Mar  8 10:50:12 1999  Gray Watson  <gray@burger.letters.com>
+
+	* Added memory tracking function so the user can register a
+	callback function to be run whenever a memory transaction occurs.
+
 Sun Mar  7 17:58:07 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Added DUMP_UNFREED_SUMMARY_ONLY variable to the settings.dist
- 	file.
+	file.
 
 	* Added MEMORY_TABLE_SIZE and MEMORY_TABLE_LOG variables to the
 	settings.dist file.
@@ -10,7 +15,7 @@ Sun Mar  7 17:58:07 1999  Gray Watson  <gray@burger.letters.com>
 	rand().  Grrr.
 
 	* Added memory table code for grouping of allocated and non-freed
- 	memory.  Looks great!
+	memory.  Looks great!
 
 Thu Mar  4 19:28:45 1999  Gray Watson  <gray@whopper.letters.com>
 
@@ -19,6 +24,9 @@ Thu Mar  4 19:28:45 1999  Gray Watson  <gray@whopper.letters.com>
 	* Removed PERMISSION file and all references to commercial-ness.
 
 	* Moved to internal sprintf code for snprintf, etc..
+
+	* Added dmalloc_message to the exported list of functions.  Had to
+	add stdarg.h handling to dmalloc.h.
 
 Fri Dec 11 00:04:04 1998  Gray Watson  <gray@burger.letters.com>
 
@@ -1410,5 +1418,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.210 1999/03/08 04:27:13 gray Exp $
+$Id: ChangeLog,v 1.211 1999/03/08 15:56:55 gray Exp $
 -------------------------------------------------------------------------------

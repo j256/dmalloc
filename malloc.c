@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.125 1999/03/07 23:02:14 gray Exp $
+ * $Id: malloc.c,v 1.126 1999/03/08 15:56:44 gray Exp $
  */
 
 /*
@@ -78,10 +78,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.125 1999/03/07 23:02:14 gray Exp $";
+#ident "$Id: malloc.c,v 1.126 1999/03/08 15:56:44 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.125 1999/03/07 23:02:14 gray Exp $";
+  "$Id: malloc.c,v 1.126 1999/03/08 15:56:44 gray Exp $";
 #endif
 #endif
 
@@ -112,6 +112,7 @@ static	int		enabled_b = FALSE;	/* have we started yet? */
 static	int		in_alloc_b = FALSE;	/* can't be here twice */
 static	int		do_shutdown_b = FALSE;	/* execute shutdown soon */
 static	int		memalign_warn_b = FALSE; /* memalign warning printed?*/
+static	dmalloc_track_t	tracking_func = NULL;	/* memory trxn tracking func */
 
 /* debug variables */
 static	char		*start_file = START_FILE_INIT;	/* file to start at */
@@ -412,6 +413,7 @@ static	int	dmalloc_startup(void)
   _dmalloc_debug_current_func = _dmalloc_debug_current;
   _dmalloc_examine_func = _dmalloc_examine;
   _dmalloc_vmessage_func = _dmalloc_vmessage;
+  _dmalloc_track_func = _dmalloc_track;
   _dmalloc_strerror_func = _dmalloc_strerror;
   
   /*
@@ -546,12 +548,12 @@ void	__fini_dmalloc()
 /******************************* memory calls ********************************/
 
 /*
- * Allocate and return a SIZE block of bytes.  If it is a calloc then
- * the CALLOC_B is set to 1 else 0.  If we are aligning our malloc
- * then ALIGNMENT is greater than 0.  Returns 0L on error.
+ * Allocate and return a SIZE block of bytes.  FUNC_ID contains the
+ * type of function.  If we are aligning our malloc then ALIGNMENT is
+ * greater than 0.  Returns 0L on error.
  */
 DMALLOC_PNT	_loc_malloc(const char *file, const int line,
-			    const DMALLOC_SIZE size, const int calloc_b,
+			    const DMALLOC_SIZE size, const int func_id,
 			    const DMALLOC_SIZE alignment)
 {
   void		*new_p;
@@ -561,11 +563,17 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
   if (size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
     dmalloc_error("malloc");
+    if (tracking_func != NULL) {
+      tracking_func(file, line, func_id, size, alignment, NULL, NULL);
+    }
     return MALLOC_ERROR;
   }
 #endif
   
   if (check_debug_vars(file, line) != NOERROR) {
+    if (tracking_func != NULL) {
+      tracking_func(file, line, func_id, size, alignment, NULL, NULL);
+    }
     return MALLOC_ERROR;
   }
   
@@ -590,7 +598,7 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
     /* align = alignment */
   }
   
-  new_p = _chunk_malloc(file, line, size, calloc_b, 0, align);
+  new_p = _chunk_malloc(file, line, size, func_id, align);
   in_alloc_b = FALSE;
   
   check_pnt(file, line, new_p, "malloc");
@@ -601,6 +609,10 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
+  }
+  
+  if (tracking_func != NULL) {
+    tracking_func(file, line, func_id, size, alignment, NULL, new_p);
   }
   
   return new_p;
@@ -616,7 +628,7 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
  */
 DMALLOC_PNT	_loc_realloc(const char *file, const int line,
 			     DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
-			     const int recalloc_b)
+			     const int func_id)
 {
   void		*new_p;
   
@@ -624,11 +636,17 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
   if (new_size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
     dmalloc_error("realloc");
+    if (tracking_func != NULL) {
+      tracking_func(file, line, func_id, new_size, 0, old_pnt, NULL);
+    }
     return MALLOC_ERROR;
   }
 #endif
   
   if (check_debug_vars(file, line) != NOERROR) {
+    if (tracking_func != NULL) {
+      tracking_func(file, line, func_id, new_size, 0, old_pnt, NULL);
+    }
     return REALLOC_ERROR;
   }
   
@@ -637,7 +655,7 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL) {
     /* recalloc_b acts the same way as a calloc */
-    new_p = _chunk_malloc(file, line, new_size, recalloc_b, 0, 0);
+    new_p = _chunk_malloc(file, line, new_size, func_id, 0);
   }
   else
 #endif
@@ -653,7 +671,7 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
     }
     else
 #endif
-      new_p = _chunk_realloc(file, line, old_pnt, new_size, recalloc_b);
+      new_p = _chunk_realloc(file, line, old_pnt, new_size, func_id);
   
   in_alloc_b = FALSE;
   
@@ -669,6 +687,10 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
     _dmalloc_shutdown();
   }
   
+  if (tracking_func != NULL) {
+    tracking_func(file, line, func_id, new_size, 0, old_pnt, new_p);
+  }
+  
   return new_p;
 }
 
@@ -680,6 +702,9 @@ int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt)
   int		ret;
   
   if (check_debug_vars(file, line) != NOERROR) {
+    if (tracking_func != NULL) {
+      tracking_func(file, line, DMALLOC_FUNC_FREE, 0, 0, pnt, NULL);
+    }
     return FREE_ERROR;
   }
   
@@ -695,6 +720,10 @@ int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt)
   
   if (do_shutdown_b) {
     _dmalloc_shutdown();
+  }
+  
+  if (tracking_func != NULL) {
+    tracking_func(file, line, DMALLOC_FUNC_FREE, 0, 0, pnt, NULL);
   }
   
   return ret;
@@ -1054,6 +1083,18 @@ int	_dmalloc_examine(const char *file, const int line,
   else {
     return ERROR;
   }
+}
+
+/*
+ * Register an allocation tracking function which will be called each
+ * time an allocation occurs.  Pass in NULL to disable.
+ */
+void	_dmalloc_track(const dmalloc_track_t track_func)
+{
+  if (! enabled_b) {
+    (void)dmalloc_startup();
+  }
+  tracking_func = track_func;
 }
 
 /*
