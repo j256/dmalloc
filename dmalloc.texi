@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.96 1995/06/21 17:12:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.97 1995/06/21 18:22:17 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -116,7 +116,7 @@ Gray Watson.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
 @ifinfo
-* Full Node Listings::          Listing of all the nodes in the manual.
+* Full Node Listing::           Listing of all the nodes in the manual.
 @end ifinfo
 @end menu
 
@@ -199,7 +199,7 @@ USA
 @end menu
 
 @node Allocation Basics, Features, Overview, Overview
-@section Allocation Terms and Functions
+@section Allocation Basics: Terms and Functions
 
 @cindex allocation basics
 
@@ -363,7 +363,7 @@ is returned by malloc libraries has already been cleared.  @emph{Only}
 the calloc routine will zero the memory space it returns.
 
 @node Features, How To Get, Allocation Basics, Overview
-@section Library Features
+@section Features of the Library
 
 @cindex features
 
@@ -511,7 +511,7 @@ Thanks much to them all.
 @end table
 
 @node Installation, Getting Started, How To Get, Overview
-@section Installing the Library
+@section Installation of the Library
 
 @cindex installing the library
 @cindex compiling the library
@@ -524,9 +524,9 @@ carefully.
 
 @enumerate
 
-@cindex LICENSE file
+@cindex PERMISSIONS file
 
-@item First, please examine the @file{LICENSE} file.  If you are using
+@item First, please examine the @file{PERMISSIONS} file.  If you are using
 the library in a commercial setting, please consider paying for a
 licensed copy of the software.
 
@@ -625,7 +625,7 @@ library:
 
 @enumerate
 
-@item First, please examine the @file{LICENSE} file.  If you are using
+@item First, please examine the @file{PERMISSIONS} file.  If you are using
 the library in a commercial setting, please consider paying for a
 licensed copy of the software.
 
@@ -699,7 +699,7 @@ combination of debug tokens.  @xref{RC File}.
 @end menu
 
 @node Programming, Using a Debugger, Details, Details
-@section How to Program with the Library
+@section Programming with the Library
 
 @cindex programming
 
@@ -789,7 +789,7 @@ Usage: @code{FREE(pnt)}.  This frees memory pointers.
 @end deftypefun
 
 @node Return Address, Argument Checking, Allocation Macros, Programming
-@subsection Using the Return Address Information
+@subsection Return Address Information
 
 @cindex caller's address
 @cindex return-address
@@ -879,7 +879,7 @@ For all of the arguments checked, if the pointer is not in the heap then
 it is ignored since dmalloc does not know anything about it.
 
 @node Extensions, C++ and the Library, Argument Checking, Programming
-@subsection Library Extension Routines
+@subsection Extension Routines
 
 @cindex extensions
 
@@ -1049,7 +1049,7 @@ call to the @file{dmalloc} program with a @samp{-e #} option.
 @end deftypefun
 
 @node C++ and the Library, Disabling the Library, Extensions, Programming
-@subsection Using the Library with C++
+@subsection C++ and the Library
 
 @cindex c++ usage
 @cindex dmalloc.cc file
@@ -2024,16 +2024,16 @@ including nfs, full software development utilities, X, etc.
 <bsdi-info@@bsdi.com>
 @end table
 
-@node Index of Concepts, Full Node Listings, Plugs, Top
-@unnumbered Concept Index
+@node Index of Concepts, Full Node Listing, Plugs, Top
+@unnumbered Index of Concepts
 
 @printindex cp
 @contents
 
 @ifinfo
 
-@node Full Node Listings,  , Index of Concepts, Top
-@unnumbered Detailed Node Listing
+@node Full Node Listing,  , Index of Concepts, Top
+@unnumbered Full Node Listing
 
 @menu
 Top.
