@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.52 1993/11/30 10:36:51 gray Exp $";
+  "$Id: malloc.c,v 1.53 1993/12/17 20:04:17 gray Exp $";
 #endif
 
 /*
@@ -68,15 +68,25 @@ EXPORT	int		malloc_address_count	= 0;
 /* local routines */
 LOCAL	int		malloc_startup(void);
 EXPORT	void		_malloc_shutdown(void);
+#ifdef __STDC__
 EXPORT	int		_malloc_verify(const void * pnt);
+#else
+EXPORT	int		_malloc_verify(const char * pnt);
+#endif
 EXPORT	void		_malloc_log_heap_map(void);
 EXPORT	void		_malloc_log_stats(void);
 EXPORT	void		_malloc_log_unfreed(void);
 EXPORT	void		_malloc_debug(const int debug);
 EXPORT	int		_malloc_debug_current(void);
+#ifdef __STDC__
 EXPORT	int		_malloc_examine(const void * pnt, MALLOC_SIZE * size,
 					char ** file, unsigned int * line,
 					void ** ret_attr);
+#else
+EXPORT	int		_malloc_examine(const char * pnt, MALLOC_SIZE * size,
+					char ** file, unsigned int * line,
+					char ** ret_attr);
+#endif
 EXPORT	char		*_malloc_strerror(const int errnum);
 
 
@@ -350,7 +360,11 @@ EXPORT	void	_malloc_shutdown(void)
 /*
  * allocate and return a SIZE block of bytes.  returns NULL on error.
  */
+#ifdef __STDC__
 EXPORT	void	*malloc(MALLOC_SIZE size)
+#else
+EXPORT	char	*malloc(MALLOC_SIZE size)
+#endif
 {
   void		*newp;
   
@@ -374,7 +388,11 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
  * of SIZE bytes and zero the block.  returns NULL on error.
  */
+#ifdef __STDC__
 EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
+#else
+EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
+#endif
 {
   void		*newp;
   unsigned int	len = num_elements * size;
@@ -405,7 +423,11 @@ EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
  * all of OLD_PNT to the new area or truncating.  returns NULL on error.
  */
+#ifdef __STDC__
 EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
+#else
+EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
+#endif
 {
   void		*newp;
   
@@ -561,7 +583,11 @@ EXPORT	void	_malloc_log_unfreed(void)
  * NOTE: called by way of leap routine in malloc_lp.c
  * returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
  */
+#ifdef __STDC__
 EXPORT	int	_malloc_verify(const void * pnt)
+#else
+EXPORT	int	_malloc_verify(const char * pnt)
+#endif
 {
   int	ret;
   
@@ -627,9 +653,15 @@ EXPORT	int	_malloc_debug_current(void)
  * if FILE returns NULL then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
+#ifdef __STDC__
 EXPORT	int	_malloc_examine(const void * pnt, MALLOC_SIZE * size,
 				char ** file, unsigned int * line,
 				void ** ret_attr)
+#else
+EXPORT	int	_malloc_examine(const char * pnt, MALLOC_SIZE * size,
+				char ** file, unsigned int * line,
+				char ** ret_attr)
+#endif
 {
   int		ret;
   

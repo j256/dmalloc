@@ -1,3 +1,8 @@
+Fri Dec 17 15:02:29 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* fixed some compilation errors with non-STDC systems re
+	Charles Campbell.
+
 Mon Dec  6 01:18:29 1993  Gray Watson  (gray@fridge.antaire.com)
 
 	* new fence read/write code.  much cleaner.  new FENCE_TOP define.
@@ -590,5 +595,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.81 1993/12/06 06:21:22 gray Exp $
+$Id: ChangeLog,v 1.82 1993/12/17 20:04:07 gray Exp $
 -------------------------------------------------------------------------------
