@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.172 2000/02/17 14:05:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.173 2000/03/06 17:04:46 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -107,9 +107,8 @@ Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and documentation.  Online documentation as
-well as the full source is available at URL
-@uref{http://www.dmalloc.com/}.  Details on the library's mailing list
-are available there as well.
+well as the full source is available at URL @uref{http://dmalloc.com/}.
+Details on the library's mailing list are available there as well.
 
 My contact information is available on the web page.  I can be reached
 with any questions or feedback.  Please include the version number of
@@ -339,8 +338,10 @@ the system resources.
 @end deftypefun
 
 @emph{NOTE}: the returned address from the memory
-allocation/reallocation functions should @emph{always} be cast to the
-appropriate pointer type for the variable being assigned.
+allocation/reallocation functions should be cast to the appropriate
+pointer type for the variable being assigned.  Also this may no longer
+be necessary on your system, it can still provide some documentation
+value to the code.
 
 @emph{WARNING}: there is a quite common myth that all of the space that
 is returned by malloc libraries has already been cleared.  @emph{Only}
@@ -472,7 +473,7 @@ carefully.
 @enumerate
 
 @item Make sure you have the latest version of the library available
-from the home page @uref{http://www.dmalloc.com/}.
+from the home page @uref{http://dmalloc.com/}.
 
 @cindex settings.dist file
 
@@ -608,7 +609,7 @@ library:
 @enumerate
 
 @item Make sure you have the latest version of the library available
-from the home page @uref{http://www.dmalloc.com/}.
+from the home page @uref{http://dmalloc.com/}.
 
 @item Follow the installation instructions on how to configure and
 make and install the library (i.e. type: @kbd{make install}).
