@@ -8,18 +8,19 @@
 
 #include "useful.h"
 #include "alloc.h"
+
 #if defined(ANTAIRE)
 #include "assert.h"
+#include "logger.h"
 #include "ourstring.h"
 #include "random.h"
 #include "terminate.h"
 #endif
 
-RCS_ID("$Id: dmalloc_t.c,v 1.4 1992/09/04 20:50:40 gray Exp $");
+RCS_ID("$Id: dmalloc_t.c,v 1.5 1992/09/04 21:23:13 gray Exp $");
 
 /* hexadecimal STR to integer translation */
-LOCAL	int	htoi(str)
-  char		*str;
+LOCAL	int	hex_to_int(char * str)
 {
   int		ret;
   
@@ -44,15 +45,34 @@ LOCAL	int	htoi(str)
   return ret;
 }
 
-main(argc, argv)
-  int	argc;
-  char	**argv;
+/* read an address from the user */
+LOCAL	long	get_address()
+{
+  char	line[80];
+  long	pnt;
+  
+  do {
+    (void)printf("Enter a hex address: ");
+    (void)gets(line);
+  } while (line[0] == NULLC);
+  
+  pnt = hex_to_int(line);
+  
+  return pnt;
+}
+
+EXPORT	int	main(int argc, char ** argv)
 {
   int	size, count;
   long	pnt, magic;
   char	line[80];
   
   argc--, argv++;
+  
+#if defined(ANTAIRE)
+  /* logger needs to be started for map */
+  LOGGER(LOGGER_INFO, "here we go.");
+#endif
   
   (void)printf("------------------------------------------------------\n");
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
@@ -91,37 +111,33 @@ main(argc, argv)
       (void)printf("How much: ");
       (void)gets(line);
       size = atoi(line);
-      (void)printf("malloc(%d) returned: %#lx\n", size, MALLOC(size));
+      (void)printf("malloc(%d) returned: %#lx\n", size, (long)MALLOC(size));
       continue;
     }
     
     if (strcmp(line, "free") == 0) {
-      (void)printf("Hex address: ");
-      (void)gets(line);
-      pnt = htoi(line);
+      pnt = get_address();
       (void)printf("free(%#lx) returned: %s\n",
 		   pnt, (FREE(pnt) == FREE_NOERROR ? "success" : "failure"));
       continue;
     }
     
     if (strcmp(line, "realloc") == 0) {
-      (void)printf("Hex address: ");
-      (void)gets(line);
-      pnt = htoi(line);
+      pnt = get_address();
       
       (void)printf("How much: ");
       (void)gets(line);
       size = atoi(line);
       
       (void)printf("realloc(%#lx, %d) returned: %#lx\n",
-		   pnt, size, REMALLOC(pnt, size));
+		   pnt, size, (long)REMALLOC(pnt, size));
       
       continue;
     }
     
 #if defined(ANTAIRE)
     if (strcmp(line, "assert") == 0) {
-      ASSERTM(malloc_verify(NULL) == MALLOC_VERIFY_NOERROR,
+      ASSERT(malloc_verify(NULL) == MALLOC_VERIFY_NOERROR,
 	      "malloc_verify(NULL) failed");
       ASSERT(FALSE);
       continue;
@@ -129,36 +145,32 @@ main(argc, argv)
 #endif
     
     if (strcmp(line, "map") == 0) {
-      malloc_heap_map();
+      (void)malloc_heap_map();
       continue;
     }
     
     if (strcmp(line, "overwrite") == 0) {
-      (void)printf("Hex address: ");
-      (void)gets(line);
-      pnt = htoi(line);
+      pnt = get_address();
       
       magic = 0x12345678;
-      bcopy(&magic, pnt, sizeof(magic));
+      bcopy(&magic, (char *)pnt, sizeof(magic));
       continue;
     }
     
     /* do random heap hits */
     if (strcmp(line, "random") == 0) {
       for (count = 1; count < 1000; count += 10)
-	FREE(MALLOC(random() % (count * 10) + 1));
+	(void)FREE(MALLOC(random() % (count * 10) + 1));
       continue;
     }
     
     if (strcmp(line, "verify") == 0) {
-      (void)printf("Hex address: ");
-      (void)gets(line);
-      pnt = htoi(line);
+      pnt = get_address();
       
       (void)printf("malloc_verify(%#lx) returned: %s\n",
 		   pnt,
-		   (malloc_verify(pnt) == MALLOC_VERIFY_NOERROR ? "success" :
-		    "failure"));
+		   (malloc_verify((char *)pnt) == MALLOC_VERIFY_NOERROR
+		    ? "success" : "failure"));
       continue;
     }
     

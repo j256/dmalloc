@@ -24,7 +24,7 @@
 #include "heap.h"
 #include "malloc_err.h"
 
-RCS_ID("$Id: heap.c,v 1.4 1992/09/04 20:50:29 gray Exp $");
+RCS_ID("$Id: heap.c,v 1.5 1992/09/04 21:22:59 gray Exp $");
 
 /*
  * system functions
@@ -39,8 +39,7 @@ EXPORT	char		*_heap_base = NULL;	/* base of our heap */
 EXPORT	char		*_heap_last = NULL;	/* end of our heap */
 
 /* function to get SIZE memory bytes from the end of the heap */
-EXPORT	char	*_heap_alloc(size)
-  unsigned int	size;
+EXPORT	char	*_heap_alloc(unsigned int size)
 {
   char		*ret = HEAP_ALLOC_ERROR;
   
@@ -79,8 +78,7 @@ EXPORT	void	_heap_startup()
 }
 
 /* align (by extending) _heap_base to BASE byte boundary */
-EXPORT	char	*_heap_align_base(base)
-  int	base;
+EXPORT	char	*_heap_align_base(int base)
 {
   int	diff;
   

@@ -1,12 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.4 1992/09/04 20:50:09 gray Exp $
+$Id: Manifest,v 1.5 1992/09/04 21:22:38 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
 Antaire/		Directory for Antaire Corporation compatibility
-			files.
+			files.  Hopefully few.
 
 COPYING			The famous GNU Publib License.
+
+Changelog		Change log entries detailing major module changes.
 
 Files			This file.
 
@@ -25,24 +27,29 @@ alloc.[ch]		Higher level alloc routines including malloc, free,
 
 chunk.[ch]		Lower level allocation routines.  This is the meat of
 			the allocation algorithms.  Manages and debugs the
-			administration structures of the heap.
+			administration structures of the heap.  Too large!
 
 chunk_loc.h		Local defines specific to the chunk routines only.
 
+debug.[ch]		Debugging routines and others that provide user output.
+
 heap.[ch]		Possibly machine specific routines for allocating space
-			on and manipulating the heap.  Heap.h contains a number
-			of macros that may need to be defined for each machine
-			type.
+			on and manipulating the heap.
+
+		NOTE:	Heap.h contains a number of macros that may need to be
+			defined for each machine type.
 
 malloc.txt		User-level text manual file for the malloc routines.
 
 malloc_dbg.h		How the routines in libmalloc respond to different
 			setting of the MALLOC_DEBUG environmental variable.
+malloc_levels.h		General debug level message for the malloc module.
 
 malloc_err.h		General error codes for the malloc module.
+malloc_errors.h		General error message for the malloc module.
 
 malloc_loc.h		Local defines for all of the malloc routines.
 
-malloc_t.c		Test program for testing the malloc routines.
+malloc_t.c		Meager test program for testing the malloc routines.
 
 -------------------------------------------------------------------------------

@@ -1,3 +1,29 @@
+Thu Sep  3 03:23:39 1992  Gray Watson  (gray at toaster)
+
+	* Added ability to realloc(NULL with an ifdef to disable.  Useful
+	in realloc loops where the first time you don't have to alloc it.
+
+Fri Aug 14 15:54:03 1992  Gray Watson  (gray at toaster)
+
+	* Added a bunch of new environmental variables features:
+	MALLOC_ADDRESS now can have a :# argument.  MALLOC_START now has
+	two formats, the old number and new file:line.  Looks nice!
+
+	* Made a pass through chunk.c and fixed a number of problems where
+	debug output pnt/size did not match user-supplied information.
+
+	* Moved most of the debug variables into alloc.c from chunk.c and
+	added a standardizied check_debug_vars() checking routine.
+
+Tue Jul 21 16:06:13 1992  Gray Watson  (gray at toaster)
+
+	* Fixed malloc count statistics.  Removed duplicate malloc_count
+	varaibale from a number of places.
+
+Mon Mar 23 10:49:25 1992  Gray Watson  (gray at toaster)
+
+	* Released version 1.04 with new env variable features.
+
 Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 
 	* Fixed a large problem with chunk.c not reporting the correct

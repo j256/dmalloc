@@ -3,8 +3,11 @@
  *
  * Copyright 1991 by the Antaire Corporation
  *
- * $Id: chunk_loc.h,v 1.4 1992/09/04 20:50:25 gray Exp $
+ * $Id: chunk_loc.h,v 1.5 1992/09/04 21:22:54 gray Exp $
  */
+
+#ifndef __CHUNK_LOC_H__
+#define __CHUNK_LOC_H__
 
 /* defines for the malloc subsystem */
 #define BASIC_BLOCK		12	/* basic block size in bits */
@@ -130,3 +133,5 @@ struct dblock_adm_st {
   long			da_magic2;		/* top magic number */
 };
 typedef struct dblock_adm_st	dblock_adm_t;
+
+#endif /* ! __CHUNK_LOC_H__ */
