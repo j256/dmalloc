@@ -1,10 +1,13 @@
 -------------------------------------------------------------------------------
-@(#)README	1.2  12/23/91
+$Id: README.1,v 1.4 1992/09/04 20:50:14 gray Exp $
 -------------------------------------------------------------------------------
-- malloc.txt is a text file having the user-documentation for the malloc
-	subsystem
-- Files contains a list of each of the file and what it does
+- The file malloc.txt is a text file having the user-documentation for the
+	malloc subsystem
+- The file Files contains a list of each of the file and what it does
 - typing 'make' should be enough to build libmalloc.a
 - typing 'make test' should build the malloc_t test program
+- debugging programs using libmalloc relies on the setting of the MALLOC_DEBUG
+	environmental variable (see malloc.txt for more information.
 - output from programs using libmalloc goes to the filename stored in the
 	MALLOC_LOGFILE environmental variable (setenv MALLOC_LOGFILE filename).
+-------------------------------------------------------------------------------

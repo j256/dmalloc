@@ -2,16 +2,17 @@
  * test program for malloc code
  *
  * Copyright 1991 by the Antaire Corporation
- *
- * malloc_t.c 2.1 12/23/91
  */
 
 #define MALLOC_TEST_MAIN
 
 #include "useful.h"
 #include "alloc.h"
+#if defined(ANTAIRE)
+#include "logger.h"
+#endif
 
-LOCAL	char	sccs_id[] = "@(#)malloc_t.c	2.1 GRAY@ANTAIRE.COM 12/23/91";
+RCS_ID("$Id: dmalloc_t.c,v 1.3 1992/09/04 20:46:49 gray Exp $");
 
 /* hexadecimal STR to integer translation */
 LOCAL	int	htoi(str)
@@ -49,6 +50,10 @@ main(argc, argv)
   char	line[80];
   
   argc--, argv++;
+  
+#if defined(ANTAIRE)
+  logger_level = LOGGER_DEBUG;
+#endif
   
   (void)printf("------------------------------------------------------\n");
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");

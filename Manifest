@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-@(#)Files	1.2  12/23/91
+$Id: Manifest,v 1.4 1992/09/04 20:50:09 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -10,7 +10,7 @@ COPYING			The famous GNU Publib License.
 
 Files			This file.
 
-Makefile		Makefile for the malloc library.
+Makefile.all		Makefile for the malloc library.
 
 NOTES			General Notes of the malloc routines and associated
 			algorithms.

@@ -4,8 +4,6 @@
  * Copyright 1991 by the Antaire Corporation
  *
  * Written by Gray Watson
- *
- * heap.c 1.10 12/23/91
  */
 
 /*
@@ -25,7 +23,7 @@
 #include "heap.h"
 #include "malloc_err.h"
 
-SCCS_ID("@(#)heap.c	1.10 GRAY@ANTAIRE.COM 12/23/91");
+RCS_ID("$Id: heap.c,v 1.3 1992/09/04 20:46:39 gray Exp $");
 
 /*
  * system functions

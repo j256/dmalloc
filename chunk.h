@@ -3,7 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation
  *
- * @(#)chunk.h	3.6 GRAY@ANTAIRE.COM 12/23/91
+ * $Id: chunk.h,v 1.3 1992/09/04 20:46:36 gray Exp $
  */
 
 #define CHUNK_CHECK_LEVEL	0	/* check depending on level only */

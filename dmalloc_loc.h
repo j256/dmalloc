@@ -5,7 +5,7 @@
  *
  * Written by Gray Watson
  *
- * @(#)malloc_loc.h	1.6 GRAY@ANTAIRE.COM 12/7/91
+ * $Id: dmalloc_loc.h,v 1.3 1992/09/04 20:46:47 gray Exp $
  */
 
 /* should we NOT allow 0 length allocations? */

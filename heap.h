@@ -3,7 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation
  *
- * @(#)heap.h	1.11 GRAY@ANTAIRE.COM 12/23/91
+ * $Id: heap.h,v 1.4 1992/09/04 20:50:31 gray Exp $
  */
 
 /*
@@ -52,13 +52,13 @@
 
 #if !defined(HEAP_MAIN)
 
-IMPORT	char		*_heap_base;	/* base of our heap */
+IMPORT	char		*_heap_base;  /* base of our heap */
 
-IMPORT	char		*_heap_last;	/* end of our heap */
+IMPORT	char		*_heap_last;  /* end of our heap */
 
 /* function to get SIZE memory bytes from the end of the heap */
 IMPORT	char	*_heap_alloc(/* size */);
-/*   unsigned int	size; */
+/* unsigned int	size; */
 
 /* return a pointer to the current end of the heap */
 IMPORT	char	*_heap_end(/* VOID */);
@@ -68,6 +68,6 @@ IMPORT	void	_heap_startup(/* VOID */);
 
 /* align (by extending) _heap_base to BASE byte boundary */
 IMPORT	char	*_heap_align_base(/* base */);
-/*   int	base; */
+/* int	base; */
 
 #endif

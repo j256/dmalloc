@@ -3,7 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation
  *
- * @(#)chunk_loc.h	1.12 GRAY@ANTAIRE.COM 12/7/91
+ * $Id: chunk_loc.h,v 1.4 1992/09/04 20:50:25 gray Exp $
  */
 
 /* defines for the malloc subsystem */
