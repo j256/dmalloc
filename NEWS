@@ -1,10 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.43 1994/10/14 22:41:38 gray Exp $
+$Id: NEWS,v 1.44 1994/10/15 18:52:29 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
-	* Fixed errors with FUNC_CHECK code.  Thanks Dave.
+	* Added dmalloc.h.2 creation to config.status file.
+	* Fixed errors with FUNC_CHECK code.
 	* Added default tags: default,low,medium,high,all to dmalloc.
 	* Renamed 'check-free' token to 'check-blank'.
 	* Made many changes to make it easier to get running with dmalloc.
@@ -13,14 +14,14 @@ Version 3.0.3:
 		* -T (list-tokens) -> -D (debug-tokens)
 		* -L (list-tags) -> -t (list-tags)
 	* Added better error logging in chunk.
-	* Added DG/UX code to return.h and atexit.c to contrib.  Thanks Joerg.
+	* Added DG/UX code to return.h and atexit.c to contrib.
 
 Version 3.0.2:
 
 	* Fixed strtok error in dmallocrc file processing.
 	* Fixed problems with env code when sprintf doesn't returns int.
 	* Library now dumps the proper fence-bottom bytes on 1st pointer error.
-	* Fixed casting problems on OSF.  Thanks Dave.
+	* Fixed casting problems on OSF.
 
 Version 3.0.1:
 
@@ -35,8 +36,8 @@ Version 3.0.1:
 
 Version 3.0.0:
 
-	* Fixed a problem with some list checking via user feedback.
-	* Fixed possible recursion problem via feedback from Marty.
+	* Fixed a problem with some list checking.
+	* Fixed possible recursion problem.
 	* Tons of name changes going from malloc_dbg -> dmalloc.
 
 Version 2.2.1:
@@ -50,7 +51,7 @@ Version 2.2.0:
 	* Added ability to combine adjacent free blocks into one.
 	* 0 or negative MALLOC_INTERVAL values act as if no interval value.
 	* Made a 'malloc_dbg -i 0' undefine MALLOC_INTERVAL.
-	* Fixed calloc return-address problem from user feedback.
+	* Fixed calloc return-address problem.
 	* Added KILL_PROCESS macro to configuration scripts.
 	* Marty Leisner compiles library on MS-DOG!
 	* Fixed some problems with malloc_errno set after call to error.
@@ -67,7 +68,7 @@ Version 2.1.0:
 	* Added iteration count label to all logfile output.  See conf.h.
 	* Added xmalloc,xrealloc,etc. override functions.
 	* Added better mechanisms for const definition.
-	* Lots of install, notes, misc. changes from net feedback.
+	* Lots of install, notes, misc. changes.
 	* Renamed token 'log-perror' and 'print-perror' to '...-error'.
 
 Version 2.0.1:

@@ -1,5 +1,7 @@
 Sat Oct 15 13:55:16 1994  Gray Watson  (gray@blender.antaire.com)
 
+	* Added dmalloc.h.2 creation to config.status file.  Thanks Dave.
+
 	* Added a startup message with the debug flags used to logfile.
 
 Fri Oct 14 18:40:59 1994  Gray Watson  (gray at toaster.antaire.com)
@@ -12,8 +14,8 @@ Thu Oct 13 21:25:52 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Renamed check-free to check-blank but left free for compat.
 
-	* Made a number of changes from Dave MacKenzie.  Thanks Dave!
-	Reworking the manual fixed the Makefile, RC file, argv, etc...
+	* Made a number of changes from Dave MacKenzie.  Reworking the
+	manual fixed the Makefile, RC file, argv, etc...
 
 Wed Oct 12 13:00:48 1994  Gray Watson  (gray@blender.antaire.com)
 
@@ -864,5 +866,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.125 1994/10/15 17:55:57 gray Exp $
+$Id: ChangeLog,v 1.126 1994/10/15 18:52:27 gray Exp $
 -------------------------------------------------------------------------------
