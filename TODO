@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.25 1994/12/15 15:57:23 gray Exp $
+$Id: TODO,v 1.26 1995/03/03 17:37:43 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -118,6 +118,7 @@ DOCUMENTATION:
 	- use of MALLOC_FUNC_CHECK by inserting dmalloc.h and FUNC_CHECK on
 - need to make sure the manual works for the brand new user
 - need an overview early on about its purpose (at a very high level)
+- need a section to explain all the error codes
 
 -------------------------------------------------------------------------------
 

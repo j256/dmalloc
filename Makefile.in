@@ -1,7 +1,5 @@
 #
-# Copyright 1993 by the Antaire Corporation
-#
-# $Id: Makefile.in,v 1.69 1994/11/13 00:38:07 gray Exp $
+# $Id: Makefile.in,v 1.70 1995/03/03 17:37:40 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -47,37 +45,31 @@ DOCFLS	= dmalloc.ps texinfo.tex
 # NOTE: the wc level should be below 90k due to shar overhead
 SHARSIZE= 85k
 
-.PHONY : all
-all : $(LIBRARY) $(LIB_DIS) $(UTIL)
+all :: $(LIBRARY) $(LIB_DIS) $(UTIL)
 
-.PHONY : clobber
-clobber :
+clean ::
+	$(CLEAN)
 	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f part.? dmalloc.info dmalloc.h
 	rm -f INSTALL README README_ftp
 
-.PHONY : distclean
-distclean : clobber
+distclean :: clean
 	rm -f configure config.status config.log config.cache conf.h
 	rm -f Makefile dmalloc.h.2 dmalloc.ps
 	rm -rf port
 
-.PHONY : installincs
-installincs : $(HFLS)
+installincs :: $(HFLS)
 	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
 
-.PHONY : installlibs
-installlibs : installincs $(LIBRARY) $(LIB_DIS) $(MANFILE)
+installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(MANFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
 
-.PHONY : install
-install : installlibs $(UTIL)
+install :: installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
 
-.PHONY : installftp
-installftp : README_ftp $(DOCS)
+installftp :: README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 	cd ftp/docs ; gzip -fv $(DOCS)
@@ -88,66 +80,60 @@ dmalloc.h.2 : configure
 	$(SHELL) configure -v
 
 dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
-	rm -f $@ $@.t
-	cat dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
-	mv $@.t $@
+	rm -f $(.TARGET) $(.TARGET).t
+	cat dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $(.TARGET).t
+	mv $(.TARGET).t $(.TARGET)
 
 $(LIBRARY) : $(OBJS)
 	ar cr $(LIBRARY) $?
-	ranlib $@
+	ranlib $(.TARGET)
 
 $(LIB_DIS) : dmalloc_lp.o
 	ar cr $(LIB_DIS) $?
-	ranlib $@
+	ranlib $(.TARGET)
 
 $(UTIL) : dmalloc.o argv.o compat.o env.o
-	rm -f $@
+	rm -f $(.TARGET)
 	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
-	mv a.out $@
+	mv a.out $(.TARGET)
 
-.PHONY : port
-port : $(FLS) $(DOCFLS) $(CFGFLS) Makefile.all.in
-	@ answer 'Is it okay to remove the $@ directory? '
-	rm -rf $@
-	mkdir $@ $@/contrib
-	cp $(FLS) Makefile.all.in $@
-	cp $(DOCFLS) $@
-	cp $(CFGFLS) $@/contrib
-	mv $@/Makefile.all.in $@/Makefile.in
+port :: $(FLS) $(DOCFLS) $(CFGFLS) Makefile.all.in
+	@ answer 'Is it okay to remove the $(.TARGET) directory? '
+	rm -rf $(.TARGET)
+	mkdir $(.TARGET) $(.TARGET)/contrib
+	cp $(FLS) Makefile.all.in $(.TARGET)
+	cp $(DOCFLS) $(.TARGET)
+	cp $(CFGFLS) $(.TARGET)/contrib
+	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
 	@ echo ''
-	@ echo 'Please rename $@ to dmalloc-version and tar up file'
+	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
 
-.PHONY : patch
-patch :
+patch ::
 	@ echo 'Run fixpatch.pl on the patch file'
 
-.PHONY : fill
-fill : $(FILLFLS)
+fill :: $(FILLFLS)
 	fillproto $(FILLFLS)
 
-tests : $(TEST)
+tests :: $(TEST)
 
 $(TEST) : $(TEST).o argv.o $(LIBRARY)
-	rm -f $@
+	rm -f $(.TARGET)
 	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
-	mv a.out $@
+	mv a.out $(.TARGET)
 
-.PHONY : light
-light : $(TEST)
+light :: $(TEST)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 
-.PHONY : heavy
-heavy : $(TEST) light
+heavy :: $(TEST) light
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
 
-.PHONY : continuous
-continuous : $(TEST)
+continuous :: $(TEST)
 	while test 1 ;\
 		do  (\
 			$(TEST) -n -t 10000 ;\
@@ -158,55 +144,54 @@ dmalloc.ps : dmalloc.texi
 	rm -rf work
 	mkdir work
 	( cd work ; texi2dvi ../dmalloc.texi ; texi2dvi ../dmalloc.texi ; \
-	  dvips -o ../$@ dmalloc.dvi )
+	  dvips -o ../$(.TARGET) dmalloc.dvi )
 	rm -rf work
 
 INSTALL : INSTALL.1 dmalloc.info
-	rm -f $@ $@.t
-	cp INSTALL.1 $@.t
+	rm -f $(.TARGET) $(.TARGET).t
+	cp INSTALL.1 $(.TARGET).t
 	sed -e '1,/,  Node: Installation/d' -e '/,  Prev: Installation/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $@.t
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
-		>> $@.t
+		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Prev: Getting Started/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $@.t
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
-		>> $@.t
-	mv $@.t $@
+		>> $(.TARGET).t
+	mv $(.TARGET).t $(.TARGET)
 
 README : README.1 dmalloc.info
-	rm -f $@ $@.t
+	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
-		> $@.t
+		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $@.t
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
-		>> $@.t
+		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $@.t
-	cat README.1 >> $@.t
-	mv $@.t $@
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+	cat README.1 >> $(.TARGET).t
+	mv $(.TARGET).t $(.TARGET)
 
 README_ftp : README_ftp.1 dmalloc.info
-	rm -f $@ $@.t
+	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
-		> $@.t
+		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $@.t
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
-		>> $@.t
+		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $@.t
-	cat README_ftp.1 >> $@.t
-	mv $@.t $@
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+	cat README_ftp.1 >> $(.TARGET).t
+	mv $(.TARGET).t $(.TARGET)
 
 dmalloc.info : dmalloc.texi
-	rm -f $@
-	makeinfo --no-split $^
+	rm -f $(.TARGET)
+	makeinfo --no-split $(.OODATE)
 
-.PHONY : shar
-shar : $(FLS) $(CFGFLS)
+shar :: $(FLS) $(CFGFLS)
 	rm -f part.?? part.t Makefile.in.bak
 	mv -i Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
@@ -237,5 +222,7 @@ config.status : configure
 configure : configure.in
 	autoconf
 
-include /usr/antaire/Default.make
-include Makefile.dep
+.include <local.mk>
+.if exists Makefile.dep
+.include "Makefile.dep"
+.endif
