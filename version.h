@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.126 2004/10/12 13:53:37 gray Exp $
+ * $Id: version.h,v 1.127 2004/10/12 19:42:24 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -39,8 +39,8 @@
  *
  * Make sure to also cvs tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.4.0" ;
+static	char	*dmalloc_version = "5.4.1" ;
 
-/* Version Date: $Date: 2004/10/12 13:53:37 $ */
+/* Version Date: $Date: 2004/10/12 19:42:24 $ */
 
 #endif /* ! __VERSION_H__ */

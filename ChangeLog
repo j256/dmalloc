@@ -1,5 +1,9 @@
 2004-10-12  Gray Watson  <gray@outside.256.com>
 
+	* Releasing dmalloc version 5.4.1.
+
+	* Found and fixed a stupid little test bug so re-released as 5.4.1.
+
 	* Releasing dmalloc version 5.4.0.
 
 	* Added return.h support for ARM processors from Silvester Erdeg.
@@ -2228,5 +2232,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.325 2004/10/12 13:53:37 gray Exp $
+$Id: ChangeLog,v 1.326 2004/10/12 19:42:24 gray Exp $
 -------------------------------------------------------------------------------
