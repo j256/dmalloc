@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.41 1993/07/23 21:24:09 gray Exp $";
+  "$Id: chunk.c,v 1.42 1993/08/11 02:33:43 gray Exp $";
 #endif
 
 /* checking information */
@@ -184,7 +184,8 @@ LOCAL	void	log_bad_pnt(const char * file, const unsigned int line,
 LOCAL	int	fence_read(const char * file, const unsigned int line,
 			   void * pnt, unsigned int size)
 {
-  long		top, *longp;
+  unsigned long	top;
+  long		*longp;
   
   /*
    * write magic numbers into block in bottom of allocation
@@ -227,7 +228,7 @@ LOCAL	int	fence_read(const char * file, const unsigned int line,
  */
 LOCAL	void	fence_write(void * pnt, unsigned int size)
 {
-  long		top = FENCE_MAGIC_TOP;
+  unsigned long	top = FENCE_MAGIC_TOP;
   long		*longp;
   
   /* write magic numbers into block in bottom of allocation */

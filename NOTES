@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.17 1993/07/19 16:31:30 gray Exp $
+$Id: NOTES,v 1.18 1993/08/11 02:33:36 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -19,7 +19,8 @@ WARNINGS:
 	some other anonymous value.  Malloc-dbg will complain if it
 	does not get contiguous memory and gets confused by this.  If
 	the configuration script does not set it up correctly, then
-	you may have to play with the basic block size accordingly.
+	you may have to play with the basic block size to make it
+	match the page size.
 
 -------------------------------------------------------------------------------
 
@@ -32,22 +33,14 @@ GENERAL:
 	critical error has occurred then the library would quickly go
 	recursive.
 
--	for coders, the library should have no code that depends on
-	heaps growing up or down (all subtraction or other position
-	dependent code must be changed to macros in heap.h)
-	>,<,-,+,etc
+-	for coders, the library should have all the code that depends
+	on heaps growing up or down in heap.[ch].  Any dependences on
+	>,<,-,+,etc are potential problems.
 
--	it is assumed that NONE of the __FILE__ arguments are on the
+-	it is assumed that none of the __FILE__ arguments are on the
 	heap because to determine whether a dblock is free or not it
 	looks at the next argument (unioned with the file argument)
 	and sees if it is null or in the heap meaning it is at the end
 	or middle of a free list.
-
--------------------------------------------------------------------------------
-
-OVERHEAD:
-
-- dblock: 8 bytes per pointer
-- bblock: 12 bytes per pointer
 
 -------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.25 1993/07/23 21:24:44 gray Exp $
+@c $Id: dmalloc.texi,v 1.26 1993/08/11 02:33:48 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -540,7 +540,7 @@ Here is a detailed list of the flags that can passed to malloc_dbg:
 Set the @samp{MALLOC_ADDRESS} variable with the string address (or
 alternatively address:number).
 
- @item -b
+@item -b
 Output Bourne shell type commands.
 
 @item -C
@@ -813,10 +813,12 @@ may still be lurking.
 @menu
 * Allocation Macros::           For providing file and line information.
 * Extensions::                  Additional non-standard routines.
+* Running with the Library::    How to debug problems with the library
+* C++ and the Library::         How to use the library with C++.
 * Disabling the Library::       How to compile/link without the library.
 @end menu
 
-@node Allocation Macros, Extensions,  , Usage
+@node Allocation Macros, Running with the Library,  , Usage
 @section Allocation macros.
 
 @cindex Allocation Macros
@@ -914,7 +916,33 @@ return-values from macros.  I have included a gcc form of these 2 macros
 a superior compiler and future releases of this library may even require
 its use.
 
-@node Extensions, Disabling the Library, Allocation Macros, Usage
+@node Running with the Library, Extensions, Allocation Macros, Usage
+@section Debugging program with the library.
+
+Here is one possible scenario for using the malloc_dbg library.
+
+@itemize
+@item
+set a breakpoint at _malloc_perror()
+
+@item
+run the program until it stops there indicating that before this
+malloc call, the heap got messed up somehow
+
+@item
+check the error code to determine what went specifically went wrong.
+print malloc_errno, malloc_dbg -e value-returned-from-print
+
+@item
+look at the code between the last good call and the current call to
+find the problem
+
+@item
+there's always the chance that some other code caused the
+problem of course.
+@end itemize
+
+@node Extensions, C++ and the Library, Running with the Library, Usage
 @section Extensions: Non-Standard Malloc Routines.
 
 @cindex extensions
@@ -999,7 +1027,43 @@ call to the @file{malloc_dbg} program with a @samp{-e #} option
 @xref{Malloc_dbg Program}.
 @end table
 
-@node Disabling the Library,  , Extensions, Usage
+@node C++ and the Library, Disabling the Library, Extensions, Usage
+@section Using the Library with C++.
+
+For those people using the C++ language, some special things need to be
+done to get the library to work.  The problem exists with the fact that
+the dynamic memory routines in C++ are @code{new()} and @code{delete()}
+as opposed to @code{malloc()} and @code{free()}.
+
+Place the following function definitions in a file and link this and the
+malloc_dbg library in with the C++ program you want to debug.
+
+@example
+	extern "C" @{
+	#include <stdlib.h>
+	@}
+
+	void *
+	operator new(size_t n)
+	@{
+		return malloc(n);
+	@}
+
+	void
+	operator new(void * cp)
+	@{
+		free(cp);
+	@}
+@end example
+
+The above functions effectively redirect @code{new} to the more familiar
+@code{malloc} and @code{delete} to the more familiar @code{free}.  They
+also give the known error behaviour, too.
+
+I am not a C++ hacker so feedback in the form of other hints and ideas
+for C++ users would be much appreciated.
+
+@node Disabling the Library,  , C++ and the Library, Usage
 @section Disabling the Library.
 
 @cindex disabling the library

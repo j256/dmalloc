@@ -34,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.15 1993/07/23 21:24:16 gray Exp $";
+  "$Id: compat.c,v 1.16 1993/08/11 02:33:46 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
@@ -89,7 +89,7 @@ EXPORT	char	*index(const char * str, int ch)
 {
   for (; *str != NULLC; str++)
     if (*str == (char)ch)
-      return str;
+      return (char *)str;
   
   return NULL;
 }

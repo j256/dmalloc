@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.4 1993/07/23 21:24:06 gray Exp $
+$Id: TODO,v 1.5 1993/08/11 02:33:38 gray Exp $
 -------------------------------------------------------------------------------
 
 IMPORTANT:
@@ -12,8 +12,9 @@ IMPORTANT:
 		blocks 101+ have 1 bucket for all
 	- maybe but the administration information at the front of the block
 		well buffered with magic numbers and such.
-	- this would reduce if not remove the need for the block-based
-		administrative information
+		- other problems with this however
+		- this would reduce if not remove the need for the block-based
+			administrative information
 	- be able to break up bigger blocks of memory into small ones
 - fix the dblock-admin structures to pack them into the same block as their
 	allocations.  So for 8 byte allocationes in a 4k blocksize there
@@ -105,7 +106,7 @@ GENERAL:
 - handle memalign, valloc, maybe some form of mallopt
 - handle 0 length allocations correctly if the #define is set
 	- i.e. maybe give back a small section with bounds-checking touching
-- manage dblock_admin entries better
+- manage dblock_admin entries better:
 	- map out usage and get some stats
 	- add to normal db_free lists, zero out each of the entries.  if they
 		are both zero or some magic X then we need to get more bblock
@@ -122,6 +123,7 @@ TESTING / STATISTICS:
 	- maybe start with a test shell like malloc_t but stripped and then
 		run a script through it and analyse the output
 	- should be a killer that does a million hits
+	- maybe use the new gnu testing code
 - test define for allowing 0 length defines
 - test define for realloc(NULL)
 - check out situation where sbrk calls return ERROR (from the beginning and
@@ -136,7 +138,7 @@ TESTING / STATISTICS:
 
 -------------------------------------------------------------------------------
 
-RMS comments:
+RMS COMMENTS:
 
 - integrate into gnu-malloc
 - change the bit-flags into the functionality strings themselves
