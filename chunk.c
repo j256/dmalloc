@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.105 1997/03/21 14:33:17 gray Exp $";
+  "$Id: chunk.c,v 1.106 1997/03/21 17:23:57 gray Exp $";
 #endif
 
 /*
@@ -288,7 +288,7 @@ LOCAL	char	*display_pnt(const void * pnt, const overhead_t * overp)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
 #if STORE_TIMEVAL
-    (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&overp->ov_timeval, FALSE));
+    (void)sprintf(buf2, "|w%s", _dmalloc_ptimeval(&overp->ov_timeval, FALSE));
     (void)strcat(buf, buf2);
 #else
 #if STORE_TIME
