@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.206 2001/07/11 18:48:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.207 2001/07/11 21:21:45 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -374,9 +374,7 @@ should probably be placed at or near the end of the library list.
 
 @item enable a number of debug features (@kbd{low}).  You can
 also try @kbd{runtime} for minimal checking or @kbd{medium} or
-@kbd{high} for more extensive heap verification.  @kbd{all} is also
-provided but generates a multitude of log messages without many more
-tests.
+@kbd{high} for more extensive heap verification.
 
 @end itemize
 
@@ -2241,9 +2239,6 @@ significant checking of heap areas
 @item high
 extensive checking of heap areas
 
-@item all
-turns on all the checking possible.  This generates a multitude of log
-messages without many more tests than high.
 @end table
 
 For expert users, a sample @file{dmallocrc} file has been provided but
