@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.48 2001/05/23 13:34:17 gray Exp $
+ * $Id: error.h,v 1.49 2002/02/14 22:55:42 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -105,6 +105,14 @@ extern
 char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 			   const int buf_size, const int elapsed_b);
 #endif /* if STORE_TIMEVAL */
+
+/*
+ * Re-open our log file which basically calls close() on the
+ * logfile-fd.  If we change the name of the log-file then we will
+ * re-open the file.
+ */
+extern
+void	_dmalloc_reopen_log(void);
 
 #if STORE_TIMEVAL == 0 && HAVE_TIME
 /*

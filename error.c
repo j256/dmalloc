@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.98 2001/05/23 13:34:16 gray Exp $
+ * $Id: error.c,v 1.99 2002/02/14 22:55:42 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: error.c,v 1.98 2001/05/23 13:34:16 gray Exp $"
+#ident "$Id: error.c,v 1.99 2002/02/14 22:55:42 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.98 2001/05/23 13:34:16 gray Exp $";
+  "$Id: error.c,v 1.99 2002/02/14 22:55:42 gray Exp $";
 #endif
 #endif
 
@@ -209,8 +209,7 @@ void	_dmalloc_open_log(void)
 char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 			   const int buf_size, const int elapsed_b)
 {
-  unsigned long	hrs, mins, secs;
-  unsigned long	usecs;
+  unsigned long	hrs, mins, secs, usecs;
   
   secs = timeval_p->tv_sec;
   usecs = timeval_p->tv_usec;
@@ -240,6 +239,25 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
   return buf;
 }
 #endif
+
+/*
+ * Re-open our log file which basically calls close() on the
+ * logfile-fd.  If we change the name of the log-file then we will
+ * re-open the file.
+ */
+void	_dmalloc_reopen_log(void)
+{
+  /* if it's already open or if we don't have a log file configured */
+  if (outfile_fd >= 0) {
+    _dmalloc_message("Closing logfile to be reopened as '%s'",
+		     (dmalloc_logpath == NULL ? "none" : dmalloc_logpath));
+    (void)close(outfile_fd);
+    outfile_fd = -1;
+    /* we don't call open here, we'll let the next message do it */
+  }
+  
+  /* if we aren't open yet then don't open it */
+}
 
 /* NOTE: we do the ifdef this way for fillproto */
 #if STORE_TIMEVAL == 0 && HAVE_TIME
