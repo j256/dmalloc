@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.29 1993/09/22 05:02:06 gray Exp $
+$Id: README.1,v 1.30 1993/10/03 02:01:16 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -8,18 +8,19 @@ INSTALLATION:
 	conf.h, const.h, and Makefile as well as configure the argv
 	subdirectory.  Examine the conf.h files as well as the
 	Makefiles to make sure configure set things up correctly.
-	You also may want to examine the manual settings section
-	in conf.h to tune some specific features of the library.
 
 	NOTE: It seems that some versions of tr (especially from
 	HP-UX) don't understand "tr '[a-z]' '[A-Z]'".  Since configure
 	uses tr often, you may need to either get gnu's tr or generate
 	the conf.h and Makefile by hand.
 
-2) Typing 'make' should be enough to build libmalloc.a and
+2) Examine the manual settings section of conf.h to tune some specific
+	features of the library.  
+
+3) Typing 'make' should be enough to build libmalloc.a and
 	malloc_dbg program as well as the argv subdirectory.
 
-3) Typing 'make tests' should build the malloc_t test program
+4) Typing 'make tests' should build the malloc_t test program
 	(more automated test facilities are needed!!)
 
 See the 'Quick Start' section below or examine the malloc.info file to

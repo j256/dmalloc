@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.20 1993/08/26 23:08:53 gray Exp $
+$Id: NOTES,v 1.21 1993/10/03 02:01:18 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -22,12 +22,15 @@ WARNINGS:
 	you may have to play with the basic block size to make it
 	match the page size.
 
--	currently, it is assumed that non of the return-addresses that
-	are returned by the assembly hacks in return.h, are on the
-	heap.  this is because the admin structures use this test on
-	the _next arguments which are usually unioned with the file
-	args to see if the slot is on the free list or not.  See the
-	2 XXX sections for specifics
+-	currently, it is assumed that none of the return-addresses
+	that are returned by the assembly hacks in return.h, are on
+	the heap -- in other words that you do not make calls to
+	malloc libraries ffrom code stored on the heap.  this is
+	because the admin structures use this test on the _next
+	arguments which are usually unioned with the file args to see
+	if the slot is on the free list or not.  See the 2 XXX
+	sections for specifics.  Set USE_RET_ADDRESS define to 0
+	in conf.h to disable if you are having problems.
 
 -	incorrect formats passed in from environment variable
 	MALLOC_LOGFILE will cause core dumps because it is passed
