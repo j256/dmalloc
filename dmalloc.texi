@@ -16,14 +16,14 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.121 1997/03/21 22:27:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.122 1997/07/07 07:11:53 gray Exp $
 @c ================================================================
 
 @ifinfo
 This file is an introduction to the Dmalloc library which handles general
 memory heap management.
 
-Copyright @copyright{} 1992 - 1995 by Gray Watson.
+Copyright 1992 to 1997 by Gray Watson.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -55,7 +55,7 @@ translation approved by the author instead of in the original English.
 @author Gray Watson <gray@@letters.com>
 
 @page
-Copyright @copyright{} 1992 - 1995 by Gray Watson.
+Copyright 1992 to 1997 by Gray Watson.
 
 Published by Gray Watson @samp{<gray@@letters.com>}
 
@@ -94,9 +94,9 @@ detection, file/line number reporting, and general logging of
 statistics.
 
 The library is reasonably portable having been run successfully on at
-least the following operating systems: AIX, BSDI, DG/UX, HPUX, Irix,
-Linux, MS-DOG, NeXT, OSF, Solaris, SunOS, Ultrix, Unixware, and even
-Unicos on a Cray Y-MP.
+least the following operating systems: AIX, BSDI, DG/UX, FreeBSD, HPUX,
+Irix, Linux, MS-DOG, NeXT, OSF, Solaris, SunOS, Ultrix, Unixware, and
+even Unicos on a Cray Y-MP.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
@@ -105,9 +105,9 @@ texi, info, and ps).  Documentation is available online at URL
 
 The library is available via ftp from @samp{ftp.letters.com} in the
 @file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached at
-@samp{gray@@letters.com} with any questions, feedback, or general
-comments.  Please include the version number of the library that you are
-using as well as your machine and operating system types.
+@samp{gray@@letters.com} with any questions or feedback.  Please include
+the version number of the library that you are using as well as your
+machine and operating system types.
 
 Gray Watson.
 
@@ -131,7 +131,7 @@ Gray Watson.
 @cindex library permissions
 @cindex permissions of the library
 
-Copyright @copyright{} 1992 - 1995 by Gray Watson.
+Copyright 1992 to 1997 by Gray Watson.
 
 Gray Watson makes no representations about the suitability of the
 software described herein for any purpose.  It is provided ``as is''
