@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.75 1998/10/15 15:31:00 gray Exp $
+# $Id: Makefile.all.in,v 1.76 1998/11/12 21:35:44 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -201,10 +201,10 @@ heavy : $(TEST) light
 # development on the library
 #
 
-#Makefile : $(srcdir)/Makefile.in
+#Makefile : $(srcdir)/Makefile.in config.status
 #	$(SHELL) config.status
 
-#conf.h : $(srcdir)/conf.h.in
+#conf.h : $(srcdir)/conf.h.in config.status
 #	$(SHELL) config.status
 
 #config.status : $(srcdir)/configure
