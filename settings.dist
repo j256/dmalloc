@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.62 2003/06/10 19:44:49 gray Exp $
+ * $Id: settings.dist,v 1.63 2003/11/20 17:04:00 gray Exp $
  */
 
 /*
@@ -127,12 +127,12 @@
 
 /*
  * The largest allowable allocation size.  This is only for
- * verification purposes.  Any allocation larger than this
- * will generate a ERROR_TOO_BIG error.
+ * verification purposes to control allocations of bizarre sizes.  Any
+ * allocation larger than this will generate a ERROR_TOO_BIG error.
  *
- * 268435456UL == 256mb
+ * Set to 0 to disable the test altogether.
  */
-#define LARGEST_ALLOCATION	268435456UL
+#define LARGEST_ALLOCATION	268435456UL		/* 256 mb */
 
 /*
  * Automatically call dmalloc_shutdown if on_exit or atexit is

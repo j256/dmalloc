@@ -1,3 +1,10 @@
+2003-11-20  Gray Watson  <gray@outside.256.com>
+
+	* Added some more error code documentation.
+
+	* Added ability to disable the LARGEST_ALLOCATION setting by
+	defining it to be 0.
+
 2003-11-18  Gray Watson  <gray@outside.256.com>
 
 	* Released dmalloc version 5.2.4.
@@ -2108,5 +2115,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.312 2003/11/18 15:28:28 gray Exp $
+$Id: ChangeLog,v 1.313 2003/11/20 17:04:00 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.197 2003/11/18 15:20:18 gray Exp $
+ * $Id: chunk.c,v 1.198 2003/11/20 17:04:00 gray Exp $
  */
 
 /*
@@ -1632,11 +1632,13 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
     return 0;
   }
   
-  /* check our size */
+#if LARGEST_ALLOCATION
+  /* have we exceeded the upper bounds */
   if (slot_p->sa_user_size > LARGEST_ALLOCATION) {
     dmalloc_errno = ERROR_BAD_SIZE;
     return 0;
   }
+#endif
   
   /* check our total block size */
   if (slot_p->sa_total_size > BLOCK_SIZE / 2
@@ -2342,6 +2344,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   }
 #endif
   
+#if LARGEST_ALLOCATION
   /* have we exceeded the upper bounds */
   if (size > LARGEST_ALLOCATION) {
     dmalloc_errno = ERROR_TOO_BIG;
@@ -2349,6 +2352,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
     dmalloc_error("_dmalloc_chunk_malloc");
     return MALLOC_ERROR;
   }
+#endif
   
   needed_size = size;
   
