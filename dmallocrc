@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.13 1993/07/19 18:56:45 gray Exp $
+# $Id: dmallocrc,v 1.14 1993/08/25 00:25:10 gray Exp $
 #
 
 #
@@ -36,6 +36,7 @@
 # log-blocks			log detailed block information in heap_map
 # log-unknown			log unknown non-freed memory pointers too
 # log-bad-space			log some memory from the bad pointers
+# log-ra			log non-freed ret-address memory pointers
 #
 # check-fence			check fence-post areas
 # check-heap			do general heap checking

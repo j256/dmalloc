@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.29 1993/08/24 22:17:23 gray Exp $
+@c $Id: dmalloc.texi,v 1.30 1993/08/25 00:25:07 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -306,8 +306,17 @@ One of the nice things about a good debugger is its ability to provide
 the file and line number of an offending piece of code.  This library
 attempts to give this functionality with the help of @dfn{cpp}, the C
 preprocessor.  If the file @file{malloc_dbg.h} is included, the library
-can provide file and line information for the warning messages and
-errors it generates.
+can provide file and line information of the caller of a malloc function
+for the warning messages and errors it generates.  @xref{Allocation
+Macros}.
+
+@item Return-address information
+@cindex return-address
+To debug calls to the library from external sources (i.e. those files
+that did not include @file{malloc_dbg.h}), some facilities have been
+provided to supply the callers address.  This address, with the help of
+a debugger, can provide a lot of debugging information.
+@xref{Return Address}.
 
 @item fence-post (i.e. bounds) checking
 @cindex fence-post checking
@@ -544,6 +553,10 @@ like log-non-free but logs unknown non-freed memory pointers
 @item log-bad-space
 log actual bytes in and around bad pointers
 
+@item log-ra
+like log-non-free but logs the pointers which only have return-address
+information
+
 @item check-fence
 check fence-post memory areas
 
@@ -566,6 +579,7 @@ write special values (non-0) into space when it is alloced
 @item catch-null
 abort the program immediately if the library fails to get more heap
 space from sbrk
+@cindex sbrk
 
 @item error-abort
 abort the program (and dump core) on errors
@@ -851,13 +865,14 @@ are disabled.
 
 @menu
 * Allocation Macros::           For providing file and line information.
+* Return Address::              For providing caller information.
 * Extensions::                  Additional non-standard routines.
 * Running with the Library::    How to debug problems with the library
 * C++ and the Library::         How to use the library with C++.
 * Disabling the Library::       How to compile/link without the library.
 @end menu
 
-@node Allocation Macros, Running with the Library,  , Programming
+@node Allocation Macros, Return Address,  , Programming
 @section Allocation macros.
 
 @cindex Allocation Macros
@@ -955,7 +970,53 @@ return-values from macros.  I have included a gcc form of these 2 macros
 a superior compiler and future releases of this library may even require
 its use.
 
-@node Running with the Library, Extensions, Allocation Macros, Programming
+@node Return Address, Running with the Library, Allocation Macros, Programming
+@section Making use of the caller's address information.
+
+@cindex return-address
+
+Even though the allocation macros can provide file/line information for
+some of your modules, there are still modules which either you can't
+include @file{malloc_dbg.h} or you just don't want to.  For the routines
+which use malloc calls in these files, you can get return-address
+information instead.  To accomplish this, you must be using this library
+on one of the supported architecture/compilers.  @xref{Portability}.
+
+The library attempts to use some assembly hacks to get the the
+return-address or the address of the line that called the malloc
+function.  If you have the @samp{log-ra} token enabled and you run your
+program, you might see the following non-freed memory messages.
+
+@example
+	not freed: 0x38410 ( 22 bytes) from 'ra=0xdd2c'
+	not freed: 0x38600 ( 10232 bytes) from 'ra=0x10234d'
+	not freed: 0x38220 ( 137 bytes) from 'ra=0x82cc'
+@end example
+
+With the help of a debugger, these return-addresses (or ra) can then be
+identified.
+
+@example
+        > gdb malloc_t
+
+        (gdb) x 0xdd2c
+        0xdddc <on_exit+4>:     0x7fffd8fd
+        (gdb) x 0x10234d
+        0x10234d <_findbuf+132>: 0x7fffceb7
+
+        (gdb) info line *(0x82cc)
+        Line 1092 of "argv.c" starts at pc 0x7540 and ends at 0x7550.
+
+        (gdb) quit
+@end example
+
+In the above example, gdb was used to find that the two non-freed memory
+pointers were alloc'ed in on_exit(), _fund_buf(), and in file argv.c
+line 1092 respectively.  The @samp{x address} (for examine) can always
+be used on the return-addresses but the @samp{info line *(address)} will
+only work if that file was compiled using the -g option.
+
+@node Running with the Library, Extensions, Return Address, Programming
 @section Debugging program with the library.
 
 Here is one possible scenario for using the malloc_dbg library.
@@ -1236,8 +1297,11 @@ General portability issues center around:
 
 @itemize @bullet
 @item
+@cindex sbrk
 sbrk or compatible function usages
+
 @item
+@cindex heap growing
 Whether the systems's heap grows towards high or low memory.  The
 chunk.c code is designed (loosely) around the fact that consecutive
 calls to sbrk should give higher memory addresses.
@@ -1245,6 +1309,32 @@ calls to sbrk should give higher memory addresses.
 I have not been able to test the library on a system whose heap grows
 towards low memory.  If you are trying to run the library on such a
 system I would be interested in talking with you.
+
+@item
+@cindex return-address
+The locating of the caller's address from the malloc_dbg functions.
+This is useful to locate problems with malloc calls from functions not
+able to use the uppercase macros: library calls for instance.
+
+See @file{return.h} for the available architecture/compiler
+combinations.  You may want to examine the assembly code from gcc
+version 2+ being run on the following code.  It should give you a good
+start on building a hack for your box.
+
+@example
+        static char * x;
+
+        a()
+        @{
+                x = __builtin_return_address(0);
+        @}
+        
+        main()
+        @{
+                a();
+        @}
+@end example
+
 @end itemize
 
 @node Plugs, Index of Concepts, Source Code, Top

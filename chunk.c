@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.45 1993/08/24 22:24:11 gray Exp $";
+  "$Id: chunk.c,v 1.46 1993/08/25 00:24:59 gray Exp $";
 #endif
 
 /* checking information */
@@ -2283,8 +2283,9 @@ EXPORT	void	_chunk_dump_not_freed(void)
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   void		*pnt;
-  char		unknown;
+  char		unknown, ra;
   int		unknown_sizec = 0, unknown_dblockc = 0, unknown_bblockc = 0;
+  int		ra_sizec = 0, ra_dblockc = 0, ra_bblockc = 0;
   int		sizec = 0, dblockc = 0, bblockc = 0;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
@@ -2324,17 +2325,25 @@ EXPORT	void	_chunk_dump_not_freed(void)
       /* find pointer to memory chunk */
       pnt = BLOCK_POINTER(this->ba_count + (bblockp - this->ba_block));
       
+      unknown = 0;
+      ra = 0;
+      
       /* unknown pointer? */
-      if (bblockp->bb_file == _malloc_unknown_file
+      if ((bblockp->bb_file == _malloc_unknown_file
+	   || bblockp->bb_file == NULL)
 	  && bblockp->bb_line == MALLOC_DEFAULT_LINE) {
 	unknown_bblockc++;
 	unknown_sizec += bblockp->bb_size - pnt_total_adm;
 	unknown = 1;
       }
-      else
-	unknown = 0;
+      else if (bblockp->bb_line == MALLOC_DEFAULT_LINE) {
+	ra_bblockc++;
+	ra_sizec += bblockp->bb_size - pnt_total_adm;
+	ra = 1;
+      }
       
-      if (! unknown || BIT_IS_SET(_malloc_debug, DEBUG_LOG_UNKNOWN))
+      if ((! unknown || BIT_IS_SET(_malloc_debug, DEBUG_LOG_UNKNOWN))
+	  && (! ra || BIT_IS_SET(_malloc_debug, DEBUG_LOG_RA)))
 	_malloc_message("not freed: %#lx (%8d bytes) from '%s'",
 			(char *)pnt + pnt_below_adm,
 			bblockp->bb_size - pnt_total_adm,
@@ -2400,17 +2409,25 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	  pnt = bbp->bb_mem + (dblockp - bbp->bb_dblock) * (1 << bbp->bb_bitc);
 	}
 	
+	unknown = 0;
+	ra = 0;
+	
 	/* unknown pointer? */
-	if (dblockp->db_file == _malloc_unknown_file
+	if ((dblockp->db_file == _malloc_unknown_file
+	     || dblockp->db_file == NULL)
 	    && dblockp->db_line == MALLOC_DEFAULT_LINE) {
 	  unknown_dblockc++;
 	  unknown_sizec += dblockp->db_size - pnt_total_adm;
 	  unknown = 1;
 	}
-	else
-	  unknown = 0;
+	else if (dblockp->db_line == MALLOC_DEFAULT_LINE) {
+	  ra_dblockc++;
+	  ra_sizec += dblockp->db_size - pnt_total_adm;
+	  ra = 1;
+	}
 	
-	if (! unknown || BIT_IS_SET(_malloc_debug, DEBUG_LOG_UNKNOWN))
+	if ((! unknown || BIT_IS_SET(_malloc_debug, DEBUG_LOG_UNKNOWN))
+	    && (! ra || BIT_IS_SET(_malloc_debug, DEBUG_LOG_RA)))
 	  _malloc_message("not freed: %#lx (%8d bytes) from '%s'",
 			  (char *)pnt + pnt_below_adm,
 			  dblockp->db_size - pnt_total_adm,
@@ -2433,6 +2450,10 @@ EXPORT	void	_chunk_dump_not_freed(void)
     _malloc_message("unknown memory not freed: %d pointers, %d byte%s",
 		    unknown_bblockc + unknown_dblockc, unknown_sizec,
 		    (unknown_sizec == 1 ? "" : "s"));
+    
+    _malloc_message("ret-addr memory not freed: %d pointers, %d byte%s",
+		    ra_bblockc + ra_dblockc, ra_sizec,
+		    (ra_sizec == 1 ? "" : "s"));
   }
 }
 

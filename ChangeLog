@@ -1,5 +1,8 @@
 Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Added log-ra token to log specific information about non-freed
+	memory with only return-address information.
+
 	* Added the beginnings of return-address handling via feedback
 	from Dave Hill.  Need to resolve some XXX sections in chunk and
 	get more architecture/compiler hacks in return.h.  Along the way
