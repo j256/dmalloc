@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.50 1993/09/10 21:44:55 gray Exp $";
+  "$Id: chunk.c,v 1.51 1993/09/22 05:02:12 gray Exp $";
 #endif
 
 /* checking information */
@@ -203,9 +203,9 @@ LOCAL	void	log_bad_pnt(const char * file, const unsigned int line,
 			    const void * pnt, const char * reason,
 			    const char dump)
 {
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-    _malloc_message("%s: pointer '%#lx' from '%s'",
-		    reason, pnt, _chunk_display_pnt(file, line));
+  /* dump the pointer information */
+  _malloc_message("%s: pointer '%#lx' from '%s'",
+		  reason, pnt, _chunk_display_pnt(file, line));
   
   /* NOTE: this has the potential for generating a seg-fault */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_SPACE) && pnt != NULL && dump)

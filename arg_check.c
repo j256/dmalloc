@@ -38,7 +38,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: arg_check.c,v 1.2 1993/08/30 20:14:01 gray Exp $";
+  "$Id: arg_check.c,v 1.3 1993/09/22 05:02:09 gray Exp $";
 #endif
 
 #if HAVE_BCMP
@@ -50,8 +50,7 @@ EXPORT	int	_malloc_bcmp(void * b1, void * b2, MALLOC_SIZE len)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bcmp", b1, CHUNK_PNT_LOOSE, len) != NOERROR
 	|| _chunk_pnt_check("bcmp", b2, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in bcmp");
+      _malloc_message("bad pointer argument found in bcmp");
   }
   return bcmp(b1, b2, len);
 }
@@ -66,8 +65,7 @@ EXPORT	void	_malloc_bcopy(char * from, char * to, MALLOC_SIZE len)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bcopy", from, CHUNK_PNT_LOOSE, len) != NOERROR
 	|| _chunk_pnt_check("bcopy", to, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in bcopy");
+      _malloc_message("bad pointer argument found in bcopy");
   }
   bcopy(from, to, len);
 }
@@ -82,8 +80,7 @@ EXPORT	int	_malloc_memcmp(void * b1, void * b2, MALLOC_SIZE len)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memcmp", b1, CHUNK_PNT_LOOSE, len) != NOERROR
 	|| _chunk_pnt_check("memcmp", b2, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in memcmp");
+      _malloc_message("bad pointer argument found in memcmp");
   }
   return memcmp(b1, b2, len);
 }
@@ -98,8 +95,7 @@ EXPORT	char	*_malloc_memcpy(char * to, char * from, MALLOC_SIZE len)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memcpy", to, CHUNK_PNT_LOOSE, len) != NOERROR
 	|| _chunk_pnt_check("memcpy", from, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in memcpy");
+      _malloc_message("bad pointer argument found in memcpy");
   }
   return (char *)memcpy(to, from, len);
 }
@@ -113,8 +109,7 @@ EXPORT	char	*_malloc_memset(void * buf, char ch, MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memset", buf, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in memset");
+      _malloc_message("bad pointer argument found in memset");
   }
   return (char *)memset(buf, ch, len);
 }
@@ -129,8 +124,7 @@ EXPORT	char	*_malloc_index(char * str, char ch)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("index", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
 			 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in index");
+      _malloc_message("bad pointer argument found in index");
   }
   return (char *)index(str, ch);
 }
@@ -145,8 +139,7 @@ EXPORT	char	*_malloc_rindex(char * str, char ch)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("rindex", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
 			 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in rindex");
+      _malloc_message("bad pointer argument found in rindex");
   }
   return (char *)rindex(str, ch);
 }
@@ -163,8 +156,7 @@ EXPORT	char	*_malloc_strcat(char * to, char * from)
 			 strlen(to) + strlen(from) + 1) != NOERROR
 	|| _chunk_pnt_check("strcat", from,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strcat");
+      _malloc_message("bad pointer argument found in strcat");
   }
   return (char *)strcat(to, from);
 }
@@ -181,8 +173,7 @@ EXPORT	int	_malloc_strcmp(char * s1, char * s2)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strcmp", s2, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
 			    0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strcmp");
+      _malloc_message("bad pointer argument found in strcmp");
   }
   return strcmp(s1, s2);
 }
@@ -197,8 +188,7 @@ EXPORT	MALLOC_SIZE	_malloc_strlen(char * str)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strlen", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
 			 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strlen");
+      _malloc_message("bad pointer argument found in strlen");
   }
   return strlen(str);
 }
@@ -215,8 +205,7 @@ EXPORT	char	*_malloc_strtok(char * str, char * sep)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strtok", sep,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strtok");
+      _malloc_message("bad pointer argument found in strtok");
   }
   return (char *)strtok(str, sep);
 }
@@ -230,8 +219,7 @@ EXPORT	void	_malloc_bzero(void * buf, MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bzero", buf, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in bzero");
+      _malloc_message("bad pointer argument found in bzero");
   }
   bzero(buf, len);
 }
@@ -248,8 +236,7 @@ EXPORT	char	*_malloc_memccpy(char * s1, char * s2, char ch,
     /* maybe len maybe first ch */
     if (_chunk_pnt_check("memccpy", s1, CHUNK_PNT_LOOSE, 0) != NOERROR
 	|| _chunk_pnt_check("memccpy", s2, CHUNK_PNT_LOOSE, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in memccpy");
+      _malloc_message("bad pointer argument found in memccpy");
   }
   return (char *)memccpy(s1, s2, ch, len);
 }
@@ -263,8 +250,7 @@ EXPORT	char	*_malloc_memchr(char * s1, char ch, MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memchr", s1, CHUNK_PNT_LOOSE, len) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in memchr");
+      _malloc_message("bad pointer argument found in memchr");
   }
   return (char *)memchr(s1, ch, len);
 }
@@ -279,8 +265,7 @@ EXPORT	char	*_malloc_strchr(char * str, char ch)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strchr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
 			 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strchr");
+      _malloc_message("bad pointer argument found in strchr");
   }
   return (char *)strchr(str, ch);
 }
@@ -295,8 +280,7 @@ EXPORT	char	*_malloc_strrchr(char * str, char ch)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strrchr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
 			 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strrchr");
+      _malloc_message("bad pointer argument found in strrchr");
   }
   return (char *)strrchr(str, ch);
 }
@@ -313,8 +297,7 @@ EXPORT	char	*_malloc_strcpy(char * to, char * from)
 			 strlen(from) + 1) != NOERROR
 	|| _chunk_pnt_check("strcpy", from,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strcpy");
+      _malloc_message("bad pointer argument found in strcpy");
   }
   return (char *)strcpy(to, from);
 }
@@ -332,8 +315,7 @@ EXPORT	char	*_malloc_strncpy(char * to, char * from, MALLOC_SIZE len)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strncpy", from,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strncpy");
+      _malloc_message("bad pointer argument found in strncpy");
   }
   return (char *)strncpy(to, from, len);
 }
@@ -350,8 +332,7 @@ EXPORT	int	_malloc_strcasecmp(char * s1, char * s2)
 			 CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR
 	|| _chunk_pnt_check("strcasecmp", s2,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strcasecmp");
+      _malloc_message("bad pointer argument found in strcasecmp");
   }
   return strcasecmp(s1, s2);
 }
@@ -369,8 +350,7 @@ EXPORT	int	_malloc_strncasecmp(char * s1, char * s2, MALLOC_SIZE len)
 			 CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR
 	|| _chunk_pnt_check("strncasecmp", s2,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strncasecmp");
+      _malloc_message("bad pointer argument found in strncasecmp");
   }
   return strncasecmp(s1, s2, len);
 }
@@ -387,8 +367,7 @@ EXPORT	int	_malloc_strspn(char * str, char * list)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strspn", list,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strspn");
+      _malloc_message("bad pointer argument found in strspn");
   }
   return strspn(str, list);
 }
@@ -405,8 +384,7 @@ EXPORT	int	_malloc_strcspn(char * str, char * list)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strcspn", list,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strcspn");
+      _malloc_message("bad pointer argument found in strcspn");
   }
   return strcspn(str, list);
 }
@@ -424,8 +402,7 @@ EXPORT	char	*_malloc_strncat(char * to, char * from, MALLOC_SIZE len)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strncat", from,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strncat");
+      _malloc_message("bad pointer argument found in strncat");
   }
   return (char *)strncat(to, from, len);
 }
@@ -443,8 +420,7 @@ EXPORT	int	_malloc_strncmp(char * s1, char * s2, MALLOC_SIZE len)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strncmp", s2,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strncmp");
+      _malloc_message("bad pointer argument found in strncmp");
   }
   return strncmp(s1, s2, len);
 }
@@ -461,8 +437,7 @@ EXPORT	char	*_malloc_strpbrk(char * str, char * list)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strpbrk", list,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strpbrk");
+      _malloc_message("bad pointer argument found in strpbrk");
   }
   return (char *)strpbrk(str, list);
 }
@@ -479,8 +454,7 @@ EXPORT	char	*_malloc_strstr(char * str, char * pat)
 			 0) != NOERROR
 	|| _chunk_pnt_check("strstr", pat,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
-      if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-	_malloc_message("bad pointer argument found in strstr");
+      _malloc_message("bad pointer argument found in strstr");
   }
   return (char *)strstr(str, pat);
 }

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.36 1993/09/10 21:16:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.37 1993/09/22 05:02:22 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -546,9 +546,6 @@ log internal error-messages
 @item log-trans
 log general memory transactions (quite verbose)
 
-@item log-bad-pnt
-log information about bad-pointers
-
 @item log-admin
 log full administrative information (quite verbose)
 
@@ -770,7 +767,7 @@ settings in a verbose manner.  For example:
 
 @example
         MALLOC_DEBUG == '0x4000417' (unknown)
-           log-stats, log-non-free, log-perror, log-bad-pnt
+           log-stats, log-non-free, log-perror,
            check-fence, catch-null
         MALLOC_ADDRESS not set
         MALLOC_INTERVAL not set
@@ -840,14 +837,14 @@ Here is an example of a @file{.mallocrc} file:
 none    none
 
 # basic debugging
-debug1	log-stats, log-non-free, log-perror, log-bad-pnt, check-fence
+debug1	log-stats, log-non-free, log-perror, check-fence
 
 # more logging and some heap checking
-debug2	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+debug2	log-stats, log-non-free, log-perror, log-trans, \
 	check-fence, check-heap, check-lists, error-abort
 
 # good utilities
-debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+debug3	log-stats, log-non-free, log-perror, log-trans, \
 	log-admin, check-fence, check-heap, check-lists, realloc-copy, \
 	free-blank, error-abort
 
