@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.191 2003/09/05 21:42:53 gray Exp $
+ * $Id: chunk.c,v 1.192 2003/09/06 15:00:20 gray Exp $
  */
 
 /*
@@ -1128,7 +1128,7 @@ static	void	log_error_info(const char *now_file,
   if ((! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_BAD_SPACE))
       || (dmalloc_errno != ERROR_UNDER_FENCE
 	  && dmalloc_errno != ERROR_OVER_FENCE
-	  && dmalloc_errno != ERROR_FREE_NON_BLANK)) {
+	  && dmalloc_errno != ERROR_FREE_OVERWRITTEN)) {
     return;
   }
   
@@ -1602,8 +1602,8 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
 static	int	check_used_slot(const skip_alloc_t *slot_p,
 				const void *user_pnt)
 {
-  const char	*file, *name_p, *bounds_p;
-  unsigned int	line;
+  const char	*file, *name_p, *bounds_p, *mem_p;
+  unsigned int	line, num;
   pnt_info_t	pnt_info;
   
   if (! (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_USER)
@@ -1651,6 +1651,20 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
       dmalloc_errno = ERROR_SLOT_CORRUPT;
       return 0;
     }
+    
+    /* now check the below space to make sure it is still clear */
+    num = (char *)pnt_info.pi_fence_bottom - (char *)pnt_info.pi_alloc_start;
+    if (num > 0 && (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
+		    || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))) {
+      for (mem_p = pnt_info.pi_alloc_start;
+	   mem_p < (char *)pnt_info.pi_fence_bottom;
+	   mem_p++) {
+	if (*mem_p != FREE_BLANK_CHAR) {
+	  dmalloc_errno = ERROR_FREE_OVERWRITTEN;
+	  return 0;
+	}
+      }
+    }
   }
   
   /* check out the fence-posts */
@@ -1660,6 +1674,25 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
     return 0;
   }
   
+  /* check above the allocation to see if it's been overwritten */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+    
+    if (pnt_info.pi_fence_b) {
+      mem_p = (char *)pnt_info.pi_fence_top + FENCE_TOP_SIZE;
+    }
+    else {
+      mem_p = pnt_info.pi_user_bounds;
+    }
+    
+    for (; mem_p < (char *)pnt_info.pi_alloc_bounds; mem_p++) {
+      if (*mem_p != FREE_BLANK_CHAR) {
+	dmalloc_errno = ERROR_FREE_OVERWRITTEN;
+	return 0;
+      }
+    }
+  }
+
   file = slot_p->sa_file;
   line = slot_p->sa_line;
   
@@ -1734,7 +1767,7 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
 	 check_p < (char *)slot_p->sa_mem + slot_p->sa_total_size;
 	 check_p++) {
       if (*check_p != FREE_BLANK_CHAR) {
-	dmalloc_errno = ERROR_FREE_NON_BLANK;
+	dmalloc_errno = ERROR_FREE_OVERWRITTEN;
 	return 0;
       }
     }
@@ -1958,7 +1991,7 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
  * set to the last time the pointer was "used".
  *
  * valloc_bp <- Pointer to an integer which, if not NULL, will be set
- * to 1 if the pointer was allocated with valloc() otherwise 0.
+ * to 1 if the pointer was allocated with valloc otherwise 0.
  *
  * fence_bp <- Pointer to an integer which, if not NULL, will be set
  * to 1 if the pointer has the fence bit set otherwise 0.
@@ -2255,6 +2288,15 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
     }
   }
   
+  /* make sure that the user slot is valid */
+  if (! check_used_slot(slot_p, user_pnt)) {
+    /* dmalloc_error set in check_used_slot */
+    log_error_info(NULL, 0, slot_p->sa_file, slot_p->sa_line,
+		   user_pnt, 0, NULL, "pointer-check");
+    dmalloc_error(func);
+    return 0;
+  }
+  
   /* if min_size is < 0 then do a strlen and take into account the \0 */
   if (min_size != 0) {
     if (min_size > 0) {
@@ -2311,8 +2353,8 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
  * block.
  */
 void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
-			  const unsigned long size, const int func_id,
-			  const unsigned int alignment)
+			       const unsigned long size, const int func_id,
+			       const unsigned int alignment)
 {
   unsigned long	needed_size;
   int		valloc_b = 0, memalign_b = 0, fence_b = 0;
