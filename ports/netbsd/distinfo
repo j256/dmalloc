@@ -1,4 +1,4 @@
 $NetBSD: distinfo,v 1.2 2001/04/21 00:44:16 wiz Exp $
 
-SHA1 (dmalloc-5.2.3.tgz) = 5662c34c6457b393a54c39483b189eed
-Size (dmalloc-5.2.3.tgz) = 330717 bytes
+SHA1 (dmalloc-5.2.4.tgz) = 9cd06d5be53bf53663df420d99719a21
+Size (dmalloc-5.2.4.tgz) = 338663 bytes
