@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.41 1999/03/09 15:54:10 gray Exp $
+ * $Id: settings.dist,v 1.42 1999/04/15 12:55:38 gray Exp $
  */
 
 /*
@@ -111,7 +111,7 @@
  * something wrong.
  */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
-#define MAX_FILE_LENGTH		   40		/* max __FILE__ length */
+#define MAX_FILE_LENGTH		  100		/* max __FILE__ length */
 #define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
 
 /*

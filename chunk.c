@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.150 1999/03/12 16:53:54 gray Exp $
+ * $Id: chunk.c,v 1.151 1999/04/15 12:55:37 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.150 1999/03/12 16:53:54 gray Exp $";
+#ident "$Id: chunk.c,v 1.151 1999/04/15 12:55:37 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.150 1999/03/12 16:53:54 gray Exp $";
+  "$Id: chunk.c,v 1.151 1999/04/15 12:55:37 gray Exp $";
 #endif
 #endif
 
@@ -392,7 +392,7 @@ static	void	log_error_info(const char *file, const unsigned int line,
 {
   static int	dump_bottom_b = 0, dump_top_b = 0;
   char		out[(DUMP_SPACE + FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE) * 4];
-  char		where_buf[64];
+  char		where_buf[MAX_FILE_LENGTH + 64];
   const char	*reason_str;
   const void	*dump_pnt = pnt;
   int		out_len, dump_size = DUMP_SPACE, offset = 0;
@@ -2309,7 +2309,7 @@ void	_chunk_log_heap_map(void)
 {
   bblock_adm_t	*bblock_adm_p;
   bblock_t	*bblock_p;
-  char		line[BB_PER_ADMIN + 10], where_buf[64];
+  char		line[BB_PER_ADMIN + 10], where_buf[MAX_FILE_LENGTH + 64];
   int		char_c, bblock_c, tblock_c, bb_admin_c;
   int		undef_b = 0;
   
@@ -2487,7 +2487,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   unsigned int	bit_n;
   unsigned long	byte_n = size;
   int		valloc_b = 0, memalign_b = 0;
-  char		where_buf[64], disp_buf[64];
+  char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   bblock_t	*bblock_p;
   overhead_t	*over_p;
   const char	*trans_log;
@@ -2688,7 +2688,8 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
 		    const int realloc_b)
 {
   unsigned int	bit_n, block_n, given;
-  char		where_buf[64], where_buf2[64], disp_buf[64];
+  char		where_buf[MAX_FILE_LENGTH + 64];
+  char		where_buf2[MAX_FILE_LENGTH + 64], disp_buf[64];
   int		valloc_b = 0;
   bblock_t	*bblock_p, *prev_p, *next_p, *list_p, *this_p;
   dblock_t	*dblock_p;
@@ -3019,7 +3020,8 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
 {
   void		*new_p, *ret_addr;
   char		*old_file;
-  char		where_buf[64], where_buf2[64];
+  char		where_buf[MAX_FILE_LENGTH + 64];
+  char		where_buf2[MAX_FILE_LENGTH + 64];
   const char	*trans_log;
   unsigned long	*seen_cp;
   int		valloc_b;
@@ -3320,7 +3322,8 @@ void	_chunk_dump_unfreed(void)
   dblock_t	*dblock_p;
   void		*pnt;
   int		unknown_b;
-  char		out[DUMP_SPACE * 4], where_buf[64], disp_buf[64];
+  char		out[DUMP_SPACE * 4];
+  char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   int		unknown_size_c = 0, unknown_block_c = 0, out_len;
   int		size_c = 0, block_c = 0;
   

@@ -1,3 +1,7 @@
+Fri Mar 26 17:57:54 1999  Gray Watson  <gray@burger.letters.com>
+
+	* Increased the filename size from 40 to 100 characters.
+
 Thu Mar 11 17:31:00 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.2.0.
@@ -1447,5 +1451,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.218 1999/03/11 22:40:10 gray Exp $
+$Id: ChangeLog,v 1.219 1999/04/15 12:55:39 gray Exp $
 -------------------------------------------------------------------------------
