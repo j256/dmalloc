@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.137 1999/03/07 23:05:38 gray Exp $
+ * $Id: chunk.c,v 1.138 1999/03/07 23:55:34 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.137 1999/03/07 23:05:38 gray Exp $";
+#ident "$Id: chunk.c,v 1.138 1999/03/07 23:55:34 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.137 1999/03/07 23:05:38 gray Exp $";
+  "$Id: chunk.c,v 1.138 1999/03/07 23:55:34 gray Exp $";
 #endif
 #endif
 
@@ -2633,6 +2633,12 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 				       sizeof(disp_buf)));
   }
   
+#if MEMORY_TABLE_LOG
+  if (! realloc_b) {
+    _table_alloc(file, line, size);
+  }
+#endif
+  
   return pnt;
 }
 
@@ -2735,6 +2741,13 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
 				       dblock_p->db_line));
     }
     
+#if MEMORY_TABLE_LOG
+    if (! realloc_b) {
+      _table_free(dblock_p->db_file, dblock_p->db_line,
+		  dblock_p->db_size - fence_overhead_size);
+    }
+#endif
+    
     /* check fence-post, probably again */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE)) {
       if (fence_read(dblock_p->db_file, dblock_p->db_line, pnt,
@@ -2812,6 +2825,13 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
 				     bblock_p->bb_file,
 				     bblock_p->bb_line));
   }
+  
+#if MEMORY_TABLE_LOG
+  if (! realloc_b) {
+    _table_free(bblock_p->bb_file, bblock_p->bb_line,
+		bblock_p->bb_size - fence_overhead_size);
+  }
+#endif
   
   /* check fence-post, probably again */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE)) {
@@ -3128,6 +3148,11 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
 		     (unsigned long)new_p, new_size);
   }
   
+#if MEMORY_TABLE_LOG
+  _table_free(old_file, old_line, old_size);
+  _table_alloc(file, line, new_size);
+#endif
+  
   return new_p;
 }
 
@@ -3235,6 +3260,11 @@ void	_chunk_stats(void)
 		   (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
   _dmalloc_message("   final external space: %ld bytes (%ld blocks)",
 		   extern_count * BLOCK_SIZE, extern_count);
+  
+#if MEMORY_TABLE_LOG
+  _dmalloc_message("Allocated memory summary:");
+  _table_log_info(MEMORY_TABLE_LOG);
+#endif
 }
 
 /*
@@ -3252,8 +3282,11 @@ void	_chunk_dump_unfreed(void)
   int		size_c = 0, block_c = 0;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    _dmalloc_message("dumping the unfreed pointers");
+    _dmalloc_message("dumping the unfreed pointers:");
   }
+  
+  /* clear out our memory table */
+  _table_clear();
   
   /* has anything been alloced yet? */
   this_adm_p = bblock_adm_head;
@@ -3297,6 +3330,7 @@ void	_chunk_dump_unfreed(void)
       }
       
       if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+#if DUMP_UNFREED_SUMMARY_ONLY == 0
 	_dmalloc_message("not freed: '%s' (%ld bytes) from '%s'",
 			 display_pnt(CHUNK_TO_USER(pnt),
 				     &bblock_p->bb_overhead, disp_buf,
@@ -3312,6 +3346,9 @@ void	_chunk_dump_unfreed(void)
 	  _dmalloc_message("Dump of '%#lx': '%.*s'",
 			   (unsigned long)CHUNK_TO_USER(pnt), out_len, out);
 	}
+#endif
+	_table_alloc(bblock_p->bb_file, bblock_p->bb_line,
+		     bblock_p->bb_size - fence_overhead_size);
       }
       
       size_c += bblock_p->bb_size - fence_overhead_size;
@@ -3391,6 +3428,7 @@ void	_chunk_dump_unfreed(void)
 	}
 	
 	if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+#if DUMP_UNFREED_SUMMARY_ONLY == 0
 	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			   display_pnt(CHUNK_TO_USER(pnt),
 				       &dblock_p->db_overhead, disp_buf,
@@ -3406,6 +3444,9 @@ void	_chunk_dump_unfreed(void)
 	    _dmalloc_message("Dump of '%#lx': '%.*s'",
 			     (unsigned long)CHUNK_TO_USER(pnt), out_len, out);
 	  }
+#endif
+	  _table_alloc(dblock_p->db_file, dblock_p->db_line,
+		       dblock_p->db_size - fence_overhead_size);
 	}
 	
 	size_c += dblock_p->db_size - fence_overhead_size;
@@ -3429,4 +3470,9 @@ void	_chunk_dump_unfreed(void)
 		       unknown_size_c);
     }
   }
+  
+  /* dump the summary and clear the table */
+  _dmalloc_message("Unfreed pointer summary:");
+  _table_log_info(0);
+  _table_clear();
 }

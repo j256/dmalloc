@@ -1,5 +1,8 @@
 Sun Mar  7 17:58:07 1999  Gray Watson  <gray@burger.letters.com>
 
+	* Added DUMP_UNFREED_SUMMARY_ONLY variable to the settings.dist
+ 	file.
+
 	* Added MEMORY_TABLE_SIZE and MEMORY_TABLE_LOG variables to the
 	settings.dist file.
 
@@ -1407,5 +1410,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.208 1999/03/07 23:07:47 gray Exp $
+$Id: ChangeLog,v 1.209 1999/03/07 23:55:32 gray Exp $
 -------------------------------------------------------------------------------
