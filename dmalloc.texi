@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.151 1998/11/10 20:34:15 gray Exp $
+@c $Id: dmalloc.texi,v 1.152 1998/11/12 21:30:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -174,6 +174,7 @@ registration see the following section.  @xref{Commercial License}.
 @section Commercial License
 
 @cindex commercial license
+@cindex license, commercial
 
 In order to fund maintenance and continued development of this product,
 the requirement has been added that commercial entities license the
@@ -249,7 +250,7 @@ USA
 @menu
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    The general features of the library.
-* How To Get::			How to get the library.
+* How To Get::                  How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
 * Using With Threads::          Using the library with a thread package.
@@ -259,6 +260,7 @@ USA
 @section Allocation Basics: Terms and Functions
 
 @cindex allocation basics
+@cindex basic allocation information
 
 @menu
 * Basic Definitions::           General memory terms and concepts.
@@ -384,6 +386,7 @@ void *calloc ( unsigned int @var{number}, unsigned int
 @var{size} )
 @cindex calloc
 @cindex Allocation of zeros
+@cindex zeros, allocation of
 
 Usage: @code{pnt = (type *)calloc(number, size)}
 
@@ -464,6 +467,7 @@ Address}.
 @item fence-post (i.e. bounds) checking
 @cindex fence-post checking
 @cindex bounds checking
+@cindex checking bounds
 @dfn{Fence-post} memory is the area immediately above or below memory
 allocations.  It is all too easy to write code that accesses above or
 below an allocation -- especially when dealing with arrays or strings.
@@ -499,6 +503,7 @@ inform the user of problems in a graceful manner.
 @cindex logging statistics
 @cindex statistics
 @cindex memory leaks
+@cindex leaking memory
 One of the reasons why the debug malloc library was initially developed
 was to track programs' memory usage -- specifically to locate
 @dfn{memory leaks} which are places where allocated memory is never
@@ -532,12 +537,14 @@ understood, then it is most likely just trying to indicate that a part
 of the heap has been corrupted.
 
 @cindex dump core
+@cindex core dump
 The library can be configured to quit immediately when an error is
 detected and to dump a core file or memory-image.  This can be examined
 with a debugger to determine the source of the problem.  The library can
 either stop after dumping core or continue running.
 
 @cindex system memory problems
+@cindex memory problems in system functions
 @emph{NOTE}: do not be surprised if the library catches problems with
 your system's routines.  It took me hours to finally come to the
 conclusion that the localtime call, included in SunOS release 4.1,
@@ -567,18 +574,6 @@ and @file{dmalloc.tar.gz} files.
 The versions in this repository include such stuff as a postscript
 version of the manual and other large files which may not have been
 included in the distribution you received.
-
-@item Other Repositories:
-
-@cindex gatekeeper version
-
-You can also get a recent version from anonymous ftp via
-@samp{gatekeeper.dec.com} in the @file{/pub/misc/dmalloc} directory.
-This repository has been made available through the generosity of the
-Digital Equipment Corporation with special help from Dave Hill and the
-gatekeepers.
-
-Thanks much to them all.
 
 @end table
 
@@ -731,6 +726,7 @@ heap libraries.
 @cindex jump start
 @cindex how to begin
 @cindex where to begin
+@cindex beginning
 
 This section should give you a quick idea on how to get going.
 Basically, you need to do the following things to make use of the
@@ -751,6 +747,7 @@ make and install the library (i.e. type: @kbd{make install}).
 @xref{Installation}.
 
 @cindex automatic shutdown
+@cindex shutdown, automatic
 
 @item You need to make sure that the dmalloc building process
 above was able to locate one of the the @code{on_exit} or @code{atexit}
@@ -896,15 +893,15 @@ thread programmers only please.
 @cindex operation details
 
 @menu
-* Programming::                 How to program with the library.
-* Using a Debugger::            Using a debugger with the library.
-* Environment Variable::        The variable name and its features.
-* Debug Tokens::                Description of the debugging tokens.
-* RC File::                     Format of the run-time configuration file.
-* Dmalloc Program::             Env variable setting utility.
+* Programming::                   How to program with the library.
+* Using Dmalloc With a Debugger:: Using a debugger with the library.
+* Environment Variable ::         The variable name and its features.
+* Debug Tokens::                  Description of the debugging tokens.
+* RC File::                       Format of the run-time configuration file.
+* Dmalloc Program::               Env variable setting utility.
 @end menu
 
-@node Programming, Using a Debugger, Details, Details
+@node Programming, Using Dmalloc With a Debugger, Details, Details
 @section Programming with the Library
 
 @cindex programming
@@ -922,6 +919,7 @@ thread programmers only please.
 @subsection Allocation Macros
 
 @cindex allocation macros
+@cindex macros, allocation
 @cindex dmalloc.h file
 
 By including @file{dmalloc.h} in your C files, your calls to malloc,
@@ -933,6 +931,7 @@ xcalloc, xrealloc, xrecalloc, xmemalign, xvalloc, xstrdup, and xfree
 with associated _leap calls.
 
 @cindex leap macros
+@cindex macros, leap
 
 These @dfn{leap macros} use the c-preprocessor @code{__FILE__} and
 @code{__LINE__} macros which get replaced at compilation time with the
@@ -1033,6 +1032,7 @@ stripped.  This limitation may not be true in later versions of gdb.
 @subsection Argument Checking of Function Arguments
 
 @cindex argument checking
+@cindex checking arguments
 @cindex DMALLOC_FUNC_CHECK flag
 
 One potential problem with the library and its multitude of checks and
@@ -1323,11 +1323,11 @@ If you get unresolved references like @code{_malloc_leap} or
 been.
 @end itemize
 
-@node Using a Debugger, Environment Variable, Programming, Details
-@section Using a Debugger with the Library
+@node Using Dmalloc With a Debugger, Environment Variable, Programming, Details
+@section Using Dmalloc With the Library
 
-@cindex debugger usage
-@cindex using a debugger
+@cindex debugger usage with dmalloc
+@cindex using a debugger with dmalloc
 
 Here are a number of possible scenarios for using the dmalloc library to
 track down problems with your program.
@@ -1359,7 +1359,7 @@ automatically.
 * Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
 @end menu
 
-@node General Errors, Memory Leaks, Using a Debugger, Using a Debugger
+@node General Errors, Memory Leaks, Using Dmalloc With a Debugger, Using Dmalloc With a Debugger
 @subsection Diagnosing General Errors with a Debugger
 
 @cindex diagnosing errors
@@ -1397,10 +1397,11 @@ before the section which generated the error.  This should locate the
 problem faster by checking the library's structures at that point.
 @xref{Extensions}.
 
-@node Memory Leaks, Fence-Post Overruns, General Errors, Using a Debugger
+@node Memory Leaks, Fence-Post Overruns, General Errors, Using Dmalloc With a Debugger
 @subsection Tracking down Non-Freed Memory
 
 @cindex memory leaks
+@cindex leaking memory
 
 So you've run your program, examined the log-file and discovered (to
 your horror) some un-freed memory.  Memory leaks can become large
@@ -1477,7 +1478,7 @@ cause the library to never reuse memory that has been freed.  Unique
 addresses are always generated.  This should be used with caution since
 it may cause your program to run out of memory.
 
-@node Fence-Post Overruns,  , Memory Leaks, Using a Debugger
+@node Fence-Post Overruns,  , Memory Leaks, Using Dmalloc With a Debugger
 @subsection Diagnosing Fence-Post Overwritten Memory
 
 @cindex fence-post errors
@@ -1510,7 +1511,7 @@ interval setting to a low number, you should be able to locate
 approximately when this problem happened.  @xref{Debug Tokens} and
 @xref{Dmalloc Program}.
 
-@node Environment Variable, Debug Tokens, Using a Debugger, Details
+@node Environment Variable, Debug Tokens, Using Dmalloc With a Debugger, Details
 @section Environment Variable Features
 
 @cindex environment variable
@@ -1646,6 +1647,7 @@ setenv DMALLOC_OPTIONS log=malloc,addr=0x1234,start=file.c:123
 @section Debugging Tokens
 
 @cindex debug tokens
+@cindex tokens, debug
 
 The below tokens and their corresponding descriptions are for the
 setting of the debug library setting in the environment variable.
@@ -1661,107 +1663,140 @@ print out the Debug tokens in Very-verbose mode.  @xref{Dmalloc
 Program}.
 
 @table @code
+@cindex none token
 @item none
 No debugging functionality
 
+@cindex log-stats
 @item log-stats
 Log general statistics when dmalloc_shutdown or dmalloc_log_stats is
 called.
 
+@cindex log-non-free
 @item log-non-free
 Log non-freed memory pointers when dmalloc_shutdown or dmalloc_log_unfreed
 is called.
 
+@cindex log-thread-id
 @item log-thread-id
 For systems that have multi-threaded programs (don't worry if this does
 not make sense to you), log thread-id for allocated pointer (see
 @file{conf.h}).
 
+@cindex log-trans
 @item log-trans
 Log general memory transactions (quite verbose).
 
+@cindex log-stamp
 @item log-stamp
 Log a time stamp for all messages.
 
+@cindex log-admin
 @item log-admin
 Log administrative information (quite verbose).
 
+@cindex log-blocks
 @item log-blocks
 Log detailed block information when dmalloc_log_heap_map is called.
 
+@cindex log-unknown
 @item log-unknown
 Like log-non-free but logs non-freed memory pointers that did not have
 file/line information associated with them.
 
+@cindex log-bad-space
 @item log-bad-space
 Log actual bytes in and around bad pointers.
 
+@cindex log-nonfree-space
 @item log-nonfree-space
 Log actual bytes in non-freed pointers.
 
+@cindex log-elapsed-time
 @item log-elapsed-time
 Log elapsed-time for allocated pointers (see @file{conf.h}).
 
+@cindex log-current-time
 @item log-current-time
 Log current-time for allocated pointers (see @file{conf.h}).
 
+@cindex check-fence
 @item check-fence
 Check fence-post memory areas.
 
+@cindex check-heap
 @item check-heap
 Verify heap administrative structure.
 
+@cindex check-lists
 @item check-lists
 Examine internal heap linked-lists.
 
+@cindex check-blank
 @item check-blank
 Check to see if space that was blanked by free-blank or alloc-blank has
 been overwritten.
 
+@cindex check-funcs
 @item check-funcs
 Check the arguments of some functions (mostly string operations) looking
 for bad pointers.
 
+@cindex realloc-copy
 @item realloc-copy
 Always copy data to a new pointer when realloc.
 
 @cindex blank space
+@cindex blanking memory
+@cindex overwriting memory
+@cindex clearing memory
 @cindex decimal 197
 @cindex octal 305
 @cindex hex 0xc5
+@cindex free-blank
 @item free-blank
 Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
 it is freed.
 
 @cindex dump core
 @cindex core dump
+@cindex error-abort
 @item error-abort
 Abort the program (and dump core) on errors.  See @code{error-dump} below.
 
 @cindex blank space
+@cindex blanking memory
+@cindex overwriting memory
+@cindex clearing memory
 @cindex decimal 197
 @cindex octal 305
 @cindex hex 0xc5
+@cindex alloc-blank
 @item alloc-blank
 Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
 it is allocated.
 
+@cindex heap-check-map
 @item heap-check-map
 Log a heap-map to the logfile every time the heap is checked.
 
-@item print-error
+@cindex print-messages
+@item print-messages
 Log any errors and messages to the screen via standard-error.
 
 @cindex sbrk
+@cindex catch-null
 @item catch-null
 Abort the program immediately if the library fails to get more heap
 space from sbrk.
 
+@cindex never-reuse
 @item never-reuse
 Have the heap never use space that has been used before and freed.
 @xref{Memory Leaks}.  @emph{WARNING}: This should be used with caution
 since you may run out of heap space.
 
+@cindex allow-nonlinear
 @item allow-nonlinear
 Have the heap not complain when additional program functionality seems
 to have made use of the system's heap-allocation routine @code{sbrk}
@@ -1772,17 +1807,18 @@ pthreads package.
 @emph{WARNING}: This should be used with caution since it may hide
 certain heap problems.
 
-@item allow-zero
+@cindex allow-free-null
+@item allow-free-null
 The library will not generate an error when a program tries to free a
-NULL pointer.  Also, if the ALLOW_ALLOC_ZERO_SIZE variable is @emph{not}
-set to 1 in @file{settings.h}, then the library will not generate an
-error when a program asks for a 0 byte allocation.
+NULL pointer.  See ALLOW_FREE_NULL and ALLOW_FREE_NULL_MESSAGE settings
+in the @file{settings.h} file which change the default behavior.
 
 @emph{NOTE}: This does not impact the ALLOW_REALLOC_NULL compilation
 options which can be adjusted in @file{conf.h}.
 
 @cindex dump core
 @cindex core dump
+@cindex error-dump
 @item error-dump
 Dump core on error and then continue.  Later core dumps overwrite
 earlier ones if the program encounters more than one error.  See
@@ -1799,6 +1835,7 @@ recursive.
 
 @cindex rc file
 @cindex runtime-config file
+@cindex configuration file
 @cindex dmallocrc file
 @cindex .dmallocrc file
 
@@ -1856,14 +1893,14 @@ Here is an example of a @file{.dmallocrc} file:
 none    none
 
 # basic debugging
-debug1	log-stats, log-non-free, check-fence
+debug1  log-stats, log-non-free, check-fence
 
 # more logging and some heap checking
-debug2	log-stats, log-non-free, log-trans, \
+debug2  log-stats, log-non-free, log-trans, \
         check-fence, check-heap, check-lists, error-abort
 
 # good utilities
-debug3	log-stats, log-non-free, log-trans, \
+debug3  log-stats, log-non-free, log-trans, \
         log-admin, check-fence, check-heap, check-lists, realloc-copy, \
         free-blank, error-abort
 
@@ -2171,6 +2208,7 @@ sbrk or compatible function usages
 
 @item
 @cindex heap growing
+@cindex growing the heap
 Whether the systems' heap grows towards high or low memory.  The chunk.c
 code is designed (loosely) around the fact that consecutive calls to
 sbrk should give higher memory addresses.
@@ -2241,6 +2279,7 @@ values and priorities.  http://www.cpsr.org/
 @item Berkeley Software Design, Inc. (BSDI)
 @cindex BSDI
 @cindex BSD/386
+@cindex BSD/OS
 @cindex Berkeley Software Design, Inc.
 The author has been a proud and enthusiastic owner and user of the
 BSD/OS operating system for some time now.  For around $1k you get a
@@ -2267,7 +2306,7 @@ facilities including nfs, full software development utilities, X, etc.
 @menu
 Top.
 
-* Copying::                     Library copying conditions.
+* Copying::                     Library copying and licensing conditions.
 * Overview::                    Description of how to debug with the library.
 * Details::                     Details about the library's operations.
 * Source Code::                 Information on the source and general concerns.
@@ -2275,33 +2314,41 @@ Top.
 * Index of Concepts::           Index of concepts in the manual.
 * Full Node Listing::           Listing of all the nodes in the manual.
 
+Copying.
+
+* Non-Commercial License::      Permissions for non-commercial entities.
+* Commercial License::          Permissions for commercial entities.
+* Printed Manuals::             Printed/bound manuals and source floppies.
+* Registration Information::    Permissions for commercial entities.
+
 Overview.
 
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    The general features of the library.
-* How To Get::			Where to find and how to get the library.
+* How To Get::                  How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
-* Using a Debugger::            Using a debugger with the library.
+* Using With Threads::          Using the library with a thread package.
 
 Allocation Basics.
 
 * Basic Definitions::           General memory terms and concepts.
 * Malloc Functions::            Functionality supported by all malloc libs.
 
-Using a Debugger.
-
-* General Errors::              Diagnosing general problems with a debugger.
-* Memory Leaks::                Tracking down non-freed memory.
-* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
-
 Details.
 
-* Programming::                 How to program with the library.
-* Environment Variable::        The variable name and its features.
-* Debug Tokens::                Description of the debugging tokens.
-* RC File::                     Format of the run-time configuration file.
-* Dmalloc Program::             Env variable setting utility.
+* Programming::                   How to program with the library.
+* Using Dmalloc With a Debugger:: Using a debugger with the library.
+* Environment Variable ::         The variable name and its features.
+* Debug Tokens::                  Description of the debugging tokens.
+* RC File::                       Format of the run-time configuration file.
+* Dmalloc Program::               Env variable setting utility.
+
+Source Code.
+
+* Definitions::                 Some terms and other information.
+* Compatibility::               General compatibility concerns.
+* Portability::                 Issues important for porting the library.
 
 Programming.
 
@@ -2312,11 +2359,11 @@ Programming.
 * C++ and the Library::         Using the Library with C++.
 * Disabling the Library::       How to compile/link without the library.
 
-Source Code.
+Using Dmalloc With the Library.
 
-* Definitions::                 Some terms and other information.
-* Compatibility::               General compatibility concerns.
-* Portability::                 Issues important for porting the library.
+* General Errors::              Diagnosing general problems with a debugger.
+* Memory Leaks::                Tracking down non-freed memory.
+* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
 @end menu
 
 @end ifinfo
