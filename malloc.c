@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.127 1999/03/08 16:19:38 gray Exp $
+ * $Id: malloc.c,v 1.128 1999/03/08 17:25:01 gray Exp $
  */
 
 /*
@@ -78,10 +78,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.127 1999/03/08 16:19:38 gray Exp $";
+#ident "$Id: malloc.c,v 1.128 1999/03/08 17:25:01 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.127 1999/03/08 16:19:38 gray Exp $";
+  "$Id: malloc.c,v 1.128 1999/03/08 17:25:01 gray Exp $";
 #endif
 #endif
 
@@ -747,7 +747,7 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, 0);
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, DMALLOC_FUNC_MALLOC, 0);
 }
 
 /*
@@ -762,7 +762,7 @@ DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
   char		*file;
   
   GET_RET_ADDR(file);
-  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, len, 1, 0);
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, len, DMALLOC_FUNC_CALLOC, 0);
 }
 
 /*
@@ -779,7 +779,8 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_realloc(file, DMALLOC_DEFAULT_LINE, old_pnt, new_size, 0);
+  return _loc_realloc(file, DMALLOC_DEFAULT_LINE, old_pnt, new_size,
+		      DMALLOC_FUNC_REALLOC);
 }
 
 /*
@@ -796,7 +797,8 @@ DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_realloc(file, DMALLOC_DEFAULT_LINE, old_pnt, new_size, 1);
+  return _loc_realloc(file, DMALLOC_DEFAULT_LINE, old_pnt, new_size,
+		      DMALLOC_FUNC_RECALLOC);
 }
 
 /*
@@ -810,7 +812,8 @@ DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size)
   char		*file;
   
   GET_RET_ADDR(file);
-  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, alignment);
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, DMALLOC_FUNC_MEMALIGN,
+		     alignment);
 }
 
 /*
@@ -823,7 +826,8 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, BLOCK_SIZE);
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, DMALLOC_FUNC_VALLOC,
+		     BLOCK_SIZE);
 }
 
 /*
@@ -841,7 +845,8 @@ char	*strdup(const char *str)
   /* len + \0 */
   len = strlen(str) + 1;
   
-  buf = (char *)_loc_malloc(file, DMALLOC_DEFAULT_LINE, len, 0, 0);
+  buf = (char *)_loc_malloc(file, DMALLOC_DEFAULT_LINE, len,
+			    DMALLOC_FUNC_STRDUP, 0);
   if (buf != NULL) {
     (void)strcpy(buf, str);
   }
