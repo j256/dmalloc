@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.260 2004/08/13 17:19:40 gray Exp $
+@c $Id: dmalloc.texi,v 1.261 2004/08/13 21:55:36 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -328,14 +328,15 @@ make, and install the library (i.e. type: @kbd{make install}).
 @cindex atexit
 @cindex destructor
 
-@item You need to make sure that the dmalloc building process
-above was able to locate one of the @code{on_exit} function,
-@code{atexit} function, or compiler destructor support.  If so, then the
-dmalloc library should be able to automatically call
-@code{dmalloc_shutdown} when @code{exit} is called.  This causes the
-memory statistics and unfreed information to be dumped to the log file.
-However if your system has none of the above, then you will need to call
-@code{dmalloc_shutdown} yourself before your program exits.
+@item You need to make sure that the library configuration and
+build process above was able to locate one of the @code{on_exit}
+function, @code{atexit} function, or had compiler destructor support.
+If one of these functions or support is available then the dmalloc
+library should be able to automatically shut itself down when the
+program exits.  This causes the memory statistics and unfreed
+information to be dumped to the log file.  However, if your system has
+none of the above, then you will need to call @code{dmalloc_shutdown}
+yourself before your program exits.
 
 @cindex alias, shell
 @cindex bash shell
@@ -1354,7 +1355,7 @@ pointers that have not been freed.  If @code{free_b} is set to non-0
 then count the pointers that have been freed.
 
 This can be used in conjunction with the @code{dmalloc_mark()}
-function to help servers which never exit encure that transactions or
+function to help servers which never exit ensure that transactions or
 events are not leaking memory.  @xref{Debugging A Server}.
 
 @example
