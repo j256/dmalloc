@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.28 1993/08/30 20:14:34 gray Exp $";
+  "$Id: dmalloc.c,v 1.29 1993/10/05 04:32:16 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -427,7 +427,7 @@ EXPORT	int	main(int argc, char ** argv)
   
   /*
    * turn off debugging for this program
-   * NOTE: gcc has already called malloc unfortunately
+   * NOTE: some pre-main function may already have called malloc unfortunately
    */
   (void)malloc_debug(0);
   

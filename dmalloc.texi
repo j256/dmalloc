@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.37 1993/09/22 05:02:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.38 1993/10/05 04:32:12 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1103,10 +1103,10 @@ instance, if debugging should never be enabled for a program, a call to
 @code{malloc_debug(0);} as the first call in @code{main()} will disable
 all the memory debugging from that point on.
 
-One problem however is that some compilers (gcc for instance) make calls
-to memory allocation functions @emph{before} @code{main()} is reached
-and @code{malloc_debug()} called meaning some debugging information may
-be generated regardless.
+One problem however is that some systems make calls to memory allocation
+functions @emph{before} @code{main()} is reached and
+@code{malloc_debug()} called meaning some debugging information may be
+generated regardless.
 
 @item int malloc_examine(char * pnt, int * size, char ** file, int * line,
 void ** ret_address);
