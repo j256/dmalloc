@@ -28,6 +28,6 @@
  * NOTE to gray: whenever this is changed, a corresponding Changlog
  * entry *must* be entered.
  */
-LOCAL	char	*malloc_version = "1.2.5";
+LOCAL	char	*malloc_version = "1.2.6";
 
-/* Version Date: $Date: 1993/06/15 14:30:55 $ */
+/* Version Date: $Date: 1993/07/13 05:55:12 $ */
