@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.85 1995/03/23 15:34:29 gray Exp $
+@c $Id: dmalloc.texi,v 1.86 1995/04/02 23:26:01 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -582,8 +582,10 @@ problems.  @xref{Allocation Macros}.
 @item have the library check itself every 100 iterations (@kbd{-i 100})
 
 @item enable a number of debug features (@kbd{low}).  You can
-also try @kbd{runtime} for minimal checking or @kbd{medium}, @kbd{high},
-or @kbd{all} for more extensive heap verification.
+also try @kbd{runtime} for minimal checking or @kbd{medium} or
+@kbd{high} for more extensive heap verification.  @kbd{all} is also
+provided but generates a multitude of log messages without many more
+tests.
 
 @end itemize
 
