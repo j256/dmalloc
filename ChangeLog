@@ -1,5 +1,7 @@
 Tue Sep 29 09:26:50 1998  Gray Watson  <gray@burger.letters.com>
 
+	* Releasing dmalloc version 4.0.0 beta2. 
+
 	* Aligned valloc to block alignment as it should have been with
         fence post checking installed.
 
@@ -1286,5 +1288,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.189 1998/09/29 13:33:26 gray Exp $
+$Id: ChangeLog,v 1.190 1998/09/29 13:43:19 gray Exp $
 -------------------------------------------------------------------------------

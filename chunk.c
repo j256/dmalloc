@@ -50,7 +50,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.118 1998/09/29 13:31:14 gray Exp $";
+  "$Id: chunk.c,v 1.119 1998/09/29 13:43:21 gray Exp $";
 #endif
 
 /* local routines */
@@ -3061,9 +3061,10 @@ void	_chunk_stats(void)
 		   (long)HEAP_SIZE, bblock_count, check_count);
   
   /* log user allocation information */
-  _dmalloc_message("alloc calls: malloc %ld, calloc %ld, realloc %ld, recalloc %ld, valloc %ld, free %ld",
-		   malloc_count, calloc_count, realloc_count, recalloc_count,
-		   valloc_count, free_count);
+  _dmalloc_message("alloc calls: malloc %ld, calloc %ld, realloc %ld, free %ld",
+		   malloc_count, calloc_count, realloc_count, free_count);
+  _dmalloc_message("alloc calls: recalloc %ld, valloc %ld",
+		   recalloc_count, valloc_count);
   _dmalloc_message(" total memory allocated: %ld bytes (%ld pnts)",
 		  alloc_total, alloc_tot_pnts);
   

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.23 1998/09/29 13:27:19 gray Exp $
+ * $Id: settings.dist,v 1.24 1998/09/29 13:43:23 gray Exp $
  */
 
 /*
@@ -180,7 +180,7 @@
 
 /*
  * Number of bytes to write at the bottom of allocations. See the
- * FENCE_TOP setting above or the manual for more information.
+ * FENCE_TOP_SIZE setting above or the manual for more information.
  *
  * WARNING: this should changed with caution and probably should only be
  * increased.  If you need to change it, use (ALLOCATION_ALIGNMENT *
