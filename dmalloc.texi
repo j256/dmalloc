@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.268 2004/10/20 13:15:33 gray Exp $
+@c $Id: dmalloc.texi,v 1.269 2004/10/20 13:49:17 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -780,15 +780,15 @@ the pointers are freed.
 
 @cindex check-heap
 In addition to per-pointer checks, you can configure the library to
-perform complete heap checks.  These complete checks verify all internal
-heap structures and include walking all of the known allocated pointers
-to verify each one in turn.  You need this level of checking to find
-random pointers in your program which got corrupted but that won't be
-freed for a while.  To turn on these checks, you will need to enable the
-'check-heap' debug token.  @xref{Debug Tokens}.  By default this will
-cause the heap to be fully checked each and every time dmalloc is called
-whether it is a malloc, free, realloc, or another dmalloc overloaded
-function.
+perform complete heap checks.  These complete checks verify all
+internal heap structures and include walking all of the known
+allocated pointers to verify each one in turn.  You need this level of
+checking to find random pointers in your program which got corrupted
+but that won't be freed for a while.  To turn on these checks, you
+will need to enable the @code{check-heap} debug token.  @xref{Debug
+Tokens}.  By default this will cause the heap to be fully checked each
+and every time dmalloc is called whether it is a malloc, free,
+realloc, or another dmalloc overloaded function.
 
 Performing a full heap check can take a good bit of CPU and it may be
 that you will want to run it sporadically.  This can be accomplished in
@@ -1443,8 +1443,11 @@ using the @samp{-o} "lock-on" option.  @xref{Using With Threads}.
 
 @item 13 (ERROR_LOCK_NOT_CONFIG)
 Thread locking has not been configured.  This indicates that you
-attempted to use the @samp{-o} "lock-on" option without linking with the
-thread version of the library.
+attempted to use the @samp{-o} "lock-on" option without linking with
+the thread version of the library.  You should probably be using
+@code{-ldmallocth} @emph{not} @code{-ldmalloc} when you are linking.
+Or you should include @code{@dots{}/lib/libdmallocth.a} on your
+compilation line.
 
 @c --------------------------------
 
@@ -1458,7 +1461,7 @@ thread version of the library.
 
 @item 20 (ERROR_IS_NULL)
 Pointer is null.  The program passed a NULL (0L) pointer to @code{free}
-and you have the @samp{error-free-null} token enabled.
+and you have the @code{error-free-null} token enabled.
 
 @c --------------------------------
 
@@ -1551,7 +1554,7 @@ file.
 
 @item 26 (ERROR_UNDER_FENCE)
 This indicates that a pointer had its lower bound picket-fence magic
-number overwritten.  If the @samp{check-fence} token is enabled, the
+number overwritten.  If the @code{check-fence} token is enabled, the
 library writes magic values above and below allocations to protect
 against overflow.  Most likely this is because a pointer below it went
 past its allocate and wrote into the next pointer's space.
@@ -1566,7 +1569,7 @@ past its allocate and wrote into the next pointer's space.
 
 @item 27 (ERROR_OVER_FENCE)
 This indicates that a pointer had its upper bound picket-fence magic
-space overwritten.  If the @samp{check-fence} token is enabled, the
+space overwritten.  If the @code{check-fence} token is enabled, the
 library writes magic values above and below allocations to protect
 against overflow.  Most likely this is because an array or string
 allocation wrote past the end of the allocation.
@@ -1870,7 +1873,7 @@ track down problems with your program.
 You should first enable a logfile filename and turn on a set of debug
 features.  You can use @kbd{dmalloc -l logfile low} to accomplish this.
 If you are interested in having the error messages printed to your
-terminal as well, enable the @samp{print-messages} token by typing
+terminal as well, enable the @code{print-messages} token by typing
 @kbd{dmalloc -p print-messages} afterwards.  @xref{Dmalloc Program}.
 
 @cindex gdb
@@ -2025,7 +2028,7 @@ and when the breakpoint is reached you can examine the stack frame to
 determine who called @code{strdup} to allocate the pointer.
 
 To not bother with the @code{STORE_SEEN_COUNT} feature, you can also run
-your program with the @samp{never-reuse} token enabled.  This token will
+your program with the @code{never-reuse} token enabled.  This token will
 cause the library to never reuse memory that has been freed.  Unique
 addresses are always generated.  This should be used with caution since
 it may cause your program to run out of memory.
@@ -2681,10 +2684,11 @@ options can be specified.
 @cindex ERROR_OVER_LIMIT
 @item -M limit
 Set the memory allocation limit which will abort the program if the
-total memory allocations exceed this number of bytes.  The limit can be
-a number with a k, m, or g at the end to indicate kilobyte, megabyte,
-and gigabyte respectively.  Ex: 100k, 200m, 1g.  If the limit is
-exceeded, this will generate an @code{ERROR_OVER_LIMIT} error.
+total memory allocations exceed this number of bytes.  The limit can
+be a number with a k, m, or g at the end to indicate kilobyte,
+megabyte, and gigabyte respectively.  Ex: 100k, 200m, 1g.  If the
+limit is exceeded, this will generate an @code{ERROR_OVER_LIMIT}
+error.  @xref{Error Codes}.
 
 @item -n
 Without changing the environment, output the commands resulting from the
@@ -2991,8 +2995,8 @@ setting of the debug library setting in the environment variable.
 @file{.dmallocrc} file.  @xref{RC File}.
 
 Each token, when specified, enables a specific debugging feature.  For
-instance, if you have the log-stats token enabled, the library will log
-general statistics to the logfile.
+instance, if you have the @code{log-stats} token enabled, the library
+will log general statistics to the logfile.
 
 To get this information on the fly, use @kbd{dmalloc -DV}.  This will
 print out the Debug tokens in Very-verbose mode.  @xref{Dmalloc
@@ -3052,9 +3056,9 @@ Verify heap administrative structure.
 
 @cindex check-blank
 @item check-blank
-Check to see if space that was blanked by free-blank or alloc-blank has
-been overwritten.  If this is enabled then it will enable free-blank and
-alloc-blank automatically.
+Check to see if space that was blanked when a pointer was allocated or
+when it was freed has been overwritten.  If this is enabled then it
+will enable @code{free-blank} and @code{alloc-blank} automatically.
 
 @cindex check-funcs
 @item check-funcs
@@ -3100,10 +3104,11 @@ Always copy data to a new pointer when realloc.
 @item free-blank
 Write special ``dmalloc-free'' byte (hexadecimal @code{0xdf}, octal
 @code{0337}, decimal @code{223}) into space when it is freed.  You can
-set this to be something else in the @file{settings.dist} file.  You
-can then check to see if areas have been improperly overwritten with
+set this to be something else in the @file{settings.dist} file.  This
+ensures that your program is not using memory after it has been freed.
+You can check to see if areas have been improperly overwritten with
 the @code{check-blank} token.  If the free space has been overwritten,
-then ERROR_FREE_OVERWRITTEN is triggered.
+then @code{ERROR_FREE_OVERWRITTEN} is triggered.  @xref{Error Codes}.
 
 @cindex dump core
 @cindex core dump
@@ -3128,8 +3133,13 @@ Abort the program (and dump core) on errors.  See @code{error-dump} below.
 Write special ``dmalloc-alloc'' byte (hexadecimal @code{0xda}, octal
 @code{0332}, decimal @code{218}) into space when it is allocated.  You
 can set this to be something else in the @file{settings.dist} file.
-You can then check to see if areas have been improperly overwritten
-with the check-blank token.
+If you are not using @code{calloc} this will overwrite the user space
+with the special bytes ensuring that your program is initializing its
+dynamic memory appropriately.  Also, if you ask for 35 bytes and the
+library has to give you a block of 64 because of rounding issues, it
+will overwrite the extra memory with the special byte.  You can then
+check to see if the extra areas have been improperly overwritten by
+enabling the @code{check-blank} token.
 
 @cindex print-messages
 @item print-messages
@@ -3475,11 +3485,11 @@ directory.
 
 @item The logfile is only produced when @code{dmalloc_shutdown()} is
 called.  By default it will be called when @code{exit()} gets called.
-If you are running your program and press @kbd{Control-C} under Unix the
-program will stop immediately and @code{dmalloc_shutdown()} will not get
-called.  You can either setup a signal handler for @code{SIGINTR} and
-call exit yourself, or you can enable the @kbd{catch-signals} token.
-@xref{Debug Tokens}.
+If you are running your program and press @kbd{Control-C} under Unix
+the program will stop immediately and @code{dmalloc_shutdown()} will
+not get called.  You can either setup a signal handler for
+@code{SIGINTR} and call exit yourself, or you can enable the
+@code{catch-signals} token.  @xref{Debug Tokens}.
 
 @item If your program is segfaulting or otherwise crashing when it exits, the
 @code{exit()} routine may not being called.  You will have to resolve
