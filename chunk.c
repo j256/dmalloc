@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.204 2004/07/10 03:49:51 gray Exp $
+ * $Id: chunk.c,v 1.205 2004/07/11 05:45:36 gray Exp $
  */
 
 /*
@@ -151,7 +151,6 @@ static	unsigned long	alloc_tot_pnts = 0;	/* total pointers */
 static	unsigned long	heap_check_c = 0;	/* count of heap-checks */
 static	unsigned long	user_block_c = 0;	/* count of blocks */
 static	unsigned long	admin_block_c = 0;	/* count of admin blocks */
-static	unsigned long	extern_block_c = 0;	/* count of extern blocks */
 
 /* alloc counts */
 static	unsigned long	func_malloc_c = 0;	/* count the mallocs */
@@ -2807,11 +2806,12 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
  */
 void	_dmalloc_chunk_log_stats(void)
 {
-  unsigned long	overhead, tot_space, ext_space;
+  unsigned long	overhead, user_space, tot_space;
   
   dmalloc_message("Dumping Chunk Statistics:");
   
-  tot_space = alloc_current + free_space_bytes;
+  tot_space = (user_block_c + admin_block_c) * BLOCK_SIZE;
+  user_space = alloc_current + free_space_bytes;
   overhead = admin_block_c * BLOCK_SIZE;
   
   /* version information */
@@ -2825,15 +2825,13 @@ void	_dmalloc_chunk_log_stats(void)
 		  (unsigned long)_dmalloc_heap_high -
 		  (unsigned long)_dmalloc_heap_low);
   dmalloc_message("    user blocks: %ld blocks, %ld bytes (%ld%%)",
-		  user_block_c, tot_space, /* XXX */ 0L);
+		  user_block_c, user_space,
+		  (tot_space < 100 ? 0 : user_space / (tot_space / 100)));
   dmalloc_message("   admin blocks: %ld blocks, %ld bytes (%ld%%)",
-		  admin_block_c, overhead, /* XXX */ 0L);
-  ext_space = extern_block_c * BLOCK_SIZE;
-  dmalloc_message("external blocks: %ld blocks, %ld bytes (%ld%%)",
-		  extern_block_c, ext_space, /* XXX */ 0L);
-  tot_space = (user_block_c + admin_block_c + extern_block_c) * BLOCK_SIZE;
+		  admin_block_c, overhead,
+		  (tot_space < 100 ? 0 : overhead / (tot_space / 100)));
   dmalloc_message("   total blocks: %ld blocks, %ld bytes",
-		  user_block_c + admin_block_c + extern_block_c, tot_space);
+		  user_block_c + admin_block_c, tot_space);
   
   dmalloc_message("heap checked %ld", heap_check_c);
   

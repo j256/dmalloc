@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.66 2004/07/11 03:08:38 gray Exp $
+ * $Id: heap.c,v 1.67 2004/07/11 05:45:36 gray Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ static	void	*heap_extend(const int incr)
     dmalloc_error("heap_extend");
   }
   
-  if ((char *)ret < (char *)_dmalloc_heap_low) {
+  if (_dmalloc_heap_low == NULL || (char *)ret < (char *)_dmalloc_heap_low) {
     _dmalloc_heap_low = ret;
   }
   high = (char *)ret + incr;

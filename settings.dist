@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.65 2004/07/11 03:08:39 gray Exp $
+ * $Id: settings.dist,v 1.66 2004/07/11 05:45:36 gray Exp $
  */
 
 /*
@@ -377,10 +377,11 @@
  * optimized for space and so you can easily run out of memory with
  * it.
  *
- * WARNING: this should only be used if HAVE_SBRK is 0.  Please send
- * me email with any problems or comments on this feature.
+ * WARNING: this probably should only be used if HAVE_SBRK and
+ * HAVE_MMAP are 0.  Please send me email with any problems or
+ * comments on this feature.
  */
-#if HAVE_SBRK == 0
+#if HAVE_SBRK == 0 && HAVE_MMAP == 0
 #define INTERNAL_MEMORY_SPACE (1024 * 1024)
 #endif
 
