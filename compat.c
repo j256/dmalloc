@@ -24,7 +24,7 @@
  * function just in case your system does not have them.
  */
 
-#define DMALLOC_DEBUG_DISABLE
+#define DMALLOC_DISABLE
 
 #include "dmalloc.h"
 #include "conf.h"
@@ -34,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.28 1994/09/10 23:27:14 gray Exp $";
+  "$Id: compat.c,v 1.29 1994/09/12 17:17:07 gray Exp $";
 #endif
 
 #if HAVE_BCOPY == 0
@@ -78,28 +78,6 @@ EXPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
   return 0;
 }
 #endif /* HAVE_BCMP == 0 */
-
-#if HAVE_GETPID == 0
-/*
- * return a fake pid for brain-dead systems without getpid()
- */
-EXPORT	int	getpid(void)
-{
-  return 0;
-}
-#endif /* HAVE_GETPID == 0 */
-
-#if HAVE_TIME == 0
-/*
- * return a fake time for brain-dead systems without time()
- */
-EXPORT	long	time(long * timep)
-{
-  if (timep != NULL)
-    *timep = 0L;
-  return 0L;
-}
-#endif /* HAVE_TIME == 0 */
 
 #if HAVE_INDEX == 0
 /*
