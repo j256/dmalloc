@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk.h,v 1.37 1995/03/10 19:43:23 gray Exp $
+ * $Id: chunk.h,v 1.38 1995/05/05 16:51:08 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -49,14 +49,8 @@ IMPORT	int	_chunk_startup(void);
 /*
  * display a bad pointer with FILE and LINE information
  */
-IMPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line);
-
-/*
- * note in the chunk-level admin structures that BLOCKN blocks were
- * sbrk'ed externally by someone else up to MEM
- * returns [NO]ERROR
- */
-IMPORT	int	_chunk_note_external(const int blockn, const void * mem);
+IMPORT	char	*_chunk_display_where(const char * file,
+				      const unsigned int line);
 
 /*
  * run extensive tests on the entire heap
@@ -72,12 +66,19 @@ IMPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 				 const int check, const int min_size);
 
 /*
+ * note in the chunk-level admin structures that BLOCKN blocks were
+ * sbrk'ed externally by someone else up to MEM
+ * returns [NO]ERROR
+ */
+IMPORT	int	_chunk_note_external(const int blockn, const void * mem);
+
+/*
  * return some information associated with PNT, returns [NO]ERROR
  */
 IMPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 				 unsigned int * alloc_size, char ** file,
 				 unsigned int * line, void ** ret_attr,
-				 const char * where);
+				 const char * where, int ** seencp);
 
 /*
  * log the heap structure plus information on the blocks if necessary

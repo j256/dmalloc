@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.88 1995/03/10 19:43:21 gray Exp $";
+  "$Id: chunk.c,v 1.89 1995/05/05 16:51:07 gray Exp $";
 #endif
 
 /*
@@ -249,7 +249,8 @@ LOCAL	void	desc_pnt(char * buf, const char * file,
 /*
  * display a bad pointer with FILE and LINE information
  */
-EXPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line)
+EXPORT	char	*_chunk_display_where(const char * file,
+				      const unsigned int line)
 {
   static char	buf[256];
   desc_pnt(buf, file, line);
@@ -260,10 +261,46 @@ EXPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line)
  * small hack here.  same as above but different buffer space so we
  * can use 2 calls in 1 printf.
  */
-LOCAL	char	*chunk_display_pnt2(const char * file, const unsigned int line)
+LOCAL	char	*chunk_display_where2(const char * file,
+				      const unsigned int line)
 {
   static char	buf[256];
   desc_pnt(buf, file, line);
+  return buf;
+}
+
+/*
+ * display a pointer PNT and information about it.
+ */
+LOCAL	char	*display_pnt(const void * pnt, const int seenc,
+			     const int iter, const long when,
+			     const int thread_id)
+{
+  static char	buf[256];
+  char		buf2[64];
+  
+  (void)sprintf(buf, "%#lx", (long)pnt);
+  
+#if STORE_POINTER_COUNT
+  (void)sprintf(buf2, ":c%d", seenc);
+  (void)strcat(buf, buf2);
+#endif
+  
+#if STORE_ITERATION_COUNT
+  (void)sprintf(buf2, ":i%d", iter);
+  (void)strcat(buf, buf2);
+#endif
+  
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+  (void)sprintf(buf2, ":w%ld", when);
+  (void)strcat(buf, buf2);
+#endif
+  
+#if STORE_THREAD_ID
+  (void)sprintf(buf2, ":t%d", thread_id);
+  (void)strcat(buf, buf2);
+#endif
+  
   return buf;
 }
 
@@ -287,10 +324,10 @@ LOCAL	void	log_error_info(const char * file, const unsigned int line,
   /* dump the pointer information */
   if (pnt_known)
     _dmalloc_message("%s: %s: pointer '%#lx' from '%s'",
-		     where, reason_str, pnt, _chunk_display_pnt(file, line));
+		     where, reason_str, pnt, _chunk_display_where(file, line));
   else
     _dmalloc_message("%s: %s: from '%s'",
-		     where, reason_str, _chunk_display_pnt(file, line));
+		     where, reason_str, _chunk_display_where(file, line));
   
   /* NOTE: this has the potential for generating a seg-fault */
   if (dump && pnt_known && BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_BAD_SPACE)) {
@@ -549,7 +586,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
       }
       
       admp = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblockp);
-      bblockp->bb_mem = BLOCK_POINTER(admp->ba_count +
+      bblockp->bb_mem = BLOCK_POINTER(admp->ba_posn +
 				      (bblockp - admp->ba_blocks));
       return bblockp;
     }
@@ -581,21 +618,25 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
      */
     admp->ba_magic1 = CHUNK_MAGIC_BOTTOM;
     if (bblock_adm_tail == NULL) {
-      admp->ba_count = 0;
+      admp->ba_posn = 0;
       bblock_adm_head = admp;
       bblock_adm_tail = admp;
       freep = admp;
     }
     else {
-      admp->ba_count = bblock_adm_tail->ba_count + BB_PER_ADMIN;
+      admp->ba_posn = bblock_adm_tail->ba_posn + BB_PER_ADMIN;
       bblock_adm_tail->ba_next = admp;
       bblock_adm_tail = admp;
     }
     
     /* initialize the bblocks in the bblock_admin */
     for (bblockp = admp->ba_blocks; bblockp < admp->ba_blocks + BB_PER_ADMIN;
-	 bblockp++)
+	 bblockp++) {
       bblockp->bb_flags = 0;
+#if STORE_POINTER_COUNT
+      bblockp->bb_seenc = 0;
+#endif
+    }
     
     admp->ba_next = NULL;
     admp->ba_magic2 = CHUNK_MAGIC_TOP;
@@ -603,7 +644,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
     /* set counter to next free slot */
     bblockp = admp->ba_blocks + (BB_PER_ADMIN - 1);
     bblockp->bb_flags = BBLOCK_ADMIN_FREE;
-    bblockp->bb_count = 0;
+    bblockp->bb_freen = 0;
     
     /* maybe we used them up the last time? */
     if (freep == NULL)
@@ -619,17 +660,17 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
     
     /* we assume the freep always points to a bunch we has a free slot */
     bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
-    bblockc = bblockp->bb_count;
+    bblockc = bblockp->bb_freen;
     
     /* increment free slot counter although it may be overwritten shortly */
-    bblockp->bb_count++;
+    bblockp->bb_freen++;
     
     /* this block will hold the info for this admin block */
     bblockp = freep->ba_blocks + bblockc;
     
     bblockp->bb_flags	= BBLOCK_ADMIN;
     bblockp->bb_adminp	= freep;
-    bblockp->bb_count	= freep->ba_count + bblockc;
+    bblockp->bb_freen	= freep->ba_posn + bblockc;
     
     /* did we just fill up?  we know we have more */
     if (bblockc + 1 >= BB_PER_ADMIN)
@@ -640,7 +681,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
   }
   
   /* get the block pointer to the one we got */
-  bblockc = (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_count;
+  bblockc = (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_freen;
   bblockp = freep->ba_blocks + bblockc;
   
   /*
@@ -672,7 +713,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
    * next time
    */
   if (freep != NULL && freec > 0)
-    (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_count = BB_PER_ADMIN - freec;
+    (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_freen = BB_PER_ADMIN - freec;
   
   return bblockp;
 }
@@ -847,99 +888,109 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
  * get a dblock of 1<<BITN sized chunks, also asked for the slot memory
  */
 LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
-			    const char * file, const unsigned short line)
+			    const char * file, const unsigned short line,
+			    int * seenc, int * iter, long * when,
+			    int * thread_id)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp, *firstp, *freep;
   void		*pnt;
   
   /* is there anything on the dblock free list? */
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-    dblockp = free_dblock[bitn];
-    if (dblockp != NULL) {
-      free_dblock[bitn] = dblockp->db_next;
-      free_space_count -= 1 << bitn;
-      
-      /* find pointer to memory chunk */
-      pnt = (char *)dblockp->db_bblock->bb_mem +
-	(dblockp - dblockp->db_bblock->bb_dblock) * (1 << bitn);
-      
-      dblockp->db_line = (unsigned short)line;
-      dblockp->db_size = (unsigned short)byten;
-      dblockp->db_file = (char *)file;
-      
-      /* do we need to print admin info? */
-      if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
-	_dmalloc_message("found a free %d byte dblock entry", 1 << bitn);
-      
-      return pnt;
+  dblockp = free_dblock[bitn];
+  if (dblockp != NULL && ! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+    free_dblock[bitn] = dblockp->db_next;
+    free_space_count -= 1 << bitn;
+    
+    /* find pointer to memory chunk */
+    pnt = (char *)dblockp->db_bblock->bb_mem +
+      (dblockp - dblockp->db_bblock->bb_dblock) * (1 << bitn);
+    
+    /* do we need to print admin info? */
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
+      _dmalloc_message("found a free %d byte dblock entry", 1 << bitn);
+  }
+  else {
+    /* do we need to print admin info? */
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
+      _dmalloc_message("need to create a dblock for %dx %d byte blocks",
+		       1 << (BASIC_BLOCK - bitn), 1 << bitn);
+    
+    /* get some dblock admin slots and the bblock space */
+    dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn), &bblockp);
+    if (dblockp == NULL)
+      return NULL;
+    
+    dblock_count++;
+    
+    pnt = bblockp->bb_mem;
+    
+    /* setup bblock information */
+    bblockp->bb_flags	= BBLOCK_DBLOCK;
+    bblockp->bb_bitn	= bitn;
+    bblockp->bb_dblock	= dblockp;
+    
+    /* add the rest to the free list (has to be at least 1 other dblock) */
+    firstp = dblockp;
+    dblockp++;
+    freep = free_dblock[bitn];
+    free_dblock[bitn] = dblockp;
+    
+    for (; dblockp < firstp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
+      dblockp->db_next = dblockp + 1;
+      dblockp->db_bblock = bblockp;
+#if STORE_POINTER_COUNT
+      dblockp->db_seenc = 0;
+#endif
+      free_space_count	+= 1 << bitn;
     }
-  }
-  
-  /* do we need to print admin info? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
-    _dmalloc_message("need to create a dblock for %dx %d byte blocks",
-		    1 << (BASIC_BLOCK - bitn), 1 << bitn);
-  
-  /* get some dblock admin slots and the bblock space */
-  dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn), &bblockp);
-  if (dblockp == NULL)
-    return NULL;
-  
-  dblock_count++;
-  
-  pnt = bblockp->bb_mem;
-  
-  /* setup bblock information */
-  bblockp->bb_flags	= BBLOCK_DBLOCK;
-  bblockp->bb_bitn	= bitn;
-  bblockp->bb_dblock	= dblockp;
-  
-  /* add the rest to the free list (has to be at least 1 other dblock) */
-  firstp = dblockp;
-  dblockp++;
-  freep = free_dblock[bitn];
-  free_dblock[bitn] = dblockp;
-  
-  for (; dblockp < firstp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
-    dblockp->db_next	= dblockp + 1;
+    
+    /* last one points to the free list (probably NULL) */
+    dblockp->db_next	= freep;
     dblockp->db_bblock	= bblockp;
-    free_space_count	+= 1 << bitn;
+    free_space_count += 1 << bitn;
+    
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
+	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))
+      (void)memset((char *)pnt + (1 << bitn), BLANK_CHAR,
+		   BLOCK_SIZE - (1 << bitn));
+    
+#if STORE_POINTER_COUNT
+    /* the first pointer in the block inherits the counter of the bblock */
+    firstp->db_seenc = bblockp->bb_seenc;
+#endif
+    
+    dblockp = firstp;
   }
   
-  /* last one points to the free list (probably NULL) */
-  dblockp->db_next	= freep;
-  dblockp->db_bblock	= bblockp;
-  free_space_count += 1 << bitn;
+  dblockp->db_line = line;
+  dblockp->db_size = byten;
+  dblockp->db_file = file;
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))
-    (void)memset((char *)pnt + (1 << bitn), BLANK_CHAR,
-		 BLOCK_SIZE - (1 << bitn));
-  
-  firstp->db_line = line;
-  firstp->db_size = byten;
-  firstp->db_file = file;
+#if STORE_POINTER_COUNT
+  dblockp->db_seenc++;
+  *seenc = dblockp->db_seenc;
+#endif
+#if STORE_ITERATION_COUNT
+  dblockp->db_iter = _dmalloc_iterc;
+  *iter = dblockp->db_iter;
+#endif
+#if HAVE_TIME
+#if STORE_CURRENT_TIME
+  dblockp->db_time = time(NULL);
+  *when = dblockp->db_time;
+#endif
+#if STORE_ELAPSED_TIME
+  dblockp->db_time = time(NULL) - _dmalloc_start;
+  *when = dblockp->db_time;
+#endif
+#endif
+#if STORE_THREAD_ID
+  dblockp->db_thread_id = GET_THREAD_ID;
+  *thread_id = dblockp->db_thread_id;
+#endif
   
   return pnt;
-}
-
-/*
- * note in the chunk-level admin structures that BLOCKN blocks were
- * sbrk'ed externally by someone else up to MEM
- * returns [NO]ERROR
- */
-EXPORT	int	_chunk_note_external(const int blockn, const void * mem)
-{
-  bblock_t	*bblockp;
-  
-  bblockp = get_bblocks(blockn, TRUE);
-  if (bblockp == NULL
-      || set_bblock_admin(blockn, bblockp, BBLOCK_EXTERNAL, 0, 0, mem) !=
-      NOERROR)
-    return ERROR;
-  else
-    return NOERROR;
 }
 
 /******************************* heap checking *******************************/
@@ -1031,7 +1082,7 @@ EXPORT	int	_chunk_heap_check(void)
   }
   
   /* verify count value */
-  if (this_admp->ba_count != bbc) {
+  if (this_admp->ba_posn != bbc) {
     dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
     dmalloc_error("_chunk_heap_check");
     return ERROR;
@@ -1065,7 +1116,7 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* verify count value */
-      if (this_admp->ba_count != bbc) {
+      if (this_admp->ba_posn != bbc) {
 	dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
 	dmalloc_error("_chunk_heap_check");
 	return ERROR;
@@ -1111,7 +1162,7 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check fence-posts for memory chunk */
       if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE)) {
-	pnt = BLOCK_POINTER(this_admp->ba_count +
+	pnt = BLOCK_POINTER(this_admp->ba_posn +
 			    (bblockp - this_admp->ba_blocks));
 	if (fence_read(bblockp->bb_file, bblockp->bb_line,
 		       pnt, bblockp->bb_size, "heap-check") != NOERROR)
@@ -1187,8 +1238,8 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* check count against admin count */
-      if (bblockp->bb_count !=
-	  this_admp->ba_count + (bblockp - this_admp->ba_blocks)) {
+      if (bblockp->bb_freen !=
+	  this_admp->ba_posn + (bblockp - this_admp->ba_blocks)) {
 	dmalloc_errno = ERROR_BAD_BLOCK_ADMINC;
 	dmalloc_error("_chunk_heap_check");
 	return ERROR;
@@ -1212,7 +1263,7 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* verify mem pointer */
-      if (bblockp->bb_mem != BLOCK_POINTER(this_admp->ba_count +
+      if (bblockp->bb_mem != BLOCK_POINTER(this_admp->ba_posn +
 					   (bblockp - this_admp->ba_blocks))) {
 	dmalloc_errno = ERROR_BAD_DBLOCK_MEM;
 	dmalloc_error("_chunk_heap_check");
@@ -1413,7 +1464,7 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* should we verify that we have a block of BLANK_CHAR? */
       if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-	pnt = BLOCK_POINTER(this_admp->ba_count +
+	pnt = BLOCK_POINTER(this_admp->ba_posn +
 			    (bblockp - this_admp->ba_blocks));
 	for (bytep = (char *)pnt; bytep < (char *)pnt + BLOCK_SIZE; bytep++)
 	  if (*bytep != BLANK_CHAR) {
@@ -1434,7 +1485,7 @@ EXPORT	int	_chunk_heap_check(void)
       case BBLOCK_ADMIN_FREE:
 	/* better be the last block and the count should match undef */
 	if (bblockp != this_admp->ba_blocks + (BB_PER_ADMIN - 1)
-	    || bblockp->bb_count != (BB_PER_ADMIN - 1) - undef) {
+	    || bblockp->bb_freen != (BB_PER_ADMIN - 1) - undef) {
 	  dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
 	  dmalloc_error("_chunk_heap_check");
 	  return ERROR;
@@ -1702,18 +1753,39 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 /**************************** information routines ***************************/
 
 /*
+ * note in the chunk-level admin structures that BLOCKN blocks were
+ * sbrk'ed externally by someone else up to MEM
+ * returns [NO]ERROR
+ */
+EXPORT	int	_chunk_note_external(const int blockn, const void * mem)
+{
+  bblock_t	*bblockp;
+  
+  bblockp = get_bblocks(blockn, TRUE);
+  if (bblockp == NULL
+      || set_bblock_admin(blockn, bblockp, BBLOCK_EXTERNAL, 0, 0, mem) !=
+      NOERROR)
+    return ERROR;
+  else
+    return NOERROR;
+}
+
+/*
  * return some information associated with PNT, returns [NO]ERROR
  */
 EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 				 unsigned int * alloc_size, char ** file,
 				 unsigned int * line, void ** ret_attr,
-				 const char * where)
+				 const char * where, int ** seencp)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
     _dmalloc_message("reading info about pointer '%#lx'", pnt);
+  
+  if (seencp != NULL)
+    *seencp = NULL;
   
   /* adjust the pointer down if fence-posting */
   pnt = USER_TO_CHUNK(pnt);
@@ -1771,6 +1843,10 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 	*ret_attr = (char *)dblockp->db_file;
       else
 	*ret_attr = NULL;
+#if STORE_POINTER_COUNT
+      if (seencp != NULL)
+	*seencp = &dblockp->db_seenc;
+#endif
     }
   }
   else {
@@ -1803,6 +1879,10 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
       else
 	*ret_attr = NULL;
     }
+#if STORE_POINTER_COUNT
+    if (seencp != NULL)
+      *seencp = &bblockp->bb_seenc;
+#endif
   }
   
   return NOERROR;
@@ -1975,10 +2055,10 @@ EXPORT	void	_chunk_log_heap_map(void)
       
       if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
 	_dmalloc_message("%d (%#lx): start-of-user block: %d bytes from '%s'",
-			tblockc, BLOCK_POINTER(tblockc),
-			bblockp->bb_size,
-			_chunk_display_pnt(bblockp->bb_file,
-					   bblockp->bb_line));
+			 tblockc, BLOCK_POINTER(tblockc),
+			 bblockp->bb_size,
+			 _chunk_display_where(bblockp->bb_file,
+					      bblockp->bb_line));
 	continue;
       }
       
@@ -1989,9 +2069,9 @@ EXPORT	void	_chunk_log_heap_map(void)
       }
       
       if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_ADMIN)) {
-	_dmalloc_message("%d (%#lx): administration block, count = %d",
+	_dmalloc_message("%d (%#lx): administration block, position = %d",
 			tblockc, BLOCK_POINTER(tblockc),
-			bblockp->bb_count);
+			bblockp->bb_freen);
 	continue;
       }
       
@@ -2023,7 +2103,7 @@ EXPORT	void	_chunk_log_heap_map(void)
       
       if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_ADMIN_FREE)) {
 	_dmalloc_message("%d (%#lx): admin free pointer to offset %d",
-			tblockc, BLOCK_POINTER(tblockc), bblockp->bb_count);
+			tblockc, BLOCK_POINTER(tblockc), bblockp->bb_freen);
 	continue;
       }
     }
@@ -2041,6 +2121,8 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   unsigned int	bitn, byten = size;
   bblock_t	*bblockp;
   void		*pnt;
+  int		seenc = 0, iter = 0, thread_id = 0;
+  long		when = 0;
   
   /* counts calls to malloc */
   malloc_count++;
@@ -2090,7 +2172,8 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
   /* allocate divided block if small */
   if (bitn < BASIC_BLOCK) {
-    pnt = get_dblock(bitn, byten, file, line);
+    pnt = get_dblock(bitn, byten, file, line, &seenc, &iter, &when,
+		     &thread_id);
     if (pnt == NULL)
       return MALLOC_ERROR;
     
@@ -2126,6 +2209,29 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     /* overwrite to-be-alloced or non-used portion of memory */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK))
       (void)memset(pnt, BLANK_CHAR, given);
+    
+#if STORE_POINTER_COUNT
+    bblockp->bb_seenc++;
+    seenc = bblockp->bb_seenc;
+#endif
+#if STORE_ITERATION_COUNT
+    bblockp->bb_iter = _dmalloc_iterc;
+    iter = bblockp->bb_iter;
+#endif
+#if HAVE_TIME
+#if STORE_CURRENT_TIME
+    bblockp->bb_time = time(NULL);
+    when = bblockp->bb_time;
+#endif
+#if STORE_ELAPSED_TIME
+    bblockp->bb_time = time(NULL) - _dmalloc_start;
+    when = bblockp->bb_time;
+#endif
+#endif
+#if STORE_THREAD_ID
+    bblockp->bb_thread_id = GET_THREAD_ID;
+    thread_id = bblockp->bb_thread_id;
+#endif
   }
   
   /* write fence post info if needed */
@@ -2136,9 +2242,9 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
-    _dmalloc_message("*** alloc: at '%s' for %d bytes, got '%#lx'",
-		    _chunk_display_pnt(file, line), byten - pnt_total_adm,
-		    pnt);
+    _dmalloc_message("*** alloc: at '%s' for %d bytes, got '%s'",
+		     _chunk_display_where(file, line), byten - pnt_total_adm,
+		     display_pnt(pnt, seenc, iter, when, thread_id));
   
   return pnt;
 }
@@ -2204,12 +2310,39 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
       return FREE_ERROR;
     }
     
+#if STORE_POINTER_COUNT
+    dblockp->db_seenc++;
+#endif
+    
     /* print transaction info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
-      _dmalloc_message("*** free: at '%s' pnt '%#lx': size %d, alloced at '%s'",
-		      _chunk_display_pnt(file, line), CHUNK_TO_USER(pnt),
-		      dblockp->db_size - pnt_total_adm,
-		      chunk_display_pnt2(dblockp->db_file, dblockp->db_line));
+      _dmalloc_message("*** free: at '%s' pnt '%s': size %d, alloced at '%s'",
+		       _chunk_display_where(file, line),
+		       display_pnt(CHUNK_TO_USER(pnt),
+#if STORE_POINTER_COUNT
+				   dblockp->db_seenc,
+#else
+				   0,
+#endif
+#if STORE_ITERATION_COUNT
+				   dblockp->db_iter,
+#else
+				   0,
+#endif
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+				   dblockp->db_time,
+#else
+				   0,
+#endif
+#if STORE_THREAD_ID
+				   dblockp->db_thread_id
+#else
+				   0
+#endif
+				   ),
+		       dblockp->db_size - pnt_total_adm,
+		       chunk_display_where2(dblockp->db_file,
+					    dblockp->db_line));
     
     /* check fence-post, probably again */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE))
@@ -2254,12 +2387,38 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     return FREE_ERROR;
   }
   
+#if STORE_POINTER_COUNT
+  bblockp->bb_seenc++;
+#endif
+  
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
-    _dmalloc_message("*** free: at '%s' pnt '%#lx': size %d, alloced at '%s'",
-		    _chunk_display_pnt(file, line), CHUNK_TO_USER(pnt),
-		    bblockp->bb_size - pnt_total_adm,
-		    chunk_display_pnt2(bblockp->bb_file, bblockp->bb_line));
+    _dmalloc_message("*** free: at '%s' pnt '%s': size %d, alloced at '%s'",
+		     _chunk_display_where(file, line),
+		     display_pnt(CHUNK_TO_USER(pnt),
+#if STORE_POINTER_COUNT
+				 bblockp->bb_seenc,
+#else
+				 0,
+#endif
+#if STORE_ITERATION_COUNT
+				 bblockp->bb_iter,
+#else
+				 0,
+#endif
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+				 bblockp->bb_time,
+#else
+				 0,
+#endif
+#if STORE_THREAD_ID
+				 bblockp->bb_thread_id
+#else
+				 0
+#endif
+				 ),
+		     bblockp->bb_size - pnt_total_adm,
+		     chunk_display_where2(bblockp->bb_file, bblockp->bb_line));
   
   /* check fence-post, probably again */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE))
@@ -2364,6 +2523,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
 {
   void		*newp, *ret_addr;
   char		*old_file;
+  int		*seencp;
   unsigned int	old_size, size, old_line, alloc_size;
   unsigned int	old_bitn, new_bitn;
   
@@ -2397,7 +2557,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   
   /* get info about old pointer */
   if (_chunk_read_info(oldp, &old_size, &alloc_size, &old_file, &old_line,
-		       &ret_addr, "realloc") != NOERROR)
+		       &ret_addr, "realloc", &seencp) != NOERROR)
     return REALLOC_ERROR;
   
   if (ret_addr != NULL)
@@ -2486,6 +2646,11 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     oldp = CHUNK_TO_USER(oldp);
     old_size -= pnt_total_adm;
     new_size -= pnt_total_adm;
+    
+#if STORE_POINTER_COUNT
+    /* we see in inbound and outbound so we need to increment by 2 */
+    *seencp += 2;
+#endif
   }
   
   /*
@@ -2495,8 +2660,8 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
    */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
     _dmalloc_message("*** realloc: at '%s' from '%#lx' (%u bytes) file '%s' to '%#lx' (%u bytes)",
-		    _chunk_display_pnt(file, line),
-		    oldp, old_size, chunk_display_pnt2(old_file, old_line),
+		    _chunk_display_where(file, line),
+		    oldp, old_size, chunk_display_where2(old_file, old_line),
 		    newp, new_size);
   
   /* newp is already user-level real */
@@ -2510,7 +2675,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
  */
 EXPORT	void	_chunk_list_count(void)
 {
-  int		bitc, count;
+  int		bitc, blockc;
   char		info[256], tmp[80];
   bblock_t	*bblockp;
   dblock_t	*dblockp;
@@ -2519,14 +2684,14 @@ EXPORT	void	_chunk_list_count(void)
   info[0] = NULLC;
   for (bitc = smallest_block; bitc < MAX_SLOTS; bitc++) {
     if (bitc < BASIC_BLOCK)
-      for (count = 0, dblockp = free_dblock[bitc]; dblockp != NULL;
-	   count++, dblockp = dblockp->db_next);
+      for (blockc = 0, dblockp = free_dblock[bitc]; dblockp != NULL;
+	   blockc++, dblockp = dblockp->db_next);
     else
-      for (count = 0, bblockp = free_bblock[bitc]; bblockp != NULL;
-	   count++, bblockp = bblockp->bb_next);
+      for (blockc = 0, bblockp = free_bblock[bitc]; bblockp != NULL;
+	   blockc++, bblockp = bblockp->bb_next);
     
-    if (count > 0) {
-      (void)sprintf(tmp, " %d/%d", count, bitc);
+    if (blockc > 0) {
+      (void)sprintf(tmp, " %d/%d", blockc, bitc);
       (void)strcat(info, tmp);
     }
   }
@@ -2633,7 +2798,7 @@ EXPORT	void	_chunk_dump_unfreed(void)
       
     case BBLOCK_START_USER:
       /* find pointer to memory chunk */
-      pnt = BLOCK_POINTER(this_admp->ba_count +
+      pnt = BLOCK_POINTER(this_admp->ba_posn +
 			  (bblockp - this_admp->ba_blocks));
       
       unknown = 0;
@@ -2648,10 +2813,32 @@ EXPORT	void	_chunk_dump_unfreed(void)
       }
       
       if (! unknown || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
-	_dmalloc_message("not freed: %#lx (%8d bytes) from '%s'",
-			CHUNK_TO_USER(pnt), bblockp->bb_size - pnt_total_adm,
-			_chunk_display_pnt(bblockp->bb_file,
-					   bblockp->bb_line));
+	_dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
+			 display_pnt(CHUNK_TO_USER(pnt),
+#if STORE_POINTER_COUNT
+				     bblockp->bb_seenc,
+#else
+				     0,
+#endif
+#if STORE_ITERATION_COUNT
+				     bblockp->bb_iter,
+#else
+				     0,
+#endif
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+				     bblockp->bb_time,
+#else
+				     0,
+#endif
+#if STORE_THREAD_ID
+				     bblockp->bb_thread_id
+#else
+				     0
+#endif
+				     ),
+			 bblockp->bb_size - pnt_total_adm,
+			 _chunk_display_where(bblockp->bb_file,
+					      bblockp->bb_line));
 	
 	if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE))
 	  _dmalloc_message("Dump of '%#lx': '%s'",
@@ -2731,16 +2918,38 @@ EXPORT	void	_chunk_dump_unfreed(void)
 	}
 	
 	if (! unknown || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
-	  _dmalloc_message("not freed: %#lx (%8d bytes) from '%s'",
-			  CHUNK_TO_USER(pnt), dblockp->db_size - pnt_total_adm,
-			  _chunk_display_pnt(dblockp->db_file,
-					     dblockp->db_line));
+	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
+			   display_pnt(CHUNK_TO_USER(pnt),
+#if STORE_POINTER_COUNT
+				       dblockp->db_seenc,
+#else
+				       0,
+#endif
+#if STORE_ITERATION_COUNT
+				       dblockp->db_iter,
+#else
+				       0,
+#endif
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+				       dblockp->db_time,
+#else
+				       0,
+#endif
+#if STORE_THREAD_ID
+				       dblockp->db_thread_id
+#else
+				       0
+#endif
+				       ),
+			   dblockp->db_size - pnt_total_adm,
+			   _chunk_display_where(dblockp->db_file,
+						dblockp->db_line));
 	  
 	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE))
 	    _dmalloc_message("Dump of '%#lx': '%s'",
-			    CHUNK_TO_USER(pnt),
-			    expand_buf((char *)CHUNK_TO_USER(pnt),
-				       DUMP_SPACE));
+			     CHUNK_TO_USER(pnt),
+			     expand_buf((char *)CHUNK_TO_USER(pnt),
+					DUMP_SPACE));
 	}
 	
 	sizec += dblockp->db_size - pnt_total_adm;
