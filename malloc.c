@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.150 2000/11/13 15:46:31 gray Exp $
+ * $Id: malloc.c,v 1.151 2000/12/01 00:08:03 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.150 2000/11/13 15:46:31 gray Exp $"
+#ident "$Id: malloc.c,v 1.151 2000/12/01 00:08:03 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.150 2000/11/13 15:46:31 gray Exp $";
+  "$Id: malloc.c,v 1.151 2000/12/01 00:08:03 gray Exp $";
 #endif
 #endif
 
@@ -432,8 +432,13 @@ void	_dmalloc_shutdown(void)
   
   in_alloc_b = 1;
   
-  /* check the heap since we are dumping info from it */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)) {
+  /*
+   * Check the heap since we are dumping info from it.  We check it
+   * when check-blank is enabled do make sure all of the areas have
+   * not been overwritten.  Thanks Randell.
+   */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK) {
     (void)_chunk_check();
   }
   

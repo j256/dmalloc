@@ -1,3 +1,15 @@
+Thu Nov 30 19:01:10 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added heap checking when we shutdown if check-blank is enabled.
+  	This will verify that all of the freed memory was not overwritten.
+
+Mon Nov 27 19:01:10 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added a separate ALLOC_BLANK_CHAR and FREE_BLANK_CHAR to the
+ 	settings.dist file.  Now the default 0xc5 character has been
+ 	replaced with 0xda for dmalloc-allocated memory and 0xdf for
+ 	dmalloc-freed memory.
+	
 Tue Nov 14 15:09:02 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Releasing dmalloc version 4.8.1.
@@ -1728,5 +1740,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.269 2000/11/14 23:59:39 gray Exp $
+$Id: ChangeLog,v 1.270 2000/12/01 00:08:03 gray Exp $
 -------------------------------------------------------------------------------
