@@ -1,7 +1,7 @@
 #
 # Dmalloc RPM file for building of .rpm files for Redhat Linux systems.
 #
-# $Id: dmalloc.spec,v 1.25 2003/09/29 23:13:34 gray Exp $
+# $Id: dmalloc.spec,v 1.26 2003/09/29 23:53:12 gray Exp $
 #
 Summary: Debug Malloc (Dmalloc)
 Name: dmalloc
@@ -44,7 +44,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(444,root,root,755)
 
 %doc INSTALL README NEWS
-%doc dmalloc.info dmalloc.html dmalloc.texi
+%doc docs/dmalloc.info docs/dmalloc.html docs/dmalloc.texi
 
 %attr(755,root,root) /usr/bin/dmalloc
 /usr/include/dmalloc.h

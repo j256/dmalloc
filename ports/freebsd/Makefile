@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2003/09/29 23:13:35 gray Exp $
+# $Id: Makefile,v 1.9 2003/09/29 23:53:12 gray Exp $
 #
 
 PORTNAME=	dmalloc
@@ -39,11 +39,11 @@ do-install:
 	${INSTALL_DATA} ${WRKSRC}/libdmalloc.a ${PREFIX}/lib
 .if !defined(NOPORTDOCS)
 	@${MKDIR} ${PREFIX}/share/doc/dmalloc
-	${INSTALL_DATA} ${WRKSRC}/dmalloc.html ${PREFIX}/share/doc/dmalloc
+	${INSTALL_DATA} ${WRKSRC}/docs/dmalloc.html ${PREFIX}/share/doc/dmalloc
 .endif
 
 post-install:
-	${INSTALL_DATA} ${WRKSRC}/dmalloc.info ${PREFIX}/info
+	${INSTALL_DATA} ${WRKSRC}/docs/dmalloc.info ${PREFIX}/info
 	@install-info ${PREFIX}/info/dmalloc.info ${PREFIX}/info/dir
 
 .include <bsd.port.mk>
