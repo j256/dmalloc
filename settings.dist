@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.38 1999/03/08 04:26:32 gray Exp $
+ * $Id: settings.dist,v 1.39 1999/03/08 04:38:37 gray Exp $
  */
 
 /*
@@ -294,8 +294,9 @@
 /*
  * In OSF (anyone else?) you can setup __fini_* functions in each
  * module which will be called automagically at shutdown of the
- * program.  This means that dmalloc can shut itself down and log
- * statistics when the program closes.  Pretty cool.
+ * program.  If you enable this variable, dmalloc will shut itself
+ * down and log statistics when the program closes on its own.  Pretty
+ * cool OS feature.
  */
 #define FINI_DMALLOC 0
 
