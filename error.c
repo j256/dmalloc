@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.104 2003/05/19 18:14:15 gray Exp $
+ * $Id: error.c,v 1.105 2003/06/08 19:31:11 gray Exp $
  */
 
 /*
@@ -67,6 +67,7 @@
 
 #include "dmalloc.h"
 
+#include "chunk.h"				/* for _dmalloc_memory_limit */
 #include "compat.h"
 #include "debug_tok.h"
 #include "env.h"				/* for LOGPATH_INIT */
@@ -176,10 +177,9 @@ void	_dmalloc_open_log(void)
 		  dmalloc_version, DMALLOC_HOME);
   dmalloc_message("flags = %#x, logfile '%s'",
 		  _dmalloc_flags, dmalloc_logpath);
-  dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
-		  _dmalloc_check_interval,
-		  (unsigned long)_dmalloc_address,
-		  _dmalloc_address_seen_n);
+  dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld, limit = %ld",
+		  _dmalloc_check_interval, (unsigned long)_dmalloc_address,
+		  _dmalloc_address_seen_n, _dmalloc_memory_limit);
 #if LOCK_THREADS
   dmalloc_message("threads enabled, lock-on = %d, lock-init = %d",
 		  _dmalloc_lock_on, THREAD_INIT_LOCK);
