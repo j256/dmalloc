@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.1 1992/11/06 03:36:43 gray Exp $
+# $Id: dmallocrc,v 1.2 1992/11/11 23:15:01 gray Exp $
 #
 
 #
@@ -29,6 +29,7 @@
 # log-trans			log memory transactions
 # log-bad-pnt			log information about bad-pointers
 # log-admin			log full administrative information
+# log-blocks			log detailed block information in heap_map
 #
 # check-fence			check fence-post areas
 # check-heap			do general heap checking
@@ -41,6 +42,7 @@
 # free-blank			overwrite space that is freed
 # error-abort			abort the program (and dump core) on errors
 # alloc-blank			overwrite space that is to be alloced
+# heap-check-map		log a heap-map every time the heap is checked
 #
 
 # no debugging
@@ -57,20 +59,20 @@ runtime	log-stats, log-non-free, log-perror, log-bad-pnt, \
 
 # good utilities
 3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
-	log-admin, \
+	log-admin, log-blocks, \
 	check-fence, check-heap, check-lists, \
 	realloc-copy, free-blank, alloc-blank, error-abort
 
 # extensive checking
 4	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
-	log-admin, \
+	log-admin, log-blocks, \
 	check-fence, check-heap, check-lists, check-dblock, \
 	check-fence-dblock, \
 	realloc-copy, free-blank, alloc-blank, error-abort
 
 # ultra-extensive checking
 5	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
-	log-admin, \
+	log-admin, log-blocks, \
 	check-fence, check-heap, check-lists, check-dblock, \
 	check-dblock-fence, check-free, \
 	realloc-copy, free-blank, alloc-blank, error-abort
@@ -81,5 +83,6 @@ fence	log-stats, log-non-free, log-perror, log-bad-pnt, \
 
 # full logging of statistics
 log	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
-	log-admin, \
-	check-fence
+	log-admin, log-blocks, \
+	check-fence, \
+	heap-check-map

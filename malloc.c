@@ -30,6 +30,7 @@
 #include "chunk.h"
 #include "compat.h"
 #include "conf.h"
+#include "debug_values.h"
 #include "error.h"
 #include "error_str.h"
 #include "heap.h"
@@ -37,7 +38,7 @@
 #include "malloc_leap.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.7 1992/11/10 23:25:30 gray Exp $";
+  "$Id: malloc.c,v 1.8 1992/11/11 23:14:53 gray Exp $";
 
 /*
  * exported variables

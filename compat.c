@@ -27,10 +27,11 @@
 #include "malloc.h"
 #include "malloc_loc.h"
 
+#include "compat.h"
 #include "conf.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.2 1992/11/10 23:25:11 gray Exp $";
+  "$Id: compat.c,v 1.3 1992/11/11 23:14:42 gray Exp $";
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
 /*

@@ -36,13 +36,14 @@
 #include "chunk_loc.h"
 #include "compat.h"
 #include "conf.h"
+#include "debug_values.h"
 #include "error.h"
 #include "heap.h"
 #include "malloc_errno.h"
 #include "version.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.14 1992/11/10 23:25:04 gray Exp $";
+  "$Id: chunk.c,v 1.15 1992/11/11 23:14:39 gray Exp $";
 
 /* checking information */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
@@ -555,6 +556,129 @@ LOCAL	bblock_t	*find_bblock(char * pnt, int * block_num,
 }
 
 /*
+ * log the heap structure plus information on the blocks if necessary
+ */
+LOCAL	void	log_heap_map(void)
+{
+  bblock_adm_t	*bblock_admp;
+  char		line[BB_PER_ADMIN + 10];
+  int		linec, bblockc, bb_adminc;
+  
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
+    _malloc_message("logging heap map information");
+  
+  _malloc_message("heap-base = %#lx, heap-end = %#lx, size = %ld bytes",
+		  _heap_base, _heap_last, HEAP_SIZE);
+  
+  for (bb_adminc = 0, bblock_admp = bblock_adm_head; bblock_admp != NULL;
+       bb_adminc++, bblock_admp = bblock_admp->ba_next) {
+    linec = 0;
+    
+    for (bblockc = 0; bblockc < BB_PER_ADMIN; bblockc++) {
+      bblock_t	*bblockp = &bblock_admp->ba_block[bblockc];
+      
+      if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_ALLOCATED)) {
+	line[linec++] = '_';
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
+	line[linec++] = 'S';
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_USER)) {
+	line[linec++] = 'U';
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_ADMIN)) {
+	line[linec++] = 'A';
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
+	line[linec++] = 'd';
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK_ADMIN)) {
+	line[linec++] = 'a';
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_FREE)) {
+	line[linec++] = 'F';
+	continue;
+      }
+    }
+    
+    /* dumping a line to the logfile */
+    if (linec > 0) {
+      line[linec] = NULLC;
+      _malloc_message("S%d:%s", bb_adminc, line);
+    }
+  }
+  
+  /* if we are not logging blocks then leave */
+  if (! BIT_IS_SET(_malloc_debug, DEBUG_LOG_BLOCKS))
+    return;
+  
+  for (bb_adminc = 0, bblock_admp = bblock_adm_head; bblock_admp != NULL;
+       bb_adminc++, bblock_admp = bblock_admp->ba_next) {
+    
+    for (bblockc = 0; bblockc < BB_PER_ADMIN; bblockc++) {
+      bblock_t	*bblockp = &bblock_admp->ba_block[bblockc];
+      
+      if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_ALLOCATED)) {
+	_malloc_message("%d: not-allocated block",
+			bb_adminc * BB_PER_ADMIN + bblockc);
+	/* quit after the first non-allocated is found */
+	break;
+      }
+      
+      if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
+	_malloc_message("%d: start-of-user block: %d bytes from '%s:%d'",
+			bb_adminc * bb_adminc + bblockc,
+			bblockp->bb_size, bblockp->bb_file, bblockp->bb_line);
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_USER)) {
+	_malloc_message("%d: user continuation block",
+			bb_adminc * BB_PER_ADMIN + bblockc);
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_ADMIN)) {
+	_malloc_message("%d: administration block",
+			bb_adminc * BB_PER_ADMIN + bblockc);
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_DBLOCK)) {
+	_malloc_message("%d: dblock block",
+			bb_adminc * BB_PER_ADMIN + bblockc);
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags,
+		     BBLOCK_DBLOCK_ADMIN)) {
+	_malloc_message("%d: dblock-admin block",
+			bb_adminc * BB_PER_ADMIN + bblockc);
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_FREE)) {
+	_malloc_message("%d: free block",
+			bb_adminc * BB_PER_ADMIN + bblockc);
+	continue;
+      }
+    }
+  }
+}
+
+/*
  * run extensive tests on the entire heap depending on TYPE
  */
 EXPORT	int	_chunk_heap_check(void)
@@ -824,7 +948,7 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check fence-posts for memory chunk */
       if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)
-	  && BIT_IS_SET(_malloc_debug, DEBUG_DBLOCK_FENCE)) {
+	  && BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DB_FENCE)) {
 	for (dblockc = 0, dblockp = bblockp->bb_dblock;
 	     dblockp < bblockp->bb_dblock +
 	     (1 << (BASIC_BLOCK - bblockp->bb_bitc));
@@ -1071,6 +1195,9 @@ EXPORT	int	_chunk_heap_check(void)
     }
   }
   
+  if (BIT_IS_SET(_malloc_debug, DEBUG_HEAP_CHECK_MAP))
+    log_heap_map();
+  
   return NOERROR;
 }
 
@@ -1082,6 +1209,10 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   int		len;
+  
+  /* do we need to check the heap */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
+    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("checking pointer '%#lx'", pnt);
@@ -1234,6 +1365,10 @@ EXPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
+  
+  /* check the heap? */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
+    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("reading info about pointer '%#lx'", pnt);
@@ -1423,7 +1558,7 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
     line = DEFAULT_LINE;
   }
   
-  /* do we need to check the levels */
+  /* do we need to check the heap */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
@@ -1569,7 +1704,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   
   alloc_cur_pnts--;
   
-  /* do we need to check the levels */
+  /* do we need to check the heap */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
@@ -1742,7 +1877,7 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
     line = DEFAULT_LINE;
   }
   
-  /* do we need to check the levels */
+  /* do we need to check the heap */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
@@ -1855,6 +1990,10 @@ EXPORT	void	_chunk_list_count(void)
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   
+  /* do we need to check the heap */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
+    (void)_chunk_heap_check();
+  
   /* print header bit-counts */
   info[0] = NULLC;
   for (bitc = SMALLEST_BLOCK; bitc <= LARGEST_BLOCK; bitc++) {
@@ -1887,6 +2026,10 @@ EXPORT	void	_chunk_list_count(void)
 EXPORT	void	_chunk_stats(void)
 {
   long		overhead;
+  
+  /* do we need to check the heap */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
+    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("getting chunk statistics");
@@ -2082,73 +2225,16 @@ EXPORT	void	_chunk_dump_not_freed(void)
 }
 
 /*
- * log an entry for the heap structure
+ * log the heap structure plus information on the blocks if necessary
  */
 EXPORT	void	_chunk_log_heap_map(void)
 {
-  bblock_adm_t	*bblock_admp;
-  char		line[BB_PER_ADMIN + 10];
-  int		linec, bblockc, bb_adminc;
-  
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
-    _malloc_message("logging heap map information");
-  
-  /* do we need to check the levels? */
+  /* do we need to check the heap? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
-  _malloc_message("heap-base = %#lx, heap-end = %#lx, size = %ld bytes",
-		  _heap_base, _heap_last, HEAP_SIZE);
-  
-  for (bb_adminc = 0, bblock_admp = bblock_adm_head; bblock_admp != NULL;
-       bb_adminc++, bblock_admp = bblock_admp->ba_next) {
-    linec = 0;
-    
-    for (bblockc = 0; bblockc < BB_PER_ADMIN; bblockc++) {
-      if (! BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags,
-		       BBLOCK_ALLOCATED)) {
-	line[linec++] = '_';
-	continue;
-      }
-      
-      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags,
-		     BBLOCK_START_USER)) {
-	line[linec++] = 'S';
-	continue;
-      }
-      
-      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags,
-		     BBLOCK_USER)) {
-	line[linec++] = 'U';
-	continue;
-      }
-      
-      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_ADMIN)) {
-	line[linec++] = 'A';
-	continue;
-      }
-      
-      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_DBLOCK)) {
-	line[linec++] = 'd';
-	continue;
-      }
-      
-      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags,
-		     BBLOCK_DBLOCK_ADMIN)) {
-	line[linec++] = 'a';
-	continue;
-      }
-      
-      if (BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags, BBLOCK_FREE)) {
-	line[linec++] = 'F';
-	continue;
-      }
-    }
-    
-    /* dumping a line to the logfile */
-    if (linec > 0) {
-      line[linec] = NULLC;
-      _malloc_message("S%d:%s", bb_adminc, line);
-    }
-  }
+  /* did we map the heap second ago? */
+  if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP) ||
+      ! BIT_IS_SET(_malloc_debug, DEBUG_HEAP_CHECK_MAP))
+    log_heap_map();
 }

@@ -1,0 +1,76 @@
+#
+# $Id: Makefile.in,v 1.1 1992/11/11 23:14:36 gray Exp $
+#
+
+HFLS	= malloc.h malloc_leap.h
+OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_leap.o
+
+DEFS	= $(DEFINES)
+INCS	= -I. $(INCLUDES)
+LIBS	= -L. -lmalloc $(LIBRARIES)
+
+CFLAGS	= $(CCFLAGS)
+DESTDIR	= /usr/antaire
+TESTS	= malloc_test
+LIBRARY	= libmalloc.a
+UTIL	= malloc_debug
+
+MANFILE	= malloc.info
+
+PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
+	COPYING-LIB ChangeLog Manifest NOTES README TTD \
+	chunk.[ch] chunk_loc.h compat.[ch] debug_tokens.h error.[ch] \
+	error_str.h heap.[ch] malloc.[ch] mallocrc malloc.info malloc.texinfo \
+	malloc_debug.c malloc_errno.h malloc_leap.[ch] malloc_loc.h \
+	malloc_test.c sample.c version.h
+
+.PHONY : all
+all : $(LIBRARY) $(UTIL)
+
+.PHONY : clobber
+clobber :
+	rm -f $(LIBRARY) $(TESTS) $(UTIL)
+
+.PHONY : install
+install : $(LIBRARY) $(UTIL) $(HFLS) $(MANFILE)
+	install -ce -m 444 $(HFLS) $(DESTDIR)/inc
+	install -ce $(UTIL) $(DESTDIR)/bin
+	install -cer -m 644 $(LIBRARY) $(DESTDIR)/lib
+	install -ce -m 444 $(MANFILE) $(DESTDIR)/info
+
+.PHONY : installincs
+installincs : $(HFLS)
+	install -ce -m 444 $(HFLS) $(DESTDIR)/inc
+
+# put situation specific lines here
+$(LIBRARY) : $(OBJS)
+	ar cr $(LIBRARY) $?
+	ranlib $@
+	- chmod 660 $@
+
+$(UTIL) : malloc_debug.o $(LIBRARY) /usr/antaire/lib
+	$(CC) $(LDFLAGS) $@.o $(LIBS)
+	mv a.out $@
+
+.PHONY : port
+port : malloc.info
+	@ answer 'Is it okay to remove the $@ directory? '
+	rm -rf $@
+	mkdir $@
+	cp $(PORTFILES) $@
+	mv $@/Makefile.all.in $@/Makefile.in
+	@ echo ''
+	@ echo 'Please rename $@ to malloc-version and tar up file'
+
+conf.h : conf.h.in configure
+	configure
+
+Makefile : Makefile.in configure
+	configure
+
+tests : $(TESTS)
+
+malloc_test : malloc_test.o $(LIBRARY)
+
+include /usr/antaire/Default.make
+include Makefile.dep

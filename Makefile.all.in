@@ -1,7 +1,7 @@
 #
 # Makefile for the Malloc library.
 #
-# $Id: Makefile.all.in,v 1.2 1992/11/10 23:24:56 gray Exp $
+# $Id: Makefile.all.in,v 1.3 1992/11/11 23:14:34 gray Exp $
 #
 
 # default root installation directory
@@ -37,7 +37,7 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
-HFLS = malloc.h malloc_errno.h malloc_leap.h
+HFLS = malloc.h malloc_leap.h
 OBJS = chunk.o compat.o error.o heap.o malloc.o malloc_leap.o
 
 CFLAGS = $(CCFLAGS)
@@ -88,16 +88,16 @@ malloc_test : malloc_test.o $(LIBRARY)
 #
 
 sample.o : sample.c malloc.h malloc_leap.h 
-malloc_test.o : malloc_test.c malloc.h malloc_leap.h compat.h 
+malloc_test.o : malloc_test.c malloc.h malloc_leap.h conf.h compat.h 
 malloc_leap.o : malloc_leap.c malloc.h malloc_leap.h 
 malloc_debug.o : malloc_debug.c malloc.h malloc_leap.h malloc_loc.h compat.h \
-  conf.h debug_tokens.h error.h version.h 
+  conf.h debug_tokens.h debug_values.h version.h 
 malloc.o : malloc.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h conf.h \
-  error.h error_str.h heap.h malloc_errno.h 
+  debug_values.h error.h error_str.h heap.h malloc_errno.h 
 heap.o : heap.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h conf.h \
   error.h heap.h malloc_errno.h 
 error.o : error.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h conf.h \
-  error.h 
-compat.o : compat.c malloc.h malloc_leap.h malloc_loc.h conf.h 
+  debug_values.h error.h 
+compat.o : compat.c malloc.h malloc_leap.h malloc_loc.h compat.h conf.h 
 chunk.o : chunk.c malloc.h malloc_leap.h malloc_loc.h chunk.h chunk_loc.h compat.h \
-  conf.h error.h heap.h malloc_errno.h version.h 
+  conf.h debug_values.h error.h heap.h malloc_errno.h version.h 

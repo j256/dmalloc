@@ -35,10 +35,11 @@
 #include "chunk.h"
 #include "compat.h"
 #include "conf.h"
+#include "debug_values.h"
 #include "error.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.7 1992/11/10 23:25:19 gray Exp $";
+  "$Id: error.c,v 1.8 1992/11/11 23:14:50 gray Exp $";
 
 /*
  * exported variables
