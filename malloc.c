@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.30 1993/05/24 17:00:44 gray Exp $";
+  "$Id: malloc.c,v 1.31 1993/07/19 16:31:52 gray Exp $";
 #endif
 
 /*
@@ -78,9 +78,9 @@ LOCAL	int		check_interval	= -1;	/* check every X */
 /*
  * hexadecimal STR to int translation
  */
-LOCAL	int	hex_to_int(char * str)
+LOCAL	long	hex_to_long(char * str)
 {
-  int		ret;
+  long		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++);
@@ -185,7 +185,7 @@ LOCAL	void	get_environ(void)
   /* get the malloc_debug value */
   env = (char *)getenv(DEBUG_ENVIRON);
   if (env != NULL)
-    _malloc_debug = hex_to_int(env);
+    _malloc_debug = (int)hex_to_long(env);
   
   /* get the malloc debug logfile name into a holding variable */
   env = (char *)getenv(LOGFILE_ENVIRON);
@@ -207,7 +207,7 @@ LOCAL	void	get_environ(void)
     else
       address_count = 1;
     
-    malloc_address = (char *)hex_to_int(env);
+    malloc_address = (char *)hex_to_long(env);
   }
   
   /* check the heap every X times */

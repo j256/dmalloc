@@ -21,26 +21,27 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.10 1993/04/08 21:46:34 gray Exp $
+ * $Id: chunk_loc.h,v 1.11 1993/07/19 16:31:40 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
 #define __CHUNK_LOC_H__
 
 /* defines for the malloc subsystem */
-#define BASIC_BLOCK		12	/* basic block size in bits */
-#define SMALLEST_BLOCK		 4	/* smallest block size in bits */
-#define LARGEST_BLOCK		24	/* allowable allocation in bits */
-#define LARGEST_NORMAL_BLOCK	16	/* largest normal allocation in bits */
+#define BLOCK_SIZE	(1 << BASIC_BLOCK)
 
-#define BLOCK_SIZE		(1 << BASIC_BLOCK)
-
-#define IS_DBLOCK(size)		((size) < BLOCK_SIZE)
-
-/* number of blocks in the administrative structures */
+/*
+ * number of ba_block entries is a bblock_adm_t which must fit in a
+ * basic block
+ */
 #define BB_PER_ADMIN	((BLOCK_SIZE - \
-			  (sizeof(long) + sizeof(int) + sizeof(char *) + \
+			  (sizeof(long) + sizeof(int) + \
+			   sizeof(struct bblock_adm_st *) + \
 			   sizeof(long))) / sizeof(bblock_t))
+/*
+ * number of da_block entries in a dblock_adm_t which must fit in a
+ * basic block
+ */
 #define DB_PER_ADMIN	((BLOCK_SIZE - (sizeof(long) + sizeof(long))) \
 			 / sizeof(dblock_t))
 

@@ -33,7 +33,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.21 1993/05/19 01:31:12 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.22 1993/07/19 16:32:01 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -41,9 +41,9 @@ LOCAL	char	*rcs_id =
 /*
  * hexadecimal STR to integer translation
  */
-static	int	hex_to_int(char * str)
+static	long	hex_to_long(char * str)
 {
-  int		ret;
+  long		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++);
@@ -79,7 +79,7 @@ static	long	get_address(void)
     (void)fgets(line, sizeof(line), stdin);
   } while (line[0] == '\0');
   
-  pnt = hex_to_int(line);
+  pnt = hex_to_long(line);
   
   return pnt;
 }

@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.12 1993/05/24 17:00:35 gray Exp $
+ * $Id: conf.h.in,v 1.13 1993/07/19 16:31:42 gray Exp $
  */
 
 /*
@@ -36,15 +36,16 @@
 #define INCLUDE_RCS_IDS 1
 
 /*
- * should we allow zero length allocations or should be registered as errors.
+ * should we allow zero length allocations or should be registered as
+ * errors.
  * WARNING: this has not been tested although some code does exist for it.
  */
 #define ALLOW_ALLOC_ZERO_SIZE 0
 
 /*
- * should we allow realloc of a NULL pointer.  this is useful when you are
- * extending an array in a loop and do not want to allocate it specially the
- * first time.
+ * should we allow realloc of a NULL pointer.  this is useful when you
+ * are extending an array in a loop and do not want to allocate it
+ * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
 
@@ -55,28 +56,47 @@
  */
 
 /*
- * (char *)sbrk(int incr) is the main system memory allocation routine.  this
- * extends the program's data space by INCR bytes.
+ * (char *)sbrk(int incr) is the main system memory allocation
+ * routine.  this extends the program's data space by INCR bytes.
  */
 #define HAVE_SBRK 0
 
 /*
- * does your heap grow up?  Hopefully it does because there is not too much
- * support for growing-down heaps because I do not have a system to test it on.
+ * does your heap grow up?  Hopefully it does because there is not too
+ * much support for growing-down heaps because I do not have a system
+ * to test it on.
  */
 #define HEAP_GROWS_UP 1
 
 /*
- * the alignment value of all allocations in number of bits (i.e. 2 ^ X) for
- * fence-post checking.  it needs to be a base 2 number and 3 (i.e. 2 ^ 3 == 8)
- * should work.  2 bits may also work on i386/i486 systems (for instance) but
- * some RISC boxes (sparc for instance) require certain memory to be base 8
- * (stack frames, code, etc.).
+ * this is the basic block size in bits.  if possible, the configure
+ * script will set this to be the value returned by the getpagesize()
+ * function.  if not then some sort of best guess will be necessary.
+ * 12 or 13 (meaning basic block size of 4 or 8k) will probably be good.
  *
- * NOTE: larger the number the more memory will be wasted when fence-checking
- * NOTE: this is not necessarily the smallest possible allocated memory chunk
+ * NOTE: some sbrk functions round to the correct page-size.  If this
+ * value is too low, the malloc-dbg library may think someone is using
+ * sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR error.  No
+ * problems should happen if this value is too high.
  */
-#define ALLOCATION_ALIGNMENT_IN_BITS 3
+#define BASIC_BLOCK 12
+
+/*
+ * the alignment value of all allocations in number of bits for
+ * loading admin information before an allocation.  if possible, the
+ * configure script will set this to be the value returned by
+ * sizeof(long) which in most systems is the register width.
+ *
+ * NOTE: the value will never be auto-configured to be less than 3
+ * bits (i.e. sizeof(long) == 8) because some system (like sparc for
+ * instance) report the sizeof(long) == 4 while the register size is
+ * 8 bytes.  Because of the register size, certain memory needs to be
+ * base 8 (stack frames, code, etc.).
+ *
+ * NOTE: larger the number the more memory may be wasted with certain
+ *       combinations of requested admin info like fence-post checking.
+ */
+#define ALLOCATION_ALIGNMENT 3
 
 /*
  * if your system unstands const.

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.21 1993/07/12 06:07:04 gray Exp $
+@c $Id: dmalloc.texi,v 1.22 1993/07/19 16:31:55 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -745,12 +745,6 @@ verify heap administrative structure
 
 @item check-lists
 examine internal heap linked-lists
-
-@item check-dblock
-do detailed checking on small allocations
-
-@item check-dblock-fence
-check the fence-post areas of small allocations
 
 @item check-free
 check to see if free space has been overwritten

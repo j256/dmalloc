@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.19 1993/06/26 21:16:06 gray Exp $
+# $Id: Makefile.in,v 1.20 1993/07/19 16:31:28 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -9,8 +9,8 @@ FILLFLS	= chunk.c error.c heap.c malloc_dbg.c malloc_lp.c malloc_str.c \
 	malloc_t.c sample.c
 
 DEFS	= $(DEFINES)
-INCS	= -I. $(INCLUDES)
-LIBS	= -L. -lmalloc_dbg $(LIBRARIES)
+INCS	= -I. -Iargv $(INCLUDES)
+LIBS	= -L. -Largv -largv -lmalloc_dbg $(LIBRARIES)
 
 CFLAGS	= -g -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \

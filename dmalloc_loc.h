@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.18 1993/04/30 20:02:48 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.19 1993/07/19 16:31:59 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -30,7 +30,7 @@
 #include "conf.h"				/* for HAVE_BCMP */
 
 /* fence post checking defines */
-#define FENCE_BOTTOM		(1 << ALLOCATION_ALIGNMENT_IN_BITS)
+#define FENCE_BOTTOM		(1 << ALLOCATION_ALIGNMENT)
 #define FENCE_TOP		sizeof(long)
 #define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
 #define FENCE_MAGIC_BASE	0xC0C0AB1B
@@ -72,7 +72,7 @@
  * generic constants
  */
 #undef	NULL
-#define NULL		0
+#define NULL		0L
 
 #undef	NULLC
 #define NULLC		'\0'

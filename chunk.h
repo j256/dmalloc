@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.21 1993/05/19 01:30:58 gray Exp $
+ * $Id: chunk.h,v 1.22 1993/07/19 16:31:38 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -54,7 +54,7 @@ IMPORT	int	_chunk_heap_check(void);
  * returns [NO]ERROR
  */
 IMPORT	int	_chunk_pnt_check(const char * func, void * pnt,
-				 const int check, int min_size);
+				 const int check, const int min_size);
 
 /*
  * return some information associated with PNT, returns [NO]ERROR
@@ -66,7 +66,7 @@ IMPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
  * get a SIZE chunk of memory for FILE at LINE
  */
 IMPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
-			       unsigned int size);
+			       const unsigned int size);
 
 /*
  * frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR

@@ -47,7 +47,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.17 1993/07/13 05:54:19 gray Exp $";
+  "$Id: dmalloc.c,v 1.18 1993/07/19 16:31:57 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -72,8 +72,8 @@ LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
-LOCAL	char	*tag		= NULL;		/* the debug tag */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
+LOCAL	char	*tag		= NULL;		/* maybe a tag argument */
 
 LOCAL	argv_t	args[] = {
   { 'a',	"address",	ARGV_CHARP,	&address,
@@ -100,7 +100,7 @@ LOCAL	argv_t	args[] = {
       "file:line",		"start check heap after this" },
   { 'v',	"verbose",	ARGV_BOOL,	&verbose,
       NULL,			"turn on verbose output" },
-  { ARGV_MAND,	NULL,		ARGV_CHARP,	&tag,
+  { ARGV_MAYBE,	NULL,		ARGV_CHARP,	&tag,
       "tag",			"debug token to find in rc" },
   { ARGV_LAST }
 };
@@ -108,9 +108,9 @@ LOCAL	argv_t	args[] = {
 /*
  * hexadecimal STR to long translation
  */
-LOCAL	int	hex_to_int(char * str)
+LOCAL	long	hex_to_long(char * str)
 {
-  int		ret;
+  long		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++);
@@ -138,13 +138,13 @@ LOCAL	int	hex_to_int(char * str)
  * look for DEBUG_VALUE in the file and return the token for it in STR.
  * routine returns the new debug value matching tag.
  */
-LOCAL	int	process(int debug_value, char ** strp)
+LOCAL	long	process(const long debug_value, char ** strp)
 {
   static char	token[128];
   FILE		*infile = NULL;
   char		path[1024], buf[1024], *homep;
   char		found, cont;
-  int		new_debug = 0;
+  long		new_debug = 0;
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -289,13 +289,13 @@ LOCAL	void	dump_debug(const int val)
 LOCAL	void	dump_current(void)
 {
   char		*str;
-  int		num;
+  long		num;
   
   str = (char *)getenv(DEBUG_ENVIRON);
   if (str == NULL)
     (void)fprintf(stderr, "%s not set\n", DEBUG_ENVIRON);
   else {
-    num = hex_to_int(str);
+    num = hex_to_long(str);
     (void)process(num, &str);
     (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
     
@@ -382,14 +382,14 @@ EXPORT	int	main(int argc, char ** argv)
   argv_help_string = "Sets malloc_dbg library env variables.";
   argv_version_string = malloc_version;
   
-  ARGV_PROCESS(args, argc, argv);
+  argv_process(args, argc, argv);
   
   /* get a new debug value from tag */
   if (tag != NULL) {
     if (debug != NO_VALUE)
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
-    debug = process(0, NULL);
+    debug = process(0L, NULL);
   }
   
   if (debug != NO_VALUE) {

@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.23 1993/07/12 06:07:02 gray Exp $";
+  "$Id: heap.c,v 1.24 1993/07/19 16:31:48 gray Exp $";
 #endif
 
 /* external routines */
@@ -58,7 +58,7 @@ EXPORT	void		*_heap_last = NULL;	/* end of our heap */
 /*
  * function to get SIZE memory bytes from the end of the heap
  */
-EXPORT	void	*_heap_alloc(unsigned int size)
+EXPORT	void	*_heap_alloc(const unsigned int size)
 {
   void		*ret = HEAP_ALLOC_ERROR;
   
@@ -137,9 +137,9 @@ EXPORT	void	_heap_startup(void)
 /*
  * align (by extending) _heap_base to BASE byte boundary
  */
-EXPORT	void	*_heap_align_base(int base)
+EXPORT	void	*_heap_align_base(const long base)
 {
-  int	diff;
+  long	diff;
   
   diff = (long)_heap_base % base;
   (char *)_heap_base += base - diff;

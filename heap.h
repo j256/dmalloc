@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.12 1993/04/30 20:02:37 gray Exp $
+ * $Id: heap.h,v 1.13 1993/07/19 16:31:50 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -68,7 +68,7 @@ IMPORT	void		*_heap_last;  /* end of our heap */
 /*
  * function to get SIZE memory bytes from the end of the heap
  */
-IMPORT	void	*_heap_alloc(unsigned int size);
+IMPORT	void	*_heap_alloc(const unsigned int size);
 
 /*
  * return a pointer to the current end of the heap
@@ -83,7 +83,7 @@ IMPORT	void	_heap_startup(void);
 /*
  * align (by extending) _heap_base to BASE byte boundary
  */
-IMPORT	void	*_heap_align_base(int base);
+IMPORT	void	*_heap_align_base(const long base);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

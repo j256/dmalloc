@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.36 1993/05/24 17:00:29 gray Exp $";
+  "$Id: chunk.c,v 1.37 1993/07/19 16:31:34 gray Exp $";
 #endif
 
 /* checking information */
@@ -257,9 +257,9 @@ EXPORT	int	_chunk_startup(void)
   /* verify some conditions */
   if (BB_PER_ADMIN <= 2
       || sizeof(bblock_adm_t) > BLOCK_SIZE
-      || DB_PER_ADMIN < (1 << (BASIC_BLOCK - SMALLEST_BLOCK))
+      || DB_PER_ADMIN < (BLOCK_SIZE / (1 << SMALLEST_BLOCK))
       || sizeof(dblock_adm_t) > BLOCK_SIZE
-      || SMALLEST_BLOCK < ALLOCATION_ALIGNMENT_IN_BITS) {
+      || SMALLEST_BLOCK < ALLOCATION_ALIGNMENT) {
     malloc_errno = MALLOC_BAD_SETUP;
     _malloc_perror("_chunk_startup");
     return ERROR;
@@ -294,7 +294,7 @@ EXPORT	int	_chunk_startup(void)
 /*
  * return the number of bits in number SIZE
  */
-LOCAL	int	num_bits(unsigned int size)
+LOCAL	int	num_bits(const unsigned int size)
 {
   unsigned int	tmp = size;
   int		bitc;
@@ -372,7 +372,7 @@ LOCAL	bblock_adm_t	*get_bblock_admin(void)
 /*
  * get MANY of bblocks, return a pointer to the first one
  */
-LOCAL	bblock_t	*get_bblocks(int bitc)
+LOCAL	bblock_t	*get_bblocks(const int bitc)
 {
   static int	free_slots = 0;		/* free slots in last bb_admin */
   int		newc, mark;
@@ -446,7 +446,7 @@ LOCAL	bblock_t	*get_bblocks(int bitc)
 /*
  * get MANY of contiguous dblock administrative slots
  */
-LOCAL	dblock_t	*get_dblock_admin(int many)
+LOCAL	dblock_t	*get_dblock_admin(const int many)
 {
   static int		free_slots = 0;
   static dblock_adm_t	*dblock_admp;
@@ -506,7 +506,7 @@ LOCAL	dblock_t	*get_dblock_admin(int many)
 /*
  * get a dblock of 1<<BITC sized chunks, also asked for the slot memory
  */
-LOCAL	void	*get_dblock(int bitc, dblock_t ** admp)
+LOCAL	void	*get_dblock(const int bitc, dblock_t ** admp)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
@@ -798,21 +798,18 @@ EXPORT	int	_chunk_heap_check(void)
 	}
     }
     
-    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DBLOCK)) {
+    /* count the dblock free lists */
+    for (bitc = 0; bitc < BASIC_BLOCK; bitc++) {
+      free_dblockc[bitc] = 0;
       
-      /* count the dblock free lists */
-      for (bitc = 0; bitc < BASIC_BLOCK; bitc++) {
-	free_dblockc[bitc] = 0;
-	
-	/* parse dblock free list doing minimal pointer checking */
-	for (dblockp = free_dblock[bitc]; dblockp != NULL;
-	     dblockp = dblockp->db_next, free_dblockc[bitc]++)
-	  if (dblockp->db_next != NULL && ! IS_IN_HEAP(dblockp->db_next)) {
-	    malloc_errno = MALLOC_BAD_FREE_LIST;
-	    _malloc_perror("_chunk_heap_check");
-	    return ERROR;
-	  }
-      }
+      /* parse dblock free list doing minimal pointer checking */
+      for (dblockp = free_dblock[bitc]; dblockp != NULL;
+	   dblockp = dblockp->db_next, free_dblockc[bitc]++)
+	if (dblockp->db_next != NULL && ! IS_IN_HEAP(dblockp->db_next)) {
+	  malloc_errno = MALLOC_BAD_FREE_LIST;
+	  _malloc_perror("_chunk_heap_check");
+	  return ERROR;
+	}
     }
   }
   
@@ -1027,56 +1024,53 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* check dblock entry very closely if necessary */
-      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DBLOCK)) {
-	for (dblockc = 0, dblockp = bblockp->bb_dblock;
-	     dblockp < bblockp->bb_dblock +
-	     (1 << (BASIC_BLOCK - bblockp->bb_bitc));
-	     dblockc++, dblockp++) {
+      for (dblockc = 0, dblockp = bblockp->bb_dblock;
+	   dblockp < bblockp->bb_dblock +
+	   (1 << (BASIC_BLOCK - bblockp->bb_bitc));
+	   dblockc++, dblockp++) {
+	
+	/* check out dblock entry to see if it is not free */
+	if (dblockp->db_next == NULL || IS_IN_HEAP(dblockp->db_next)) {
 	  
-	  /* check out dblock entry to see if it is not free */
-	  if (dblockp->db_next == NULL || IS_IN_HEAP(dblockp->db_next)) {
+	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_LISTS)) {
+	    dblock_t	*dblistp;
 	    
-	    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_LISTS)) {
-	      dblock_t	*dblistp;
-	      
-	      /* find the free block in the free list */
-	      for (dblistp = free_dblock[bblockp->bb_bitc]; dblistp != NULL;
-		   dblistp = dblistp->db_next)
-		if (dblistp == dblockp)
-		  break;
-	      
-	      /* did we find it? */
-	      if (dblistp == NULL) {
-		malloc_errno = MALLOC_BAD_FREE_LIST;
-		_malloc_perror("_chunk_heap_check");
-		return ERROR;
-	      }
-	      
-	      free_dblockc[bblockp->bb_bitc]--;
+	    /* find the free block in the free list */
+	    for (dblistp = free_dblock[bblockp->bb_bitc]; dblistp != NULL;
+		 dblistp = dblistp->db_next)
+	      if (dblistp == dblockp)
+		break;
+	    
+	    /* did we find it? */
+	    if (dblistp == NULL) {
+	      malloc_errno = MALLOC_BAD_FREE_LIST;
+	      _malloc_perror("_chunk_heap_check");
+	      return ERROR;
 	    }
 	    
-	    continue;
+	    free_dblockc[bblockp->bb_bitc]--;
 	  }
 	  
-	  /*
-	   * check out size, better be less than BLOCK_SIZE / 2
-	   * I have to check this twice :-(
-	   */
-	  if (dblockp->db_size > BLOCK_SIZE / 2) {
-	    log_bad_pnt(dblockp->db_file, dblockp->db_line, NULL, "bad size",
-			FALSE);
-	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
-	    _malloc_perror("_chunk_heap_check");
+	  continue;
+	}
+	
+	/*
+	 * check out size, better be less than BLOCK_SIZE / 2
+	 * I have to check this twice :-(
+	 */
+	if (dblockp->db_size > BLOCK_SIZE / 2) {
+	  log_bad_pnt(dblockp->db_file, dblockp->db_line, NULL, "bad size",
+		      FALSE);
+	  malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	  _malloc_perror("_chunk_heap_check");
+	  return ERROR;
+	}
+	
+	if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
+	  pnt = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
+	  if (fence_read(dblockp->db_file, dblockp->db_line,
+			 pnt, dblockp->db_size) != NOERROR)
 	    return ERROR;
-	  }
-	  
-	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)
-	      && BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DB_FENCE)) {
-	    pnt = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
-	    if (fence_read(dblockp->db_file, dblockp->db_line,
-			   pnt, dblockp->db_size) != NOERROR)
-	      return ERROR;
-	  }
 	}
       }
       break;
@@ -1099,63 +1093,61 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* check out each dblock_admin struct? */
-      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DBLOCK)) {
-	for (dblockp = bblockp->bb_slotp->da_block;
-	     dblockp < bblockp->bb_slotp->da_block + DB_PER_ADMIN; dblockp++) {
+      for (dblockp = bblockp->bb_slotp->da_block;
+	   dblockp < bblockp->bb_slotp->da_block + DB_PER_ADMIN; dblockp++) {
+	
+	/* verify if we have a good bblock pointer and good back pointer */
+	if (dblockp->db_bblock == NULL && dblockp->db_next == NULL)
+	  continue;
+	
+	/* check out dblock pointer and next pointer (if free) */
+	if (dblockp->db_next == NULL || IS_IN_HEAP(dblockp->db_next)) {
 	  
-	  /* verify if we have a good bblock pointer and good back pointer */
-	  if (dblockp->db_bblock == NULL && dblockp->db_next == NULL)
-	    continue;
+	  /* find pointer to memory chunk */
+	  pnt = dblockp->db_bblock->bb_mem +
+	    (dblockp - dblockp->db_bblock->bb_dblock) *
+	      (1 << dblockp->db_bblock->bb_bitc);
 	  
-	  /* check out dblock pointer and next pointer (if free) */
-	  if (dblockp->db_next == NULL || IS_IN_HEAP(dblockp->db_next)) {
-	    
-	    /* find pointer to memory chunk */
-	    pnt = dblockp->db_bblock->bb_mem +
-	      (dblockp - dblockp->db_bblock->bb_dblock) *
-		(1 << dblockp->db_bblock->bb_bitc);
-	    
-	    /* should we verify that we have a block of FREE_CHAR? */
-	    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)
-		&& BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
-	      for (bytep = (char *)pnt;
-		   bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitc);
-		   bytep++)
-		if (*bytep != FREE_CHAR) {
-		  log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, bytep,
-			      "overwrote free space", TRUE);
-		  malloc_errno = MALLOC_FREE_NON_BLANK;
-		  _malloc_perror("_chunk_heap_check");
-		  return ERROR;
-		}
-	    
-	    continue;
-	  }
+	  /* should we verify that we have a block of FREE_CHAR? */
+	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)
+	      && BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+	    for (bytep = (char *)pnt;
+		 bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitc);
+		 bytep++)
+	      if (*bytep != FREE_CHAR) {
+		log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, bytep,
+			    "overwrote free space", TRUE);
+		malloc_errno = MALLOC_FREE_NON_BLANK;
+		_malloc_perror("_chunk_heap_check");
+		return ERROR;
+	      }
 	  
-	  /* check out size, better be less than BLOCK_SIZE / 2 */
-	  if (dblockp->db_size > BLOCK_SIZE / 2) {
-	    log_bad_pnt(dblockp->db_file, dblockp->db_line, NULL, "bad size",
-			FALSE);
-	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
-	    _malloc_perror("_chunk_heap_check");
-	    return ERROR;
-	  }
-	  
-	  /* check line number */
-	  if (dblockp->db_line > MAX_LINE_NUMBER) {
-	    log_bad_pnt(dblockp->db_file, dblockp->db_line, NULL,
-			"bad line number", FALSE);
-	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
-	    _malloc_perror("_chunk_heap_check");
-	    return ERROR;
-	  }
-	  
-	  len = strlen(dblockp->db_file);
-	  if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
-	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
-	    _malloc_perror("_chunk_heap_check");
-	    return ERROR;
-	  }
+	  continue;
+	}
+	
+	/* check out size, better be less than BLOCK_SIZE / 2 */
+	if (dblockp->db_size > BLOCK_SIZE / 2) {
+	  log_bad_pnt(dblockp->db_file, dblockp->db_line, NULL, "bad size",
+		      FALSE);
+	  malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	  _malloc_perror("_chunk_heap_check");
+	  return ERROR;
+	}
+	
+	/* check line number */
+	if (dblockp->db_line > MAX_LINE_NUMBER) {
+	  log_bad_pnt(dblockp->db_file, dblockp->db_line, NULL,
+		      "bad line number", FALSE);
+	  malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	  _malloc_perror("_chunk_heap_check");
+	  return ERROR;
+	}
+	
+	len = strlen(dblockp->db_file);
+	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
+	  malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	  _malloc_perror("_chunk_heap_check");
+	  return ERROR;
 	}
       }
       break;
@@ -1264,14 +1256,13 @@ EXPORT	int	_chunk_heap_check(void)
 	return ERROR;
       }
     
-    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DBLOCK)) {
-      /* any free dblock entries not accounted for? */
-      for (bitc = 0; bitc < BASIC_BLOCK; bitc++)
-	if (free_dblockc[bitc] != 0) {
-	  malloc_errno = MALLOC_BAD_FREE_LIST;
-	  _malloc_perror("_chunk_heap_check");
-	  return ERROR;
-	}
+    /* any free dblock entries not accounted for? */
+    for (bitc = 0; bitc < BASIC_BLOCK; bitc++) {
+      if (free_dblockc[bitc] != 0) {
+	malloc_errno = MALLOC_BAD_FREE_LIST;
+	_malloc_perror("_chunk_heap_check");
+	return ERROR;
+      }
     }
   }
   
@@ -1287,21 +1278,19 @@ EXPORT	int	_chunk_heap_check(void)
  * returns [NO]ERROR
  */
 EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
-				 const int check, int min_size)
+				 const int check, const int min_size)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
-  int		len, diff;
+  int		len, diff, min = min_size;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_TRANS))
     _malloc_message("checking pointer '%#lx'", pnt);
   
   /* adjust the pointer down if fence-posting */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
-    (char *)pnt -= FENCE_BOTTOM;
-    if (min_size != 0)
-      min_size += FENCE_OVERHEAD;
-  }
+  (char *)pnt -= pnt_below_adm;
+  if (min != 0)
+    min += pnt_total_adm;
   
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, NULL);
@@ -1321,10 +1310,10 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
   
   /* maybe watch out for nullc character */
   if (BIT_IS_SET(check, CHUNK_PNT_NULL)) {
-    if (min_size != 0) {
+    if (min != 0) {
       len = strlen(pnt) + 1;
-      if (len > min_size)
-	min_size = len;
+      if (len > min)
+	min = len;
     }
   }
   
@@ -1333,8 +1322,8 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
     diff = ((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc);
     if (diff != 0) {
       if (BIT_IS_SET(check, CHUNK_PNT_LOOSE)) {
-	if (min_size != 0)
-	  min_size += diff;
+	if (min != 0)
+	  min += diff;
 	(char *)pnt -= diff;
       }
       else {
@@ -1377,7 +1366,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
       return ERROR;
     }
     
-    if (min_size != 0 && dblockp->db_size < min_size) {
+    if (min != 0 && dblockp->db_size < min) {
       log_bad_pnt(dblockp->db_file, dblockp->db_line, CHUNK_TO_USER(pnt),
 		  "not enough space", TRUE);
       malloc_errno = MALLOC_WOULD_OVERWRITE;
@@ -1417,8 +1406,8 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
        */
       diff = (char *)pnt - BLOCK_POINTER(WHICH_BLOCK(pnt));
       (char *)pnt -= diff;
-      if (min_size != 0)
-	min_size += diff;
+      if (min != 0)
+	min += diff;
     }
     else {
       log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, CHUNK_TO_USER(pnt),
@@ -1459,7 +1448,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
     return ERROR;
   }
   
-  if (min_size != 0 && bblockp->bb_size < min_size) {
+  if (min != 0 && bblockp->bb_size < min) {
     log_bad_pnt(bblockp->bb_file, bblockp->bb_line, CHUNK_TO_USER(pnt),
 		"not enough space", TRUE);
     malloc_errno = MALLOC_WOULD_OVERWRITE;
@@ -1504,8 +1493,7 @@ EXPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
     _malloc_message("reading info about pointer '%#lx'", pnt);
   
   /* adjust the pointer down if fence-posting */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
-    (char *)pnt -= FENCE_BOTTOM;
+  (char *)pnt -= pnt_below_adm;
   
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, NULL);
@@ -1576,7 +1564,7 @@ EXPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
  * write new FILE, LINE, SIZE info into PNT
  */
 LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
-				 void * pnt, unsigned int size)
+				 void * pnt, const unsigned int size)
 {
   int		bitc, bblockc;
   bblock_t	*bblockp;
@@ -1680,18 +1668,19 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
  * get a SIZE chunk of memory for FILE at LINE
  */
 EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
-			       unsigned int size)
+			       const unsigned int size)
 {
-  int		bitc, bblockc;
+  int		bitc, bblockc, byten = size;
   bblock_t	*bblockp;
   bblock_adm_t	*bblock_admp;
   dblock_t	*dblockp;
   void		*pnt;
   
-  malloc_count++;				/* counts calls to malloc */
+  /* counts calls to malloc */
+  malloc_count++;
   
 #if ALLOW_ALLOC_ZERO_SIZE == 0
-  if (size == 0) {
+  if (byten == 0) {
     log_bad_pnt(file, line, NULL, "bad zero byte allocation request",
 		FALSE);
     malloc_errno = MALLOC_BAD_SIZE;
@@ -1707,21 +1696,20 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   }
   
   /* adjust the size */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
-    size += FENCE_OVERHEAD;
+  byten += pnt_total_adm;
   
   /* count the bits */
-  bitc = num_bits(size);
+  bitc = num_bits(byten);
   if (bitc == ERROR)
     return MALLOC_ERROR;
   
   /* monitor current allocation level */
-  alloc_current += size;
+  alloc_current += byten;
   alloc_cur_given += 1 << bitc;
   alloc_maximum = MAX(alloc_maximum, alloc_current);
   alloc_max_given = MAX(alloc_max_given, alloc_cur_given);
-  alloc_total += size;
-  alloc_one_max = MAX(alloc_one_max, size);
+  alloc_total += byten;
+  alloc_one_max = MAX(alloc_one_max, byten);
   
   /* monitor pointer usage */
   alloc_cur_pnts++;
@@ -1747,7 +1735,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
       return MALLOC_ERROR;
     
     dblockp->db_line = (unsigned short)line;
-    dblockp->db_size = (unsigned short)size;
+    dblockp->db_size = (unsigned short)byten;
     dblockp->db_file = (char *)file;
   }
   else {
@@ -1792,7 +1780,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 	bblockp->bb_flags = BBLOCK_USER;
       
       bblockp->bb_line	= (unsigned short)line;
-      bblockp->bb_size	= (unsigned int)size;
+      bblockp->bb_size	= (unsigned int)byten;
       bblockp->bb_file	= (char *)file;
     }
   }
@@ -1803,14 +1791,14 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
   /* write fence post info if needed */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
-    fence_write(pnt, size);
+    fence_write(pnt, byten);
   
   (char *)pnt += pnt_below_adm;
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_TRANS))
     _malloc_message("*** alloc: at '%s:%u' for %u bytes (%d bits), got '%#lx'",
-		    file, line, size - pnt_total_adm, bitc, pnt);
+		    file, line, byten - pnt_total_adm, bitc, pnt);
   
   return pnt;
 }
@@ -1826,13 +1814,13 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   bblock_adm_t	*bblock_admp;
   dblock_t	*dblockp;
   
-  free_count++;					/* counts calls to free */
+  /* counts calls to free */
+  free_count++;
   
   alloc_cur_pnts--;
   
   /* adjust the pointer down if fence-posting */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
-    (char *)pnt -= FENCE_BOTTOM;
+  (char *)pnt -= pnt_below_adm;
   
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, &bblock_admp);
@@ -1998,17 +1986,16 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   unsigned int	old_size, size, old_line;
   int		old_bitc, new_bitc;
   
-  realloc_count++;				/* counts calls to realloc */
+  /* counts calls to realloc */
+  realloc_count++;
   
   /* get info about old pointer */
   if (_chunk_read_info(oldp, &old_size, &old_file, &old_line) != NOERROR)
     return REALLOC_ERROR;
   
   /* adjust the pointer down if fence-posting */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
-    (char *)oldp -= FENCE_BOTTOM;
-    new_size += FENCE_OVERHEAD;
-  }
+  (char *)oldp -= pnt_below_adm;
+  new_size += pnt_total_adm;
   
   /* check the fence-posting */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
@@ -2028,11 +2015,9 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   if (BIT_IS_SET(_malloc_debug, DEBUG_REALLOC_COPY) || old_bitc != new_bitc) {
     
     /* readjust info */
-    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
-      (char *)oldp += FENCE_BOTTOM;
-      old_size -= FENCE_OVERHEAD;
-      new_size -= FENCE_OVERHEAD;
-    }
+    (char *)oldp += pnt_below_adm;
+    old_size -= pnt_total_adm;
+    new_size -= pnt_total_adm;
     
     /* allocate space for new chunk */
     newp = _chunk_malloc(file, line, new_size);
@@ -2076,14 +2061,13 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
 		   (1 << new_bitc) - old_size);
     
     /* write in fence-post info and adjust new pointer over fence info */
-    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
+    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
       fence_write(newp, new_size);
-      
-      (char *)newp += FENCE_BOTTOM;
-      (char *)oldp += FENCE_BOTTOM;
-      old_size -= FENCE_OVERHEAD;
-      new_size -= FENCE_OVERHEAD;
-    }
+    
+    (char *)newp += pnt_below_adm;
+    (char *)oldp += pnt_below_adm;
+    old_size -= pnt_total_adm;
+    new_size -= pnt_total_adm;
   }
   
   /*
