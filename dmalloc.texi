@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.154 1998/11/16 16:56:03 gray Exp $
+@c $Id: dmalloc.texi,v 1.155 1998/11/16 17:22:08 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -114,8 +114,8 @@ Gray Watson.
 
 @menu
 * Copying::                     Library copying and licensing conditions.
-* Overview::                    Description of how to debug with the library.
-* Details::                     Details about the library's operations.
+* Overview::                    Description of features and how to get started.
+* Details::                     Details about how to use the library.
 * Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
@@ -253,7 +253,6 @@ USA
 * How To Get::                  How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
-* Using With Threads::          Using the library with a thread package.
 @end menu
 
 @node Allocation Basics, Features, Overview, Overview
@@ -718,7 +717,7 @@ optimized for space nor speed.  in fact, some of its features make it
 unable to use some of the organizational methods of other more efficient
 heap libraries.
 
-@node Getting Started, Using With Threads, Installation, Overview
+@node Getting Started, , Installation, Overview
 @section Getting Started with the Library
 
 @cindex quick start
@@ -819,89 +818,23 @@ the library is actually getting linked into your program.
 
 @end enumerate
 
-@node Using With Threads, , Getting Started, Overview
-@section Using the Library with a Thread Package
-
-@cindex threads
-
-This is the newest section of the library and therefore contains the
-least information about a subject on which I probably could write a
-book.  My apologies.
-
-@cindex pthreads
-
-Threads are special operating system facilities which allow your
-programs to have multiple threads of execution (hence the name).  In
-effect your program can be doing a number of things ``at the same
-time''.  This allows you to take full advantage of modern operating
-system scheduling and multi-processor hardware.  If I've already lost
-you or if any of the terminology below does not make sense, see manuals
-about POSIX threads (pthreads) before going any further.  O'Reilly
-publishes a pretty good pthreads manual for example.
-
-The support for threads in dmalloc is minimal although probably adequate
-for most if not all testing scenarios.  It provides support for mutex
-locking itself to protect against race conditions that result in
-multiple simultaneous execution.  One of the major problems is that most
-thread libraries uses malloc themselves.  Since all of dmalloc's
-initialization happens when a call to malloc is made, we may be
-attempting to initialize or lock the mutex while the thread library is
-booting up.  A baaaad thing since thread libraries aren't reentrant.
-
-@cindex lock on
-
-The solution to this problem is to have the library not initialize or
-lock its mutex variable until after a certain number of allocation calls
-have been completed.  If the library does not wait before initializing
-the locks, the thread library will probably core dump.  If it waits too
-long then it can't protect itself from multiple execution and it will
-abort or other bad things might happen.  You adjust the number of times
-to wait at runtime with the ``lock-on'' option to the dmalloc program
-(for example @kbd{dmalloc -o 20}).  @xref{Dmalloc Program}.  Times
-values between 2 and 30 are probably good although operating systems
-will vary significantly.  You know its too low if your program core
-dumps and too high if the library generates an exception.
-
-An additional complexity is when we are initializing the lock before
-mutex locking around the library.  As mentioned, the initialization
-itself may generate a malloc call causing the library to go recursive
-and the pthread library to possibly core dump. With the THREAD_INIT_LOCK
-setting defined in @file{settings.h}, you can tune how many times before
-we start locking to try and initialize the mutex lock.  It defaults to 2
-which seems to work for me.  If people need to have this runtime
-configurable or would like to present an alternative default, please let
-me know.
-
-In addition to the ``lock-on'' option, you probably will need to enable
-the @samp{allow-nonlinear} token if you thread library needs to call
-sbrk directly to allocate some storage.  @xref{Debug Tokens}.
-
-To build the library with the threaded stubs type @kbd{make threads}
-which should build @file{libdmallocth.a}.  The auto-configurations for
-these functions is in its infancy and may or may not work depending on
-the script's ability to detect your local thread functionality.  Feel
-free to send me mail with comments or improvements to them.
-
-So that's it.  If you have any specific questions or would like addition
-information posted in this section, please let me know.  Experienced
-thread programmers only please.
-
 @node Details, Source Code, Overview, Top
-@chapter Details about the Library's Operations
+@chapter Details About How to Use the Library.
 
 @cindex details
 @cindex operation details
 
 @menu
-* Programming::                   How to program with the library.
-* Using Dmalloc With a Debugger:: Using a debugger with the library.
-* Environment Variable::          The variable name and its features.
-* Debug Tokens::                  Description of the debugging tokens.
-* RC File::                       Format of the run-time configuration file.
-* Dmalloc Program::               Env variable setting utility.
+* Programming::                 How to program with the library.
+* Environment Variable::        The variable name and its features.
+* Debug Tokens::                Description of the debugging tokens.
+* RC File::                     Format of the run-time configuration file.
+* Dmalloc Program::             Env variable setting utility.
+* Using With a Debugger::       Using a debugger with the library.
+* Using With Threads::          Using the library with a thread package.
 @end menu
 
-@node Programming, Using Dmalloc With a Debugger, Details, Details
+@node Programming, Environment Variable, Details, Details
 @section Programming with the Library
 
 @cindex programming
@@ -1323,195 +1256,7 @@ If you get unresolved references like @code{_malloc_leap} or
 been.
 @end itemize
 
-@node Using Dmalloc With a Debugger, Environment Variable, Programming, Details
-@section Using Dmalloc With the Library
-
-@cindex debugger usage with dmalloc
-@cindex using a debugger with dmalloc
-
-Here are a number of possible scenarios for using the dmalloc library to
-track down problems with your program.
-
-You should first enable a logfile filename (I use @file{dmalloc}) and
-turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
-low} to accomplish this.  If you are interested in having the error
-messages printed to your terminal as well, enable the @samp{print-error}
-token by typing @kbd{dmalloc -p print-error} afterwards.  @xref{Dmalloc
-Program}.
-
-@cindex gdb
-@cindex dmalloc_error() routine
-Now you can enter your debugger (I use the @emph{excellent} GNU debugger
-gdb), and put a break-point in @code{dmalloc_error()} which is the
-internal error routine for the library.  When your program is run, it
-will stop there if a memory problem is detected.
-
-If you are using GDB, I would recommend adding the contents of
-@file{dmalloc.gdb} in the @file{contrib} subdirectory to your
-@file{.gdbinit} file in your home directory.  This enables the
-@code{dmalloc} command which will prompt you for the arguments to the
-dmalloc command and will set a break point in @code{dmalloc_error()}
-automatically.
-
-@menu
-* General Errors::              Diagnosing general problems with a debugger.
-* Memory Leaks::                Tracking down non-freed memory.
-* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
-@end menu
-
-@node General Errors, Memory Leaks, Using Dmalloc With a Debugger, Using Dmalloc With a Debugger
-@subsection Diagnosing General Errors with a Debugger
-
-@cindex diagnosing errors
-@cindex general errors
-
-If your program stops at the @code{dmalloc_error()} routine then one of
-a number of problems could be happening.  Incorrect arguments could have
-been passed to a malloc call: asking for negative number of bytes,
-trying to realloc a non-heap pointer, etc..  There also could be a
-problem with the system's allocations: you've run out of memory, some
-other function in your program is using @code{sbrk}, etc.  However, it
-is most likely that some code that has been executed was naughty.
-
-To get more information about the problem, first print via the debugger
-the dmalloc_errno variable to get the library's internal error code.
-You can suspend your debugger and run @samp{dmalloc -e
-value-returned-from-print} to get an English translation of the error.
-A number of the error messages are designed to indicate specific
-problems with the library administrative structures and may not be
-user-friendly.
-
-If the problem was due to the arguments or system allocations then the
-source of the problem has been found.  However, if some code did
-something wrong, you may have some more work to do to locate the actual
-problem.  The @code{check-heap} token should be enabled and the interval
-setting disabled or set to a low value so that the library can find the
-problem as close as possible to its source.  The code that was execute
-right before the library halted, can then be examined closely for
-irregularities.  @xref{Debug Tokens} and @xref{Dmalloc Program}.
-
-@cindex dmalloc_verify() routine
-
-You may also want to put calls to @code{dmalloc_verify(0)} in your code
-before the section which generated the error.  This should locate the
-problem faster by checking the library's structures at that point.
-@xref{Extensions}.
-
-@node Memory Leaks, Fence-Post Overruns, General Errors, Using Dmalloc With a Debugger
-@subsection Tracking down Non-Freed Memory
-
-@cindex memory leaks
-@cindex leaking memory
-
-So you've run your program, examined the log-file and discovered (to
-your horror) some un-freed memory.  Memory leaks can become large
-problems since even the smallest and most insignificant leak can starve
-the program given the right circumstances.
-
-@example
-not freed: '0x45008' (12 bytes) from 'ra=0x1f8f4'
-not freed: '0x45028' (12 bytes) from 'unknown'
-not freed: '0x45048' (10 bytes) from 'argv.c:1077'
-  known memory not freed: 1 pointer, 10 bytes
-unknown memory not freed: 2 pointers, 24 bytes
-@end example
-
-Above you will see a sample of some non-freed memory messages from the
-logfile.  In the first line the @samp{0x45008} is the pointer that was
-not freed, the @samp{12 bytes} is the size of the unfreed block, and the
-@samp{ra=0x1f8f4} or return-address shows where the allocation
-originated from.  @xref{Return Address}.
-
-The systems which cannot provide return-address information show
-@samp{unknown} instead, as in the 2nd line in the sample above.
-
-The @samp{argv.c:1077} information from the 3rd line shows the file and
-line number which allocated the memory which was not freed.  This
-information comes from the calls from C files which included
-@file{dmalloc.h}.  @xref{Allocation Macros}.
-
-At the bottom of the sample it totals the memory for you and breaks it
-down to known memory (those calls which supplied the file/line
-information) and unknown (the rest).
-
-Often, you may allocate memory in via @code{strdup()} or another
-routine, so the logfile listing where in the @code{strdup} routine the
-memory was allocated does not help locate the true source of the memory
-leak -- the routine that called @code{strdup}.  Without a mechanism to
-trace the calling stack, there is no way for the library to see who the
-caller of the caller (so to speak) was.
-
-@cindex STORE_SEEN_COUNT option
-@cindex pointer seen count
-
-However, there is a way to track down unfreed memory in this
-circumstance.  You need to compile the library with
-@code{STORE_SEEN_COUNT} defined in @file{conf.h}.  The library will then
-record how many times a pointer has been allocated or freed.  It will
-display the unfreed memory as:
-
-@example
-not freed: '0x45008|s3' (12 bytes) from 'ra=0x1f8f4'
-@end example
-
-The @code{STORE_SEEN_COUNT} option adds a @samp{|s#} qualifier to the
-address.  This means that the address in question was seen @samp{#} many
-times.  In the above example, the address @samp{0x45008} was seen
-@samp{3} times.  The last time it was allocated, it was not freed.
-
-How can a pointer be ``seen'' 3 times?  Let say you @code{strdup} a
-string of 12 characters and get address @samp{0x45008} -- this is #1
-time the pointer is seen.  You then free the pointer (seen #2) but later
-@code{strdup} another 12 character string and it gets the @samp{0x45008}
-address from the free list (seen #3).
-
-So to find out who is allocating this particular 12 bytes the 3rd time,
-try @samp{dmalloc -a 0x45008:3}.  The library will stop the program the
-third time it sees the @samp{0x45008} address.  You then enter a
-debugger and put a break point at @code{dmalloc_error}.  Run the program
-and when the breakpoint is reached you can examine the stack frame to
-determine who called @code{strdup} to allocate the pointer.
-
-To not bother with the @code{STORE_SEEN_COUNT} feature, you can also run
-your program with the @samp{never-reuse} token enabled.  This token will
-cause the library to never reuse memory that has been freed.  Unique
-addresses are always generated.  This should be used with caution since
-it may cause your program to run out of memory.
-
-@node Fence-Post Overruns,  , Memory Leaks, Using Dmalloc With a Debugger
-@subsection Diagnosing Fence-Post Overwritten Memory
-
-@cindex fence-post errors
-
-For a definition of fence-posts please see the ``Features'' section.
-@xref{Features}.
-
-If you have encountered a fence-post memory error, the logfile should be
-able to tell you the offending address.
-
-@example
-free: failed UNDER picket-fence magic-number checking: 
-pointer '0x1d008' from 'dmalloc_t.c:427'
-Dump of proper fence-bottom bytes: '\e\253\300\300\e\253\300\300'
-Dump of '0x1d008'-8: '\e\253\300\300WOW!\003\001pforger\023\001\123'
-@end example
-
-The above sample shows that the pointer @samp{0x1d008} has had its lower
-fence-post area overwritten.  This means that the code wrote below the
-bottom of the address or above the address right below this one.  In the
-sample, the string that did it was @samp{WOW!}.
-
-The library first shows you what the proper fence-post information
-should look like, and then shows what the pointer's bad information was.
-If it cannot print the character, it will display the value as
-@samp{\ddd} where ddd are three octal digits.
-
-By enabling the @code{check-heap} debugging token and assigning the
-interval setting to a low number, you should be able to locate
-approximately when this problem happened.  @xref{Debug Tokens} and
-@xref{Dmalloc Program}.
-
-@node Environment Variable, Debug Tokens, Using Dmalloc With a Debugger, Details
+@node Environment Variable, Debug Tokens, Programming, Details
 @section Environment Variable Features
 
 @cindex environment variable
@@ -1914,7 +1659,7 @@ and the checking of fence-post memory areas.
 
 Enter @code{dmalloc none} to disable all memory debugging features.
 
-@node Dmalloc Program,  , RC File, Details
+@node Dmalloc Program, Using With a Debugger, RC File, Details
 @section Dmalloc Utility Program
 
 @cindex dmalloc program
@@ -2118,6 +1863,261 @@ dmalloc -DV
 dmalloc -tv
 @end example
 
+@node Using With a Debugger, Using With Threads, Dmalloc Program, Details
+@section Using Dmalloc With a Debugger
+
+@cindex debugger usage with dmalloc
+@cindex using a debugger with dmalloc
+
+Here are a number of possible scenarios for using the dmalloc library to
+track down problems with your program.
+
+You should first enable a logfile filename (I use @file{dmalloc}) and
+turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
+low} to accomplish this.  If you are interested in having the error
+messages printed to your terminal as well, enable the @samp{print-error}
+token by typing @kbd{dmalloc -p print-error} afterwards.  @xref{Dmalloc
+Program}.
+
+@cindex gdb
+@cindex dmalloc_error() routine
+Now you can enter your debugger (I use the @emph{excellent} GNU debugger
+gdb), and put a break-point in @code{dmalloc_error()} which is the
+internal error routine for the library.  When your program is run, it
+will stop there if a memory problem is detected.
+
+If you are using GDB, I would recommend adding the contents of
+@file{dmalloc.gdb} in the @file{contrib} subdirectory to your
+@file{.gdbinit} file in your home directory.  This enables the
+@code{dmalloc} command which will prompt you for the arguments to the
+dmalloc command and will set a break point in @code{dmalloc_error()}
+automatically.
+
+@menu
+* General Errors::              Diagnosing general problems with a debugger.
+* Memory Leaks::                Tracking down non-freed memory.
+* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
+@end menu
+
+@node General Errors, Memory Leaks, Using With a Debugger, Using With a Debugger
+@subsection Diagnosing General Errors with a Debugger
+
+@cindex diagnosing errors
+@cindex general errors
+
+If your program stops at the @code{dmalloc_error()} routine then one of
+a number of problems could be happening.  Incorrect arguments could have
+been passed to a malloc call: asking for negative number of bytes,
+trying to realloc a non-heap pointer, etc..  There also could be a
+problem with the system's allocations: you've run out of memory, some
+other function in your program is using @code{sbrk}, etc.  However, it
+is most likely that some code that has been executed was naughty.
+
+To get more information about the problem, first print via the debugger
+the dmalloc_errno variable to get the library's internal error code.
+You can suspend your debugger and run @samp{dmalloc -e
+value-returned-from-print} to get an English translation of the error.
+A number of the error messages are designed to indicate specific
+problems with the library administrative structures and may not be
+user-friendly.
+
+If the problem was due to the arguments or system allocations then the
+source of the problem has been found.  However, if some code did
+something wrong, you may have some more work to do to locate the actual
+problem.  The @code{check-heap} token should be enabled and the interval
+setting disabled or set to a low value so that the library can find the
+problem as close as possible to its source.  The code that was execute
+right before the library halted, can then be examined closely for
+irregularities.  @xref{Debug Tokens} and @xref{Dmalloc Program}.
+
+@cindex dmalloc_verify() routine
+
+You may also want to put calls to @code{dmalloc_verify(0)} in your code
+before the section which generated the error.  This should locate the
+problem faster by checking the library's structures at that point.
+@xref{Extensions}.
+
+@node Memory Leaks, Fence-Post Overruns, General Errors, Using With a Debugger
+@subsection Tracking down Non-Freed Memory
+
+@cindex memory leaks
+@cindex leaking memory
+
+So you've run your program, examined the log-file and discovered (to
+your horror) some un-freed memory.  Memory leaks can become large
+problems since even the smallest and most insignificant leak can starve
+the program given the right circumstances.
+
+@example
+not freed: '0x45008' (12 bytes) from 'ra=0x1f8f4'
+not freed: '0x45028' (12 bytes) from 'unknown'
+not freed: '0x45048' (10 bytes) from 'argv.c:1077'
+  known memory not freed: 1 pointer, 10 bytes
+unknown memory not freed: 2 pointers, 24 bytes
+@end example
+
+Above you will see a sample of some non-freed memory messages from the
+logfile.  In the first line the @samp{0x45008} is the pointer that was
+not freed, the @samp{12 bytes} is the size of the unfreed block, and the
+@samp{ra=0x1f8f4} or return-address shows where the allocation
+originated from.  @xref{Return Address}.
+
+The systems which cannot provide return-address information show
+@samp{unknown} instead, as in the 2nd line in the sample above.
+
+The @samp{argv.c:1077} information from the 3rd line shows the file and
+line number which allocated the memory which was not freed.  This
+information comes from the calls from C files which included
+@file{dmalloc.h}.  @xref{Allocation Macros}.
+
+At the bottom of the sample it totals the memory for you and breaks it
+down to known memory (those calls which supplied the file/line
+information) and unknown (the rest).
+
+Often, you may allocate memory in via @code{strdup()} or another
+routine, so the logfile listing where in the @code{strdup} routine the
+memory was allocated does not help locate the true source of the memory
+leak -- the routine that called @code{strdup}.  Without a mechanism to
+trace the calling stack, there is no way for the library to see who the
+caller of the caller (so to speak) was.
+
+@cindex STORE_SEEN_COUNT option
+@cindex pointer seen count
+
+However, there is a way to track down unfreed memory in this
+circumstance.  You need to compile the library with
+@code{STORE_SEEN_COUNT} defined in @file{conf.h}.  The library will then
+record how many times a pointer has been allocated or freed.  It will
+display the unfreed memory as:
+
+@example
+not freed: '0x45008|s3' (12 bytes) from 'ra=0x1f8f4'
+@end example
+
+The @code{STORE_SEEN_COUNT} option adds a @samp{|s#} qualifier to the
+address.  This means that the address in question was seen @samp{#} many
+times.  In the above example, the address @samp{0x45008} was seen
+@samp{3} times.  The last time it was allocated, it was not freed.
+
+How can a pointer be ``seen'' 3 times?  Let say you @code{strdup} a
+string of 12 characters and get address @samp{0x45008} -- this is #1
+time the pointer is seen.  You then free the pointer (seen #2) but later
+@code{strdup} another 12 character string and it gets the @samp{0x45008}
+address from the free list (seen #3).
+
+So to find out who is allocating this particular 12 bytes the 3rd time,
+try @samp{dmalloc -a 0x45008:3}.  The library will stop the program the
+third time it sees the @samp{0x45008} address.  You then enter a
+debugger and put a break point at @code{dmalloc_error}.  Run the program
+and when the breakpoint is reached you can examine the stack frame to
+determine who called @code{strdup} to allocate the pointer.
+
+To not bother with the @code{STORE_SEEN_COUNT} feature, you can also run
+your program with the @samp{never-reuse} token enabled.  This token will
+cause the library to never reuse memory that has been freed.  Unique
+addresses are always generated.  This should be used with caution since
+it may cause your program to run out of memory.
+
+@node Fence-Post Overruns,  , Memory Leaks, Using With a Debugger
+@subsection Diagnosing Fence-Post Overwritten Memory
+
+@cindex fence-post errors
+
+For a definition of fence-posts please see the ``Features'' section.
+@xref{Features}.
+
+If you have encountered a fence-post memory error, the logfile should be
+able to tell you the offending address.
+
+@example
+free: failed UNDER picket-fence magic-number checking: 
+pointer '0x1d008' from 'dmalloc_t.c:427'
+Dump of proper fence-bottom bytes: '\e\253\300\300\e\253\300\300'
+Dump of '0x1d008'-8: '\e\253\300\300WOW!\003\001pforger\023\001\123'
+@end example
+
+The above sample shows that the pointer @samp{0x1d008} has had its lower
+fence-post area overwritten.  This means that the code wrote below the
+bottom of the address or above the address right below this one.  In the
+sample, the string that did it was @samp{WOW!}.
+
+The library first shows you what the proper fence-post information
+should look like, and then shows what the pointer's bad information was.
+If it cannot print the character, it will display the value as
+@samp{\ddd} where ddd are three octal digits.
+
+By enabling the @code{check-heap} debugging token and assigning the
+interval setting to a low number, you should be able to locate
+approximately when this problem happened.  @xref{Debug Tokens} and
+@xref{Dmalloc Program}.
+
+@node Using With Threads, , Using With a Debugger, Details
+@section Using the Library with a Thread Package
+
+@cindex threads
+
+This is the newest section of the library and therefore contains the
+least information about a subject on which I probably could write a
+book.  My apologies.
+
+@cindex pthreads
+
+Threads are special operating system facilities which allow your
+programs to have multiple threads of execution (hence the name).  In
+effect your program can be doing a number of things ``at the same
+time''.  This allows you to take full advantage of modern operating
+system scheduling and multi-processor hardware.  If I've already lost
+you or if any of the terminology below does not make sense, see manuals
+about POSIX threads (pthreads) before going any further.  O'Reilly
+publishes a pretty good pthreads manual for example.
+
+The support for threads in dmalloc is minimal although probably adequate
+for most if not all testing scenarios.  It provides support for mutex
+locking itself to protect against race conditions that result in
+multiple simultaneous execution.  One of the major problems is that most
+thread libraries uses malloc themselves.  Since all of dmalloc's
+initialization happens when a call to malloc is made, we may be
+attempting to initialize or lock the mutex while the thread library is
+booting up.  A baaaad thing since thread libraries aren't reentrant.
+
+@cindex lock on
+
+The solution to this problem is to have the library not initialize or
+lock its mutex variable until after a certain number of allocation calls
+have been completed.  If the library does not wait before initializing
+the locks, the thread library will probably core dump.  If it waits too
+long then it can't protect itself from multiple execution and it will
+abort or other bad things might happen.  You adjust the number of times
+to wait at runtime with the ``lock-on'' option to the dmalloc program
+(for example @kbd{dmalloc -o 20}).  @xref{Dmalloc Program}.  Times
+values between 2 and 30 are probably good although operating systems
+will vary significantly.  You know its too low if your program core
+dumps and too high if the library generates an exception.
+
+An additional complexity is when we are initializing the lock before
+mutex locking around the library.  As mentioned, the initialization
+itself may generate a malloc call causing the library to go recursive
+and the pthread library to possibly core dump. With the THREAD_INIT_LOCK
+setting defined in @file{settings.h}, you can tune how many times before
+we start locking to try and initialize the mutex lock.  It defaults to 2
+which seems to work for me.  If people need to have this runtime
+configurable or would like to present an alternative default, please let
+me know.
+
+In addition to the ``lock-on'' option, you probably will need to enable
+the @samp{allow-nonlinear} token if you thread library needs to call
+sbrk directly to allocate some storage.  @xref{Debug Tokens}.
+
+To build the library with the threaded stubs type @kbd{make threads}
+which should build @file{libdmallocth.a}.  The auto-configurations for
+these functions is in its infancy and may or may not work depending on
+the script's ability to detect your local thread functionality.  Feel
+free to send me mail with comments or improvements to them.
+
+So that's it.  If you have any specific questions or would like addition
+information posted in this section, please let me know.  Experienced
+thread programmers only please.
+
 @node Source Code, Plugs, Details, Top
 @chapter Source Code Information
 
@@ -2307,8 +2307,8 @@ facilities including nfs, full software development utilities, X, etc.
 Top.
 
 * Copying::                     Library copying and licensing conditions.
-* Overview::                    Description of how to debug with the library.
-* Details::                     Details about the library's operations.
+* Overview::                    Description of features and how to get started.
+* Details::                     Details about how to use the library.
 * Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
@@ -2337,12 +2337,13 @@ Allocation Basics.
 
 Details.
 
-* Programming::                   How to program with the library.
-* Using Dmalloc With a Debugger:: Using a debugger with the library.
-* Environment Variable::          The variable name and its features.
-* Debug Tokens::                  Description of the debugging tokens.
-* RC File::                       Format of the run-time configuration file.
-* Dmalloc Program::               Env variable setting utility.
+* Programming::                 How to program with the library.
+* Environment Variable::        The variable name and its features.
+* Debug Tokens::                Description of the debugging tokens.
+* RC File::                     Format of the run-time configuration file.
+* Dmalloc Program::             Env variable setting utility.
+* Using With a Debugger::       Using a debugger with the library.
+* Using With Threads::          Using the library with a thread package.
 
 Source Code.
 
@@ -2359,7 +2360,7 @@ Programming.
 * C++ and the Library::         Using the Library with C++.
 * Disabling the Library::       How to compile/link without the library.
 
-Using Dmalloc With the Library.
+Using Dmalloc With a Debugger.
 
 * General Errors::              Diagnosing general problems with a debugger.
 * Memory Leaks::                Tracking down non-freed memory.
