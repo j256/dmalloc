@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.60 2002/07/24 19:05:07 gray Exp $
+ * $Id: heap.c,v 1.61 2003/05/13 14:54:47 gray Exp $
  */
 
 /*
@@ -45,18 +45,18 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: heap.c,v 1.60 2002/07/24 19:05:07 gray Exp $"
+#ident "$Id: heap.c,v 1.61 2003/05/13 14:54:47 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.60 2002/07/24 19:05:07 gray Exp $";
+  "$Id: heap.c,v 1.61 2003/05/13 14:54:47 gray Exp $";
 #endif
 #endif
 
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
 
 /* exported variables */
-void	*_heap_base = NULL;			/* base of our heap */
-void	*_heap_last = NULL;			/* end of our heap */
+void	*_dm_heap_base = NULL;			/* base of our heap */
+void	*_dm_heap_last = NULL;			/* end of our heap */
 
 /****************************** local functions ******************************/
 
@@ -143,13 +143,13 @@ int	_heap_startup(void)
 {
   long		diff;
   
-  _heap_base = heap_extend(0);
-  if (_heap_base == SBRK_ERROR) {
+  _dm_heap_base = heap_extend(0);
+  if (_dm_heap_base == SBRK_ERROR) {
     return 0;
   }
   
   /* align the heap-base */
-  diff = BLOCK_SIZE - ((long)_heap_base % BLOCK_SIZE);
+  diff = BLOCK_SIZE - ((long)_dm_heap_base % BLOCK_SIZE);
   if (diff == BLOCK_SIZE) {
     diff = 0;
   }
@@ -158,10 +158,10 @@ int	_heap_startup(void)
     if (heap_extend(diff) == SBRK_ERROR) {
       return 0;
     }
-    _heap_base = (char *)HEAP_INCR(_heap_base, diff);
+    _dm_heap_base = (char *)HEAP_INCR(_dm_heap_base, diff);
   }
   
-  _heap_last = _heap_base;
+  _dm_heap_last = _dm_heap_base;
   
   return 1;
 }
@@ -180,7 +180,7 @@ void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
   
   /* set our external memory pointer to where the heap should be */ 
   if (extern_p != NULL) {
-    *extern_p = _heap_last;
+    *extern_p = _dm_heap_last;
   }
   
   while (1) {
@@ -192,8 +192,8 @@ void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
     }
     
     /* is the heap linear? */
-    if (heap_new == _heap_last) {
-      _heap_last = HEAP_INCR(heap_new, size);
+    if (heap_new == _dm_heap_last) {
+      _dm_heap_last = HEAP_INCR(heap_new, size);
       if (extern_cp != NULL) {
 	*extern_cp = 0;
       }
@@ -201,7 +201,7 @@ void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
     }
     
     /* if we went down then this is a real error! */
-    if ((! IS_GROWTH(heap_new, _heap_last))
+    if ((! IS_GROWTH(heap_new, _dm_heap_last))
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_FORCE_LINEAR)) {
       dmalloc_errno = ERROR_ALLOC_NONLINEAR;
       dmalloc_error("_dh_heap_alloc");
@@ -209,10 +209,10 @@ void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
     }
     
     /* adjust chunk admin information to align to blocksize */
-    block_n += BLOCKS_BETWEEN(heap_new, _heap_last);
+    block_n += BLOCKS_BETWEEN(heap_new, _dm_heap_last);
     
     /* move heap last forward */
-    _heap_last = HEAP_INCR(heap_new, size);
+    _dm_heap_last = HEAP_INCR(heap_new, size);
     
     /* calculate bytes needed to align to block boundary */
     diff = BLOCK_SIZE - ((long)heap_new % BLOCK_SIZE);
@@ -239,11 +239,11 @@ void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
     }
     
     /* if we got what we expected, then we are done */
-    if (heap_diff == _heap_last) {
+    if (heap_diff == _dm_heap_last) {
       /* shift the new pointer up to align it */
       heap_new = HEAP_INCR(heap_new, diff);
       /* move the heap last pointer past the diff section */
-      _heap_last = HEAP_INCR(heap_diff, diff);
+      _dm_heap_last = HEAP_INCR(heap_diff, diff);
       break;
     }
     
@@ -254,7 +254,7 @@ void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
      */
     
     /* move the heap last pointer past the diff section */
-    _heap_last = HEAP_INCR(heap_diff, diff);
+    _dm_heap_last = HEAP_INCR(heap_diff, diff);
     
     /* start over again */
   }
