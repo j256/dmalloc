@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.19 1993/06/15 14:30:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.20 1993/06/19 18:50:33 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -564,6 +564,11 @@ in their @file{.cshrc} file:
 @example
         alias malloc 'eval `malloc_dbg \!*`'
 @end example
+
+Zsh users on the other hand should put the following in their
+@file{.zshrc} file:
+
+	malloc() @{ eval `malloc_dbg -b $*` @}
 
 This allows the user to execute @code{malloc args}.
 

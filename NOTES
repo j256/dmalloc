@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.15 1993/05/24 17:00:18 gray Exp $
+$Id: NOTES,v 1.16 1993/06/19 18:50:26 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -31,38 +31,6 @@ GENERAL:
 	looks at the next argument (unioned with the file argument)
 	and sees if it is null or in the heap meaning it is at the end
 	or middle of a free list.
-
--------------------------------------------------------------------------------
-
-DBLOCK METHOD:
-
-- have the bblock admin struct point to the dblock admin structure
-	block which contains a number of dblock admin entries.
-- have a global pointer that points to last free dblock admin
-	structure entry and has a count of the number left in the
-	block
-- only allocate contiguous dblock admin slots so have some fragmentation
-	- must have contiguous because bblocks do not have pointer to start of
-		array
-- maybe have a sorted free list of the number of free dblock admin
-	structs.  sorted in descending order
-- you have the free pointer which gets you to the bblock where you can
-	see if it is a dblock and if it is on the correct boundary.
-	Then you go to the dblock admin struct to get the file, line,
-	size info.
-- the bblock tells you of the number of bits in the chunk, etc.
-- have some way to run through the dblock admin slot blocks to verify
-	that crc's have not been overwritten.
-
--------------------------------------------------------------------------------
-
-NEW ALGORITHMS:
-
-- maybe have some sort of bitmask for free space/used space like BSD
-	disk blocks
-- look in your free_list for first block.
-	- if NULL then move up a bin and try to divide
-	- continue until up X blocks then sbrk a new smaller block
 
 -------------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.15 1993/05/19 01:30:45 gray Exp $
+$Id: Manifest,v 1.16 1993/06/19 18:50:25 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -87,6 +87,9 @@ mallocrc		Sample RC file that is used to set the debug
 
 sample.c		A sample file to demonstrate the usage of the
 			library.
+
+texinfo.tex		File included to allow tex output from the
+			malloc.texi file.
 
 version.h		Version number for the library.
 

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.21 1993/06/03 20:02:19 gray Exp $
+$Id: README.1,v 1.22 1993/06/19 18:50:28 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -42,12 +42,11 @@ DOCUMENTATION:
 Examine the malloc.info file.  Is is a gnu-info file having the
 user-documentation for the malloc subsystem.  It can be installed in
 the emacs info directory and read with emacs/info or the info program
-available at GNU archive sites.  It is also suitable for reading as
-text.
+available from the texinfo package at GNU archive sites.  It is also
+suitable for reading as text.
 
 It can be reproduced from the malloc.texi texinfo file which also can
-generate TeX hardcopy output.  You may need the new texinfo.tex from
-the gnu archive sites.
+generate TeX hardcopy output with the help of the texinfo.tex file.
 
 -------------------------------------------------------------------------------
 
@@ -55,7 +54,6 @@ GENERAL:
 
 - the system is pretty dependent on a good ansi-c compiler like gcc.
 	non-ansi folks with have to:
-	- define const to be nothing in malloc_dbg.h
 	- change stdarg.h and ... to varargs.h and va_alist, etc. in error.c
 	- possibly fix all the functions to remove the foo(char * var) decls.
 - the file Manifest contains a list of each of the file and what it does.
@@ -81,7 +79,7 @@ You need to do 6 things to make use of the library:
 1)	Configure and make the library and program, and install the
 	malloc_dbg program in your favorite bin directory, the
 	libmalloc_dbg.a library in the correct lib directory, and the
-	malloc_dbg.h include file in the correct inc directory.
+	malloc_dbg.h include file in the correct include directory.
 
 2)	Install the mallocrc file in your home directory as .mallocrc.
 	You may want to take a look at the file and add your own
@@ -103,7 +101,7 @@ You need to do 6 things to make use of the library:
 	combination of number of debug tokens and set the malloc
 	log path to 'logfile'.  malloc --usage might help.
 
-6)	Run your program.
+6)	Run your program.  And voila!
 
 -------------------------------------------------------------------------------
 
