@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.38 1993/10/05 04:32:12 gray Exp $
+@c $Id: dmalloc.texi,v 1.39 1993/10/17 00:39:28 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -535,32 +535,34 @@ general statistics to the logfile.
 no debugging functionality
 
 @item log-stats
-log general statistics when malloc_shutdown is called
+log general statistics when malloc_shutdown or malloc_log_stats is
+called
 
 @item log-non-free
-log non-freed memory pointers when malloc_shutdown is called
+log non-freed memory pointers when malloc_shutdown or malloc_log_unfreed
+is called
 
 @item log-perror
-log internal error-messages
+log heap error-messages
 
 @item log-trans
 log general memory transactions (quite verbose)
 
+@item log-stamp
+log a time stamp for all messages
+
 @item log-admin
-log full administrative information (quite verbose)
+log administrative information (quite verbose)
 
 @item log-blocks
 log detailed block information when malloc_heap_map is called
 
 @item log-unknown
-like log-non-free but logs unknown non-freed memory pointers
+like log-non-free but logs non-freed memory pointers that did not have
+file/line information associated with them.
 
 @item log-bad-space
 log actual bytes in and around bad pointers
-
-@item log-ra
-like log-non-free but logs the pointers which only have return-address
-information
 
 @item check-fence
 check fence-post memory areas
@@ -579,19 +581,17 @@ free-blank also.
 check the arguments of some functions (mostly string operations) looking
 for bad pointers
 
-@item alloc-blank
-write special values (non-0) into space when it is alloced
+@item realloc-copy
+always copy data to a new pointer when realloc
 
-@item catch-null
-abort the program immediately if the library fails to get more heap
-space from sbrk
-@cindex sbrk
+@item free-blank
+write special values (non-0) into space when it is freed
 
 @item error-abort
 abort the program (and dump core) on errors
 
-@item free-blank
-write special values (non-0) into space when it is freed
+@item alloc-blank
+write special values (non-0) into space when it is alloced
 
 @item heap-check-map
 log a heap-map to the logfile every time the heap is checked
@@ -599,8 +599,10 @@ log a heap-map to the logfile every time the heap is checked
 @item print-perror
 log any errors and messages to the screen via standard-error
 
-@item realloc-copy
-always copy data to a new pointer when realloc
+@item catch-null
+abort the program immediately if the library fails to get more heap
+space from sbrk
+@cindex sbrk
 @end table
 
 @node Argument Checking,  , Debug Tokens, Features
@@ -736,6 +738,10 @@ Set the @samp{MALLOC_LOGFILE} env variable to filename.
 @item -L
 List all of the tags in the rc-file.  Useful with -v.
 
+@item -p token(s)
+Add the debug capabilities of token(s) to the selected tag (or -d
+value).  Multiple -p's can be specified.
+
 @item -r
 Remove (unset) all variables when setting a tag.  This is useful when
 you are returning to a standard development tag and want the logfile,
@@ -770,17 +776,17 @@ settings in a verbose manner.  For example:
            log-stats, log-non-free, log-perror,
            check-fence, catch-null
         MALLOC_ADDRESS not set
-        MALLOC_INTERVAL not set
+        MALLOC_INTERVAL == '100'
         MALLOC_LOGFILE not set
         MALLOC_START not set
 @end example
 
-Here are some more examples:
+Here are some examples of malloc_dbg usage:
 
 @example
-        # start tough debugging (5), check the heap every 1000 times,
-        # send the log information to 'malloc'
-        malloc -l malloc -i 1000 5
+        # start tough debugging, check the heap every 1000 times,
+        # send the log information to file 'malloc'
+        malloc tough -i 1000 -l malloc
 
         # find out what error code 20 is (from the logfile)
         malloc -e 20
@@ -791,7 +797,11 @@ Here are some more examples:
 
         # return to the normal 'runtime' settings and clear out all
         # other variables
-        malloc -r runtime
+        malloc -c runtime
+
+        # enable basic settings (1) plus (-p) the logging of
+        # transactions (log-trans) to file 'malloc'
+        malloc 1 -p log-trans -l malloc
 @end example
 
 @node RC File,  , Malloc_dbg Program, Usage

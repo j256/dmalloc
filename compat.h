@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.15 1993/09/10 21:22:43 gray Exp $
+ * $Id: compat.h,v 1.16 1993/10/17 00:39:12 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -34,6 +34,13 @@
  */
 #if HAVE_GETPID == 0
 IMPORT	int	getpid(void);
+#endif
+
+/*
+ * return a fake time for brain-dead systems without time()
+ */
+#if HAVE_TIME == 0
+IMPORT	int	time(void);
 #endif
 
 /*

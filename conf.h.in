@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.23 1993/10/03 01:59:48 gray Exp $
+ * $Id: conf.h.in,v 1.24 1993/10/17 00:39:14 gray Exp $
  */
 
 /*
@@ -148,6 +148,7 @@
 #define HAVE_STRTOK 0
 
 #define HAVE_GETPID 0
+#define HAVE_TIME 0
 
 /*
  * the below functions are here to provide function argument checking

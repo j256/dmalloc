@@ -38,14 +38,15 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: arg_check.c,v 1.3 1993/09/22 05:02:09 gray Exp $";
+  "$Id: arg_check.c,v 1.4 1993/10/17 00:39:04 gray Exp $";
 #endif
 
 #if HAVE_BCMP
 /*
  * dummy function for checking bcmp's arguments.
  */
-EXPORT	int	_malloc_bcmp(void * b1, void * b2, MALLOC_SIZE len)
+EXPORT	int	_malloc_bcmp(const void * b1, const void * b2,
+			     const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bcmp", b1, CHUNK_PNT_LOOSE, len) != NOERROR
@@ -60,7 +61,8 @@ EXPORT	int	_malloc_bcmp(void * b1, void * b2, MALLOC_SIZE len)
 /*
  * dummy function for checking bcopy's arguments.
  */
-EXPORT	void	_malloc_bcopy(char * from, char * to, MALLOC_SIZE len)
+EXPORT	void	_malloc_bcopy(const char * from, char * to,
+			      const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bcopy", from, CHUNK_PNT_LOOSE, len) != NOERROR
@@ -75,7 +77,8 @@ EXPORT	void	_malloc_bcopy(char * from, char * to, MALLOC_SIZE len)
 /*
  * dummy function for checking memcmp's arguments.
  */
-EXPORT	int	_malloc_memcmp(void * b1, void * b2, MALLOC_SIZE len)
+EXPORT	int	_malloc_memcmp(const void * b1, const void * b2,
+			       const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memcmp", b1, CHUNK_PNT_LOOSE, len) != NOERROR
@@ -90,7 +93,8 @@ EXPORT	int	_malloc_memcmp(void * b1, void * b2, MALLOC_SIZE len)
 /*
  * dummy function for checking memcpy's arguments.
  */
-EXPORT	char	*_malloc_memcpy(char * to, char * from, MALLOC_SIZE len)
+EXPORT	char	*_malloc_memcpy(char * to, const char * from,
+				const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memcpy", to, CHUNK_PNT_LOOSE, len) != NOERROR
@@ -105,7 +109,8 @@ EXPORT	char	*_malloc_memcpy(char * to, char * from, MALLOC_SIZE len)
 /*
  * dummy function for checking memset's arguments.
  */
-EXPORT	char	*_malloc_memset(void * buf, char ch, MALLOC_SIZE len)
+EXPORT	char	*_malloc_memset(void * buf, const char ch,
+				const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memset", buf, CHUNK_PNT_LOOSE, len) != NOERROR)
@@ -119,7 +124,7 @@ EXPORT	char	*_malloc_memset(void * buf, char ch, MALLOC_SIZE len)
 /*
  * dummy function for checking index's arguments.
  */
-EXPORT	char	*_malloc_index(char * str, char ch)
+EXPORT	char	*_malloc_index(const char * str, const char ch)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("index", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -134,7 +139,7 @@ EXPORT	char	*_malloc_index(char * str, char ch)
 /*
  * dummy function for checking rindex's arguments.
  */
-EXPORT	char	*_malloc_rindex(char * str, char ch)
+EXPORT	char	*_malloc_rindex(const char * str, const char ch)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("rindex", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -149,7 +154,7 @@ EXPORT	char	*_malloc_rindex(char * str, char ch)
 /*
  * dummy function for checking strcat's arguments.
  */
-EXPORT	char	*_malloc_strcat(char * to, char * from)
+EXPORT	char	*_malloc_strcat(char * to, const char * from)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strcat", to, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -166,7 +171,7 @@ EXPORT	char	*_malloc_strcat(char * to, char * from)
 /*
  * dummy function for checking strcmp's arguments.
  */
-EXPORT	int	_malloc_strcmp(char * s1, char * s2)
+EXPORT	int	_malloc_strcmp(const char * s1, const char * s2)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strcmp", s1, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -183,7 +188,7 @@ EXPORT	int	_malloc_strcmp(char * s1, char * s2)
 /*
  * dummy function for checking strlen's arguments.
  */
-EXPORT	MALLOC_SIZE	_malloc_strlen(char * str)
+EXPORT	MALLOC_SIZE	_malloc_strlen(const char * str)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strlen", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -198,7 +203,7 @@ EXPORT	MALLOC_SIZE	_malloc_strlen(char * str)
 /*
  * dummy function for checking strtok's arguments.
  */
-EXPORT	char	*_malloc_strtok(char * str, char * sep)
+EXPORT	char	*_malloc_strtok(char * str, const char * sep)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strtok", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -215,7 +220,7 @@ EXPORT	char	*_malloc_strtok(char * str, char * sep)
 /*
  * dummy function for checking bzero's arguments.
  */
-EXPORT	void	_malloc_bzero(void * buf, MALLOC_SIZE len)
+EXPORT	void	_malloc_bzero(void * buf, const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bzero", buf, CHUNK_PNT_LOOSE, len) != NOERROR)
@@ -229,8 +234,8 @@ EXPORT	void	_malloc_bzero(void * buf, MALLOC_SIZE len)
 /*
  * dummy function for checking memccpy's arguments.
  */
-EXPORT	char	*_malloc_memccpy(char * s1, char * s2, char ch,
-				 MALLOC_SIZE len)
+EXPORT	char	*_malloc_memccpy(char * s1, const char * s2, const char ch,
+				 const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     /* maybe len maybe first ch */
@@ -246,7 +251,8 @@ EXPORT	char	*_malloc_memccpy(char * s1, char * s2, char ch,
 /*
  * dummy function for checking memchr's arguments.
  */
-EXPORT	char	*_malloc_memchr(char * s1, char ch, MALLOC_SIZE len)
+EXPORT	char	*_malloc_memchr(const char * s1, const char ch,
+				const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memchr", s1, CHUNK_PNT_LOOSE, len) != NOERROR)
@@ -260,7 +266,7 @@ EXPORT	char	*_malloc_memchr(char * s1, char ch, MALLOC_SIZE len)
 /*
  * dummy function for checking strchr's arguments.
  */
-EXPORT	char	*_malloc_strchr(char * str, char ch)
+EXPORT	char	*_malloc_strchr(const char * str, const char ch)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strchr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -275,7 +281,7 @@ EXPORT	char	*_malloc_strchr(char * str, char ch)
 /*
  * dummy function for checking strrchr's arguments.
  */
-EXPORT	char	*_malloc_strrchr(char * str, char ch)
+EXPORT	char	*_malloc_strrchr(const char * str, const char ch)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strrchr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -290,7 +296,7 @@ EXPORT	char	*_malloc_strrchr(char * str, char ch)
 /*
  * dummy function for checking strcpy's arguments.
  */
-EXPORT	char	*_malloc_strcpy(char * to, char * from)
+EXPORT	char	*_malloc_strcpy(char * to, const char * from)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strcpy", to, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -307,7 +313,8 @@ EXPORT	char	*_malloc_strcpy(char * to, char * from)
 /*
  * dummy function for checking strncpy's arguments.
  */
-EXPORT	char	*_malloc_strncpy(char * to, char * from, MALLOC_SIZE len)
+EXPORT	char	*_malloc_strncpy(char * to, const char * from,
+				 const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     /* len or until nullc */
@@ -325,7 +332,7 @@ EXPORT	char	*_malloc_strncpy(char * to, char * from, MALLOC_SIZE len)
 /*
  * dummy function for checking strcasecmp's arguments.
  */
-EXPORT	int	_malloc_strcasecmp(char * s1, char * s2)
+EXPORT	int	_malloc_strcasecmp(const char * s1, const char * s2)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strcasecmp", s1,
@@ -342,7 +349,8 @@ EXPORT	int	_malloc_strcasecmp(char * s1, char * s2)
 /*
  * dummy function for checking strncasecmp's arguments.
  */
-EXPORT	int	_malloc_strncasecmp(char * s1, char * s2, MALLOC_SIZE len)
+EXPORT	int	_malloc_strncasecmp(const char * s1, const char * s2,
+				    const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     /* len or until nullc */
@@ -360,7 +368,7 @@ EXPORT	int	_malloc_strncasecmp(char * s1, char * s2, MALLOC_SIZE len)
 /*
  * dummy function for checking strspn's arguments.
  */
-EXPORT	int	_malloc_strspn(char * str, char * list)
+EXPORT	int	_malloc_strspn(const char * str, const char * list)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strspn", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -377,7 +385,7 @@ EXPORT	int	_malloc_strspn(char * str, char * list)
 /*
  * dummy function for checking strcspn's arguments.
  */
-EXPORT	int	_malloc_strcspn(char * str, char * list)
+EXPORT	int	_malloc_strcspn(const char * str, const char * list)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strcspn", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -394,7 +402,8 @@ EXPORT	int	_malloc_strcspn(char * str, char * list)
 /*
  * dummy function for checking strncat's arguments.
  */
-EXPORT	char	*_malloc_strncat(char * to, char * from, MALLOC_SIZE len)
+EXPORT	char	*_malloc_strncat(char * to, const char * from,
+				 const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     /* either len or nullc */
@@ -412,7 +421,8 @@ EXPORT	char	*_malloc_strncat(char * to, char * from, MALLOC_SIZE len)
 /*
  * dummy function for checking strncmp's arguments.
  */
-EXPORT	int	_malloc_strncmp(char * s1, char * s2, MALLOC_SIZE len)
+EXPORT	int	_malloc_strncmp(const char * s1, const char * s2,
+				const MALLOC_SIZE len)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     /* either len or nullc */
@@ -430,7 +440,7 @@ EXPORT	int	_malloc_strncmp(char * s1, char * s2, MALLOC_SIZE len)
 /*
  * dummy function for checking strpbrk's arguments.
  */
-EXPORT	char	*_malloc_strpbrk(char * str, char * list)
+EXPORT	char	*_malloc_strpbrk(const char * str, const char * list)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strpbrk", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -447,7 +457,7 @@ EXPORT	char	*_malloc_strpbrk(char * str, char * list)
 /*
  * dummy function for checking strstr's arguments.
  */
-EXPORT	char	*_malloc_strstr(char * str, char * pat)
+EXPORT	char	*_malloc_strstr(const char * str, const char * pat)
 {
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strstr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,

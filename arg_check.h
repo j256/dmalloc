@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: arg_check.h,v 1.2 1993/08/30 20:14:03 gray Exp $
+ * $Id: arg_check.h,v 1.3 1993/10/17 00:39:07 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -32,133 +32,143 @@
 /*
  * dummy function for checking bcmp's arguments.
  */
-IMPORT	int	_malloc_bcmp(void * b1, void * b2, MALLOC_SIZE len);
+IMPORT	int	_malloc_bcmp(const void * b1, const void * b2,
+			     const MALLOC_SIZE len);
 
 /*
  * dummy function for checking bcopy's arguments.
  */
-IMPORT	void	_malloc_bcopy(char * from, char * to, MALLOC_SIZE len);
+IMPORT	void	_malloc_bcopy(const char * from, char * to,
+			      const MALLOC_SIZE len);
 
 /*
  * dummy function for checking memcmp's arguments.
  */
-IMPORT	int	_malloc_memcmp(void * b1, void * b2, MALLOC_SIZE len);
+IMPORT	int	_malloc_memcmp(const void * b1, const void * b2,
+			       const MALLOC_SIZE len);
 
 /*
  * dummy function for checking memcpy's arguments.
  */
-IMPORT	char	*_malloc_memcpy(char * to, char * from, MALLOC_SIZE len);
+IMPORT	char	*_malloc_memcpy(char * to, const char * from,
+				const MALLOC_SIZE len);
 
 /*
  * dummy function for checking memset's arguments.
  */
-IMPORT	char	*_malloc_memset(void * buf, char ch, MALLOC_SIZE len);
+IMPORT	char	*_malloc_memset(void * buf, const char ch,
+				const MALLOC_SIZE len);
 
 /*
  * dummy function for checking index's arguments.
  */
-IMPORT	char	*_malloc_index(char * str, char ch);
+IMPORT	char	*_malloc_index(const char * str, const char ch);
 
 /*
  * dummy function for checking rindex's arguments.
  */
-IMPORT	char	*_malloc_rindex(char * str, char ch);
+IMPORT	char	*_malloc_rindex(const char * str, const char ch);
 
 /*
  * dummy function for checking strcat's arguments.
  */
-IMPORT	char	*_malloc_strcat(char * to, char * from);
+IMPORT	char	*_malloc_strcat(char * to, const char * from);
 
 /*
  * dummy function for checking strcmp's arguments.
  */
-IMPORT	int	_malloc_strcmp(char * s1, char * s2);
+IMPORT	int	_malloc_strcmp(const char * s1, const char * s2);
 
 /*
  * dummy function for checking strlen's arguments.
  */
-IMPORT	MALLOC_SIZE	_malloc_strlen(char * str);
+IMPORT	MALLOC_SIZE	_malloc_strlen(const char * str);
 
 /*
  * dummy function for checking strtok's arguments.
  */
-IMPORT	char	*_malloc_strtok(char * str, char * sep);
+IMPORT	char	*_malloc_strtok(char * str, const char * sep);
 
 /*
  * dummy function for checking bzero's arguments.
  */
-IMPORT	void	_malloc_bzero(void * buf, MALLOC_SIZE len);
+IMPORT	void	_malloc_bzero(void * buf, const MALLOC_SIZE len);
 
 /*
  * dummy function for checking memccpy's arguments.
  */
-IMPORT	char	*_malloc_memccpy(char * s1, char * s2, char ch,
-				 MALLOC_SIZE len);
+IMPORT	char	*_malloc_memccpy(char * s1, const char * s2, const char ch,
+				 const MALLOC_SIZE len);
 
 /*
  * dummy function for checking memchr's arguments.
  */
-IMPORT	char	*_malloc_memchr(char * s1, char ch, MALLOC_SIZE len);
+IMPORT	char	*_malloc_memchr(const char * s1, const char ch,
+				const MALLOC_SIZE len);
 
 /*
  * dummy function for checking strchr's arguments.
  */
-IMPORT	char	*_malloc_strchr(char * str, char ch);
+IMPORT	char	*_malloc_strchr(const char * str, const char ch);
 
 /*
  * dummy function for checking strrchr's arguments.
  */
-IMPORT	char	*_malloc_strrchr(char * str, char ch);
+IMPORT	char	*_malloc_strrchr(const char * str, const char ch);
 
 /*
  * dummy function for checking strcpy's arguments.
  */
-IMPORT	char	*_malloc_strcpy(char * to, char * from);
+IMPORT	char	*_malloc_strcpy(char * to, const char * from);
 
 /*
  * dummy function for checking strncpy's arguments.
  */
-IMPORT	char	*_malloc_strncpy(char * to, char * from, MALLOC_SIZE len);
+IMPORT	char	*_malloc_strncpy(char * to, const char * from,
+				 const MALLOC_SIZE len);
 
 /*
  * dummy function for checking strcasecmp's arguments.
  */
-IMPORT	int	_malloc_strcasecmp(char * s1, char * s2);
+IMPORT	int	_malloc_strcasecmp(const char * s1, const char * s2);
 
 /*
  * dummy function for checking strncasecmp's arguments.
  */
-IMPORT	int	_malloc_strncasecmp(char * s1, char * s2, MALLOC_SIZE len);
+IMPORT	int	_malloc_strncasecmp(const char * s1, const char * s2,
+				    const MALLOC_SIZE len);
 
 /*
  * dummy function for checking strspn's arguments.
  */
-IMPORT	int	_malloc_strspn(char * str, char * list);
+IMPORT	int	_malloc_strspn(const char * str, const char * list);
 
 /*
  * dummy function for checking strcspn's arguments.
  */
-IMPORT	int	_malloc_strcspn(char * str, char * list);
+IMPORT	int	_malloc_strcspn(const char * str, const char * list);
 
 /*
  * dummy function for checking strncat's arguments.
  */
-IMPORT	char	*_malloc_strncat(char * to, char * from, MALLOC_SIZE len);
+IMPORT	char	*_malloc_strncat(char * to, const char * from,
+				 const MALLOC_SIZE len);
 
 /*
  * dummy function for checking strncmp's arguments.
  */
-IMPORT	int	_malloc_strncmp(char * s1, char * s2, MALLOC_SIZE len);
+IMPORT	int	_malloc_strncmp(const char * s1, const char * s2,
+				const MALLOC_SIZE len);
 
 /*
  * dummy function for checking strpbrk's arguments.
  */
-IMPORT	char	*_malloc_strpbrk(char * str, char * list);
+IMPORT	char	*_malloc_strpbrk(const char * str, const char * list);
 
 /*
  * dummy function for checking strstr's arguments.
  */
-IMPORT	char	*_malloc_strstr(char * str, char * pat);
+IMPORT	char	*_malloc_strstr(const char * str, const char * pat);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

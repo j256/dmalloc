@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.30 1993/08/30 20:14:21 gray Exp $";
+  "$Id: error.c,v 1.31 1993/10/17 00:39:23 gray Exp $";
 #endif
 
 /*
@@ -57,6 +57,7 @@ EXPORT	void	_malloc_message(const char * format, ...)
 {
   static int	outfile = -1;
   static char	str[1024];
+  char		*strp = str;
   int		len;
   va_list	args;
   
@@ -65,9 +66,15 @@ EXPORT	void	_malloc_message(const char * format, ...)
       && ! BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR))
     return;
   
+  /* maybe dump a time stamp */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_STAMP)) {
+    (void)sprintf(str, "%ld: ", time(NULL));
+    strp += strlen(str);
+  }
+  
   /* write the format + info into str */
   va_start(args, format);
-  (void)vsprintf(str, format, args);
+  (void)vsprintf(strp, format, args);
   va_end(args);
   
   /* find the length of str, if empty then return */
@@ -82,7 +89,7 @@ EXPORT	void	_malloc_message(const char * format, ...)
   }
   
   /* do we need to log the message? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR) && malloc_logpath != NULL) {
+  if (malloc_logpath != NULL) {
     /*
      * do we need to open the outfile?
      * it will be closed by _exit().  yeach.
