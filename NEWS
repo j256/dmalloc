@@ -1,6 +1,25 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.100 2000/11/14 23:59:39 gray Exp $
+$Id: NEWS,v 1.101 2002/02/14 23:42:52 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.0.0:
+
+	* Added a function to re-open the logfile when processing flags.
+	* Added section to docs about debugging daemon and CGI processes.
+	* Made some cosmetic improvements to the configure.in script.
+	* Due to public pressure, I've made free(0L) not an error by default.
+	* Removed short token support.  Was anyone using this?
+	* Did some more work on testing and chunk.c changes.
+	* Added better autoconf checking of thread libraries for FreeBSD.
+	* Added dmalloc_debug_setup function to set dmalloc flags thru a call.
+	* Significantly changed how the library manages fence protected allocs.
+	* Renamed _dmalloc_logpath to dmalloc_logpath to match the docs and .h.
+	* Solved problem with dmalloc_t and no sbrk.
+	* Added INTERNAL_MEMORY_SPACE setting to the settings.dist file.
+	* Added the 'How It Works' section to the manual.
+	* Removed necessity of strcat.
+	* Removed use of strcpy internally.
+	* Fixed problem with use of start-count and start-file.
 
 Version 4.8.1:
 

@@ -1,3 +1,31 @@
+2002-02-14  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc 5.0.0.
+
+	* Added a function to close and re-open the dmalloc logfile when
+	you process a new set of environmental flags.
+
+	* Added a section to the docs about debugging daemon and CGI
+	processes.
+
+2002-01-28  Gray Watson  <gray@outside.256.com>
+
+	* Made some cosmetic improvements to the configure.in script.
+
+2001-11-30  Gray Watson  <gray@outside.256.com>
+
+	* Made free(0L) not an error by default.  I've been swayed by
+	public pressure.
+
+	* Removed short token support.
+
+	* Did some more work on testing and chunk.c changes.
+
+2001-07-18  Gray Watson  <gray@outside.256.com>
+
+	* Added better autoconf checking of thread libraries to include
+	FreeBSD's non-portable libc_r.  Grrr.  Thanks to Steve Roberts.
+
 2001-07-12  Gray Watson  <gray@outside.256.com>
 
 	* Added dmalloc_debug_setup function with which you can set the
@@ -6,6 +34,11 @@
 	* Finally got the main line compiling again.  Ugh.  Chunk code
 	looks a lot better however.
 	
+	* Before this time I've changed significantly the way the chunk
+	routines account for pointers.  Now every pointer has a flags
+	field which says whether fence post checking should be applied to
+	it.
+
 2001-05-23  Gray Watson  <gray@outside.256.com>
 
 	* Renamed _dmalloc_logpath to dmalloc_logpath to match the
@@ -1798,5 +1831,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.277 2001/07/12 23:12:13 gray Exp $
+$Id: ChangeLog,v 1.278 2002/02/14 23:42:52 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.99 2002/02/14 22:55:42 gray Exp $
+ * $Id: error.c,v 1.100 2002/02/14 23:42:53 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: error.c,v 1.99 2002/02/14 22:55:42 gray Exp $"
+#ident "$Id: error.c,v 1.100 2002/02/14 23:42:53 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.99 2002/02/14 22:55:42 gray Exp $";
+  "$Id: error.c,v 1.100 2002/02/14 23:42:53 gray Exp $";
 #endif
 #endif
 
@@ -247,16 +247,22 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
  */
 void	_dmalloc_reopen_log(void)
 {
-  /* if it's already open or if we don't have a log file configured */
-  if (outfile_fd >= 0) {
-    _dmalloc_message("Closing logfile to be reopened as '%s'",
-		     (dmalloc_logpath == NULL ? "none" : dmalloc_logpath));
-    (void)close(outfile_fd);
-    outfile_fd = -1;
-    /* we don't call open here, we'll let the next message do it */
+  /* no need to reopen it if it hasn't been reopened yet */
+  if (outfile_fd < 0) {
+    return;
   }
   
-  /* if we aren't open yet then don't open it */
+  if (dmalloc_logpath == NULL) {
+    _dmalloc_message("Closing logfile to be reopened as '%s'",
+		     dmalloc_logpath);
+  }
+  else {
+    _dmalloc_message("Closing logfile to not be reopened");
+  }
+  
+  (void)close(outfile_fd);
+  outfile_fd = -1;
+  /* we don't call open here, we'll let the next message do it */
 }
 
 /* NOTE: we do the ifdef this way for fillproto */

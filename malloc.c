@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.155 2001/07/12 23:09:42 gray Exp $
+ * $Id: malloc.c,v 1.156 2002/02/14 23:42:53 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.155 2001/07/12 23:09:42 gray Exp $"
+#ident "$Id: malloc.c,v 1.156 2002/02/14 23:42:53 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.155 2001/07/12 23:09:42 gray Exp $";
+  "$Id: malloc.c,v 1.156 2002/02/14 23:42:53 gray Exp $";
 #endif
 #endif
 
@@ -250,10 +250,18 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
  */
 static	void	process_environ(const char *option_str)
 {
+  /*
+   * we have a static here so we can store the string without getting
+   * into problems
+   */
+  static char	options[1024];
+  
+  strncpy(options, option_str, sizeof(options));
+  options[sizeof(options) - 1] = '\0';
   
   /* process the options flag */
   if (option_str != NULL) {
-    _dmalloc_environ_process(option_str, &_dmalloc_address,
+    _dmalloc_environ_process(options, &_dmalloc_address,
 			     (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
 			     &_dmalloc_check_interval, &_dmalloc_lock_on,
 			     &dmalloc_logpath, &start_file, &start_line,
@@ -270,6 +278,9 @@ static	void	process_environ(const char *option_str)
   if (_dmalloc_debug_preset != DEBUG_PRE_NONE) {
     _dmalloc_flags = _dmalloc_debug_preset;
   }
+  
+  /* indicate that we should reopen the logfile if we need to */
+  _dmalloc_reopen_log(void)
   
 #if LOCK_THREADS == 0
   /* was thread-lock-on specified but not configured? */
@@ -302,7 +313,7 @@ static	RETSIGTYPE	signal_handler(const int sig)
 /*
  * startup the memory-allocation module
  */
-static	int	dmalloc_startup(void)
+static	int	dmalloc_startup(const char *debug_str)
 {
   static int	some_up_b = 0;
   const char	*env_str;
@@ -325,7 +336,12 @@ static	int	dmalloc_startup(void)
 #endif
     
     /* get the options flag */
-    env_str = getenv(OPTIONS_ENVIRON);
+    if (debug_str == NULL) {
+      env_str = getenv(OPTIONS_ENVIRON);
+    }
+    else {
+      env_str = debug_str;
+    }
     
     /* process the environmental variable(s) */
     process_environ(env_str);
@@ -552,7 +568,7 @@ static	int	dmalloc_in(const char *file, const int line,
    * the THREAD_LOCK will flip.
    */
   if (! enabled_b) {
-    if (! dmalloc_startup()) {
+    if (! dmalloc_startup(NULL)) {
       return 0;
     }
   }
@@ -1098,7 +1114,7 @@ unsigned int	_dmalloc_debug(const unsigned int flags)
   unsigned int	old_flags;
   
   if (! enabled_b) {
-    (void)dmalloc_startup();
+    (void)dmalloc_startup(NULL);
   }
   
   old_flags = _dmalloc_flags;
@@ -1131,7 +1147,7 @@ unsigned int	_dmalloc_debug(const unsigned int flags)
 unsigned int	_dmalloc_debug_current(void)
 {
   if (! enabled_b) {
-    (void)dmalloc_startup();
+    (void)dmalloc_startup(NULL);
   }
   
   /* should not check the heap here since we are dumping the debug variable */
@@ -1146,7 +1162,8 @@ unsigned int	_dmalloc_debug_current(void)
  * Set the global debugging functionality as an option string.
  * Normally this would be pased in in the DMALLOC_OPTIONS
  * environmental variable.  This is here to override the env or for
- * circumstances where it does not apply.
+ * circumstances where modifying the environment is not possible or
+ * does not apply.
  *
  * RETURNS:
  *
@@ -1159,10 +1176,19 @@ unsigned int	_dmalloc_debug_current(void)
 void	_dmalloc_debug_setup(const char *options_str)
 {
   if (! enabled_b) {
-    (void)dmalloc_startup();
+    (void)dmalloc_startup(options_str);
+    /* if we just started up then we don't have to do anything else */
+    return;
+  }
+  
+  /* we need to lock */
+  if (! dmalloc_in(NULL /* no file-name */, 0 /* no line-number */,
+		   0 /* don't-check-heap */)) {
+    return;
   }
   
   process_environ(options_str);
+  dmalloc_out();
 }
 
 /*
@@ -1248,7 +1274,7 @@ void	_dmalloc_track(const dmalloc_track_t track_func)
 unsigned long	_dmalloc_mark(void)
 {
   if (! enabled_b) {
-    (void)dmalloc_startup();
+    (void)dmalloc_startup(NULL);
   }
   
   return _dmalloc_iter_c;
@@ -1269,7 +1295,6 @@ void	_dmalloc_log_changed(const char *file, const int line,
   if (! dmalloc_in(file, line, 1)) {
     return;
   }
-  
   _chunk_log_changed(mark, not_freed_b, free_b, details_b);
   
   dmalloc_out();
