@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.221 2003/06/06 19:03:51 gray Exp $
+@c $Id: dmalloc.texi,v 1.222 2003/06/08 19:35:37 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1974,8 +1974,7 @@ settings in a verbose manner.  For example:
 
 @example
 Debug-Flags  '0x40005c7' (runtime)
-   log-stats, log-non-free, log-blocks,
-   log-bad-space, check-fence, catch-null
+   log-stats, log-non-free, log-bad-space, check-fence, catch-null
 Address      0x1f008, count = 10
 Interval     100
 Logpath      'malloc'
@@ -2194,31 +2193,18 @@ called.
 Log non-freed memory pointers when dmalloc_shutdown or dmalloc_log_unfreed
 is called.
 
-@cindex log-thread-id
-@item log-thread-id
-For systems that have multi-threaded programs (don't worry if this does
-not make sense to you), log thread-id for allocated pointer (see
-@file{conf.h}).
+@cindex log-known
+@item log-known
+Log only known memory pointers that have not been freed.  Pointers which
+do not have file/line or return-address information will not be logged.
 
 @cindex log-trans
 @item log-trans
 Log general memory transactions (quite verbose).
 
-@cindex log-stamp
-@item log-stamp
-Log a time stamp for all messages.
-
 @cindex log-admin
 @item log-admin
 Log administrative information (quite verbose).
-
-@cindex log-blocks
-@item log-blocks
-Log detailed block information when dmalloc_log_heap_map is called.
-
-@cindex log-unknown
-@item log-unknown
-This token is now the default.
 
 @cindex log-bad-space
 @item log-bad-space
@@ -2243,10 +2229,6 @@ Check fence-post memory areas.
 @cindex check-heap
 @item check-heap
 Verify heap administrative structure.
-
-@cindex check-lists
-@item check-lists
-Examine internal heap linked-lists.
 
 @cindex check-blank
 @item check-blank
@@ -2322,10 +2304,6 @@ Write special ``dmalloc-alloc'' byte (octal 0xda, octal 0332, decimal
 else in the @file{settings.dist} file.  You can then check to see if
 areas have been improperly overwritten with the check-blank token.
 
-@cindex heap-check-map
-@item heap-check-map
-Log a heap-map to the logfile every time the heap is checked.
-
 @cindex print-messages
 @item print-messages
 Log any errors and messages to the screen via standard-error.
@@ -2353,12 +2331,6 @@ earlier ones if the program encounters more than one error.  See
 @emph{NOTE}: This will only work if your system supports the @code{fork}
 system call and the configuration utility was able to fork without going
 recursive.
-
-@cindex allow-free-null
-@item allow-free-null
-This is the default now.  By default the library will allow the free of
-0L pointers.  If you do not want this behavior then enable the
-error-free-null token.
 
 @cindex error-free-null
 @item error-free-null
