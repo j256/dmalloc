@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk.h,v 1.43 1997/01/16 15:25:04 gray Exp $
+ * $Id: chunk.h,v 1.44 1997/01/16 22:24:35 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -40,7 +40,7 @@
  */
 extern	char		*_dmalloc_unknown_file;
 
-extern	long		_calloc_count, done in alloc */
+extern	long		_calloc_count;	/* # callocs, done in alloc */
 
 /*
  * startup the low level malloc routines
