@@ -16,6 +16,10 @@ Mon Nov 20 22:14:14 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Fixed some porting problems to Unixware.  Unsigned chars.
 
+Mon Oct 21 00:23:51 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Fixed bug where I called display_pnt instead of display_where.
+
 Tue Oct 10 18:43:09 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.1.2.
@@ -1132,5 +1136,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.167 1995/12/29 01:58:40 gray Exp $
+$Id: ChangeLog,v 1.168 1995/12/29 02:05:58 gray Exp $
 -------------------------------------------------------------------------------
