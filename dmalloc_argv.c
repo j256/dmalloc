@@ -37,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.10 2000/05/15 15:42:58 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.11 2003/05/13 14:57:35 gray Exp $";
 #endif
 
 /* internal routines */
@@ -2844,10 +2844,10 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
 			    int *queue_head_p, int *queue_tail_p, int *okay_bp)
 {
   int	env_c, env_n;
-  char	**vect_p, env_name[256], *environ_p;
+  char	**vect_p, env_name[1024], *environ_p;
   
   /* create the env variable */
-  (void)sprintf(env_name, ENVIRON_FORMAT, argv_program);
+  (void)loc_snprintf(env_name, sizeof(env_name), ENVIRON_FORMAT, argv_program);
   
   /* NOTE: by default the env name is all uppercase */
   for (environ_p = env_name; *environ_p != '\0'; environ_p++) {
