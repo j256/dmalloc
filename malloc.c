@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.167 2003/06/06 19:03:33 gray Exp $
+ * $Id: malloc.c,v 1.168 2003/06/06 21:02:15 gray Exp $
  */
 
 /*
@@ -874,7 +874,7 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
  * Failure - FREE_ERROR
  *
  * Note: many operating systems define free to return (void) so this
- * return values may be filtered.  Dumb.
+ * return value may be filtered.  Dumb.
  *
  * ARGUMENTS:
  *

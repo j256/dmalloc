@@ -141,7 +141,7 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
  * Failure - FREE_ERROR
  *
  * Note: many operating systems define free to return (void) so this
- * return values may be filtered.  Dumb.
+ * return value may be filtered.  Dumb.
  *
  * ARGUMENTS:
  *
