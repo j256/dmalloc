@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.33 2003/11/02 07:30:01 gray Exp $
+ * $Id: error_val.h,v 1.34 2004/10/20 14:04:04 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -31,11 +31,12 @@
  * needs them as well as the dmalloc library.
  */
 #define ERROR_NONE			1	/* no error */
+/* 2 is reserved for invalid error */
 
 /* administrative errors */
 #define ERROR_BAD_SETUP			10	/* bad setup value */
 #define ERROR_IN_TWICE			11	/* in malloc domain twice */
-#define ERROR_BAD_ERRNO			12	/* bad errno value */
+/* 12 unused */
 #define ERROR_LOCK_NOT_CONFIG		13	/* thread locking not config */
 
 /* pointer verification errors */
@@ -48,22 +49,26 @@
 #define ERROR_UNDER_FENCE		26	/* failed picket fence lower */
 #define ERROR_OVER_FENCE		27	/* failed picket fence upper */
 #define ERROR_WOULD_OVERWRITE		28	/* would overwrite fence */
+/* 29 unused */
 #define ERROR_NOT_START_BLOCK		30	/* pointer not to start mem */
 
 /* allocation errors */
 #define ERROR_BAD_SIZE			40	/* bad size value */
 #define ERROR_TOO_BIG			41	/* allocation too large */
+/* 42 unused */
 #define ERROR_ALLOC_FAILED		43	/* could not get more space */
-#define ERROR_ALLOC_NONLINEAR		44	/* no linear address space */
+/* 44 unused */
 #define ERROR_OVER_LIMIT		45	/* over allocation limit */
 
 /* free errors */
 #define ERROR_NOT_ON_BLOCK		60	/* not on block boundary */
 #define ERROR_ALREADY_FREE		61	/* already in free list */
+/* 62-66 unused */
 #define ERROR_FREE_OVERWRITTEN		67	/* free space overwritten */
 
 /* administrative errors */
 #define ERROR_ADMIN_LIST		70	/* list pnt out of bounds */
+/* 71 unused */
 #define ERROR_ADDRESS_LIST		72	/* invalid address list */
 #define ERROR_SLOT_CORRUPT		73	/* memory slot corruption */
 
@@ -71,7 +76,7 @@
 
 typedef struct {
   int		es_error;		/* error number */
-  char		*es_string;		/* assocaited string */
+  char		*es_string;		/* associated string */
 } error_str_t;
 
 /* string error codes which apply to error codes in error_val.h */
@@ -85,7 +90,6 @@ __attribute__ ((unused))
   /* administrative errors */
   { ERROR_BAD_SETUP,		"initialization and setup failed" },
   { ERROR_IN_TWICE,		"malloc library has gone recursive" },
-  { ERROR_BAD_ERRNO,		"errno value from user is out-of-bounds" },
   { ERROR_LOCK_NOT_CONFIG,	"thread locking has not been configured" },
   
   /* pointer verification errors */
@@ -104,7 +108,6 @@ __attribute__ ((unused))
   { ERROR_BAD_SIZE,		"invalid allocation size" },
   { ERROR_TOO_BIG,		"largest maximum allocation size exceeded" },
   { ERROR_ALLOC_FAILED,		"could not grow heap by allocating memory" },
-  { ERROR_ALLOC_NONLINEAR,	"heap failed to produce linear address space"},
   { ERROR_OVER_LIMIT,		"over user specified allocation limit" },
   
   /* free errors */
