@@ -1,5 +1,7 @@
 Mon Dec 20 14:14:08 1993  Gray Watson  (gray@fridge.antaire.com)
 
+	* Added a -m max-amount flag to malloc_t.
+
 	* Renamed dbg_tokens.h -> debug_tok.h and dbg_values.h -> debug_val.h
 
 Mon Dec 20 02:24:02 1993  Gray Watson  (gray at toaster.antaire.com)
@@ -610,5 +612,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.85 1993/12/20 19:15:13 gray Exp $
+$Id: ChangeLog,v 1.86 1993/12/20 19:42:44 gray Exp $
 -------------------------------------------------------------------------------

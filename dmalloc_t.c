@@ -36,13 +36,13 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.31 1993/11/30 10:36:55 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.32 1993/12/20 19:42:47 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
-#define MAX_POINTERS		1000
-#define MAX_AMOUNT		(1000 * 1000)
+#define MAX_POINTERS		1024
+#define MAX_ALLOC		(1024 * 1024)
 
 /* pointer tracking structure */
 struct pnt_info_st {
@@ -59,12 +59,15 @@ static	pnt_info_t	pointer_grid[MAX_POINTERS];
 /* argument variables */
 static	int		default_itern = DEFAULT_ITERATIONS; /* # of iters */
 static	char		interactive = ARGV_FALSE;	/* interactive flag */
+static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
 static	char		silent = ARGV_FALSE;		/* silent flag */
 static	char		verbose = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
   { INTER_CHAR,	"interactive",		ARGV_BOOL,		&interactive,
       NULL,			"turn on interactive mode" },
+  { 'm',	"max-alloc",		ARGV_INT,		&max_alloc,
+      "bytes",			"maximum allocation to test" },
   { 's',	"silent",		ARGV_BOOL,		&silent,
       NULL,			"do not display messages" },
   { 't',	"times",		ARGV_INT,		&default_itern,
@@ -125,7 +128,7 @@ static	void	*get_address(void)
  */
 static	int	do_random(const int itern)
 {
-  int		iterc, last, amount, max = MAX_AMOUNT;
+  int		iterc, last, amount, max = max_alloc;
   pnt_info_t	*freep = pointer_grid, *usedp = NULL;
   pnt_info_t	*pntp, *lastp, *thisp;
   
