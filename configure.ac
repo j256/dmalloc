@@ -21,9 +21,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.3 2003/05/21 04:10:08 gray Exp $
+# $Id: configure.ac,v 1.4 2003/05/21 04:33:31 gray Exp $
 #
-AC_REVISION($Revision: 1.3 $)
+AC_REVISION($Revision: 1.4 $)
 AC_INIT(dmalloc, 5.0.1, [http://dmalloc.org/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -235,7 +235,7 @@ main() { exit(0); }
 main() { exit(1); }
 #endif
 ]])],
-[ac_cv_strdup_macro=yes ],
+[ac_cv_strdup_macro=yes],
 [ac_cv_strdup_macro=no],
 [ac_cv_strdup_macro=no]
 )
@@ -297,19 +297,19 @@ AC_MSG_CHECKING([basic-block size])
 ac_cv_page_size=0
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([main() { if (getpagesize()<=2048) exit(0); else exit(1); }],
-	[ ac_cv_page_size=11 ], [ ], [ ] )
+	[ ac_cv_page_size=11 ] )
 fi
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([main() { if (getpagesize()<=4096) exit(0); else exit(1); }],
-	[ ac_cv_page_size=12 ], [ ], [ ] )
+	[ ac_cv_page_size=12 ] )
 fi
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([main() { if (getpagesize()<=8192) exit(0); else exit(1); }],
-	[ ac_cv_page_size=13 ], [ ], [ ] )
+	[ ac_cv_page_size=13 ] )
 fi
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([main() { if (getpagesize()<=16384) exit(0); else exit(1); }],
-	[ ac_cv_page_size=14 ], [ ], [ ] )
+	[ ac_cv_page_size=14 ] )
 fi
 if test $ac_cv_page_size = 0; then
     ac_cv_page_size=15
@@ -427,7 +427,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.3 2003/05/21 04:10:08 gray Exp $"
+#ident "$Id: configure.ac,v 1.4 2003/05/21 04:33:31 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -436,6 +436,8 @@ static void foo (void) { }
 
 ##############################################################################
 AC_MSG_NOTICE([pthread particulars])
+
+XX_OLD_LIBS=$LIBS
 
 AC_SEARCH_LIBS(pthread_mutex_init, pthread pthreads c_r)
 AC_CHECK_HEADERS(pthread.h pthreads.h)
@@ -474,6 +476,8 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 [AC_DEFINE(THREAD_LOCK_INIT_VAL,0)
  AC_MSG_RESULT([0])]
 )
+
+LIBS=$XX_OLD_LIBS
 
 ##############################################################################
 AC_MSG_NOTICE([functions])
