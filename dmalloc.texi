@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.41 1993/12/20 04:38:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.42 1993/12/20 04:58:14 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -80,20 +80,15 @@ translation approved by the author instead of in the original English.
 This file documents the general-usage and the inner-workings of the
 memory allocation or @dfn{malloc} library it accompanies.
 
-This malloc library has been designed as a drop in replacement for the
-system's malloc, realloc, calloc, free and other memory management
-routines.  For more information about their capabilities, do a @code{man
-3 malloc} to read the system's manual pages.
+The library has been designed as a drop in replacement for the system's
+malloc, realloc, calloc, free and other memory management routines while
+providing powerful debugging facilities.  It is also reasonably portable
+having been successfully run on the following operating systems: BSDI,
+SunOS, Solaris, AIX, Ultrix, OSF, Irix, HPUX, and probably a couple
+others.
 
-What is unique about this library is that it contains a number of
-powerful debugging facilities including very comprehensive heap testing
-and excellent run-time debugging information.  We have found these
-capabilities to be superb development tools.
-
-I can be reached at @samp{gray.watson@@antaire.com} with any questions
-or general comments.
-
-Gray Watson, Antaire Corporation.
+I can be reached at @samp{gray.watson@@antaire.com} with any questions,
+feedback, or general comments.  Gray Watson, Antaire Corporation.
 
 @menu
 * Copying::                     Library copying conditions.
@@ -220,7 +215,9 @@ handle any sized file.
 @section Malloc functions Supported by all Malloc Libraries.
 
 All malloc libraries support 4 basic memory allocation commands.  These
-include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.
+include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
+more information about their capabilities, do a @code{man 3 malloc} to
+read the system's manual pages.
 
 @table @samp
 @item malloc
@@ -1419,30 +1416,30 @@ some anonymous amount of memory
 @itemize @bullet
 @item
 Realloc() backwards compatibility with being able to realloc from the
-last freed block is @emph{not} supported.
+last freed block is @emph{not} supported.  I would be interested to know
+who is using this (cough, cough) feature and for what reason.
 
 @item
 Realloc() of a NULL pointer is supported in which case the library will
 just make a call to malloc().  This can be disabled with the help of a
-compilation option in the @file{conf.h} file.
+manual compilation option in the @file{conf.h} file.
 
 @item
 The library does @emph{not} provide memalign() nor valloc() support as
 of yet, but may in future releases.  I would be interested to know who
-is using these functions, which architectures they are supported on, and
-for what reason they are being used.
+is using these functions and for what reason.
 
 @item
-Some systems allow free(0) to not be an error for some (idiotic IMHO)
-reason.  Since 0 is not a valid address returned by the malloc library
-then my library interprets this as an error.  See @file{conf.h} for some
-manual settings to this effect but this may cause problems.
+Some systems allow free(0) to not be an error for some reason (idiotic
+IMHO).  Since 0 is not a valid address returned by the malloc library, I
+don't see why free(0) should be allowed.  See @file{conf.h} for some
+manual compilation options to handle this.
 
 @item
 Aside from possibly being slower than the system's memory allocation
 functions, the library should be fully compatible with the standard
-memory routines.  If this is @emph{not} the case please bring this to my
-attention.
+memory routines.  If this is @emph{not} the case, please bring this to
+my attention.
 @end itemize
 
 @node Portability,  , Compatibility, Source Code
