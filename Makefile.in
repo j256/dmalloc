@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.109 1998/10/08 15:07:15 gray Exp $
+# $Id: Makefile.in,v 1.110 1998/10/13 21:16:08 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -44,14 +44,14 @@ INFOFILE= dmalloc.info
 #
 FLS	=  conf.h.in configure.in config.help \
 	ChangeLog Manifest INSTALL PERMISSIONS NEWS NOTES README TODO \
-	dmallocrc dmalloc.texi \
+	dmallocrc dmalloc.texi $(INFOFILE) \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
 	dmalloc_t.c return.h settings.dist version.h \
 	dmalloc_argv.[ch] dmalloc_argv_loc.h dmalloc.cc \
 	install-sh mkinstalldirs Deansify.pl \
-	configure $(INFOFILE)
+	configure
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dmalloc_summarize.pl \
 	contrib/next_notes contrib/ra_info.pl contrib/stratus_ftx_notes
@@ -67,7 +67,7 @@ all :: $(LIBRARY) $(LIB_DIS) $(UTIL)
 clean ::
 	$(CLEAN)
 	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL) $(INFOFILE)
-	rm -f part.? dmalloc.h
+	rm -f dmalloc.h
 	rm -f INSTALL PERMISSIONS README README_ftp
 
 distclean :: clean
@@ -144,20 +144,6 @@ malloc_th.o : malloc.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
 		-c malloc.c -o $(.TARGET)
 
-port :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
-	@ answer 'Is it okay to remove the $(.TARGET) directory? '
-	rm -rf $(.TARGET)
-	mkdir $(.TARGET) $(.TARGET)/contrib
-	cp $(FLS) Makefile.all.in $(.TARGET)
-	cp $(DOCFLS) $(.TARGET)
-	cp $(CONTFLS) $(.TARGET)/contrib
-	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
-	@ echo ''
-	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
-
-patch ::
-	@ echo 'Run fixpatch.pl on the patch file'
-
 fill :: $(FILLFLS)
 	fillproto $(FILLFLS)
 
@@ -186,17 +172,28 @@ continuous :: $(TEST)
 			$(TEST) -n -t 100000 ;\
 		); done
 
+port :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
+	@ answer 'Is it okay to remove the $(.TARGET) directory? '
+	rm -rf $(.TARGET)
+	mkdir $(.TARGET) $(.TARGET)/contrib
+	cp $(FLS) Makefile.all.in $(.TARGET)
+	cp $(DOCFLS) $(.TARGET)
+	cp $(CONTFLS) $(.TARGET)/contrib
+	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
+	@ echo ''
+	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
+
 dmalloc.ps : dmalloc.texi
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi ../dmalloc.texi ; \
+	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; \
 		dvips -o ../$(.TARGET) dmalloc.dvi )
 	rm -rf work
 
 dmalloc.dvi : dmalloc.texi
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi ../dmalloc.texi ; mv dmalloc.dvi .. )
+	( cd work ; texi2dvi .././$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
 INSTALL : $(srcdir)/INSTALL.1 $(INFOFILE)
@@ -256,22 +253,6 @@ README_ftp : $(srcdir)/README_ftp.1 $(INFOFILE)
 $(INFOFILE) : $(srcdir)/dmalloc.texi
 	rm -f $(.TARGET)
 	makeinfo --no-split $(.OODATE)
-
-shar :: $(FLS) $(CONTFLS)
-	rm -f part.?? part.t Makefile.in.bak
-	mv Makefile.in Makefile.in.bak
-	cp Makefile.all.in Makefile.in
-	makekit -n part. -s ${SHARSIZE} \
-		-t "See the INSTALL file for instructions on building and installing the library." \
-		$(FLS) Makefile.in $(CONTFLS)
-	rm -f Makefile.in
-	mv Makefile.in.bak Makefile.in
-	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  > part.t
-	echo ---------------------------------------------------------------- \
-		>> part.t
-	cat part.01 >> part.t
-	mv part.t part.01
 
 #
 # auto configure settings
