@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.30 2000/03/21 18:19:16 gray Exp $
+ * $Id: return.h,v 1.31 2000/04/18 19:39:00 gray Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
  * some bogus data -- it seems to return the last return-address or
  * something like that.
  *
- * Alexandre Oliva <oliva@dcc.unicamp.br> recently advised to change
+ * Alexandre Oliva <oliva at dcc.unicamp.br> recently advised to change
  * the "=g" to a "=m".  If you are having problems, you may want to
  * return to the =g to see if it works.
  */
@@ -126,8 +126,8 @@
 /******************************* contributions *******************************/
 
 /*
- * For DEC Alphas running OSF.  from Dave Hill <ddhill@zk3.dec.com>
- * and Alexandre Oliva <oliva@dcc.unicamp.br>.  Thanks guys.
+ * For DEC Alphas running OSF.  from Dave Hill <ddhill at zk3.dec.com>
+ * and Alexandre Oliva <oliva at dcc.unicamp.br>.  Thanks guys.
  */
 #if __alpha
 
@@ -149,7 +149,7 @@
 
 /*
  * For Data General workstations running DG/UX 5.4R3.00 from Joerg
- * Wunsch <joerg_wunsch@julia.tcd-dresden.de>.
+ * Wunsch <joerg_wunsch at julia.tcd-dresden.de>.
  */
 #ifdef __m88k__
 
@@ -177,7 +177,7 @@
 /*
  * SGI compilers implement a C level method of accessing the return
  * address by simply referencing the __return_address symbol. -- James
- * Bonfield <jkb@mrc-lmb.cam.ac.uk>
+ * Bonfield <jkb at mrc-lmb.cam.ac.uk>
  */
 #if defined(__sgi)
 
@@ -196,7 +196,7 @@
  * "dmalloc.h.3" in such a way that the malloc/calloc/realloc/free
  * definitions would no longer cause the compiler to bark with
  * 'identifier redeclared' (I just put an #ifdef _STDLIB_H ... #endif
- * around those functions).  -- Wim_van_Duuren@stratus.com
+ * around those functions).  -- Wim_van_Duuren at stratus.com
  */
 #if defined(_FTX) && defined(i860)
 
@@ -222,7 +222,7 @@ asm void ASM_GET_RET_ADDR(file)
 
 /*
  * For HP-UX PA-RISC with gcc/g++ from Jack Perdue
- * <j-perdue@tamu.edu>.
+ * <j-perdue at tamu.edu>.
  */
 #if __hpux && __hppa && __GNUC__ > 1
 
@@ -235,7 +235,7 @@ asm void ASM_GET_RET_ADDR(file)
  * just put togther little tidbits of knowledge I found while looking
  * for one to take a stab with this.  Like I said, it seems to work on
  * my g++ code under HPUX11 on a HP V-class system.  YMMV. -- Jack
- * Perdue (j-perdue@tamu.edu)
+ * Perdue (j-perdue at tamu.edu)
  */
 #define GET_RET_ADDR(file)  asm("stw %%r2, %0" : "=m" (file) :  );
 
@@ -245,7 +245,7 @@ asm void ASM_GET_RET_ADDR(file)
 
 /*
  * For Powerpc 603 based system running LynxOS 2.3.1 using gcc/gas.
- * From Shawn Carey <smc@questra.com>.
+ * From Shawn Carey <smc at questra.com>.
  */
 #if defined(__powerpc__) && defined(__GNUC__) && !defined(__OPTIMIZE__)
 
