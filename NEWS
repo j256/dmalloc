@@ -1,9 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.40 1994/10/04 17:46:59 gray Exp $
+$Id: NEWS,v 1.41 1994/10/12 17:22:26 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Changed some dmalloc options:
+		* -T (list-tokens) -> -D (debug-tokens)
+		* -L (list-tags) -> -t (list-tags).
+	* Added long(-L)/short(-S) options to output debug-tokens in env.
+	* Added much better error logging in chunk.
 	* Added DG/UX code to return.h and atexit.c to contrib.  Thanks Joerg.
 
 Version 3.0.2:

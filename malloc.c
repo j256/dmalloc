@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.69 1994/09/20 18:23:10 gray Exp $";
+  "$Id: malloc.c,v 1.70 1994/10/12 17:22:38 gray Exp $";
 #endif
 
 /*
@@ -635,7 +635,8 @@ EXPORT	int	_dmalloc_examine(const char * pnt, DMALLOC_SIZE * size,
     return ERROR;
   
   /* NOTE: we do not need the alloc-size info */
-  ret = _chunk_read_info(pnt, size, NULL, file, line, ret_attr);
+  ret = _chunk_read_info(pnt, size, NULL, file, line, ret_attr,
+			 "dmalloc_examine");
   
   in_alloc = FALSE;
   

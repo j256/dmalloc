@@ -1,3 +1,11 @@
+Wed Oct 12 13:00:48 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Changed some dmalloc options.  -T -> -D, -L -> -t.  Yeach!
+
+	* Added long/short options to dmalloc and env.
+
+	* Added much better error logging in chunk.
+
 Tue Oct  4 13:39:40 1994  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added DG/UX code to return.h and atexit code and notes to the
@@ -839,5 +847,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.121 1994/10/04 17:46:52 gray Exp $
+$Id: ChangeLog,v 1.122 1994/10/12 17:22:23 gray Exp $
 -------------------------------------------------------------------------------

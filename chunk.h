@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.34 1994/09/10 23:27:10 gray Exp $
+ * $Id: chunk.h,v 1.35 1994/10/12 17:22:36 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -76,7 +76,8 @@ IMPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
  */
 IMPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 				 unsigned int * alloc_size, char ** file,
-				 unsigned int * line, void ** ret_attr);
+				 unsigned int * line, void ** ret_attr,
+				 const char * where);
 
 /*
  * log the heap structure plus information on the blocks if necessary
