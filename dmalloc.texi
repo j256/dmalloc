@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.219 2003/06/06 04:59:30 gray Exp $
+@c $Id: dmalloc.texi,v 1.220 2003/06/06 05:01:49 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1707,6 +1707,7 @@ you want are @code{0x4f47d03} then you can pass this number to the
 have used the environmental variable.
 
 @cindex dmalloc_debug_setup function
+
 In version 5 and above of the library, you can also use the
 @code{dmalloc_debug_setup} function which takes a string in the same
 format of the @samp{DMALLOC_OPTIONS}.  @xref{Environment Variable}.  So,
@@ -2019,8 +2020,8 @@ dmalloc -tv
 
 @cindex environment variable
 @cindex DMALLOC_OPTIONS
-
 @cindex dmalloc_debug_setup function
+
 An @dfn{environment variable} is a variable that is part of the user's
 working environment and is shared by all the programs.  The
 @samp{DMALLOC_OPTIONS} variable is used by the dmalloc library to enable
