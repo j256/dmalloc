@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.175 2003/09/10 00:09:19 gray Exp $
+# $Id: Makefile.in,v 1.176 2003/09/12 06:09:19 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -74,8 +74,8 @@ INFOFILE= $(MODULE).info
 # the end on purpose
 #
 FLS	=  conf.h.in configure.ac config.help \
-	ChangeLog.1 Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
-	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
+	ChangeLog.1 INSTALL NEWS README RELEASE.html \
+	dmallocrc \
 	arg_check.c arg_check.h chunk.c chunk.h chunk_loc.h \
 	compat.c compat.h debug_tok.h env.c env.h error.c error.h error_val.h \
 	heap.c heap.h malloc.c dmalloc.c dmalloc.h.1 dmalloc.h.3 \
@@ -86,6 +86,7 @@ FLS	=  conf.h.in configure.ac config.help \
 	dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
 	$(srcdir)/configure
+DOCFLS	= dmalloc.texi $(INFOFILE) dmalloc.html Manifest NOTES TODO
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
@@ -116,7 +117,7 @@ distclean :: clean
 	rm -f config.cache conf.h
 	rm -f Makefile dmalloc.h.2 settings.h
 	rm -rf autom4te.cache
-	rm -rf port
+	rm -rf release
 
 installincs :: $(HFLS)
 	install -Cv -m 444 $(HFLS) $(DESTDIR)/include
@@ -285,14 +286,18 @@ compile_test :: settings.h
 	done
 	rm -f settings.h.t
 
-port :: $(FLS) $(CONTFLS) Makefile.all.in
+release :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
 	@ test ! -d dmalloc-$(VERSION) || \
 		answer 'Is it okay to remove the dmalloc-$(VERSION) dir? '
-	rm -rf dmalloc-$(VERSION)
-	mkdir dmalloc-$(VERSION) dmalloc-$(VERSION)/contrib
-	cp $(FLS) Makefile.all.in dmalloc-$(VERSION)
-	cp $(CONTFLS) dmalloc-$(VERSION)/contrib
-	mv dmalloc-$(VERSION)/Makefile.all.in dmalloc-$(VERSION)/Makefile.in
+	rm -rf dmalloc-$(VERSION).t dmalloc-$(VERSION)
+	mkdir dmalloc-$(VERSION).t dmalloc-$(VERSION).t/contrib \
+		dmalloc-$(VERSION).t/docs
+	cp $(FLS) Makefile.all.in dmalloc-$(VERSION).t
+	cp $(CONTFLS) dmalloc-$(VERSION).t/contrib
+	cp $(DOCFLS) dmalloc-$(VERSION).t/docs
+	mv dmalloc-$(VERSION).t/Makefile.all.in \
+		dmalloc-$(VERSION).t/Makefile.in
+	mv dmalloc-$(VERSION).t dmalloc-$(VERSION)
 	rm -f dmalloc-$(VERSION).tgz dmalloc-$(VERSION).tgz.t
 	tar -czf dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION)
 	mv dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION).tgz
