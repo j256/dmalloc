@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.50 2001/05/21 22:44:25 gray Exp $
+ * $Id: settings.dist,v 1.51 2001/11/30 23:54:57 gray Exp $
  */
 
 /*
@@ -62,27 +62,28 @@
 #define ALLOW_REALLOC_SIZE_ZERO 1
 
 /*
+ * I have swayed to public pressure and allowing free(0L) is now the
+ * default.  Sigh.  :-)
+ *
  * Should we allow the free of a NULL pointer and if it happens,
  * should a message be generated to that effect.  Most (if not all)
  * POSIX C libraries allow you to free() or delete() a NULL pointer
  * and a number of programming reference manuals mention that freeing
- * of NULL is ``allowed''.  However, I believe that it is bad form,
- * promotes lazy pointer handling, and can often hide program bugs.
- * As the author of dmalloc, I reserve the right to determine the
- * default action of the library to encourage code similar to the
- * following: if (pnt != NULL) { free(pnt); }
+ * of NULL is "allowed".  However, I believe that it is bad form,
+ * promotes lazy pointer handling, and can often hide program bugs.  I
+ * encourage you to do something like the following in your programs:
+ * if (pnt != NULL) { free(pnt); }
  *
- * The default is to generate an exception whenever a free of NULL is
- * encountered allowing the user to determine where s/he is freeing a
- * possibly random pointer.  Setting ALLOW_FREE_NULL to 1 will cause
- * this not to happen.  I recommend at least logging a message with
- * the ALLOW_FREE_NULL_MESSAGE set to 1.
+ * Setting ALLOW_FREE_NULL to 0 will cause an exception whenever a
+ * free of NULL is encountered allowing the user to determine where
+ * s/he is freeing a possibly random pointer.  I recommend at least
+ * logging a message with the ALLOW_FREE_NULL_MESSAGE set to 1.
  *
  * Even with ALLOW_FREE_NULL set to 0, you can enable the
- * 'allow-free-null' token at runtime for specific programs.  It will
- * not generate an exception when it sees a free(0L).
+ * 'error-free-null' token at runtime for a specific program to
+ * generate an exception when it sees a free(0L).
  */
-#define ALLOW_FREE_NULL 0
+#define ALLOW_FREE_NULL 1
 #define ALLOW_FREE_NULL_MESSAGE 1
 
 /*
