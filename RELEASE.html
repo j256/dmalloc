@@ -26,34 +26,33 @@ Date: June 10, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Quick feature release here to fold in a couple of changes in the
-last couple of days.  Added the ability to put %p, %t, and other %
-strings in the logfile path and have then be expanded to
-<tt>getpid()</tt> and <tt>time()</tt> output respectively.  More
-documentation online. </p>
+<p> Quick feature release to fold in a couple of changes in the last
+couple of days.  Added the ability to put %p, %t, and other % strings
+in the logfile path and have then be expanded to <tt>getpid()</tt> and
+<tt>time()</tt> output respectively.  More documentation online. </p>
 
 <h3><a name="func"> New Functionality </a></h3>
 
 <ul>
 
 <li> <p> Added new expansion of the -l --logfile environment setting.
-%h as gethostname(), %p as getpid(), %t as time(), %u as getuid(), and
-%i as thread-id.  So you can, for example, use <tt> dmalloc -l
-log.%u.%t </tt> and get logfiles in the form of: <tt>
-log.1001.1055273186 </tt> where 1001 is your user-id (under Unix) and
-1055273186 is the time in seconds. </p>
+%h expands to the output of gethostname(), %p to getpid(), %t to
+time(), %u to getuid(), and %i to the thread-id, if configured.  So
+you can, for example, use <tt> dmalloc -l log.%u.%t </tt> and get
+logfiles in the form of: <tt> log.1001.1055273186 </tt> where 1001 is
+your user-id (under Unix) and 1055273186 is the time in seconds. </p>
 
 <p> NOTE: You must install the 5.2.0 version of the dmalloc utility
 for this to work. </p>
 </li>
 
 <li> Added LOG_PID to the settings.dist config file.  Set to 1 to have
-dmalloc log the PID on each line of the logfile. q</li>
+dmalloc log the PID on each line of the logfile. </li>
 
-<li><p> Added LOG_REOPEN to the settings.dist config file.  If set to 1
-(the default) it will reopen the logfile if the process-id changes.
-This will happen when the process forks.  It will only open the
-logfile if the %p string is in the logpath otherwise the reopened
+<li><p> Added LOG_REOPEN to the settings.dist config file.  If set to
+1 (the default) it will reopen the logfile if the process-id changes.
+This will happen when the process forks.  The log will only be
+reopened if the %p string is in the logpath otherwise the reopened
 logfile might overwrite the initial one. </p>
 
 <p> NOTE: I removed the old logfile % processing.  %d no long expands
@@ -105,7 +104,7 @@ None.
 
 <ul>
 
-<li> The log=... section now takes special % strings.  See
+<li> The log=... setting now takes special % strings.  See
 above. </li>
 
 </ul>
