@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk_loc.h,v 1.53 1998/11/12 21:50:56 gray Exp $
+ * $Id: chunk_loc.h,v 1.54 1998/11/12 23:55:57 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -37,7 +37,14 @@
 #endif
 #endif
 
-/* for timeval type -- see conf.h */
+/* for time type -- see settings.h */
+#if STORE_TIME
+#ifdef TIME_INCLUDE
+#include TIME_INCLUDE
+#endif
+#endif
+
+/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
 #ifdef TIMEVAL_INCLUDE
 #include TIMEVAL_INCLUDE
@@ -145,16 +152,16 @@
  */
 typedef struct {
 #if STORE_SEEN_COUNT
-  int		ov_seen_c;		/* times pointer was seen */
+  unsigned long	ov_seen_c;		/* times pointer was seen */
 #endif
 #if STORE_ITERATION_COUNT
-  long		ov_iteration;		/* interation when pointer alloced */
+  unsigned long	ov_iteration;		/* interation when pointer alloced */
 #endif
 #if STORE_TIME
-  long		ov_time;		/* time when pointer alloced */
+  TIME_TYPE	ov_time;		/* time when pointer alloced */
 #endif
 #if STORE_TIMEVAL
-  struct timeval  ov_timeval;		/* time when pointer alloced */
+  TIMEVAL_TYPE  ov_timeval;		/* time when pointer alloced */
 #endif
 #if STORE_THREAD_ID
   THREAD_TYPE	ov_thread_id;		/* thread id which allocaed pnt */
@@ -205,6 +212,10 @@ typedef struct dblock_st {
   /* to reference union elements as db elements */
 #define db_next		db_pnt.pn_next		/* Free */
 #define db_file		db_pnt.pn_file		/* Alloced */
+  
+#if FREED_POINTER_DELAY
+  unsigned long	db_reuse_iter;			/* when avail for reuse */
+#endif
   
   overhead_t	db_overhead;			/* configured overhead adds */
 } dblock_t;
@@ -265,6 +276,10 @@ typedef struct bblock_st {
 #define	bb_mem		bb_pnt.pn_mem		/* User-dblock, External */
 #define	bb_next		bb_pnt.pn_next		/* Free */
 #define	bb_file		bb_pnt.pn_file		/* User-bblock */
+  
+#if FREED_POINTER_DELAY
+  unsigned long	bb_reuse_iter;			/* when avail for reuse */
+#endif
   
   overhead_t	bb_overhead;			/* configured overhead adds */
 } bblock_t;
