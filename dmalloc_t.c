@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.111 2004/01/16 14:05:51 gray Exp $
+ * $Id: dmalloc_t.c,v 1.112 2004/01/28 14:30:59 gray Exp $
  */
 
 /*
@@ -2027,12 +2027,12 @@ static	void	do_interactive(void)
       (void)printf("\tmalloc    - allocate memory\n");
       (void)printf("\tcalloc    - allocate/clear memory\n");
       (void)printf("\trealloc   - reallocate memory\n");
+      (void)printf("\trecalloc  - reallocate cleared memory\n");
       (void)printf("\tmemalign  - allocate aligned memory\n");
       (void)printf("\tvalloc    - allocate page-aligned memory\n");
       (void)printf("\tstrdup    - allocate a string\n");
       (void)printf("\tfree      - deallocate memory\n\n");
       
-      (void)printf("\tmap       - map the heap to the logfile\n");
       (void)printf("\tstats     - dump heap stats to the logfile\n");
       (void)printf("\tunfreed   - list the unfree memory to the logfile\n");
       (void)printf("\tmark      - display the current mark value\n");
