@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.65 2003/05/13 18:16:48 gray Exp $
+ * $Id: chunk.h,v 1.66 2003/05/16 04:09:32 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -229,11 +229,11 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
  *
  * user_pnt -> Pointer we are freeing.
  *
- * realloc_b -> Set to 1 if realloc is calling free.
+ * func_id -> Function ID
  */
 extern
 int	_dmalloc_chunk_free(const char *file, const unsigned int line,
-		       void *user_pnt, const int realloc_b);
+			    void *user_pnt, const int func_id);
 
 /*
  * void *_dmalloc_chunk_realloc
