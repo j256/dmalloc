@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.250 2004/01/28 14:51:37 gray Exp $
+@c $Id: dmalloc.texi,v 1.251 2004/04/09 14:21:01 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -85,6 +85,8 @@ except that the chapter entitled ``Copying'' may be included in a
 translation approved by the author instead of in the original English.
 @end titlepage
 
+@c --------------------------------
+
 @node Top, Copying, (dir), (dir)
 @top Debug Malloc Library
 
@@ -133,6 +135,8 @@ Gray Watson.
 * Index of Concepts::           Index of concepts in the manual.
 @end menu
 
+@c --------------------------------
+
 @node Copying, Overview, Top, Top
 @chapter Library Copying and Licensing Conditions
 
@@ -154,6 +158,8 @@ Gray Watson makes no representations about the suitability of the
 software described herein for any purpose.  It is provided ``as is''
 without express or implied warranty.
 
+@c --------------------------------
+
 @node Overview, Programming, Copying, Top
 @chapter Description of Features and How to Get Started
 
@@ -167,6 +173,8 @@ without express or implied warranty.
 * How It Works::                How the library checks your program.
 * Troubleshooting::             Some solutions to common problems.
 @end menu
+
+@c --------------------------------
 
 @node Installation, Getting Started, Overview, Overview
 @section How to Install the Library
@@ -295,6 +303,8 @@ which case @samp{/usr/local} will have been replaced with @samp{PATH}.
 
 See the ``Getting Started'' section to get up and running with the
 library.  @xref{Getting Started}.
+
+@c --------------------------------
 
 @node Getting Started, Allocation Basics, Installation, Overview
 @section Getting Started with the Library
@@ -436,6 +446,8 @@ See the next section for help with this.  @xref{Troubleshooting}.
 
 @end enumerate
 
+@c --------------------------------
+
 @node Allocation Basics, Features, Getting Started, Overview
 @section Basic Description of Terms and Functions
 
@@ -446,6 +458,8 @@ See the next section for help with this.  @xref{Troubleshooting}.
 * Basic Definitions::           General memory terms and concepts.
 * Malloc Functions::            Functionality supported by all malloc libs.
 @end menu
+
+@c --------------------------------
 
 @node Basic Definitions, Malloc Functions, Allocation Basics, Allocation Basics
 @subsection General Memory Terms and Concepts
@@ -534,11 +548,13 @@ might only be reading in a 10 byte file because it is wasteful of system
 resources.  Also, you are worried that your program might have to handle
 files of more than 1.2 megabytes.
 
-A solution: first checkout the file's size and then, using the
+A solution: first check out the file's size and then, using the
 heap-allocation routines, get enough storage to read the entire file
 into memory.  The program will only be using the system resources
 necessary for the job and you will be guaranteed that your program can
 handle any sized file.
+
+@c --------------------------------
 
 @node Malloc Functions,, Basic Definitions, Allocation Basics
 @subsection Functionality Supported by All Malloc Libraries
@@ -615,6 +631,8 @@ the system resources.
 is returned by malloc libraries has already been cleared.  @emph{Only}
 the @code{calloc} routine will zero the memory space it returns.
 
+@c --------------------------------
+
 @node Features, How It Works, Allocation Basics, Overview
 @section General Features of the Library
 
@@ -689,9 +707,9 @@ The library has a number of logging capabilities that can track un-freed
 memory pointers as well as runtime memory usage, memory transactions,
 administrative actions, and final statistics.
 
-@item examining unfreed memory
-@cindex unfreed memory
-@cindex non-freed memory
+@item examining freed memory
+@cindex freed memory
+@cindex freed memory
 Another common problem happens when a program frees a memory pointer but
 goes on to use it again by mistake.  This can lead to mysterious crashes
 and unexplained problems.
@@ -725,6 +743,8 @@ either stop after dumping core or continue running.
 your system's routines.  It took me hours to finally come to the
 conclusion that the localtime call, included in SunOS release 4.1,
 overwrites one of its fence-post markers.
+
+@c --------------------------------
 
 @node How It Works, Troubleshooting, Features, Overview
 @section How the Library Checks Your Program
@@ -789,6 +809,8 @@ checking the heap after it sees a dmalloc call from the
 @samp{dmalloc_t.c:0}, with a 0 line number, then dmalloc will start
 checking the heap after it sees a call from anywhere in the
 @file{dmalloc_t.c} file.
+
+@c --------------------------------
 
 @node Troubleshooting,, How It Works, Overview
 @section Some Solutions to Common Problems
@@ -858,7 +880,7 @@ dmalloc log-file somewhere else in the filesystem.  You will need to
 check both where the program was started and to where it might change
 directory.
 
-@item The logfile is only producted when @code{dmalloc_shutdown()} is
+@item The logfile is only produced when @code{dmalloc_shutdown()} is
 called.  By default it will be called when @code{exit()} gets called.
 If you are running your program and press @kbd{Control-C} under Unix the
 program will stop immediately and @code{dmalloc_shutdown()} will not get
@@ -868,7 +890,7 @@ call exit yourself, or you can enable the @kbd{catch-signals} token.
 
 @item If your program is segfaulting or otherwise crashing when it exits, the
 @code{exit()} routine may not being called.  You will have to resolve
-these issues so the dmalloc library can gracefully exit and write it's
+these issues so the dmalloc library can gracefully exit and write its
 log file.
 
 @item You may want to call @code{dmalloc_log_stats()} and
@@ -907,6 +929,8 @@ system version/type, and the version of Dmalloc you are using.
 
 @end table
 
+@c --------------------------------
+
 @node Programming, Dmalloc Program, Overview, Top
 @chapter How to Program with the Library
 
@@ -925,6 +949,8 @@ system version/type, and the version of Dmalloc you are using.
 * Using With Cygwin::           Using the library with Cygwin environment.
 * Debugging A Daemon::          Debugging allocations in a daemon process.
 @end menu
+
+@c --------------------------------
 
 @node Allocation Macros, Return Address, Programming, Programming
 @section Macros Providing File and Line Information
@@ -984,6 +1010,8 @@ sources, it is recommended that it be at the end of your include file
 list because dmalloc uses macros and may try to change declarations of
 the malloc functions if they come after it.
 
+@c --------------------------------
+
 @node Return Address, Argument Checking, Allocation Macros, Programming
 @section Getting Caller Address Information
 
@@ -1014,31 +1042,14 @@ not freed: '0x38600' (10232 bytes) from 'ra=0x10234d'
 not freed: '0x38220' (137 bytes) from 'ra=0x82cc'
 @end example
 
-@cindex gdb
+@cindex ra_info.pl
 With the help of a debugger, these return-addresses (or ra) can then be
 identified.  I've provided a @file{ra_info.pl} perl script in the
 @file{contrib/} directory with the dmalloc sources which seems to work
-well with gdb.  You can also use the manual methods below for gdb.
+well with gdb.  You can also use manual methods for gdb to find the
+return-address location.  @xref{Translate Return Addresses}.
 
-@example
-# you may need to add the following commands to load in shared libraries
-(gdb) sharedlibrary
-(gdb) add-shared-symbol-files
-
-(gdb) x 0x10234d
-0x10234d <_findbuf+132>: 0x7fffceb7
-
-(gdb) info line *(0x82cc)
-Line 1092 of argv.c starts at pc 0x7540 and ends at 0x7550.
-@end example
-
-In the above example, gdb was used to find that the two non-freed memory
-pointers were allocated in @code{_findbuf()} and in file argv.c line
-1092 respectively.  The @samp{x address} (for examine) can always be
-used on the return-addresses but the @samp{info line *(address)} will
-only work if that file was compiled using the @kbd{-g} option and has
-not been stripped.  This limitation may not be true in later versions of
-gdb.
+@c --------------------------------
 
 @node Argument Checking, Extensions, Return Address, Programming
 @section Checking of Function Arguments
@@ -1080,6 +1091,8 @@ number of bytes specified.
 
 For all of the arguments checked, if the pointer is not in the heap then
 it is ignored since dmalloc does not know anything about it.
+
+@c --------------------------------
 
 @node Extensions, Error Codes, Argument Checking, Programming
 @section Additional Non-standard Routines
@@ -1655,11 +1668,11 @@ could mean that you have some super long file with more than
 @cindex ERROR_UNDER_FENCE
 
 @item 26 (ERROR_UNDER_FENCE)
-This indicates that a pointer had it's lower bound picket-fence magic
+This indicates that a pointer had its lower bound picket-fence magic
 number overwritten.  If the @samp{check-fence} token is enabled, the
 library writes magic values above and below allocations to protect
 against overflow.  Most likely this is because a pointer below it went
-past it's allocate and wrote into the next pointer's space.
+past its allocate and wrote into the next pointer's space.
 
 @c --------------------------------
 
@@ -1670,7 +1683,7 @@ past it's allocate and wrote into the next pointer's space.
 @cindex ERROR_OVER_FENCE
 
 @item 27 (ERROR_OVER_FENCE)
-This indicates that a pointer had it's upper bound picket-fence magic
+This indicates that a pointer had its upper bound picket-fence magic
 space overwritten.  If the @samp{check-fence} token is enabled, the
 library writes magic values above and below allocations to protect
 against overflow.  Most likely this is because an array or string
@@ -2003,9 +2016,10 @@ commands initially to load in dmalloc and other library symbols:
 @end example
 
 @menu
-* General Errors::              Diagnosing general problems with a debugger.
-* Memory Leaks::                Tracking down non-freed memory.
-* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
+* General Errors::                Diagnosing general problems with a debugger.
+* Memory Leaks::                  Tracking down non-freed memory.
+* Fence-Post Overruns::           Diagnosing fence-post overwritten memory.
+* Translate Return Addresses::    Convert ra return-addresses into a location.
 @end menu
 
 @c --------------------------------
@@ -2049,6 +2063,8 @@ before the section which generated the error.  This should locate the
 problem faster by checking the library's structures at that point.
 @xref{Extensions}.
 
+@c --------------------------------
+
 @node Memory Leaks, Fence-Post Overruns, General Errors, Using With a Debugger
 @subsection Tracking Down Non-Freed Memory
 
@@ -2072,7 +2088,7 @@ Above you will see a sample of some non-freed memory messages from the
 logfile.  In the first line the @samp{0x45008} is the pointer that was
 not freed, the @samp{12 bytes} is the size of the unfreed block, and the
 @samp{ra=0x1f8f4} or return-address shows where the allocation
-originated from.  @xref{Return Address}.
+originated from.  @xref{Translate Return Addresses}.
 
 The systems which cannot provide return-address information show
 @samp{unknown} instead, as in the 2nd line in the sample above.
@@ -2130,7 +2146,9 @@ cause the library to never reuse memory that has been freed.  Unique
 addresses are always generated.  This should be used with caution since
 it may cause your program to run out of memory.
 
-@node Fence-Post Overruns,, Memory Leaks, Using With a Debugger
+@c --------------------------------
+
+@node Fence-Post Overruns, Translate Return Addresses, Memory Leaks, Using With a Debugger
 @subsection Diagnosing Fence-Post Overwritten Memory
 
 @cindex fence-post errors
@@ -2168,6 +2186,42 @@ By enabling the @code{check-heap} debugging token and assigning the
 interval setting to a low number, you should be able to locate
 approximately when this problem happened.  @xref{Debug Tokens},
 @xref{Dmalloc Program}.
+
+@c --------------------------------
+
+@node Translate Return Addresses,, Fence-Post Overruns, Using With a Debugger
+@subsection Translating Return Addresses into Code Locations
+
+@cindex ra_info.pl
+
+The following gdb commands help you translate the return-addresses (ra=)
+entries in the logfile into locations in your code.  I've provided a
+@file{ra_info.pl} perl script in the @file{contrib/} directory with the
+dmalloc sources which seems to work well with gdb.  But, if you need to
+do it manually, here are the commands in gdb to use.
+
+@cindex return-address translation
+@cindex caller address translation
+
+@example
+# you may need to add the following commands to load in shared libraries
+(gdb) sharedlibrary
+(gdb) add-shared-symbol-files
+
+(gdb) x 0x10234d
+0x10234d <_findbuf+132>: 0x7fffceb7
+
+(gdb) info line *(0x82cc)
+Line 1092 of argv.c starts at pc 0x7540 and ends at 0x7550.
+@end example
+
+In the above example, gdb was used to find that the two non-freed memory
+pointers were allocated in @code{_findbuf()} and in file argv.c line
+1092 respectively.  The @samp{x address} (for examine) can always be
+used on the return-addresses but the @samp{info line *(address)} will
+only work if that file was compiled using the @kbd{-g} option and has
+not been stripped.  This limitation may not be true in later versions of
+gdb.
 
 @c --------------------------------
 
@@ -2281,7 +2335,7 @@ it initializes, dmalloc makes a call to @code{getenv} to read the
 environmental variables.  It is looking for the value of the
 @samp{DMALLOC_OPTIONS} variable which sets the debugging options.
 @xref{Environment Variable}.  Because Cygwin calls a memory allocation
-function while it is loading it's shared libraries, it goes recursive
+function while it is loading its shared libraries, it goes recursive
 when @code{getenv} is called from within @code{malloc} causing a
 segfault.
 
@@ -2410,6 +2464,8 @@ through the @code{eval} shell command which will do the commands.
 * RC File::                     Format of the runtime configuration file.
 @end menu
 
+@c --------------------------------
+
 @node Shell Alias, Utility Usage, Dmalloc Program, Dmalloc Program
 @section Using a Shell Alias with the Utility
 
@@ -2477,6 +2533,8 @@ log back in to have it take effect, or you can execute the above
 appropriate command on the command line.  If you enter @kbd{dmalloc
 runtime} and see any output with DMALLOC_OPTIONS in it then the alias
 did not work.
+
+@c --------------------------------
 
 @node Utility Usage, Environment Variable, Shell Alias, Dmalloc Program
 @section How to Use the Dmalloc Program
@@ -2641,7 +2699,7 @@ exceeded, this will generate an @code{ERROR_OVER_LIMIT} error.
 
 @cindex lock on
 @item -o times
-Set the ``lock-on'' period which dictates with the threaded version of
+Set the ``lock-on'' period which dictates to the threaded version of
 the library to not initialize or lock the mutex lock around the library
 until after a certain number of allocation calls have been made.  Some
 number between 2 and 30 is probably good.  See the ``Using With
@@ -2763,6 +2821,8 @@ dmalloc -DV
 # list the available tags from the rc file with verbose output
 dmalloc -tv
 @end example
+
+@c --------------------------------
 
 @node Environment Variable, Debug Tokens, Utility Usage, Dmalloc Program
 @section Environment Variable Name and Features
@@ -2911,6 +2971,8 @@ setenv DMALLOC_OPTIONS debug=0x1f,check-heap,inter=100
 # checking when we see file.c line 123
 setenv DMALLOC_OPTIONS log=malloc,addr=0x1234,start=file.c:123
 @end example
+
+@c --------------------------------
 
 @node Debug Tokens, RC File, Environment Variable, Dmalloc Program
 @section Description of the Debugging Tokens
@@ -3113,6 +3175,8 @@ the default behavior.
 
 @end table
 
+@c --------------------------------
+
 @node RC File,, Debug Tokens, Dmalloc Program
 @section Format of the Runtime Configuration File
 
@@ -3194,6 +3258,8 @@ and the checking of fence-post memory areas.
 
 Enter @code{dmalloc none} to disable all memory debugging features.
 
+@c --------------------------------
+
 @node Source Code, Index of Concepts, Dmalloc Program, Top
 @chapter Information on the Source Code
 
@@ -3204,6 +3270,8 @@ Enter @code{dmalloc none} to disable all memory debugging features.
 * Compatibility::               General compatibility concerns.
 * Portability::                 Issues important for porting the library.
 @end menu
+
+@c --------------------------------
 
 @node Definitions, Compatibility, Source Code, Source Code
 @section Definition of Terms and other Information
@@ -3236,6 +3304,8 @@ some anonymous amount of memory
 For more information about administration structures, see the code and
 comments from @file{chunk_loc.h}.
 
+@c --------------------------------
+
 @node Compatibility, Portability, Definitions, Source Code
 @section General Compatibility Concerns
 
@@ -3264,6 +3334,8 @@ functions, the library should be fully compatible with the standard
 memory routines.  If this is @emph{not} the case, please bring this to
 my attention.
 @end itemize
+
+@c --------------------------------
 
 @node Portability,  , Compatibility, Source Code
 @section Issues Important for Porting the Library
@@ -3309,6 +3381,8 @@ main()
 @end example
 
 @end itemize
+
+@c --------------------------------
 
 @node Index of Concepts, , Source Code, Top
 @unnumbered Index of Concepts
