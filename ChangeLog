@@ -2,6 +2,8 @@ Tue Apr 18 15:41:30 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.5.2.
 
+	* Added DGUX notes from Takis Psarogiannakopoulos.
+
 	* Fixed bug in chunk.c pointer checking.  Thanks Ezra.
 
 Mon Apr 17 21:55:39 2000  Gray Watson  <gray@256.com>
@@ -1576,5 +1578,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.243 2000/04/18 19:42:13 gray Exp $
+$Id: ChangeLog,v 1.244 2000/04/18 19:47:47 gray Exp $
 -------------------------------------------------------------------------------
