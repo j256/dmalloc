@@ -10,3 +10,5 @@ dmalloc
 dmalloc.h
 dmalloc.head
 dmalloc.h.2
+config.log
+config.cache

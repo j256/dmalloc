@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.73 1994/11/09 17:45:40 gray Exp $
+@c $Id: dmalloc.texi,v 1.74 1994/11/10 00:11:36 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -146,13 +146,8 @@ is" without express or implied warranty.
 
 @cindex allocation basics
 
-This section provides a basic definition of terms used throughout the
-manual as well as a brief overview of the basic malloc functions and
-examples of their use.  It is quite unnecessary for you to read this
-section if you are familiar with using the heap allocation functions.
-
 @menu
-* Basic Definitions::           For defining general terms and concepts.
+* Basic Definitions::           General memory terms and concepts.
 * Malloc Functions::            Functionality supported by all malloc libs.
 @end menu
 
@@ -412,7 +407,7 @@ determined that this might cause a recursive call back into the library.
 
 @cindex system memory problems
 @emph{NOTE}: do not be surprised if the library catches problems with
-your system's library routines.  It took me hours to finally come to the
+your system's routines.  It took me hours to finally come to the
 conclusion that the localtime call, included in SunOS release 4.1,
 overwrites one of its fence-post markers.
 
@@ -425,7 +420,7 @@ overwrites one of its fence-post markers.
 @cindex configuring the library
 @cindex making the library
 
-To confiure, compile, and install the library, follow these steps
+To configure, compile, and install the library, follow these steps
 carefully.
 
 @enumerate
@@ -433,8 +428,8 @@ carefully.
 @item Type @kbd{sh ./configure} to configure the library (add a @kbd{-v}
 to see what configure is doing) .  You may want to first examine the
 @file{config.help} file for some information about configure.  Configure
-should generate the @file{Makefile} and @file{conf.h} files and should
-configure any subdirectories (if necessary).
+should generate the @file{Makefile} and @file{conf.h} files
+automatically.
 
 @emph{NOTE}: It seems that some versions of tr (especially from HP-UX)
 don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr
@@ -442,10 +437,8 @@ often, you may need to either get GNU's tr (in their textutils package)
 or generate the @file{Makefile} and @file{conf.h} files by hand.
 
 @item You may want to examine the files created by configure to make sure
-it did its job correctly.
-
-@item Examine the manual settings section of @file{conf.h} to tune some
-specific features of the library.
+it did its job correctly.  Examine the manual settings section of
+@file{conf.h} to tune some specific features of the library.
 
 @item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
 @file{libdmalloclp.a}, and @file{dmalloc} program.
@@ -487,13 +480,13 @@ Basically, you need to do 6 things to make use of the library:
 
 @enumerate
 
-@item Follow the installation instructions about to configure and
+@item Follow the installation instructions on how to configure and
 make and install the library (i.e. type: @kbd{make install}).
 @xref{Installation}.
 
-@item Setup an alias to dmalloc and put in your shell's rc file.
-csh/tcsh users should add the following to their @file{.cshrc} file
-(notice the -C option for c-shell output):
+@item Add an alias for dmalloc to your shell's rc file. csh/tcsh users
+should add the following to their @file{.cshrc} file (notice the -C
+option for c-shell output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
@@ -522,9 +515,9 @@ problems.  @xref{Allocation Macros}.
 
 @item have the library check itself every 100 iterations (@kbd{-i 100})
 
-@item enables a number of debug features (@kbd{low}).  You can
-also try @kbd{runtime} for minimal checking or @kbd{medium},
-@kbd{high}, or @kbd{all} for more extensive heap verification.
+@item enable a number of debug features (@kbd{low}).  You can
+also try @kbd{runtime} for minimal checking or @kbd{medium}, @kbd{high},
+or @kbd{all} for more extensive heap verification.
 
 @end itemize
 
@@ -550,13 +543,13 @@ to track down problems with your program.
 You should first enable a logfile filename (I use @file{dmalloc}) and
 turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
 low} to accomplish this.  If you are interested in have the error
-messages be printed to stderr as well, enable the @samp{print-error}
+messages printed to your terminal as well, enable the @samp{print-error}
 token by typing @kbd{dmalloc -p print-error} afterwards.
 
 @cindex gdb
 Now you can enter your debugger (I use the @emph{excellent} GNU debugger
 gdb), and put a break-point in @code{dmalloc_error()} which is the
-internal error routine for the library.  When your program is run it
+internal error routine for the library.  When your program is run, it
 will stop there as soon as a memory problem is detected.
 
 @menu
@@ -583,7 +576,7 @@ To get more information about the problem, first print dmalloc_errno to
 get the heap's error code.  You can suspend your debugger and run
 @samp{dmalloc -e value-returned-from-print} to get an english
 translation of the error.  A number of the error messages are designed
-to diagnose specific problems with the heap and may not be
+to indicate specific problems with the heap and may not be
 user-friendly.
 
 If the problem was due to the arguments or system allocations then the
@@ -591,13 +584,14 @@ source of the problem has been found.  However, if some code did
 something wrong, you have more work to do.  The @code{check-heap} token
 should be enabled and the interval setting disabled or set to a low
 value so that the library can find the problem as close as possible to
-its source.  The code before the call to the library which stopped can
-then be examined closely for irregularities.  @xref{Debug Tokens} and
-@xref{Dmalloc Program}.
+its source.  The code that was execute right before the library halted,
+can then be examined closely for irregularities.  @xref{Debug Tokens}
+and @xref{Dmalloc Program}.
 
 You may also want to put calls to @code{dmalloc_verify(0)} in your code
 before the section which generated the error.  This should locate the
 problem faster by checking the library's structures more frequently.
+@xref{Extensions}.
 
 @node Memory Leaks, Fence-Post Overruns, General Errors, Using a Debugger
 @subsection Tracking down Non-Freed Memory
@@ -719,19 +713,16 @@ These @dfn{leap macros} use the c-preprocessor @code{__FILE__} and
 @code{__LINE__} macros which get replaced at compilation time with the
 current file and line-number of the source code in question.  The leap
 routines take this information and pass it on to the library making it
-able to produce verbose reports on memory not freed:
+able to produce verbose reports on memory problems.
 
 @example
 not freed: 0x38410 ( 22 bytes) from 'dmalloc_t.c:92'
-not freed: 0x38600 ( 10232 bytes) from 'dmalloc_t.c:104'
 @end example
 
-These lines from a log file shows that two allocations were not freed.
-One at address 0x38410 of size 22 bytes in source file @file{dmalloc_t.c}
-at line 92 and another at address 0x38600 of size 10232 bytes at line
-104 of @file{dmalloc_t.c}.
+This line from a log file shows that memory was not freed from file
+@file{dmalloc_t.c} line 92.
 
-Along with the above leap macros, @file{dmalloc.h} also contains the
+Along with the above leap functionality, @file{dmalloc.h} also adds the
 following macros which I have been using for all our memory allocation
 needs for some time now.  They take care of all the type-casting and
 make the code look much cleaner (IMHO).
@@ -782,13 +773,13 @@ functionality of the @samp{strdup} function.  string can be either a
 static string like "hello" or a character pointer.  Non-gcc users should
 use @code{STRDUP("hello", char_pnt)} where char_pnt is the variable
 which will be assigned to the pointer to the copy of "hello".
-@end deftypefun
 
 The strdup(3) function, it takes a string, allocates enough information
 to store the string (along with its null character), and then copies the
 string into the new space.  This macro does not actually call strdup but
 provides the same functionality while giving file and line memory
 information to the library.
+@end deftypefun
 
 @deftypefun void * BDUP ( void * @var{pnt}, int @var{size} )
 
@@ -841,9 +832,6 @@ identified.  I've provided a @file{ra_info.pl} perl script in the
 well with gdb.  You can also use the manual methods below for gdb.
 
 @example
-(gdb) x 0xdd2c
-0xdddc <on_exit+4>:     0x7fffd8fd
-
 (gdb) x 0x10234d
 0x10234d <_findbuf+132>: 0x7fffceb7
 
@@ -852,11 +840,10 @@ Line 1092 of "argv.c" starts at pc 0x7540 and ends at 0x7550.
 @end example
 
 In the above example, gdb was used to find that the two non-freed memory
-pointers were alloc'ed in on_exit(), _fund_buf(), and in file argv.c
-line 1092 respectively.  The @samp{x address} (for examine) can always
-be used on the return-addresses but the @samp{info line *(address)} will
-only work if that file was compiled using the -g option and has not
-been stripped.
+pointers were alloc'ed in _findbuf() and in file argv.c line 1092
+respectively.  The @samp{x address} (for examine) can always be used on
+the return-addresses but the @samp{info line *(address)} will only work
+if that file was compiled using the -g option and has not been stripped.
 
 @node Argument Checking, Extensions, Return Address, Programming
 @subsection Argument Checking of Function Arguments
@@ -871,7 +858,7 @@ your source code with the @code{DMALLOC_FUNC_CHECK} flag defined and
 enable the @code{check-funcs} token.  @xref{Debug Tokens}.
 
 @example
-gcc -DDMALLOC_FUNC_CHECK file.c
+cc -DDMALLOC_FUNC_CHECK file.c
 @end example
 
 @emph{NOTE}: Once you have compiled your source with DMALLOC_FUNC_CHECK
@@ -1085,7 +1072,7 @@ defining @code{DMALLOC_DISABLE}.  This will cause the dmalloc leap
 macros to not be applied.  @xref{Allocation Macros}.
 
 @example
-gcc -O -g -DMALLOC_DISABLE main.c
+cc -g -DMALLOC_DISABLE main.c
 @end example
 
 @item
@@ -1099,7 +1086,7 @@ defined then you need to link your program with the
 @file{libdmalloclp.a} library.
 
 @example
-gcc -O -g main.o -L/usr/local/lib -ldmalloclp -lgmalloc
+cc main.o -L/usr/local/lib -ldmalloclp -lgmalloc
 @end example
 
 If you have disabled dmalloc with the @code{DMALLOC_DISABLED} flag or
@@ -1111,7 +1098,7 @@ never included
 then you will not need the @file{libdmalloclp.a} library.
 
 @example
-gcc -O -g main.o -L/usr/local/lib -lgmalloc
+cc -g main.o -L/usr/local/lib -lgmalloc
 @end example
 
 If you get unresolved references like @code{_malloc_leap} or
@@ -1843,7 +1830,7 @@ Overview.
 
 Allocation Basics.
 
-* Basic Definitions::           For defining general terms and concepts.
+* Basic Definitions::           General memory terms and concepts.
 * Malloc Functions::            Functionality supported by all malloc libs.
 
 Using a Debugger.

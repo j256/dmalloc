@@ -1,3 +1,7 @@
+Wed Nov  9 15:43:45 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Upgraded to autoconf 2.1.  New configure script.
+
 Tue Nov  8 18:54:04 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Added dying message when malloc_die is called.  Thanks Marty.
@@ -890,5 +894,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.133 1994/11/09 16:14:36 gray Exp $
+$Id: ChangeLog,v 1.134 1994/11/10 00:11:19 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.64 1994/11/09 17:19:03 gray Exp $
+# $Id: Makefile.in,v 1.65 1994/11/10 00:11:29 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -61,8 +61,9 @@ clobber :
 
 .PHONY : distclean
 distclean : clobber
-	rm -f configure config.status Makefile conf.h dmalloc.h.2
-	rm -rf port dmalloc.ps
+	rm -f configure config.status config.log config.cache conf.h
+	rm -f Makefile dmalloc.h.2 dmalloc.ps
+	rm -rf port
 
 .PHONY : installincs
 installincs : $(HFLS)

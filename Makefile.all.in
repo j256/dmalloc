@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.50 1994/11/03 22:26:14 gray Exp $
+# $Id: Makefile.all.in,v 1.51 1994/11/10 00:11:27 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -64,7 +64,7 @@ realclean : clobber
 
 # .PHONY : distclean
 distclean : clobber
-	rm -f config.status Makefile conf.h dmalloc.h.2
+	rm -f Makefile config.status config.cache config.log conf.h dmalloc.h.2
 #	rm -f configure
 
 # .PHONY : installdirs
