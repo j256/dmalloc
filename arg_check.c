@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.32 2003/05/13 16:38:43 gray Exp $
+ * $Id: arg_check.c,v 1.33 2003/05/15 02:42:14 gray Exp $
  */
 
 /*
@@ -37,19 +37,10 @@
 #include "conf.h"
 
 #include "chunk.h"
-#include "debug_val.h"
+#include "debug_tok.h"
 #include "error.h"
 #include "dmalloc_loc.h"
 #include "arg_check.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: arg_check.c,v 1.32 2003/05/13 16:38:43 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.32 2003/05/13 16:38:43 gray Exp $";
-#endif
-#endif
 
 #if HAVE_BCMP
 /*

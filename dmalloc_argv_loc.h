@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_argv_loc.h,v 1.9 2000/05/15 15:42:58 gray Exp $
+ * $Id: dmalloc_argv_loc.h,v 1.10 2003/05/15 02:42:21 gray Exp $
  */
 
 #ifndef __ARGV_LOC_H__
@@ -29,11 +29,6 @@
 /*
  * some compilation options
  */
-
-/* to include RCS ids in the code */
-#ifndef INCLUDE_RCS_IDS
-#define INCLUDE_RCS_IDS 1
-#endif
 
 /*
  * generic constants

@@ -35,15 +35,6 @@
 #include "dmalloc_argv_loc.h"
 #include "compat.h"
 
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "@(#) $Id: dmalloc_argv.c,v 1.12 2003/05/13 16:40:18 gray Exp $"
-#else
-static	char	*rcs_id =
-  "@(#) $Id: dmalloc_argv.c,v 1.12 2003/05/13 16:40:18 gray Exp $";
-#endif
-#endif
-
 /* internal routines */
 static	void	do_list(argv_t *grid, const int arg_c, char **argv,
 			argv_t **queue_list, int *queue_head_p,

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.53 2001/03/29 00:21:33 gray Exp $
+ * $Id: compat.c,v 1.54 2003/05/15 02:42:15 gray Exp $
  */
 
 /*
@@ -39,15 +39,6 @@
 
 #include "compat.h"
 #include "dmalloc_loc.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: compat.c,v 1.53 2001/03/29 00:21:33 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: compat.c,v 1.53 2001/03/29 00:21:33 gray Exp $";
-#endif
-#endif
 
 /*
  * Local vsnprintf which handles the buffer-size or not.  Returns the

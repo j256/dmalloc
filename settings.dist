@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.54 2003/05/13 18:16:19 gray Exp $
+ * $Id: settings.dist,v 1.55 2003/05/15 02:42:56 gray Exp $
  */
 
 /*
@@ -28,12 +28,6 @@
 
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
-
-/*
- * should we include the RCS ids in the .c files and the installed
- * library?
- */
-#define INCLUDE_RCS_IDS 1
 
 /*
  * Should we allow zero length allocations?  This will generate the
