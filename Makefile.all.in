@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.110 2003/05/15 02:47:27 gray Exp $
+# $Id: Makefile.all.in,v 1.111 2003/05/16 16:31:03 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -283,6 +283,8 @@ $(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
 	@shlinkargs@
 	mv $@.t $@
 
+threadssl : $(LIB_TH_SL)
+
 threadscxxsl : $(LIB_TH_CXX_SL)
 
 threadscxx : $(BUILD_TH_CXX)
@@ -290,8 +292,12 @@ threadscxx : $(BUILD_TH_CXX)
 
 threads : $(BUILD_THREADS)
 @CXX_OFF@	@echo "Enter 'make threadscxx' to build the threaded C++ library"
+@SL_OFF@	@echo "Enter 'make threadssl' to build the threaded shared library"
+
+cxxsl :  $(LIB_CXX_SL)
 
 cxx : $(BUILD_CXX)
+@SL_OFF@	@echo "Enter 'make cxxsl' to build the cxx shared library"
 
 utils : $(UTIL)
 
