@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.85 2000/03/24 21:57:28 gray Exp $
+ * $Id: dmalloc_t.c,v 1.86 2000/05/15 22:23:03 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.85 2000/03/24 21:57:28 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.86 2000/05/15 22:23:03 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.85 2000/03/24 21:57:28 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.86 2000/05/15 22:23:03 gray Exp $";
 #endif
 #endif
 
@@ -526,7 +526,7 @@ static	int	check_special(void)
   }
   free(NULL);
 #if ALLOW_FREE_NULL
-  if (dmalloc_errno != ERROR_NONE && ! silent_b) {
+  if (dmalloc_errno != ERROR_NONE && (! silent_b)) {
     (void)printf("   ERROR: free of 0L returned error.\n");
   }
 #else
