@@ -1,9 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.101 2002/02/14 23:42:52 gray Exp $
+$Id: NEWS,v 1.102 2003/05/15 20:09:32 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 5.0.0:
 
+	* Added -M --memory-limit argument to dmalloc to limit allocations.
+	* Deprecated log-blocks and heap-check-map debug tokens.
+	* Added a currently in use stats to log-stats.
+	* Removed a number of old error codes.
+	* Fixed some literal ranlib entries in the Makefile.in.
+	* Removed the USE_DMALLOC_LEAP functionality to simplify.
 	* Added a function to re-open the logfile when processing flags.
 	* Added section to docs about debugging daemon and CGI processes.
 	* Made some cosmetic improvements to the configure.in script.
