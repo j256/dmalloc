@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk.h,v 1.41 1995/08/13 20:02:57 gray Exp $
+ * $Id: chunk.h,v 1.42 1995/09/06 17:49:37 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -67,13 +67,6 @@ IMPORT	int	_chunk_check(void);
  */
 IMPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 				 const int check, const int min_size);
-
-/*
- * note in the chunk-level admin structures that BLOCKN blocks were
- * sbrk'ed externally by someone else up to MEM
- * returns [NO]ERROR
- */
-IMPORT	int	_chunk_note_external(const int blockn, const void * mem);
 
 /*
  * return some information associated with PNT, returns [NO]ERROR
