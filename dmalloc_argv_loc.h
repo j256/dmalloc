@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_argv_loc.h,v 1.5 1998/10/26 14:24:33 gray Exp $
+ * $Id: dmalloc_argv_loc.h,v 1.6 1999/03/04 16:31:22 gray Exp $
  */
 
 #ifndef __DMALLOC_ARGV_LOC_H__

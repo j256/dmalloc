@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: compat.c,v 1.40 1998/11/12 16:28:11 gray Exp $
+ * $Id: compat.c,v 1.41 1999/03/04 16:32:37 gray Exp $
  */
 
 /*
@@ -39,10 +39,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.40 1998/11/12 16:28:11 gray Exp $";
+#ident "$Id: compat.c,v 1.41 1999/03/04 16:32:37 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.40 1998/11/12 16:28:11 gray Exp $";
+  "$Id: compat.c,v 1.41 1999/03/04 16:32:37 gray Exp $";
 #endif
 #endif
 

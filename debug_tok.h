@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.27 1998/11/12 21:29:55 gray Exp $
+ * $Id: debug_tok.h,v 1.28 1999/03/04 16:31:15 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__

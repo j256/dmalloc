@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: arg_check.h,v 1.13 1998/10/26 14:24:25 gray Exp $
+ * $Id: arg_check.h,v 1.14 1999/03/04 16:31:07 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__

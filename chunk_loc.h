@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.54 1998/11/12 23:55:57 gray Exp $
+ * $Id: chunk_loc.h,v 1.55 1999/03/04 16:31:11 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__

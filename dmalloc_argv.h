@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_argv.h,v 1.5 1998/10/26 14:24:33 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.6 1999/03/04 16:31:20 gray Exp $
  */
 
 #ifndef __DMALLOC_ARGV_H__
@@ -38,7 +38,7 @@
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.5 1998/10/26 14:24:33 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.6 1999/03/04 16:31:20 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments

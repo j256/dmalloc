@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: return.h,v 1.24 1998/10/26 14:24:40 gray Exp $
+ * $Id: return.h,v 1.25 1999/03/04 16:31:38 gray Exp $
  */
 
 /*

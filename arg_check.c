@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: arg_check.c,v 1.18 1998/10/26 14:24:24 gray Exp $
+ * $Id: arg_check.c,v 1.19 1999/03/04 16:32:29 gray Exp $
  */
 
 /*
@@ -47,10 +47,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.18 1998/10/26 14:24:24 gray Exp $";
+#ident "$Id: arg_check.c,v 1.19 1999/03/04 16:32:29 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.18 1998/10/26 14:24:24 gray Exp $";
+  "$Id: arg_check.c,v 1.19 1999/03/04 16:32:29 gray Exp $";
 #endif
 #endif
 

@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.letters.com/~gray/
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.121 1999/03/03 16:05:20 gray Exp $
+ * $Id: malloc.c,v 1.122 1999/03/04 16:33:00 gray Exp $
  */
 
 /*
@@ -81,10 +81,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.121 1999/03/03 16:05:20 gray Exp $";
+#ident "$Id: malloc.c,v 1.122 1999/03/04 16:33:00 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.121 1999/03/03 16:05:20 gray Exp $";
+  "$Id: malloc.c,v 1.122 1999/03/04 16:33:00 gray Exp $";
 #endif
 #endif
 
