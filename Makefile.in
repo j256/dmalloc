@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.55 1994/09/10 23:26:41 gray Exp $
+# $Id: Makefile.in,v 1.56 1994/09/12 17:19:39 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -33,7 +33,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
 	return.h version.h \
 	argv.[ch] argv_loc.h \
 	dmalloc.texi dmalloc.info dmalloc.ps texinfo.tex \
-	Deansify.pl
+	install.sh Deansify.pl
 PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
 MAXSIZE	= 85k
