@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.67 2003/06/06 19:06:21 gray Exp $
+ * $Id: chunk.h,v 1.68 2003/09/08 19:27:19 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -118,7 +118,7 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
  * set to the last time the pointer was "used".
  *
  * valloc_bp <- Pointer to an integer which, if not NULL, will be set
- * to 1 if the pointer was allocated with valloc() otherwise 0.
+ * to 1 if the pointer was allocated with valloc otherwise 0.
  *
  * fence_bp <- Pointer to an integer which, if not NULL, will be set
  * to 1 if the pointer has the fence bit set otherwise 0.
@@ -179,7 +179,7 @@ int	_dmalloc_chunk_heap_check(void);
  */
 extern
 int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
-			    const int exact_b, const int min_size);
+				 const int exact_b, const int min_size);
 
 /*
  * void *_dmalloc_chunk_malloc
@@ -209,8 +209,8 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
  */
 extern
 void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
-			  const unsigned long size, const int func_id,
-			  const unsigned int alignment);
+			       const unsigned long size, const int func_id,
+			       const unsigned int alignment);
 
 /*
  * int _dmalloc_chunk_free
