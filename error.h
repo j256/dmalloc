@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.h,v 1.38 1999/03/02 17:42:21 gray Exp $
+ * $Id: error.h,v 1.39 1999/03/03 16:04:58 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -98,6 +98,12 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b);
 extern
 char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b);
 #endif /* if STORE_TIMEVAL == 0 */
+
+/*
+ * message writer with vprintf like arguments
+ */
+extern
+void	_dmalloc_vmessage(const char *format, va_list args);
 
 /*
  * message writer with printf like arguments

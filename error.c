@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.c,v 1.78 1999/03/02 17:42:21 gray Exp $
+ * $Id: error.c,v 1.79 1999/03/03 16:04:57 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.78 1999/03/02 17:42:21 gray Exp $";
+#ident "$Id: error.c,v 1.79 1999/03/03 16:04:57 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.78 1999/03/02 17:42:21 gray Exp $";
+  "$Id: error.c,v 1.79 1999/03/03 16:04:57 gray Exp $";
 #endif
 #endif
 
@@ -177,15 +177,13 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b)
 #endif
 
 /*
- * message writer with printf like arguments
+ * message writer with vprintf like arguments
  */
-void	_dmalloc_message(const char *format, ...)
-  /* __attribute__ ((format (printf, 1, 2))) */
+void	_dmalloc_vmessage(const char *format, va_list args)
 {
   static int	outfile = -1;
   char		str[1024], *str_p = str;
   int		len;
-  va_list	args;
   
   /* no logpath and no print then no workie */
   if (dmalloc_logpath == LOGPATH_INIT
@@ -267,13 +265,8 @@ void	_dmalloc_message(const char *format, ...)
        * NOTE: this makes it go recursive here but it will never enter
        * this section of code.
        */
-#if DMALLOC_LICENSE
-      _dmalloc_message("Dmalloc version '%s'.  Licensed copy #%d.",
-		       dmalloc_version, DMALLOC_LICENSE);
-#else
-      _dmalloc_message("Dmalloc version '%s'.  UN-LICENSED copy.",
+      _dmalloc_message("Dmalloc version '%s'.  Public domain copy.",
 		       dmalloc_version);
-#endif
       _dmalloc_message("dmalloc_logfile '%s': flags = %#x, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags,
 		       (unsigned long)dmalloc_address);
@@ -303,6 +296,19 @@ void	_dmalloc_message(const char *format, ...)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     (void)write(STDERR, str, len);
   }
+}
+
+/*
+ * message writer with printf like arguments
+ */
+void	_dmalloc_message(const char *format, ...)
+  /* __attribute__ ((format (printf, 1, 2))) */
+{
+  va_list	args;
+  
+  va_start(args, format);
+  _dmalloc_vmessage(format, args);
+  va_end(args);
 }
 
 /*
