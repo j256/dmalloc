@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $
+ * $Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $
  */
 
 /*
@@ -62,25 +62,25 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+#ident "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+  "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
 #endif
 #endif
 
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+#ident "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
 #ident "@(#) Dmalloc package Copyright 2000 by Gray Watson";
-#ident "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+#ident "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
 #ident "@(#) Source for dmalloc available from http://dmalloc.com/";
 #else
 static	char	*copyright =
-  "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+  "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
 static	char	*copyright_w =
   "@(#) Dmalloc package Copyright 2000 by Gray Watson";
 static	char	*source_url =
-  "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+  "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
 static	char	*source_url_w =
   "@(#) Source for dmalloc available from http://dmalloc.com/";
 #endif
@@ -549,6 +549,7 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
     switch (flag) {
       
     case BBLOCK_START_USER:
+    case BBLOCK_USER:
     case BBLOCK_VALLOC:
       if (bblock_c == 0) {
 	bblock_p->bb_flags = BBLOCK_START_USER;
@@ -565,24 +566,22 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
       bblock_p->bb_line = (unsigned short)num;
       bblock_p->bb_size = (unsigned int)info;
       bblock_p->bb_file = (char *)pnt;
-#if FREED_POINTER_DELAY
-      bblock_p->bb_reuse_iter = 0;
-#endif
+      bblock_p->bb_use_iter = _dmalloc_iter_c;
       break;
       
+    case BBLOCK_START_FREE:
     case BBLOCK_FREE:
-      bblock_p->bb_flags = BBLOCK_FREE;
-      bblock_p->bb_bit_n = (unsigned short)num;
-      bblock_p->bb_block_n = (unsigned int)block_n;
       if (bblock_c == 0) {
 	bblock_p->bb_next = (struct bblock_st *)pnt;
+	bblock_p->bb_flags = BBLOCK_START_FREE;
       }
       else {
-	bblock_p->bb_next = (struct bblock_st *)NULL;
+	bblock_p->bb_next = NULL;
+	bblock_p->bb_flags = BBLOCK_FREE;
       }
-#if FREED_POINTER_DELAY
-      bblock_p->bb_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
-#endif
+      bblock_p->bb_bit_n = (unsigned short)num;
+      bblock_p->bb_block_n = (unsigned int)block_n;
+      bblock_p->bb_use_iter = _dmalloc_iter_c;
       break;
       
     default:
@@ -626,7 +625,8 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
       
 #if FREED_POINTER_DELAY
       /* are we still waiting on this guy? */
-      if (_dmalloc_iter_c < bblock_p->bb_reuse_iter) {
+      if (bblock_p->bb_use_iter > 0
+	  && _dmalloc_iter_c < bblock_p->bb_use_iter + FREED_POINTER_DELAY) {
 	continue;
       }
 #endif
@@ -700,6 +700,7 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
   }
   
   bblock_p = adm_p->ba_blocks + pos;
+  /* we should not be at the start of a free section but in the middle */
   if (bblock_p->bb_flags != BBLOCK_FREE) {
     dmalloc_errno = ERROR_BAD_FREE_MEM;
     dmalloc_error("find_free_bblocks");
@@ -709,7 +710,7 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
   block_n = bblock_p->bb_block_n - many;
   NUM_BITS(block_n * BLOCK_SIZE, bit_n);
   
-  set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, bit_n, 0,
+  set_bblock_admin(block_n, bblock_p, BBLOCK_START_FREE, bit_n, 0,
 		   free_bblock[bit_n]);
   free_bblock[bit_n] = bblock_p;
   
@@ -746,7 +747,7 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
     free_space_count -= many * BLOCK_SIZE;
     
     /* space should be free */
-    if (bblock_p->bb_flags != BBLOCK_FREE) {
+    if (bblock_p->bb_flags != BBLOCK_START_FREE) {
       dmalloc_errno = ERROR_BAD_FREE_MEM;
       dmalloc_error("get_bblocks");
       return NULL;
@@ -998,7 +999,7 @@ static	bblock_t	*find_bblock(const void *pnt, bblock_t **prev_p,
     }
     
     /* adjust the last pointer back to start of free block */
-    if (prev != NULL && BIT_IS_SET(prev->bb_flags, BBLOCK_FREE)) {
+    if (prev != NULL && BIT_IS_SET(prev->bb_flags, BBLOCK_START_FREE)) {
       if (prev->bb_block_n <= bblock_c) {
 	prev = bblock_adm_p->ba_blocks + (bblock_c - prev->bb_block_n);
       }
@@ -1124,7 +1125,8 @@ static	dblock_t	*find_free_dblock(const int bit_n)
        prev_p = dblock_p, dblock_p = dblock_p->db_next) {
     
     /* are we still waiting on this guy? */
-    if (_dmalloc_iter_c < dblock_p->db_reuse_iter) {
+    if (dblock_p->db_use_iter > 0
+	&& _dmalloc_iter_c < dblock_p->db_use_iter + FREED_POINTER_DELAY) {
       continue;
     }
     
@@ -1211,9 +1213,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
       dblock_p->db_flags = DBLOCK_FREE;
       dblock_p->db_bblock = bblock_p;
       dblock_p->db_next = dblock_p + 1;
-#if FREED_POINTER_DELAY
-      dblock_p->db_reuse_iter = 0;
-#endif
+      dblock_p->db_use_iter = 0;
 #if STORE_SEEN_COUNT
       dblock_p->db_overhead.ov_seen_c = 0;
 #endif
@@ -1224,9 +1224,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     dblock_p->db_flags = DBLOCK_FREE;
     dblock_p->db_next = free_p;
     dblock_p->db_bblock = bblock_p;
-#if FREED_POINTER_DELAY
-    dblock_p->db_reuse_iter = 0;
-#endif
+    dblock_p->db_use_iter = 0;
     free_space_count += 1 << bit_n;
     
     /*
@@ -1250,6 +1248,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
   dblock_p->db_line = line;
   dblock_p->db_size = byte_n;
   dblock_p->db_file = file;
+  dblock_p->db_use_iter = _dmalloc_iter_c;
   
 #if STORE_SEEN_COUNT
   dblock_p->db_overhead.ov_seen_c++;
@@ -1291,7 +1290,7 @@ int	_chunk_check(void)
   char		*byte_p;
   void		*pnt;
   int		bit_c, dblock_c = 0, bblock_c = 0, free_c = 0;
-  unsigned int	bb_c = 0, len;
+  unsigned int	bb_c = 0, len, block_type;
   int		free_bblock_c[MAX_SLOTS];
   int		free_dblock_c[BASIC_BLOCK];
   
@@ -1430,7 +1429,8 @@ int	_chunk_check(void)
     /*
      * check for different types
      */
-    switch (BBLOCK_FLAG_TYPE(bblock_p->bb_flags)) {
+    block_type = BBLOCK_FLAG_TYPE(bblock_p->bb_flags);
+    switch (block_type) {
       
       /* check a starting user-block */
     case BBLOCK_START_USER:
@@ -1507,18 +1507,17 @@ int	_chunk_check(void)
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
-      else {
-	if (start == 0
-	    && (prev_bblock_p == NULL
-		|| ((! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_START_USER))
-		    && (! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_USER)))
-		|| bblock_p->bb_file != prev_bblock_p->bb_file
-		|| bblock_p->bb_line != prev_bblock_p->bb_line
-		|| bblock_p->bb_size != prev_bblock_p->bb_size)) {
-	  dmalloc_errno = ERROR_USER_NON_CONTIG;
-	  dmalloc_error("_chunk_check");
-	  return ERROR;
-	}
+      
+      if (start == 0
+	  && (prev_bblock_p == NULL
+	      || ((! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_START_USER))
+		  && (! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_USER)))
+	      || bblock_p->bb_file != prev_bblock_p->bb_file
+	      || bblock_p->bb_line != prev_bblock_p->bb_line
+	      || bblock_p->bb_size != prev_bblock_p->bb_size)) {
+	dmalloc_errno = ERROR_USER_NON_CONTIG;
+	dmalloc_error("_chunk_check");
+	return ERROR;
       }
       
       bblock_c--;
@@ -1720,47 +1719,50 @@ int	_chunk_check(void)
       }
       break;
       
-    case BBLOCK_FREE:
+    case BBLOCK_START_FREE:
       
-      /* NOTE: check out free_lists, depending on debug value? */
-      
-      /* verify linked list pointer */
-      if (bblock_p->bb_next != NULL && (! IS_IN_HEAP(bblock_p->bb_next))) {
-	dmalloc_errno = ERROR_BAD_FREE_LIST;
+      /* check X blocks in a row */
+      if (free_c != 0) {
+	dmalloc_errno = ERROR_USER_NON_CONTIG;
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
-      /* check X blocks in a row */
-      if (free_c == 0) {
-	free_c = bblock_p->bb_block_n;
+      free_c = bblock_p->bb_block_n;
+      
+      if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
 	
-	if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
-	  
-	  /* find the free block in the free list */
-	  for (bblist_p = free_bblock[bblock_p->bb_bit_n];
-	       bblist_p != NULL;
-	       bblist_p = bblist_p->bb_next) {
-	    if (bblist_p == bblock_p)
-	      break;
-	  }
-	  
-	  /* did we find it? */
-	  if (bblist_p == NULL) {
-	    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-	      dmalloc_errno = ERROR_BAD_FREE_LIST;
-	      dmalloc_error("_chunk_check");
-	      return ERROR;
-	    }
-	  }
-	  else {
-	    free_bblock_c[bblock_p->bb_bit_n]--;
+	/* find the free block in the free list */
+	for (bblist_p = free_bblock[bblock_p->bb_bit_n];
+	     bblist_p != NULL;
+	     bblist_p = bblist_p->bb_next) {
+	  if (bblist_p == bblock_p) {
+	    break;
 	  }
 	}
+	
+	/* did we find it? */
+	if (bblist_p == NULL) {
+	  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+	    dmalloc_errno = ERROR_BAD_FREE_LIST;
+	    dmalloc_error("_chunk_check");
+	    return ERROR;
+	  }
+	}
+	else {
+	  free_bblock_c[bblock_p->bb_bit_n]--;
+	}
       }
-      else {
+      /* NOTE: NO BREAK HERE ON PURPOSE */
+      
+    case BBLOCK_FREE:
+      
+      /* NOTE: check out free_lists, depending on debug value? */
+      
+      if (block_type == BBLOCK_FREE) {
 	if (prev_bblock_p == NULL
-	    || prev_bblock_p->bb_flags != BBLOCK_FREE
+	    || (prev_bblock_p->bb_flags != BBLOCK_FREE
+		&& prev_bblock_p->bb_flags != BBLOCK_START_FREE)
 	    || bblock_p->bb_bit_n != prev_bblock_p->bb_bit_n) {
 	  dmalloc_errno = ERROR_FREE_NON_CONTIG;
 	  dmalloc_error("_chunk_check");
@@ -2281,6 +2283,7 @@ static	int	chunk_write_info(const char *file, const unsigned int line,
     dblock_p->db_size = size;
     dblock_p->db_file = (char *)file;
     dblock_p->db_line = (unsigned short)line;
+    dblock_p->db_use_iter = _dmalloc_iter_c;
   }
   else {
     
@@ -2375,10 +2378,14 @@ void	_chunk_log_heap_map(void)
 	continue;
       }
       
-      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_FREE)) {
+      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_FREE)) {
 	line[char_c++] = 'F';
 	continue;
-	
+      }
+      
+      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_FREE)) {
+	line[char_c++] = 'f';
+	continue;
       }
       
       if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_EXTERNAL)) {
@@ -2457,6 +2464,14 @@ void	_chunk_log_heap_map(void)
       if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_DBLOCK_ADMIN)) {
 	_dmalloc_message("%d (%#lx): dblock-admin block",
 			tblock_c, (unsigned long)BLOCK_POINTER(tblock_c));
+	continue;
+      }
+      
+      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_FREE)) {
+	_dmalloc_message("%d (%#lx): start-of-free block of %ld blocks, next at %#lx",
+			 tblock_c, (unsigned long)BLOCK_POINTER(tblock_c),
+			 bblock_p->bb_block_n,
+			 (unsigned long)bblock_p->bb_mem);
 	continue;
       }
       
@@ -2815,9 +2830,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     /* adjust the pointer info structure */
     dblock_p->db_flags = DBLOCK_FREE;
     dblock_p->db_bblock = bblock_p;
-#if FREED_POINTER_DELAY
-    dblock_p->db_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
-#endif
+    dblock_p->db_use_iter = _dmalloc_iter_c;
     /* put pointer on the dblock free list if we are reusing memory */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
       dblock_p->db_next = NULL;
@@ -2944,7 +2957,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
    */
   
   if (prev_p != NULL
-      && BIT_IS_SET(prev_p->bb_flags, BBLOCK_FREE)
+      && BIT_IS_SET(prev_p->bb_flags, BBLOCK_START_FREE)
       && (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE))) {
     
     /* find prev in free list and remove it */
@@ -2977,7 +2990,8 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     bblock_p = prev_p;
   }
   if (next_p != NULL
-      && BIT_IS_SET(next_p->bb_flags, BBLOCK_FREE)
+      && (BIT_IS_SET(next_p->bb_flags, BBLOCK_START_FREE)
+	  || BIT_IS_SET(next_p->bb_flags, BBLOCK_FREE))
       && (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE))) {
     
     /* find next in free list and remove it */
@@ -3313,38 +3327,56 @@ void	_chunk_stats(void)
 		   bblock_count - bblock_adm_count - dblock_count -
 		   dblock_adm_count - extern_count, dblock_count,
 		   tot_space);
-  _dmalloc_message("   final admin overhead: basic %ld, divided %ld, %ld bytes (%ld%%)",
+  _dmalloc_message(" final admin overhead: basic %ld, divided %ld, %ld bytes (%ld%%)",
 		   bblock_adm_count, dblock_adm_count, overhead,
 		   (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
-  _dmalloc_message("   final external space: %ld bytes (%ld blocks)",
+  _dmalloc_message(" final external space: %ld bytes (%ld blocks)",
 		   extern_count * BLOCK_SIZE, extern_count);
   
 #if MEMORY_TABLE_LOG
-  _dmalloc_message("Top %d allocations:", MEMORY_TABLE_LOG);
+  _dmalloc_message("top %d allocations:", MEMORY_TABLE_LOG);
   _table_log_info(MEMORY_TABLE_LOG, 1);
 #endif
 }
 
 /*
- * Dump the unfreed memory, logs the unfreed information to logger
+ * Dump the pointer information that has changed since mark.  If
+ * non_freed_b is 1 then log the new not-freed (i.e. used) pointers.
+ * If free_b is 1 then log the new freed pointers.  If details_b is 1
+ * then dump the individual pointer entries instead of just the
+ * summary.
  */
-void	_chunk_dump_unfreed(void)
+void	_chunk_log_changed(const unsigned long mark, const int not_freed_b,
+			   const int freed_b, const int details_b)
 {
   bblock_adm_t	*this_adm_p;
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
   void		*pnt;
+  unsigned int	block_type;
   int		unknown_b;
-  char		out[DUMP_SPACE * 4];
+  char		out[DUMP_SPACE * 4], *which_str;
   char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   int		unknown_size_c = 0, unknown_block_c = 0, out_len;
   int		size_c = 0, block_c = 0;
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    _dmalloc_message("dumping the unfreed pointers:");
+  if (not_freed_b && freed_b) {
+    which_str = "not-freed and freed";
+  }
+  else if (not_freed_b) {
+    which_str = "not-freed";
+  }
+  else if (freed_b) {
+    which_str = "freed";
+  }
+  else {
+    return;
   }
   
-  /* clear out our memory table so we can fill it with unfreed pointer info */
+  _dmalloc_message("dumping %s pointers changed since %lu:",
+		   which_str, mark);
+  
+  /* clear out our memory table so we can fill it with pointer info */
   _table_clear();
   
   /* has anything been alloced yet? */
@@ -3371,9 +3403,22 @@ void	_chunk_dump_unfreed(void)
     /*
      * check for different types
      */
-    switch (BBLOCK_FLAG_TYPE(bblock_p->bb_flags)) {
+    block_type = BBLOCK_FLAG_TYPE(bblock_p->bb_flags);
+    switch (block_type) {
       
     case BBLOCK_START_USER:
+    case BBLOCK_START_FREE:
+      
+      /* are we displaying the currently used pointers? */
+      if (! ((not_freed_b && block_type == BBLOCK_START_USER)
+	     || (freed_b && block_type == BBLOCK_START_FREE))) {
+	continue;
+      }
+      /* has this changed since the mark */
+      if (bblock_p->bb_use_iter <= mark) {
+	continue;
+      }
+      
       /* find pointer to memory chunk */
       pnt = BLOCK_POINTER(this_adm_p->ba_pos_n +
 			  (bblock_p - this_adm_p->ba_blocks));
@@ -3389,23 +3434,23 @@ void	_chunk_dump_unfreed(void)
       }
       
       if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
-#if DUMP_UNFREED_SUMMARY_ONLY == 0
-	_dmalloc_message("not freed: '%s' (%ld bytes) from '%s'",
-			 display_pnt(CHUNK_TO_USER(pnt),
-				     &bblock_p->bb_overhead, disp_buf,
-				     sizeof(disp_buf)),
-			 bblock_p->bb_size - fence_overhead_size,
-			 _chunk_desc_pnt(where_buf, sizeof(where_buf),
-					 bblock_p->bb_file,
-					 bblock_p->bb_line));
-	
-	if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
-	  out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
-				 out, sizeof(out));
-	  _dmalloc_message("Dump of '%#lx': '%.*s'",
-			   (unsigned long)CHUNK_TO_USER(pnt), out_len, out);
+	if (details_b) {
+	  _dmalloc_message(" not freed: '%s' (%ld bytes) from '%s'",
+			   display_pnt(CHUNK_TO_USER(pnt),
+				       &bblock_p->bb_overhead, disp_buf,
+				       sizeof(disp_buf)),
+			   bblock_p->bb_size - fence_overhead_size,
+			   _chunk_desc_pnt(where_buf, sizeof(where_buf),
+					   bblock_p->bb_file,
+					   bblock_p->bb_line));
+	  
+	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
+	    out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
+				   out, sizeof(out));
+	    _dmalloc_message("  dump of '%#lx': '%.*s'",
+			     (unsigned long)CHUNK_TO_USER(pnt), out_len, out);
+	  }
 	}
-#endif
 	_table_alloc(bblock_p->bb_file, bblock_p->bb_line,
 		     bblock_p->bb_size - fence_overhead_size);
       }
@@ -3419,7 +3464,6 @@ void	_chunk_dump_unfreed(void)
       for (dblock_p = bblock_p->bb_slot_p->da_block;
 	   dblock_p < bblock_p->bb_slot_p->da_block + DB_PER_ADMIN;
 	   dblock_p++) {
-	bblock_adm_t	*bba_p;
 	bblock_t	*bb_p;
 	
 	/* see if this admin slot has ever been used */
@@ -3427,40 +3471,18 @@ void	_chunk_dump_unfreed(void)
 	  continue;
 	}
 	
-	/* is this slot in a free list? */
-	if (dblock_p->db_flags == DBLOCK_FREE) {
+	/* do we want this slot */
+	if (! ((freed_b && dblock_p->db_flags == DBLOCK_FREE)
+	       || (not_freed_b && dblock_p->db_flags != DBLOCK_FREE))) {
+	  continue;
+	}
+	/* has this changed since the mark */
+	if (dblock_p->db_use_iter <= mark) {
 	  continue;
 	}
 	
-	bba_p = bblock_adm_head;
-	
-	/* check out the basic blocks */
-	for (bb_p = bba_p->ba_blocks;; bb_p++) {
-	  
-	  /* are we at the end of the bb_admin section */
-	  if (bb_p >= bba_p->ba_blocks + BB_PER_ADMIN) {
-	    bba_p = bba_p->ba_next;
-	    
-	    /* are we done? */
-	    if (bba_p == NULL) {
-	      break;
-	    }
-	    
-	    bb_p = bba_p->ba_blocks;
-	  }
-	  
-	  if (bb_p->bb_flags != BBLOCK_DBLOCK) {
-	    continue;
-	  }
-	  
-	  if (dblock_p >= bb_p->bb_dblock
-	      && dblock_p < bb_p->bb_dblock +
-	      (1 << (BASIC_BLOCK - bb_p->bb_bit_n))) {
-	    break;
-	  }
-	}
-	
-	if (bba_p == NULL) {
+	bb_p = dblock_p->db_bblock;
+	if (bb_p == NULL) {
 	  dmalloc_errno = ERROR_BAD_DBLOCK_POINTER;
 	  dmalloc_error("_chunk_dump_unfreed");
 	  return;
@@ -3480,23 +3502,26 @@ void	_chunk_dump_unfreed(void)
 	}
 	
 	if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
-#if DUMP_UNFREED_SUMMARY_ONLY == 0
-	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
-			   display_pnt(CHUNK_TO_USER(pnt),
-				       &dblock_p->db_overhead, disp_buf,
-				       sizeof(disp_buf)),
-			   dblock_p->db_size - fence_overhead_size,
-			   _chunk_desc_pnt(where_buf, sizeof(where_buf),
-					   dblock_p->db_file,
-					   dblock_p->db_line));
-	  
-	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
-	    out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
-				   out, sizeof(out));
-	    _dmalloc_message("Dump of '%#lx': '%.*s'",
-			     (unsigned long)CHUNK_TO_USER(pnt), out_len, out);
+	  if (details_b) {
+	    _dmalloc_message(" %s: '%s' (%d bytes) from '%s'",
+			     (dblock_p->db_flags == DBLOCK_FREE ?
+			      "freed" : "not freed"),
+			     display_pnt(CHUNK_TO_USER(pnt),
+					 &dblock_p->db_overhead, disp_buf,
+					 sizeof(disp_buf)),
+			     dblock_p->db_size - fence_overhead_size,
+			     _chunk_desc_pnt(where_buf, sizeof(where_buf),
+					     dblock_p->db_file,
+					     dblock_p->db_line));
+	    
+	    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
+	      out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
+				     out, sizeof(out));
+	      _dmalloc_message("  dump of '%#lx': '%.*s'",
+			       (unsigned long)CHUNK_TO_USER(pnt), out_len,
+			       out);
+	    }
 	  }
-#endif
 	  _table_alloc(dblock_p->db_file, dblock_p->db_line,
 		       dblock_p->db_size - fence_overhead_size);
 	}
@@ -3509,20 +3534,19 @@ void	_chunk_dump_unfreed(void)
   }
   
   /* dump the summary and clear the table */
-  _dmalloc_message("Unfreed allocations:");
   _table_log_info(0, 0);
   _table_clear();
   
   /* copy out size of pointers */
   if (block_c > 0) {
     if (block_c - unknown_block_c > 0) {
-      _dmalloc_message("  known memory not freed: %d pointer%s, %d bytes",
+      _dmalloc_message(" known memory: %d pointer%s, %d bytes",
 		       block_c - unknown_block_c,
 		       (block_c - unknown_block_c == 1 ? "" : "s"),
 		       size_c - unknown_size_c);
     }
     if (unknown_block_c > 0) {
-      _dmalloc_message("unknown memory not freed: %d pointer%s, %d bytes",
+      _dmalloc_message(" unknown memory: %d pointer%s, %d bytes",
 		       unknown_block_c, (unknown_block_c == 1 ? "" : "s"),
 		       unknown_size_c);
     }

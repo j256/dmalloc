@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.58 2000/03/21 18:19:07 gray Exp $
+ * $Id: chunk.h,v 1.59 2000/03/24 21:58:18 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -117,10 +117,15 @@ extern
 void	_chunk_stats(void);
 
 /*
- * Dump the unfreed memory, logs the unfreed information to logger
+ * Dump the pointer information that has changed since mark.  If
+ * non_freed_b is 1 then log the new not-freed (i.e. used) pointers.
+ * If free_b is 1 then log the new freed pointers.  If details_b is 1
+ * then dump the individual pointer entries instead of just the
+ * summary.
  */
 extern
-void	_chunk_dump_unfreed(void);
+void	_chunk_log_changed(const unsigned long mark, const int not_freed_b,
+			   const int freed_b, const int details_b);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
