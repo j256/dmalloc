@@ -1,11 +1,11 @@
 #
 # Dmalloc RPM file for building of .rpm files for Redhat Linux systems.
 #
-# $Id: dmalloc.spec,v 1.26 2003/09/29 23:53:12 gray Exp $
+# $Id: dmalloc.spec,v 1.27 2003/11/18 15:28:29 gray Exp $
 #
 Summary: Debug Malloc (Dmalloc)
 Name: dmalloc
-Version: 5.2.3
+Version: 5.2.4
 Release: 1
 Group: Development/Libraries
 Copyright: public domain

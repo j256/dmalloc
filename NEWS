@@ -1,6 +1,16 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.113 2003/11/10 23:45:33 gray Exp $
+$Id: NEWS,v 1.114 2003/11/18 15:28:28 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.2.4 (11/18/2003):
+
+	* Fixed bug with check-fence and check-funcs interaction.  Thanks John.
+	* Added support for rc shell.  Thanks Michael.
+	* Fixed a logfile NULL pointer printf.  Thanks John.
+	* Fleshed out the error code documentation.
+	* Fixed Makefile.in to properly refer to docs directory.  Thanks Mike.
+	* Improved the docs about alias creation and usage.
+	* Added testing for destructors in configure.
 
 Version 5.2.3 (09/29/2003):
 

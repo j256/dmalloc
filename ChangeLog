@@ -1,6 +1,13 @@
+2003-11-18  Gray Watson  <gray@outside.256.com>
+
+	* Released dmalloc version 5.2.4.
+
+	* Fixed bug with check-fence and check-funcs interaction.  Thanks
+	to John Hetherington.
+
 2003-11-17  Gray Watson  <gray@outside.256.com>
 
-	* Added support for rc shell.  Thanks to 
+	* Added support for rc shell.  Thanks to Michael Haardt.
 
 	* Fixed a logfile NULL pointer printf.  Thanks to John
 	Hetherington.
@@ -20,7 +27,7 @@
 
 2003-10-01  Gray Watson  <gray@outside.256.com>
 
-	* Added testing for destructors.
+	* Added testing for destructors in configure.
 
 2003-09-29  Gray Watson  <gray@outside.256.com>
 
@@ -2101,5 +2108,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.311 2003/11/17 22:25:48 gray Exp $
+$Id: ChangeLog,v 1.312 2003/11/18 15:28:28 gray Exp $
 -------------------------------------------------------------------------------
