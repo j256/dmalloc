@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.73 1998/09/19 00:12:11 gray Exp $
+# $Id: Makefile.all.in,v 1.74 1998/10/08 15:07:16 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -56,9 +56,9 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = dmalloc.h
-OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o
-MALLOC_OBJ = malloc.o
-MALLOC_TH_OBJ = malloc_th.o
+OBJS = arg_check.o compat.o dmalloc_lp.o env.o heap.o
+NORMAL_OBJS = chunk.o error.o malloc.o
+THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
@@ -130,11 +130,11 @@ ${SHLIBRARY} : $(LIBRARY)
 	ld -shared -o $@.t -all $(LIBRARY) -all -soname $@ -none -lc
 	mv $@.t $@
 
-$(LIBRARY) : $(OBJS) $(MALLOC_OBJ)
+$(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
 	ar cr $@ $?
 	@RANLIB@ $@
 
-$(LIB_TH) : $(OBJS) $(MALLOC_TH_OBJ)
+$(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
@@ -154,8 +154,18 @@ $(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o
 
 threads : $(LIB_TH)
 
-# special _th version of malloc.o with the LOCK_THREADS variable defined to 1
-$(MALLOC_TH_OBJ) : malloc.c
+# special _th versions of objects with the LOCK_THREADS variable defined to 1
+chunk_th.o : chunk.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
+		-c chunk.c -o ./$@
+
+error_th.o : error.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
+		-c error.c -o ./$@
+
+malloc_th.o : malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
 		-c malloc.c -o ./$@
@@ -212,6 +222,8 @@ arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h \
  debug_val.h dmalloc_loc.h error.h arg_check.h
 chunk.o: chunk.c dmalloc.h conf.h settings.h chunk.h chunk_loc.h \
  dmalloc_loc.h compat.h debug_val.h error.h error_val.h heap.h
+chunk_th.o: chunk.c dmalloc.h conf.h settings.h chunk.h chunk_loc.h \
+ dmalloc_loc.h compat.h debug_val.h error.h error_val.h heap.h
 compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
 crc.o: crc.c
 dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
@@ -225,6 +237,8 @@ dmalloc_t.o: dmalloc_t.c dmalloc_argv.h dmalloc.h conf.h settings.h \
 env.o: env.c conf.h settings.h dmalloc.h dmalloc_loc.h debug_tok.h \
  debug_val.h env.h error.h
 error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
+ dmalloc_loc.h env.h error.h error_val.h version.h
+error_th.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
  dmalloc_loc.h env.h error.h error_val.h version.h
 heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h error.h error_val.h heap.h

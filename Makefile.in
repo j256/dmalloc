@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.108 1998/10/05 02:51:58 gray Exp $
+# $Id: Makefile.in,v 1.109 1998/10/08 15:07:15 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -8,9 +8,9 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o
-MALLOC_OBJ = malloc.o
-MALLOC_TH_OBJ = malloc_th.o
+OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o
+NORMAL_OBJS = chunk.o error.o malloc.o
+THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
 # NOTE:
 # not argv.c because from argv module
@@ -109,11 +109,11 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 		$(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-$(LIBRARY) : $(OBJS) $(MALLOC_OBJ)
+$(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
 	ar cr $(.TARGET) $?
 	ranlib $(.TARGET)
 
-$(LIB_TH) : $(OBJS) $(MALLOC_TH_OBJ)
+$(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $(.TARGET) $?
 	ranlib $(.TARGET)
 
@@ -128,7 +128,17 @@ $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 
 threads : $(LIB_TH)
 
-# special _th version of malloc.o with the LOCK_THREAD variable defined to 1
+# special _th versions of objects with the LOCK_THREADS variable defined to 1
+chunk_th.o : chunk.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
+		-c chunk.c -o ./$@
+
+error_th.o : error.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
+		-c error.c -o $(.TARGET)
+
 malloc_th.o : malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \

@@ -1,6 +1,19 @@
+Thu Oct  8 11:07:25 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added startup messages acknowledging the thread status.  Added
+        error.o to the thread object list.
+
 Wed Oct  7 14:52:14 1998  Gray Watson  <gray@burger.letters.com>
 
-	* Fixed possible sbrk race condition.
+	* Fixed problem with thread compilation and chunk.c.  Thanks much
+        to Didier Verna for pointing out this problem.
+
+	* Fixed possible race condition with synchronizing with external
+        sbrk calls.
+
+Mon Oct  5 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Migrated in new argv code.
 
 Sun Oct  4 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
 
@@ -1301,5 +1314,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.192 1998/10/07 18:52:25 gray Exp $
+$Id: ChangeLog,v 1.193 1998/10/08 15:07:59 gray Exp $
 -------------------------------------------------------------------------------
