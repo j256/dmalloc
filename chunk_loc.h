@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.63 2001/02/28 05:13:46 gray Exp $
+ * $Id: chunk_loc.h,v 1.64 2003/05/13 14:53:12 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -51,19 +51,10 @@
 #define SPECIAL_CHARS		"\"\"''\\\\n\nr\rt\tb\bf\fa\007"
 
 /*
- * the default smallest allowable allocations in bits.  this is
- * adjusted at runtime to conform to other settings.
+ * Maximum level in the skip list.  This implies that we can only
+ * store 2^32 entries optimally.  Needless to say this is plenty.
  */
-#define DEFAULT_SMALLEST_BLOCK	4
-
-/*
- * definition of admin overhead during race condition clearing with
- * admin, needed, and external block handling.
- */
-#define MAX_ADMIN_STORE		100
-
-#define BITS(type)		(sizeof(type) * 8)	/* # bits in TYPE */
-#define MAX_SLOTS		(int)(BITS(long) - 1)	/* # of bit slots */
+#define MAX_SKIP_LEVEL		32
 
 /* pointer to the start of the block which holds PNT */
 #define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
@@ -76,25 +67,6 @@
 
 /* get the number of blocks to hold SIZE */
 #define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
-
-/*
- * number of ba_block entries is a bblock_adm_t which must fit in a
- * basic block
- */
-#define BB_PER_ADMIN	(int)((BLOCK_SIZE - \
-			       (sizeof(long) + \
-				sizeof(int) + \
-				sizeof(struct bblock_adm_st *) + \
-				sizeof(long))) \
-			      / sizeof(bblock_t))
-
-/*
- * number of da_block entries in a dblock_adm_t which must fit in a
- * basic block
- */
-#define DB_PER_ADMIN	(int)((BLOCK_SIZE - \
-			       (sizeof(long) + sizeof(long))) \
-			      / sizeof(dblock_t))
 
 /*
  * calculate the number of bits in SIZE and put in ANS
@@ -116,141 +88,90 @@
 /* type of the fence magic values */
 #define FENCE_MAGIC_TYPE	int
 
-#define FENCE_WRITE(pnt, size)	do { \
-				  memcpy((char *)(pnt), fence_bottom, \
-					FENCE_BOTTOM_SIZE); \
-				  memcpy((char *)(pnt) + (size) \
-					 - FENCE_TOP_SIZE, \
-					 fence_top, FENCE_TOP_SIZE); \
-				} while (0)
-
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
-/* bb_flags values (unsigned short) */
-#define BBLOCK_ALLOCATED	0x0FFF		/* block has been allocated */
+/* flags associated with the skip_alloc_t type */
+#define ALLOC_FLAG_EXTERN	BIT_FLAG(0)	/* slot allocated externally */
+#define ALLOC_FLAG_USER		BIT_FLAG(1)	/* slot is user allocated */
+#define ALLOC_FLAG_FREE		BIT_FLAG(2)	/* slot is free */
 
-#define BBLOCK_START_USER	0x0001		/* start of some user space */
-#define BBLOCK_USER		0x0002		/* allocated by user space */
-#define BBLOCK_ADMIN		0x0004		/* pointing to bblock admin */
-#define BBLOCK_DBLOCK		0x0008		/* pointing to divided block */
-#define BBLOCK_DBLOCK_ADMIN	0x0010		/* pointing to dblock admin */
-#define BBLOCK_FREE		0x0020		/* block is free */
-#define BBLOCK_START_FREE	0x0040		/* start of free block */
-#define BBLOCK_EXTERNAL		0x0080		/* externally used block */
-#define BBLOCK_ADMIN_FREE	0x0100		/* ba_free_n pnt to free slot*/
-#define BBLOCK_VALLOC		0x0200		/* block is aligned alloc */
-
-#define BBLOCK_FENCE		0x1000		/* fence post checking is on */
-
-#define BBLOCK_FLAG_TYPE(f)	((f) & BBLOCK_ALLOCATED)
+#define ALLOC_FLAG_FENCE	BIT_FLAG(10)	/* slot is fence posted */
+#define ALLOC_FLAG_VALLOC	BIT_FLAG(11)	/* slot is block aligned */
 
 /*
- * some overhead fields for recording information about the pointer.
- * this structure is included in both the basic-block and
- * divided-block admin structures and helps track specific information
- * about the pointer.
+ * Below defines an allocation structure either on the free or used
+ * list.  It tracks allocations that fit in partial, one, or many
+ * basic-blocks.  It stores some optional fields for recording
+ * information about the pointer.
  */
-typedef struct {
+typedef struct skip_alloc_st {
+  
+  unsigned int		sa_flags;	/* what it is */
+  unsigned int		sa_user_size;	/* user size of allocated area */
+  unsigned int		sa_total_size;	/* total size given to user */
+  
+  void			*sa_mem;	/* pointer to the memory in question */
+  const char		*sa_file;	/* .c filename where alloced */
+  unsigned int		sa_line;	/* line where it was alloced */
+  unsigned long		sa_use_iter;	/* when last ``used'' */
+  
 #if STORE_SEEN_COUNT
-  unsigned long	ov_seen_c;		/* times pointer was seen */
+  unsigned long		sa_seen_c;	/* times pointer was seen */
 #endif
 #if STORE_ITERATION_COUNT
-  unsigned long	ov_iteration;		/* interation when pointer alloced */
+  unsigned long		sa_iteration;	/* interation when pointer alloced */
 #endif
 #if STORE_TIMEVAL
-  TIMEVAL_TYPE  ov_timeval;		/* time when pointer alloced */
+  TIMEVAL_TYPE 		sa_timeval;	/* time when pointer alloced */
 #else
 #if STORE_TIME
-  TIME_TYPE	ov_time;		/* time when pointer alloced */
+  TIME_TYPE		sa_time;	/* time when pointer alloced */
 #endif
 #endif
 #if LOG_THREAD_ID
-  THREAD_TYPE	ov_thread_id;		/* thread id which allocaed pnt */
+  THREAD_TYPE		sa_thread_id;	/* thread id which allocaed pnt */
 #endif
   
-#if STORE_SEEN_COUNT == 0 && STORE_ITERATION_COUNT == 0 && STORE_TIME == 0 && STORE_TIMEVAL == 0 && LOG_THREAD_ID == 0
-  int		ov_junk;		/* for compilers that hate 0 structs */
-#endif
-} overhead_t;
-
-/* db_flags values (unsigned short) */
-#define DBLOCK_USER	0x0001			/* block is user space */
-#define DBLOCK_FREE	0x0002			/* block is free */
-#define DBLOCK_FENCE	0x0010			/* fence post is on */
+  /*
+   * Array of next pointers.  This may extend past the end of the
+   * function if we allocate for space larger than the structure.
+   */
+  struct skip_alloc_st	*sa_next_p[1];
+  
+} skip_alloc_t;
 
 /*
- * Below defines a divided-block structure.  This structure is used to
- * track allocations that are less than half the size of a
- * basic-block.  If you have a basic-block size of 4k then 2 2k
- * allocations will be put into 1 basic-block, each getting one of
- * these admin structures.  Or 4 1k allocations, or 8 512 byte
- * allocations, etc.
+ * This macro helps us determine how much memory we need to store to
+ * hold all of the next pointers in the skip-list entry.  We do a -1
+ * on the next_n because there is 1 next pointer in the skip_alloc
+ * structure already.
  */
-typedef struct dblock_st {
-  unsigned short	db_flags;		/* what it is */
-  
-  unsigned short	db_size;		/* size of allocated area */
-  unsigned short	db_line;		/* line where it was alloced */
-  struct bblock_st	*db_bblock;		/* pointer to free bblock */
-  
-  struct dblock_st	*db_next;		/* next in the free list */
-  const char		*db_file;		/* .c filename where alloced */
-  unsigned long		db_use_iter;		/* when last ``used'' */
-  
-  overhead_t		db_overhead;		/* configured overhead adds */
-} dblock_t;
+#define SKIP_SLOT_SIZE(next_n)	\
+	(sizeof(skip_alloc_t) + sizeof(struct skip_alloc_st *) * ((next_n)-1))
+
+/* entry block magic numbers */
+#define ENTRY_BLOCK_MAGIC1	0xEBEB1111	/* for the eb_magic1 field */
+#define ENTRY_BLOCK_MAGIC2	0xEBEB2222	/* for the eb_magic2 field */
+#define ENTRY_BLOCK_MAGIC3	0xEBEB3333	/* written at end of eb block*/
 
 /*
- * Below defines a basic-block structure.  This structure is used to
- * track allocations that fit in one or many basic-blocks.  If you
- * have a basic-block size of 4k then a 16k allocation will take up 4
- * basic-blocks and 4 of these admin structures.
+ * The following structure is written at the front of a skip-list
+ * entry administrative block.  
  */
-typedef struct bblock_st {
-  unsigned short	bb_flags;		/* what it is */
+typedef struct entry_block_st {
+  unsigned int		eb_magic1;	/* magic number */
+  unsigned int		eb_level_n;	/* the levels which are stored here */
+  struct entry_block_st	*eb_next_p;	/* pointer to next block */
+  unsigned int		eb_magic2;	/* magic number */
   
-  unsigned short	bb_bit_n;		/* free chunk bit size */
-  unsigned short	bb_line;		/* line where it was alloced */
+  skip_alloc_t		eb_first_slot;	/* first slot in the block */
+  /*
+   * the rest are after this one but we don't really knowthere size
+   * because it is based on the skip-level
+   */
   
-  unsigned long		bb_free_n;		/* admin free number */
-  unsigned long		bb_pos_n;		/* admin block position */
-  unsigned long		bb_block_n;		/* number of free blocks */
-  unsigned long		bb_size;		/* size of user allocation */
-  dblock_t		*bb_dblock;		/* pointer to dblock info */
-  
-  struct dblock_adm_st	*bb_slot_p;		/* pointer to db_admin block */
-  struct bblock_adm_st	*bb_admin_p;		/* pointer to bb_admin block */
-  void			*bb_mem;		/* extern user dblock mem */
-  struct bblock_st	*bb_next;		/* next in free list */
-  const char		*bb_file;		/* .c filename where alloced */
-  unsigned long		bb_use_iter;		/* when last ``used'' */
-  
-  overhead_t		bb_overhead;		/* configured overhead adds */
-} bblock_t;
-
-/*
- * Below is a definition of a bblock (basic-block) administration
- * structure.  This structure which fills a basic-block of space in
- * memory and holds a number of bblock structures.
- */
-typedef struct bblock_adm_st {
-  long			ba_magic1;		/* bottom magic number */
-  unsigned int		ba_pos_n;		/* position in bblock array */
-  bblock_t		ba_blocks[BB_PER_ADMIN]; /* bblock admin info */
-  struct bblock_adm_st	*ba_next;		/* next bblock adm struct */
-  long			ba_magic2;		/* top magic number */
-} bblock_adm_t;
-
-/*
- * Below is a definition of a dblock (divided-block) administration
- * structure.  This structure fills a basic-block of space in memory
- * and holds a number of dblock structures.
- */
-typedef struct dblock_adm_st {
-  long			da_magic1;		/* bottom magic number */
-  dblock_t		da_block[DB_PER_ADMIN];	/* dblock admin info */
-  long			da_magic2;		/* top magic number */
-} dblock_adm_t;
+  /* at the end of the block is the MAGIC3 value */
+} entry_block_t;
 
 #endif /* ! __CHUNK_LOC_H__ */
