@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error_val.h,v 1.17 1997/12/22 00:23:43 gray Exp $
+ * $Id: error_val.h,v 1.18 1998/09/17 19:26:02 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -36,6 +36,7 @@
 #define ERROR_BAD_SETUP			10	/* bad setup value */
 #define ERROR_IN_TWICE			11	/* in malloc domain twice */
 #define ERROR_BAD_ERRNO			12	/* bad errno value */
+#define ERROR_LOCK_NOT_CONFIG		13	/* thread locking not config */
 
 /* pointer verification errors */
 #define ERROR_IS_NULL			20	/* pointer is NULL */
