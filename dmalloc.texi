@@ -11,24 +11,29 @@
 * Dmalloc: (dmalloc).			Malloc debug library.
 @end direntry
 
-@c ================================================================
+@c ----------------------------------------------------------------
 @c This file has the new style title page commands.
 @c Also, it uses `@@include' files instead of `@@input' files.
 
 @c Run using special version of `texinfo.tex'.
 
 @c Also, run `makeinfo' rather than `texinfo-format-buffer'.
-@c ================================================================
+@c ----------------------------------------------------------------
 
-@c ================================================================
-@c $Id: dmalloc.texi,v 1.225 2003/06/09 22:58:24 gray Exp $
-@c ================================================================
+@c ----------------------------------------------------------------
+@c $Id: dmalloc.texi,v 1.226 2003/06/10 17:17:17 gray Exp $
+@c ----------------------------------------------------------------
+
+@c ----------------------------------------------------------------
+@set dmalloc_version Version 5.2.0
+@set dmalloc_date June 2003
+@c ----------------------------------------------------------------
 
 @ifinfo
 This file is an introduction to the Dmalloc library which handles general
 memory heap management.
 
-Copyright 1992 to 2001 by Gray Watson.
+Copyright 1992 to 2003 by Gray Watson.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -55,8 +60,8 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 5.1.0
-@subtitle June 2003
+@subtitle @value{dmalloc_version}
+@subtitle @value{dmalloc_date}
 @author Gray Watson
 
 @page
@@ -84,7 +89,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 5.1.0 -- June 2003
+@value{dmalloc_version} -- @value{dmalloc_date}
 @end ifinfo
 
 @cindex introduction
@@ -1452,12 +1457,11 @@ been.
 Here are a number of possible scenarios for using the dmalloc library to
 track down problems with your program.
 
-You should first enable a logfile filename (I use @file{dmalloc}) and
-turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
-low} to accomplish this.  If you are interested in having the error
-messages printed to your terminal as well, enable the
-@samp{print-messages} token by typing @kbd{dmalloc -p print-messages}
-afterwards.  @xref{Dmalloc Program}.
+You should first enable a logfile filename and turn on a set of debug
+features.  You can use @kbd{dmalloc -l logfile low} to accomplish this.
+If you are interested in having the error messages printed to your
+terminal as well, enable the @samp{print-messages} token by typing
+@kbd{dmalloc -p print-messages} afterwards.  @xref{Dmalloc Program}.
 
 @cindex gdb
 @cindex dmalloc_error() routine
@@ -1962,7 +1966,65 @@ specifically overrides the @kbd{-r} option and is provided here to
 override @kbd{-r} if it has been added to the dmalloc alias.
 
 @item -l filename
-Write the debugging output and other log-file information to filename.
+Write the debugging output and other log-file information to the
+filename.  Filename can include some of the following patterns which get
+expanded into strings:
+
+@table @code
+
+@cindex %h
+@cindex gethostname function usage
+@cindex hostname in logfile path
+@cindex name of host in logfile path
+@item %h
+Gets expanded into the hostname if the @code{gethostname()} function is
+available.
+
+@cindex %i
+@cindex thread-id in logfile path
+@item %i
+Gets expanded into the thread-id if the library has been configure to be
+used with threads.  @xref{Using With Threads}.  See the end of the
+@file{settings.dist} file for settings which return the thread-id and
+convert it into a string.
+
+@cindex %p
+@cindex getpid function usage
+@cindex pid in logfile path
+@cindex process-id in logfile path
+@item %p
+Gets expanded into the process-id if the @code{getpid()} function is
+available.
+
+@cindex %t
+@cindex time function usage
+@cindex time in logfile path
+@item %t
+Gets expanded into the time value in seconds if the @code{time()}
+function is available.
+
+@cindex %u
+@cindex getuid function usage
+@cindex uid in logfile path
+@cindex user-id in logfile path
+@item %u
+Gets expanded into the user-id number if the @code{getuid()} function is
+available.
+
+@end table
+
+Some examples are:
+
+@example
+# logfile produced with pid extension:   logfile.8412  or  logfile.31451
+dmalloc -l logfile.%p
+
+# hostname and time extensions:  dmalloc-box1.foo.com-1055213240
+dmalloc -l dmalloc-%h-%t
+
+# if threads enabled, have thread-id extension:  log.thread32
+dmalloc -l log.thread%i
+@end example
 
 @item -L
 Output the debug-value not in hex but by individual debug-tokens in long
@@ -2048,8 +2110,8 @@ Here are some examples of dmalloc usage:
 
 @example
 # start tough debugging, check the heap every 100 times,
-# send the log information to file 'dmalloc'
-dmalloc high -i 100 -l dmalloc
+# send the log information to file 'logfile'
+dmalloc high -i 100 -l logfile
 
 # find out what error code 20 is (from the logfile)
 dmalloc -e 20
@@ -2058,13 +2120,17 @@ dmalloc -e 20
 # for the 6th time.
 dmalloc -a 0x34238:6
 
+# send the log information to file 'logfile' with the time in seconds
+# as an extension.
+dmalloc -l logfile.%t
+
 # return to the normal 'runtime' settings and clear out all
 # other settings
 dmalloc -c runtime
 
 # enable basic 'low' settings plus (-p) the logging of
-# transactions (log-trans) to file 'dmalloc'
-dmalloc low -p log-trans -l dmalloc
+# transactions (log-trans) to file 'logfile'
+dmalloc low -p log-trans -l logfile
 
 # print out the current settings with Very-verbose output
 dmalloc -V
@@ -2469,11 +2535,11 @@ debug1  log-stats, log-non-free, check-fence
 
 # more logging and some heap checking
 debug2  log-stats, log-non-free, log-trans, \
-        check-fence, check-heap, check-lists, error-abort
+        check-fence, check-heap, error-abort
 
 # good utilities
 debug3  log-stats, log-non-free, log-trans, \
-        log-admin, check-fence, check-heap, check-lists, realloc-copy, \
+        log-admin, check-fence, check-heap, realloc-copy, \
         free-blank, error-abort
 
 @dots{}
