@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab_loc.h,v 1.4 1999/03/11 01:01:34 gray Exp $
+ * $Id: dmalloc_tab_loc.h,v 1.5 1999/03/11 05:22:36 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_LOC_H__
@@ -28,6 +28,13 @@
 
 #define MEM_ENTRIES_N	(MEMORY_TABLE_SIZE * 2)
 
+/*
+ * Maximum number of qsort splits.  This should mean that these
+ * routines can handle at least 2^128 different values (that's _quite_
+ * a few).  And then you can always increase the value.
+ */
+#define MAX_SPLITS	128
+
 /* entry in our memory table */
 typedef struct mem_table_st {
   const char		*mt_file;		/* filename of alloc or ra */
@@ -36,10 +43,8 @@ typedef struct mem_table_st {
   unsigned long		mt_total_c;		/* total pointers allocated */
   unsigned long		mt_in_use_size;		/* size currently alloced */
   unsigned long		mt_in_use_c;		/* pointers currently in use */
-#if QSORT_OKAY
   /* we use this so we can easily un-sort the list */
   struct mem_table_st	*mt_entry_pos_p;	/* pos of entry in table */
-#endif
 } mem_table_t;
 
 /*
