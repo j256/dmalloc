@@ -21,12 +21,12 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.230 2003/09/05 22:34:03 gray Exp $
+@c $Id: dmalloc.texi,v 1.231 2003/09/08 14:49:56 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@set dmalloc_version Version 5.2.1
-@set dmalloc_date July 2003
+@set dmalloc_version Version 5.2.2
+@set dmalloc_date September 2003
 @c ----------------------------------------------------------------
 
 @ifinfo
@@ -891,6 +891,7 @@ system version/type, and the version of Dmalloc you are using.
 * Using With a Debugger::       Using a debugger with the library.
 * Using With Threads::          Using the library with a thread package.
 * Debugging A Daemon::          Debugging allocations in a daemon process.
+* Using with Cygwin::           Using the library with Cygwin environment.
 @end menu
 
 @node Allocation Macros, Return Address, Programming, Programming
@@ -1767,7 +1768,7 @@ If you have any specific questions or would like addition information
 posted in this section, please let me know.  Experienced thread
 programmers only please.
 
-@node Debugging A Daemon,, Using With Threads, Programming
+@node Debugging A Daemon, Using with CYGWIN, Using With Threads, Programming
 @section Debugging Allocations in a Daemon Process
 
 @cindex daemon process debugging
@@ -1831,6 +1832,60 @@ You can also use the @code{dmalloc_log_stats} and
 the geap.  Also, remember that you can use the @code{dmalloc_message}
 and @code{dmalloc_vmessage} routines to annotate the dmalloc logfile
 with details to help you debug memory problems.  @xref{Extensions}.
+
+@node Using with Cygwin,, Debugging A Daemon, Programming
+@section Using the library with Cygwin environment.
+
+@cindex cygwin
+
+The Cygwin environment is a Linux-like environment for Windows.  It
+provides Linux look and feel as well as a programming environment.  See
+@uref{http://www.cygwin.com/} for more details.
+
+@cindex reading environment, problems with
+@cindex getenv, problems with
+
+The challenge with using dmalloc to debug Cygwin programs is that when
+it initializes, dmalloc makes a call to @code{getenv} to read the
+environmental variables.  It is looking for the value of the
+@samp{DMALLOC_OPTIONS} variable which sets the debugging options.
+@xref{Environment Variable}.  Because Cygwin calls a memory allocation
+function while it is loading it's shared libraries, it goes recursive
+when @code{getenv} is called from within @code{malloc} causing a
+segfault.
+
+To work around this, I have added to the configure script a check to
+make sure that calls to @code{getenv} are okay inside of malloc.  If
+they are not then you are going to have to add some code into the
+@code{main} function in your program to initialize the dmalloc flags
+yourself.  Here is a code sample:
+
+@cindex dmalloc_debug_setup usage
+
+@example
+main(int argc, char **argv)
+@{
+#ifdef DMALLOC]])
+  /*
+   * Get environ variable DMALLOC_OPTIONS and pass the settings string
+   * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
+   */
+  dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
+#endif
+
+  /* rest of code in main starts here */
+  ...
+@}
+@end example
+
+The @code{#ifdef} is just a good idea.  I means that when debugging with
+dmalloc you need to compile your code with @code{-DDMALLOC}.  When you
+are done debugging you can remove the flag and the call to
+@code{dmalloc_debug_setup} will be removed.
+
+Please let me know if there is a different way to read the environment
+in Cygwin without calling @code{getenv} or if there is a better way to
+do this.
 
 @node Dmalloc Program, Source Code, Programming, Top
 @chapter Dmalloc Utility Program
