@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.35 1994/07/21 20:24:55 gray Exp $
+ * $Id: conf.h.in,v 1.36 1994/08/02 03:11:24 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -45,8 +45,9 @@
 #define ALLOW_ALLOC_ZERO_SIZE 0
 
 /*
- * should we allow realloc of a NULL pointer?  this is useful when you
- * are extending an array in a loop and do not want to allocate it
+ * should we allow realloc of a NULL pointer?  if set to one, this
+ * will call malloc when 0L is realloced.  this is useful when you are
+ * extending an array in a loop and do not want to allocate it
  * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
@@ -85,10 +86,12 @@
  * although I don't know why you would want to tune this since this is
  * pretty dependent on my general heap mechanisms, here are some
  * options to use general first, best, and worst fit algorithms.  if
- * you don't know what these are, then DON'T TOUCH.  NOTES: they may
- * go away in the future and/or be replaced by debug-tokens.  I've
- * tested all three and have not noticed any large differences.  Also,
- * they only apply for allocations > basic-block (page) size.
+ * you don't know what these are, then DON'T TOUCH.
+ *
+ * NOTES: they may go away in the future and/or be replaced by
+ * debug-tokens.  I've tested all three and have not noticed any large
+ * differences.  Also, they only apply for allocations > basic-block
+ * (page) size.
  */
 #define FIRST_FIT 1
 #define BEST_FIT 0
@@ -107,7 +110,7 @@
  * (maybe with another signal from signal.h) although others may want
  * to substiture in the abort.
  *
- * NOTE: On some OS's, abort calls fclose() which may want to free
+ * WARNING: On some OS's, abort calls fclose() which may want to free
  * memory making the library go recursive.
  */
 #define KILL_PROCESS()		(void)kill(0, SIGABRT)
