@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.8 1994/09/16 18:54:20 gray Exp $
+ * $Id: debug_tok.h,v 1.9 1994/09/26 16:10:23 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -34,7 +34,7 @@
 typedef struct {
   char		*at_string;		/* attribute string */
   char		*at_short;		/* short string */
-  long		at_value;		/* value for the item */
+  unsigned long	at_value;		/* value for the item */
   char		*at_desc;		/* description string */
 } attr_t;
 
