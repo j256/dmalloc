@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.120 2003/07/24 00:24:29 gray Exp $
+# $Id: Makefile.all.in,v 1.121 2003/09/29 22:58:40 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -22,12 +22,15 @@ docdir = $(prefix)/share/doc/$(MODULE)
 CC = @CC@
 CXX = @CXX@
 
-DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
+DEFS = -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
 	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ \
 	-DHAVE_SYS_MMAN_H=@HAVE_SYS_MMAN_H@ \
 	-DHAVE_SYS_TYPES_H=@HAVE_SYS_TYPES_H@ \
+	-DHAVE_W32API_WINBASE_H=@HAVE_W32API_WINBASE_H@ \
+	-DHAVE_W32API_WINDEF_H=@HAVE_W32API_WINDEF_H@ \
+	-DHAVE_SYS_CYGWIN_H=@HAVE_SYS_CYGWIN_H@ \
 	$(DEFINES)
 INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@

@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.17 2003/09/12 05:55:57 gray Exp $
+# $Id: configure.ac,v 1.18 2003/09/29 22:58:27 gray Exp $
 #
-AC_REVISION($Revision: 1.17 $)
+AC_REVISION($Revision: 1.18 $)
 AC_INIT(dmalloc, 5.2.2, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -438,8 +438,42 @@ if test x$getenv_safe != xyes; then
   AC_MSG_WARN([See the Cygwin section in the documentation for details.])
 fi
 
-# now check to see if we can replace getenv with this
-AC_CHECK_FUNCS(GetEnvironmentVariableA)
+# now check to see if we can replace getenv with GetEnvironmentVariableA
+AC_CHECK_HEADER([sys/cygwin.h],
+		[AC_SUBST([HAVE_SYS_CYGWIN_H],1)],
+		[AC_SUBST([HAVE_SYS_CYGWIN_H],0)])
+AC_CHECK_HEADER([w32api/windef.h],
+		[AC_SUBST([HAVE_W32API_WINDEF_H],1)],
+		[AC_SUBST([HAVE_W32API_WINDEF_h],0)])
+AC_CHECK_HEADER([w32api/winbase.h],
+		[AC_SUBST([HAVE_W32API_WINBASE_H],1)],
+		[AC_SUBST([HAVE_W32API_WINBASE_h],0)],
+		[[#if HAVE_W32API_WINDEF_H
+# include <w32api/windef.h>
+#endif]])
+AC_MSG_CHECKING([for GetEnvironmentVariableA])
+AC_RUN_IFELSE([[
+#if HAVE_SYS_CYGWIN_H
+# include <sys/cygwin.h>
+#endif
+#if HAVE_STDARG_H
+# include <stdarg.h>
+#endif
+#if HAVE_W32API_WINDEF_H
+# include <w32api/windef.h>
+#endif
+#if HAVE_W32API_WINBASE_H
+# include <w32api/winbase.h>
+#endif
+main() {
+  char env_buf[256];
+  GetEnvironmentVariableA("PATH", env_buf, sizeof(env_buf));
+}
+]],
+[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1) AC_MSG_RESULT([yes]) ],
+[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 0) AC_MSG_RESULT([no]) ],
+[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1) AC_MSG_RESULT([yes]) ]
+)
 
 ############
 
@@ -501,7 +535,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.17 2003/09/12 05:55:57 gray Exp $"
+#ident "$Id: configure.ac,v 1.18 2003/09/29 22:58:27 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

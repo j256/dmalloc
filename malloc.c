@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.174 2003/09/12 05:55:57 gray Exp $
+ * $Id: malloc.c,v 1.175 2003/09/29 22:58:27 gray Exp $
  */
 
 /*
@@ -38,13 +38,20 @@
 # include <unistd.h>				/* for write */
 #endif
 
-#ifdef __CYGWIN__
-#include <sys/cygwin.h>
+/*
+ * cygwin includes
+ */
+#if HAVE_SYS_CYGWIN_H
+# include <sys/cygwin.h>
+#endif
 #if HAVE_STDARG_H
 # include <stdarg.h>
 #endif
-#include <w32api/windef.h>
-#include <w32api/winbase.h>
+#if HAVE_W32API_WINDEF_H
+# include <w32api/windef.h>
+#endif
+#if HAVE_W32API_WINBASE_H
+# include <w32api/winbase.h>
 #endif
 
 #include "conf.h"				/* up here for _INCLUDE */
