@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.55 1997/06/03 16:20:22 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.56 1997/07/07 06:44:14 gray Exp $";
 #endif
 
 /* external routines */
@@ -617,8 +617,10 @@ int	main(int argc, char ** argv)
   if (silent && (verbose || interactive))
     silent = ARGV_FALSE;
   
-  if (seed_random == 0)
+  /* repeat until we get a non 0 seed */
+  while (seed_random == 0) {
     seed_random = time(0) ^ 0xDEABEEF;
+  }
   (void)srand(seed_random);
   
   if (! silent)
