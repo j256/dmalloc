@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.171 2003/06/08 21:26:16 gray Exp $
+# $Id: Makefile.in,v 1.172 2003/06/10 17:17:34 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -91,7 +91,8 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
 	contrib/ra_info.pl contrib/stratus_ftx_notes contrib/tsecs
 
-DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi texinfo.tex
+DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi dmalloc.pdf \
+	dmalloc.dvi texinfo.tex
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -106,12 +107,13 @@ clean ::
 	rm -f $(A_OUT) $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
 	rm -f $(UTIL) dmalloc.h dmalloc.h.3
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
+	rm -f dmalloc.ps dmalloc.dvi dmalloc.pdf
 	rm -f ChangeLog.1
 
 distclean :: clean
 	rm -f confdefs.h configure configure.lineno config.status config.log
 	rm -f config.cache conf.h
-	rm -f Makefile dmalloc.h.2 dmalloc.ps dmalloc.dvi settings.h
+	rm -f Makefile dmalloc.h.2 settings.h
 	rm -rf autom4te.cache
 	rm -rf port
 
@@ -305,6 +307,12 @@ dmalloc.dvi : $(srcdir)/dmalloc.texi
 	rm -rf work
 	mkdir work
 	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
+	rm -rf work
+
+dmalloc.pdf : $(srcdir)/dmalloc.texi
+	rm -rf work
+	mkdir work
+	( cd work ; texi2pdf ../$(srcdir)/dmalloc.texi ; mv dmalloc.pdf .. )
 	rm -rf work
 
 INSTALL : $(INFOFILE)
