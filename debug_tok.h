@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.40 2004/07/10 03:49:52 gray Exp $
+ * $Id: debug_tok.h,v 1.41 2004/09/13 05:13:29 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -137,12 +137,12 @@ __attribute__ ((unused))
     "Disabled because of new heap organization" },
   /* this is the default and force-linear is opposite */
   { "allow-nonlinear",	0,
-    "Disabled -- this is the default now, force-linear is opposite" },
+    "Disabled -- this is the default now" },
   /* this is the default and error-free-null opposite */
   { "allow-free-null",	0,
     "Disabled -- this is the default now, error-free-null is opposite" },
   { "heap-check-map",	0,
-    "Disbaled because of new heap organization" },
+    "Disabled because of new heap organization" },
   { "check-lists",	0,
     "Disabled -- removed with new heap organization" },
   { "force-linear",	0,
