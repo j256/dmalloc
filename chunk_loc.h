@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.16 1993/09/25 20:38:06 gray Exp $
+ * $Id: chunk_loc.h,v 1.17 1993/09/26 19:58:08 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -62,6 +62,7 @@
 #define BBLOCK_DBLOCK		0x08		/* pointing to divided block */
 #define BBLOCK_DBLOCK_ADMIN	0x10		/* pointing to dblock admin */
 #define BBLOCK_FREE		0x20		/* block is free */
+#define BBLOCK_ADMIN_FREE	0x40		/* ba_count pnt to free slot */
 
 /*
  * single divided-block administrative structure
@@ -105,33 +106,35 @@ struct bblock_st {
   } bb_num;
   
   /* to reference union elements as bb elements */
-#define bb_bitn		bb_num.nu_bitn		/* DF */
+#define bb_bitn		bb_num.nu_bitn		/* D */
 #define bb_line		bb_num.nu_line		/* U */
   
   union {
     unsigned int	in_count;		/* admin count number */
     dblock_t		*in_dblock;		/* pointer to dblock info */
-    struct bblock_st	*in_next;		/* next in free list */
+    unsigned int	in_blockn;		/* number of blocks */
     unsigned int	in_size;		/* size of allocation */
   } bb_info;
   
   /* to reference union elements as bb elements */
 #define bb_count	bb_info.in_count	/* A */
 #define	bb_dblock	bb_info.in_dblock	/* D */
-#define	bb_next		bb_info.in_next		/* F */
+#define	bb_blockn	bb_info.in_blockn	/* F */
 #define	bb_size		bb_info.in_size		/* U */
   
   union {
     struct dblock_adm_st	*pn_slotp;	/* pointer to db_admin block */
     struct bblock_adm_st	*pn_adminp;	/* pointer to bb_admin block */
-    char			*pn_mem;	/* memory associated to it */
+    void			*pn_mem;	/* memory associated to it */
+    struct bblock_st		*pn_next;	/* next in free list */
     char			*pn_file;	/* .c filename where alloced */
   } bb_pnt;
   
   /* to reference union elements as bb elements */
 #define	bb_slotp	bb_pnt.pn_slotp		/* a */
 #define	bb_adminp	bb_pnt.pn_adminp	/* A */
-#define	bb_mem		bb_pnt.pn_mem		/* DF */
+#define	bb_mem		bb_pnt.pn_mem		/* D */
+#define	bb_next		bb_pnt.pn_next		/* F */
 #define	bb_file		bb_pnt.pn_file		/* U */
   
 };

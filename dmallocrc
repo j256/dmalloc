@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.15 1993/09/22 05:02:25 gray Exp $
+# $Id: dmallocrc,v 1.16 1993/09/26 19:58:10 gray Exp $
 #
 
 #
@@ -52,57 +52,97 @@
 # catch-null			abort program if library can't get sbrk space
 #
 
-# no debugging
-none	none
+# no debugging (for disabling memory checking)
+none		none
 
-# basic production combination
-production	log-stats, log-non-free, log-perror, \
+# basic runtime without fence over-head
+production	log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
 		catch-null
 
-# basic runtime development combination
-runtime		log-stats, log-non-free, log-perror, \
+# basic runtime
+runtime		log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
 		check-fence, \
 		catch-null
 
-# more logging and some heap checking
-2		log-stats, log-non-free, log-perror, log-trans, \
-		check-fence, check-heap, check-lists, \
-		catch-null, error-abort
+# basic tests
+1		log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
+		check-fence, \
+		alloc-blank, catch-null, error-abort, free-blank
 
-# good checking functionality
-3		log-stats, log-non-free, log-perror, log-trans, \
-		log-admin, log-blocks, \
-		check-fence, check-heap, check-lists, \
-		check-funcs, \
-		alloc-blank, catch-null, error-abort, free-blank, realloc-copy
+# 1 + log unknown/ra
+1-log		log-stats, log-non-free, log-perror, log-blocks, \
+		log-unknown, log-bad-space, log-ra, \
+		check-fence, \
+		alloc-blank, catch-null, error-abort, free-blank
 
 # extensive checking
-4		log-stats, log-non-free, log-perror, log-trans, \
-		log-admin, log-blocks, \
-		check-fence, check-heap, check-lists, check-funcs, \
-		alloc-blank, catch-null, error-abort, free-blank, realloc-copy
+2		log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
+		check-fence, check-heap, check-lists, \
+		alloc-blank, catch-null, error-abort, free-blank, \
+		realloc-copy
 
-# ultra-extensive checking (the whole ball of wax)
-5		log-stats, log-non-free, log-perror, log-trans, \
-		log-admin, log-blocks, \
+# ultra-extensive checking
+3		log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
+		check-fence, check-heap, check-lists, check-free, \
+		alloc-blank, catch-null, error-abort, free-blank, \
+		realloc-copy
+
+# ultra-extensive checking + funcs
+4		log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
 		check-fence, check-heap, check-lists, check-free, \
 		check-funcs, \
-		alloc-blank, catch-null, error-abort, free-blank, realloc-copy
+		realloc-copy, free-blank, error-abort, alloc-blank, \
+		catch-null
+
+# tough debugging without lots of output
+tough		log-stats, log-non-free, log-perror, log-bad-space, log-ra, \
+		check-fence, check-heap, check-lists, check-free, \
+		alloc-blank, catch-null, error-abort, free-blank, \
+		realloc-copy
 
 # full fence-post checking
-fence		log-stats, log-non-free, log-perror, \
+fence		log-stats, log-non-free, log-perror, log-bad-space, log-ra, \
 		check-fence, \
 		catch-null
 
-# full logging of statistics to logfile and screen
-log		log-stats, log-non-free, log-perror, log-trans, \
-		log-admin, log-blocks, log-bad-space, \
+# full logging of statistics
+log		log-stats, log-non-free, log-perror, log-trans, log-admin, \
+		log-blocks, log-unknown, log-bad-space, log-ra, \
 		check-fence, \
-		heap-check-map, print-perror, catch-null
+		catch-null
+
+# log detailed map entries
+map		log-stats, log-non-free, log-perror, log-blocks, \
+		log-bad-space, log-ra, \
+		check-fence, check-heap, \
+		catch-null, heap-check-map
+
+# immediate logging of problems in a text-based programs
+text		log-perror, log-bad-space, log-ra, \
+		check-fence, \
+		catch-null, print-perror
+
+# full logging of statistics in text programs
+verbose		log-stats, log-non-free, log-perror, log-trans, log-admin, \
+		log-blocks, log-unknown, log-bad-space, log-ra, \
+		check-fence, \
+		catch-null, print-perror
+
+# check-funcs
+funcs		log-stats, log-non-free, log-perror, log-trans, log-blocks, \
+		log-bad-space, log-ra, \
+		check-fence, check-heap, check-lists, check-funcs, \
+		catch-null, error-abort
 
 # the kitchen-sink
-all		log-stats, log-non-free, log-perror, log-trans, \
-		log-admin, log-blocks, log-unknown, log-bad-space, \
+all		log-stats, log-non-free, log-perror, log-trans, log-admin, \
+		log-blocks, log-unknown, log-bad-space, log-ra, \
 		check-fence, check-heap, check-lists, check-free, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
