@@ -1,3 +1,16 @@
+Sat Jan 30 12:33:43 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Took out the check_vars call inside of malloc_strerror since
+	_malloc_perror calls malloc_strerror which would go quickly
+	recursive.  Thanks scott.
+
+	* Changed to version 1.1.4
+
+Sat Jan  5 00:00:00 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Around this time, sent off 1.1.3 shar files to
+	comp.sources.unix.
+
 Sun Dec 27 20:28:19 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Fixed problem with some external functions in malloc.c not

@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.15 1992/12/28 01:05:31 gray Exp $";
+  "$Id: malloc.c,v 1.16 1993/01/30 18:47:02 gray Exp $";
 #endif
 
 /*
@@ -476,10 +476,10 @@ EXPORT	int	malloc_examine(char * pnt, unsigned int * size, char ** file,
  */
 EXPORT	char	*malloc_strerror(int errnum)
 {
-  if (check_debug_vars(NULL, 0) != NOERROR)
-    return ERROR;
-  
-  in_alloc = FALSE;
+  /*
+   * NOTE: should not check_debug_vars here because _malloc_perror calls this.
+   * thanks scott!
+   */
   
   if (! IS_MALLOC_ERRNO(errnum))
     return malloc_errlist[MALLOC_BAD_ERRNO];
