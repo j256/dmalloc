@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.182 2000/04/18 19:46:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.183 2000/05/02 00:34:55 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -633,7 +633,17 @@ alias dmalloc 'eval `\dmalloc -C \!*`'
 @item Although not necessary, you may want to include @file{dmalloc.h}
 in your C files and recompile.  This will allow the library to report
 the file/line numbers of calls that generate problems.  @xref{Allocation
-Macros}.
+Macros}.  It should be inserted at the @emph{bottom} of your include
+files as to not conflict with other includes.  You may want to ifdef it
+as well and compile with @kbd{cc -DDMALLOC @dots{}}:
+
+@example
+/* other includes above ^^^ */
+
+#ifdef DMALLOC
+#include "dmalloc.h"
+#endif
+@end example
 
 @item Link the dmalloc library into your program.
 

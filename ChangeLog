@@ -1,3 +1,7 @@
+Mon May  1 20:34:18 2000  Gray Watson  <gray@256.com>
+
+	* Fixed some more function headers.
+
 Tue Apr 18 15:41:30 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.5.2.
@@ -1578,5 +1582,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.244 2000/04/18 19:47:47 gray Exp $
+$Id: ChangeLog,v 1.245 2000/05/02 00:34:55 gray Exp $
 -------------------------------------------------------------------------------
