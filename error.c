@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.83 1999/03/05 00:30:47 gray Exp $
+ * $Id: error.c,v 1.84 1999/03/08 04:59:17 gray Exp $
  */
 
 /*
@@ -73,10 +73,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.83 1999/03/05 00:30:47 gray Exp $";
+#ident "$Id: error.c,v 1.84 1999/03/08 04:59:17 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.83 1999/03/05 00:30:47 gray Exp $";
+  "$Id: error.c,v 1.84 1999/03/08 04:59:17 gray Exp $";
 #endif
 #endif
 
@@ -257,15 +257,18 @@ void	_dmalloc_vmessage(const char *format, va_list args)
        * NOTE: this makes it go recursive here but it will never enter
        * this section of code.
        */
-      _dmalloc_message("Dmalloc version '%s', logfile '%s'",
-		       dmalloc_version, _dmalloc_logpath);
-      _dmalloc_message("flags = %#x, interval = %lu",
-		       _dmalloc_flags, _dmalloc_check_interval);
+      _dmalloc_message("Dmalloc version '%s' from '%s'",
+		       dmalloc_version, DMALLOC_HOME);
+      _dmalloc_message("flags = %#x, logfile '%s'",
+		       _dmalloc_flags, _dmalloc_logpath);
       if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT) {
-	_dmalloc_message("addr = %#lx", (unsigned long)_dmalloc_address);
+	_dmalloc_message("interval = %lu, addr = %#lx",
+			 _dmalloc_check_interval,
+			 (unsigned long)_dmalloc_address);
       }
       else {
-	_dmalloc_message("addr = %#lx, seen # = %ld",
+	_dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
+			 _dmalloc_check_interval,
 			 (unsigned long)_dmalloc_address,
 			 _dmalloc_address_seen_n);
       }

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_loc.h,v 1.41 1999/03/04 19:08:27 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.42 1999/03/08 04:59:18 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -31,7 +31,10 @@
  */
 #define OPTIONS_ENVIRON		"DMALLOC_OPTIONS"
 
-/******************************* useful defines ******************************/
+/*
+ * web home directory
+ */
+#define DMALLOC_HOME		"http://www.dmalloc.com/"
 
 /*
  * standard int return codes
