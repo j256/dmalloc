@@ -1,7 +1,7 @@
 #
 # Registration information
 #
-# $Id: list,v 1.4 1997/11/05 16:25:48 gray Exp $
+# $Id: list,v 1.5 1998/02/11 02:10:17 gray Exp $
 #
 
 Number:		1011
@@ -112,3 +112,69 @@ Letter Sent:
 Email Sent:	3/22/97
 Other Sent:	none
 Status:		Waiting for email response.
+
+Number:		1016
+Name:		Tony Rice
+Organization:	VTLS, Inc.
+Amount:		$70
+What:		2 License
+Type:		check (corporate # 018766, PO 4660)
+From:		mail
+Position:	
+Street Address:	1800 Kraft Drive
+City:		Balcksburg
+State:		VA
+Zip:		24060-6351
+Country:	USA
+Email:		
+Phone:		1-540-557-1200
+Fax:		1-540-557-1210
+Arrival Date:	7/7/97
+Letter Sent:	2/10/98
+Email Sent:	
+Other Sent:	none
+Status:		
+
+Number:		1017
+Name:		Greg Nakhimovsky
+Organization:	Sun Microsystem (on site at Parametric Tech Corp)
+Amount:		$35
+What:		1 License
+Type:		check (#4031)
+From:		mail
+Position:	Member Technical Staff
+Street Address:	128 Technology Drive.
+City:		Waltham
+State:		MA
+Zip:		02154
+Country:	USA
+Email:		gregn@ptc.com
+Phone:		1-617-398-5602
+Fax:		
+Arrival Date:	5/21/97
+Letter Sent:	2/10/98
+Email Sent:	2/10/98
+Other Sent:	none
+Status:		
+
+Number:		1018
+Name:		Victor Welchman
+Organization:	Business Management Systems
+Amount:		$50
+What:		1 License + 1 Doc
+Type:		business check (#3617)
+From:		mail
+Position:	
+Street Address:	3301 W. Hampden Ave.  Suite 4
+City:		Englewood
+State:		CO
+Zip:		80110
+Country:	USA
+Email:		
+Phone:		
+Fax:		
+Arrival Date:	2/14/97
+Letter Sent:	
+Email Sent:	2/10/98
+Other Sent:	none
+Status:		
