@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.171 1999/11/08 22:07:46 gray Exp $
+@c $Id: dmalloc.texi,v 1.172 2000/02/17 14:05:09 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -108,7 +108,7 @@ Threads}.
 The package includes the library, configuration scripts, debug utility
 application, test program, and documentation.  Online documentation as
 well as the full source is available at URL
-@code{http://www.dmalloc.com/}.  Details on the library's mailing list
+@uref{http://www.dmalloc.com/}.  Details on the library's mailing list
 are available there as well.
 
 My contact information is available on the web page.  I can be reached
@@ -472,7 +472,7 @@ carefully.
 @enumerate
 
 @item Make sure you have the latest version of the library available
-from the home page @samp{http://www.dmalloc.com/}.
+from the home page @uref{http://www.dmalloc.com/}.
 
 @cindex settings.dist file
 
@@ -608,7 +608,7 @@ library:
 @enumerate
 
 @item Make sure you have the latest version of the library available
-from the home page @samp{http://www.dmalloc.com/}.
+from the home page @uref{http://www.dmalloc.com/}.
 
 @item Follow the installation instructions on how to configure and
 make and install the library (i.e. type: @kbd{make install}).
@@ -1577,7 +1577,7 @@ tag     token1, token2, @dots{}
 
 @samp{tag} is to be matched with the tag argument passed to the dmalloc
 program, while @samp{token1, token2, @dots{}} are debug capability
-tokens.  @xref{Dmalloc Program} and @ref{Debug Tokens}.
+tokens.  @xref{Dmalloc Program}, @ref{Debug Tokens}.
 
 A line can be finished with a @samp{\} meaning it continues onto the
 next line.  Lines beginning with @samp{#} are treated as comments and
@@ -1832,8 +1832,7 @@ dmalloc -tv
 @node Using With a Debugger, Using With Threads, Dmalloc Program, Details
 @section Using Dmalloc With a Debugger
 
-@cindex debugger usag
-e with dmalloc
+@cindex debugger usage with dmalloc
 @cindex using a debugger with dmalloc
 
 Here are a number of possible scenarios for using the dmalloc library to
@@ -1895,7 +1894,7 @@ problem.  The @code{check-heap} token should be enabled and the interval
 setting disabled or set to a low value so that the library can find the
 problem as close as possible to its source.  The code that was execute
 right before the library halted, can then be examined closely for
-irregularities.  @xref{Debug Tokens} and @xref{Dmalloc Program}.
+irregularities.  @xref{Debug Tokens}, @xref{Dmalloc Program}.
 
 @cindex dmalloc_verify() routine
 
@@ -2015,7 +2014,7 @@ If it cannot print the character, it will display the value as
 
 By enabling the @code{check-heap} debugging token and assigning the
 interval setting to a low number, you should be able to locate
-approximately when this problem happened.  @xref{Debug Tokens} and
+approximately when this problem happened.  @xref{Debug Tokens},
 @xref{Dmalloc Program}.
 
 @node Using With Threads, , Using With a Debugger, Details
@@ -2208,71 +2207,10 @@ main()
 
 @end itemize
 
-@node Index of Concepts, Full Node Listing, Source Code, Top
+@node Index of Concepts, , Source Code, Top
 @unnumbered Index of Concepts
 
 @printindex cp
 @contents
 
-@ifinfo
-
-@node Full Node Listing,  , Index of Concepts, Top
-@unnumbered Full Node Listing
-
-@menu
-Top.
-
-* Copying::                     Library copying and licensing conditions.
-* Overview::                    Description of features and how to get started.
-* Details::                     Details about how to use the library.
-* Source Code::                 Information on the source and general concerns.
-* Index of Concepts::           Index of concepts in the manual.
-* Full Node Listing::           Listing of all the nodes in the manual.
-
-Overview.
-
-* Allocation Basics::           Basic description of terms and functions.
-* Features::                    The general features of the library.
-* Installation::                How to install the library.
-* Getting Started::             Getting started with the library.
-* Troubleshooting::             Some solutions to common problems.
-
-Allocation Basics.
-
-* Basic Definitions::           General memory terms and concepts.
-* Malloc Functions::            Functionality supported by all malloc libs.
-
-Details.
-
-* Programming::                 How to program with the library.
-* Environment Variable::        The variable name and its features.
-* Debug Tokens::                Description of the debugging tokens.
-* RC File::                     Format of the run-time configuration file.
-* Dmalloc Program::             Env variable setting utility.
-* Using With a Debugger::       Using a debugger with the library.
-* Using With Threads::          Using the library with a thread package.
-
-Programming.
-
-* Allocation Macros::           For providing file and line information.
-* Return Address::              For providing caller information.
-* Argument Checking::           Special checking of function arguments.
-* Extensions::                  Additional non-standard routines.
-* C++ and the Library::         Using the Library with C++.
-* Disabling the Library::       How to compile/link without the library.
-
-Using Dmalloc With a Debugger.
-
-* General Errors::              Diagnosing general problems with a debugger.
-* Memory Leaks::                Tracking down non-freed memory.
-* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
-
-Source Code.
-
-* Definitions::                 Some terms and other information.
-* Compatibility::               General compatibility concerns.
-* Portability::                 Issues important for porting the library.
-@end menu
-
-@end ifinfo
 @bye
