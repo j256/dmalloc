@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.73 1999/03/04 16:32:47 gray Exp $
+ * $Id: dmalloc_t.c,v 1.74 1999/03/04 16:49:27 gray Exp $
  */
 
 /*
@@ -47,10 +47,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.73 1999/03/04 16:32:47 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.74 1999/03/04 16:49:27 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.73 1999/03/04 16:32:47 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.74 1999/03/04 16:49:27 gray Exp $";
 #endif
 #endif
 
@@ -64,8 +64,6 @@ extern	char		*sbrk(const int incr);	/* to extend the heap */
 #define MAX_POINTERS		1024
 #define MAX_ALLOC		(1024 * 1024)
 #define MIN_AVAIL		10
-
-#define RANDOM_VALUE(x)		((rand() % ((x) * 10)) / 10)
 
 /* pointer tracking structure */
 struct pnt_info_st {
@@ -167,6 +165,22 @@ static	void	*get_address(void)
 }
 
 /*
+ * Select a random value in VAL
+ */
+static	int	random_value(const int val)
+{
+  int	ret;
+  
+#if HAVE_RANDOM
+  ret = ((random() % ((x) * 10)) / 10);
+#else
+  ret = ((rand() % ((x) * 10)) / 10);
+#endif
+  
+  return ret;
+}
+
+/*
  * Try ITER_N random program iterations, returns 1 on success else 0
  */
 static	int	do_random(const int iter_n)
@@ -208,7 +222,7 @@ static	int	do_random(const int iter_n)
     }
     
     if (random_debug_b) {
-      which = RANDOM_VALUE(sizeof(int) * 8);
+      which = random_value(sizeof(int) * 8);
       flags ^= 1 << which;
       if (verbose_b) {
 	(void)printf("%d: debug flags = %#x\n", iter_c + 1, flags);
@@ -228,7 +242,7 @@ static	int	do_random(const int iter_n)
     }
     
     /* decide whether to malloc a new pointer or free/realloc an existing */
-    which = RANDOM_VALUE(4);
+    which = random_value(4);
     
     /*
      * < MIN_AVAIL means alloc as long as we have enough memory and
@@ -236,7 +250,7 @@ static	int	do_random(const int iter_n)
      */
     if (free_c == max_pointers
 	|| (free_c > 0 && which < 3 && max >= MIN_AVAIL)) {
-      amount = RANDOM_VALUE(max / 2);
+      amount = random_value(max / 2);
 #if ALLOW_ALLOC_ZERO_SIZE == 0
       if (amount == 0) {
 	amount = 1;
@@ -244,10 +258,10 @@ static	int	do_random(const int iter_n)
 #endif
       
       if (flags & DEBUG_ALLOW_NONLINEAR) {
-	which = RANDOM_VALUE(16);
+	which = random_value(16);
       }
       else {
-	which = RANDOM_VALUE(15);
+	which = random_value(15);
       }
       
       switch (which) {
@@ -294,7 +308,7 @@ static	int	do_random(const int iter_n)
 	  continue;
 	}
 	
-	which = RANDOM_VALUE(max_pointers - free_c);
+	which = random_value(max_pointers - free_c);
 	for (pnt_p = used_p; which > 0; which--) {
 	  pnt_p = pnt_p->pi_next;
 	}
@@ -314,7 +328,7 @@ static	int	do_random(const int iter_n)
 	  continue;
 	}
 	
-	which = RANDOM_VALUE(max_pointers - free_c);
+	which = random_value(max_pointers - free_c);
 	for (pnt_p = used_p; which > 0; which--) {
 	  pnt_p = pnt_p->pi_next;
 	}
@@ -401,9 +415,9 @@ static	int	do_random(const int iter_n)
     }
     
     /*
-     * choose a rand slot to free and make sure it is not a free-slot
+     * choose a random slot to free and make sure it is not a free-slot
      */
-    which = RANDOM_VALUE(max_pointers - free_c);
+    which = random_value(max_pointers - free_c);
     for (pnt_p = used_p; which > 0; which--) {
       pnt_p = pnt_p->pi_next;
     }
@@ -833,7 +847,11 @@ int	main(int argc, char **argv)
 #endif /* ! HAVE_GETPID */
 #endif /* ! HAVE_TIME */
   }
+#if HAVE_RANDOM
+  (void)srandom(seed_random);
+#else
   (void)srand(seed_random);
+#endif
   
   if (! silent_b) {
     (void)printf("Random seed is %u\n", seed_random);
