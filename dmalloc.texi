@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.47 1994/04/07 03:03:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.48 1994/05/18 04:28:22 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1076,7 +1076,7 @@ and no other option-commands used, malloc_dbg will display the current
 settings of the environmental variables.
 
 To find out the usage for the malloc debug program try @code{malloc_dbg
---usage-long}.  This is one of the many features of the argv library
+--usage-all}.  This is one of the many features of the argv library
 included with this package.  See @file{argv.info} for more information.
 
 Here is a detailed list of the flags that can passed to malloc_dbg:
