@@ -21,13 +21,11 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: version.h,v 1.73 1998/10/15 20:20:11 gray Exp $
+ * $Id: version.h,v 1.74 1998/10/22 14:24:09 gray Exp $
  */
 
 #ifndef __VERSION_H__
 #define __VERSION_H__
-
-#include "dmalloc_loc.h"			/* for LOCAL */
 
 /*
  * NOTE to gray: whenever this is changed, a corresponding entry
@@ -39,6 +37,6 @@
  */
 static	char	*dmalloc_version = "4.0.3";
 
-/* Version Date: $Date: 1998/10/15 20:20:11 $ */
+/* Version Date: $Date: 1998/10/22 14:24:09 $ */
 
 #endif /* ! __VERSION_H__ */
