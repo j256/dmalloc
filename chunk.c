@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.59 1993/11/23 09:03:47 gray Exp $";
+  "$Id: chunk.c,v 1.60 1993/11/23 09:47:17 gray Exp $";
 #endif
 
 /*
@@ -1312,8 +1312,9 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* should we verify that we have a block of BLANK_CHAR? */
       if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE)) {
-	for (bytep = (char *)bblockp->bb_mem;
-	     bytep < (char *)bblockp->bb_mem + BLOCK_SIZE; bytep++)
+	pnt = BLOCK_POINTER(this_admp->ba_count +
+			    (bblockp - this_admp->ba_blocks));
+	for (bytep = (char *)pnt; bytep < (char *)pnt + BLOCK_SIZE; bytep++)
 	  if (*bytep != BLANK_CHAR) {
 	    log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, bytep,
 			"overwrote free space", TRUE);
@@ -2351,7 +2352,7 @@ EXPORT	void	_chunk_stats(void)
 		  alloc_maximum, alloc_max_pnts);
   _malloc_message("max alloced with 1 call: %ld bytes",
 		  alloc_one_max);
-  _malloc_message(" max rounded alloc loss: %ld bytes (%d%%)",
+  _malloc_message("max alloc rounding loss: %ld bytes (%d%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
 		   ((alloc_max_given - alloc_maximum) * 100) /

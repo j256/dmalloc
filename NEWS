@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.10 1993/11/23 07:40:58 gray Exp $
+$Id: NEWS,v 1.11 1993/11/23 09:47:07 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.0:
 
+	* Added light and heavy makefile targets for automatic testing.
 	* New heap code with per/block allocations (not	base 2).
 	* Better free list management with block splitting.
 
