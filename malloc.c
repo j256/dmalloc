@@ -55,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.83 1995/08/18 15:49:06 gray Exp $";
+  "$Id: malloc.c,v 1.84 1995/09/02 21:38:07 gray Exp $";
 #endif
 
 /*
@@ -107,6 +107,9 @@ LOCAL	int		check_interval = INTERVAL_INIT; /* check every X */
  */
 LOCAL	int	check_debug_vars(const char * file, const int line)
 {
+  if (_dmalloc_aborting)
+    return ERROR;
+  
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
     dmalloc_error("check_debug_vars");
@@ -116,6 +119,10 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   }
   
   in_alloc = TRUE;
+  
+#if LOCK_THREADS
+  THREAD_LOCK;
+#endif  
   
   if (! enabled)
     if (dmalloc_startup() != NOERROR)
@@ -151,10 +158,10 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
 }
 
 /*
- * check out a pointer to see if we were looking for it.  may not
- * return.
+ * check out a pointer to see if we were looking for it.  this should
+ * be re-entrant and it may not return.
  */
-LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
+LOCAL	void	check_pnt(const char * file, const int line, const void * pnt,
 			  const char * label)
 {
   static int	addc = 0;
@@ -230,6 +237,7 @@ LOCAL	int	dmalloc_startup(void)
   if (_chunk_startup() == ERROR)
     return ERROR;
   
+  /* set leap variables */
   _dmalloc_shutdown_func = _dmalloc_shutdown;
   _dmalloc_log_heap_map_func = _dmalloc_log_heap_map;
   _dmalloc_log_stats_func = _dmalloc_log_stats;
@@ -281,8 +289,14 @@ EXPORT	void	_dmalloc_shutdown(void)
   /* NOTE: do not generate errors for IN_TWICE here */
   
   /* if we've died in dmalloc somewhere then leave fast and quietly */
-  if (in_alloc)
+  if (in_alloc || _dmalloc_aborting)
     return;
+  
+  in_alloc = TRUE;
+  
+#if LOCK_THREADS
+  THREAD_LOCK;
+#endif  
   
   /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
@@ -315,6 +329,12 @@ EXPORT	void	_dmalloc_shutdown(void)
 #endif
 #endif
   
+  in_alloc = FALSE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
+  
   /* NOTE: do not set enabled to false here */
 }
 
@@ -329,9 +349,6 @@ EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
-    return MALLOC_ERROR;
-  
   /* yes, this could be always false if size is unsigned */
   if (size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
@@ -339,20 +356,28 @@ EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
     return MALLOC_ERROR;
   }
   
-  newp = _chunk_malloc(_dmalloc_file, _dmalloc_line, size);
-  check_pnt(_dmalloc_file, _dmalloc_line, newp, "malloc");
+  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
+    return MALLOC_ERROR;
   
+  newp = _chunk_malloc(_dmalloc_file, _dmalloc_line, size);
   in_alloc = FALSE;
+  
+  check_pnt(_dmalloc_file, _dmalloc_line, newp, "malloc");
   
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
   
   return newp;
 }
 
 /*
- * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
- * of SIZE bytes and zero the block.  returns 0L on error.
+ * allocate and return a block of _zeroed_ bytes able to hold
+ * NUM_ELEMENTS, each element contains SIZE bytes.  returns 0L on
+ * error.
  */
 EXPORT	DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 {
@@ -372,19 +397,15 @@ EXPORT	DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 }
 
 /*
- * resizes OLD_PNT to SIZE bytes and return the new space after either copying
- * all of OLD_PNT to the new area or truncating.  returns 0L on error.
+ * resizes OLD_PNT to NEW_SIZE bytes and return the new space after
+ * either copying all of OLD_PNT to the new area or truncating.
+ * returns 0L on error.
  */
 EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 {
   void		*newp;
   
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
-    return REALLOC_ERROR;
-  
-  check_pnt(_dmalloc_file, _dmalloc_line, old_pnt, "realloc-in");
   
   /* yes, this could be always false if new_size is unsigned */
   if (new_size < 0) {
@@ -393,6 +414,11 @@ EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
     return MALLOC_ERROR;
   }
   
+  check_pnt(_dmalloc_file, _dmalloc_line, old_pnt, "realloc-in");
+  
+  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
+    return REALLOC_ERROR;
+  
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL)
     newp = _chunk_malloc(_dmalloc_file, _dmalloc_line, new_size);
@@ -400,12 +426,16 @@ EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 #endif
     newp = _chunk_realloc(_dmalloc_file, _dmalloc_line, old_pnt, new_size);
   
-  check_pnt(_dmalloc_file, _dmalloc_line, newp, "realloc-out");
-  
   in_alloc = FALSE;
+  
+  check_pnt(_dmalloc_file, _dmalloc_line, newp, "realloc-out");
   
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
   
   return newp;
 }
@@ -420,6 +450,8 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
+  check_pnt(_dmalloc_file, _dmalloc_line, pnt, "free");
+  
   if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
 #if defined(__STDC__) && __STDC__ == 1
     return;
@@ -427,8 +459,6 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
     return FREE_ERROR;
 #endif
   }
-  
-  check_pnt(_dmalloc_file, _dmalloc_line, pnt, "free");
   
 #if ALLOW_FREE_NULL
   if (pnt == NULL) {
@@ -448,6 +478,10 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
   
 #if defined(__STDC__) && __STDC__ == 1
 #else
@@ -477,13 +511,22 @@ EXPORT	DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
  */
 EXPORT	void	_dmalloc_log_heap_map(void)
 {
+  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  
   /* check the heap since we are dumping info from it */
-  if (check_debug_vars(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE) != NOERROR)
+  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
     return;
   
   _chunk_log_heap_map();
   
   in_alloc = FALSE;
+  
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
 }
 
 /*
@@ -504,6 +547,10 @@ EXPORT	void	_dmalloc_log_stats(void)
   
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
 }
 
 /*
@@ -526,6 +573,10 @@ EXPORT	void	_dmalloc_log_unfreed(void)
   
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
 }
 
 /*
@@ -537,7 +588,12 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
 {
   int	ret;
   
+  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  
   /* should not check heap here because we will be doing it below */
+  
+  if (_dmalloc_aborting)
+    return DMALLOC_VERIFY_ERROR;
   
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
@@ -549,12 +605,23 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
   
   in_alloc = TRUE;
   
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
+  
   if (pnt == NULL)
     ret = _chunk_check();
   else
     ret = _chunk_pnt_check("dmalloc_verify", pnt, CHUNK_PNT_EXACT, 0);
   
   in_alloc = FALSE;
+  
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
   
   if (ret == NOERROR)
     return DMALLOC_VERIFY_NOERROR;
@@ -571,9 +638,9 @@ EXPORT	int	_malloc_verify(const DMALLOC_PNT pnt)
 }
 
 /*
- * set the global debug functionality flags to DEBUG (0 to disable).
- * NOTE: after this module has started up, you cannot set certain flags
- * such as fence-post or free-space checking.
+ * set the global debug functionality flags to DEBUG (0 to disable all
+ * debugging).  NOTE: after this module has started up, you cannot set
+ * certain flags such as fence-post or free-space checking.
  */
 EXPORT	void	_dmalloc_debug(const int debug)
 {
@@ -614,14 +681,23 @@ EXPORT	int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
   int		ret;
   unsigned int	size_map;
   
+  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  
   /* need to check the heap here since we are geting info from it below */
-  if (check_debug_vars(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE) != NOERROR)
+  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
     return ERROR;
   
   /* NOTE: we do not need the alloc-size info */
   ret = _chunk_read_info(pnt, &size_map, NULL, file, line, ret_attr,
 			 "dmalloc_examine", NULL);
   in_alloc = FALSE;
+  
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  
+#if LOCK_THREADS
+  THREAD_UNLOCK;
+#endif  
   
   if (ret == NOERROR) {
     if (size != NULL)
