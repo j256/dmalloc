@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.74 1997/12/22 00:24:52 gray Exp $";
+  "$Id: dmalloc.c,v 1.75 1998/09/17 13:32:14 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -487,19 +487,18 @@ static	void	dump_current(void)
   char		*lpath, *start_file;
   unsigned long	addr;
   int		addr_count, inter, lock_on, start_line, start_count;
-  long		flags;
+  unsigned int	flags;
   
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
 		       &inter, &lock_on, &lpath,
 		       &start_file, &start_line, &start_count);
   
-  if (flags == DEBUG_INIT) {
+  if (flags == (unsigned int)DEBUG_INIT) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
   }
   else {
     (void)process(flags, NULL, &tok_p);
-    (void)fprintf(stderr, "Debug-Flags %#lx (%ld) (%s)\n", flags, flags,
-		  tok_p);
+    (void)fprintf(stderr, "Debug-Flags %#x (%u) (%s)\n", flags, flags, tok_p);
     if (verbose_b) {
       dump_debug(flags);
     }
@@ -605,7 +604,7 @@ int	main(int argc, char **argv)
   int		addr_count = ADDRESS_COUNT_INIT, inter = INTERVAL_INIT;
   int		lock_on = LOCK_ON_INIT;
   int		sline = START_LINE_INIT, scount = START_COUNT_INIT;
-  long		flags = DEBUG_INIT;
+  unsigned int	flags = DEBUG_INIT;
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
   argv_version_string = dmalloc_version;
@@ -640,7 +639,7 @@ int	main(int argc, char **argv)
     
     /* get current debug value and add tokens if possible */
     if (debug == NO_VALUE) {
-      if (flags == DEBUG_INIT) {
+      if (flags == (unsigned int)DEBUG_INIT) {
 	debug = 0;
       }
       else {
@@ -658,7 +657,7 @@ int	main(int argc, char **argv)
     
     /* get current debug value and add tokens if possible */
     if (debug == NO_VALUE) {
-      if (flags == DEBUG_INIT) {
+      if (flags == (unsigned int)DEBUG_INIT) {
 	debug = 0;
       }
       else {
