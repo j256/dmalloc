@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.174 2001/11/30 16:04:53 gray Exp $
+ * $Id: chunk.c,v 1.175 2001/12/01 00:02:12 gray Exp $
  */
 
 /*
@@ -63,10 +63,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "@(#) $Id: chunk.c,v 1.174 2001/11/30 16:04:53 gray Exp $"
+#ident "@(#) $Id: chunk.c,v 1.175 2001/12/01 00:02:12 gray Exp $"
 #else
 static	char	*rcs_id =
-  "@(#) $Id: chunk.c,v 1.174 2001/11/30 16:04:53 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.175 2001/12/01 00:02:12 gray Exp $";
 #endif
 #endif
 
@@ -2929,25 +2929,31 @@ int	_chunk_free(const char *file, const unsigned int line, void *user_pnt,
   }
   
   if (user_pnt == NULL) {
+    
 #if ALLOW_FREE_NULL_MESSAGE
+    /* does the user want a specific message? */
     _dmalloc_message("WARNING: tried to free(0) from '%s'",
 		     _chunk_desc_pnt(where_buf, sizeof(where_buf),
 				     file, line));
 #endif
+    
     /*
      * NOTE: we have here both a default in the settings.h file and a
      * runtime token in case people want to turn it on or off at
      * runtime.
      */
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_FREE_NULL)) {
+      dmalloc_errno = ERROR_IS_NULL;
+      log_error_info(file, line, NULL, 0, user_pnt, 0, "invalid pointer",
+		     "free");
+      dmalloc_error("_chunk_free");
+      return FREE_ERROR;
+    }
+    
 #if ALLOW_FREE_NULL
     return FREE_NOERROR;
 #else
     dmalloc_errno = ERROR_IS_NULL;
-    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_FREE_NULL)) {
-      log_error_info(file, line, NULL, 0, user_pnt, 0, "invalid pointer",
-		     "free");
-      dmalloc_error("_chunk_free");
-    }
     return FREE_ERROR;
 #endif
   }
