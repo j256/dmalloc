@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.60 1997/12/08 07:26:53 gray Exp $
+ * $Id: conf.h.in,v 1.61 1998/09/17 15:22:43 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -101,6 +101,18 @@
  */
 #define SIGNAL_OKAY 0
 #define RETSIGTYPE void
+
+/*
+ * While pthread include file to use.
+ */
+#define HAVE_PTHREAD_H 0
+#define HAVE_PTHREADS_H 0
+
+/*
+ * What is the pthread mutex type?  Usually (always?) it is
+ * pthread_mutex_t.
+ */
+#define THREAD_MUTEX_T pthread_mutex_t
 
 /*
  * On some systems, you initialize mutex variables with NULL.  Others
