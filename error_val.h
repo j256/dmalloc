@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.30 2003/05/16 00:09:42 gray Exp $
+ * $Id: error_val.h,v 1.31 2003/09/06 14:59:41 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -65,7 +65,7 @@
 #define ERROR_FREE_LIST			64	/* free-list mess-up */
 #define ERROR_FREE_NON_CONTIG		65	/* free space not contiguous */
 #define ERROR_FREE_MEM			66	/* bad memory pointer */
-#define ERROR_FREE_NON_BLANK		67	/* free space should be 0's */
+#define ERROR_FREE_OVERWRITTEN		67	/* free space overwritten */
 
 /* administrative errors */
 #define ERROR_ADMIN_LIST		70	/* list pnt out of bounds */
@@ -121,7 +121,7 @@ __attribute__ ((unused))
   { ERROR_FREE_LIST,		"inconsistency with free linked-list" },
   { ERROR_FREE_NON_CONTIG,	"free space contiguous block error" },
   { ERROR_FREE_MEM,		"bad basic-block mem pointer in free-list" },
-  { ERROR_FREE_NON_BLANK,	"free space has been overwritten" },
+  { ERROR_FREE_OVERWRITTEN,	"free space has been overwritten" },
   
   /* administrative errors */
   { ERROR_ADMIN_LIST,		"bad admin structure list" },
