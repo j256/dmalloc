@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: error.c,v 1.66 1997/12/05 21:09:46 gray Exp $";
+  "$Id: error.c,v 1.67 1997/12/22 00:25:05 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -81,10 +81,10 @@ int		dmalloc_errno = ERROR_NONE;
 DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
-long		_dmalloc_flags = 0;
+unisnged int	_dmalloc_flags = 0;
 
 /* global iteration counter for activities */
-unsigned long	_dmalloc_iterc = 0;
+unsigned long	_dmalloc_iter_c = 0;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
@@ -185,7 +185,7 @@ void	_dmalloc_message(const char *format, ...)
   
 #if LOG_ITERATION_COUNT
   /* add the iteration number */
-  (void)sprintf(str_p, "%lu: ", _dmalloc_iterc);
+  (void)sprintf(str_p, "%lu: ", _dmalloc_iter_c);
   for (; *str_p != '\0'; str_p++);
 #endif
   
