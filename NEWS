@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.22 1994/03/25 06:20:14 gray Exp $
+$Id: NEWS,v 1.23 1994/03/30 06:06:38 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.2:
 
+	* Added iteration count lable to all logfile output.  See conf.h.
 	* Added xmalloc,xrealloc,etc. override functions.
 	* Added better mechanisms for const definition.
 	* Lots of install, notes, misc. changes from net feedback.

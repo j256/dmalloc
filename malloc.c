@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.58 1994/03/25 06:20:20 gray Exp $";
+  "$Id: malloc.c,v 1.59 1994/03/30 06:06:47 gray Exp $";
 #endif
 
 /*
@@ -137,8 +137,6 @@ LOCAL	long	hex_to_long(const char * str)
  */
 LOCAL	int	check_debug_vars(const char * file, const int line)
 {
-  static int	iterc = 0;
-  
   if (in_alloc) {
     malloc_errno = ERROR_IN_TWICE;
     _malloc_error("check_debug_vars");
@@ -167,10 +165,11 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
     BIT_SET(_malloc_flags, DEBUG_CHECK_HEAP);
   
   /* checking heap every X times */
+  _malloc_iterc++;
   if (check_interval != -1) {
-    if (++iterc >= check_interval) {
+    if (_malloc_iterc >= check_interval) {
       BIT_SET(_malloc_flags, DEBUG_CHECK_HEAP);
-      iterc = 0;
+      _malloc_iterc = 0;
     }
     else
       BIT_CLEAR(_malloc_flags, DEBUG_CHECK_HEAP);

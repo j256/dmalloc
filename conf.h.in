@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.32 1994/03/03 03:50:21 gray Exp $
+ * $Id: conf.h.in,v 1.33 1994/03/30 06:06:41 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -115,6 +115,13 @@
  * more information.
  */
 #define FENCE_TOP 4
+
+/*
+ * write the iteration count at the start of every log entry.  This is
+ * handy when you are using the MALLOC_START variable and want to
+ * begin the tough debugging at a certain point.
+ */
+#define LOG_ITERATION_COUNT 1
 
 /*
  ************************************************************************

@@ -40,14 +40,17 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.35 1994/03/20 17:01:08 gray Exp $";
+  "$Id: error.c,v 1.36 1994/03/30 06:06:43 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
 /* global debug flags that are set my MALLOC_DEBUG environ variable */
-EXPORT	int		_malloc_flags = 0;
+EXPORT	long		_malloc_flags = 0;
+
+/* global iteration counter for activities */
+EXPORT	unsigned long	_malloc_iterc = 0;
 
 /*
  * message writer with printf like arguments
@@ -67,25 +70,34 @@ EXPORT	void	_malloc_message(const char * format, ...)
   
   /* maybe dump a time stamp */
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_STAMP)) {
-    (void)sprintf(strp, "%ld: ", time(NULL));
-    strp += strlen(strp);
+    (void)sprintf(strp, "%lds: ", time(NULL));
+    for (; *strp != NULLC; strp++);
   }
+  
+#if LOG_ITERATION_COUNT
+  /* add the iteration number */
+  (void)sprintf(strp, "%lu: ", _malloc_iterc);
+  for (; *strp != NULLC; strp++);
+#endif
   
   /* write the format + info into str */
   va_start(args, format);
   (void)vsprintf(strp, format, args);
   va_end(args);
   
-  /* find the length of str, if empty then return */
-  len = strlen(str);
-  if (len == 0)
+  /* was it an empty format? */
+  if (*strp == NULLC)
     return;
   
+  /* find the length of str */
+  for (; *strp != NULLC; strp++);
+  
   /* tack on a '\n' if necessary */
-  if (str[len - 1] != '\n') {
-    str[len++] = '\n';
-    str[len] = NULLC;
+  if (*(strp - 1) != '\n') {
+    *strp++ = '\n';
+    *strp = NULLC;
   }
+  len = strp - str;
   
   /* do we need to log the message? */
   if (malloc_logpath != NULL) {

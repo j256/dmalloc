@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.15 1994/03/17 05:34:40 gray Exp $
+$Id: TODO,v 1.16 1994/03/30 06:06:39 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -25,8 +25,10 @@ CHECKING:
 	only the fence posts
 - maybe add another debug level which stores crc information about internal
 	heap structures and verifies it during run time.  slow, slow!!
-- add 'use-mprotect' token to allow the user to access only user-allocated
-	pages
+- maybe add crc information about each memory block into the admin
+	structure and then be able to dump which blocks have changed
+- maybe add 'use-mprotect' token to allow the user to access only
+	user-allocated pages
 - try and determine how purify gives the user per-allocation bounds
 	checking on READS.
 - watch for non-contiguous memory and mark those blocks as external
@@ -64,6 +66,9 @@ DOCUMENTATION:
 
 GENERAL:
 
+- maybe have some sort etext support for systems that don't have it?
+	- etext (heap-start?)
+	- end (heap-end?)
 - maybe have some sort of memory-stack support:
 	- malloc_push_location("foo");
 	- malloc_pop_location("foo");
@@ -71,9 +76,6 @@ GENERAL:
 	- count how deep we are and if we go over don't store but track	so
 		when we drop below 100 it will be correct info
 	- if we are at an unknown spot, display the top of the stack
-- print out the iteration-count for help with the MALLOC_START variable.
-	- if an error happens you can set malloc_start to one less to break
-		before the error happens and step forward
 - maybe some sort of cheap crc on memory in non-freed memory sections so
 	you can see what portions of memory changed (check tripwire)
 - maybe provide support for reference counts on allocations:
@@ -95,11 +97,6 @@ GENERAL:
 	overflow the pointer above's info
 - handle memalign, valloc, maybe some form of mallopt
 	- maybe mallopt could be mapped into malloc_debug()
-- manage dblock_admin entries better:
-	- map out usage and get some stats
-	- add to normal db_free lists, zero out each of the entries.
-		if they are both zero or some magic X then we need to
-		get more bblock space for the dblocks.
 
 -------------------------------------------------------------------------------
 
