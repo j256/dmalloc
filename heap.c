@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.18 1993/04/05 01:29:03 gray Exp $";
+  "$Id: heap.c,v 1.19 1993/04/08 21:46:36 gray Exp $";
 #endif
 
 /* external routines */
@@ -51,15 +51,15 @@ IMPORT	char		*sbrk(int incr);	/* to extend the heap */
 #endif
 
 /* exported variables */
-EXPORT	char		*_heap_base = NULL;	/* base of our heap */
-EXPORT	char		*_heap_last = NULL;	/* end of our heap */
+EXPORT	void		*_heap_base = NULL;	/* base of our heap */
+EXPORT	void		*_heap_last = NULL;	/* end of our heap */
 
 /*
  * function to get SIZE memory bytes from the end of the heap
  */
-EXPORT	char	*_heap_alloc(unsigned int size)
+EXPORT	void	*_heap_alloc(unsigned int size)
 {
-  char		*ret = HEAP_ALLOC_ERROR;
+  void		*ret = HEAP_ALLOC_ERROR;
   
 #if HAVE_SBRK
   ret = sbrk(size);
@@ -70,7 +70,7 @@ EXPORT	char	*_heap_alloc(unsigned int size)
   }
   else {
     /* increment last pointer */
-    _heap_last += size;
+    (char *)_heap_last += size;
   }
 #endif
   
@@ -80,9 +80,9 @@ EXPORT	char	*_heap_alloc(unsigned int size)
 /*
  * return a pointer to the current end of the heap
  */
-EXPORT	char	*_heap_end(void)
+EXPORT	void	*_heap_end(void)
 {
-  char		*ret = HEAP_ALLOC_ERROR;
+  void		*ret = HEAP_ALLOC_ERROR;
   
 #if HAVE_SBRK
   ret = sbrk(0);
@@ -107,12 +107,12 @@ EXPORT	void	_heap_startup(void)
 /*
  * align (by extending) _heap_base to BASE byte boundary
  */
-EXPORT	char	*_heap_align_base(int base)
+EXPORT	void	*_heap_align_base(int base)
 {
   int	diff;
   
   diff = (long)_heap_base % base;
-  _heap_base += base - diff;
+  (char *)_heap_base += base - diff;
   
   return _heap_alloc(base - diff);
 }

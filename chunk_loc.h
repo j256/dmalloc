@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.9 1993/04/05 22:29:58 gray Exp $
+ * $Id: chunk_loc.h,v 1.10 1993/04/08 21:46:34 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -48,7 +48,7 @@
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
 #define WHAT_BLOCK(pnt)		(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
-#define CHUNK_TO_USER(pnt)	((pnt) + pnt_below_adm)
+#define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_below_adm)
 
 /* bb_flags values */
 #define BBLOCK_ALLOCATED	0x3F		/* block has been allocated */

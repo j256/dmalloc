@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.12 1993/04/06 04:24:36 gray Exp $
+@c $Id: dmalloc.texi,v 1.13 1993/04/08 21:46:44 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -174,7 +174,7 @@ section if you are familiar with using the heap allocation functions.
 @end menu
 
 @node Basic definitions, Malloc functions,  , Allocation Basics
-@section For Defining General Terms and Concepts.
+@section Basic Definitions of Terms and Concepts.
 
 Any program can be divided into 2 logical parts: text and data.  Text is
 the actual program code in machine-readable format and data is the
@@ -193,6 +193,7 @@ program.
            @dots{}
         @}
 @end example
+
 Stack data is data allocated at run-time to hold information used inside
 of functions.  This data is managed by the system in the space called
 stack space.
@@ -206,6 +207,7 @@ stack space.
            @dots{}
         @}
 @end example
+
 Heap data is also allocated at run-time and provides a programmer with
 dynamic memory capabilities.
 
@@ -224,6 +226,7 @@ dynamic memory capabilities.
            @dots{}
         @}
 @end example
+
 It is the heap data that is managed by this library.
 
 Although the above is an example of how to use the malloc and free
@@ -246,7 +249,7 @@ necessary for the job and you will be guaranteed that your program can
 handle any sized file.
 
 @node Malloc functions,  , Basic definitions, Allocation Basics
-@section Functionality Supported by all Malloc Libraries.
+@section Malloc functions Supported by all Malloc Libraries.
 
 All malloc libraries support 4 basic memory allocation commands.  These
 include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.
@@ -310,7 +313,7 @@ the calloc routine will zero the memory space it returns.
 @end menu
 
 @node Overview, Environment variables,  , Features
-@section General Debugging Concepts.
+@section Overview of General Debugging Concepts.
 
 The features of this library are controlled by a number of environmental
 variables.  They enable the memory debugging features at runtime to help
@@ -430,12 +433,14 @@ To set them by hand, C shell (or tcsh) users need to invoke:
 @example
         setenv variable value;
 @end example
+
 Bourne shell (or bash, ksh) users should use:
 
 @example
         variable=value;
         export variable;
 @end example
+
 @table @samp
 @item MALLOC_DEBUG
 This env variable should be set to a value in hexadecimal which
@@ -491,7 +496,7 @@ routine or file has been reached in the program.
 @end table
 
 @node malloc_dbg program, RC file, Environment variables, Features
-@section Env Variable Setting Utility.
+@section Malloc_dbg program: An Env Variable Setting Utility.
 
 The malloc_dbg program is designed to assist in the setting of the
 environmental variables, especially @samp{MALLOC_DEBUG}.
@@ -509,6 +514,7 @@ their @file{.cshrc} file:
 @example
         alias malloc 'eval `malloc_dbg \!*`'
 @end example
+
 This allows the user to execute @code{malloc args}.
 
 The most basic usage for the program is @code{malloc_dbg [-b] tag}.  The
@@ -567,7 +573,7 @@ that you have for the malloc environmental variables.  For example:
 @end example
 
 @node RC file, Debug tokens, malloc_dbg program, Features
-@section Format of the Run-Time Configuration File.
+@section Run-Time Configuration File.
 
 The name of default @dfn{RC file} (or run-time configuration file) is
 @file{$HOME/.mallocrc}.  The @samp{$HOME} environmental variable should
@@ -609,6 +615,7 @@ debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 
 @dots{}
 @end example
+
 With the above file, when I say @code{eval `malloc_dbg debug1`}, I
 enable the logging of statistics, the logging of non-freed memory,
 logging of errors, logging of bad pointer information, and the checking
@@ -618,7 +625,7 @@ When I say @code{eval `malloc_dbg none`}, all memory debugging features
 are disabled.
 
 @node Debug tokens, Argument Checking, RC file, Features
-@section Description of the Debugging Token Flags.
+@section Debugging Tokens.
 
 The below tokens and their corresponding descriptions are for the
 setting of the @samp{MALLOC_DEBUG} environmental variable
@@ -695,7 +702,7 @@ log any errors and messages to the screen via standard-error
 @end table
 
 @node Argument Checking,  , Debug tokens, Features
-@section Check Certain Function Arguments.
+@section Argument Checking of Certain Function Arguments.
 
 One potential problem with the library and its multitude of checks and
 diagnoses is that they only get performed when a malloc function is
@@ -706,6 +713,7 @@ enable the @code{check-funcs} token @xref{Debug tokens}.
 @example
         gcc -DMALLOC_FUNC_CHECK file.c
 @end example
+
 Once you have compiled your source with FUNC_CHECK enabled, you will
 have to recompile with it off to disconnect the library @xref{Disabling
 the Library}.
@@ -738,7 +746,7 @@ may still be lurking.
 @end menu
 
 @node Allocation macros, Extensions,  , Usage
-@section For Providing File/Line Debugging Information.
+@section Allocation macros.
 
 By including @file{malloc.h} in your C files, your calls to calloc,
 free, malloc, or realloc are replaced with calls to _calloc_leap,
@@ -754,6 +762,7 @@ able to produce verbose reports on memory not freed:
 	not freed: 0x38410 ( 22 bytes) from 'malloc_t.c:92'
         not freed: 0x38600 ( 10232 bytes) from 'malloc_t.c:104'
 @end example
+
 These lines from a log file shows that two allocations were not freed.
 One at address 0x38410 of size 22 bytes in source file @file{malloc_t.c}
 at line 92 and another at address 0x38600 of size 10232 bytes at line
@@ -828,7 +837,7 @@ a superior compiler and future releases of this library may require its
 use.
 
 @node Extensions, Disabling the Library, Allocation macros, Usage
-@section Additional Non-Standard Routines.
+@section Extensions: Non-Standard Malloc Routines.
 
 The library has a number of variables and routines that are not a
 standard part of most malloc libraries:
@@ -857,6 +866,7 @@ right before @code{exit()} or as the last function in @code{main()}.
                 exit(0);
         @}
 @end example
+
 @item int malloc_heap_map(void);
 This routine will log to the logfile (if it is enabled) a graphical
 representation of the current heap space.  It needs some work but should
@@ -903,7 +913,7 @@ call to the @file{malloc_dbg} program with a @samp{-e #} option
 @end table
 
 @node Disabling the Library,  , Extensions, Usage
-@section How to Compile/Link Without the Library.
+@section Disabling the Library.
 
 When you are finished with the development and debugging sessions, you
 may want to disable the malloc-debug library and put in its place either
@@ -935,6 +945,7 @@ leap macros to not be applied @xref{Allocation macros}.
 @example
         gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
 @end example
+
 @item
 Now you are ready to relink with a new library.  If you have not
 compiled all your source with @code{MALLOC_DEBUG_DISABLED} defined then
@@ -943,6 +954,7 @@ you need to include the @file{malloc_lp.o} file on the link line.
 @example
         gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
 @end example
+
 If you have disabled malloc with the @code{MALLOC_DEBUG_DISABLED} flag
 or never included @file{malloc.h} in any of your C files, then you will
 not need to include the @file{malloc_lp.o} file on the link line.
@@ -950,6 +962,7 @@ not need to include the @file{malloc_lp.o} file on the link line.
 @example
         gcc -O -g main.o -L/usr/local/lib -lgmalloc
 @end example
+
 If you get unresolved references like @code{_malloc_leap} or
 @code{_malloc_bcopy} then something was not disabled as it should have
 been.
@@ -965,7 +978,7 @@ been.
 @end menu
 
 @node Definitions, Compatibility,  , Code
-@section Some Terms and Other Information.
+@section Definitions of Terms and Other Information.
 
 Here are a couple definitions and other information for those interested
 in "picking the brain" of the library.  The code is a little ugly here
@@ -1017,7 +1030,7 @@ attention.
 @end itemize
 
 @node Portability,  , Compatibility, Code
-@section Issues Important for Porting the Library.
+@section Portability Issues.
 
 General compatibility issues center around:
 

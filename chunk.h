@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.16 1993/04/05 22:29:57 gray Exp $
+ * $Id: chunk.h,v 1.17 1993/04/08 21:46:32 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -51,32 +51,32 @@ IMPORT	int	_chunk_heap_check(void);
  * run extensive tests on PNT from FUNC. test PNT HOW_MUCH of MIN_SIZE
  * (or 0 if unknown).  returns [NO]ERROR
  */
-IMPORT	int	_chunk_pnt_check(const char * func, char * pnt,
+IMPORT	int	_chunk_pnt_check(const char * func, void * pnt,
 				 const int check, int min_size);
 
 /*
  * return some information associated with PNT, returns [NO]ERROR
  */
-IMPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
+IMPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
 				 char ** file, unsigned int * line);
 
 /*
  * get a SIZE chunk of memory for FILE at LINE
  */
-IMPORT	char	*_chunk_malloc(const char * file, const unsigned int line,
+IMPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 			       unsigned int size);
 
 /*
  * frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR
  */
 IMPORT	int	_chunk_free(const char * file, const unsigned int line,
-			    char * pnt);
+			    void * pnt);
 
 /*
  * reallocate a section of memory
  */
-IMPORT	char	*_chunk_realloc(const char * file, const unsigned int line,
-				char * oldp, unsigned int new_size);
+IMPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
+				void * oldp, unsigned int new_size);
 
 /*
  * log present free and used lists

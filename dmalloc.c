@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.6 1993/04/06 04:24:39 gray Exp $";
+  "$Id: dmalloc.c,v 1.7 1993/04/08 21:46:47 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -398,7 +398,7 @@ LOCAL	void	dump_current(void)
   else {
     num = hex_to_int(str);
     (void)process(num, &str);
-    (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
+    (void)fprintf(stderr, "%s == '0x%x' (%s)\n", DEBUG_ENVIRON, num, str);
   }
   
   str = (char *)getenv(ADDRESS_ENVIRON);
@@ -472,14 +472,13 @@ EXPORT	int	main(int argc, char ** argv)
   /* get a new debug value from tag */
   if (tag != NULL) {
     if (debug != NO_VALUE)
-      (void)fprintf(stderr, "%s: warning -d option ignored, processing tag "
-		    "'%s'\n",
+      (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    program, tag);
     debug = process(0, NULL);
   }
   
   if (tag != NULL || debug != NO_VALUE)
-    set_variable(DEBUG_ENVIRON, "%#lx", debug);
+    set_variable(DEBUG_ENVIRON, "0x%x", debug);
   
   if (address != NULL)
     set_variable(ADDRESS_ENVIRON, "%s", address);

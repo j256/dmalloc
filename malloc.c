@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.22 1993/04/05 22:30:13 gray Exp $";
+  "$Id: malloc.c,v 1.23 1993/04/08 21:46:40 gray Exp $";
 #endif
 
 /*
@@ -169,7 +169,7 @@ LOCAL	void	check_var(const char * file, const int line, char * pnt)
     return;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-    _malloc_message("found address '%#lx' after %d pass%s from '%s:%u'",
+    _malloc_message("found address '0x%x' after %d pass%s from '%s:%u'",
 		    pnt, addc, (addc == 1 ? "" : "es"), file, line);
   malloc_errno = MALLOC_POINTER_FOUND;
   _malloc_perror("check_var");
@@ -293,14 +293,14 @@ EXPORT	void	malloc_shutdown(void)
 /*
  * allocate and return a SIZE block of bytes
  */
-EXPORT	char	*malloc(unsigned int size)
+EXPORT	void	*malloc(MALLOC_SIZE size)
 {
-  char		*newp;
+  void		*newp;
   
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return MALLOC_ERROR;
   
-  newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, size);
+  newp = _chunk_malloc(_malloc_file, _malloc_line, size);
   check_var(_malloc_file, _malloc_line, newp);
   
   in_alloc = FALSE;
@@ -312,9 +312,9 @@ EXPORT	char	*malloc(unsigned int size)
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
  * of SIZE bytes and zero the block
  */
-EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
+EXPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size)
 {
-  char		*newp;
+  void		*newp;
   unsigned int	len = num_elements * size;
   
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
@@ -324,7 +324,7 @@ EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
   _calloc_count++;
   
   /* alloc and watch for the die address */
-  newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, len);
+  newp = _chunk_malloc(_malloc_file, _malloc_line, len);
   check_var(_malloc_file, _malloc_line, newp);
   
   (void)memset(newp, NULLC, len);
@@ -338,9 +338,9 @@ EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
  * all of OLD_PNT to the new area or truncating
  */
-EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
+EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
 {
-  char		*newp;
+  void		*newp;
   
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL)
@@ -351,7 +351,7 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
     return REALLOC_ERROR;
   
   check_var(_malloc_file, _malloc_line, old_pnt);
-  newp = (char *)_chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
+  newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
   check_var(_malloc_file, _malloc_line, newp);
   
   in_alloc = FALSE;
@@ -362,19 +362,30 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
 /*
  * release PNT in the heap, returning FREE_[NO]ERROR
  */
-EXPORT	int	free(char * pnt)
+#if __STDC__
+EXPORT	void	free(void * pnt)
+#else
+EXPORT	int	free(void * pnt)
+#endif
 {
   int		ret;
   
-  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR) {
+#if __STDC__
+    return;
+#else
     return FREE_ERROR;
+#endif
+  }
   
   check_var(_malloc_file, _malloc_line, pnt);
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
   
+#if ! __STDC__
   return ret;
+#endif
 }
 
 /******************************** utility calls ******************************/
@@ -398,7 +409,7 @@ EXPORT	int	malloc_heap_map(void)
  * verify pointer PNT, if PNT is 0 then check the entire heap.
  * returns MALLOC_VERIFY_[NO]ERROR
  */
-EXPORT	int	malloc_verify(char * pnt)
+EXPORT	int	malloc_verify(void * pnt)
 {
   int	ret;
   
@@ -444,7 +455,7 @@ EXPORT	int	malloc_debug(int debug)
  * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-EXPORT	int	malloc_examine(char * pnt, unsigned int * size,
+EXPORT	int	malloc_examine(void * pnt, MALLOC_SIZE * size,
 			       char ** file, unsigned int * line)
 {
   int		ret;

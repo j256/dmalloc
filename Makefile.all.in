@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.11 1993/04/06 05:23:08 gray Exp $
+# $Id: Makefile.all.in,v 1.12 1993/04/08 21:46:24 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -9,7 +9,7 @@ prefix = /usr/local
 srcdir = @srcdir@
 bindir = $(prefix)/bin
 libdir = $(prefix)/lib
-incdir = $(prefix)/inc
+incdir = $(prefix)/include
 infodir = $(prefix)/info
 
 # default c-compiler

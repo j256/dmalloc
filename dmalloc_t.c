@@ -33,7 +33,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.15 1993/04/06 04:24:44 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.16 1993/04/08 21:46:54 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -137,7 +137,7 @@ EXPORT	int	main(int argc, char ** argv)
       (void)printf("How much: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
-      (void)printf("malloc(%d) returned: %#lx\n", size, (long)MALLOC(size));
+      (void)printf("malloc(%d) returned: 0x%x\n", size, (long)MALLOC(size));
       continue;
     }
     
@@ -145,7 +145,7 @@ EXPORT	int	main(int argc, char ** argv)
       long	pnt;
       
       pnt = get_address();
-      (void)printf("free(%#lx) returned: %s\n",
+      (void)printf("free(0x%x) returned: %s\n",
 		   pnt, (FREE(pnt) == FREE_NOERROR ? "success" : "failure"));
       continue;
     }
@@ -160,7 +160,7 @@ EXPORT	int	main(int argc, char ** argv)
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
       
-      (void)printf("realloc(%#lx, %d) returned: %#lx\n",
+      (void)printf("realloc(0x%x, %d) returned: 0x%x\n",
 		   pnt, size, (long)REMALLOC(pnt, size));
       
       continue;
@@ -215,7 +215,7 @@ EXPORT	int	main(int argc, char ** argv)
       pnt = get_address();
       
       ret = malloc_verify((char *)pnt);
-      (void)printf("malloc_verify(%#lx) returned: %s\n",
+      (void)printf("malloc_verify(0x%x) returned: %s\n",
 		   pnt,
 		   (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
       continue;

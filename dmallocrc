@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.7 1993/04/05 22:30:25 gray Exp $
+# $Id: dmallocrc,v 1.8 1993/04/08 21:46:56 gray Exp $
 #
 
 #
@@ -74,7 +74,7 @@ runtime		log-stats, log-non-free, log-perror, log-bad-pnt, \
 4		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock, \
-		check-fence-dblock, check-funcs, \
+		check-dblock-fence, check-funcs, \
 		realloc-copy, free-blank, alloc-blank, error-abort
 
 # ultra-extensive checking
