@@ -7,3 +7,4 @@ malloc.info
 malloc.ps
 malloc_t
 malloc_dbg
+const.h

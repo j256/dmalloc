@@ -18,7 +18,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.18 1993/08/26 23:08:58 gray Exp $
+ * $Id: conf.h.in,v 1.19 1993/08/27 00:07:38 gray Exp $
  */
 
 /*
@@ -101,11 +101,6 @@
  *       combinations of requested admin info like fence-post checking.
  */
 #define ALLOCATION_ALIGNMENT 3
-
-/*
- * if your system unstands const.
- */
-#define const	const
 
 /*
  * LIBRARY DEFINES:

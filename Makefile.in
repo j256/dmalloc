@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.30 1993/08/25 21:30:14 gray Exp $
+# $Id: Makefile.in,v 1.31 1993/08/27 00:07:36 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -71,6 +71,18 @@ install : installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
 
 # put situation specific lines here
+config.status :
+	sh ./configure
+
+const.h : const.h.in config.status
+	rm -f $@
+	sh ./config.status
+
+malloc_dbg.h : malloc_dbg.1 malloc_dbg.2 const.h
+	rm -f $@ $@.t
+	cat malloc_dbg.1 const.h malloc_dbg.2 > $@.t
+	mv $@.t $@
+
 $(LIBRARY) : $(OBJS)
 	ar cr $(LIBRARY) $?
 	ranlib $@

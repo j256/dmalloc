@@ -1,5 +1,8 @@
 Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Fixed some dumb const problems.  Have to now preprocess
+	malloc_dbg.h from start const.h end.  Yeach!
+
 	* Added MALLOC_LOGFILE feature where %d in the string will be
 	replaced with the pid of the process.  Had to add getpid to
 	configure and compat.
