@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.228 2003/07/08 18:09:51 gray Exp $
+@c $Id: dmalloc.texi,v 1.229 2003/08/04 19:19:08 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -227,10 +227,10 @@ things to stop complaining when you go to compile about the size
 arguments to malloc routines.  Comments on this please.
 
 @item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
-@file{libdmalloclp.a}, and @file{dmalloc} program.  If it does not work,
-please see if there are any notes in the contrib directory about your
-system-type.  If not and you figure your problem out, please send me
-some notes so future users can profit from your experiences.
+and @file{dmalloc} program.  If it does not work, please see if there
+are any notes in the contrib directory about your system-type.  If not
+and you figure your problem out, please send me some notes so future
+users can profit from your experiences.
 
 @emph{NOTE}: You may experience some errors compiling some of the
 return.h assembly macros which attempt to determine the callers address
@@ -278,12 +278,12 @@ operations in a very random manner.  Anal folks can type @kbd{make
 heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 @file{dmalloc_t} options.
 
-@item Typing @kbd{make install} should install the @file{libdmalloc.a} 
-and @file{libdmalloc_lp.a} library files in @file{/usr/local/lib}, the
-@file{dmalloc.h} include file in @file{/usr/local/include}, and the
-@file{dmalloc} utility in @file{/usr/local/bin}.  You may also want to
-type @kbd{make installth} to install the thread library into place
-and/or @kbd{make installcc} to install the C++ library into place.
+@item Typing @kbd{make install} should install the @file{libdmalloc.a}
+library in @file{/usr/local/lib}, the @file{dmalloc.h} include file in
+@file{/usr/local/include}, and the @file{dmalloc} utility in
+@file{/usr/local/bin}.  You may also want to type @kbd{make installth}
+to install the thread library into place and/or @kbd{make installcc} to
+install the C++ library into place.
 
 You may have specified a @samp{--prefix=PATH} option to configure in
 which case @samp{/usr/local} will have been replaced with @samp{PATH}.
@@ -902,20 +902,15 @@ system version/type, and the version of Dmalloc you are using.
 
 By including @file{dmalloc.h} in your C files, your calls to malloc,
 calloc, realloc, recalloc, memalign, valloc, strdup, and free are
-replaced with calls to _malloc_leap, _calloc_leap, _realloc_leap,
-_recalloc_leap, _memalign_leap, _valloc_leap, _strdup_leap, and
-_free_leap.  Additionally the library replaces calls to xmalloc,
-xcalloc, xrealloc, xrecalloc, xmemalign, xvalloc, xstrdup, and xfree
-with associated _leap calls.
+replaced with calls to _dmalloc_malloc, _dmalloc_realloc, and
+_dmalloc_free with various flags.  Additionally the library replaces
+calls to xmalloc, xcalloc, xrealloc, xrecalloc, xmemalign, xvalloc,
+xstrdup, and xfree with associated calls.
 
-@cindex leap macros
-@cindex macros, leap
-
-These @dfn{leap macros} use the c-preprocessor @code{__FILE__} and
-@code{__LINE__} macros which get replaced at compilation time with the
-current file and line-number of the source code in question.  The leap
-routines take this information and pass it on to the library making it
-able to produce verbose reports on memory problems.
+These macros use the c-preprocessor @code{__FILE__} and @code{__LINE__}
+macros which get replaced at compilation time with the current file and
+line-number of the source code in question.  The routines use this
+information to produce verbose reports on memory problems.
 
 @example
 not freed: '0x38410' (22 bytes) from 'dmalloc_t.c:92'
@@ -930,7 +925,7 @@ This line from a log file shows that memory was not freed from file
 @cindex strdup
 
 You may notice some non standard memory allocation functions in the
-above leap list.  Recalloc is a routine like realloc that reallocates
+above list.  Recalloc is a routine like realloc that reallocates
 previously allocated memory to a new size.  If the new memory size is
 larger than the old, recalloc initializes the new space to all zeros.
 This may or may not be supported natively by your operating system.
@@ -1411,39 +1406,52 @@ while maintaining the effectiveness of the debugging.
 @item
 If you want to @emph{totally} disable the dmalloc library then you will
 need to recompile all the C files that include @file{dmalloc.h} while
-defining @code{DMALLOC_DISABLE}.  This will cause the dmalloc leap
-macros to not be applied.  @xref{Allocation Macros}.
+defining @code{DMALLOC_DISABLE}.  This will cause the dmalloc macros to
+not be applied.  @xref{Allocation Macros}.
 
 @example
 cc -g -DDMALLOC_DISABLE main.c
 @end example
+
+An alternative is to surround the @code{dmalloc.h} inclusion or any
+direct dmalloc references with an @code{#ifdef dmalloc} and then just
+remove the -Ddmalloc.
+
+@example
+#ifdef dmalloc
+#include "dmalloc.h"
+#endif
+
+main()
+@{
+  @dots{}
+
+#ifdef dmalloc
+  dmalloc_verify(0L);
+#endif
+  return 0;
+@}
+@end example
+
+@example
+// to get dmalloc information
+> cc -Ddmalloc main.c
+
+// without dmalloc information
+> cc main.c
+@end example
+
 
 @item
 If you compiled any of your source modules with @code{DMALLOC_FUNC_CHECK}
 defined then you must first recompile all those modules without the flag
 enabled.
 
-@cindex leap library
-@cindex libdmalloclp.a library
-
-@item
-If you have not compiled all your source with @code{DMALLOC_DISABLED}
-defined then you need to link your program with the
-@file{libdmalloclp.a} library.
-
-@example
-cc main.o -L/usr/local/lib -ldmalloclp -lgmalloc
-@end example
-
 If you have disabled dmalloc with the @code{DMALLOC_DISABLED} flag or
 never included @file{dmalloc.h} in any of your C files, then you will
-not need the @file{libdmalloclp.a} library.
+not need to recompile your sources when you need to disable the library.
 
-@example
-cc -g main.o -L/usr/local/lib -lgmalloc
-@end example
-
-If you get unresolved references like @code{_malloc_leap} or
+If you get unresolved references like @code{_dmalloc_malloc} or
 @code{_dmalloc_bcopy} then something was not disabled as it should have
 been.
 @end itemize
