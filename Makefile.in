@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.95 1997/07/07 07:13:37 gray Exp $
+# $Id: Makefile.in,v 1.96 1997/07/07 08:14:50 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -49,7 +49,8 @@ FLS	=  conf.h.in configure.in config.help \
 	install-sh mkinstalldirs Deansify.pl \
 	configure $(INFOFILE)
 CFGFLS	= contrib/README contrib/Xmalloc.c contrib/atexit.c \
-	contrib/dec_notes contrib/next_notes contrib/ra_info.pl
+	contrib/dec_notes contrib/dmalloc_summarize.pl contrib/next_notes \
+	contrib/ra_info.pl
 DOCFLS	= dmalloc.ps texinfo.tex
 
 # Shar file maximum size
