@@ -1,5 +1,6 @@
 - send registration physical letter
 	- send LICENSE and confirmation via email
+	- send printed copy of LICENSE file and letter via hard-copy
 - a floppy should contain:
 	- dmalloc-version.tar.gz
 	- dmalloc-version.tar.Z
