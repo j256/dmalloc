@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.62 1995/12/29 01:39:50 gray Exp $
+# $Id: Makefile.all.in,v 1.63 1997/03/20 20:45:47 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -157,8 +157,9 @@ conf.h : $(srcdir)/conf.h.in
 config.status : $(srcdir)/configure
 	$(SHELL) config.status --recheck
 
-$(srcdir)/configure : $(srcdir)/configure.in
-	cd $(srcdir); autoconf
+# Uncomment if you are playing with the configure script
+# $(srcdir)/configure : $(srcdir)/configure.in
+#	cd $(srcdir); autoconf
 
 ###############################################################################
 #
