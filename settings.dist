@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.42 1999/04/15 12:55:38 gray Exp $
+ * $Id: settings.dist,v 1.43 1999/08/25 12:34:43 gray Exp $
  */
 
 /*
@@ -46,8 +46,8 @@
 
 /*
  * Should we allow realloc of a NULL pointer?  If set to one, this
- * will call malloc when 0L is realloced.  This is useful when you are
- * extending an array in a loop and do not want to allocate it
+ * will call malloc when 0L is realloc-ed.  This is useful when you
+ * are extending an array in a loop and do not want to allocate it
  * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
@@ -55,7 +55,7 @@
 /*
  * Should we allow realloc to a 0 size to cause the pointer to be
  * freed?  If set to one, this will call free when a pointer is
- * realloced to a size of 0.  Thanks to Stefan.Froehlich@tuwien.ac.at
+ * realloc-ed to a size of 0.  Thanks to Stefan.Froehlich@tuwien.ac.at
  * for patiently pointing that the realloc in just about every Unix
  * has this functionality.
  */
@@ -64,9 +64,13 @@
 /*
  * Should we allow the free of a NULL pointer and if it happens,
  * should a message be generated to that effect.  Most (if not all)
- * POSIX C libraries allow you to free() or delete() a NULL pointer.
- * In general, I think it is bad form and the following should be
- * preferred: if (pnt != NULL) free(pnt);
+ * POSIX C libraries allow you to free() or delete() a NULL pointer
+ * and a number of programming reference manuals mention that freeing
+ * of NULL is ``allowed''.  However, I believe that it is bad form,
+ * promotes lazy pointer handling, and can often hide program bugs.
+ * As the author of dmalloc, I reserve the right to determine the
+ * default action of the library to encourage code similar to the
+ * following: if (pnt != NULL) { free(pnt); }
  *
  * The default is to generate an exception whenever a free of NULL is
  * encountered allowing the user to determine where s/he is freeing a
@@ -77,7 +81,7 @@
  * Even with ALLOW_FREE_NULL set to 0, you can enable the
  * 'allow-free-null' token at runtime for specific programs.  It will
  * not cause an error when the user asks for 0 bytes and will not
- * generate an exceptiion when it sees a free(0L).
+ * generate an exception when it sees a free(0L).
  */
 #define ALLOW_FREE_NULL 0
 #define ALLOW_FREE_NULL_MESSAGE 1
@@ -95,7 +99,7 @@
 
 /*
  * Write this character into memory when it is allocated and not
- * calloc'ed if the alloc-blank token is enabled and when it has been
+ * calloc-ed if the alloc-blank token is enabled and when it has been
  * freed if the free-blank token is enabled.  You can verify that
  * these sections have not been overwritten with the check-blank
  * token.
@@ -107,7 +111,7 @@
  * file name and line numbers returned by the __FILE__ and __LINE__
  * compiler macros.  You may need to tune then to fit your environment
  * although I would argue that if you have filenames longer than 40
- * charactes or files longer than 10,000 lines, you are doing
+ * characters or files longer than 10,000 lines, you are doing
  * something wrong.
  */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
@@ -182,7 +186,7 @@
 /*
  * Define the signals that are to be caught by the catch-signals
  * token.  When caught, these signals will cause an automatic shutdown
- * of the library so that the unfreed memory and other statistics will
+ * of the library so that the not-freed memory and other statistics will
  * be displayed.  Thanks Marty.
  */
 #if SIGNAL_OKAY
@@ -230,7 +234,7 @@
 /*
  * Store the number of times a pointer is "seen" being allocated or
  * freed -- it shows up as a s# (for seen) in the logfile.  This is
- * useful for tracking of unfreed memory.  See the docs for more
+ * useful for tracking of not-freed memory.  See the documents for more
  * information.
  *
  * NOTE: This creates a certain amount of memory overhead.
@@ -238,7 +242,7 @@
 #define STORE_SEEN_COUNT 1
 
 /*
- * Store the interation count or when a pointer is allocated -- it
+ * Store the iteration count when a pointer is allocated -- it
  * shows up as a i# (for iteration) in the logfile.  This is to give
  * you some idea when during program execution, a pointer was
  * allocated but not freed.
@@ -338,7 +342,7 @@
  * you want to log by default to the log file.
  *
  * NOTE: to display the top entries correctly, your OS must support
- * the qsort function.
+ * the quicksort function.
  */
 #define MEMORY_TABLE_LOG 10
 
@@ -349,6 +353,20 @@
  * tracked down.
  */
 #define DUMP_UNFREED_SUMMARY_ONLY 0
+
+/*
+ * If you are including the dmalloc.h include file, define this to 1
+ * to be able to disable the library by linking in the libdmalloc_lp.a
+ * library.  The alternative is to have to recompile your source files
+ * without including dmalloc.h.  With the libdmalloc_lp.a you can use
+ * the system's or another set of malloc functions without having to
+ * recompile.
+ *
+ * During a recent poll on the dmalloc mailing list, very few people
+ * showed that they cared at all about this and only 1 (one) said that
+ * they used it.
+ */
+#define USE_DMALLOC_LEAP 0
 
 /****************************** thread settings ******************************/
 
@@ -387,7 +405,7 @@
  * library to log the identity of the thread that allocated a specific
  * pointer.  The thread-id will show up as a ``t'' followed by a
  * string identifying the thread.  The LOG_THREAD_ID macro says
- * whether the thread-id is logged at the front of all log mesasges.
+ * whether the thread-id is logged at the front of all log messages.
  * The THREAD_TYPE macro defines the variable type of the id.  The
  * THREAD_GET_ID macro is what function to call to get the currently
  * running thread.  The THREAD_ID_TO_STRING defines how the thread-id
