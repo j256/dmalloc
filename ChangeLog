@@ -1,3 +1,9 @@
+Fri Mar 10 13:29:49 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Added allow-zero token for not minding malloc(0) and free(0L).
+
+	* Made all chunk.c global counters longs.
+
 Fri Mar  3 12:37:17 1995  Gray Watson  (gray@burger.letters.com)
 
 	* Integrated into new CVS hierarchy.  New copyrights.
@@ -920,5 +926,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.139 1995/03/03 17:37:37 gray Exp $
+$Id: ChangeLog,v 1.140 1995/03/10 19:43:15 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.70 1995/03/03 17:37:40 gray Exp $
+# $Id: Makefile.in,v 1.71 1995/03/10 19:43:18 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -21,7 +21,7 @@ CFLAGS	= -g $(CCFLS) -pipe -W -Wreturn-type -Wunused -Wpointer-arith \
 	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
-DESTDIR	= $(ROOT)
+DESTDIR	= /usr/local/local
 TEST	= dmalloc_t
 LIBRARY	= libdmalloc.a
 LIB_DIS	= libdmalloclp.a
@@ -223,6 +223,3 @@ configure : configure.in
 	autoconf
 
 .include <local.mk>
-.if exists Makefile.dep
-.include "Makefile.dep"
-.endif

@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.87 1995/03/03 17:37:51 gray Exp $";
+  "$Id: chunk.c,v 1.88 1995/03/10 19:43:21 gray Exp $";
 #endif
 
 /*
@@ -88,17 +88,17 @@ LOCAL	long		alloc_max_pnts	= 0;	/* maximum pointers */
 LOCAL	long		alloc_tot_pnts	= 0;	/* current pointers */
 
 /* admin counts */
-LOCAL	int		bblock_adm_count = 0;	/* count of bblock_admin */
-LOCAL	int		dblock_adm_count = 0;	/* count of dblock_admin */
-LOCAL	int		bblock_count	 = 0;	/* count of basic-blocks */
-LOCAL	int		dblock_count	 = 0;	/* count of divided-blocks */
-LOCAL	int		check_count	 = 0;	/* count of heap-checks */
+LOCAL	long		bblock_adm_count = 0;	/* count of bblock_admin */
+LOCAL	long		dblock_adm_count = 0;	/* count of dblock_admin */
+LOCAL	long		bblock_count	 = 0;	/* count of basic-blocks */
+LOCAL	long		dblock_count	 = 0;	/* count of divided-blocks */
+LOCAL	long		check_count	 = 0;	/* count of heap-checks */
 
 /* alloc counts */
-EXPORT	int		_calloc_count	= 0;	/* # callocs, done in alloc */
-LOCAL	int		free_count	= 0;	/* count the frees */
-LOCAL	int		malloc_count	= 0;	/* count the mallocs */
-LOCAL	int		realloc_count	= 0;	/* count the reallocs */
+EXPORT	long		_calloc_count	= 0;	/* # callocs, done in alloc */
+LOCAL	long		free_count	= 0;	/* count the frees */
+LOCAL	long		malloc_count	= 0;	/* count the mallocs */
+LOCAL	long		realloc_count	= 0;	/* count the reallocs */
 
 /******************************* misc routines *******************************/
 
@@ -2050,7 +2050,8 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     dmalloc_errno = ERROR_BAD_SIZE;
     log_error_info(file, line, FALSE, NULL, "bad zero byte allocation request",
 		   "malloc", FALSE);
-    dmalloc_error("_chunk_malloc");
+    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO))
+      dmalloc_error("_chunk_malloc");
     return MALLOC_ERROR;
   }
 #endif
@@ -2158,7 +2159,8 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   if (pnt == NULL) {
     dmalloc_errno = ERROR_IS_NULL;
     log_error_info(file, line, TRUE, pnt, "invalid pointer", "free", FALSE);
-    dmalloc_error("_chunk_free");
+    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO))
+      dmalloc_error("_chunk_free");
     return FREE_ERROR;
   }
   
@@ -2373,7 +2375,8 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     dmalloc_errno = ERROR_BAD_SIZE;
     log_error_info(file, line, FALSE, NULL, "bad zero byte allocation request",
 		   "realloc", FALSE);
-    dmalloc_error("_chunk_realloc");
+    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO))
+      dmalloc_error("_chunk_realloc");
     return REALLOC_ERROR;
   }
 #endif
@@ -2551,13 +2554,13 @@ EXPORT	void	_chunk_stats(void)
 		  (HEAP_GROWS_UP ? "up" : "down"));
   
   /* general heap information */
-  _dmalloc_message("heap: start %#lx, end %#lx, size %ld bytes, checked %d",
+  _dmalloc_message("heap: start %#lx, end %#lx, size %ld bytes, checked %ld",
 		  _heap_base, _heap_last, HEAP_SIZE, check_count);
   
   /* log user allocation information */
-  _dmalloc_message("alloc calls: malloc %d, realloc %d, calloc %d, free %d",
-		  malloc_count - _calloc_count, realloc_count, _calloc_count,
-		  free_count);
+  _dmalloc_message("alloc calls: malloc %ld, realloc %ld, calloc %ld, free %ld"
+		   , malloc_count - _calloc_count, realloc_count,
+		   _calloc_count, free_count);
   _dmalloc_message(" total memory allocated: %ld bytes (%ld pnts)",
 		  alloc_total, alloc_tot_pnts);
   
@@ -2566,7 +2569,7 @@ EXPORT	void	_chunk_stats(void)
 		  alloc_maximum, alloc_max_pnts);
   _dmalloc_message("max alloced with 1 call: %ld bytes",
 		  alloc_one_max);
-  _dmalloc_message("max alloc rounding loss: %ld bytes (%d%%)",
+  _dmalloc_message("max alloc rounding loss: %ld bytes (%ld%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
 		   ((alloc_max_given - alloc_maximum) * 100) /
@@ -2575,17 +2578,17 @@ EXPORT	void	_chunk_stats(void)
   if (wasted <= 0)
     _dmalloc_message("max memory space wasted: 0 bytes (0%%)");
   else
-    _dmalloc_message("max memory space wasted: %ld bytes (%d%%)",
+    _dmalloc_message("max memory space wasted: %ld bytes (%ld%%)",
 		    wasted,
 		    (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   
   /* final stats */
-  _dmalloc_message("final user memory space: basic %d, divided %d, %ld bytes",
-		  bblock_count - bblock_adm_count - dblock_count,
-		  dblock_count - dblock_adm_count, tot_space);
-  _dmalloc_message("   final admin overhead: basic %d, divided %d, %ld bytes (%d%%)",
-		  bblock_adm_count, dblock_adm_count, overhead,
-		  (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
+  _dmalloc_message("final user memory space: basic %ld, divided %ld, %ld bytes"
+		   , bblock_count - bblock_adm_count - dblock_count,
+		   dblock_count - dblock_adm_count, tot_space);
+  _dmalloc_message("   final admin overhead: basic %ld, divided %ld, %ld bytes (%d%%)",
+		   bblock_adm_count, dblock_adm_count, overhead,
+		   (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
 }
 
 /*

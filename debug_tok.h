@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.13 1995/03/03 17:38:01 gray Exp $
+ * $Id: debug_tok.h,v 1.14 1995/03/10 19:43:25 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -93,6 +93,8 @@ LOCAL	attr_t		attributes[] = {
       "never re-use freed memory" },
   { "allow-nonlinear",	"ano",	DEBUG_ALLOW_NONLINEAR,
       "allow non-linear heap space"},
+  { "allow-zero",	"aze",	DEBUG_ALLOW_ZERO,
+      "allow allocs of 0 bytes, frees of NULL"},
   
   { NULL }
 };

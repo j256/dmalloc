@@ -1,6 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.51 1994/12/21 20:11:19 gray Exp $
+$Id: NEWS,v 1.52 1995/03/10 19:43:19 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.0.6:
+
+	* Added allow-zero token for not minding malloc(0) and free(0L).
+	* Made all chunk.c global counters longs.
 
 Version 3.0.5:
 

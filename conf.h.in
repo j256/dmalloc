@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.40 1995/03/03 17:37:59 gray Exp $
+ * $Id: conf.h.in,v 1.41 1995/03/10 19:43:24 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -59,6 +59,10 @@
  * would recommend at least using the message to point out the
  * offenders because I would guess that this is not a portable feature
  * of most malloc libraries.
+ *
+ * You can also enable the 'allow-zero' token which will not cause an
+ * error when the user asks for 0 bytes and will not barf when it sees
+ * a free(0L).
  */
 #define ALLOW_FREE_NULL 0
 #define ALLOW_FREE_NULL_MESSAGE 1

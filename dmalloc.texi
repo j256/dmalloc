@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.83 1995/03/03 17:01:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.84 1995/03/10 19:43:27 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1364,6 +1364,13 @@ certain heap problems.
 @emph{NOTE}: If you are using the pthreads package, you will probably
 have to enable this since it seems to employ sbrk directly for some
 reason.
+
+@item allow-zero
+the library will not generate errors when a program asks for a 0 byte
+allocation or when someone tries to free a NULL pointer.
+
+@emph{NOTE}: This does not impact the ALLOW_REALLOC_NULL compilation
+options which can be adjusted in @file{conf.h}.
 
 @end table
 
