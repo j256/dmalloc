@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.210 2002/02/14 22:27:13 gray Exp $
+@c $Id: dmalloc.texi,v 1.211 2002/02/14 23:42:02 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1409,6 +1409,7 @@ automatically.
 
 @cindex diagnosing errors
 @cindex general errors
+@cindex sbrk
 
 If your program stops at the @code{dmalloc_error()} routine then one of
 a number of problems could be happening.  Incorrect arguments could have
@@ -2199,6 +2200,7 @@ Check the arguments of some functions (mostly string operations) looking
 for bad pointers.
 
 @cindex force-linear
+@cindex sbrk
 @item force-linear
 Have the heap complain when additional program functionality seems to
 have made use of the system's heap-allocation routine @code{sbrk}
