@@ -184,8 +184,8 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
  * of memory.
  */
 extern
-DMALLOC_PNT	dmalloc_strdup(const char *file, const int line,
-			       const char *string, const int xalloc_b);
+char	*dmalloc_strdup(const char *file, const int line,
+			const char *string, const int xalloc_b);
 
 /*
  * DMALLOC_PNT malloc

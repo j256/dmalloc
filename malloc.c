@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.170 2003/06/09 23:15:06 gray Exp $
+ * $Id: malloc.c,v 1.171 2003/06/18 21:57:39 gray Exp $
  */
 
 /*
@@ -937,18 +937,18 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
  * xalloc_b -> If set to 1 then print an error and exit if we run out
  * of memory.
  */
-DMALLOC_PNT	dmalloc_strdup(const char *file, const int line,
-			       const char *string, const int xalloc_b)
+char	*dmalloc_strdup(const char *file, const int line,
+			const char *string, const int xalloc_b)
 {
   DMALLOC_SIZE	len;
-  DMALLOC_PNT	*new_string;
+  char		*new_string;
   
   len = strlen(string) + 1;
   
   new_string = dmalloc_malloc(file, line, len, DMALLOC_FUNC_STRDUP,
 			      0 /* no alignment */, xalloc_b);
   if (new_string != NULL) {
-    strncpy((char *)new_string, string, len - 1);
+    strncpy(new_string, string, len - 1);
     new_string[len - 1] = '\0';
   }
   
