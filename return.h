@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.21 1998/09/17 16:05:05 gray Exp $
+ * $Id: return.h,v 1.22 1998/10/05 01:08:24 gray Exp $
  */
 
 /*
@@ -63,16 +63,30 @@
  *
  * This does't seem to work with optimizations turned on for some
  * reason.  Anyone know why?
+ *
+ * Alexandre Oliva <oliva@dcc.unicamp.br> recently advised to change
+ * the "=g" to a "=m".  If you are having problems, you may want to
+ * return to the =g to see if it works.
  */
+#define GET_RET_ADDR(file)	asm("st %%i7,%0" : \
+				    "=m" (file) : \
+				    /* no inputs */ )
+
+#if 0
+
+/* this was the default however =g was recommended to be changed to =m */
 #define GET_RET_ADDR(file)	asm("st %%i7,%0" : \
 				    "=g" (file) : \
 				    /* no inputs */ )
 
-#if 0
-      asm("ld [%%fp+4],%%o0; st %%o0,%0" : \
-	  "=g" (file) : \
-	  /* no inputs */ : \
-	  "o0")
+/*
+ * This was what the gcc __builtin_return_address returned.  The above
+ * versions worked better.  It is here for reference purposes only.
+ */
+#define GET_RET_ADDR(file)	asm("ld [%%fp+4],%%o0; st %%o0,%0" : \
+					"=g" (file) : \
+					/* no inputs */ : \
+					"o0")
 #endif
 
 #endif /* __sparc */
