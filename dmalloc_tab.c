@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.6 1999/03/11 01:01:33 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.7 1999/03/11 01:18:59 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.6 1999/03/11 01:01:33 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.7 1999/03/11 01:18:59 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.6 1999/03/11 01:01:33 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.7 1999/03/11 01:18:59 gray Exp $";
 #endif
 #endif
 
@@ -479,7 +479,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   
   /* is the table empty */
   if (table_entry_c == 0) {
-    _dmalloc_message("memory table is empty");
+    _dmalloc_message("  memory table is empty");
     return;
   }
   
