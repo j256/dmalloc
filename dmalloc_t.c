@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.79 1999/03/08 15:56:23 gray Exp $
+ * $Id: dmalloc_t.c,v 1.80 1999/03/08 17:25:38 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.79 1999/03/08 15:56:23 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.80 1999/03/08 17:25:38 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.79 1999/03/08 15:56:23 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.80 1999/03/08 17:25:38 gray Exp $";
 #endif
 #endif
 
@@ -871,6 +871,10 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
   case DMALLOC_FUNC_VALLOC:
     (void)printf("%s valloc %d bytes alignment %d got %#lx\n",
 		 file_line, byte_size, alignment, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_STRDUP:
+    (void)printf("%s strdup %d bytes ot %#lx\n",
+		 file_line, byte_size, (long)new_addr);
     break;
   case DMALLOC_FUNC_FREE:
     (void)printf("%s free %#lx\n", file_line, (long)old_addr);
