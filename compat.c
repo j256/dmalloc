@@ -34,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.20 1993/09/10 21:22:41 gray Exp $";
+  "$Id: compat.c,v 1.21 1993/10/03 02:02:58 gray Exp $";
 #endif
 
 #if HAVE_GETPID == 0
@@ -58,7 +58,7 @@ EXPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len)
   int		bytec;
   
   if (len <= 0)
-    return dest;
+    return;
   
   srcp = src;
   destp = dest;
@@ -72,8 +72,6 @@ EXPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len)
   } else
     for (bytec = 0; bytec < len; bytec++)
       *destp++ = *srcp++;
-  
-  return dest;
 }
 #endif /* HAVE_BCOPY == 0 */
 
@@ -139,7 +137,7 @@ EXPORT	char	*rindex(const char * str, int ch)
   if (ch == NULLC)
     return (char *)str;
   else
-    return pnt;
+    return (char *)pnt;
 }
 #endif /* HAVE_RINDEX == 0 */
 
