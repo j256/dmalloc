@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.136 1999/08/25 12:34:21 gray Exp $
+ * $Id: malloc.c,v 1.137 1999/10/11 23:53:18 gray Exp $
  */
 
 /*
@@ -79,10 +79,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.136 1999/08/25 12:34:21 gray Exp $";
+#ident "$Id: malloc.c,v 1.137 1999/10/11 23:53:18 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.136 1999/08/25 12:34:21 gray Exp $";
+  "$Id: malloc.c,v 1.137 1999/10/11 23:53:18 gray Exp $";
 #endif
 #endif
 
@@ -838,6 +838,7 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size)
 		     BLOCK_SIZE);
 }
 
+#ifndef DMALLOC_STRDUP_MACRO
 /*
  * Allocate and return a block of bytes that contains the string STR
  * including the \0.  Returns 0L on error.
@@ -861,6 +862,7 @@ char	*strdup(const char *str)
   
   return buf;
 }
+#endif
 
 /*
  * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
