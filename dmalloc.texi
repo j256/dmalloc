@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.64 1994/10/15 18:49:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.65 1994/10/15 23:58:35 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -235,7 +235,7 @@ read the system's manual pages.
 @deftypefun void * malloc ( unsigned int @var{size} )
 @cindex malloc
 
-Usage: @code{pnt = (type *)malloc(size);}
+Usage: @code{pnt = (type *)malloc(size)}
 
 The malloc routine is the basic memory allocation routine.  It allocates
 an area of size bytes.  It will return a pointer to the space requested.
@@ -247,7 +247,7 @@ an area of size bytes.  It will return a pointer to the space requested.
 @cindex calloc
 @cindex Allocation of zeros
 
-Usage: @code{pnt = (type *)calloc(number, size);}
+Usage: @code{pnt = (type *)calloc(number, size)}
 
 The calloc routine allocates a certain number of items, each of size
 bytes, and returns a pointer to the space.  It is appropriate to pass in
@@ -262,7 +262,7 @@ is all zeros.
 @item realloc
 @cindex realloc
 
-Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size);}
+Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
 
 The realloc function expands or shrinks the memory allocation in old_pnt
 to new_size number of bytes.  Realloc copies the information in old_pnt
@@ -272,7 +272,7 @@ the information from old_pnt.
 @end deftypefun
 @deftypefun void free ( void * @var{pnt} )
 
-Usage: @code{free(pnt);}
+Usage: @code{free(pnt)}
 
 The free routine releases an allocation returned by malloc, calloc, or
 realloc back to the heap.  This allows other parts of the program to
@@ -762,49 +762,63 @@ following macros which I have been using for all our memory allocation
 needs for some time now.  They take care of all the type-casting and
 make the code look much cleaner (IMHO).
 
-@table @code
-@item ALLOC(type, count)
-Usage: @code{long_pnt = ALLOC(long, 30);}.  This means allocate space
+@deftypefun void * ALLOC(@var{type}, int @var{count})
+
+Usage: @code{long_pnt = ALLOC(long, 30)}.  This means allocate space
 for 30 longs.
+@end deftypefun
 
-@item MALLOC(size)
-Usage: @code{char_pnt = MALLOC(1000);}.  This is like ALLOC but for
+@deftypefun void * MALLOC ( int @var{size} )
+
+Usage: @code{char_pnt = MALLOC(1000)}.  This is like ALLOC but for
 characters only.  It means allocate space for 1000 characters.
+@end deftypefun
 
-@item CALLOC(type, count)
-Usage: @code{info_pnt = CALLOC(struct info_st, 100);}.  This means
+@deftypefun void * CALLOC ( @var{type}, int @var{count} )
+
+Usage: @code{info_pnt = CALLOC(struct info_st, 100)}.  This means
 allocate space for 100 info_st structures and zero them all.
 
 @emph{NOTE}: the arguments for the CALLOC macro are sort of reversed
 from calloc(unsigned int count, unsigned int size).
+@end deftypefun
 
-@item REALLOC(pnt, type, count)
-Usage: @code{long_pnt = REALLOC(old_pnt, long, 10);}.  This takes
+@deftypefun void * REALLOC ( void * @var{pnt}, @var{type}, int @var{count} )
+
+Usage: @code{long_pnt = REALLOC(old_pnt, long, 10)}.  This takes
 old_pnt and and changes its size to accommodate 10 longs.
+@end deftypefun
 
-@item REMALLOC(pnt, size)
-Usage: @code{char_pnt = REMALLOC(char_pnt, 100);}.  This is like REALLOC
+@deftypefun void * REMALLOC ( void * @var{pnt}, int @var{size} )
+
+Usage: @code{char_pnt = REMALLOC(char_pnt, 100)}.  This is like REALLOC
 but for characters only.  It takes char_pnt and changes its size to 100
 characters.
+@end deftypefun
 
-@item FREE(pnt)
-Usage: @code{FREE(pnt);}.  This frees memory pointers.
+@deftypefun void FREE ( void * @var{pnt} )
 
-@item STRDUP(string)
-Usage: @code{char_pnt = STRDUP("hello");}.  This macro duplicates the
+Usage: @code{FREE(pnt)}.  This frees memory pointers.
+@end deftypefun
+
+@deftypefun char * STRDUP ( char * @var{string} )
+
+Usage: @code{char_pnt = STRDUP("hello")}.  This macro duplicates the
 functionality of the @samp{strdup} function.  string can be either a
 static string like "hello" or a character pointer.  Non-gcc users should
-use @code{STRDUP("hello", char_pnt);} where char_pnt is the variable
+use @code{STRDUP("hello", char_pnt)} where char_pnt is the variable
 which will be assigned to the pointer to the copy of "hello".
+@end deftypefun
 
-@item BDUP(pnt, size)
-Usage: @code{new_item_pnt = BDUP(&item, sizeof(item));}.  This allocates
+@deftypefun void * BDUP ( void * @var{pnt}, int @var{size} )
+
+Usage: @code{new_item_pnt = BDUP(&item, sizeof(item))}.  This allocates
 space for size bytes, copies size bytes from pnt into the new allocation
 and returns it.  It is like strdup but for non-strings.  Non-gcc users
-should use @code{BDUP(&item, sizeof(item), new_item_pnt);} where
+should use @code{BDUP(&item, sizeof(item), new_item_pnt)} where
 new_item_pnt is the variable which will be assigned the pointer to the
 copy of item.
-@end table
+@end deftypefun
 
 STRDUP, for those who are not familiar with the strdup(3) function,
 takes a string, allocates enough information to store the string (along
@@ -878,11 +892,11 @@ been stripped.
 
 @cindex extensions
 
-The library has a number of variables and routines that are not a
-standard part of most malloc libraries:
+The library has a number of variables that are not a standard part of
+most malloc libraries:
 
 @table @code
-@item char * dmalloc_logpath;
+@item char * dmalloc_logpath
 @cindex dmalloc_logpath variable
 This variable can be used to set the dmalloc log filename.  The env
 variable
@@ -891,33 +905,39 @@ variable
 @end iftex
 DMALLOC_LOGFILE overrides this variable.
 
-@item int dmalloc_errno;
+@item int dmalloc_errno
 @cindex dmalloc_errno variable
 This variable stores the internal dmalloc library error number like errno
 does for the system calls.  It can be passed to @code{dmalloc_strerror()}
 (see below) to get a string version of the error.  It will have a value
 of zero if the library has not detected any problems.
 
-@item int dmalloc_address;
+@item int dmalloc_address
 @cindex dmalloc_address variable
 This variable hold the address to be specifically looked for when
 allocating or freeing by the library.
 
-@item int dmalloc_address_count;
+@item int dmalloc_address_count
 @cindex dmalloc_address_count variable
 This variable hold the argument to the @samp{addr} part of the
 @samp{DMALLOC_OPTIONS} variable.  If it is set to a greater than 0 value
 then after the library has seen the @samp{addr} address this many times,
 it will call @code{dmalloc_error()}.
 
-@item void dmalloc_shutdown(void);
+@end table
+
+Additionally the library provides a number of non-standard malloc
+routines:
+
+@deftypefun void dmalloc_shutdown ( void )
 @cindex dmalloc_shutdown function
-This routine shuts the library down and logs the final statistics and
-information especially the non-freed memory pointers.  The library has
-code to support auto-shutdown if your system has @code{on_exit()} or
+
+Shuts the library down and logs the final statistics and information
+especially the non-freed memory pointers.  The library has code to
+support auto-shutdown if your system has @code{on_exit()} or
 @code{atexit()} calls.  If you do not have these routines, then
-@code{dmalloc_shutdown} should be called right before @code{exit()} or as
-the last function in @code{main()}.
+@code{dmalloc_shutdown} should be called right before @code{exit()} or
+as the last function in @code{main()}.
 
 @example
 main()
@@ -927,75 +947,88 @@ main()
         exit(0);
 @}
 @end example
+@end deftypefun
 
-@item void dmalloc_log_heap_map(void);
+@deftypefun void dmalloc_log_heap_map ( void )
 @cindex dmalloc_log_heap_map function
-This routine will log to the logfile (if it is enabled) a graphical
-representation of the current heap space.
 
-@item void dmalloc_log_stats(void);
+Logs to the logfile (if it is enabled) a graphical representation of the
+current heap space.
+@end deftypefun
+
+@deftypefun void dmalloc_log_stats ( void )
 @cindex dmalloc_log_stats function
-This routine dumps the current dmalloc statistics to the log file.
 
-@item void dmalloc_log_unfreed(void);
+Outputs the current dmalloc statistics to the log file.
+@end deftypefun
+
+@deftypefun void dmalloc_log_unfreed( void )
 @cindex dmalloc_log_unfreed function
-This routine dumps the unfreed-memory information to the log file.  This
-is also useful to dump the currently allocated points to the log file to
-be diff'ed against another dump later on.
 
-@item int dmalloc_verify(char * pnt);
+Dumps the unfreed-memory information to the log file.  This is also
+useful to dump the currently allocated points to the log file to be
+diff'ed against another dump later on.
+@end deftypefun
+
+@deftypefun int dmalloc_verify ( char * @var{pnt} )
 @cindex dmalloc_verify function
-Use this routines to verify individual memory pointers that are suspect
-of memory problems.  To check the entire heap pass in a NULL or 0
-pointer.  The routine returns DMALLOC_VERIFY_ERROR or
-DMALLOC_VERIFY_NOERROR.
+
+Verifies individual memory pointers that are suspect of memory problems.
+To check the entire heap pass in a NULL or 0 pointer.  The routine
+returns DMALLOC_VERIFY_ERROR or DMALLOC_VERIFY_NOERROR.
 
 @emph{NOTE}: @samp{dmalloc_verify()} can only check the heap with the
 functions that have been enabled.  For example, if fence-post checking
 is not enabled in the @samp{DMALLOC_OPTIONS} variable,
 @samp{dmalloc_verify()} cannot check the fence-post areas in the heap.
+@end deftypefun
 
-@item void dmalloc_debug(long debug);
+@deftypefun void dmalloc_debug ( long @var{debug} )
 @cindex dmalloc_debug function
-With this routine, the value in the @samp{debug} part of the
-@samp{DMALLOC_OPTIONS} variable can be overridden and the library
-debugging features set explicitly.  For instance, if debugging should
-never be enabled for a program, a call to @code{dmalloc_debug(0);} as
-the first call in @code{main()} will disable all the memory debugging
-from that point on.
+
+Overrides the value in the @samp{debug} part of the
+@samp{DMALLOC_OPTIONS} variable and sets the library debugging features
+explicitly.  For instance, if debugging should never be enabled for a
+program, a call to @code{dmalloc_debug(0)} as the first call in
+@code{main()} will disable all the memory debugging from that point on.
 
 One problem however is that some systems make calls to memory allocation
 functions @emph{before} @code{main()} is reached therefore before
 @code{dmalloc_debug()} can be called meaning some debugging information
 may be generated regardless.
+@end deftypefun
 
-@item int dmalloc_debug_current(void);
+@deftypefun long dmalloc_debug_current ( void )
 @cindex dmalloc_debug_current function
-This routine returns the current value in the @samp{debug} part of the
+
+Returns the current value in the @samp{debug} part of the
 @samp{DMALLOC_OPTIONS} variable.  This allows you to save a copy of the
 debug dmalloc settings to be changed and then restored later.
+@end deftypefun
 
-@item int dmalloc_examine(char * pnt, int * size, char ** file, int * line,
-void ** ret_address);
+@deftypefun int dmalloc_examine ( char * @var{pnt}, int * @var{size},
+char ** @var{file}, int * @var{line}, void ** @var{ret_address} )
 @cindex dmalloc_examine function
-This routine provides some very interesting functionality.  It returns
-the size of a pnt's allocation as well as the file and line or the
-return-address from where it was allocated.  It will return NOERROR or
-ERROR depending on whether pnt is good or not.
+
+Returns the size of a pnt's allocation as well as the file and line or
+the return-address from where it was allocated.  It will return NOERROR
+or ERROR depending on whether pnt is good or not.
 
 @emph{NOTE}: This function is @emph{certainly} not provided by most if
 not all other malloc libraries.
+@end deftypefun
 
-@item char * dmalloc_strerror(int errnum);
+@deftypefun char * dmalloc_strerror ( int @var{errnum} )
 @cindex dmalloc_strerror function
-@code{dmalloc_strerror} returns the string representation of the error
-value in errnum (which probably should be dmalloc_errno).  This allows
-the logging of more verbose memory error messages.
+
+Returns the string representation of the error value in errnum (which
+probably should be dmalloc_errno).  This allows the logging of more
+verbose memory error messages.
 
 You can also display the string representation of an error value by a
 call to the @file{dmalloc} program with a @samp{-e #} option
 @xref{Dmalloc Program}.
-@end table
+@end deftypefun
 
 @node C++ and the Library, Disabling the Library, Extensions, Programming
 @section Using the Library with C++.
@@ -1314,7 +1347,7 @@ tags built into it so it is not necessary for you to setup a RC file:
 enables basic run-time tests
 
 @item low
-turns on minumal checking of heap structures
+turns on minimal checking of heap structures
 
 @item medium
 significant checking of heap areas
