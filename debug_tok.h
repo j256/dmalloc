@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.11 1994/10/14 01:59:32 gray Exp $
+ * $Id: debug_tok.h,v 1.12 1994/10/27 01:23:30 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -43,21 +43,19 @@ LOCAL	attr_t		attributes[] = {
       "no functionality" },
   
   { "log-stats",	"lst",	DEBUG_LOG_STATS,
-      "generally log statistics" },
+      "log general statistics" },
   { "log-non-free",	"lnf",	DEBUG_LOG_NONFREE,
-      "report non-freed pointers" },
-  { "log-error",	"ler",	DEBUG_LOG_ERROR,
-      "log error messages" },
+      "log non-freed pointers" },
   { "log-trans",	"ltr",	DEBUG_LOG_TRANS,
       "log memory transactions" },
   { "log-stamp",	"lst",	DEBUG_LOG_STAMP,
-      "add time stamp to log" },
+      "add time-stamp to log" },
   { "log-admin",	"lad",	DEBUG_LOG_ADMIN,
-      "log background admin info" },
+      "log administrative info" },
   { "log-blocks",	"lbl",	DEBUG_LOG_BLOCKS,
       "log blocks when heap-map" },
   { "log-unknown",	"lun",	DEBUG_LOG_UNKNOWN,
-      "report unknown non-freed" },
+      "log unknown non-freed" },
   { "log-bad-space",	"lbs",	DEBUG_LOG_BAD_SPACE,
       "dump space from bad pnt" },
   { "log-nonfree-space","lns",	DEBUG_LOG_NONFREE_SPACE,
@@ -66,30 +64,31 @@ LOCAL	attr_t		attributes[] = {
   { "check-fence",	"cfe",	DEBUG_CHECK_FENCE,
       "check fence-post errors" },
   { "check-heap",	"che",	DEBUG_CHECK_HEAP,
-      "examine heap adm structs" },
+      "check heap adm structs" },
   { "check-lists",	"cli",	DEBUG_CHECK_LISTS,
       "check free lists" },
-  { "check-free",	"cfr",	DEBUG_CHECK_BLANK,
-      "please use and see check-blank" },
   { "check-blank",	"cbl",	DEBUG_CHECK_BLANK,
       "check blanked memory" },
+  /* NOTE: this should be after check-blank */
+  { "check-free",	"cfr",	DEBUG_CHECK_BLANK,
+      "PLEASE USE AND SEE CHECK-BLANK" },
   { "check-funcs",	"cfu",	DEBUG_CHECK_FUNCS,
       "check functions" },
   
   { "realloc-copy",	"rco",	DEBUG_REALLOC_COPY,
       "copy all re-allocations" },
   { "free-blank",	"fbl",	DEBUG_FREE_BLANK,
-      "write over free'd memory" },
+      "blank free'd memory" },
   { "error-abort",	"eab",	DEBUG_ERROR_ABORT,
       "abort immediately on error" },
   { "alloc-blank",	"abl",	DEBUG_ALLOC_BLANK,
       "blank newly alloced memory" },
   { "heap-check-map",	"hcm",	DEBUG_HEAP_CHECK_MAP,
-      "heap-map on heap-check" },
+      "log heap-map on heap-check" },
   { "print-error",	"per",	DEBUG_PRINT_ERROR,
       "print errors to stderr" },
   { "catch-null",	"cnu",	DEBUG_CATCH_NULL,
-      "abort before return null" },
+      "abort if no memory available" },
   { "never-reuse",	"nre",	DEBUG_NEVER_REUSE,
       "never re-use freed memory" },
   { "allow-nonlinear",	"ano",	DEBUG_ALLOW_NONLINEAR,
