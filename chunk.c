@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.165 2000/10/10 23:06:23 gray Exp $
+ * $Id: chunk.c,v 1.166 2000/11/07 17:04:27 gray Exp $
  */
 
 /*
@@ -63,13 +63,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: chunk.c,v 1.165 2000/10/10 23:06:23 gray Exp $";
-#ident "@(#) $Id: chunk.c,v 1.165 2000/10/10 23:06:23 gray Exp $";
+#ident "@(#) $Id: chunk.c,v 1.166 2000/11/07 17:04:27 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.165 2000/10/10 23:06:23 gray Exp $";
-static	char	*rcs_id_w =
-  "@(#) $Id: chunk.c,v 1.165 2000/10/10 23:06:23 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.166 2000/11/07 17:04:27 gray Exp $";
 #endif
 #endif
 
@@ -77,19 +74,14 @@ static	char	*rcs_id_w =
  * Library Copyright and URL information for ident and what programs
  */
 #if IDENT_WORKS
-#ident "$Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
-#ident "@(#) Dmalloc package Copyright 2000 by Gray Watson";
-#ident "$URL: Source for dmalloc available from http://dmalloc.com/ $";
-#ident "@(#) Source for dmalloc available from http://dmalloc.com/";
+#ident "@(#) $Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
+#ident "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $";
 #else
 static	char	*copyright =
-  "$Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
-static	char	*copyright_w =
-  "@(#) Dmalloc package Copyright 2000 by Gray Watson";
+  "@(#) $Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
 static	char	*source_url =
-  "$URL: Source for dmalloc available from http://dmalloc.com/ $";
-static	char	*source_url_w =
-  "@(#) Source for dmalloc available from http://dmalloc.com/";
+  "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $";
+#endif
 #endif
 
 /* local routines */
@@ -3483,7 +3475,7 @@ void	_chunk_log_changed(const unsigned long mark, const int not_freed_b,
   dblock_t	*dblock_p;
   void		*pnt;
   unsigned int	block_type;
-  int		unknown_b;
+  int		known_b;
   char		out[DUMP_SPACE * 4], *which_str;
   char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   int		unknown_size_c = 0, unknown_block_c = 0, out_len;
@@ -3552,17 +3544,18 @@ void	_chunk_log_changed(const unsigned long mark, const int not_freed_b,
       pnt = BLOCK_POINTER(this_adm_p->ba_pos_n +
 			  (bblock_p - this_adm_p->ba_blocks));
       
-      unknown_b = 0;
-      
       /* unknown pointer? */
       if (bblock_p->bb_file == DMALLOC_DEFAULT_FILE
 	  || bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
 	unknown_block_c++;
 	unknown_size_c += bblock_p->bb_size - fence_overhead_size;
-	unknown_b = 1;
+	known_b = 0;
+      }
+      else {
+	known_b = 1;
       }
       
-      if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+      if (known_b || (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_KNOWN))) {
 	if (details_b) {
 	  _dmalloc_message(" not freed: '%s' (%ld bytes) from '%s'",
 			   display_pnt(CHUNK_TO_USER(pnt),
@@ -3620,17 +3613,18 @@ void	_chunk_log_changed(const unsigned long mark, const int not_freed_b,
 	pnt = (char *)bb_p->bb_mem + (dblock_p - bb_p->bb_dblock) *
 	  (1 << bb_p->bb_bit_n);
 	
-	unknown_b = 0;
-	
 	/* unknown pointer? */
 	if (dblock_p->db_file == DMALLOC_DEFAULT_FILE
 	    || dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
 	  unknown_block_c++;
 	  unknown_size_c += dblock_p->db_size - fence_overhead_size;
-	  unknown_b = 1;
+	  known_b = 0;
+	}
+	else {
+	  known_b = 1;
 	}
 	
-	if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+	if (known_b || (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_KNOWN))) {
 	  if (details_b) {
 	    _dmalloc_message(" %s: '%s' (%d bytes) from '%s'",
 			     (dblock_p->db_flags == DBLOCK_FREE ?

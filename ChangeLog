@@ -1,3 +1,12 @@
+Tue Nov  7 11:39:26 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Made log-unknown the default and depreciated the token.  Added a
+	log-known token to _only_ report on known (file/line) memory.
+
+	* Removed INSTALL.1 file because it was basically empty.
+
+	* Added Troubleshooting section to the INSTALL manual.
+
 Tue Oct 10 19:03:14 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Releasing dmalloc version 4.7.2 with just the ident
@@ -1689,5 +1698,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.262 2000/10/11 18:10:14 gray Exp $
+$Id: ChangeLog,v 1.263 2000/11/07 17:04:40 gray Exp $
 -------------------------------------------------------------------------------
