@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.177 2000/03/21 20:08:16 gray Exp $
+@c $Id: dmalloc.texi,v 1.178 2000/03/24 21:59:12 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -55,7 +55,7 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 4.4.0
+@subtitle Version 4.5.0
 @subtitle March 2000
 @author Gray Watson
 
@@ -84,7 +84,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 4.4.0 -- March 2000
+Version 4.5.0 -- March 2000
 @end ifinfo
 
 @cindex introduction
@@ -1095,7 +1095,69 @@ not all other malloc libraries.
 @end deftypefun
 
 @deftypefun
-char * dmalloc_strerror ( int @var{errnum} )
+void dmalloc_message ( char * @var{format}, @var{...} )
+
+@cindex dmalloc_message function
+
+Write a message into the dmalloc logfile using printf-like arguments.
+
+@emph{NOTE:} this is only available is STDARG is defined by the library
+and you have the @file{stdarg.h} include file.
+@end deftypefun
+
+@deftypefun
+void dmalloc_vmessage ( char * @var{format}, va_list @var{args} )
+
+@cindex dmalloc_vmessage function
+
+Write a message into the dmalloc logfile using vprintf-like arguments.
+
+@emph{NOTE:} this is only available is STDARG is defined by the library
+and you have the @file{stdarg.h} include file.
+@end deftypefun
+
+@deftypefun
+void dmalloc_track ( dmalloc_track_t @var{track_func} )
+
+@cindex dmalloc_track function
+@cindex track memory calls
+
+Register an allocation tracking function which will be called each time
+an allocation occurs.  Pass in NULL to disable.  To take a look at what
+information is provided, see the dmalloc_track_t function typedef in
+dmalloc.h.
+@end deftypefun
+
+@deftypefun
+unsigned long dmalloc_mark ( void )
+
+@cindex dmalloc_mark function
+@cindex memory position marker
+@cindex mark memory position
+
+Return to the caller the current "mark" which can be used later to
+dmalloc_log_changed pointers since this point.  Multiple marks can be
+saved and used.
+@end deftypefun
+
+@deftypefun
+unsigned long dmalloc_log_changed ( unsigned long @var{mark},
+int @var{not_freed_b}, int @var{freed_b}, int @var{details_b} )
+
+@cindex dmalloc_log_changed function
+@cindex changed memory
+@cindex checkpoint memory usage
+@cindex log memory changed
+
+Dump the pointers that have changed since the mark which was returned by
+dmalloc_mark.  If not_freed_b is set to non-0 then log the new pointers
+that are non-freed.  If free_b is set to non-0 then log the new pointers
+that are freed.  If details_b set to non-0 then dump the individual
+pointers that have changed otherwise just dump the summaries.
+@end deftypefun
+
+@deftypefun
+const char * dmalloc_strerror ( int @var{errnum} )
 
 @cindex dmalloc_strerror function
 @cindex string error message

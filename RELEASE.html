@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.5 2000/03/21 21:41:12 gray Exp $ -->
-<TITLE> Dmalloc Release Notes - 4.4.0 </TITLE>
+<!-- $Id: RELEASE.html,v 1.6 2000/03/24 21:59:12 gray Exp $ -->
+<TITLE> Dmalloc Release Notes - 4.5.0 </TITLE>
 </HEAD>
 <BODY>
 
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.4.0 <BR>
+Version: Release 4.5.0 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.3.0.html">4.3.0</A> <BR>
-Date: March 20, 2000
+Last-Version: <A HREF="dmalloc-4.4.0.html">4.4.0</A> <BR>
+Date: March 24, 2000
 </H4>
 </CENTER>
 
@@ -31,8 +31,9 @@ Date: March 20, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Some changes here to improve the pthread workings and lower the
-incidence of recursive behavior.  Various other lower level changes.
+<P> Added the ability to checkpoint a place in memory and then dump
+the not-freed or freed memory that has changed since the checkpoint.
+See the dmalloc_mark and dmalloc_log_changed functions.
 
 <P>
 <HR>
@@ -41,10 +42,10 @@ incidence of recursive behavior.  Various other lower level changes.
 
 <UL>
 
-<P><LI> The library should handle pthreaded applications better.
-Especially under Freebsd.  More attention was spent to handling
-initialization recursive problems.  More work needs to be spent in
-this area.
+<P><LI> The dmalloc_mark function returns a mark value.  When passed
+at a later point to dmalloc_log_changed, the library will log the
+memory pointers that have changed the call to dmalloc_mark.  Multiple
+marks can be recorded and used.
 
 </UL>
 
@@ -77,15 +78,8 @@ this area.
 
 <UL>
 
-<P><LI> Removed support for the PTHREAD_MUTEX_INITIALIZER define.  It
-turns out that this only delayed the mutex initialization process
-until the lock was called increasing the recursive nature of dmalloc
-under pthreads.
-
-<P><LI> Finally removed all of the gross unions in chunk_loc.h.
-Thanks much to Randell Jesup's patches which I sat on forever.  He
-also added flags for the dblock entries which makes detecting of small
-block allocations status more deterministic.
+<P><LI> Added a new BBLOCK_START_FREE basic-block type which marks the
+start of a multiple block free section.
 
 </UL>
 
