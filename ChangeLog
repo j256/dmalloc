@@ -1,3 +1,15 @@
+Fri Apr  8 13:51:39 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed some race conditions with sbrk failure.
+
+Thu Apr  7 17:13:31 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Added some better checking for out-of-range arguments.
+
+	* Changed heap-error to 0L from -1.
+
+	* Added -p max-pointers argument to malloc_t.
+
 Wed Apr  6 23:02:07 1994  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added 'log-nonfree-space' token for logging unfreed memory
@@ -684,5 +696,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.101 1994/04/07 03:03:21 gray Exp $
+$Id: ChangeLog,v 1.102 1994/04/08 17:53:07 gray Exp $
 -------------------------------------------------------------------------------

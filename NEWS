@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.24 1994/04/07 03:03:26 gray Exp $
+$Id: NEWS,v 1.25 1994/04/08 17:53:12 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.2:
 
+	* Fixed some race conditions with sbrk failure.
+	* Added -p max-pointers argument to malloc_t.
 	* Added 'log-nonfree-space' token for logging unfreed memory space.
 	* Added iteration count lable to all logfile output.  See conf.h.
 	* Added xmalloc,xrealloc,etc. override functions.
