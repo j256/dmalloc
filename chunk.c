@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.99 1995/09/06 18:06:45 gray Exp $";
+  "$Id: chunk.c,v 1.100 1995/09/06 19:25:15 gray Exp $";
 #endif
 
 /*
@@ -696,7 +696,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, void ** memp)
   }
   
   /* get the block pointer to the first free slot we have */
-  bblockp = admp->ba_blocks + (BB_PER_ADMIN - 1);
+  bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
   bblockc = bblockp->bb_freen;
   bblockp = freep->ba_blocks + bblockc;
   
