@@ -1,184 +1,223 @@
-<HTML>
-<HEAD>
-<!-- $Id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<TITLE> Dmalloc Release Notes - 4.8.1 </TITLE>
-</HEAD>
-<BODY>
+<html>
+<head>
+<!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
+<title> Dmalloc Release Notes - 5.0.0 </title>
+</head>
+<body>
 
-<CENTER>
-<H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
-<H4>
-Version: Release 4.8.1 <BR>
-<!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.8.0.html">4.8.0</A> <BR>
-Date: November 14, 2000
-</H4>
-</CENTER>
+<center>
+<h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
+<h4>
+Version: Release 5.0.0 <br />
+<!-- fix the TITLE ^^^above^^^ too -->
+Last-Version: <a href="dmalloc-4.8.1.html">4.8.1</a> <br />
+Date: May 15, 2003
+</h4>
+</center>
 
-<HR>
+<p>
+<a href="#overview">Overview</a> &nbsp;&nbsp;
+<a href="#func">New Functionality</a> &nbsp;&nbsp;
+<a href="#dmalloc">Dmalloc Utility</a> &nbsp;&nbsp;
+<a href="#settings.dist">settings.dist</a> &nbsp;&nbsp;
+<a href="#install">Installation</a> &nbsp;&nbsp;
+<a href="#programming">Programming</a> &nbsp;&nbsp;
+<a href="#env">Environmental Variables</a> &nbsp;&nbsp;
+<a href="#bugs">Bugs Fixed</a>
+</p>
 
-<CENTER>
-<A HREF="#overview">Overview</A> |
-<A HREF="#func">New Functionality</A> |
-<A HREF="#dmalloc">Dmalloc Utility</A> |
-<A HREF="#settings.dist">settings.dist</A> <BR>
-<A HREF="#install">Installation</A> |
-<A HREF="#programming">Programming</A> |
-<A HREF="#env">Environmental Variables</A> <BR>
-<A HREF="#bugs">Bugs Fixed</A> <BR>
-</CENTER>
+<h3><a name="overview"> Overview </a></h3>
 
-<HR>
+<p> Major release with a number of internal changes as well as some
+external features.  Reworked the entire pointer management structures
+to use skip-lists which simplified a good bit of the code and removed
+a number of functions and slimmed down many others. </p>
 
-<H3><A NAME="overview"> Overview </A></H3>
+<h3><a name="func"> New Functionality </a></h3>
 
-<P> Quick patch release to fix problems with semicolons at the end of
-#ident statements.
+<ul>
 
-<P>
-<HR>
+<li> Added dmalloc_debug_setup function to set the environment from a
+string.  This will allow servers or cgi-bin programs which cannot
+affect their environment to enable dmalloc checking. </li>
 
-<H3><A NAME="func"> New Functionality </A></H3>
+<li> Added -M --memory-limit argument to dmalloc to limit the amount
+of memory that dmalloc can allocate. </li>
 
-<UL>
+<li> Added an internal memory space feature where people can
+statically allocate a chunk of memory for dmalloc to manage.  This is
+for embedded systems without sbrk. </li>
 
-<P> None.
+<li> Added separate characters for blanking allocations (0xda for
+dmalloc-allocation) versus freed pointers (0xdf for
+dmalloc-free). </li>
 
-</UL>
+<li> A couple of other features not annotated in the ChangeLog
+file. </li>
 
-<P>
-<HR>
+</ul>
 
-<H3><A NAME="dmalloc"> Dmalloc Utility Changes </A></H3>
+<h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
-<UL>
+<ul>
 
-<P> None.
+<li> Added -M --memory-limit argument to dmalloc to limit the amount
+of memory that dmalloc can allocate.  You can specify the limit as
+256k, 120m, or 2g to get kilobytes, megabytes, or gigabytes
+respectively.  </li>
 
-</UL>
+<li> Removed the -S --short-tokens flag and support for short version
+of the debug tokens.  I apologize to folks that used this. </li>
 
-<P>
-<HR>
+<li> Added better usage information to the -u and --usage flags. </li>
 
-<H3><A NAME="settings.dist"> Changes to the settings.dist File </A></H3>
+<li> Now when you clear out all of the debug tokens, dmalloc will tell
+the environment to unset the variable. </li>
 
-<UL>
+</ul>
 
-<P> None.
+<h3><a name="settings.dist"> Changes to the settings.dist File </a></h3>
 
-</UL>
+<ul>
 
-<HR>
+<li> By popular demand, I've changed the default behavior for free(0L)
+[cheering heard in the distance].  By default now, freeing a 0L
+pointer is fine unless the ALLOW_FREE_NULL variable is set to 0. </li>
 
-<P>
-<H3><A NAME="install"> Installation Changes </A></H3>
+<li> Removed the USE_DMALLOC_LEAP functionality to simplify a number
+of sections in the code.  I apologize to those developers who relied
+on this feature.  Please feel free to contact me with any questions
+for replacement functionality. </li>
 
-<UL>
+<li> Added the INTERNAL_MEMORY_SPACE setting which will statically
+allocate a chunk of memory for dmalloc to manage.  This is for
+embedded systems without sbrk. </li>
 
-<P> None.
+<li> Removed the INCLUDE_RCS_IDS switch. </li> 
 
-</UL>
+<li> Changed BLANK_CHAR to be ALLOC_BLANK_CHAR and FREE_BLANK_CHAR.
+New allocations are now set with a different character than freed
+pointers. </li>
 
-<HR>
+<li> Removed the FIRST_FIT, BEST_FIT, and WORST_FIT settings which
+really weren't obeyed well in past versions and aren't supported in
+the current one. </li>
 
-<P>
-<H3><A NAME="programming"> Programming Notes </A></H3>
+<li> Changed the LARGEST_BLOCK setting from bits to be
+LARGEST_ALLOCATION and increased the default value from 64mb to
+256mb. </li>
 
-<UL>
+<li> Added the DEFAULT_SMALLEST_ALLOCATION with which you can set the
+smallest sized allocation allowed.  Any blocks smaller than this will
+be rounded up to this size. </li>
 
-<P><LI> Improved the shared library creation in the Makefile.  Need to
-better autoconf this part of the install process.
+</ul>
 
-</UL>
+<h3><a name="install"> Installation Changes </a></h3>
 
-<P>
-<HR>
+<blockquote>
+None.
+</blockquote>
 
-<H3><A NAME="env"> Environmental Variable Changes </A></H3>
+<h3><a name="programming"> Programming Notes </a></h3>
 
-<UL>
+<ul>
 
-<P> None.
+<li> This new version of dmalloc utilized the skip-list data type to
+manage all of its pointers and freed memory.  Skip lists are
+alternatives to balanced trees with a significantly simpler
+implementation with low power overhead.  The code to implement the
+skip-list in dmalloc is 254 lines including 85 lines of function
+header comments. </li>
 
-</UL>
+</ul>
 
-<P>
-<HR>
+<h3><a name="env"> Environmental Variable Changes </a></h3>
 
-<H3><A NAME="bugs"> Bugs Fixed </A></H3>
+<ul>
 
-<UL>
+<li> Removed the log-blocks and heap-check-map tokens.  Please contact
+me if you used these functions and would like to see something like
+them again. </li>
 
-<P><LI> Removed extraneous and invalid semicolons from the end of
-#ident statements in the code.  This was causing problems with the
-autoconfig and handling of #ident by gcc.
+<li> Added limit=XX setting with which you can limit the amount of
+memory that dmalloc can allocate.  This does not include it's
+administrative overhead. </li>
 
-</UL>
+</ul>
 
-<P>
-<HR>
+<h3><a name="bugs"> Bugs Fixed </a></h3>
 
-<P>
-<CENTER>
-<FONT SIZE="-1">
-<A HREF="http://dmalloc.com/">Dmalloc Home Page</A>.
-Copyright 2000 by <A HREF="http://256.com/gray/">Gray Watson</A>.
-</FONT>
-</CENTER>
+<ul>
 
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
+<li> I believe that the long standing problem where the seen pointer
+in some situations would not be initialized has been fixed. </li>
 
-</BODY>
-</HTML>
+<li> This is a major release.  Many bugs were probably <i>created</i>
+not fixed. </li>
+
+</ul>
+
+<p>
+<font size="-1">
+<a href="http://dmalloc.com/">Dmalloc Home Page</a>.
+Copyright 2000 by <a href="http://256.com/gray/">Gray Watson</a>.
+</font>
+</p>
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+</body>
+</html>
