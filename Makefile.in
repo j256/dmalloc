@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.141 2000/10/11 18:10:14 gray Exp $
+# $Id: Makefile.in,v 1.142 2000/11/07 16:42:22 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -241,7 +241,7 @@ dmalloc.dvi : dmalloc.texi
 	( cd work ; texi2dvi .././$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
-INSTALL : $(srcdir)/INSTALL.1 $(INFOFILE)
+INSTALL : $(INFOFILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
 		> $@.t
@@ -251,9 +251,15 @@ INSTALL : $(srcdir)/INSTALL.1 $(INFOFILE)
 	echo ------------------------------------------------------------------------------- \
 		>> $@.t
 	sed -e '1,/,  Node: Getting Started/d' \
-		-e '/,  Node: Details/,$$d' \
+		-e '/,  Node: Troubleshooting/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $@.t
-	cat $(srcdir)/INSTALL.1 >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: Troubleshooting/d' \
+		-e '/,  Node: Programming/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
 	mv $@.t $@
 
 README : $(srcdir)/README.1 $(INFOFILE)
