@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.27 1993/04/30 20:02:39 gray Exp $";
+  "$Id: malloc.c,v 1.28 1993/04/30 21:16:48 gray Exp $";
 #endif
 
 /*
@@ -271,7 +271,7 @@ EXPORT	void	malloc_shutdown(void)
 {
   /* NOTE: do not test for IN_TWICE here */
   
-  /* do we need to check the heap? */
+  /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
@@ -395,6 +395,7 @@ EXPORT	int	free(void * pnt)
  */
 EXPORT	int	malloc_heap_map(void)
 {
+  /* check the heap since we are dumping info from it */
   if (check_debug_vars(NULL, 0) != NOERROR)
     return ERROR;
   
@@ -413,8 +414,7 @@ EXPORT	int	malloc_verify(void * pnt)
 {
   int	ret;
   
-  if (check_debug_vars(NULL, 0) != NOERROR)
-    return MALLOC_VERIFY_ERROR;
+  /* should not check heap here because we will be doing it below */
   
   if (pnt == NULL)
     ret = _chunk_heap_check();
@@ -437,8 +437,7 @@ EXPORT	int	malloc_debug(int debug)
 {
   int	hold;
   
-  if (check_debug_vars(NULL, 0) != NOERROR)
-    return MALLOC_ERROR;
+  /* should not check the heap here since we are setting the debug variable */
   
   /* make sure that the not-changeable flags' values are preserved */
   hold = _malloc_debug & DEBUG_NOT_CHANGEABLE;
@@ -460,6 +459,7 @@ EXPORT	int	malloc_examine(void * pnt, MALLOC_SIZE * size,
 {
   int		ret;
   
+  /* need to check the heap here since we are geting info from it below */
   if (check_debug_vars(NULL, 0) != NOERROR)
     return ERROR;
   
@@ -479,9 +479,7 @@ EXPORT	int	malloc_examine(void * pnt, MALLOC_SIZE * size,
  */
 EXPORT	char	*malloc_strerror(int errnum)
 {
-  /*
-   * NOTE: should not check_debug_vars here because _malloc_perror calls this.
-   */
+  /* should not check_debug_vars here because _malloc_perror calls this */
   
   if (! IS_MALLOC_ERRNO(errnum))
     return malloc_errlist[MALLOC_BAD_ERRNO];
