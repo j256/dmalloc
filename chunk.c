@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.201 2004/01/28 14:29:43 gray Exp $
+ * $Id: chunk.c,v 1.202 2004/06/29 22:38:35 gray Exp $
  */
 
 /*
@@ -1067,15 +1067,10 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
  *
  * now_line -> Line number from where we generated the error.
  *
- * prev_file -> File of a previous location.  For instance the
- * location of a previous free() if we tried to free something twice.
+ * user_pnt -> Pointer in question.  This can be 0L then it will use
+ * the slot_p memory pointer.
  *
- * prev_line -> Line number of a previous location.  For instance the
- * location of a previous free() if we tried to free something twice.
- *
- * user_pnt -> Pointer in question.
- *
- * size -> Size that the user requested including any fence space.
+ * slot_p -> Pointer to the slot associated with the user_pnt or 0L.
  *
  * reason -> Reason string why something happened.
  *
@@ -1084,39 +1079,55 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
  */
 static	void	log_error_info(const char *now_file,
 			       const unsigned int now_line,
-			       const char *prev_file,
-			       const unsigned int prev_line,
-			       const void *user_pnt, const unsigned int size,
+			       const void *user_pnt,
+			       const skip_alloc_t *slot_p,
 			       const char *reason, const char *where)
 {
   static int	dump_bottom_b = 0, dump_top_b = 0;
   char		out[(DUMP_SPACE + FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE) * 4];
   char		where_buf[MAX_FILE_LENGTH + 64];
   char		where_buf2[MAX_FILE_LENGTH + 64];
-  const char	*reason_str;
+  const char	*prev_file;
   const void	*dump_pnt = user_pnt;
+  const void	*start_user;
+  unsigned int	prev_line, user_size;
+  skip_alloc_t	*other_p;
+  pnt_info_t	pnt_info;
   int		out_len, dump_size, offset;
   
-  /* get a proper reason string */
-  if (reason == NULL) {
-    reason_str = dmalloc_strerror(dmalloc_errno);
+  dmalloc_error(where);
+
+  if (slot_p == NULL) {
+    prev_file = NULL;
+    prev_line = 0;
+    user_size = 0;
+    start_user = user_pnt;
   }
   else {
-    reason_str = reason;
+    prev_file = slot_p->sa_file;
+    prev_line = slot_p->sa_line;
+    user_size = slot_p->sa_user_size;
+    if (user_pnt == NULL) {
+      get_pnt_info(slot_p, &pnt_info);
+      start_user = pnt_info.pi_user_start;
+    }
   }
   
+  /* get a proper reason string */
+  if (reason != NULL) {
+    dmalloc_message("  error details: %s", reason);
+  }
   /* dump the pointer information */
-  if (user_pnt == NULL) {
-    dmalloc_message("%s: %s: from '%s' prev access '%s'",
-		    where, reason_str,
+  if (start_user == NULL) {
+    dmalloc_message("  from '%s' prev access '%s'",
 		    _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
 					    now_file, now_line),
 		    _dmalloc_chunk_desc_pnt(where_buf2, sizeof(where_buf2),
 					    prev_file, prev_line));
   }
   else {
-    dmalloc_message("%s: %s: pointer '%#lx' from '%s' prev access '%s'",
-		    where, reason_str, (unsigned long)user_pnt,
+    dmalloc_message("  pointer '%#lx' from '%s' prev access '%s'",
+		    (unsigned long)start_user,
 		    _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
 					    now_file, now_line),
 		    _dmalloc_chunk_desc_pnt(where_buf2, sizeof(where_buf2),
@@ -1140,18 +1151,22 @@ static	void	log_error_info(const char *now_file,
     if (! dump_bottom_b) {
       out_len = expand_chars(fence_bottom, FENCE_BOTTOM_SIZE, out,
 			     sizeof(out));
-      dmalloc_message("Dump of proper fence-bottom bytes: '%.*s'",
+      dmalloc_message("  dump of proper fence-bottom bytes: '%.*s'",
 		      out_len, out);
       dump_bottom_b = 1;
     }
     offset = -FENCE_BOTTOM_SIZE;
     dump_size = DUMP_SPACE + FENCE_BOTTOM_SIZE;
+    if (dump_size > user_size + FENCE_OVERHEAD_SIZE) {
+      dump_size = user_size + FENCE_OVERHEAD_SIZE;
+    }
   }
-  else if (dmalloc_errno == ERROR_OVER_FENCE && size > 0) {
+  else if (dmalloc_errno == ERROR_OVER_FENCE
+	   && user_size > 0) {
     /* NOTE: only dump out the proper fence-post area once */
     if (! dump_top_b) {
       out_len = expand_chars(fence_top, FENCE_TOP_SIZE, out, sizeof(out));
-      dmalloc_message("Dump of proper fence-top bytes: '%.*s'",
+      dmalloc_message("  dump of proper fence-top bytes: '%.*s'",
 		      out_len, out);
       dump_top_b = 1;
     }
@@ -1159,30 +1174,61 @@ static	void	log_error_info(const char *now_file,
      * The size includes the bottom fence post area.  We want it to
      * align with the start of the top fence post area.
      */
-    offset = size - FENCE_BOTTOM_SIZE - FENCE_TOP_SIZE;
-    if (offset < 0) {
-      offset = 0;
+    if (DUMP_SPACE > user_size + FENCE_OVERHEAD_SIZE) {
+      dump_size = user_size + FENCE_OVERHEAD_SIZE;
+      offset = -FENCE_BOTTOM_SIZE;
     }
-    dump_size = DUMP_SPACE + FENCE_TOP_SIZE;
+    else {
+      dump_size = DUMP_SPACE;
+      /* we will go backwards possibly up to FENCE_BOTTOM_SIZE offset */
+      offset = user_size + FENCE_TOP_SIZE - DUMP_SPACE;
+    }
   }
   else {
     dump_size = DUMP_SPACE;
     offset = 0;
+    if (user_size > 0 && dump_size > user_size) {
+      dump_size = user_size;
+    }
   }
   
-  if (size > 0 && dump_size > size) {
-    dump_size = size;
-  }
-  
-  dump_pnt = (char *)user_pnt + offset;
+  dump_pnt = (char *)start_user + offset;
   if (IS_IN_HEAP(dump_pnt)) {
     out_len = expand_chars(dump_pnt, dump_size, out, sizeof(out));
-    dmalloc_message("Dump of '%#lx'%+d: '%.*s'",
-		    (unsigned long)user_pnt, offset, out_len, out);
+    dmalloc_message("  dump of '%#lx'%+d: '%.*s'",
+		    (unsigned long)start_user, offset, out_len, out);
   }
   else {
-    dmalloc_message("Dump of '%#lx'%+d failed: not in heap",
-		    (unsigned long)user_pnt, offset);
+    dmalloc_message("  dump of '%#lx'%+d failed: not in heap",
+		    (unsigned long)start_user, offset);
+  }
+  
+  /* find the previous pointer in case it ran over */
+  if (dmalloc_errno == ERROR_UNDER_FENCE && start_user != NULL) {
+    (void)find_address((char *)start_user - FENCE_BOTTOM_SIZE - 1,
+		       1 /* not exact pointer */, skip_update);
+    other_p = skip_update->sa_next_p[0];
+    if (other_p != NULL) {
+      dmalloc_message("  prev pointer '%#lx' (size %u) may have run over from '%s'",
+		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
+		      _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
+					      other_p->sa_file,
+					      other_p->sa_line));
+    }
+  }
+  /* find the next pointer in case it ran under */
+  else if (dmalloc_errno == ERROR_OVER_FENCE
+	   && start_user != NULL
+	   && slot_p != NULL) {
+    other_p = slot_p->sa_next_p[0];
+    /* a user_size of 0 could be admin information */
+    if (other_p != NULL && other_p->sa_user_size > 0) {
+      dmalloc_message("  next pointer '%#lx' (size %u) may have run under from '%s'",
+		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
+		      _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
+					      other_p->sa_file,
+					      other_p->sa_line));
+    }
   }
 }
 
@@ -1969,16 +2015,14 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
-    log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
-    dmalloc_error("_dmalloc_chunk_read_info");
+    log_error_info(NULL, 0, user_pnt, NULL, "finding address in heap", where);
     return 0;
   }
   
   /* might as well check the pointer now */
   if (! check_used_slot(slot_p, user_pnt, 1 /* exact */)) {
     /* errno set in check_slot */
-    log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
-    dmalloc_error("_dmalloc_chunk_read_info");
+    log_error_info(NULL, 0, user_pnt, slot_p, "checking pointer admin", where);
     return 0;
   }
   
@@ -2035,6 +2079,7 @@ int	_dmalloc_chunk_heap_check(void)
   skip_alloc_t	*slot_p;
   entry_block_t	*block_p;
   int		ret, level_c, checking_list_c = 0;
+  int		final = 1;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     dmalloc_message("checking heap");
@@ -2176,18 +2221,27 @@ int	_dmalloc_chunk_heap_check(void)
     if (checking_list_c == 0) {
       ret = check_used_slot(slot_p, NULL /* no user pnt */,
 			    0 /* loose pnt checking */);
+      if (! ret) {
+	/* error set in check_slot */
+	log_error_info(NULL, 0, NULL, slot_p, "checking user pointer",
+		       "_dmalloc_chunk_heap_check");
+	/* not a critical error */
+	final = 0;
+      }
     }
     else {
       ret = check_free_slot(slot_p);
-    }
-    if (! ret) {
-      /* error set in check_slot */
-      dmalloc_error("_dmalloc_chunk_heap_check");
-      return 0;
+      if (! ret) {
+	/* error set in check_slot */
+	log_error_info(NULL, 0, NULL, slot_p, "checking free pointer",
+		       "_dmalloc_chunk_heap_check");
+	/* not a critical error */
+	final = 0;
+      }
     }
   }
   
-  return 1;
+  return final;
 }
 
 /*
@@ -2237,8 +2291,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   if (slot_p == NULL) {
     if (exact_b) {
       dmalloc_errno = ERROR_NOT_FOUND;
-      log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, "pointer-check");
-      dmalloc_error(func);
+      log_error_info(NULL, 0, user_pnt, NULL, "pointer-check", func);
       return 0;
     }
     else {
@@ -2250,9 +2303,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   /* now make sure that the user slot is valid */
   if (! check_used_slot(slot_p, user_pnt, exact_b)) {
     /* dmalloc_error set in check_used_slot */
-    log_error_info(NULL, 0, slot_p->sa_file, slot_p->sa_line,
-		   user_pnt, 0, NULL, "pointer-check");
-    dmalloc_error(func);
+    log_error_info(NULL, 0, user_pnt, slot_p, "pointer-check", func);
     return 0;
   }
   
@@ -2273,9 +2324,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
     if ((char *)user_pnt < (char *)pnt_info.pi_user_start
 	|| (char *)user_pnt + min > (char *)pnt_info.pi_user_bounds) {
       dmalloc_errno = ERROR_WOULD_OVERWRITE;
-      log_error_info(NULL, 0, slot_p->sa_file, slot_p->sa_line,
-		     user_pnt, 0, NULL, "pointer-check");
-      dmalloc_error(func);
+      log_error_info(NULL, 0, user_pnt, slot_p, "pointer-check", func);
       return 0;
     }
   }
@@ -2345,9 +2394,8 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (size == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    log_error_info(file, line, NULL, 0, NULL, 0,
-		   "bad zero byte allocation request", "malloc");
-    dmalloc_error("_dmalloc_chunk_malloc");
+    log_error_info(file, line, NULL, NULL, "bad zero byte allocation request",
+		   "malloc");
     return MALLOC_ERROR;
   }
 #endif
@@ -2356,8 +2404,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   /* have we exceeded the upper bounds */
   if (size > LARGEST_ALLOCATION) {
     dmalloc_errno = ERROR_TOO_BIG;
-    log_error_info(file, line, NULL, 0, NULL, 0, NULL, "malloc");
-    dmalloc_error("_dmalloc_chunk_malloc");
+    log_error_info(file, line, NULL, NULL, "allocation too big", "malloc");
     return MALLOC_ERROR;
   }
 #endif
@@ -2535,9 +2582,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
      */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_FREE_NULL)) {
       dmalloc_errno = ERROR_IS_NULL;
-      log_error_info(file, line, NULL, 0, user_pnt, 0, "invalid pointer",
-		     "free");
-      dmalloc_error("_dmalloc_chunk_free");
+      log_error_info(file, line, user_pnt, NULL, "invalid 0L pointer", "free");
       return FREE_ERROR;
     }
     
@@ -2554,16 +2599,15 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   if (slot_p == NULL) {
     /* not found */
     dmalloc_errno = ERROR_NOT_FOUND;
-    log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
-    dmalloc_error("_dmalloc_chunk_free");
+    log_error_info(file, line, user_pnt, NULL, "finding address in heap",
+		   "free");
     return FREE_ERROR;
   }
   
   if (! check_used_slot(slot_p, user_pnt, 1 /* exact pnt */)) {
     /* error set in check slot */
-    log_error_info(file, line, slot_p->sa_file, slot_p->sa_line, user_pnt,
-		   0, NULL, "free");
-    dmalloc_error("_dmalloc_chunk_free");
+    log_error_info(file, line, user_pnt, slot_p, "checking pointer admin",
+		   "free");
     return FREE_ERROR;
   }
   
@@ -2695,9 +2739,8 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (new_size == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    log_error_info(file, line, NULL, 0, NULL, 0,
-		   "bad zero byte allocation request", "realloc");
-    dmalloc_error("_dmalloc_chunk_realloc");
+    log_error_info(file, line, NULL, NULL, "bad zero byte allocation request",
+		   "realloc");
     return REALLOC_ERROR;
   }
 #endif
@@ -2705,9 +2748,8 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   /* by now malloc.c should have taken care of the realloc(NULL) case */
   if (old_user_pnt == NULL) {
     dmalloc_errno = ERROR_IS_NULL;
-    log_error_info(file, line, NULL, 0, old_user_pnt, 0, "invalid pointer",
+    log_error_info(file, line, old_user_pnt, NULL, "invalid pointer",
 		   "realloc");
-    dmalloc_error("_dmalloc_chunk_realloc");
     return REALLOC_ERROR;
   }
   
@@ -2715,9 +2757,8 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   slot_p = find_address(old_user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
-    log_error_info(file, line, NULL, 0, old_user_pnt, 0, NULL,
-		   "_dmalloc_chunk_realloc");
-    dmalloc_error("_dmalloc_chunk_realloc");
+    log_error_info(file, line, old_user_pnt, NULL, "finding address in heap",
+		   "realloc");
     return 0;
   }
   
