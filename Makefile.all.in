@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.59 1995/09/02 21:39:27 gray Exp $
+# $Id: Makefile.all.in,v 1.60 1995/09/05 16:40:47 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -54,7 +54,7 @@ OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o malloc.o
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
 
-all : $(LIBRARY) $(LIB_DIS) $(UTIL)
+all : $(LIBRARY) $(LIB_DIS) $(UTIL) $(INFOFILE)
 
 clean :
 	rm -f a.out core *.o *.t

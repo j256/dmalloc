@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.87 1995/09/03 16:35:59 gray Exp $
+# $Id: Makefile.in,v 1.88 1995/09/05 16:40:46 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -27,6 +27,7 @@ TEST	= dmalloc_t
 LIBRARY	= libdmalloc.a
 LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
+INFOFILE= dmalloc.info
 
 MANFILE	= dmalloc.info
 
@@ -38,8 +39,8 @@ FLS	=  conf.h.in configure configure.in config.help \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
 	dmalloc_t.c return.h settings.dist version.h \
 	argv.[ch] argv_loc.h dmalloc.cc \
-	dmalloc.texi dmalloc.info \
-	install.sh mkinstalldirs Deansify.pl
+	dmalloc.texi $(INFOFILE) \
+	install-sh mkinstalldirs Deansify.pl
 CFGFLS	= contrib/README contrib/Xmalloc.c contrib/atexit.c \
 	contrib/dec_notes contrib/next_notes contrib/ra_info.pl
 DOCFLS	= dmalloc.ps texinfo.tex
@@ -52,8 +53,8 @@ all :: $(LIBRARY) $(LIB_DIS) $(UTIL)
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL)
-	rm -f part.? dmalloc.info dmalloc.h
+	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL) $(INFOFILE)
+	rm -f part.? dmalloc.h
 	rm -f INSTALL PERMISSIONS README README_ftp
 
 distclean :: clean
@@ -159,61 +160,61 @@ dmalloc.dvi : dmalloc.texi
 	( cd work ; texi2dvi ../dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
-INSTALL : INSTALL.1 dmalloc.info
+INSTALL : INSTALL.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	cp INSTALL.1 $(.TARGET).t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Node: Details/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-PERMISSIONS : dmalloc.info
+PERMISSIONS : $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Copying/d' \
 		-e '/,  Node: Overview/,$$d' \
-		-e '/^\* Menu/,/^File: dmalloc.info/d' \
-		-e '/^File: dmalloc.info/d' < \
-		dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		-e '/^\* Menu/,/^File: $(INFOFILE)/d' \
+		-e '/^File: $(INFOFILE)/d' < \
+		$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-README : README.1 dmalloc.info
+README : README.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	cat README.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-README_ftp : README_ftp.1 dmalloc.info
+README_ftp : README_ftp.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	cat README_ftp.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-dmalloc.info : dmalloc.texi
+$(INFOFILE) : dmalloc.texi
 	rm -f $(.TARGET)
 	makeinfo --no-split $(.OODATE)
 
@@ -227,7 +228,7 @@ shar :: $(FLS) $(CFGFLS)
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< dmalloc.info | tr -d '\037'  > part.t
+		< $(INFOFILE) | tr -d '\037'  > part.t
 	echo ---------------------------------------------------------------- \
 		>> part.t
 	cat part.01 >> part.t
