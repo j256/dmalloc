@@ -21,9 +21,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.2 2003/05/21 04:05:05 gray Exp $
+# $Id: configure.ac,v 1.3 2003/05/21 04:10:08 gray Exp $
 #
-AC_REVISION($Revision: 1.2 $)
+AC_REVISION($Revision: 1.3 $)
 AC_INIT(dmalloc, 5.0.1, [http://dmalloc.org/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -217,6 +217,7 @@ main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
 ]])],
 [AC_DEFINE(DMALLOC_SIZE_UNSIGNED,1)  AC_MSG_RESULT([yes])],
 [AC_DEFINE(DMALLOC_SIZE_UNSIGNED,0)  AC_MSG_RESULT([no])],
+[AC_DEFINE(DMALLOC_SIZE_UNSIGNED,0)  AC_MSG_RESULT([no])]
 )
 
 #
@@ -235,6 +236,7 @@ main() { exit(1); }
 #endif
 ]])],
 [ac_cv_strdup_macro=yes ],
+[ac_cv_strdup_macro=no],
 [ac_cv_strdup_macro=no]
 )
 AC_MSG_RESULT([$ac_cv_strdup_macro])
@@ -282,7 +284,8 @@ else
 		}
 	],
 	[ AC_DEFINE(HEAP_GROWS_UP, 1) AC_MSG_RESULT([up]) ],
-	[ AC_DEFINE(HEAP_GROWS_UP, 0) AC_MSG_RESULT([down]) ]
+	[ AC_DEFINE(HEAP_GROWS_UP, 0) AC_MSG_RESULT([down]) ],
+	[ AC_DEFINE(HEAP_GROWS_UP, 1) AC_MSG_RESULT([up]) ]
 	)
 fi
 
@@ -293,28 +296,20 @@ AC_CHECK_FUNCS(getpagesize)
 AC_MSG_CHECKING([basic-block size])
 ac_cv_page_size=0
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([
-	main() { if (getpagesize() <= 2048) exit(0); else exit(1); }
-	], [ ac_cv_page_size=11 ]
-   )
+   AC_RUN_IFELSE([main() { if (getpagesize()<=2048) exit(0); else exit(1); }],
+	[ ac_cv_page_size=11 ], [ ], [ ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([
-	main() { if (getpagesize() <= 4096) exit(0); else exit(1); }
-	], [ ac_cv_page_size=12 ]
-   )
+   AC_RUN_IFELSE([main() { if (getpagesize()<=4096) exit(0); else exit(1); }],
+	[ ac_cv_page_size=12 ], [ ], [ ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([
-	main() { if (getpagesize() <= 8192) exit(0); else exit(1); }
-	], [ ac_cv_page_size=13 ]
-   )
+   AC_RUN_IFELSE([main() { if (getpagesize()<=8192) exit(0); else exit(1); }],
+	[ ac_cv_page_size=13 ], [ ], [ ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([
-	main() { if (getpagesize() <= 16384) exit(0); else exit(1); }
-	], [ ac_cv_page_size=14 ]
-   )
+   AC_RUN_IFELSE([main() { if (getpagesize()<=16384) exit(0); else exit(1); }],
+	[ ac_cv_page_size=14 ], [ ], [ ] )
 fi
 if test $ac_cv_page_size = 0; then
     ac_cv_page_size=15
@@ -377,7 +372,8 @@ main() { main_b = 1; abort(); _exit(1); }
 # 0 which means that it should fail
 [ AC_DEFINE(ABORT_OKAY, 0) AC_MSG_RESULT([no]) ],
 # if it succeeds then something called free on the way out
-[ AC_DEFINE(ABORT_OKAY, 1) AC_MSG_RESULT([yes]) ]
+[ AC_DEFINE(ABORT_OKAY, 1) AC_MSG_RESULT([yes]) ],
+[ AC_DEFINE(ABORT_OKAY, 0) AC_MSG_RESULT([no]) ]
 )
 
 AC_TYPE_SIGNAL
@@ -420,6 +416,7 @@ main()
 }
 ],
 [ AC_DEFINE(RETURN_MACROS_WORK, 1) AC_MSG_RESULT([yes]) ],
+[ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ],
 [ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ]
 )
 
@@ -430,7 +427,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.2 2003/05/21 04:05:05 gray Exp $"
+#ident "$Id: configure.ac,v 1.3 2003/05/21 04:10:08 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

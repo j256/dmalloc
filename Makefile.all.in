@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.114 2003/05/21 03:07:55 gray Exp $
+# $Id: Makefile.all.in,v 1.115 2003/05/21 04:11:22 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -163,6 +163,8 @@ realclean : clean
 
 distclean : clean
 	rm -f confdefs.h config.status config.log config.cache conf.h
+	rm -f configure.lineno
+	rm -rf autom4te.cache
 	rm -f Makefile settings.h dmalloc.h.2
 #	rm -f configure
 

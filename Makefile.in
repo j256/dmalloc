@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.162 2003/05/21 03:07:55 gray Exp $
+# $Id: Makefile.in,v 1.163 2003/05/21 04:10:08 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -106,8 +106,10 @@ clean ::
 	rm -f ChangeLog.1
 
 distclean :: clean
-	rm -f confdefs.h configure config.status config.log config.cache conf.h
+	rm -f confdefs.h configure configure.lineno config.status config.log
+	rm -f config.cache conf.h
 	rm -f Makefile dmalloc.h.2 dmalloc.ps dmalloc.dvi settings.h
+	rm -rf autom4te.cache
 	rm -rf port
 
 installincs :: $(HFLS)
