@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.77 1994/07/21 19:01:37 gray Exp $";
+  "$Id: chunk.c,v 1.78 1994/07/22 15:49:20 gray Exp $";
 #endif
 
 /*
@@ -335,7 +335,7 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
   int		bblockc;
   bblock_adm_t	*bblock_admp;
   
-  bblock_admp = (bblock_adm_t *)WHAT_BLOCK(bblockp);
+  bblock_admp = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblockp);
   
   for (bblockc = 0; bblockc < blockn; bblockc++, bblockp++) {
     if (bblockp == bblock_admp->ba_blocks + BB_PER_ADMIN) {
@@ -367,7 +367,10 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
       bblockp->bb_flags		= BBLOCK_FREE;
       bblockp->bb_bitn		= (unsigned short)num;
       bblockp->bb_blockn	= (unsigned int)blockn;
-      bblockp->bb_next		= (struct bblock_st *)pnt;
+      if (bblockc == 0)
+	bblockp->bb_next	= (struct bblock_st *)pnt;
+      else
+	bblockp->bb_next	= (struct bblock_st *)NULL;
       break;
       
     case BBLOCK_EXTERNAL:
@@ -395,7 +398,7 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
 {
   bblock_t	*bblockp, *prevp;
   bblock_t	*bestp = NULL, *best_prevp = NULL;
-  int		bitc, bitn, pos, best = 0;
+  int		bitc, bitn, blockn, pos, best = 0;
   bblock_adm_t	*admp;
   
   /*
@@ -463,7 +466,7 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
    * free-list with an adjusted block-count
    */
   bblockp = bestp;
-  admp = (bblock_adm_t *)WHAT_BLOCK(bblockp);
+  admp = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblockp);
   pos = (bblockp - admp->ba_blocks) + many;
   
   /* parse forward until we've found the correct split point */
@@ -483,16 +486,12 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
     _malloc_error("find_free_bblocks");
     return ERROR;
   }
-  bblockp->bb_blockn -= many;
   
-  NUM_BITS(bblockp->bb_blockn, bitn);
-  bitn += BASIC_BLOCK;
+  blockn = bblockp->bb_blockn - many;
+  NUM_BITS(blockn * BLOCK_SIZE, bitn);
   
-  bblockp->bb_next = free_bblock[bitn];
+  set_bblock_admin(blockn, bblockp, BBLOCK_FREE, bitn, 0, free_bblock[bitn]);
   free_bblock[bitn] = bblockp;
-  
-  set_bblock_admin(bblockp->bb_blockn, bblockp, BBLOCK_FREE, bitn, 0,
-		   bblockp->bb_next);
   
   *retp = bestp;
   return NOERROR;
@@ -532,7 +531,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
 	return NULL;
       }
       
-      admp = (bblock_adm_t *)WHAT_BLOCK(bblockp);
+      admp = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblockp);
       bblockp->bb_mem = BLOCK_POINTER(admp->ba_count +
 				      (bblockp - admp->ba_blocks));
       return bblockp;
@@ -662,13 +661,14 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
 }
 
 /*
- * find the bblock entry for PNT
+ * find the bblock entry for PNT, LASTP and NEXTP point to the last
+ * and next blocks starting block
  */
 LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
 				     bblock_t ** nextp)
 {
-  int		bblockc;
-  bblock_t	*last = NULL, *next, *this;
+  int		bblockc, bblockn;
+  bblock_t	*last = NULL, *this;
   bblock_adm_t	*bblock_admp;
   
   if (pnt == NULL) {
@@ -684,17 +684,12 @@ LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
     return NULL;
   }
   
-  /* find which block it is in */
-  bblockc = WHICH_BLOCK(pnt);
-  
   /* find right bblock admin */
-  for (bblock_admp = bblock_adm_head; bblock_admp != NULL;
-       bblock_admp = bblock_admp->ba_next) {
-    if (bblockc < BB_PER_ADMIN)
-      break;
-    
-    last = bblock_admp->ba_blocks + (BB_PER_ADMIN - 1);
-    bblockc -= BB_PER_ADMIN;
+  for (bblockc = WHICH_BLOCK(pnt), bblock_admp = bblock_adm_head;
+       bblockc >= BB_PER_ADMIN && bblock_admp != NULL;
+       bblockc -= BB_PER_ADMIN, bblock_admp = bblock_admp->ba_next) {
+    if (lastp != NULL)
+      last = bblock_admp->ba_blocks + (BB_PER_ADMIN - 1);
   }
   
   if (bblock_admp == NULL) {
@@ -703,21 +698,37 @@ LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
   }
   
   this = bblock_admp->ba_blocks + bblockc;
-  if (bblockc > 0)
-    last = bblock_admp->ba_blocks + (bblockc - 1);
-  if (bblockc + 1 < BB_PER_ADMIN)
-    next = bblock_admp->ba_blocks + (bblockc + 1);
-  else {
-    if (bblock_admp->ba_next == NULL)
-      next = NULL;
-    else
-      next = bblock_admp->ba_next->ba_blocks;
-  }
   
-  if (lastp != NULL)
+  if (lastp != NULL) {
+    if (bblockc > 0)
+      last = bblock_admp->ba_blocks + (bblockc - 1);
+    
+    /* adjust the last pointer back to start of free block */
+    if (last != NULL && BIT_IS_SET(last->bb_flags, BBLOCK_FREE)) {
+      if (last->bb_blockn <= bblockc)
+	last = bblock_admp->ba_blocks + (bblockc - last->bb_blockn);
+      else {
+	/* we need to go recursive to go blockn back */
+	last = find_bblock((char *)pnt - last->bb_blockn * BLOCK_SIZE,
+			   NULL, NULL);
+      }
+    }
+    
     *lastp = last;
-  if (nextp != NULL)
-    *nextp = next;
+  }
+  if (nextp != NULL) {
+    /* next pointer should move past current allocation */
+    if (BIT_IS_SET(this->bb_flags, BBLOCK_START_USER))
+      bblockn = NUM_BLOCKS(this->bb_size);
+    else
+      bblockn = 1;
+    if (bblockc + bblockn < BB_PER_ADMIN)
+      *nextp = this + bblockn;
+    else {
+      /* we need to go recursive to go bblockn ahead */
+      *nextp = find_bblock((char *)pnt + bblockn * BLOCK_SIZE, NULL, NULL);
+    }
+  }
   
   return this;
 }
@@ -1963,7 +1974,7 @@ EXPORT	void	_chunk_log_heap_map(void)
       }
       
       if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_FREE)) {
-	_malloc_message("%d (%#lx): free block of %d blocks and mem %#lx",
+	_malloc_message("%d (%#lx): free block of %d blocks, next at %#lx",
 			tblockc, BLOCK_POINTER(tblockc),
 			bblockp->bb_blockn, bblockp->bb_mem);
 	continue;
@@ -2104,7 +2115,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
 			    void * pnt)
 {
   unsigned int	bitn, blockn, given;
-  bblock_t	*bblockp, *last, *next;
+  bblock_t	*bblockp, *last, *next, *prevp, *tmp;
   dblock_t	*dblockp;
   
   /* counts calls to free */
@@ -2222,8 +2233,9 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
 		   pnt, bblockp->bb_size) != NOERROR)
       return FREE_ERROR;
   
-  /* count the bits */
-  NUM_BITS(bblockp->bb_size, bitn);
+  blockn = NUM_BLOCKS(bblockp->bb_size);
+  given = blockn * BLOCK_SIZE;
+  NUM_BITS(given, bitn);
   
   if (bitn < BASIC_BLOCK) {
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt),
@@ -2233,17 +2245,18 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     return FREE_ERROR;
   }
   
-  blockn = NUM_BLOCKS(bblockp->bb_size);
-  given = blockn * BLOCK_SIZE;
-  
   /* monitor current allocation level */
   alloc_current -= bblockp->bb_size;
   alloc_cur_given -= given;
-  
-  /* setup free linked-list */
-  bblockp->bb_next = free_bblock[bitn];
-  free_bblock[bitn] = bblockp;
   free_space_count += given;
+  
+  /*
+   * should we set free memory with BLANK_CHAR?
+   * NOTE: we do this hear because blockn might change below
+   */
+  if (BIT_IS_SET(_malloc_flags, DEBUG_FREE_BLANK)
+      || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK))
+    (void)memset(pnt, BLANK_CHAR, blockn * BLOCK_SIZE);
   
   /*
    * check above and below the free bblock looking for neighbors that
@@ -2252,19 +2265,60 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
    */
   
   if (last != NULL && BIT_IS_SET(last->bb_flags, BBLOCK_FREE)) {
-    _malloc_message("block %#lx is free and last is free", pnt);
+    /* find last in free list and remove it */
+    for (tmp = free_bblock[last->bb_bitn], prevp = NULL;
+	 tmp != NULL;
+	 prevp = tmp, tmp = tmp->bb_next) {
+      if (tmp == last)
+	break;
+    }
+    
+    /* we better have found it */
+    if (tmp == NULL) {
+      malloc_errno = ERROR_BAD_FREE_LIST;
+      _malloc_error("_chunk_free");
+      return FREE_ERROR;
+    }
+    
+    if (prevp == NULL)
+      free_bblock[last->bb_bitn] = last->bb_next;
+    else
+      prevp->bb_next = last->bb_next;
+    
+    blockn += last->bb_blockn;
+    NUM_BITS(blockn * BLOCK_SIZE, bitn);
+    bblockp = last;
   }
   if (next != NULL && BIT_IS_SET(next->bb_flags, BBLOCK_FREE)) {
-    _malloc_message("block %#lx is free and next is free", pnt);
+    /* find last in free list and remove it */
+    for (tmp = free_bblock[next->bb_bitn], prevp = NULL;
+	 tmp != NULL;
+	 prevp = tmp, tmp = tmp->bb_next) {
+      if (tmp == next)
+	break;
+    }
+    
+    /* we better have found it */
+    if (tmp == NULL) {
+      malloc_errno = ERROR_BAD_FREE_LIST;
+      _malloc_error("_chunk_free");
+      return FREE_ERROR;
+    }
+    
+    if (prevp == NULL)
+      free_bblock[next->bb_bitn] = next->bb_next;
+    else
+      prevp->bb_next = next->bb_next;
+    
+    blockn += next->bb_blockn;
+    NUM_BITS(blockn * BLOCK_SIZE, bitn);
   }
   
   /* set the information for the bblock(s) */
-  set_bblock_admin(blockn, bblockp, BBLOCK_FREE, bitn, 0, bblockp->bb_next);
+  set_bblock_admin(blockn, bblockp, BBLOCK_FREE, bitn, 0, free_bblock[bitn]);
   
-  /* should we set free memory with BLANK_CHAR? */
-  if (BIT_IS_SET(_malloc_flags, DEBUG_FREE_BLANK)
-      || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK))
-    (void)memset(pnt, BLANK_CHAR, blockn * BLOCK_SIZE);
+  /* block goes at the start of the free list */
+  free_bblock[bitn] = bblockp;
   
   return FREE_NOERROR;
 }
