@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.84 1999/03/08 04:59:17 gray Exp $
+ * $Id: error.c,v 1.85 1999/03/08 15:51:52 gray Exp $
  */
 
 /*
@@ -73,10 +73,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.84 1999/03/08 04:59:17 gray Exp $";
+#ident "$Id: error.c,v 1.85 1999/03/08 15:51:52 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.84 1999/03/08 04:59:17 gray Exp $";
+  "$Id: error.c,v 1.85 1999/03/08 15:51:52 gray Exp $";
 #endif
 #endif
 
@@ -143,7 +143,8 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-  (void)loc_snprintf(buf, buf_size, "%lu:%lu:%lu.%lu", hrs, mins, secs, usecs);
+  (void)loc_snprintf(buf, buf_size, "%lu:%02lu:%02lu.%lu",
+		     hrs, mins, secs, usecs);
   
   return buf;
 }
@@ -168,7 +169,7 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-  (void)loc_snprintf(buf, buf_size, "%lu:%lu:%lu", hrs, mins, secs);
+  (void)loc_snprintf(buf, buf_size, "%lu:%02lu:%02lu", hrs, mins, secs);
   
   return buf;
 }
