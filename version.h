@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.35 1994/05/11 20:20:05 gray Exp $
+ * $Id: version.h,v 1.36 1994/05/22 22:39:03 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -34,8 +34,8 @@
  *	News
  *	malloc.texi
  */
-LOCAL	char	*malloc_version = "2.1.0";
+LOCAL	char	*malloc_version = "2.1.1b";
 
-/* Version Date: $Date: 1994/05/11 20:20:05 $ */
+/* Version Date: $Date: 1994/05/22 22:39:03 $ */
 
 #endif /* ! __VERSION_H__ */
