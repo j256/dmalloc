@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.89 2003/06/10 14:30:00 gray Exp $
+ * $Id: conf.h.in,v 1.90 2003/09/05 21:29:08 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -49,12 +49,7 @@
 #define HAVE_SBRK 0
 
 /*
- * Does your heap grow up?  Hopefully it does because there is not too
- * much support for growing-down heaps because I do not have a system
- * to test it on.
- *
- * NOTE: please send me email with any fixes, problems, or questions
- * if you system's heap grows up.
+ * Does your heap grow up or down?
  */
 #define HEAP_GROWS_UP 1
 
