@@ -1,11 +1,15 @@
+Fri Nov 10 10:27:23 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Releasing dmalloc version 4.8.0.
+
 Thu Nov  9 19:58:56 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Added OpenBSD port information.  Hopefully this will be close to
- 	Free/Net/... BSD as well.
+	Free/Net/... BSD as well.
 
 Tue Nov  7 11:39:26 2000  Gray Watson  <gray@whopper.be.256.com>
 
-	* Removed malloc.h to malloc_funcs.h to avoid system conflicts.
+	* Renamed malloc.h to malloc_funcs.h to avoid system conflicts.
 
 	* Made log-unknown the default and depreciated the token.  Added a
 	log-known token to _only_ report on known (file/line) memory.
@@ -16,17 +20,20 @@ Tue Nov  7 11:39:26 2000  Gray Watson  <gray@whopper.be.256.com>
 
 Tue Oct 10 19:03:14 2000  Gray Watson  <gray@whopper.be.256.com>
 
-	* Releasing dmalloc version 4.7.2 with just the ident
- 	autoconfigure handling for VA Linux release.  Thanks guys.
+	* Did a pre-release of 4.7.2 with the autoconfigure handling for
+	VA Linux release.  Thanks guys.
 
 	* Reorged dmalloc.h.3.  Ugh.
 
 	* malloc_verify and dmalloc_verify now return
- 	[D]MALLOC_VERIFY_[NO]ERROR.
+	[D]MALLOC_VERIFY_[NO]ERROR.
+
+	* Just about every function now initializes the library.  This was
+	not the case before with some information routines.
 
 	* dmalloc_debug now takes an unsigned-int flags and returns the
- 	old debug flag value.  debug_current now returns an unsigned int
- 	flag value.
+	old debug flag value.  debug_current now returns an unsigned int
+	flag value.
 
 	* Added autoconfig handling of #ident.  I really hate Unix
 	sometimes for its blatant disregard for anything approaching a
@@ -1705,5 +1712,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.265 2000/11/10 00:59:25 gray Exp $
+$Id: ChangeLog,v 1.266 2000/11/10 16:11:04 gray Exp $
 -------------------------------------------------------------------------------

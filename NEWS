@@ -1,10 +1,19 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.96 2000/11/07 17:03:24 gray Exp $
+$Id: NEWS,v 1.97 2000/11/10 16:11:04 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 4.7.2:
+Version 4.8.0:
 
-	* Releasing a quick 4.7.2 with auto-configured #ident directives.
+	* Added OpenBSD port information.  Hopefully Free/Net/... BSD as well.
+	* Renamed malloc.h to malloc_funcs.h to avoid system conflicts.
+	* Made log-unknown the default and depreciated the token.
+	* Added log-known token to _only_ report on known (file/line) memory.
+	* malloc_verify, dmalloc_verify now return [D]MALLOC_VERIFY_[NO]ERROR.
+	* Just about every dmalloc function now initializes the library.
+	* dmalloc_debug now takes unsigned-int flags and returns the old flags.
+	* debug_current now returns an unsigned int flag value.
+	* Added autoconfig handling of #ident. I hate Unix's lack of standards.
+	* Fixed a bug in chunk.c.
 
 Version 4.7.1:
 

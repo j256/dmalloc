@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.13 2000/11/07 17:03:34 gray Exp $ -->
+<!-- $Id: RELEASE.html,v 1.14 2000/11/10 16:11:05 gray Exp $ -->
 <TITLE> Dmalloc Release Notes - 4.7.1 </TITLE>
 </HEAD>
 <BODY>
@@ -8,10 +8,10 @@
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.7.2 <BR>
+Version: Release 4.8.0 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
 Last-Version: <A HREF="dmalloc-4.7.1.html">4.7.1</A> <BR>
-Date: October 11, 2000
+Date: November 10, 2000
 </H4>
 </CENTER>
 
@@ -32,9 +32,8 @@ Date: October 11, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Quick patch release to fix problems with #ident on newer gcc
-versions.  I really hate Unix sometimes for its blatant disregard for
-anything approaching a standard.
+<P> General release to handle a couple of issues and introduce OpenBSD
+/usr/ports support.
 
 <P>
 <HR>
@@ -43,7 +42,24 @@ anything approaching a standard.
 
 <UL>
 
-<P> None.
+<P><LI> Added OpenBSD port Makefile and other information.  Hopefully
+this will work with Free, Net, ... BSD as well.
+
+<P><LI> Added autoconf handling of #ident trying to fix problems with
+new egcs compiler.
+
+<P> &lt;rant&gt;
+
+<P> I really <I>hate</I> Unix's complete disregard of standards.  I
+don't understand why the POSIX group or some other standards
+organization hasn't produced a program which must be compiled and run
+without errors for a system to be compliant.  How hard is this?  The
+program would methodically run through and test function call
+interfaces, system calls, handling of #ident and other directives,
+whatever.  A published standard without an easy check means that every
+OS group can <I>claim</I> compliance but still miss by 5%.
+
+<P> &lt;/rant&gt;
 
 </UL>
 
@@ -54,7 +70,10 @@ anything approaching a standard.
 
 <UL>
 
-<P> None.
+<P><LI> Made log-unknown the default behavior and depreciated the token.
+
+<P><LI> Added log-known token to <I>only</I> report on known memory
+with file and line information.
 
 </UL>
 
@@ -87,7 +106,18 @@ anything approaching a standard.
 
 <UL>
 
-<P> None.
+<P><LI> The functions malloc_verify, dmalloc_verify now return
+[D]MALLOC_VERIFY_[NO]ERROR.
+
+<P><LI> The function dmalloc_debug now takes an unsigned-integer flags
+(instead of a signed int) and it now returns the value of the old
+flags.
+
+<P><LI> The function debug_current now returns an unsigned-integer
+flag value (instead of a signed int).
+
+<P><LI> Just about every function now initializes the library.  This
+was not the case before with some information routines.
 
 </UL>
 
@@ -111,6 +141,9 @@ anything approaching a standard.
 
 <P><LI> Added autoconfiguration handling of #ident directives which
 broke on newer GCC versions.  Idiots.
+
+<P><LI> Fixed a bug with the divided-block free list in chunk.c found
+by Ian Badcoe.  Thanks dude.
 
 </UL>
 

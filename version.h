@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.103 2000/11/10 00:59:27 gray Exp $
+ * $Id: version.h,v 1.104 2000/11/10 16:11:06 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -29,8 +29,8 @@
  * should be entered in:
  *
  *	Changlog
- *	RELEASE.html
  *	NEWS
+ *	RELEASE.html
  *	Makefile.bsd.ports
  *	dmalloc.spec
  *	dmalloc.texi (2 places)
@@ -38,8 +38,8 @@
  *
  * Make sure to also cvs tag the release.  dmalloc_release_X_X_X[_bX]
  */
-static	char	*dmalloc_version = "4.7.2";
+static	char	*dmalloc_version = "4.8.0";
 
-/* Version Date: $Date: 2000/11/10 00:59:27 $ */
+/* Version Date: $Date: 2000/11/10 16:11:06 $ */
 
 #endif /* ! __VERSION_H__ */
