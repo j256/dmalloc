@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.109 2003/06/10 19:44:49 gray Exp $
+ * $Id: error.c,v 1.110 2003/09/05 21:29:44 gray Exp $
  */
 
 /*
@@ -129,7 +129,6 @@ static	int	outfile_fd = -1;		/* output file descriptor */
 /* the following are here to reduce stack overhead */
 static	char	error_str[1024];		/* error string buffer */
 static	char	message_str[1024];		/* message string buffer */
-static	char	log__str[1024];		/* message string buffer */
 
 /*
  * void _dmalloc_open_log
