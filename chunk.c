@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.79 1994/08/02 03:12:12 gray Exp $";
+  "$Id: chunk.c,v 1.80 1994/08/09 02:29:45 gray Exp $";
 #endif
 
 /*
@@ -667,6 +667,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
 LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
 				     bblock_t ** nextp)
 {
+  void		*tmp;
   int		bblockc, bblockn;
   bblock_t	*last = NULL, *this;
   bblock_adm_t	*bblock_admp;
@@ -708,9 +709,17 @@ LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
       if (last->bb_blockn <= bblockc)
 	last = bblock_admp->ba_blocks + (bblockc - last->bb_blockn);
       else {
-	/* we need to go recursive to go blockn back */
-	last = find_bblock((char *)pnt - last->bb_blockn * BLOCK_SIZE,
-			   NULL, NULL);
+	/* we need to go recursive to go bblockn back, check if at 1st block */
+	tmp = (char *)pnt - last->bb_blockn * BLOCK_SIZE;
+	if (! IS_IN_HEAP(tmp))
+	  last = NULL;
+	else {
+	  last = find_bblock(tmp, NULL, NULL);
+	  if (last == NULL) {
+	    _malloc_error("find_bblock");
+	    return NULL;
+	  }
+	}
       }
     }
     
@@ -725,8 +734,17 @@ LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
     if (bblockc + bblockn < BB_PER_ADMIN)
       *nextp = this + bblockn;
     else {
-      /* we need to go recursive to go bblockn ahead */
-      *nextp = find_bblock((char *)pnt + bblockn * BLOCK_SIZE, NULL, NULL);
+      /* we need to go recursive to go bblockn ahead, check if at last block */
+      tmp = (char *)pnt + bblockn * BLOCK_SIZE;
+      if (! IS_IN_HEAP(tmp))
+	*nextp = NULL;
+      else {
+	*nextp = find_bblock(tmp, NULL, NULL);
+	if (*nextp == NULL) {
+	  _malloc_error("find_bblock");
+	  return NULL;
+	}
+      }
     }
   }
   
