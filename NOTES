@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.18 1993/08/11 02:33:36 gray Exp $
+$Id: NOTES,v 1.19 1993/08/24 22:24:03 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -21,6 +21,13 @@ WARNINGS:
 	the configuration script does not set it up correctly, then
 	you may have to play with the basic block size to make it
 	match the page size.
+
+-	currently, it is assumed that non of the return-addresses that
+	are returned by the assembly hacks in return.h, are on the
+	heap.  this is because the admin structures use this test on
+	the _next arguments which are usually unioned with the file
+	args to see if the slot is on the free list or not.  See the
+	2 XXX sections for specifics
 
 -------------------------------------------------------------------------------
 

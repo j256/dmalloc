@@ -1,14 +1,13 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.27 1993/08/24 04:37:10 gray Exp $
+# $Id: Makefile.in,v 1.28 1993/08/24 22:24:01 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
 OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN	= malloc_lp.o 
-FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_dbg.c malloc_lp.c \
-	malloc_t.c sample.c
+FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c sample.c
 
 DEFS	= $(DEFINES)
 INCS	= -I. -Iargv $(INCLUDES)
@@ -29,7 +28,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
 	ChangeLog Manifest NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
 	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h \
+	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h return.h \
 	version.h malloc_t.c sample.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
 PORTCFG	= contrib/README contrib/dec_notes
@@ -98,8 +97,8 @@ port : malloc.info
 patch :
 	@ echo 'Run fixpatch.pl on the patch file'
 
-.PHONY : localfill
-localfill : $(FILLFLS)
+.PHONY : fill
+fill : $(FILLFLS)
 	fillproto $(FILLFLS)
 
 tests : $(TESTS)

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.5 1993/08/11 02:33:38 gray Exp $
+$Id: TODO,v 1.6 1993/08/24 22:24:06 gray Exp $
 -------------------------------------------------------------------------------
 
 IMPORTANT:
@@ -78,6 +78,9 @@ MANUALS:
 
 GENERAL:
 
+- add a feature to malloc_dbg to dump all the tokens in the mallocrc
+	file with their hex values
+	- if -v then dump the tokens plus a break-down of the sub-tokens
 - non-graphical map of the heap. 
 	- just a long dump of all the addresses in the heap
 		addr: size, caller, crc?, expanded?

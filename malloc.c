@@ -39,10 +39,11 @@
 #include "heap.h"
 #include "malloc_loc.h"
 #include "malloc_lp.h"
+#include "return.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.37 1993/08/12 22:18:35 gray Exp $";
+  "$Id: malloc.c,v 1.38 1993/08/24 22:24:24 gray Exp $";
 #endif
 
 /*
@@ -72,11 +73,11 @@ EXPORT	void		malloc_shutdown(void);
 /* local variables */
 LOCAL	int		malloc_enabled	= FALSE; /* have we started yet? */
 LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
-LOCAL	char		log_path[128]	= { NULLC }; /* storage for env path */
+LOCAL	char		log_path[512]	= { NULLC }; /* storage for env path */
 
 /* debug variables */
 LOCAL	int		address_count	= 0;	/* address argument */
-LOCAL	char		start_file[128] = { NULLC }; /* file to start at */
+LOCAL	char		start_file[512] = { NULLC }; /* file to start at */
 LOCAL	int		start_line	= 0;	/* line in module to start */
 LOCAL	int		start_count	= -1;	/* start after X */
 LOCAL	int		check_interval	= -1;	/* check every X */
@@ -87,7 +88,7 @@ LOCAL	int		trace_count	= 0;	/* times trace address seen */
 /*
  * hexadecimal STR to int translation
  */
-LOCAL	long	hex_to_long(char * str)
+LOCAL	long	hex_to_long(const char * str)
 {
   long		ret;
   
@@ -138,8 +139,9 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP)
       && start_file[0] != NULLC
       && file != NULL
+      && line != MALLOC_DEFAULT_LINE
       && strcmp(start_file, file) == 0
-      && (line == 0 || line == start_line))
+      && (start_line == 0 || start_line == line))
     BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
   
   /* start checking heap after X times */
@@ -180,8 +182,8 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
   if (malloc_trace != NULL && pnt == malloc_trace) {
     trace_count++;
     
-    _malloc_message("trace address '%#lx' from '%s' at pass %d from '%s:%u'",
-		    pnt, label, trace_count, file, line);
+    _malloc_message("trace address '%#lx' from '%s' at pass %d from '%s'",
+		    pnt, label, trace_count, _chunk_display_pnt(file, line));
     
     /* we may need to continue to handle address */
     if (malloc_address == NULL || pnt != malloc_address)
@@ -192,8 +194,9 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
     return;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-    _malloc_message("found address '%#lx' after %d pass%s from '%s:%u'",
-		    pnt, addc, (addc == 1 ? "" : "es"), file, line);
+    _malloc_message("found address '%#lx' after %d pass%s from '%s'",
+		    pnt, addc, (addc == 1 ? "" : "es"),
+		    _chunk_display_pnt(file, line));
   malloc_errno = MALLOC_POINTER_FOUND;
   _malloc_error("check_pnt");
 }
@@ -325,6 +328,8 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
 {
   void		*newp;
   
+  SET_RET_ADDR(_malloc_file, _malloc_line);
+  
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return MALLOC_ERROR;
   
@@ -332,6 +337,9 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
   check_pnt(_malloc_file, _malloc_line, newp, "malloc");
   
   in_alloc = FALSE;
+  
+  _malloc_file = MALLOC_DEFAULT_FILE;
+  _malloc_line = MALLOC_DEFAULT_LINE;
   
   return newp;
 }
@@ -344,6 +352,8 @@ EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
 {
   void		*newp;
   unsigned int	len = num_elements * size;
+  
+  SET_RET_ADDR(_malloc_file, _malloc_line);
   
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return CALLOC_ERROR;
@@ -359,6 +369,9 @@ EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
   
   in_alloc = FALSE;
   
+  _malloc_file = MALLOC_DEFAULT_FILE;
+  _malloc_line = MALLOC_DEFAULT_LINE;
+  
   return newp;
 }
 
@@ -369,6 +382,8 @@ EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
 EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
 {
   void		*newp;
+  
+  SET_RET_ADDR(_malloc_file, _malloc_line);
   
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL)
@@ -383,6 +398,9 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
   check_pnt(_malloc_file, _malloc_line, newp, "realloc-out");
   
   in_alloc = FALSE;
+  
+  _malloc_file = MALLOC_DEFAULT_FILE;
+  _malloc_line = MALLOC_DEFAULT_LINE;
   
   return newp;
 }
@@ -399,6 +417,8 @@ EXPORT	int	free(void * pnt)
 {
   int		ret;
   
+  SET_RET_ADDR(_malloc_file, _malloc_line);
+  
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR) {
 #if __STDC__
     return;
@@ -411,6 +431,9 @@ EXPORT	int	free(void * pnt)
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
+  
+  _malloc_file = MALLOC_DEFAULT_FILE;
+  _malloc_line = MALLOC_DEFAULT_LINE;
   
 #if ! __STDC__
   return ret;
@@ -425,7 +448,7 @@ EXPORT	int	free(void * pnt)
 EXPORT	int	malloc_heap_map(void)
 {
   /* check the heap since we are dumping info from it */
-  if (check_debug_vars(NULL, 0) != NOERROR)
+  if (check_debug_vars(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE) != NOERROR)
     return ERROR;
   
   _chunk_log_heap_map();
@@ -479,20 +502,22 @@ EXPORT	int	malloc_debug(int debug)
 }
 
 /*
- * examine pointer PNT and returns SIZE, and FILE / LINE info on it
- * if any of the pointers are not NULL.
+ * examine pointer PNT and returns SIZE, and FILE / LINE info on it,
+ * or return-address RET_ADDR if any of the pointers are not NULL.
+ * if FILE returns NULL then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
 EXPORT	int	malloc_examine(void * pnt, MALLOC_SIZE * size,
-			       char ** file, unsigned int * line)
+			       char ** file, unsigned int * line,
+			       void ** ret_attr)
 {
   int		ret;
   
   /* need to check the heap here since we are geting info from it below */
-  if (check_debug_vars(NULL, 0) != NOERROR)
+  if (check_debug_vars(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE) != NOERROR)
     return ERROR;
   
-  ret = _chunk_read_info(pnt, size, file, line);
+  ret = _chunk_read_info(pnt, size, file, line, ret_attr);
   
   in_alloc = FALSE;
   

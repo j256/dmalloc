@@ -1,5 +1,10 @@
 Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Added the beginnings of return-address handling via feedback
+	from Dave Hill.  Need to resolve some XXX sections in chunk and
+	get more architecture/compiler hacks in return.h.  Along the way
+	had to change the malloc_examine() arguments to add ret_attr.
+
 	* Added -L or --list to malloc_dbg to list all the rc-file tags.
 
 	* Fixed some problems in chunk.c via Dave Hill's feedback and
