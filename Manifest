@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.33 1998/10/05 02:47:43 gray Exp $
+$Id: Manifest,v 1.34 1999/03/04 19:16:25 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
@@ -19,9 +19,6 @@ NEWS			File with a condensed view of the module's
 
 NOTES			General Notes of the debug-malloc routines and
 			associated algorithms.
-
-PERMISSIONS		File detailing commercial and non-commercial
-			copying and distrbution permissions.
 
 README			Quick startup notes.
 

@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.161 1999/03/04 16:48:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.162 1999/03/04 19:16:41 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -132,115 +132,18 @@ Gray Watson.
 @cindex library permissions
 @cindex permissions of the library
 
-Copyright 1992 to 1998 by Gray Watson.
+Copyright 1992 to 1999 by Gray Watson.
+
+Permission to use, copy, modify, and distribute this software for any
+purpose and without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies, and
+that the name of Gray Watson not be used in advertising or publicity
+pertaining to distribution of the document or software without specific,
+written prior permission.
 
 Gray Watson makes no representations about the suitability of the
 software described herein for any purpose.  It is provided ``as is''
-without express or implied warranty.  The name of Gray Watson cannot be
-used in advertising or publicity pertaining to distribution of the
-document or software without specific, written prior permission.
-
-Permission to distribute this software for any purpose without fee is
-hereby granted, provided that the above copyright notice, all
-documentation files associated with the software, and this permission
-chapter appear in all copies.
-
-Please see the following sections for usage permissions.
-
-@menu
-* Non-Commercial License::      Permissions for non-commercial entities.
-* Commercial License::          Permissions for commercial entities.
-* Printed Manuals::             Printed/bound manuals and source floppies.
-* Registration Information::    Permissions for commercial entities.
-@end menu
-
-@node Non-Commercial License, Commercial License, Copying, Copying
-@section Non-Commercial License
-
-@cindex non-commercial license
-
-Permission to use, copy, and modify this software for any
-@emph{academic} or @emph{non-commercial} purpose without fee is hereby
-granted.
-
-Although only commercial users are required to license the software,
-@emph{all} registrations are greatly appreciated.  Licensees get a
-registration file for the software (which cannot be distributed), a
-letter documenting their registered status, as well as product support
-and notification of free-upgrades.  For more information about
-registration see the following section.  @xref{Commercial License}.
-
-@node Commercial License, Printed Manuals, Non-Commercial License, Copying
-@section Commercial License
-
-@cindex commercial license
-@cindex license, commercial
-
-In order to fund maintenance and continued development of this product,
-the requirement has been added that commercial entities license the
-software for a nominal fee.  There is a thirty (30) day free evaluation
-period but if your organization uses the software after this time period
-expires, please consider purchasing a registered copy.  This allows me
-to provide better support as well as bug fixes and feature updates on a
-more frequent basis.  Although not required, academic or non-commercial
-user registration is greatly appreciated.
-
-A licensed copy of the software is available for US$35.  Commercial
-entities should purchase one license per workstation, or one per dmalloc
-user, whichever is the smaller number.  Licensees get a registration
-file for the software (which cannot be distributed), a letter
-documenting their registered status, as well as product support and
-notification of free-upgrades.
-
-For ``site'' licenses (at significant discount) or any other reasonable
-agreements, please contact me directly.  It should be noted that a
-``site'' can be defined as anything you'd like.  It can be a physical
-location (a room, building, etc.), an organizational grouping (a
-workgroups, department, etc.) or any other logical grouping (``the folks
-working on the widget project'', etc.).
-
-@node Printed Manuals, Registration Information, Commercial License, Copying
-@section Printed Manuals
-
-@cindex printed manuals
-@cindex manuals, printed
-
-A printed and bound copy of the manual is available for US$15.  A copy
-of the software on a Unix tar floppy is available for US$15.
-International shipping costs outside of the US or Canada, please add
-US$5 for the extra postal charges.
-
-@node Registration Information,  , Printed Manuals, Copying
-@section Registration Information
-
-@cindex registration
-
-Please include the following registration information with your check
-made out to ``Gray Watson''.  Money orders are also accepted.  Purchase
-orders are as well, although amounts less than US$50 are discouraged.
-
-@itemize @bullet
-@item Name
-@item Position
-@item Company/Organization
-@item Street Address
-@item City
-@item State/Prov/Pref
-@item Zip/Postal Code
-@item Country
-@item Email-Address
-@item Telephone and Fax Number
-@end itemize
-
-Send it along with any other correspondence that cannot be sent via
-email to:
-
-@example
-Gray Watson
-826 Savannah Ave.
-Pittsburgh, PA  15221-3446
-USA
-@end example
+without express or implied warranty.
 
 @node Overview, Details, Copying, Top
 @chapter How to Debug with the Library
@@ -562,12 +465,6 @@ carefully.
 
 @enumerate
 
-@cindex PERMISSIONS file
-
-@item First, please examine the @file{PERMISSIONS} file.  If you are using
-the library in a commercial setting, please consider paying for a
-licensed copy of the software.
-
 @cindex settings.dist file
 
 @item You probably will want to edit the settings in
@@ -708,10 +605,6 @@ library:
 
 @item Make sure you have the latest version of the library available
 from the home page @samp{http://www.dmalloc.com/}.
-
-@item Please examine the @file{PERMISSIONS} file.  If you are using
-the library in a commercial setting, please consider paying for a
-licensed copy of the software.
 
 @item Follow the installation instructions on how to configure and
 make and install the library (i.e. type: @kbd{make install}).
@@ -2250,13 +2143,6 @@ Top.
 * Source Code::                 Information on the source and general concerns.
 * Index of Concepts::           Index of concepts in the manual.
 * Full Node Listing::           Listing of all the nodes in the manual.
-
-Copying.
-
-* Non-Commercial License::      Permissions for non-commercial entities.
-* Commercial License::          Permissions for commercial entities.
-* Printed Manuals::             Printed/bound manuals and source floppies.
-* Registration Information::    Permissions for commercial entities.
 
 Overview.
 
