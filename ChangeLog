@@ -1,6 +1,14 @@
-Thu Jan 16 15:22:06 1997  Gray Watson  <gray@burger.letters.com>
+Fri Jan 17 14:25:12 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.2.0.
+
+	* Added catch-signals debug token.
+
+	* Revamped autoconf scripts to be more standard.
+
+	* New signal handling.
+
+Thu Jan 16 15:22:06 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Moved to memcpy and memcmp from the b routines.
 
@@ -1146,5 +1154,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.170 1997/01/16 21:03:11 gray Exp $
+$Id: ChangeLog,v 1.171 1997/01/17 19:26:18 gray Exp $
 -------------------------------------------------------------------------------

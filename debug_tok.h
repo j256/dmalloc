@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.19 1995/06/21 18:19:02 gray Exp $
+ * $Id: debug_tok.h,v 1.20 1997/01/17 19:26:19 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -106,6 +106,8 @@ LOCAL	attr_t		attributes[] = {
       "allow allocs of 0 bytes, frees of NULL"},
   { "error-dump",	"edu",	DEBUG_ERROR_DUMP,
       "dump core on error and then continue"},
+  { "catch-signals",	"csi",	DEBUG_CATCH_SIGNALS,
+      "shutdown lib on SIGHUP, SIGINT, SIGTERM"},
   
   { NULL }
 };

@@ -34,8 +34,8 @@
 
 /* for KILL_PROCESS define */
 #if USE_ABORT == 0
-#ifdef SIGNAL_INCLUDE
-#include SIGNAL_INCLUDE				/* for kill signals */
+#ifdef KILL_INCLUDE
+#include KILL_INCLUDE				/* for kill signals */
 #endif
 #endif
 
@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.63 1995/08/30 18:06:55 gray Exp $";
+  "$Id: error.c,v 1.64 1997/01/17 19:26:20 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)

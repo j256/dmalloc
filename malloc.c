@@ -44,6 +44,10 @@
 #endif
 #endif
 
+#if SIGNAL_OKAY
+#include <signal.h>
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
@@ -61,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.90 1997/01/16 20:26:31 gray Exp $";
+  "$Id: malloc.c,v 1.91 1997/01/17 19:26:21 gray Exp $";
 #endif
 
 /*
@@ -98,6 +102,7 @@ EXPORT	char		*_dmalloc_strerror(const int errnum);
 /* local variables */
 LOCAL	char		enabled		= FALSE; /* have we started yet? */
 LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
+LOCAL	char		do_shutdown	= FALSE; /* execute shutdown soon */
 
 /* debug variables */
 LOCAL	char		*start_file = START_FILE_INIT; /* file to start at */
@@ -210,6 +215,21 @@ LOCAL	void	process_environ(void)
 
 /************************** startup/shutdown calls ***************************/
 
+#if SIGNAL_OKAY
+/*
+ * signal catcher
+ */
+LOCAL	RETSIGTYPE	signal_handler(const int sig)
+{
+  _dmalloc_message("caught signal %d", sig);
+  /* if we are already inside malloc then do the shutdown later */
+  if (in_alloc)
+    do_shutdown = TRUE;
+  else
+    _dmalloc_shutdown();
+}
+#endif
+
 /*
  * startup the memory-allocation module
  */
@@ -280,6 +300,29 @@ LOCAL	int	dmalloc_startup(void)
     _dmalloc_file = file_hold;
   }
 #endif /* AUTO_SHUTDOWN */
+  
+#if SIGNAL_OKAY
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_SIGNALS)) {
+#ifdef SIGNAL1
+    (void)signal(SIGNAL1, signal_handler);
+#endif
+#ifdef SIGNAL2
+    (void)signal(SIGNAL2, signal_handler);
+#endif
+#ifdef SIGNAL3
+    (void)signal(SIGNAL3, signal_handler);
+#endif
+#ifdef SIGNAL4
+    (void)signal(SIGNAL4, signal_handler);
+#endif
+#ifdef SIGNAL5
+    (void)signal(SIGNAL5, signal_handler);
+#endif
+#ifdef SIGNAL6
+    (void)signal(SIGNAL6, signal_handler);
+#endif
+  }
+#endif /* SIGNAL_OKAY */
   
   return NOERROR;
 }
@@ -374,6 +417,9 @@ EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   
   THREAD_UNLOCK;
   
+  if (do_shutdown)
+    _dmalloc_shutdown();
+  
   return newp;
 }
 
@@ -440,6 +486,9 @@ EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   
   THREAD_UNLOCK;
   
+  if (do_shutdown)
+    _dmalloc_shutdown();
+  
   return newp;
 }
 
@@ -485,6 +534,9 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   
   THREAD_UNLOCK;
   
+  if (do_shutdown)
+    _dmalloc_shutdown();
+  
 #if defined(__STDC__) && __STDC__ == 1
 #else
   return ret;
@@ -528,6 +580,9 @@ EXPORT	void	_dmalloc_log_heap_map(void)
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
+  
+  if (do_shutdown)
+    _dmalloc_shutdown();
 }
 
 /*
@@ -550,6 +605,9 @@ EXPORT	void	_dmalloc_log_stats(void)
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
+  
+  if (do_shutdown)
+    _dmalloc_shutdown();
 }
 
 /*
@@ -574,6 +632,9 @@ EXPORT	void	_dmalloc_log_unfreed(void)
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
+  
+  if (do_shutdown)
+    _dmalloc_shutdown();
 }
 
 /*
@@ -615,6 +676,9 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
+  
+  if (do_shutdown)
+    _dmalloc_shutdown();
   
   if (ret == NOERROR)
     return DMALLOC_VERIFY_NOERROR;
@@ -689,6 +753,9 @@ EXPORT	int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
+  
+  if (do_shutdown)
+    _dmalloc_shutdown();
   
   if (ret == NOERROR) {
     if (size != NULL)
