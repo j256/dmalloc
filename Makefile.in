@@ -1,13 +1,13 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.28 1993/08/24 22:24:01 gray Exp $
+# $Id: Makefile.in,v 1.29 1993/08/25 18:24:13 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
 OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN	= malloc_lp.o 
-FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c sample.c
+FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
 
 DEFS	= $(DEFINES)
 INCS	= -I. -Iargv $(INCLUDES)
@@ -29,7 +29,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
 	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
 	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h return.h \
-	version.h malloc_t.c sample.c \
+	version.h malloc_t.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
 PORTCFG	= contrib/README contrib/dec_notes
 
@@ -42,7 +42,7 @@ SHAR4	= chunk.h chunk_loc.h compat.c compat.h conf.h.in malloc.texi \
 	malloc_t.c mallocrc
 SHAR5	= configure.in dbg_tokens.h dbg_values.h heap.c heap.h malloc_dbg.c \
 	malloc_dbg.h malloc_loc.h malloc_lp.c malloc_lp.h arg_check.c \
-	arg_check.h sample.c version.h
+	arg_check.h version.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -62,7 +62,7 @@ installincs : $(HFLS)
 
 .PHONY : installlibs
 installlibs : installincs $(LIBRARY) $(OBJS_IN) $(MANFILE)
-	install -cev -m 644 $(LIBRARY) $(DESTDIR)/lib
+	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cev -m 444 $(OBJS_IN) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
 

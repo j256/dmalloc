@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.20 1993/08/25 01:02:12 gray Exp $
+$Id: Manifest,v 1.21 1993/08/25 18:24:15 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -90,9 +90,6 @@ malloc_t.c		Meager test program for testing the malloc
 
 mallocrc		Sample RC file that is used to set the debug
 			flags.
-
-sample.c		A sample file to demonstrate the usage of the
-			library.
 
 texinfo.tex		File included to allow tex output from the
 			malloc.texi file.

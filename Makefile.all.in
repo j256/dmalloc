@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.21 1993/08/25 01:02:10 gray Exp $
+# $Id: Makefile.all.in,v 1.22 1993/08/25 18:24:11 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -130,4 +130,3 @@ malloc_dbg.o : malloc_dbg.c argv/argv.h malloc_dbg.h conf.h compat.h malloc_loc.
   dbg_tokens.h dbg_values.h version.h 
 malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h 
 malloc_t.o : malloc_t.c malloc_dbg.h 
-sample.o : sample.c malloc_dbg.h 

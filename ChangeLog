@@ -33,7 +33,7 @@ Tue Aug 10 16:43:07 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Mon Jul 26 05:50:27 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Added some C++ via Peter Miller to the manual.
+	* Added some C++ from Peter Miller to the manual.
 
 Fri Jul 23 01:36:09 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -52,7 +52,7 @@ Tue Jul 20 01:52:02 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Made malloc_address exported per Dave's comments.
+	* Made malloc_address exported per Dave Hill's comments.
 
 	* Added Dave Hill's idea of auto-sensing of shell by malloc_dbg.
 	Also added -C option to malloc_dbg to force cshell output.
@@ -72,7 +72,8 @@ Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 Fri Jul 16 00:01:31 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Changed malloc_dbg per new ARGV_MAYBE.  Made some various
-	changes from ints to longs per some useful comments from Dave.
+	changes from ints to longs per some useful comments from Dave
+	Hill.
 
 Tue Jul 13 01:53:32 1993  Gray Watson  (gray@fridge.antaire.com)
 
@@ -140,7 +141,7 @@ Thu May  6 11:26:03 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Fri Apr 30 15:26:12 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Removed some heap checks in malloc.c per Bali Jatinder's
+	* Removed some heap checks in malloc.c from Bali Jatinder's
 	comments and fixed some of the error strings.
 
 	* Moved around some defines and changes include ordering.

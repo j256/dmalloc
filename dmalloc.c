@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.25 1993/08/24 22:17:20 gray Exp $";
+  "$Id: dmalloc.c,v 1.26 1993/08/25 18:24:20 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -53,7 +53,7 @@ LOCAL	char	*rcs_id =
 #define TOKENIZE_CHARS	" \t,="			/* for tag lines */
 
 #define NO_VALUE		(-1)		/* no value ... value */
-#define TOKENS_PER_LINE		4		/* num debug toks per line */
+#define TOKENS_PER_LINE		5		/* num debug toks per line */
 
 /* local variables */
 LOCAL	char	printed		= FALSE;	/* did we outputed anything? */
