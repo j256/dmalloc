@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.63 1994/11/08 23:54:40 gray Exp $
+# $Id: Makefile.in,v 1.64 1994/11/09 17:19:03 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -83,7 +83,7 @@ install : installlibs $(UTIL)
 installftp : README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
-	cd ftp/docs ; gzip $(DOCS)
+	cd ftp/docs ; gzip -fv $(DOCS)
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 
 # put situation specific lines here

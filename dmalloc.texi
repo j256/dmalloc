@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.71 1994/11/09 16:14:48 gray Exp $
+@c $Id: dmalloc.texi,v 1.72 1994/11/09 17:19:08 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -113,7 +113,7 @@ Gray Watson, Antaire Corporation.
 @end menu
 
 @node Copying, Overview, Top, Top
-@chapter Library Copying Conditions.
+@chapter Library Copying Conditions
 
 @cindex copying
 
@@ -129,7 +129,7 @@ of the software described herein for any purpose.  It is provided "as
 is" without express or implied warranty.
 
 @node Overview, Details, Copying, Top
-@chapter How to Debug with the Library.
+@chapter How to Debug with the Library
 
 @cindex overview
 
@@ -142,9 +142,8 @@ is" without express or implied warranty.
 @end menu
 
 @node Allocation Basics, Features,  , Overview
-@section Basic Description of Terms and Functions.
+@section Allocation Terms and Functions
 
-@cindex basics
 @cindex allocation basics
 
 This section provides a basic definition of terms used throughout the
@@ -158,8 +157,9 @@ section if you are familiar with using the heap allocation functions.
 @end menu
 
 @node Basic Definitions, Malloc Functions,  , Allocation Basics
-@subsection Basic Definitions of Terms and Concepts.
+@subsection Basic Concept Definitions
 
+@cindex basic defintions
 @cindex memory definitions
 
 Any program can be divided into 2 logical parts: text and data.  Text is
@@ -241,7 +241,7 @@ necessary for the job and you will be guaranteed that your program can
 handle any sized file.
 
 @node Malloc Functions,  , Basic Definitions, Allocation Basics
-@subsection Malloc functions Supported by all Malloc Libraries.
+@subsection Malloc Library Functions
 
 @cindex malloc functions
 
@@ -308,7 +308,7 @@ is returned by malloc libraries has already been cleared.  @emph{Only}
 the calloc routine will zero the memory space it returns.
 
 @node Features, Installation, Allocation Basics, Overview
-@section The Features of the Library.
+@section Library Features
 
 @cindex features
 
@@ -417,7 +417,7 @@ conclusion that the localtime call, included in SunOS release 4.1,
 overwrites one of its fence-post markers.
 
 @node Installation, Quick Start, Features, Overview
-@section How to Install the Library.
+@section Installing the Library
 
 @cindex installing the library
 @cindex compiling the library
@@ -438,7 +438,7 @@ configure any subdirectories (if necessary).
 
 @emph{NOTE}: It seems that some versions of tr (especially from HP-UX)
 don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr
-often, you may need to either get gnu's tr (in their textutils package)
+often, you may need to either get GNU's tr (in their textutils package)
 or generate the @file{Makefile} and @file{conf.h} files by hand.
 
 @item You may want to examine the files created by configure to make sure
@@ -474,7 +474,7 @@ See the Quick Start section to get up and running with the library.
 @xref{Quick Start}.
 
 @node Quick Start, Using a Debugger, Installation, Overview
-@section How to Start Using the Library.
+@section Starting to Use the Library
 
 @cindex quick start
 @cindex getting started
@@ -540,7 +540,7 @@ combination of debug tokens.  @xref{RC File}.
 @end enumerate
 
 @node Using a Debugger,  , Quick Start, Overview
-@section Using a Debugger with the Library.
+@section Using a Debugger with the Library
 
 @cindex debugger usage
 
@@ -566,7 +566,7 @@ will stop there as soon as a memory problem is detected.
 @end menu
 
 @node General Errors, Memory Leaks,  , Using a Debugger
-@subsection Diagnosing general problems with a debugger.
+@subsection Diagnosing General Errors with a Debugger
 
 @cindex diagnosing errors
 @cindex general errors
@@ -600,7 +600,7 @@ before the section which generated the error.  This should locate the
 problem faster by checking the library's structures more frequently.
 
 @node Memory Leaks, Fence-Post Overruns, General Errors, Using a Debugger
-@subsection Tracking down non-freed memory.
+@subsection Tracking down Non-Freed Memory
 
 @cindex memory leaks
 
@@ -636,7 +636,7 @@ down to known memory (those calls which supplied the file/line
 information) and unknown (the rest).
 
 @node Fence-Post Overruns,  , Memory Leaks, Using a Debugger
-@subsection Diagnosing fence-post overwritten memory.
+@subsection Diagnosing Fence-Post Overwritten Memory
 
 @cindex fence-post errors
 
@@ -669,7 +669,7 @@ approximately when this problem happened.  @xref{Debug Tokens} and
 @xref{Dmalloc Program}.
 
 @node Details, Source Code, Overview, Top
-@chapter Details about the Library's Operations.
+@chapter Details about the Library's Operations
 
 @cindex details
 @cindex operation details
@@ -683,7 +683,7 @@ approximately when this problem happened.  @xref{Debug Tokens} and
 @end menu
 
 @node Programming, Environment Variable,  , Details
-@section How to Program With the Library.
+@section How to Program with the Library
 
 @cindex programming
 
@@ -697,7 +697,7 @@ approximately when this problem happened.  @xref{Debug Tokens} and
 @end menu
 
 @node Allocation Macros, Return Address,  , Programming
-@subsection Allocation macros.
+@subsection Allocation Macros
 
 @cindex allocation macros
 @cindex dmalloc.h file
@@ -811,7 +811,7 @@ return-values from macros.  I have included a gcc form of these 2 macros
 (which makes them a lot more functional) as well as a non-gcc version.
 
 @node Return Address, Argument Checking, Allocation Macros, Programming
-@subsection Making use of the caller's address information.
+@subsection Using the Return Address Information
 
 @cindex return-address
 @cindex ra
@@ -859,7 +859,7 @@ only work if that file was compiled using the -g option and has not
 been stripped.
 
 @node Argument Checking, Extensions, Return Address, Programming
-@subsection Argument Checking of Certain Function Arguments.
+@subsection Argument Checking of Function Arguments
 
 @cindex argument checking
 @cindex DMALLOC_FUNC_CHECK flag
@@ -902,7 +902,7 @@ it is ignored since dmalloc does not know anything about it.
 may still be lurking.
 
 @node Extensions, C++ and the Library, Argument Checking, Programming
-@subsection Extensions: Non-Standard Dmalloc Routines.
+@subsection Library Extension Routines
 
 @cindex extensions
 
@@ -1045,7 +1045,7 @@ call to the @file{dmalloc} program with a @samp{-e #} option.
 @end deftypefun
 
 @node C++ and the Library, Disabling the Library, Extensions, Programming
-@subsection Using the Library with C++.
+@subsection Using the Library with C++
 
 @cindex c++ usage
 
@@ -1063,7 +1063,7 @@ file in with the C++ program you want to debug.
 hints and ideas for C++ users would be much appreciated.
 
 @node Disabling the Library,  , C++ and the Library, Programming
-@subsection Disabling the Library.
+@subsection Disabling the Library
 
 @cindex disabling the library
 
@@ -1120,12 +1120,10 @@ been.
 @end itemize
 
 @node Environment Variable, Debug Tokens, Programming, Details
-@section Environment Variable - Its Name and Features.
+@section Environment Variable Features
 
 @cindex environment variable
 @cindex DMALLOC_OPTIONS
-@cindex setenv
-@cindex export
 
 An @dfn{environment variable} is a variable that is part of the user's
 working environment and are shared by all the programs.  The
@@ -1134,12 +1132,20 @@ or disable the memory debugging features, at runtime.  It can be set
 either by hand or with the help of the dmalloc program.  @xref{Dmalloc
 Program}.
 
+@cindex C shell usage
+@cindex csh usage
+@cindex tcsh usage
 To set it by hand, C shell (csh or tcsh) users need to invoke:
 
 @example
 setenv DMALLOC_OPTIONS value;
 @end example
 
+@cindex Bourne shell usage
+@cindex sh usage
+@cindex bash usage
+@cindex ksh usage
+@cindex zsh usage
 Bourne shell (sh, bash, ksh, or zsh) users should use:
 
 @example
@@ -1251,7 +1257,7 @@ setenv DMALLOC_OPTIONS log=malloc,addr=0x1234,start=file.c:123
 @end example
 
 @node Debug Tokens, RC File, Environment Variable, Details
-@section Debugging Tokens.
+@section Debugging Tokens
 
 @cindex debug tokens
 
@@ -1368,7 +1374,7 @@ reason.
 @end table
 
 @node RC File, Dmalloc Program, Debug Tokens, Details
-@section Run-Time Configuration File.
+@section Run-Time Configuration File
 
 @cindex rc file
 @cindex runtime-config file
@@ -1403,19 +1409,19 @@ you are encouraged to roll your own combinations.  The name of default
 rc-file is @file{$HOME/.dmallocrc}.  The @samp{$HOME} environmental
 variable should be set by the system to point to your home-directory.
 
-The rc-file file should contain lines in the general form of:
+The file should contain lines in the general form of:
 
 @example
-tag     token1, token2, ...
+tag     token1, token2, @dots{}
 @end example
 
-tag is to be matched with the tag argument passed to the dmalloc
-program, while token1, token2, ... are debug capability tokens.
-@xref{Dmalloc Program} and @ref{Debug Tokens}.
+@samp{tag} is to be matched with the tag argument passed to the dmalloc
+program, while @samp{token1, token2, @dots{}} are debug capability
+tokens.  @xref{Dmalloc Program} and @ref{Debug Tokens}.
 
-A line can be finished with a '\' meaning it continues onto the next
-line.  Lines beginning with '#' are treated as comments and are ignored
-along with empty lines.
+A line can be finished with a @samp{\} meaning it continues onto the
+next line.  Lines beginning with @samp{#} are treated as comments and
+are ignored along with empty lines.
 
 Here is an example of a @file{.dmallocrc} file:
 
@@ -1451,7 +1457,7 @@ When I say @code{eval `dmalloc none`}, all memory debugging features
 are disabled.
 
 @node Dmalloc Program,  , RC File, Details
-@section Dmalloc Program: An Env Variable Setting Utility.
+@section Dmalloc Utility Program
 
 @cindex dmalloc program
 @cindex utility program
@@ -1642,7 +1648,7 @@ dmalloc -tv
 @end example
 
 @node Source Code, Plugs, Details, Top
-@chapter Information on the Source.
+@chapter Source Code Information
 
 @cindex source code
 
@@ -1653,7 +1659,7 @@ dmalloc -tv
 @end menu
 
 @node Definitions, Compatibility,  , Source Code
-@section Definitions of Terms and Other Information.
+@section Definitions of Terms
 
 @cindex source definitions
 
@@ -1681,7 +1687,7 @@ some anonymous amount of memory
 @end table
 
 @node Compatibility, Portability, Definitions, Source Code
-@section General Compatibility Concerns.
+@section General Compatibility Concerns
 
 @cindex compatibility
 
@@ -1715,7 +1721,7 @@ my attention.
 @end itemize
 
 @node Portability,  , Compatibility, Source Code
-@section Portability Issues.
+@section Portability Issues
 
 @cindex portability
 
@@ -1765,9 +1771,10 @@ main()
 @end itemize
 
 @node Plugs, Index of Concepts, Source Code, Top
-@chapter Soapbox Comments.
+@chapter Plugs and Soapbox Comments
 
 @cindex plugs
+@cindex soapbox comments
 
 Since I have your attention I would like to talk for a second about a
 couple of things that I feel strongly about.  If you would like any more
