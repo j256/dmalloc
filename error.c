@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.85 1999/03/08 15:51:52 gray Exp $
+ * $Id: error.c,v 1.86 1999/03/10 21:38:31 gray Exp $
  */
 
 /*
@@ -31,6 +31,9 @@
 
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for message vsprintf */
+#endif
+#if HAVE_STDLIB_H
+# include <stdlib.h>				/* for abort */
 #endif
 #if HAVE_UNISTD_H
 # include <unistd.h>				/* for write */
@@ -45,18 +48,16 @@
 #endif
 #endif
 
-/* for time type -- see settings.h */
-#if STORE_TIME
-#ifdef TIME_INCLUDE
-#include TIME_INCLUDE
-#endif
-#endif
-
-/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
-#ifdef TIMEVAL_INCLUDE
-#include TIMEVAL_INCLUDE
-#endif
+# ifdef TIMEVAL_INCLUDE
+#  include TIMEVAL_INCLUDE
+# endif
+#else
+# if HAVE_TIME
+#  ifdef TIME_INCLUDE
+#   include TIME_INCLUDE
+#  endif
+# endif
 #endif
 
 #define DMALLOC_DISABLE
@@ -73,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.85 1999/03/08 15:51:52 gray Exp $";
+#ident "$Id: error.c,v 1.86 1999/03/10 21:38:31 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.85 1999/03/08 15:51:52 gray Exp $";
+  "$Id: error.c,v 1.86 1999/03/10 21:38:31 gray Exp $";
 #endif
 #endif
 
@@ -110,8 +111,12 @@ unsigned long	_dmalloc_check_interval = INTERVAL_INIT;
 /* overhead information storing when the library started up for elapsed time */
 TIMEVAL_TYPE	_dmalloc_start;
 #endif
+
+/* NOTE: we do the ifdef this way for fillproto */
 #if STORE_TIMEVAL == 0
+#if HAVE_TIME
 TIME_TYPE	_dmalloc_start = 0;
+#endif
 #endif
 
 /* global flag which indicates when we are aborting */
@@ -150,7 +155,8 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 }
 #endif
 
-#if STORE_TIMEVAL == 0
+/* NOTE: we do the ifdef this way for fillproto */
+#if STORE_TIMEVAL == 0 && HAVE_TIME
 /*
  * print the time into local buffer which is returned
  */

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.57 1999/03/09 15:43:21 gray Exp $
+ * $Id: chunk_loc.h,v 1.58 1999/03/10 21:35:43 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -35,17 +35,16 @@
 #endif
 
 /* for time type -- see settings.h */
-#if STORE_TIME
-#ifdef TIME_INCLUDE
-#include TIME_INCLUDE
-#endif
-#endif
-
-/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
-#ifdef TIMEVAL_INCLUDE
-#include TIMEVAL_INCLUDE
-#endif
+# ifdef TIMEVAL_INCLUDE
+#  include TIMEVAL_INCLUDE
+# endif
+#else
+# if STORE_TIME
+#  ifdef TIME_INCLUDE
+#   include TIME_INCLUDE
+#  endif
+# endif
 #endif
 
 /* log-bad-space info */
@@ -154,11 +153,12 @@ typedef struct {
 #if STORE_ITERATION_COUNT
   unsigned long	ov_iteration;		/* interation when pointer alloced */
 #endif
+#if STORE_TIMEVAL
+  TIMEVAL_TYPE  ov_timeval;		/* time when pointer alloced */
+#else
 #if STORE_TIME
   TIME_TYPE	ov_time;		/* time when pointer alloced */
 #endif
-#if STORE_TIMEVAL
-  TIMEVAL_TYPE  ov_timeval;		/* time when pointer alloced */
 #endif
 #if LOG_THREAD_ID
   THREAD_TYPE	ov_thread_id;		/* thread id which allocaed pnt */

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.131 1999/03/10 16:41:17 gray Exp $
+ * $Id: malloc.c,v 1.132 1999/03/10 21:39:47 gray Exp $
  */
 
 /*
@@ -33,18 +33,16 @@
 
 #include "conf.h"				/* up here for _INCLUDE */
 
-/* for time type -- see settings.h */
-#if STORE_TIME
-#ifdef TIME_INCLUDE
-#include TIME_INCLUDE
-#endif
-#endif
-
-/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
-#ifdef TIMEVAL_INCLUDE
-#include TIMEVAL_INCLUDE
-#endif
+# ifdef TIMEVAL_INCLUDE
+#  include TIMEVAL_INCLUDE
+# endif
+#else
+# if HAVE_TIME /* NOT STORE_TIME */
+#  ifdef TIME_INCLUDE
+#   include TIME_INCLUDE
+#  endif
+# endif
 #endif
 
 #if LOCK_THREADS
@@ -78,10 +76,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.131 1999/03/10 16:41:17 gray Exp $";
+#ident "$Id: malloc.c,v 1.132 1999/03/10 21:39:47 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.131 1999/03/10 16:41:17 gray Exp $";
+  "$Id: malloc.c,v 1.132 1999/03/10 21:39:47 gray Exp $";
 #endif
 #endif
 
@@ -512,7 +510,7 @@ void	_dmalloc_shutdown(void)
 		     _dmalloc_ptimeval(&now, buf, sizeof(buf), 1));
   }
 #else
-#if HAVE_TIME
+#if HAVE_TIME /* NOT STORE_TIME */
   {
     TIME_TYPE	now = time(NULL);
     char	buf[64];
@@ -831,8 +829,8 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size)
 }
 
 /*
- * Allocate and return a block of bytes that contains the STR.
- * Returns 0L on error.
+ * Allocate and return a block of bytes that contains the string STR
+ * including the \0.  Returns 0L on error.
  */
 #undef strdup
 char	*strdup(const char *str)

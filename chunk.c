@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.146 1999/03/09 20:52:37 gray Exp $
+ * $Id: chunk.c,v 1.147 1999/03/10 21:34:34 gray Exp $
  */
 
 /*
@@ -34,8 +34,21 @@
 
 #define DMALLOC_DISABLE
 
-#include "dmalloc.h"
 #include "conf.h"
+
+#if STORE_TIMEVAL
+#ifdef TIMEVAL_INCLUDE
+# include TIMEVAL_INCLUDE
+#endif
+#else
+# if STORE_TIME
+#  ifdef TIME_INCLUDE
+#   include TIME_INCLUDE
+#  endif
+# endif
+#endif
+
+#include "dmalloc.h"
 
 #include "chunk.h"
 #include "chunk_loc.h"
@@ -49,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.146 1999/03/09 20:52:37 gray Exp $";
+#ident "$Id: chunk.c,v 1.147 1999/03/10 21:34:34 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.146 1999/03/09 20:52:37 gray Exp $";
+  "$Id: chunk.c,v 1.147 1999/03/10 21:34:34 gray Exp $";
 #endif
 #endif
 
@@ -1212,11 +1225,12 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
 #endif
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
-#if STORE_TIME && HAVE_TIME
-    dblock_p->db_overhead.ov_time = time(NULL);
-#endif
 #if STORE_TIMEVAL
     GET_TIMEVAL(dblock_p->db_overhead.ov_timeval);
+#else
+#if STORE_TIME
+    dblock_p->db_overhead.ov_time = time(NULL);
+#endif
 #endif
   }
   
@@ -2585,11 +2599,12 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 #endif
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
-#if STORE_TIME && HAVE_TIME
-      bblock_p->bb_overhead.ov_time = time(NULL);
-#endif
 #if STORE_TIMEVAL
       GET_TIMEVAL(bblock_p->bb_overhead.ov_timeval);
+#else
+#if STORE_TIME
+      bblock_p->bb_overhead.ov_time = time(NULL);
+#endif
 #endif
     }
     

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.h,v 1.42 1999/03/05 00:30:50 gray Exp $
+ * $Id: error.h,v 1.43 1999/03/10 21:38:32 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -75,9 +75,11 @@ TIMEVAL_TYPE	_dmalloc_start;
 #endif /* if STORE_TIMEVAL */
 
 #if STORE_TIMEVAL == 0
-/* no comments found for this variable */
+#if HAVE_TIME
+/* NOTE: we do the ifdef this way for fillproto */
 extern
 TIME_TYPE	_dmalloc_start;
+#endif /* if HAVE_TIME */
 #endif /* if STORE_TIMEVAL == 0 */
 
 /* global flag which indicates when we are aborting */
@@ -93,14 +95,14 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 			   const int buf_size, const int elapsed_b);
 #endif /* if STORE_TIMEVAL */
 
-#if STORE_TIMEVAL == 0
+#if STORE_TIMEVAL == 0 && HAVE_TIME
 /*
  * print the time into local buffer which is returned
  */
 extern
 char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 			const int elapsed_b);
-#endif /* if STORE_TIMEVAL == 0 */
+#endif /* if STORE_TIMEVAL == 0 && HAVE_TIME */
 
 /*
  * message writer with vprintf like arguments
