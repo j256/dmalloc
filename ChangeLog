@@ -1,3 +1,8 @@
+Fri Jul 23 01:36:09 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Removed LGPL copyright and put in its place fully free
+	software notices.
+
 Thu Jul 22 17:35:23 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* _malloc_perror -> _malloc_error and made some other minor

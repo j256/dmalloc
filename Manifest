@@ -1,9 +1,7 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.17 1993/06/26 21:16:09 gray Exp $
+$Id: Manifest,v 1.18 1993/07/23 05:37:33 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
-
-COPYING-LIB		The famous GNU Library Public License.
 
 Changelog		Change log entries detailing major module
 			changes.
@@ -38,6 +36,8 @@ configure		Configure script.
 
 configure.in		Used by autoconf to create the configure
 			script.
+
+contrib/		directory of contributions from other sources
 
 dbg_tokens.h		Tokens that correspond to debugging
 			functionality.

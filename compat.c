@@ -1,23 +1,20 @@
 /*
  * compatibility functions for those systems who are missing them.
  *
- * Copyright 1992 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by Gray Watson and the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose and without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies, and that
+ * the name of Antaire not be used in advertising or publicity pertaining to
+ * distribution of the document or software without specific, written prior
+ * permission.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library (see COPYING-LIB); if not, write to the
- * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Gray Watson and the Antaire Corporation make no representations about the
+ * suitability of the software described herein for any purpose.  It is
+ * provided "as is" without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -37,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.13 1993/05/24 17:00:33 gray Exp $";
+  "$Id: compat.c,v 1.14 1993/07/23 05:37:48 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0

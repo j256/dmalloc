@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.2 1993/07/20 05:53:31 gray Exp $
+$Id: TODO,v 1.3 1993/07/23 05:37:36 gray Exp $
 -------------------------------------------------------------------------------
 
 IMPORTANT:
@@ -87,6 +87,8 @@ GENERAL:
 	- have a call which reports on the reference count of the node
 	- may need additional admin space
 	- debug token?
+- check for more string functions
+	- add strdup, strcpy, strncpy
 - maybe have bit in allocation struct somewhere that it is a string and
 	maybe have a checking level/value that runs though the strings
 	and makes sure they have a NULL in them.

@@ -1,5 +1,7 @@
 #
-# $Id: Makefile.in,v 1.22 1993/07/22 21:38:11 gray Exp $
+# Copyright 1993 by Gray Watson and the Antaire Corporation
+#
+# $Id: Makefile.in,v 1.23 1993/07/23 05:37:31 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -23,7 +25,7 @@ UTIL	= malloc_dbg
 MANFILE	= malloc.info
 
 PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
-	COPYING-LIB ChangeLog Manifest NOTES README TODO mallocrc \
+	ChangeLog Manifest NOTES README TODO mallocrc \
 	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
 	error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
 	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h malloc_str.[ch] \
@@ -32,7 +34,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
 
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
-SHAR1	= COPYING-LIB ChangeLog Makefile.in Manifest NOTES README TODO malloc.c
+SHAR1	= ChangeLog Makefile.in Manifest NOTES README TODO malloc.c
 SHAR2	= chunk.c
 SHAR3	= configure error.c error.h error_str.h error_val.h malloc.info
 SHAR4	= chunk.h chunk_loc.h compat.c compat.h conf.h.in malloc.texi \
@@ -83,8 +85,9 @@ $(UTIL) : malloc_dbg.o $(LIBRARY) $(ROOT)/lib
 port : malloc.info
 	@ answer 'Is it okay to remove the $@ directory? '
 	rm -rf $@
-	mkdir $@
+	mkdir $@ $@/contrib
 	cp $(PORTFLS) $@
+	cp contrib/* $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'

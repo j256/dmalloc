@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.23 1993/07/22 21:38:28 gray Exp $
+@c $Id: dmalloc.texi,v 1.24 1993/07/23 05:38:16 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -111,65 +111,17 @@ Gray Watson, Antaire Corporation.
 @chapter Library Copying Conditions.
 
 @cindex copying
-@cindex GPL
-@cindex GLPL
 
-This package is covered by the GNU Library Public License (@dfn{GLPL}).
-See the file @file{COPYING-LIB} for details.  If you would like to do
-something with this package that you feel is reasonable but prohibited
-by the license, please contact me to see if we can work it out.
+Permission to use, copy, modify, and distribute this software for any
+purpose and without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies, and
+that the name of Antaire not be used in advertising or publicity
+pertaining to distribution of the document or software without specific,
+written prior permission.
 
-@emph{NOTICE}: this is not the GNU Public License (@dfn{GPL}) but the
-@emph{library} public license.  This license allows you to do more with
-the library than the standard public license distributed with most GNU
-software.  Please read @file{COPYING-LIB} or contact me for more
-information.
-
-The rest of this section contains some messages from the Free Software
-Foundation.  If you find this stuff offensive or annoying, remember that
-you probably did not spend any money to get this library and feel free
-to heave it into the bit bucket.
-
-The licenses for most software are designed to take away your freedom to
-share and change it.  By contrast, the GNU General Public Licenses are
-intended to guarantee your freedom to share and change free software--to
-make sure the software is free for all its users.
-
-This license, the Library General Public License, applies to some
-specially designated Free Software Foundation software, and to any other
-libraries whose authors decide to use it.  You can use it for your
-libraries, too.
-
-When we speak of free software, we are referring to freedom, not price.
-Our General Public Licenses are designed to make sure that you have the
-freedom to distribute copies of free software (and charge for this
-service if you wish), that you receive source code or can get it if you
-want it, that you can change the software or use pieces of it in new
-free programs; and that you know you can do these things.
-
-To protect your rights, we need to make restrictions that forbid anyone
-to deny you these rights or to ask you to surrender the rights.  These
-restrictions translate to certain responsibilities for you if you
-distribute copies of the library, or if you modify it.
-
-For example, if you distribute copies of the library, whether gratis or
-for a fee, you must give the recipients all the rights that we gave you.
-You must make sure that they, too, receive or can get the source code.
-If you link a program with the library, you must provide complete object
-files to the recipients so that they can relink them with the library,
-after making changes to the library and recompiling it.  And you must
-show them these terms so they know their rights.
-
-Our method of protecting your rights has two steps: (1) copyright the
-library, and (2) offer you this license which gives you legal permission
-to copy, distribute and/or modify the library.
-
-Also, for each distributor's protection, we want to make certain that
-everyone understands that there is no warranty for this free library.
-If the library is modified by someone else and passed on, we want its
-recipients to know that what they have is not the original version, so
-that any problems introduced by others will not reflect on the original
-authors' reputations.
+Gray Watson and the Antaire Corporation makes no representations about
+the suitability of the software described herein for any purpose.  It is
+provided "as is" without express or implied warranty.
 
 @node Allocation Basics, Features, Copying, Top
 @chapter Basic Description of Terms and Functions.
@@ -1164,17 +1116,25 @@ information about the below, please mail to the supplied addresses or
 drop me a line with any questions.
 
 @table @samp
-@item The Free Software Foundation <gnu@@prep.ai.mit.edu>
-@cindex FSF
-@cindex The Free Software Foundation
-As you should be able to tell by now, I am a FSF supporter.  The FSF's
-goal, as I see and support it, is to encourage the exchange of free
-source code.  The organization and its individuals have volunteered an
-amazing amount of time toward this.  If you use emacs, gcc, gdb, patch,
-perl, bison, or any of their many programs and libraries then you have
-benefited from the movement.  Please consider supporting it.
+@item The Electronic Frontier Foundation (EFF)
+@cindex EFF
+@cindex Electronic Frontier Foundation
+The EFF is a organization committed to ensuring that the rules,
+regulations, and laws being applied to emerging communications
+technologies are in keeping with our society's highest traditions of the
+free and open flow of ideas and information while protecting personal
+privacy.  <eff@@eff.org>
 
-@item Berkeley Software Design, Inc. <bsdi-info@@bsdi.com>
+@item Computer Professionals for Social Responsibility (CPSR)
+@cindex CPSR
+@cindex Computer Professionals for Social Responsibility
+CPSR is a public-interest alliance of computer scientists and others
+interested in the impact of computer technology on society.  We work to
+influence decisions regarding the development and use of computers
+because those decisions have far-reaching consequences and reflect basic
+values and priorities.  <cpsr@@csli.stanford.edu>
+
+@item Berkeley Software Design, Inc. (BSDI)
 @cindex BSDI
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
@@ -1185,8 +1145,7 @@ source} for 386 and 486 systems (binary licenses are available).  Along
 with the obvious benefits of full source code come excellent customer
 support/service and system features such as a MS-DOG runtime
 environment, complete tcp/ip networking facilities including nfs, full
-software development utilities, X, etc.
-@end table
+software development utilities, X, etc.  <bsdi-info@@bsdi.com>@end table
 
 @node Index of Concepts,  , Plugs, Top
 @unnumbered Concept Index
