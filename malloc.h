@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.20 1993/04/06 04:24:34 gray Exp $
+ * $Id: malloc.h,v 1.21 1993/04/06 04:48:09 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -261,7 +261,7 @@ IMPORT	char	*malloc_strerror(int errnum);
  * MALLOC_STRING_DISABLE define.
  */
 #define bcmp(b1, b2, len)		_malloc_bcmp(b1, b2, len)
-#define bcopy(from, to, len)		_malloc_bcopy(from, to, len
+#define bcopy(from, to, len)		_malloc_bcopy(from, to, len)
 
 #define memcmp(b1, b2, len)		_malloc_memcmp(b1, b2, len)
 #define memcpy(to, from, len)		_malloc_memcpy(to, from, len)

@@ -24,4 +24,4 @@
 
 #include "malloc.h"
 
-LOCAL	char	*malloc_version = "1.1.6";
+LOCAL	char	*malloc_version = "1.2.0";

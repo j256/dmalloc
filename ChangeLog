@@ -1,3 +1,8 @@
+Tue Apr  6 00:46:45 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Upgraded to version 1.2.0.  Ready for 2nd release to
+	comp.sources.unix.  Lots of work on the manual.
+
 Mon Apr  5 18:28:05 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Finished adding token "check-funcs" to check the arguments of
