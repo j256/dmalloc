@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.91 1997/01/17 19:26:21 gray Exp $";
+  "$Id: malloc.c,v 1.92 1997/01/21 21:01:31 gray Exp $";
 #endif
 
 /*
@@ -103,6 +103,11 @@ EXPORT	char		*_dmalloc_strerror(const int errnum);
 LOCAL	char		enabled		= FALSE; /* have we started yet? */
 LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
 LOCAL	char		do_shutdown	= FALSE; /* execute shutdown soon */
+
+#ifdef THREAD_LOCK_GLOBAL
+/* define the global thread-lock variable if needed */
+THREAD_LOCK_GLOBAL
+#endif
 
 /* debug variables */
 LOCAL	char		*start_file = START_FILE_INIT; /* file to start at */
