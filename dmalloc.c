@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.36 1994/05/02 23:06:25 gray Exp $";
+  "$Id: dmalloc.c,v 1.37 1994/07/22 14:31:18 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -544,7 +544,8 @@ EXPORT	int	main(int argc, char ** argv)
   else if (clear)
     unset_variable(ADDRESS_ENVIRON);
   
-  if (interval != NO_VALUE) {
+  /* NOTE: special case, interval == 0 causes it to be undefed */
+  if (interval != NO_VALUE && interval > 0) {
     (void)sprintf(buf, "%d", interval);
     set_variable(INTERVAL_ENVIRON, buf);
   }
