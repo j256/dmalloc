@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.140 1998/10/05 02:18:20 gray Exp $
+@c $Id: dmalloc.texi,v 1.141 1998/10/05 02:47:20 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -628,11 +628,12 @@ created by configure to make sure it did its job correctly.
 @cindex settings.h file
 
 @item You might want to tune the settings in @file{settings.h} file to
-tune the library to the local architecture -- especially if you are
-using pthreads or another thread library.  The @file{configure} script
-created this file from the @file{settings.dist} file.  Any permanent
-changes to these settings should made to the dist file.  You then can
-run @file{config.status} to re-create the @file{settings.h} file.
+tune the library to the local architecture.  This file contains relevant
+settings if you are using pthreads or another thread library.  The
+@file{configure} script created this file from the @file{settings.dist}
+file.  Any permanent changes to these settings should made to the dist
+file.  You then can run @file{config.status} to re-create the
+@file{settings.h} file.
 
 @cindex DMALLOC_SIZE variable
 
@@ -675,9 +676,6 @@ you will have to try @kbd{make noansi}.  This will run the
 
 If it doesn't work you may have to do Deansify.pl's job by hand.
 
-@cindex testing the library
-@cindex dmalloc_t test program
-
 @item Typing @kbd{make threads} should be enough to build
 @file{libdmallocth.a} which is the threaded version of the library.
 This may or may not work depending on the configuration scripts ability
@@ -687,6 +685,15 @@ with improvements.
 See the ``Using With Threads'' section for more information about the
 operation of the library with your threaded program.  @xref{Using With
 Threads}.
+
+@item See the @file{dmalloc.cc} C++ file which contains basic code to
+overload the @code{new}, @code{new[]}, and @code{delete} C++ operators.
+You may want to compile and include this object file in the dmalloc
+libraries.  My apologies on the minimal C++ support.  I am still living
+in a mostly C world.
+
+@cindex testing the library
+@cindex dmalloc_t test program
 
 @item Typing @kbd{make tests} should build the @file{dmalloc_t} test
 program.
@@ -753,22 +760,23 @@ This causes the memory statistics and unfreed information to be dumped
 to the log file.  However, if your system has neither, you will need to
 call @code{dmalloc_shutdown} yourself before your program exits.
 
-@item Add an alias for dmalloc to your shell's rc file. csh/tcsh users
-should add the following to their @file{.cshrc} file (notice the -C
-option for c-shell output):
-
-@example
-alias dmalloc 'eval `\dmalloc -C \!*`'
-@end example
-
-bash
-
-Bash and Zsh users should add the following to their @file{.bashrc} or
-@file{.zshrc} respectively file (notice the -b option for bourne shell
+@item Add an alias for dmalloc to your shell's rc file.  Bourne, bash,
+ksh, and zsh users should add the following to their @file{.bashrc} or
+@file{.zshrc} file respectively (notice the -b option for bourne shell
 output):
 
 @example
 function dmalloc @{ eval `command dmalloc -b $*` @}
+@end example
+
+By the way, if you are looking for a shell, I heartily recommend trying
+out zsh.  It is a bourne shell written from scratch with much the same
+features as tcsh without the csh crap.  If you are @emph{still} using
+csh or tcsh, you should add the following to your @file{.cshrc} file
+(notice the -C option for c-shell output):
+
+@example
+alias dmalloc 'eval `\dmalloc -C \!*`'
 @end example
 
 @item Although not necessary, you may want to include @file{dmalloc.h}
@@ -858,11 +866,11 @@ will vary significantly.  You know its too low if your program core
 dumps and too high if the library generates an exception.
 
 An additional complexity is when we are initializing the lock before
-mutex locking around the library.  As mentioned, the init itself may
-generate a malloc call causing the library to go recursive and the
-pthread library to possibly core dump. With the THREAD_LOCK_INIT setting
-defined in @file{settings.h}, you can tune how many times before we
-start locking to try and initialize the mutex lock.  It defaults to 2
+mutex locking around the library.  As mentioned, the initialization
+itself may generate a malloc call causing the library to go recursive
+and the pthread library to possibly core dump. With the THREAD_LOCK_INIT
+setting defined in @file{settings.h}, you can tune how many times before
+we start locking to try and initialize the mutex lock.  It defaults to 2
 which seems to work for me.  If people need to have this runtime
 configurable or would like to present an alternative default, please let
 me know.
@@ -1152,7 +1160,7 @@ void dmalloc_log_unfreed( void )
 
 This function dumps the unfreed-memory information to the log file.
 This is also useful to dump the currently allocated points to the log
-file to be diff'ed against another dump later on.
+file to be compared against another dump later on.
 @end deftypefun
 
 @deftypefun
@@ -1209,9 +1217,9 @@ char ** @var{file}, int * @var{line}, void ** @var{ret_address} )
 @cindex examine a pointer
 @cindex pointer information
 
-This function returns the size of a pnt's allocation as well as the file
-and line or the return-address from where it was allocated.  It will
-return NOERROR or ERROR depending on whether pnt is good or not.
+This function returns the size of a pointer's allocation as well as the
+file and line or the return-address from where it was allocated.  It
+will return NOERROR or ERROR depending on whether pnt is good or not.
 
 @emph{NOTE}: This function is @emph{certainly} not provided by most if
 not all other malloc libraries.
@@ -1722,7 +1730,7 @@ abort the program (and dump core) on errors.  See @code{error-dump} below.
 @cindex hex 0xc5
 @item alloc-blank
 write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is alloced
+it is allocated
 
 @item heap-check-map
 log a heap-map to the logfile every time the heap is checked
