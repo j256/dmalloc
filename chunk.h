@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.66 2003/05/16 04:09:32 gray Exp $
+ * $Id: chunk.h,v 1.67 2003/06/06 19:06:21 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -114,6 +114,9 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
  * seen_cp <- Pointer to an unsigned long which, if not NULL, will be
  * set to the number of times the pointer has been "seen".
  *
+ * used_p <- Pointer to an unsigned long which, if not NULL, will be
+ * set to the last time the pointer was "used".
+ *
  * valloc_bp <- Pointer to an integer which, if not NULL, will be set
  * to 1 if the pointer was allocated with valloc() otherwise 0.
  *
@@ -122,11 +125,12 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
  */
 extern
 int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
-			    unsigned int *user_size_p,
-			    unsigned int *alloc_size_p, char **file_p,
-			    unsigned int *line_p, void **ret_attr_p,
-			    unsigned long **seen_cp, int *valloc_bp,
-			    int *fence_bp);
+				 unsigned int *user_size_p,
+				 unsigned int *alloc_size_p, char **file_p,
+				 unsigned int *line_p, void **ret_attr_p,
+				 unsigned long **seen_cp,
+				 unsigned long *used_p, int *valloc_bp,
+				 int *fence_bp);
 
 /*
  * int _dmalloc_chunk_heap_check

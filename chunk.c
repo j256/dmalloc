@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.184 2003/06/04 23:43:45 gray Exp $
+ * $Id: chunk.c,v 1.185 2003/06/06 19:06:21 gray Exp $
  */
 
 /*
@@ -210,7 +210,7 @@ static	int	random_level(const int max_level)
  * Success - Pointer to the slot which matches the block-num and size
  * pair.
  *
- * Failure - NULL
+ * Failure - NULL and this will not set dmalloc_errno
  *
  * ARGUMENTS:
  *
@@ -1361,6 +1361,9 @@ static	skip_alloc_t	*use_free_memory(const unsigned int size,
   }
   free_space_bytes -= slot_p->sa_total_size;
   
+  /* set to user allocated space */
+  slot_p->sa_flags = ALLOC_FLAG_USER;
+  
   /* insert it into our address list */
   if (! insert_slot(slot_p, 0 /* used list */)) {
     /* error set in insert_slot */
@@ -1535,6 +1538,13 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
   unsigned int	line;
   pnt_info_t	pnt_info;
   
+  if (! (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_USER)
+	 || BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_EXTERN)
+	 || BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_ADMIN))) {
+    dmalloc_errno = ERROR_SLOT_CORRUPT;
+    return 0;
+  }
+  
   /* get pointer info */
   get_pnt_info(slot_p, &pnt_info);
   
@@ -1639,6 +1649,11 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
 static	int	check_free_slot(const skip_alloc_t *slot_p)
 {
   char	*check_p;
+  
+  if (! BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FREE)) {
+    dmalloc_errno = ERROR_SLOT_CORRUPT;
+    return 0;
+  }
   
   if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
     for (check_p = (char *)slot_p->sa_mem;
@@ -1773,6 +1788,10 @@ int	_dmalloc_chunk_startup(void)
     }
   }
   
+  /* set the admin flags on the two statically allocated slots */
+  skip_free_list->sa_flags = ALLOC_FLAG_ADMIN;
+  skip_address_list->sa_flags = ALLOC_FLAG_ADMIN;
+  
   return 1;
 }
 
@@ -1855,6 +1874,9 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
  * seen_cp <- Pointer to an unsigned long which, if not NULL, will be
  * set to the number of times the pointer has been "seen".
  *
+ * used_p <- Pointer to an unsigned long which, if not NULL, will be
+ * set to the last time the pointer was "used".
+ *
  * valloc_bp <- Pointer to an integer which, if not NULL, will be set
  * to 1 if the pointer was allocated with valloc() otherwise 0.
  *
@@ -1862,11 +1884,12 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
  * to 1 if the pointer has the fence bit set otherwise 0.
  */
 int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
-			    unsigned int *user_size_p,
-			    unsigned int *alloc_size_p, char **file_p,
-			    unsigned int *line_p, void **ret_attr_p,
-			    unsigned long **seen_cp, int *valloc_bp,
-			    int *fence_bp)
+				 unsigned int *user_size_p,
+				 unsigned int *alloc_size_p, char **file_p,
+				 unsigned int *line_p, void **ret_attr_p,
+				 unsigned long **seen_cp,
+				 unsigned long *used_p, int *valloc_bp,
+				 int *fence_bp)
 {
   skip_alloc_t	*slot_p;
   
@@ -1875,12 +1898,10 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
 		    (unsigned long)user_pnt);
   }
   
-  SET_POINTER(seen_cp, NULL);
-  
   /* find the pointer with loose checking for fence */
   slot_p = find_address(user_pnt, 0 /* loose checking */, skip_update);
   if (slot_p == NULL) {
-    /* errno set in find_block */
+    dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
     dmalloc_error("_dmalloc_chunk_read_info");
     return 0;
@@ -1913,10 +1934,13 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   }
 #if STORE_SEEN_COUNT
   SET_POINTER(seen_cp, &slot_p->sa_seen_c);
+#else
+  SET_POINTER(seen_cp, NULL);
 #endif
-  
+  SET_POINTER(used_p, slot_p->sa_use_iter);
   SET_POINTER(valloc_bp, BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC));
   SET_POINTER(fence_bp, BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE));
+  
   return 1;
 }
 
@@ -2292,6 +2316,9 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   /* not clear the allocation */
   clear_alloc(&pnt_info, 0 /* no old-size */, func_id);
   
+  slot_p->sa_file = file;
+  slot_p->sa_line = line;
+  slot_p->sa_use_iter = _dmalloc_iter_c;
 #if STORE_SEEN_COUNT
   slot_p->sa_seen_c++;
 #endif
@@ -2448,6 +2475,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   
   alloc_cur_pnts--;
   
+  slot_p->sa_use_iter = _dmalloc_iter_c;
 #if STORE_SEEN_COUNT
   slot_p->sa_seen_c++;
 #endif
@@ -2462,6 +2490,10 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 		    _dmalloc_chunk_desc_pnt(where_buf2, sizeof(where_buf2),
 					    slot_p->sa_file, slot_p->sa_line));
   }
+  
+  /* update the file/line */
+  slot_p->sa_file = file;
+  slot_p->sa_line = line;
   
 #if MEMORY_TABLE_LOG
   if (func_id != DMALLOC_FUNC_REALLOC
@@ -2571,7 +2603,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   /* find the old pointer with loose checking for fence post stuff */
   slot_p = find_address(old_user_pnt, 0 /* loose pointer */, skip_update);
   if (slot_p == NULL) {
-    /* errno set in find_block */
+    dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(NULL, 0, NULL, 0, old_user_pnt, 0, NULL,
 		   "_dmalloc_chunk_realloc");
     dmalloc_error("_dmalloc_chunk_realloc");
@@ -2637,6 +2669,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
     
     clear_alloc(&pnt_info, old_size, func_id);
     
+    slot_p->sa_use_iter = _dmalloc_iter_c;
 #if STORE_SEEN_COUNT
     /* we see in inbound and outbound so we need to increment by 2 */
     slot_p->sa_seen_c += 2;
@@ -2793,8 +2826,8 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 				   const int log_freed_b, const int details_b)
 {
   skip_alloc_t	*slot_p;
-  void		*user_pnt;
-  int		known_b, freed_b;
+  pnt_info_t	pnt_info;
+  int		known_b, freed_b, used_b, checking_free_b = 0;
   char		out[DUMP_SPACE * 4], *which_str;
   char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   int		unknown_size_c = 0, unknown_block_c = 0, out_len;
@@ -2813,29 +2846,50 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
     return;
   }
   
-  dmalloc_message("dumping %s pointers changed since %lu:",
-		  which_str, mark);
+  if (mark == 0) {
+    dmalloc_message("dumping %s pointers changed since program start:",
+		    which_str);
+  }
+  else {
+    dmalloc_message("dumping %s pointers changed since mark %lu:",
+		    which_str, mark);
+  }
   
   /* clear out our memory table so we can fill it with pointer info */
   _dmalloc_table_clear();
   
   /* run through the blocks */
-  for (slot_p = skip_address_list;
-       slot_p != NULL;
+  for (slot_p = skip_address_list->sa_next_p[0];
+       ;
        slot_p = slot_p->sa_next_p[0]) {
     
+    /*
+     * switch to the free list in the middle after we've checked the
+     * used pointer slots
+     */
+    if (slot_p == NULL) {
+      if (checking_free_b) {
+	break;
+      }
+      slot_p = skip_free_list->sa_next_p[0];
+      if (slot_p == NULL) {
+	break;
+      }
+      checking_free_b = 1;
+    }
+    
     freed_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FREE);
+    used_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_USER);
     
     /*
      * check for different types
      */
-    if (! (freed_b || BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_USER))) {
+    if (! (freed_b || used_b)) {
       continue;
     }
     
     /* do we want to dump this one? */
-    if (! ((log_not_freed_b && BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_USER))
-	   || (log_freed_b && freed_b))) {
+    if (! ((log_not_freed_b && used_b) || (log_freed_b && freed_b))) {
       continue;
     }    
     /* is it too long ago? */
@@ -2854,18 +2908,13 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
       known_b = 1;
     }
     
-    if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE)) {
-      user_pnt = (char *)slot_p->sa_mem + FENCE_BOTTOM_SIZE;
-    }
-    else {
-      user_pnt = slot_p->sa_mem;
-    }
+    get_pnt_info(slot_p, &pnt_info);
     
     if (known_b || (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_KNOWN))) {
       if (details_b) {
 	dmalloc_message(" %s freed: '%s' (%u bytes) from '%s'",
 			(freed_b ? "   " : "not"),
-			display_pnt(user_pnt, slot_p, disp_buf,
+			display_pnt(pnt_info.pi_user_start, slot_p, disp_buf,
 				    sizeof(disp_buf)),
 			slot_p->sa_user_size,
 			_dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
@@ -2874,10 +2923,10 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 	
 	if ((! freed_b)
 	    && BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
-	  out_len = expand_chars((char *)user_pnt, DUMP_SPACE,
+	  out_len = expand_chars((char *)pnt_info.pi_user_start, DUMP_SPACE,
 				 out, sizeof(out));
 	  dmalloc_message("  dump of '%#lx': '%.*s'",
-			  (unsigned long)user_pnt, out_len, out);
+			  (unsigned long)pnt_info.pi_user_start, out_len, out);
 	}
       }
       _dmalloc_table_alloc(slot_p->sa_file, slot_p->sa_line,
