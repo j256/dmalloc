@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.62 2000/03/24 21:57:08 gray Exp $
+ * $Id: chunk_loc.h,v 1.63 2001/02/28 05:13:46 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -69,8 +69,10 @@
 #define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
 
 /* adjust internal PNT to user-space */
-#define CHUNK_TO_USER(pnt)	((char *)(pnt) + fence_bottom_size)
-#define USER_TO_CHUNK(pnt)	((char *)(pnt) - fence_bottom_size)
+#define CHUNK_TO_USER(pnt, f_b)	\
+	((f_b) ? (char *)(pnt) + FENCE_BOTTOM_SIZE : (pnt))
+#define USER_TO_CHUNK(pnt, f_b)	\
+	((f_b) ? (char *)(pnt) - FENCE_BOTTOM_SIZE : (pnt))
 
 /* get the number of blocks to hold SIZE */
 #define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
@@ -126,7 +128,8 @@
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
 /* bb_flags values (unsigned short) */
-#define BBLOCK_ALLOCATED	0x00FF		/* block has been allocated */
+#define BBLOCK_ALLOCATED	0x0FFF		/* block has been allocated */
+
 #define BBLOCK_START_USER	0x0001		/* start of some user space */
 #define BBLOCK_USER		0x0002		/* allocated by user space */
 #define BBLOCK_ADMIN		0x0004		/* pointing to bblock admin */
@@ -136,8 +139,9 @@
 #define BBLOCK_START_FREE	0x0040		/* start of free block */
 #define BBLOCK_EXTERNAL		0x0080		/* externally used block */
 #define BBLOCK_ADMIN_FREE	0x0100		/* ba_free_n pnt to free slot*/
-#define BBLOCK_STRING		0x0200		/* block is a string (unused)*/
-#define BBLOCK_VALLOC		0x0400		/* block is aligned alloc */
+#define BBLOCK_VALLOC		0x0200		/* block is aligned alloc */
+
+#define BBLOCK_FENCE		0x1000		/* fence post checking is on */
 
 #define BBLOCK_FLAG_TYPE(f)	((f) & BBLOCK_ALLOCATED)
 
@@ -170,6 +174,11 @@ typedef struct {
 #endif
 } overhead_t;
 
+/* db_flags values (unsigned short) */
+#define DBLOCK_USER	0x0001			/* block is user space */
+#define DBLOCK_FREE	0x0002			/* block is free */
+#define DBLOCK_FENCE	0x0010			/* fence post is on */
+
 /*
  * Below defines a divided-block structure.  This structure is used to
  * track allocations that are less than half the size of a
@@ -191,10 +200,6 @@ typedef struct dblock_st {
   
   overhead_t		db_overhead;		/* configured overhead adds */
 } dblock_t;
-
-/* db_flags values (unsigned short) */
-#define DBLOCK_USER	0x0001			/* block is free */
-#define DBLOCK_FREE	0x0002			/* block is free */
 
 /*
  * Below defines a basic-block structure.  This structure is used to
