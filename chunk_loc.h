@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.44 1997/12/05 21:09:38 gray Exp $
+ * $Id: chunk_loc.h,v 1.45 1997/12/08 09:34:46 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -56,8 +56,6 @@
 
 /* log-bad-space info */
 #define SPECIAL_CHARS		"e\033^^\"\"''\\\\n\nr\rt\tb\bf\fa\007"
-#define DUMP_SPACE		20		/* number of bytes to dump */
-#define DUMP_SPACE_BUF		128		/* space for memory dump */
 
 /*
  * the default smallest allowable allocations in bits.  this is
@@ -78,8 +76,8 @@
 #define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
 
 /* adjust internal PNT to user-space */
-#define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_below_adm)
-#define USER_TO_CHUNK(pnt)	((char *)(pnt) - pnt_below_adm)
+#define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_fence_bottom)
+#define USER_TO_CHUNK(pnt)	((char *)(pnt) - pnt_fence_bottom)
 
 /* get the number of blocks to hold SIZE */
 #define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)

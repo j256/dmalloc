@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.18 1997/12/08 07:38:02 gray Exp $
+ * $Id: settings.dist,v 1.19 1997/12/08 09:34:47 gray Exp $
  */
 
 /*
@@ -168,7 +168,14 @@
  * X) or some such.  For more information see ALLOCATION_ALIGNMENT in
  * conf.h.
  */
-#define FENCE_BOTTOM		ALLOCATION_ALIGNMENT
+#define FENCE_BOTTOM ALLOCATION_ALIGNMENT
+
+/*
+ * Amount of space that we are to display whenever we need to dump a
+ * pointer's contents to a log file or stream.  This should be more
+ * than FENCE_BOTTOM and FENCE_TOP.
+ */
+#define DUMP_SPACE 20
 
 /*
  * Write the iteration count at the start of every log entry.  This is
