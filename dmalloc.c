@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.73 1997/12/08 07:22:39 gray Exp $";
+  "$Id: dmalloc.c,v 1.74 1997/12/22 00:24:52 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -581,16 +581,19 @@ static	void    set_variable(const char *var, const char *value)
 }
 
 /*
- * returns the string for ERRNUM
+ * Returns the string for ERROR_NUM.
  */
-static	char	*local_strerror(const int errnum)
+static	char	*local_strerror(const int error_num)
 {
-  if (! IS_MALLOC_ERRNO(errnum)) {
-    return errlist[ERROR_BAD_ERRNO];
+  error_str_t	*err_p;
+  
+  for (err_p = error_list; err_p->es_error != 0; err_p++) {
+    if (err_p->es_error == error_num) {
+      return err_p->es_string;
+    }
   }
-  else {
-    return errlist[errnum];
-  }
+  
+  return INVALID_ERROR;
 }
 
 int	main(int argc, char **argv)

@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.100 1997/12/18 13:19:57 gray Exp $";
+  "$Id: malloc.c,v 1.101 1997/12/22 00:25:47 gray Exp $";
 #endif
 
 /*
@@ -90,7 +90,7 @@ int		_dmalloc_debug_current(void);
 int		_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
 				 char ** file, unsigned int * line,
 				 DMALLOC_PNT * ret_attr);
-char		*_dmalloc_strerror(const int errnum);
+const char	*_dmalloc_strerror(const int error_num);
 
 
 /* local variables */
@@ -161,9 +161,9 @@ static	int	check_debug_vars(const char * file, const int line)
   }
   
   /* checking heap every X times */
-  _dmalloc_iterc++;
+  _dmalloc_iter_c++;
   if (check_interval != INTERVAL_INIT && check_interval > 0) {
-    if (_dmalloc_iterc % check_interval == 0) {
+    if (_dmalloc_iter_c % check_interval == 0) {
       BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
     }
     else { 
@@ -849,17 +849,21 @@ int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size,
 }
 
 /*
- * dmalloc version of strerror to return the string version of ERRNUM
- * returns the string for MALLOC_BAD_ERRNO if ERRNUM is out-of-range.
+ * Dmalloc version of strerror to return the string version of
+ * ERROR_NUM.  Returns an invaid errno string if ERROR_NUM is
+ * out-of-range.
  */
-char	*_dmalloc_strerror(const int errnum)
+const char	*_dmalloc_strerror(const int error_num)
 {
+  error_str_t	*err_p;
+  
   /* should not check_debug_vars here because _dmalloc_error calls this */
   
-  if (! IS_MALLOC_ERRNO(errnum)) {
-    return errlist[ERROR_BAD_ERRNO];
+  for (err_p = error_list; err_p->es_error != 0; err_p++) {
+    if (err_p->es_error == error_num) {
+      return err_p->es_string;
+    }
   }
-  else {
-    return errlist[errnum];
-  }
+  
+  return INVALID_ERROR;
 }

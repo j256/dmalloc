@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error_val.h,v 1.16 1997/12/05 21:09:49 gray Exp $
+ * $Id: error_val.h,v 1.17 1997/12/22 00:23:43 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -30,7 +30,7 @@
 /*
  * malloc error codes
  */
-#define ERROR_NONE			0	/* no error */
+#define ERROR_NONE			1	/* no error */
 
 /* administrative errors */
 #define ERROR_BAD_SETUP			10	/* bad setup value */

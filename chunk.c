@@ -43,14 +43,13 @@
 #include "compat.h"
 #include "debug_val.h"
 #include "error.h"
-#include "error_str.h"
 #include "error_val.h"
 #include "heap.h"
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.111 1997/12/08 09:34:45 gray Exp $";
+  "$Id: chunk.c,v 1.112 1997/12/22 00:23:54 gray Exp $";
 #endif
 
 /*
@@ -386,7 +385,7 @@ static	void	log_error_info(const char *file, const unsigned int line,
   
   /* get a proper reason string */
   if (reason == NULL) {
-    reason_str = errlist[dmalloc_errno];
+    reason_str = dmalloc_strerror(dmalloc_errno);
   }
   else {
     reason_str = reason;
@@ -1146,7 +1145,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
   dblock_p->db_overhead.ov_seenc++;
 #endif
 #if STORE_ITERATION_COUNT
-  dblock_p->db_overhead.ov_iteration = _dmalloc_iterc;
+  dblock_p->db_overhead.ov_iteration = _dmalloc_iter_c;
 #endif
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
@@ -1757,7 +1756,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
   if (bblock_p == NULL) {
     if (BIT_IS_SET(check, CHUNK_PNT_LOOSE)) {
       /* the pointer might not be the heap or might be NULL */
-      dmalloc_errno = 0;
+      dmalloc_errno = ERROR_NONE;
       return NOERROR;
     }
     else {
@@ -2416,7 +2415,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     bblock_p->bb_overhead.ov_seenc++;
 #endif
 #if STORE_ITERATION_COUNT
-    bblock_p->bb_overhead.ov_iteration = _dmalloc_iterc;
+    bblock_p->bb_overhead.ov_iteration = _dmalloc_iter_c;
 #endif
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
