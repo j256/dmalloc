@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.151 2000/12/01 00:08:03 gray Exp $
+ * $Id: malloc.c,v 1.152 2001/02/22 01:15:33 gray Exp $
  */
 
 /*
@@ -80,10 +80,18 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.151 2000/12/01 00:08:03 gray Exp $"
+#ident "$Id: malloc.c,v 1.152 2001/02/22 01:15:33 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.151 2000/12/01 00:08:03 gray Exp $";
+  "$Id: malloc.c,v 1.152 2001/02/22 01:15:33 gray Exp $";
+#endif
+#endif
+
+#if LOCK_THREADS
+#if IDENT_WORKS
+#ident "@(#) $Information: lock-threads is enabled $"
+#else
+static char *information = "@(#) $Information: lock-threads is enabled $"
 #endif
 #endif
 
@@ -438,7 +446,7 @@ void	_dmalloc_shutdown(void)
    * not been overwritten.  Thanks Randell.
    */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK) {
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
     (void)_chunk_check();
   }
   

@@ -18,13 +18,14 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.169 2000/12/01 00:07:23 gray Exp $
+ * $Id: chunk.c,v 1.170 2001/02/22 01:15:34 gray Exp $
  */
 
 /*
  * This file contains algorithm level routine for the heap.  They handle the
  * manipulation and administration of chunks of memory.
  */
+
 
 #include <ctype.h>
 
@@ -63,10 +64,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "@(#) $Id: chunk.c,v 1.169 2000/12/01 00:07:23 gray Exp $"
+#ident "@(#) $Id: chunk.c,v 1.170 2001/02/22 01:15:34 gray Exp $"
 #else
 static	char	*rcs_id =
-  "@(#) $Id: chunk.c,v 1.169 2000/12/01 00:07:23 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.170 2001/02/22 01:15:34 gray Exp $";
 #endif
 #endif
 
@@ -81,6 +82,14 @@ static	char	*copyright =
   "@(#) $Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
 static	char	*source_url =
   "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $";
+#endif
+
+#if LOCK_THREADS
+#if IDENT_WORKS
+#ident "@(#) $Information: lock-threads is enabled $"
+#else
+static char *information = "@(#) $Information: lock-threads is enabled $"
+#endif
 #endif
 
 /* local routines */

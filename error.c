@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.96 2000/11/13 15:46:51 gray Exp $
+ * $Id: error.c,v 1.97 2001/02/22 01:15:33 gray Exp $
  */
 
 /*
@@ -77,10 +77,18 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: error.c,v 1.96 2000/11/13 15:46:51 gray Exp $"
+#ident "$Id: error.c,v 1.97 2001/02/22 01:15:33 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.96 2000/11/13 15:46:51 gray Exp $";
+  "$Id: error.c,v 1.97 2001/02/22 01:15:33 gray Exp $";
+#endif
+#endif
+
+#if LOCK_THREADS
+#if IDENT_WORKS
+#ident "@(#) $Information: lock-threads is enabled $"
+#else
+static char *information = "@(#) $Information: lock-threads is enabled $"
 #endif
 #endif
 
