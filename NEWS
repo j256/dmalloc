@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.47 1994/11/03 22:26:18 gray Exp $
+$Id: NEWS,v 1.48 1994/11/04 00:14:28 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Added dmalloc.cc C++ file to distribution.
 	* Default is now to build/install a libdmalloclp.a library.
 	* Removed the log-error tag.  If logfile set then errors are logged.
 	* Fixed problem with new args clearing all old ones.

@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.61 1994/11/03 22:26:16 gray Exp $
+# $Id: Makefile.in,v 1.62 1994/11/04 00:14:26 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -32,7 +32,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
 	dmalloc_t.c return.h version.h \
-	argv.[ch] argv_loc.h \
+	argv.[ch] argv_loc.h dmalloc.cc \
 	dmalloc.texi dmalloc.info dmalloc.ps texinfo.tex \
 	install.sh mkinstalldirs Deansify.pl
 PORTCFG	= contrib/README contrib/atexit.c contrib/dec_notes contrib/ra_info.pl

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.67 1994/11/03 22:34:25 gray Exp $
+@c $Id: dmalloc.texi,v 1.68 1994/11/04 00:14:35 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1036,30 +1036,10 @@ done to get the library to work.  The problem exists with the fact that
 the dynamic memory routines in C++ are @code{new()} and @code{delete()}
 as opposed to @code{malloc()} and @code{free()}.
 
-Place the following function definitions in a file and link this and the
-dmalloc library in with the C++ program you want to debug.
-
-@example
-extern "C" @{
-#include <stdlib.h>
-@}
-
-void *
-operator new(size_t n)
-@{
-        return malloc(n);
-@}
-
-void
-operator delete(void * cp)
-@{
-        free(cp);
-@}
-@end example
-
-The above functions effectively redirect @code{new} to the more familiar
-@code{malloc} and @code{delete} to the more familiar @code{free}.  They
-also give the known error behavior, too.
+The file @file{dmalloc.cc} is provided in the distribution which
+effectively redirects @code{new} to the more familiar @code{malloc} and
+@code{delete} to the more familiar @code{free}.  Compile and link this
+file in with the C++ program you want to debug.
 
 @emph{NOTE}: I am not a C++ hacker so feedback in the form of other
 hints and ideas for C++ users would be much appreciated.
