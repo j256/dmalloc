@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.67 2003/05/20 04:04:23 gray Exp $
+ * $Id: chunk_loc.h,v 1.68 2003/06/04 23:44:16 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -69,7 +69,7 @@
 #define ALLOC_FLAG_FREE		BIT_FLAG(1)	/* slot is free */
 #define ALLOC_FLAG_EXTERN	BIT_FLAG(2)	/* slot allocated externally */
 #define ALLOC_FLAG_ADMIN	BIT_FLAG(3)	/* administrative space */
-#define ALLOC_FLAG_BLANK	BIT_FLAG(4)	/* slot is fence posted */
+#define ALLOC_FLAG_BLANK	BIT_FLAG(4)	/* slot has been blanked */
 #define ALLOC_FLAG_FENCE	BIT_FLAG(5)	/* slot is fence posted */
 #define ALLOC_FLAG_VALLOC	BIT_FLAG(6)	/* slot is block aligned */
 
