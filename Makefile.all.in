@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.24 1993/08/27 03:03:46 gray Exp $
+# $Id: Makefile.all.in,v 1.25 1993/08/30 20:16:12 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -55,7 +55,7 @@ clean :
 
 # .PHONY : clobber
 clobber : clean
-	rm -f $(LIBRARY) $(TEST) $(UTIL)
+	rm -f $(LIBRARY) $(TEST) $(UTIL) malloc_dbg.h
 
 # .PHONY : realclean
 realclean : clobber
