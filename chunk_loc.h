@@ -5,12 +5,15 @@
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for
- * any purpose and without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all
- * copies, and that the name of Gray Watson not be used in advertising
- * or publicity pertaining to distribution of the document or software
- * without specific, written prior permission.
+ * Permission to use, copy, modify, and distribute this software for any
+ * NON-COMMERCIAL purpose and without fee is hereby granted, provided
+ * that the above copyright notice and this permission notice appear
+ * in all copies, and that the name of Gray Watson not be used in
+ * advertising or publicity pertaining to distribution of the document
+ * or software without specific, written prior permission.
+ *
+ * Please see the LICENSE file or contact the author for information
+ * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -18,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.37 1995/06/20 18:27:58 gray Exp $
+ * $Id: chunk_loc.h,v 1.38 1995/06/20 22:35:12 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -169,7 +172,7 @@ typedef struct {
  * allocations will be put into 1 basic-block, each getting one of
  * these admin structures.  Or 4 1k allocations, or 8 512 byte
  * allocations, etc.
- * 
+ *
  * In an attempt to keep per-pointer overhead as low as possible I use a
  * lot of unions in this structure.  This tends to complicate the code
  * a bit, so to simplify I use define statements.  This in turn
@@ -212,7 +215,7 @@ typedef struct dblock_st	dblock_t;
  * track allocations that fit in one or many basic-blocks.  If you
  * have a basic-block size of 4k then a 16k allocation will take up 4
  * basic-blocks and 4 of these admin structures.
- * 
+ *
  * Like the above divided-block structure, I use unions here to to
  * simplify the code and the comments at the end show when the field
  * is used.  For instance, bb_bitn (really bb_nums.nu_bitn) is in use

@@ -5,12 +5,15 @@
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for
- * any purpose and without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all
- * copies, and that the name of Gray Watson not be used in advertising
- * or publicity pertaining to distribution of the document or software
- * without specific, written prior permission.
+ * Permission to use, copy, modify, and distribute this software for any
+ * NON-COMMERCIAL purpose and without fee is hereby granted, provided
+ * that the above copyright notice and this permission notice appear
+ * in all copies, and that the name of Gray Watson not be used in
+ * advertising or publicity pertaining to distribution of the document
+ * or software without specific, written prior permission.
+ *
+ * Please see the LICENSE file or contact the author for information
+ * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -18,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: heap.h,v 1.24 1995/03/03 17:38:18 gray Exp $
+ * $Id: heap.h,v 1.25 1995/06/20 22:35:20 gray Exp $
  */
 
 #ifndef __HEAP_H__
