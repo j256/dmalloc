@@ -1,6 +1,11 @@
-Fri Sep 10 17:10:45 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Sep 20 20:36:23 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Releasing version 1.3.3.
+
+	* Added ALLOW_FREE_NULL defines because of some systems allowing
+	free(0).  Yeach!  Via freeback from Dave Hill.
+
+Fri Sep 10 17:10:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Fixed debug value changes in mid-stream.  Repaired configuration
 	error with memcpy/bcopy and memcmp/bcmp.

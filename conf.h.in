@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.21 1993/09/10 21:22:36 gray Exp $
+ * $Id: conf.h.in,v 1.22 1993/09/21 00:38:00 gray Exp $
  */
 
 /*
@@ -28,28 +28,42 @@
  */
 
 /*
- * include the RCS ids in the .c files and the installed library
+ * should we include the RCS ids in the .c files and the installed
+ * library?
  */
 #define INCLUDE_RCS_IDS 1
 
 /*
- * should we allow zero length allocations or should be registered as
- * errors.
- * WARNING: this has not been tested although some code does exist for it.
+ * should we allow zero length allocations?  this will generate the
+ * smallest possible allocation with top and bottom of any fence post
+ * information touching.  WARNING: this has not been tested although
+ * some code does exist for it.
  */
 #define ALLOW_ALLOC_ZERO_SIZE 0
 
 /*
- * should we allow realloc of a NULL pointer.  this is useful when you
+ * should we allow realloc of a NULL pointer?  this is useful when you
  * are extending an array in a loop and do not want to allocate it
  * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
 
 /*
+ * should we allow the free of a NULL pointer and if it happens,
+ * should a message be generated to that effect?  I don't see how this
+ * would be useful but some systems can, and I guess require this.  I
+ * would recommend considering the message to point out the offenders
+ * because this is certainly not a portable feature of most malloc
+ * libraries.
+ */
+#define ALLOW_FREE_NULL 0
+#define ALLOW_FREE_NULL_MESSAGE 1
+
+/*
  * the largest allowable allocations in bits.  This is only for
  * verification purposes.  Any allocation larger than this (in bits)
- * will generate a MALLOC_TOO_BIG error.
+ * will generate a MALLOC_TOO_BIG error.  the default (24) indicates
+ * that an allocation of 16mb or more will generate an error.
  */
 #define LARGEST_BLOCK 24
 
@@ -68,7 +82,8 @@
 /*
  * does your heap grow up?  Hopefully it does because there is not too
  * much support for growing-down heaps because I do not have a system
- * to test it on.
+ * to test it on.  Please mail me if configure generates a 0 for this
+ * on your system.
  */
 #define HEAP_GROWS_UP 1
 

@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.43 1993/09/10 21:12:51 gray Exp $";
+  "$Id: malloc.c,v 1.44 1993/09/21 00:38:04 gray Exp $";
 #endif
 
 /*
@@ -408,7 +408,20 @@ EXPORT	int	free(void * pnt)
   }
   
   check_pnt(_malloc_file, _malloc_line, pnt, "free");
+  
+#if ALLOW_FREE_NULL
+  if (pnt == NULL) {
+#if ALLOW_FREE_NULL_MESSAGE
+    _malloc_message("WARNING: tried to free(0) from '%s'",
+		    _chunk_display_pnt(file, line));
+#endif
+    ret = FREE_NOERROR;
+  }
+  else
+    ret = _chunk_free(_malloc_file, _malloc_line, pnt);
+#else /* ! ALLOW_FREE_NULL */
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
+#endif
   
   in_alloc = FALSE;
   
@@ -423,7 +436,8 @@ EXPORT	int	free(void * pnt)
 /******************************* utility calls *******************************/
 
 /*
- * call through to _heap_map function, returns ERROR or NO_ERROR
+ * log the heap structure plus information on the blocks if necessary.
+ * returns ERROR or NO_ERROR
  */
 EXPORT	int	malloc_heap_map(void)
 {
