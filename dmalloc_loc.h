@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.31 1994/09/20 17:59:56 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.32 1994/09/26 15:59:12 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -57,8 +57,10 @@
 /*
  * generic constants
  */
-#undef	NULL
+/* special consideration for NULL.  some compilers bitch if I redefine it */
+#ifndef NULL
 #define NULL		0L
+#endif
 
 #undef	NULLC
 #define NULLC		'\0'
