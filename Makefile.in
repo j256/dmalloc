@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.51 1994/07/22 15:49:49 gray Exp $
+# $Id: Makefile.in,v 1.52 1994/08/09 02:33:52 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -140,6 +140,14 @@ heavy : $(TEST) light
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
+
+.PHONY : continuous
+continuous : $(TEST)
+	while test 1 ;\
+		do  (\
+			$(TEST) -n -t 10000 ;\
+			sleep 1 ;\
+		); done
 
 malloc.ps : malloc.texi
 	@ answer 'Is it okay to remove the work directory? '
