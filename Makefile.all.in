@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.121 2003/09/29 22:58:40 gray Exp $
+# $Id: Makefile.all.in,v 1.122 2003/10/06 18:20:24 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -226,9 +226,10 @@ installinfo : $(srcdir)/$(INFOFILE)
 	$(srcdir)/mkinstalldirs $(infodir)
 	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
 
-installdocs : $(srcdir)/$(HTMLFILE) $(srcdir)/$(TEXIFILE)
+installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
-	$(INSTALL_DATA) $(srcdir)/$(HTMLFILE) $(srcdir)/$(TEXIFILE) $(docdir)
+	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(docdir)
+	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(docdir)
 
 install : installincs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
