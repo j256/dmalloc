@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.102 1998/09/17 13:19:13 gray Exp $
+# $Id: Makefile.in,v 1.103 1998/09/17 13:38:50 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -48,9 +48,9 @@ FLS	=  conf.h.in configure.in config.help \
 	dmalloc_argv.[ch] dmalloc_argv_loc.h dmalloc.cc \
 	install-sh mkinstalldirs Deansify.pl \
 	configure $(INFOFILE)
-CFGFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes contrib/atexit.c \
-	contrib/dec_notes contrib/dmalloc_summarize.pl contrib/next_notes \
-	contrib/ra_info.pl contrib/stratus_ftx_notes
+CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
+	contrib/atexit.c contrib/dec_notes contrib/dmalloc_summarize.pl \
+	contrib/next_notes contrib/ra_info.pl contrib/stratus_ftx_notes
 
 DOCFLS	= dmalloc.ps texinfo.tex
 
@@ -114,13 +114,13 @@ $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
 	mv a.out $(.TARGET)
 
-port :: $(FLS) $(DOCFLS) $(CFGFLS) Makefile.all.in
+port :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
 	@ answer 'Is it okay to remove the $(.TARGET) directory? '
 	rm -rf $(.TARGET)
 	mkdir $(.TARGET) $(.TARGET)/contrib
 	cp $(FLS) Makefile.all.in $(.TARGET)
 	cp $(DOCFLS) $(.TARGET)
-	cp $(CFGFLS) $(.TARGET)/contrib
+	cp $(CONTFLS) $(.TARGET)/contrib
 	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
@@ -227,13 +227,13 @@ $(INFOFILE) : $(srcdir)/dmalloc.texi
 	rm -f $(.TARGET)
 	makeinfo --no-split $(.OODATE)
 
-shar :: $(FLS) $(CFGFLS)
+shar :: $(FLS) $(CONTFLS)
 	rm -f part.?? part.t Makefile.in.bak
 	mv Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
 	makekit -n part. -s ${SHARSIZE} \
 		-t "See the INSTALL file for instructions on building and installing the library." \
-		$(FLS) Makefile.in $(CFGFLS)
+		$(FLS) Makefile.in $(CONTFLS)
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
