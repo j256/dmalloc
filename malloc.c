@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.102 1998/09/17 13:18:55 gray Exp $";
+  "$Id: malloc.c,v 1.103 1998/09/17 13:31:55 gray Exp $";
 #endif
 
 /*
@@ -604,7 +604,7 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_malloc(size, file, 0);
+  return _loc_malloc(size, file, DMALLOC_DEFAULT_LINE);
 }
 
 /*
@@ -618,7 +618,7 @@ DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_calloc(num_elements, size, file, 0);
+  return _loc_calloc(num_elements, size, file, DMALLOC_DEFAULT_LINE);
 }
 
 /*
@@ -635,7 +635,7 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   char	*file;
 	 
   GET_RET_ADDR(file);
-  return _loc_realloc(old_pnt, new_size, file, 0);
+  return _loc_realloc(old_pnt, new_size, file, DMALLOC_DEFAULT_LINE);
 }
 
 /*
@@ -649,9 +649,9 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   
   GET_RET_ADDR(file);
 #if defined(__STDC__) && __STDC__ == 1
-  _loc_free(pnt, file, 0);
+  _loc_free(pnt, file, DMALLOC_DEFAULT_LINE);
 #else
-  return _loc_free(pnt, file, 0);
+  return _loc_free(pnt, file, DMALLOC_DEFAULT_LINE);
 #endif
 }
 
@@ -665,9 +665,9 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
   
   GET_RET_ADDR(file);
 #if defined(__STDC__) && __STDC__ == 1
-  _loc_free(pnt, file, 0);
+  _loc_free(pnt, file, DMALLOC_DEFAULT_LINE);
 #else
-  return _loc_free(pnt, file, 0);
+  return _loc_free(pnt, file, DMALLOC_DEFAULT_LINE);
 #endif
 }
 
