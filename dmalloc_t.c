@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.104 2003/09/05 22:34:30 gray Exp $
+ * $Id: dmalloc_t.c,v 1.105 2003/09/06 15:01:04 gray Exp $
  */
 
 /*
@@ -466,9 +466,9 @@ static	int	do_random(const int iter_n)
       /* do it less often then the other functions */
       which = _dmalloc_rand() % 20;
       if (which == 7) {
-	if (malloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
+	if (dmalloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
 	  if (! silent_b) {
-	    (void)printf("%d: ERROR malloc_verify failed\n", iter_c + 1);
+	    (void)printf("%d: ERROR dmalloc_verify failed\n", iter_c + 1);
 	  }
 	  final = 0;
 	}
@@ -588,9 +588,9 @@ static	int	check_initial_special(void)
     }
     
     /* now check the heap to verify tha the freed slot is good */
-    if (malloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
+    if (dmalloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: malloc_verify failed\n");
+	(void)printf("   ERROR: dmalloc_verify failed\n");
       }
       final = 0;
     }
@@ -762,7 +762,7 @@ static	int	check_special(void)
    * Check to see if overwritten freed memory is detected.
    */
   
-  if (malloc_verify(NULL) == DMALLOC_NOERROR) {
+  if (dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
     int			iter_c, amount, where;
     unsigned int	old_flags;
     unsigned char	ch_hold;
@@ -777,7 +777,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
@@ -788,18 +788,22 @@ static	int	check_special(void)
 	continue;
       }
       free(pnt);
+      
+      /* find out where overwrite inside of the pointer */
       where = _dmalloc_rand() % amount;
       ch_hold = *((char *)pnt + where);
       *((char *)pnt + where) = 'h';
       
-      if (malloc_verify(NULL) == DMALLOC_NOERROR) {
+      /* now verify that the pnt and the whole heap register errors */
+      if (dmalloc_verify(pnt) == DMALLOC_NOERROR
+	  || dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: overwriting free memory not detected.\n");
 	}
 	final = 0;
-	dmalloc_errno = ERROR_FREE_NON_BLANK;
+	dmalloc_errno = ERROR_FREE_OVERWRITTEN;
       }
-      else if (dmalloc_errno == ERROR_FREE_NON_BLANK) {
+      else if (dmalloc_errno == ERROR_FREE_OVERWRITTEN) {
 	dmalloc_errno = ERROR_NONE;
       }
       else {
@@ -824,19 +828,21 @@ static	int	check_special(void)
   {
     int			iter_c, amount, where;
     unsigned int	old_flags;
+    DMALLOC_SIZE	tot_size;
     unsigned char	ch_hold;
     
     old_flags = dmalloc_debug_current();
     
-    dmalloc_debug(old_flags | DEBUG_FREE_BLANK);
+    /* sure on free-blank on and check-fence off */
+    dmalloc_debug((old_flags | DEBUG_FREE_BLANK) & (~DEBUG_CHECK_FENCE));
     
     if (! silent_b) {
-      (void)printf("  Overwriting free memory.\n");
+      (void)printf("  Overwriting memory above allocation.\n");
     }
     
-    for (iter_c = 0; iter_c < 20; iter_c++) {
+    for (iter_c = 0; iter_c < 20; /* iter_c ++ below */) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
@@ -846,29 +852,55 @@ static	int	check_special(void)
 	final = 0;
 	continue;
       }
-      free(pnt);
-      where = _dmalloc_rand() % amount;
-      ch_hold = *((char *)pnt + where);
-      *((char *)pnt + where) = 'h';
-      
-      if (malloc_verify(NULL) == DMALLOC_NOERROR) {
+      /*
+       * check out the pointer now to make sure that we have some
+       * space above the pointer
+       */
+      if (dmalloc_examine(pnt, NULL /* now user size */, &tot_size,
+			  NULL /* no file */, NULL /* no line */,
+			  NULL /* no return address */, NULL /* no mark */,
+			  NULL /* no seen */) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: overwriting free memory not detected.\n");
+	  (void)printf("   ERROR: examining pointer %lx failed.\n",
+		       (unsigned long)pnt);
 	}
 	final = 0;
-	dmalloc_errno = ERROR_FREE_NON_BLANK;
+	break;
       }
-      else if (dmalloc_errno == ERROR_FREE_NON_BLANK) {
+      if (tot_size == amount) {
+	/* we need some space to overwrite */
+	free(pnt);
+	continue;
+      }
+      /* now we can increment */ 
+      iter_c++;
+      
+      /* where to overwrite is then a random from 0 to the remainder-1 */
+      where = _dmalloc_rand() % (tot_size - amount);
+      ch_hold = *((char *)pnt + amount + where);
+      *((char *)pnt + amount + where) = 'h';
+      
+      /* now verify that the pnt and the whole heap register errors */
+      if (dmalloc_verify(pnt) == DMALLOC_NOERROR
+	  || dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: overwriting above allocated memory not detected.\n");
+	}
+	final = 0;
+	dmalloc_errno = ERROR_FREE_OVERWRITTEN;
+      }
+      else if (dmalloc_errno == ERROR_FREE_OVERWRITTEN) {
 	dmalloc_errno = ERROR_NONE;
       }
       else {
 	if (! silent_b) {
-	  (void)printf("   ERROR: verify of overwritten memory returned: %s\n",
+	  (void)printf("   ERROR: verify of overwritten above allocated memory returned: %s\n",
 		       dmalloc_strerror(dmalloc_errno));
 	}
 	final = 0;
       }
-      *((char *)pnt + where) = ch_hold;
+      *((char *)pnt + amount + where) = ch_hold;
+      free(pnt);
     }
     
     dmalloc_debug(old_flags);
@@ -889,7 +921,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
@@ -955,7 +987,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
 	/* we need 2 because we are doing a 2-1 below */
       } while (amount < 2);
       pnt = malloc(amount); loc_file = __FILE__; loc_line = __LINE__;
@@ -1127,7 +1159,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = valloc(amount);
       if (pnt == NULL) {
@@ -1155,7 +1187,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = valloc(amount);
       if (pnt == NULL) {
@@ -1195,12 +1227,12 @@ static	int	check_special(void)
     }
     
     old_flags = dmalloc_debug_current();
-    /* turn on alloc blanking */
-    dmalloc_debug(old_flags | DEBUG_ALLOC_BLANK);
+    /* turn on alloc blanking without fence posts */
+    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
@@ -1229,7 +1261,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = valloc(amount);
       if (pnt == NULL) {
@@ -1273,7 +1305,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
@@ -1336,7 +1368,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
       do {
-	amount = _dmalloc_rand() % (page_size * 2);
+	amount = _dmalloc_rand() % (page_size * 3);
       } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
@@ -1702,8 +1734,8 @@ static	void	do_interactive(void)
       
       (void)printf("If the address is 0, verify will check the whole heap.\n");
       pnt = get_address();
-      ret = malloc_verify((char *)pnt);
-      (void)printf("malloc_verify(%#lx) returned '%s'\n",
+      ret = dmalloc_verify(pnt);
+      (void)printf("dmalloc_verify(%#lx) returned '%s'\n",
 		   (long)pnt,
 		   (ret == DMALLOC_NOERROR ? "success" : "failure"));
       continue;
@@ -1950,9 +1982,9 @@ int	main(int argc, char **argv)
   argv_cleanup(arg_list);
   
   /* last thing is to verify the heap */
-  ret = malloc_verify(NULL);
+  ret = dmalloc_verify(NULL /* check all heap */);
   if (ret != DMALLOC_NOERROR) {
-    (void)printf("Final malloc_verify returned failure: %s (%d)\n",
+    (void)printf("Final dmalloc_verify returned failure: %s (%d)\n",
 		 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
   }
   

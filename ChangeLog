@@ -1,3 +1,20 @@
+2003-09-06  Gray Watson  <gray@outside.256.com>
+
+	* Improved the pnt checking code to properly check free space
+	below and above an allocation.  Added regression tests for this.
+
+2003-09-05  Gray Watson  <gray@outside.256.com>
+
+	* Fixed possible lock leak in the shutdown code.  Thanks to TJ
+	Saunders.
+
+	* Fixed bug in function checking code.  Not sure when this broke.
+	Thanks to Philippe Roger.
+
+2003-08-04  Gray Watson  <gray@outside.256.com>
+
+	* Removed references to dmalloc leap.
+
 2003-07-23  Gray Watson  <gray@outside.256.com>
 
 	* Changed the installing of libraries to install-data. 
@@ -2017,5 +2034,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.302 2003/07/24 00:26:18 gray Exp $
+$Id: ChangeLog,v 1.303 2003/09/06 15:01:15 gray Exp $
 -------------------------------------------------------------------------------
