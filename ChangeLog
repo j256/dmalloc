@@ -1,3 +1,7 @@
+Mon Dec 20 02:24:02 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added -V option to malloc_dbg and desc field for debug-token list.
+
 Sun Dec 19 23:35:53 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* moved the NULLs in malloc_dbg.h to 0L.
@@ -602,5 +606,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.83 1993/12/20 04:37:52 gray Exp $
+$Id: ChangeLog,v 1.84 1993/12/20 07:28:46 gray Exp $
 -------------------------------------------------------------------------------

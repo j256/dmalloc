@@ -1,15 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.10 1993/12/20 04:37:56 gray Exp $
+$Id: TODO,v 1.11 1993/12/20 07:28:54 gray Exp $
 -------------------------------------------------------------------------------
 
 CHECKING:
 
 - check in heap_check the cleared space above each allocation instead of
 	only the fence posts
-- maybe write the address % 256 into bytes instead of a constant
-	- maybe it would slow it down.
-	- a token/option?
-	- \305 is recognizable however
 - maybe add another debug level which stores crc information about internal
 	heap structures and verifies it during run time.  slow, slow!!
 - think of ways we can reorganize the heap and move allocations around
@@ -31,14 +27,9 @@ GENERAL:
 
 - maybe some sort of cheap crc on memory in non-freed memory sections so
 	you can see what portions of memory changed (check tripwire)
-- a description field for the debug tokens:
-	- so when you use -T and -v it would dump a description to
-- a -V option to malloc_dbg for very-verbose:
-	- would dump description of tokens in current setting
-	- other verbosity
-	- -V == -v + ... of course
 - maybe provide support for reference counts on allocations:
-	- have a call which increments the reference count of the node
+	- have a call which along with malloc/realloc, increments the
+		reference count of the node (maybe duplicate_pointer)
 	- free will decrement the reference count and free if 0
 	- have a call which reports on the reference count of the node
 	- may need additional admin space
@@ -46,19 +37,15 @@ GENERAL:
 - maybe have bit in allocation struct somewhere that it is a string and
 	maybe have a checking level/value that runs though the strings
 	and makes sure they have a NULL in them.
-- maybe have a function that summaries the memory usage per file.
-	runs through the unfreed pointers and keeps a table per file.c
-	in terms of number of pointers and bytes per file.
-	- could be a perl script
-- for fence underflow, print out the allocation below and for fence
+	- token 'check-string' or something
+	- should only happen if alloc-blank used
+	- could be dangerous if folks are changing 'type' of allocation
+		from string to ...
+- write perl script to summarize the memory usage per file.
+- for fence underflow, print out the pointer below and for fence
 	overflow the allocation above if possible
-- have either a bunch of free or used bblocks be:
-	- start block and then a set of continuation blocks
-	- this would mean we do not have to hit each bblock entry to redo
-		the type flag
 - handle memalign, valloc, maybe some form of mallopt
-- handle 0 length allocations correctly if the #define is set
-	- i.e. give back a small section with bounds-checking touching
+	- maybe mallopt could be mapped into malloc_debug()
 - manage dblock_admin entries better:
 	- map out usage and get some stats
 	- add to normal db_free lists, zero out each of the entries.
@@ -72,18 +59,9 @@ GENERAL:
 
 TESTING / STATISTICS:
 
-- need to write a set of fully automated test programs
-	- maybe start with a test shell like malloc_t but stripped and
-		then run a script through it and analyse the output
-	- should be a killer that does a million hits
-	- maybe use the new gnu testing code
-- test define for allowing 0 length defines
-- test define for realloc(NULL)
-- check out situation where sbrk calls return ERROR (from the beginning and
-	in the middle).  the library should return NULL's straight off and
-	log appropriate errors.
-- add free-list statistics whenever it gets more memory to see the
-	viability of dividing larger free entries in two
+- maybe use the new gnu testing code
+- general tons of small blocks and watch for dblock_admin entry leak
+	like with large ndb_shell scripts
 - add statistics whenever it frees memory to see the viability of
 	combining adjacent blocks
 - maybe a program that would try a standard set of tests on a number of

@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.31 1993/11/23 07:42:04 gray Exp $";
+  "$Id: dmalloc.c,v 1.32 1993/12/20 07:28:58 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -78,6 +78,7 @@ LOCAL	argv_array_t	plus;			/* tokens to add */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
+LOCAL	char	very_verbose	= FALSE;	/* very-verbose flag */
 LOCAL	char	*tag		= NULL;		/* maybe a tag argument */
 
 LOCAL	argv_t	args[] = {
@@ -116,6 +117,8 @@ LOCAL	argv_t	args[] = {
       NULL,			"list debug tokens" },
   { 'v',	"verbose",	ARGV_BOOL,	&verbose,
       NULL,			"turn on verbose output" },
+  { 'V',	"very-verbose",	ARGV_BOOL,	&very_verbose,
+      NULL,			"turn on very-verbose output" },
   { ARGV_MAYBE,	NULL,		ARGV_CHARP,	&tag,
       "tag",			"debug token to find in rc" },
   { ARGV_LAST }
@@ -192,21 +195,31 @@ LOCAL	void	dump_debug(const int val)
   attr_t	*attrp;
   int		tokc = 0, work = val;
   
-  if (val == 0) {
-    (void)fprintf(stderr, "   none\n");
-    return;
-  }
-  
   for (attrp = attributes; attrp->at_string != NULL; attrp++) {
-    if (attrp->at_value != 0 && (work & attrp->at_value) == attrp->at_value) {
-      if (tokc == 0)
-	(void)fprintf(stderr, "   %s", attrp->at_string);
-      else if (tokc == TOKENS_PER_LINE - 1)
-	(void)fprintf(stderr, ", %s\n", attrp->at_string);
-      else
-	(void)fprintf(stderr, ", %s", attrp->at_string);
-      tokc = (tokc + 1) % TOKENS_PER_LINE;
+    /* the below is necessary to handle the 'none' HACK */
+    if ((work == 0 && attrp->at_value == 0)
+	|| (attrp->at_value != 0
+	    && (work & attrp->at_value) == attrp->at_value)) {
       work &= ~attrp->at_value;
+      
+      if (tokc == 0)
+	(void)fprintf(stderr, "   ");
+      
+      if (very_verbose)
+	(void)fprintf(stderr, "%s -- %s",
+		      attrp->at_string, attrp->at_desc);
+      else {
+	(void)fprintf(stderr, "%s", attrp->at_string);
+	if (work != 0)
+	  (void)fprintf(stderr, ", ");
+	tokc = (tokc + 1) % TOKENS_PER_LINE;
+      }
+      
+      if (tokc == 0)
+	(void)fprintf(stderr, "\n");
+      
+      if (work == 0)
+	break;
     }
   }
   
@@ -465,6 +478,9 @@ EXPORT	int	main(int argc, char ** argv)
   argv_version_string = malloc_version;
   
   argv_process(args, argc, argv);
+  
+  if (very_verbose)
+    verbose = TRUE;
   
   /* try to figure out the shell we are using */
   if (! bourne && ! cshell)

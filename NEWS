@@ -1,12 +1,18 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.11 1993/11/23 09:47:07 gray Exp $
+$Id: NEWS,v 1.12 1993/12/20 07:28:49 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.0:
 
+	* Added -V option to malloc_dbg and desc field for debug-token list.
+	* Added a debugging section to the manual.
 	* Added light and heavy makefile targets for automatic testing.
-	* New heap code with per/block allocations (not	base 2).
+	* Much improved heap code with per-block allocations (not base 2).
 	* Better free list management with block splitting.
+
+Version 1.3.6:
+
+	* Fixed some compilation errors with non-STDC systems.
 
 Version 1.3.5:
 

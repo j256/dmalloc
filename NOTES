@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.22 1993/11/23 07:41:00 gray Exp $
+$Id: NOTES,v 1.23 1993/12/20 07:28:52 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -57,6 +57,12 @@ GENERAL:
 	looks at the next argument (unioned with the file argument)
 	and sees if it is null or in the heap meaning it is at the end
 	or middle of a free list.
+
+- should the free and alloc-blank tokens write the address % 256 into
+	bytes instead of a constant '\305'
+	- it would slow it down a bit
+	- maybe some token/option?
+	- \305 is recognizable however
 
 -------------------------------------------------------------------------------
 
