@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.11 1992/11/15 00:17:31 gray Exp $";
+  "$Id: error.c,v 1.12 1992/11/20 05:07:30 gray Exp $";
 #endif
 
 /*
@@ -80,7 +80,7 @@ EXPORT	void	_malloc_message(char * format, ...)
   }
   
   /* do we need to log the message? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR)) {
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR) && malloc_logpath != NULL) {
     /*
      * do we need to open the outfile?
      * it will be closed by exit(0).  yeach.
@@ -124,7 +124,7 @@ EXPORT	void	_malloc_die(void)
 EXPORT	void	_malloc_perror(char * str)
 {
   /* do we need to log or print the error? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR)
+  if ((BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR) && malloc_logpath != NULL)
       || BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR)) {
     
     /* default str value */
