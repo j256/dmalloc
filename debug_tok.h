@@ -1,5 +1,5 @@
 /*
- * token attributes for the malloc_dbg program
+ * token attributes for the malloc_dbg program and _malloc_flags
  *
  * Copyright 1993 by the Antaire Corporation
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.4 1994/04/07 03:03:40 gray Exp $
+ * $Id: debug_tok.h,v 1.5 1994/04/08 21:13:54 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
