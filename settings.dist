@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.39 1999/03/08 04:38:37 gray Exp $
+ * $Id: settings.dist,v 1.40 1999/03/09 15:43:04 gray Exp $
  */
 
 /*
@@ -386,21 +386,25 @@
  * For those threaded programs, the following settings allow the
  * library to log the identity of the thread that allocated a specific
  * pointer.  The thread-id will show up as a ``t'' followed by a
- * string identifying the thread.  You must have the STORE_THREAD_ID
- * enabled first which has the library record which thread made the
- * allocation.  The LOG_THREAD_ID macro says whether the thread-id is
- * logged at the front of all log mesasges.  The THREAD_TYPE macro
- * defines the variable type of the id.  The THREAD_GET_ID macro is
- * what function to call to get the currently running thread.  The
- * THREAD_ID_TO_STRING defines how the thread-id value is translated
- * to the string necessary to be included with the ``t'' in the
- * logfile.
+ * string identifying the thread.  The LOG_THREAD_ID macro says
+ * whether the thread-id is logged at the front of all log mesasges.
+ * The THREAD_TYPE macro defines the variable type of the id.  The
+ * THREAD_GET_ID macro is what function to call to get the currently
+ * running thread.  The THREAD_ID_TO_STRING defines how the thread-id
+ * value is translated to the string necessary to be included with the
+ * ``t'' in the logfile.
  */
-#define STORE_THREAD_ID			0
 #define LOG_THREAD_ID			0
 #define THREAD_TYPE			pthread_t
-#define THREAD_GET_ID			pthread_self()
-#define THREAD_ID_TO_STRING(b, t)	(void)sprintf((b), "%#lx", (long)(t))
+#define THREAD_GET_ID()			pthread_self()
+#if HAVE_SNPRINTF
+#define THREAD_ID_TO_STRING(buf, buf_size, thread_id)	\
+				(void)snprintf((buf), (buf_size), "%#lx", \
+					       (long)(thread_id))
+#else
+#define THREAD_ID_TO_STRING(buf, buf_size, thread_id)	\
+				(void)sprintf((buf), "%#lx", (long)(thread_id))
+#endif
 
 #else /* LOCK_THREADS */
 

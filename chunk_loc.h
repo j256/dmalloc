@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.56 1999/03/04 19:08:18 gray Exp $
+ * $Id: chunk_loc.h,v 1.57 1999/03/09 15:43:21 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -28,7 +28,7 @@
 #include "dmalloc_loc.h"			/* for DMALLOC_SIZE */
 
 /* for thread-id types -- see conf.h */
-#if STORE_THREAD_ID
+#if LOG_THREAD_ID
 #ifdef THREAD_INCLUDE
 #include THREAD_INCLUDE
 #endif
@@ -160,11 +160,11 @@ typedef struct {
 #if STORE_TIMEVAL
   TIMEVAL_TYPE  ov_timeval;		/* time when pointer alloced */
 #endif
-#if STORE_THREAD_ID
+#if LOG_THREAD_ID
   THREAD_TYPE	ov_thread_id;		/* thread id which allocaed pnt */
 #endif
   
-#if STORE_SEEN_COUNT == 0 && STORE_ITERATION_COUNT == 0 && STORE_TIME == 0 && STORE_TIMEVAL == 0 && STORE_THREAD_ID == 0
+#if STORE_SEEN_COUNT == 0 && STORE_ITERATION_COUNT == 0 && STORE_TIME == 0 && STORE_TIMEVAL == 0 && LOG_THREAD_ID == 0
   int		ov_junk;		/* for compilers that hate 0 structs */
 #endif
 } overhead_t;
