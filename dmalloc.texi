@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.146 1998/10/15 20:20:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.147 1998/10/28 15:18:49 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -868,7 +868,7 @@ dumps and too high if the library generates an exception.
 An additional complexity is when we are initializing the lock before
 mutex locking around the library.  As mentioned, the initialization
 itself may generate a malloc call causing the library to go recursive
-and the pthread library to possibly core dump. With the THREAD_LOCK_INIT
+and the pthread library to possibly core dump. With the THREAD_INIT_LOCK
 setting defined in @file{settings.h}, you can tune how many times before
 we start locking to try and initialize the mutex lock.  It defaults to 2
 which seems to work for me.  If people need to have this runtime
