@@ -40,7 +40,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.39 1994/07/21 18:45:06 gray Exp $";
+  "$Id: error.c,v 1.40 1994/08/02 03:10:51 gray Exp $";
 #endif
 
 /*
@@ -162,7 +162,7 @@ EXPORT	void	_malloc_error(const char * func)
       func = "_malloc_error";
     
     /* print the malloc error message */
-    _malloc_message("ERROR: %s: %s(%d)",
+    _malloc_message("ERROR: %s: %s (err %d)",
 		    func, _malloc_strerror(malloc_errno), malloc_errno);
   }
   
