@@ -1,3 +1,14 @@
+Mon Dec 21 15:31:50 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Created the series of shar files in preparation to posting to
+	comp.unix.sources.  Looking good.
+
+Thu Dec 17 18:33:38 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Renamed a number of files to comply with the Sys5 12 character
+	restrictions (14 - 2 for RCS/CVS/SCCS).  Yeach.  malloc_debug ->
+	malloc_dbg.
+
 Sat Nov 14 15:59:53 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added all external functions to configure and conf.h even though
@@ -121,7 +132,7 @@ Tue Jul 21 16:06:13 1992  Gray Watson  (gray at toaster)
 
 Mon Mar 23 10:49:25 1992  Gray Watson  (gray at toaster)
 
-	* Released version 1.04 with new env variable features.
+	* Released version 0.04 with new env variable features.
 
 Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 

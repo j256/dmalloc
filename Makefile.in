@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.4 1992/12/17 23:30:20 gray Exp $
+# $Id: Makefile.in,v 1.5 1992/12/21 20:33:48 gray Exp $
 #
 
 HFLS	= malloc.h malloc_lp.h
@@ -8,6 +8,9 @@ OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
 LIBS	= -L. -lmalloc $(LIBRARIES)
+
+PARTS	= 1 2 3 4 5
+MAXPART	= 5
 
 CFLAGS	= $(CCFLAGS)
 DESTDIR	= /usr/antaire
@@ -21,15 +24,15 @@ PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
 	COPYING-LIB ChangeLog Manifest NOTES README TTD \
 	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
 	error.[ch] error_str.h heap.[ch] malloc.[ch] mallocrc malloc.info \
-	malloc.texi malloc_dbg.c malloc_err.h malloc_lp.[ch] \
-	malloc_loc.h malloc_t.c sample.c version.h
+	malloc_dbg.c malloc_err.h malloc_lp.[ch] malloc_loc.h malloc_t.c \
+	sample.c version.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
 
 .PHONY : clobber
 clobber :
-	rm -f $(LIBRARY) $(TESTS) $(UTIL)
+	rm -f $(LIBRARY) $(TESTS) $(UTIL) part.?
 
 .PHONY : install
 install : $(LIBRARY) $(UTIL) $(HFLS) $(MANFILE)
@@ -65,6 +68,15 @@ port : malloc.info
 tests : $(TESTS)
 
 malloc_t : malloc_t.o $(LIBRARY)
+
+.PHONY : shar
+shar : malloc.info
+	rm -f part*
+	$(foreach part, $(PARTS), \
+		shar -b -n${part} -e${MAXPART} -opart${part} -t \
+			"Do a 'sh ./configure' to configure the library" \
+			`cat shar.${part}` ; \
+		)
 
 include /usr/antaire/Default.make
 include Makefile.dep

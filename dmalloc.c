@@ -29,7 +29,7 @@
 
 #include <stdio.h>				/* for stderr */
 
-#define MALLOC_DEBUG_MAIN
+#define MALLOC_DBG_MAIN
 
 #include "malloc.h"
 #include "malloc_loc.h"
@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.1 1992/12/17 23:30:46 gray Exp $";
+  "$Id: dmalloc.c,v 1.2 1992/12/21 20:33:54 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */

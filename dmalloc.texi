@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.1 1992/12/17 23:30:44 gray Exp $
+@c $Id: dmalloc.texi,v 1.2 1992/12/21 20:33:52 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -88,8 +88,9 @@ powerful debugging facilities including very comprehensive heap testing
 and excellent run-time debugging information.  We have found these
 capabilities to be superb development tools.
 
-I can be reached at @samp{<gray.watson@@antaire.com>} with any questions or
-general comments.
+I can be reached at @samp{<gray.watson@@antaire.com>} with any questions
+or general comments.  Also, I decided not to distribute the texinfo
+version of this manual to save space so let me know if you want one.
 
 Gray Watson, Antaire Corporation.
 
@@ -306,14 +307,14 @@ will @emph{not} zero the memory space unless the calloc routine is used.
 @section Description of the benefits of the library.
 
 @menu
-* Debugging Overview::          General debugging concepts.
+* Overview::                    General debugging concepts.
 * Environment variables::       The variable names and their features.
-* malloc_debug program::        Env variable setting utility.
+* malloc_dbg program::          Env variable setting utility.
 * RC file::                     Format of the run-time configuration file.
 * Debug tokens::                Description of the debugging token flags.
 @end menu
 
-@node Debugging Overview, Environment variables,  , Features
+@node Overview, Environment variables,  , Features
 @subsection General debugging concepts.
 
 The features of this library are controlled through a set of
@@ -322,9 +323,9 @@ inside a program at runtine to help locate problems, chart memory leaks,
 provide basic bounds checking, statistics, etc.  @xref{Environment
 variables}.
 
-These variables can be set with the help of the malloc_debug utility
+These variables can be set with the help of the malloc_dbg utility
 program which generates C or Bourne shell code which should be passed
-through the eval command @xref{malloc_debug program}.
+through the eval command @xref{malloc_dbg program}.
 
 The debugging features that are available can be broken down into a
 couple basic classifications:
@@ -416,7 +417,7 @@ system's library routines.  It took me 6 hours once to finally come to
 the conclusion that the localtime call, included in SunOS release 4.1,
 was overwriting one of its fence-post markers.
 
-@node Environment variables, malloc_debug program, Debugging Overview, Features
+@node Environment variables, malloc_dbg program, Overview, Features
 @subsection The variable names and their features.
 
 @dfn{Environment variables} are variables that are part of the user's
@@ -424,8 +425,8 @@ working environment and are shared by all the programs.  The below
 variables are used by the malloc library to enable or disable the memory
 debugging features, at runtime.
 
-They can be set either by hand or with the help of the malloc_debug
-program @xref{malloc_debug program}.
+They can be set either by hand or with the help of the malloc_dbg
+program @xref{malloc_dbg program}.
 
 To set them by hand, C shell (or tcsh) users need to invoke:
 
@@ -491,36 +492,36 @@ This allows the tough debugging to be started after a certain routine or
 file has been reached in the program.
 @end table
 
-@node malloc_debug program, RC file, Environment variables, Features
+@node malloc_dbg program, RC file, Environment variables, Features
 @subsection Env variable setting utility.
 
-The malloc_debug program is designed to assist in the setting of the
+The malloc_dbg program is designed to assist in the setting of the
 environmental variables, especially @samp{MALLOC_DEBUG}
 @xref{Environment variables}.
 
 It is designed to print the shell commands necessary to make the
 appropriate changes to the environment.  Unfortunately, it cannot make
-the changes on its own.  The output from malloc_debug should be sent
+the changes on its own.  The output from malloc_dbg should be sent
 through the @code{eval} shell command which will do the commands.
 
 With shells that have aliasing or macro capabilities: csh, tcsh, bash,
-ksh, etc., setting up an alias to malloc_debug to do the eval call is
+ksh, etc., setting up an alias to malloc_dbg to do the eval call is
 recommended.  csh/tcsh users (for example) should put the following in
 their @file{.cshrc} file:
 
 @example
-        alias malloc 'eval `malloc_debug \!*`'
+        alias malloc 'eval `malloc_dbg \!*`'
 @end example
 
 This allows the user to execute @code{malloc args...} and the debugging
 variables will be set automatically.
 
-The most basic usage for the program is @code{malloc_debug [-b] tag}.
+The most basic usage for the program is @code{malloc_dbg [-b] tag}.
 The -b flag is for generating Bourne-shell type commands (C-shell type
 are the default).  The tag argument should match a line from the user's
 run-time configuration file @xref{RC file}.
 
-Here is a detailed list of the flags that can passed to malloc_debug:
+Here is a detailed list of the flags that can passed to malloc_dbg:
 
 @table @samp
 @item -a address
@@ -560,7 +561,7 @@ file:line).
 
 @end table
 
-@node RC file, Debug tokens, malloc_debug program, Features
+@node RC file, Debug tokens, malloc_dbg program, Features
 @subsection Format of the run-time configuration file.
 
 The name of default @dfn{RC file} (or run-time configuration file) is
@@ -571,8 +572,8 @@ The file contains lines in the general form of:
 
         @code{tag   token1, token2, ...}
 
-tag is to be matched with the first argument passed to the malloc_debug
-program @xref{malloc_debug program}.  token1, token2, ... are debug
+tag is to be matched with the first argument passed to the malloc_dbg
+program @xref{malloc_dbg program}.  token1, token2, ... are debug
 capability tokens @xref{Debug tokens}.
         
 A line can be finished with a \ meaning it continues onto the next line.
@@ -604,12 +605,12 @@ debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 @dots{}
 @end example
 
-With the above file, when I say @code{eval `malloc_debug debug1`}, I
+With the above file, when I say @code{eval `malloc_dbg debug1`}, I
 enable the logging of statistics, the logging of non-freed memory,
 logging of errors, logging of bad pointer information, and the checking
 of fence-post memory areas.
 
-When I say @code{eval `malloc_debug none`}, all memory debugging
+When I say @code{eval `malloc_dbg none`}, all memory debugging
 features will be disabled.
 
 @node Debug tokens,  , RC file, Features
@@ -835,8 +836,10 @@ cannot check the fence-post areas in the heap.
 With this routine, the value in the @samp{MALLOC_DEBUG} variable can be
 overridden and the library debugging features set explicitly.  For
 instance, if debugging should never be enabled for a program, a call to
-@code{malloc_debug(0);} as the first command in @code{main()} will
-disable all the memory debugging from that point on.
+@code{malloc_debug(0);} as the first call in @code{main()} will disable
+all the memory debugging from that point on.  One problem however is gcc
+calls malloc @emph{before} main() which means some debugging information
+will be generated regardless.
 
 @item int malloc_examine(char * pnt, int * size, char ** file, int * line);
 This routine provides some very interesting functionality.  It returns
