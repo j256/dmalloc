@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.19 1992/11/15 22:56:52 gray Exp $";
+  "$Id: chunk.c,v 1.20 1992/11/16 04:31:07 gray Exp $";
 #endif
 
 /* checking information */
@@ -648,7 +648,7 @@ LOCAL	void	log_heap_map(void)
       
       if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
 	_malloc_message("%d: start-of-user block: %d bytes from '%s:%d'",
-			bb_adminc * bb_adminc + bblockc,
+			bb_adminc * BB_PER_ADMIN + bblockc,
 			bblockp->bb_size, bblockp->bb_file, bblockp->bb_line);
 	continue;
       }
