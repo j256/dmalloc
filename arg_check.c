@@ -38,7 +38,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: arg_check.c,v 1.9 1994/09/12 17:13:11 gray Exp $";
+  "$Id: arg_check.c,v 1.10 1994/10/14 22:41:41 gray Exp $";
 #endif
 
 #if HAVE_BCMP
@@ -206,8 +206,9 @@ EXPORT	DMALLOC_SIZE	_dmalloc_strlen(const char * str)
 EXPORT	char	*_dmalloc_strtok(char * str, const char * sep)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (_chunk_pnt_check("strtok", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
-			 0) != NOERROR
+    if ((str != NULL
+	 && _chunk_pnt_check("strtok", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
+			     0) != NOERROR)
 	|| _chunk_pnt_check("strtok", sep,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
       _dmalloc_message("bad pointer argument found in strtok");
@@ -299,7 +300,7 @@ EXPORT	char	*_dmalloc_strrchr(const char * str, const char ch)
 EXPORT	char	*_dmalloc_strcpy(char * to, const char * from)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (_chunk_pnt_check("strcpy", to, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
+    if (_chunk_pnt_check("strcpy", to, CHUNK_PNT_LOOSE,
 			 strlen(from) + 1) != NOERROR
 	|| _chunk_pnt_check("strcpy", from,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
@@ -318,8 +319,7 @@ EXPORT	char	*_dmalloc_strncpy(char * to, const char * from,
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     /* len or until nullc */
-    if (_chunk_pnt_check("strncpy", to, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
-			 0) != NOERROR
+    if (_chunk_pnt_check("strncpy", to, CHUNK_PNT_LOOSE, 0) != NOERROR
 	|| _chunk_pnt_check("strncpy", from,
 			    CHUNK_PNT_LOOSE | CHUNK_PNT_NULL, 0) != NOERROR)
       _dmalloc_message("bad pointer argument found in strncpy");

@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.42 1994/10/14 02:04:26 gray Exp $
+$Id: NEWS,v 1.43 1994/10/14 22:41:38 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Fixed errors with FUNC_CHECK code.  Thanks Dave.
 	* Added default tags: default,low,medium,high,all to dmalloc.
 	* Renamed 'check-free' token to 'check-blank'.
 	* Made many changes to make it easier to get running with dmalloc.
