@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.18 1993/07/22 21:38:10 gray Exp $
+# $Id: Makefile.all.in,v 1.19 1993/08/24 04:37:08 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -40,7 +40,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = malloc_dbg.h
-OBJS = chunk.o compat.o error.o heap.o malloc.o malloc_lp.o malloc_str.o
+OBJS = chunk.o compat.o error.o heap.o malloc.o malloc_lp.o arg_check.o
 OBJS_IN = malloc_lp.o
 
 CFLAGS = $(CCFLAGS)
@@ -127,7 +127,7 @@ malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values
 malloc_dbg.o : malloc_dbg.c malloc_dbg.h conf.h compat.h malloc_loc.h dbg_tokens.h \
   dbg_values.h version.h 
 malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h 
-malloc_str.o : malloc_str.c malloc_dbg.h conf.h chunk.h malloc_loc.h dbg_values.h \
-  error.h malloc_str.h 
+arg_check.o : arg_check.c malloc_dbg.h conf.h chunk.h malloc_loc.h dbg_values.h \
+  error.h arg_check.h 
 malloc_t.o : malloc_t.c malloc_dbg.h 
 sample.o : sample.c malloc_dbg.h 

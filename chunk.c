@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.43 1993/08/18 02:06:16 gray Exp $";
+  "$Id: chunk.c,v 1.44 1993/08/24 04:37:15 gray Exp $";
 #endif
 
 /* checking information */
@@ -950,7 +950,7 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* check file pointer */
-      if (bblockp->bb_file == NULL) {
+      if (bblockp->bb_file != NULL) {
 	len = strlen(bblockp->bb_file);
 	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	  malloc_errno = MALLOC_BAD_FILEP;
@@ -1379,7 +1379,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
     }
     
     /* check file pointer */
-    if (dblockp->db_file == NULL) {
+    if (dblockp->db_file != NULL) {
       len = strlen(dblockp->db_file);
       if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	log_bad_pnt(dblockp->db_file, dblockp->db_line, CHUNK_TO_USER(pnt),
@@ -1461,7 +1461,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
   }
   
   /* check file pointer */
-  if (bblockp->bb_file == NULL) {
+  if (bblockp->bb_file != NULL) {
     len = strlen(bblockp->bb_file);
     if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
       log_bad_pnt(bblockp->bb_file, bblockp->bb_line, CHUNK_TO_USER(pnt),

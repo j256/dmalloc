@@ -1,13 +1,13 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.26 1993/08/18 02:06:07 gray Exp $
+# $Id: Makefile.in,v 1.27 1993/08/24 04:37:10 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
-OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_lp.o malloc_str.o
+OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN	= malloc_lp.o 
-FILLFLS	= chunk.c error.c heap.c malloc_dbg.c malloc_lp.c malloc_str.c \
+FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_dbg.c malloc_lp.c \
 	malloc_t.c sample.c
 
 DEFS	= $(DEFINES)
@@ -27,9 +27,9 @@ MANFILE	= malloc.info
 
 PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
 	ChangeLog Manifest NOTES README TODO mallocrc \
-	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
-	error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h malloc_str.[ch] \
+	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
+	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
+	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h \
 	version.h malloc_t.c sample.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
 PORTCFG	= contrib/README contrib/dec_notes
@@ -42,8 +42,8 @@ SHAR3	= configure error.c error.h error_str.h error_val.h malloc.info
 SHAR4	= chunk.h chunk_loc.h compat.c compat.h conf.h.in malloc.texi \
 	malloc_t.c mallocrc
 SHAR5	= configure.in dbg_tokens.h dbg_values.h heap.c heap.h malloc_dbg.c \
-	malloc_dbg.h malloc_loc.h malloc_lp.c malloc_lp.h malloc_str.c \
-	malloc_str.h sample.c version.h
+	malloc_dbg.h malloc_loc.h malloc_lp.c malloc_lp.h arg_check.c \
+	arg_check.h sample.c version.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
