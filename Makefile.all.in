@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.57 1995/07/04 02:06:24 gray Exp $
+# $Id: Makefile.all.in,v 1.58 1995/08/18 15:49:38 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -29,9 +29,8 @@ LIB_DIS	= libdmalloclp.a
 UTIL = dmalloc
 INFOFILE = dmalloc.info
 
-CCFLAGS = -g
-#LDFLAGS = -g
-LDFLAGS =
+CCFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@

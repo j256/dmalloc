@@ -1,6 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.61 1995/07/14 20:59:49 gray Exp $
+$Id: NEWS,v 1.62 1995/08/18 15:49:39 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.1.1:
+
+	* Fixed up dmalloc_t to propogate errors better.
+	* Renamed chunk_heap_check to chunk_check.
 
 Version 3.1.0:
 
