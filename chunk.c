@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.145 1999/03/09 19:28:48 gray Exp $
+ * $Id: chunk.c,v 1.146 1999/03/09 20:52:37 gray Exp $
  */
 
 /*
@@ -42,17 +42,17 @@
 #include "compat.h"
 #include "debug_val.h"
 #include "dmalloc_loc.h"
+#include "dmalloc_tab.h"
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
-#include "table.h"
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.145 1999/03/09 19:28:48 gray Exp $";
+#ident "$Id: chunk.c,v 1.146 1999/03/09 20:52:37 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.145 1999/03/09 19:28:48 gray Exp $";
+  "$Id: chunk.c,v 1.146 1999/03/09 20:52:37 gray Exp $";
 #endif
 #endif
 
