@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.182 2004/08/13 21:26:27 gray Exp $
+ * $Id: malloc.c,v 1.183 2004/09/13 22:37:36 gray Exp $
  */
 
 /*
@@ -1292,7 +1292,7 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   GET_RET_ADDR(file);
   ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_FREE);
   
-#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS)
 #else
   return ret;
 #endif
@@ -1323,7 +1323,7 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
   GET_RET_ADDR(file);
   ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_CFREE);
   
-#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS)
 #else
   return ret;
 #endif
