@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.101 1995/07/03 23:57:33 gray Exp $
+@c $Id: dmalloc.texi,v 1.102 1995/07/04 01:54:27 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -159,8 +159,10 @@ Permission to use, copy, and modify this software for any
 @emph{non-commercial} purpose without fee is hereby granted.
 
 Although only commercial users are required to license the software,
-non-commercial user registration is greatly appreciated.
-@xref{Commercial License}.
+non-commercial user registration is greatly appreciated.  Licensees get
+a registration file for the software (which cannot be distributed), a
+letter documenting their registered status, as well as product support
+and notification of free-upgrades.  @xref{Commercial License}.
 
 @node Commercial License, Printed Manuals, Non-Commercial License, Copying
 @section Commercial License
@@ -173,21 +175,22 @@ software for a nominal fee.  There is a thirty (30) day free evaluation
 period but if your organization uses the software after this time period
 expires, please consider purchasing a registered copy.  This allows me
 to provide better support as well as bug fixes and feature updates on a
-more frequent basis.  Non-commercial user registration is greatly
-appreciated.
+more frequent basis.  Although not required, non-commercial user
+registration is greatly appreciated.
 
-A licensed copy of the software is available for US$35.  Entities should
-purchase one license per workstation, or one per dmalloc user, whichever
-is the smaller number.  Licensees get a registration file for the
-software, a letter documenting their registered status, as well as more
-attentive product support.  This license file cannot be distributed with
-the software.  For ``site'' license discounts or any other reasonable
-agreements, please contact me directly.
+A licensed copy of the software is available for US$35.  Commercial
+entities should purchase one license per workstation, or one per dmalloc
+user, whichever is the smaller number.  Licensees get a registration
+file for the software (which cannot be distributed), a letter
+documenting their registered status, as well as product support and
+notification of free-upgrades.
 
-It should be noted that a ``site'' can be defined as anything you'd
-like.  It can be a physical location (a room, building, etc.), an
-organizational grouping (a workgroup, department, etc.) or any other
-logical grouping (``the folks working on the widget project'', etc.).
+For ``site'' licenses (at significant discount) or any other reasonable
+agreements, please contact me directly.  It should be noted that a
+``site'' can be defined as anything you'd like.  It can be a physical
+location (a room, building, etc.), an organizational grouping (a
+workgroup, department, etc.) or any other logical grouping (``the folks
+working on the widget project'', etc.).
 
 @node Printed Manuals, Registration Information, Commercial License, Copying
 @section Printed Manuals
@@ -209,7 +212,7 @@ Please include the following registration information with your check
 made out to ``Gray Watson''.  Money orders are also accepted.  Purchase
 orders are as well, although amounts less than US$50 are discouraged.
 
-@itemize
+@itemize @bullet
 @item Name
 @item Position
 @item Company/Organization
@@ -623,7 +626,7 @@ know and I will add it to the configure script.  Otherwise, you will
 have to try @kbd{make noansi}.  This will run the @file{Deansify.pl}
 perl script on the code which:
 
-@itemize
+@itemize @bullet
 @item @emph{WARNING}: modifies the source code in place
 @item changes @file{stdarg.h} and @code{...} to @file{varargs.h} and
 @code{va_alist}
