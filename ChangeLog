@@ -1,5 +1,7 @@
 Wed May 11 12:02:31 1994  Gray Watson  (gray@blender.antaire.com)
 
+	* Released version 2.1.0.
+
 	* Fixed problem with never-reuse going on/off and check-lists.
 
 	* Added -r (random-debug) option to malloc_t which causes it to
@@ -708,5 +710,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.103 1994/05/11 19:32:38 gray Exp $
+$Id: ChangeLog,v 1.104 1994/05/11 20:20:11 gray Exp $
 -------------------------------------------------------------------------------
