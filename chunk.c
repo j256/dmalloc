@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.202 2004/06/29 22:38:35 gray Exp $
+ * $Id: chunk.c,v 1.203 2004/06/30 12:59:24 gray Exp $
  */
 
 /*
@@ -1110,6 +1110,9 @@ static	void	log_error_info(const char *now_file,
     if (user_pnt == NULL) {
       get_pnt_info(slot_p, &pnt_info);
       start_user = pnt_info.pi_user_start;
+    }
+    else {
+      start_user = user_pnt;
     }
   }
   
