@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.245 2003/11/18 15:43:01 gray Exp $
+@c $Id: dmalloc.texi,v 1.246 2003/11/18 15:48:00 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -606,12 +606,6 @@ that the process does not grow too big and swallow a large portion of
 the system resources.
 
 @end deftypefun
-
-@emph{NOTE}: the returned address from the memory
-allocation/reallocation functions should be cast to the appropriate
-pointer type for the variable being assigned.  Also this may no longer
-be necessary on your system, it can still provide some documentation
-value to the code.
 
 @emph{WARNING}: there is a quite common myth that all of the space that
 is returned by malloc libraries has already been cleared.  @emph{Only}
