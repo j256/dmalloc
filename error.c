@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.87 1999/03/10 22:05:46 gray Exp $
+ * $Id: error.c,v 1.88 1999/03/10 22:21:58 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.87 1999/03/10 22:05:46 gray Exp $";
+#ident "$Id: error.c,v 1.88 1999/03/10 22:21:58 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.87 1999/03/10 22:05:46 gray Exp $";
+  "$Id: error.c,v 1.88 1999/03/10 22:21:58 gray Exp $";
 #endif
 #endif
 
@@ -136,10 +136,12 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
   usecs = timeval_p->tv_usec;
   
   if (elapsed_b) {
-    usecs -= _dmalloc_start.tv_usec;
-    if (usecs < 0) {
+    if (usecs >= _dmalloc_start.tv_usec) {
+      usecs -= _dmalloc_start.tv_usec;
+    }
+    else {
+      usecs = _dmalloc_start.tv_usec - usecs;
       secs--;
-      usecs = - usecs;
     }
     secs -= _dmalloc_start.tv_sec;
     
@@ -291,12 +293,20 @@ void	_dmalloc_vmessage(const char *format, va_list args)
 #endif
       
 #if STORE_TIMEVAL
-      _dmalloc_message("starting time = %lu.%lu",
-		       (unsigned long)_dmalloc_start.tv_sec,
-		       (unsigned long)_dmalloc_start.tv_usec);
+      {
+	char	time_buf[64];
+	_dmalloc_message("starting time = %s",
+			 _dmalloc_ptimeval(&_dmalloc_start, time_buf,
+					   sizeof(time_buf), 0));
+      }
 #else
 #if HAVE_TIME /* NOT STORE_TIME */
-      _dmalloc_message("starting time = %lu", (unsigned long)_dmalloc_start);
+      {
+	char	time_buf[64];
+	_dmalloc_message("starting time = %s",
+			 _dmalloc_ptime(&_dmalloc_start, time_buf,
+					sizeof(time_buf), 0));
+      }
 #endif
 #endif
     }
