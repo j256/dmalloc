@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.15 2000/11/13 15:46:52 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.16 2003/05/13 14:57:50 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_tab.c,v 1.15 2000/11/13 15:46:52 gray Exp $"
+#ident "$Id: dmalloc_tab.c,v 1.16 2003/05/13 14:57:50 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.15 2000/11/13 15:46:52 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.16 2003/05/13 14:57:50 gray Exp $";
 #endif
 #endif
 
@@ -521,12 +521,12 @@ static	void	log_entry(const mem_table_t *tab_p, const int in_use_b,
 			  const char *source)
 {
   if (in_use_b) {
-    _dmalloc_message("%11lu %6lu %11lu %6lu  %s\n",
+    dmalloc_message("%11lu %6lu %11lu %6lu  %s\n",
 		     tab_p->mt_total_size, tab_p->mt_total_c,
 		     tab_p->mt_in_use_size, tab_p->mt_in_use_c, source);
   }
   else {
-    _dmalloc_message("%11lu %6lu  %s\n",
+    dmalloc_message("%11lu %6lu  %s\n",
 		     tab_p->mt_total_size, tab_p->mt_total_c, source);
   }
 }
@@ -754,7 +754,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   
   /* is the table empty */
   if (table_entry_c == 0) {
-    _dmalloc_message(" memory table is empty");
+    dmalloc_message(" memory table is empty");
     return;
   }
   
@@ -765,10 +765,10 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   
   /* display the column headers */  
   if (in_use_b) {
-    _dmalloc_message(" total-size  count in-use-size  count  source");
+    dmalloc_message(" total-size  count in-use-size  count  source");
   }
   else {
-    _dmalloc_message(" total-size  count  source");
+    dmalloc_message(" total-size  count  source");
   }
   
   memset(&total, 0, sizeof(total));
