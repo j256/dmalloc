@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.109 2003/06/08 19:31:24 gray Exp $
+ * $Id: dmalloc.c,v 1.110 2003/09/06 15:12:44 gray Exp $
  */
 
 /*
@@ -453,8 +453,8 @@ static	int	read_rc_file(const char *path, const long debug_value,
   
   SET_POINTER(debug_p, new_debug);
   if (token != NULL) {
-    strncpy(token, next_token, token_size);
-    token[token_size - 1] = '\0';
+    (void)loc_snprintf(token, token_size, "config file token: %s",
+		       next_token);
   }
   
   if (found_b) {
@@ -471,8 +471,8 @@ static	int	read_rc_file(const char *path, const long debug_value,
  * into TOKEN of TOKEN_SIZE.  Routine returns the new debug value
  * matching tag.
  */
-static	long	process(const long debug_value, const char *tag_find,
-			char *token, const int token_size)
+static	long	find_tag(const long debug_value, const char *tag_find,
+			 char *token, const int token_size)
 {
   char		path[1024], *path_p;
   default_t	*def_p;
@@ -546,15 +546,14 @@ static	long	process(const long debug_value, const char *tag_find,
     if (token != NULL) {
       for (def_p = defaults; def_p->de_string != NULL; def_p++) {
 	if (def_p->de_flags == debug_value) {
-	  strncpy(token, def_p->de_string, token_size);
-	  token[token_size - 1] = '\0';
+	  (void)loc_snprintf(token, token_size, "internal token: %s",
+			     def_p->de_string);
 	  new_debug = def_p->de_flags;
 	  break;
 	}
       }
       if (def_p->de_string == NULL) {
-	strncpy(token, "unknown", token_size);
-	token[token_size - 1] = '\0';
+	(void)loc_snprintf(token, token_size, "unknown token");
 	new_debug = 0;
       }
     }
@@ -591,7 +590,7 @@ static	long	process(const long debug_value, const char *tag_find,
  */
 static	void	list_tags(void)
 {
-  char		path[1024], *path_p, token[64];
+  char		path[1024], *path_p, token[80];
   default_t	*def_p;
   const char	*home_p;
   long		new_debug = 0;
@@ -693,7 +692,7 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
   }
   else {
-    (void)process(flags, NULL, token, sizeof(token));
+    (void)find_tag(flags, NULL, token, sizeof(token));
     (void)fprintf(stderr, "Debug-Flags %#x (%u) (%s)\n",
 		  flags, flags, token);
     if (verbose_b) {
@@ -753,6 +752,7 @@ static	void	dump_current(void)
 		  start_file, start_line);
   }
   
+  (void)fprintf(stderr, "\n");
   (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
   (void)fprintf(stderr,
 		"  For a list of the command-line options enter: %s --usage\n",
@@ -901,7 +901,7 @@ int	main(int argc, char **argv)
 		    argv_program, tag);
     }
     set_b = 1;
-    debug = process(0L, tag, NULL, 0);
+    debug = find_tag(0L, tag, NULL, 0);
     /* should we clear the rest? */
     if (remove_auto_b && (! keep_b)) {
       clear_b = 1;
