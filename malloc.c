@@ -25,7 +25,7 @@
  * chunk.c which is the real heap manager.
  */
 
-#define DMALLOC_DEBUG_DISABLE
+#define DMALLOC_DISABLE
 
 #include "dmalloc.h"
 #include "conf.h"
@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.66 1994/09/10 23:27:57 gray Exp $";
+  "$Id: malloc.c,v 1.67 1994/09/12 17:18:43 gray Exp $";
 #endif
 
 /*
@@ -53,14 +53,14 @@ LOCAL	char	*rcs_id =
 EXPORT	char		*dmalloc_logpath = NULL;
 /* internal dmalloc error number for reference purposes only */
 EXPORT	int		dmalloc_errno = ERROR_NONE;
-/* address to look for.  when discovered call _dmalloc_error() */
+/* address to look for.  when discovered call dmalloc_error() */
 #if defined(__STDC__) && __STDC__ == 1
 EXPORT	void		*dmalloc_address = NULL;
 #else
 EXPORT	char		*dmalloc_address = NULL;
 #endif
 /*
- * argument to dmalloc_address, if 0 then never call _dmalloc_error()
+ * argument to dmalloc_address, if 0 then never call dmalloc_error()
  * else call it after seeing dmalloc_address for this many times.
  */
 EXPORT	int		dmalloc_address_count = 0;
@@ -144,7 +144,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
 {
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
-    _dmalloc_error("check_debug_vars");
+    dmalloc_error("check_debug_vars");
     /* NOTE: dmalloc_error may die already */
     _dmalloc_die();
     /*NOTREACHED*/
@@ -204,7 +204,7 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
   /* NOTE: if dmalloc_address_count == 0 then never quit */
   if (dmalloc_address_count > 0 && addc >= dmalloc_address_count) {
     dmalloc_errno = ERROR_IS_FOUND;
-    _dmalloc_error("check_pnt");
+    dmalloc_error("check_pnt");
   }
 }
 
@@ -227,8 +227,12 @@ LOCAL	void	get_environ(void)
   /* get the dmalloc logfile name into a holding variable */
   env = (const char *)getenv(LOGFILE_ENVIRON);
   if (env != NULL) {
+#if HAVE_GETPID
     /* NOTE: this may cause core dumps if env contains a bad format string */
     (void)sprintf(log_path, env, getpid());
+#else
+    (void)strcpy(log_path, env);
+#endif
     dmalloc_logpath = log_path;
   }
   
@@ -391,7 +395,7 @@ EXPORT	char	*malloc(DMALLOC_SIZE size)
   /* yes, this could be always false if size is unsigned */
   if (size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    _dmalloc_error("malloc");
+    dmalloc_error("malloc");
     return MALLOC_ERROR;
   }
   
@@ -453,7 +457,7 @@ EXPORT	char	*realloc(char * old_pnt, DMALLOC_SIZE new_size)
   /* yes, this could be always false if new_size is unsigned */
   if (new_size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    _dmalloc_error("realloc");
+    dmalloc_error("realloc");
     return MALLOC_ERROR;
   }
   
@@ -617,7 +621,7 @@ EXPORT	int	_dmalloc_verify(const char * pnt)
   
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
-    _dmalloc_error("check_debug_vars");
+    dmalloc_error("check_debug_vars");
     /* NOTE: dmalloc_error may die already */
     _dmalloc_die();
     /*NOTREACHED*/
