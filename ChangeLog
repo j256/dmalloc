@@ -1,5 +1,7 @@
 Sat Nov 12 18:05:34 1994  Gray Watson  (gray@blender.antaire.com)
 
+	* Removed message arg to env-get routine due to various probs.
+
 	* New STDC definitions of DMALLOC_PNT and DMALLOC_FREE_RET.
 
 	* Removed all STRDUP and BDUP macros.  Was anyone using them?
@@ -900,5 +902,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.135 1994/11/12 23:37:05 gray Exp $
+$Id: ChangeLog,v 1.136 1994/11/13 00:37:56 gray Exp $
 -------------------------------------------------------------------------------

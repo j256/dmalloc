@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.68 1994/11/12 23:52:31 gray Exp $
+# $Id: Makefile.in,v 1.69 1994/11/13 00:38:07 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -11,8 +11,8 @@ OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
 # not argv.c because from argv module
 # not compat.c because of HAVE_...,
 # not dmalloc.c cause no associated .h file dmalloc.h
-# not env.h because fillproto broke with ()
-FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c error.c heap.c malloc.c
+FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c error.c heap.c \
+	malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= $(DEFINES)
@@ -31,30 +31,21 @@ UTIL	= dmalloc
 
 MANFILE	= dmalloc.info
 
-PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
+FLS	=  conf.h.in configure configure.in config.help \
 	ChangeLog Manifest INSTALL NEWS NOTES README TODO dmallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
 	dmalloc_t.c return.h version.h \
 	argv.[ch] argv_loc.h dmalloc.cc \
-	dmalloc.texi dmalloc.info dmalloc.ps texinfo.tex \
-	install.sh mkinstalldirs Deansify.pl
-PORTCFG	= contrib/README contrib/atexit.c contrib/dec_notes contrib/ra_info.pl
-
-MAXSIZE	= 85k
-# NOTE: the wc level should be below 90k due to shar overhead
-SHARFLS	= conf.h.in Makefile.in configure configure.in config.help \
-	ChangeLog Manifest INSTALL NEWS NOTES README TODO dmallocrc \
-	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
-	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] dmalloc_t.c \
-	return.h version.h \
-	argv.[ch] argv_loc.h \
 	dmalloc.texi dmalloc.info \
-	Deansify.pl \
-	contrib contrib/README contrib/dec_notes \
-	contrib/ra_info.pl
+	install.sh mkinstalldirs Deansify.pl
+CFGFLS	= contrib/README contrib/atexit.c contrib/dec_notes contrib/ra_info.pl
+DOCFLS	= dmalloc.ps texinfo.tex
+
+# Shar file maximum size
+# NOTE: the wc level should be below 90k due to shar overhead
+SHARSIZE= 85k
 
 .PHONY : all
 all : $(LIBRARY) $(LIB_DIS) $(UTIL)
@@ -115,12 +106,13 @@ $(UTIL) : dmalloc.o argv.o compat.o env.o
 	mv a.out $@
 
 .PHONY : port
-port : $(PORTFLS)
+port : $(FLS) $(DOCFLS) $(CFGFLS) Makefile.all.in
 	@ answer 'Is it okay to remove the $@ directory? '
 	rm -rf $@
 	mkdir $@ $@/contrib
-	cp $(PORTFLS) $@
-	cp $(PORTCFG) $@/contrib
+	cp $(FLS) Makefile.all.in $@
+	cp $(DOCFLS) $@
+	cp $(CFGFLS) $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $@ to dmalloc-version and tar up file'
@@ -163,7 +155,6 @@ continuous : $(TEST)
 		); done
 
 dmalloc.ps : dmalloc.texi
-	@ answer 'Is it okay to remove the work directory? '
 	rm -rf work
 	mkdir work
 	( cd work ; texi2dvi ../dmalloc.texi ; texi2dvi ../dmalloc.texi ; \
@@ -215,13 +206,13 @@ dmalloc.info : dmalloc.texi
 	makeinfo --no-split $^
 
 .PHONY : shar
-shar : $(SHARFLS)
+shar : $(FLS) $(CFGFLS)
 	rm -f part.?? part.t Makefile.in.bak
-	mv Makefile.in Makefile.in.bak
+	mv -i Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
-	makekit -n part. -s${MAXSIZE} -t \
+	makekit -n part. -s${SHARSIZE} -t \
 		"Do a 'sh ./configure' to configure the library" \
-		${SHARFLS}
+		$(FLS) Makefile.in $(CFGFLS)
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \

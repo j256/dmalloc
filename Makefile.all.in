@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.51 1994/11/10 00:11:27 gray Exp $
+# $Id: Makefile.all.in,v 1.52 1994/11/13 00:38:02 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -22,9 +22,9 @@ DEFS =
 INCS = -I. -I$(srcdir)
 LIBS = @LIBS@
 
-LIBRARY	= libdmalloc.a  
+LIBRARY	= libdmalloc.a
 # library with dmalloc disabled
-LIB_DIS	= libdmalloclp.a  
+LIB_DIS	= libdmalloclp.a
 UTIL = dmalloc
 INFOFILE = dmalloc.info
 
@@ -72,7 +72,7 @@ installdirs :
 	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(infodir) $(bindir)
 
 # .PHONY : installincs
-installincs : $(HFLS) 
+installincs : $(HFLS)
 	$(INSTALL_DATA) $(HFLS) $(incdir)
 
 # .PHONY : installlib
@@ -166,7 +166,7 @@ arg_check.o : arg_check.c dmalloc.h conf.h chunk.h dmalloc_loc.h debug_val.h \
   error.h arg_check.h 
 argv.o : argv.c argv.h argv_loc.h 
 chunk.o : chunk.c dmalloc.h conf.h chunk.h dmalloc_loc.h chunk_loc.h compat.h \
-  debug_val.h error.h error_val.h heap.h version.h 
+  debug_val.h error.h error_str.h error_val.h heap.h version.h 
 compat.o : compat.c dmalloc.h conf.h compat.h dmalloc_loc.h 
 dmalloc.o : dmalloc.c argv.h dmalloc.h conf.h compat.h dmalloc_loc.h debug_tok.h \
   debug_val.h env.h error_str.h error_val.h version.h 
@@ -174,7 +174,7 @@ dmalloc_lp.o : dmalloc_lp.c dmalloc.h conf.h dmalloc_loc.h dmalloc_lp.h
 dmalloc_t.o : dmalloc_t.c argv.h dmalloc.h conf.h 
 env.o : env.c dmalloc.h dmalloc_loc.h conf.h debug_tok.h debug_val.h env.h error.h 
 error.o : error.c dmalloc.h conf.h compat.h dmalloc_loc.h debug_val.h env.h \
-  error.h 
+  error.h error_val.h 
 heap.o : heap.c dmalloc.h conf.h chunk.h dmalloc_loc.h compat.h debug_val.h \
   error.h error_val.h heap.h 
 malloc.o : malloc.c dmalloc.h conf.h chunk.h dmalloc_loc.h compat.h debug_val.h \
