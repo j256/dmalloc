@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.53 1995/03/03 17:38:03 gray Exp $";
+  "$Id: dmalloc.c,v 1.54 1995/03/31 21:58:14 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -596,8 +596,10 @@ EXPORT	int	main(int argc, char ** argv)
     _dmalloc_start_break(start, &sfile, &sline, &scount);
     set = TRUE;
   }
-  else if (clear)
+  else if (clear) {
     sfile = START_FILE_INIT;
+    scount = START_COUNT_INIT;
+  }
   
   if (errno_to_print != NO_VALUE) {
     (void)fprintf(stderr, "%s: dmalloc_errno value '%d' = \n",
