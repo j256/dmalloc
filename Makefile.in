@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.86 1995/09/02 20:48:33 gray Exp $
+# $Id: Makefile.in,v 1.87 1995/09/03 16:35:59 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -127,7 +127,7 @@ $(TEST) : $(TEST).o argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
 	mv a.out $(.TARGET)
 
-light :: $(TEST)
+check light :: $(TEST)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
