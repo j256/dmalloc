@@ -1,3 +1,19 @@
+Fri Mar 21 09:29:46 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Added to dmalloc the ability to recognize its internal tags.
+
+	* Added better documentation of auto-dmalloc_shutdown.
+
+	* Cleaned up some configuration stuff.
+
+	* Fixed a number of signed/unsigned problems in chunk.
+
+Thu Mar 20 15:45:59 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Removed autoconf rule in Makefile.all.
+
+	* Cleaned up pthreads locking delay code.
+
 Fri Jan 17 14:25:12 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.2.0.
@@ -1154,5 +1170,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.172 1997/01/17 19:46:45 gray Exp $
+$Id: ChangeLog,v 1.173 1997/03/21 14:33:54 gray Exp $
 -------------------------------------------------------------------------------
