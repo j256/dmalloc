@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.21 1992/12/17 23:30:27 gray Exp $";
+  "$Id: chunk.c,v 1.22 1992/12/28 01:05:27 gray Exp $";
 #endif
 
 /* checking information */
@@ -858,7 +858,7 @@ EXPORT	int	_chunk_heap_check(void)
     case BBLOCK_USER:
       
       /* check line number */
-      if (bblockp->bb_line < 0 || bblockp->bb_line > MAX_LINE_NUMBER) {
+      if (bblockp->bb_line > MAX_LINE_NUMBER) {
 	if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	  _malloc_message("bad line number on pointer alloced in '%s:%d'",
 			  bblockp->bb_file, bblockp->bb_line);
@@ -935,7 +935,7 @@ EXPORT	int	_chunk_heap_check(void)
     case BBLOCK_DBLOCK:
       
       /* check out bitc */
-      if (bblockp->bb_bitc < 0 || bblockp->bb_bitc >= BASIC_BLOCK) {
+      if (bblockp->bb_bitc >= BASIC_BLOCK) {
 	malloc_errno = MALLOC_BAD_DBLOCK_SIZE;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
@@ -992,7 +992,7 @@ EXPORT	int	_chunk_heap_check(void)
 	   * check out size, better be less than BLOCK_SIZE / 2
 	   * I have to check this twice :-(
 	   */
-	  if (dblockp->db_size < 0 || dblockp->db_size > BLOCK_SIZE / 2) {
+	  if (dblockp->db_size > BLOCK_SIZE / 2) {
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad size on pointer alloced in '%s:%d'",
 			      dblockp->db_file, dblockp->db_line);
@@ -1061,7 +1061,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  }
 	  
 	  /* check out size, better be less than BLOCK_SIZE / 2 */
-	  if (dblockp->db_size < 0 || dblockp->db_size > BLOCK_SIZE / 2) {
+	  if (dblockp->db_size > BLOCK_SIZE / 2) {
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad size on pointer alloced in '%s:%d'",
 			      dblockp->db_file, dblockp->db_line);
@@ -1071,7 +1071,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  }
 	  
 	  /* check line number */
-	  if (dblockp->db_line < 0 || dblockp->db_line > MAX_LINE_NUMBER) {
+	  if (dblockp->db_line > MAX_LINE_NUMBER) {
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad line number on pointer alloced in '%s:%d'",
 			      dblockp->db_file, dblockp->db_line);
@@ -1256,7 +1256,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
     }
     
     /* check line number */
-    if (dblockp->db_line < 0 || dblockp->db_line > MAX_LINE_NUMBER) {
+    if (dblockp->db_line > MAX_LINE_NUMBER) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad line number on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, dblockp->db_file,
@@ -1267,7 +1267,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
     }
     
     /* check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take over */
-    if (dblockp->db_size < 0 || dblockp->db_size > BLOCK_SIZE / 2) {
+    if (dblockp->db_size > BLOCK_SIZE / 2) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad size on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, dblockp->db_file,
@@ -1319,7 +1319,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
   }
   
   /* check line number */
-  if (bblockp->bb_line < 0 || bblockp->bb_line > MAX_LINE_NUMBER) {
+  if (bblockp->bb_line > MAX_LINE_NUMBER) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad line number on pointer '%#lx' alloced in '%s:%d'",
 		      pnt + pnt_below_adm, bblockp->bb_file, bblockp->bb_line);

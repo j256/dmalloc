@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.4 1992/12/22 18:01:41 gray Exp $
+@c $Id: dmalloc.texi,v 1.5 1992/12/28 01:05:35 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -241,7 +241,7 @@ however, is that the entire file must be in memory at one time to do the
 calculations.  You don't want to have to allocate 1.2 megabytes when you
 might only be reading in a 10 byte file because it is wasteful of system
 resources.  Also, you are worried that your program might have to handle
-files of more than 1.2 megs.
+files of more than 1.2 megabytes.
 
 A solution: first checkout the file's size and then, using the
 heap-allocation routines, get enough storage to read the entire file
@@ -277,7 +277,7 @@ is all zeros.
 Usage: @code{new_pnt = (pointer-type)realloc(void * old_pnt, unsigned int
 new_size);}
 
-The realloc function expands or shrinks the memory allocation in old_ptr
+The realloc function expands or shrinks the memory allocation in old_pnt
 to new_size number of bytes.  Realloc copies the information in old_pnt
 into the new_pnt space up to new_size bytes or until it copies all of
 the information from old_pnt.
@@ -325,8 +325,7 @@ These variables can be set with the help of the malloc_dbg utility
 @xref{malloc_dbg program}.
 
 The debugging features that are available can be broken down into a
-couple basic classifications which can be used individually or with
-other features:
+couple basic classifications:
 
 @table @samp
 @item file and line number information
@@ -475,8 +474,8 @@ time.
 
 I have found that a setting of @samp{100} works well with reasonably
 memory intensive programs.  This of course means that the library will
-not catch errors exactly when they happen but possibily 100 library
-calls later.
+not catch errors exactly when they happen but possibly 100 library calls
+later.
 
 @item MALLOC_START
 Set this env variable to a number X and malloc will begin checking the
@@ -619,8 +618,9 @@ features will be disabled.
 @subsection Description of the debugging token flags.
 
 The below tokens and their corresponding descriptions are for the
-setting of the @samp{MALLOC_DEBUG} environmental variable.  They should
-be specified in the user's @file{.mallocrc} file @xref{RC file}.
+setting of the @samp{MALLOC_DEBUG} environmental variable
+@xref{Environment variables}.  They should be specified in the user's
+@file{.mallocrc} file @xref{RC file}.
 
 @table @samp
 @item none
@@ -691,6 +691,7 @@ log any errors and messages to the screen via standard-error
 @menu
 * Allocation macros::           For providing file/line debugging information.
 * Extensions::                  Additional non-standard routines.
+* Disabling the Library::       How to compile/link without the library.
 @end menu
 
 @node Allocation macros, Extensions,  , Usage
@@ -708,57 +709,55 @@ make the code look cleaner (IMHO).
 
 @table @code
 @item ALLOC(type, count)
-Usage: @code{longp = ALLOC(long, 30);}.  This means allocate 30 longs.
+Usage: @code{long_pnt = ALLOC(long, 30);}.  This means allocate space
+for 30 longs.
 
 @item MALLOC(size)
-Usage: @code{charp = MALLOC(1000);}.  This is like ALLOC but for
-characters only.
+Usage: @code{char_pnt = MALLOC(1000);}.  This is like ALLOC but for
+characters only.  It means allocate space for 1000 characters.
 
 @item CALLOC(type, count)
 Usage: @code{infp = CALLOC(struct info_st, 100);}.  This means allocate
-100 info_st structures and zero them all.
+space for 100 info_st structures and zero them all.
 
 @emph{NOTE}: the arguments for the CALLOC macro are sort of reversed from
 calloc(unsigned int count, unsigned int size).
 
-@item REALLOC(ptr, type, count)
-Usage: @code{longp = REALLOC(old_ptr, long, 10);}.  This takes old_ptr
-and re-allocs it into a size of 10 longs.
+@item REALLOC(pnt, type, count)
+Usage: @code{long_pnt = REALLOC(old_pnt, long, 10);}.  This takes
+old_pnt and and changes its size to accommodate 10 longs.
 
-@item REMALLOC(ptr, size)
-Usage: @code{charp = REMALLOC(charp, 100);}.  This is like REALLOC but
-for characters only.  It takes charp and changes its size to 100
+@item REMALLOC(pnt, size)
+Usage: @code{char_pnt = REMALLOC(char_pnt, 100);}.  This is like REALLOC but
+for characters only.  It takes char_pnt and changes its size to 100
 characters.
 
-@item FREE(ptr)
-Usage: @code{(void)FREE(charp);}.  This frees memory pointers.
+@item FREE(pnt)
+Usage: @code{(void)FREE(pnt);}.  This frees memory pointers.
 
 @item STRDUP(string)
-Usage: @code{charp = STRDUP("hello");}.  This macro duplicates the
-functionality of the @samp{strdup} function.  Non-gcc users should use
-@code{STRDUP("hello", charp);} where charp is the variable which will be
-assigned to the pointer to the copy of "hello".  string can be either a
-static string like "hello" or a character pointer.
+Usage: @code{char_pnt = STRDUP("hello");}.  This macro duplicates the
+functionality of the @samp{strdup} function.  string can be either a
+static string like "hello" or a character pointer.  Non-gcc users should
+use @code{STRDUP("hello", char_pnt);} where char_pnt is the variable
+which will be assigned to the pointer to the copy of "hello".
 
-@item BDUP(item-pointer, size)
-Usage: @code{new_itemp = BDUP(&item, sizeof(item));}.  This allocates
-space for size bytes, copies size bytes from item into the new
-allocation and returns it.  It is like strdup but for non-strings.
-Non-gcc users should use @code{BDUP(&item, sizeof(item), new_itemp);}
-where new_itemp is the variable which will be assigned to the pointer to
-the copy of item.
+@item BDUP(pnt, size)
+Usage: @code{new_item_pnt = BDUP(&item, sizeof(item));}.  This allocates
+space for size bytes, copies size bytes from pnt into the new allocation
+and returns it.  It is like strdup but for non-strings.  Non-gcc users
+should use @code{BDUP(&item, sizeof(item), new_item_pnt);} where
+new_item_pnt is the variable which will be assigned the pointer to the
+copy of item.
 
 @end table
 
 All of the the above macros actually do not call calloc, free, malloc,
 or realloc but _calloc_leap, _free_leap, _malloc_leap, and
 _realloc_leap.  This allows the macros to provide file and line
-information to the library routines.
-
-The leap file is used so the malloc library can be disabled just by
-relinking.  Unfortunately, the @file{malloc_leap.o} file will always
-need to be linked in if you want to use the above macros.  @emph{NOTE}:
-If anyone can think of a better way to do this please let me know.
+information to the library routines.  When you are finished with the
+debugging phase of your development there are many ways to disable the
+macros and library @xref{Disabling the Library}.
 
 The c-preprocessor run by the c-compiler provides @code{__FILE__} and
 @code{__LINE__} macros which are replaced with the current file and
@@ -796,7 +795,7 @@ version.
 a superior compiler and future releases of this library may require its
 use.
 
-@node Extensions,  , Allocation macros, Usage
+@node Extensions, Disabling the Library, Allocation macros, Usage
 @subsection Additional non-standard routines.
 
 The library has a number of variables and routines that are not a
@@ -866,6 +865,43 @@ the logging of more verbose memory error messages.
 @end table
 
 For some more information, refer to the @file{malloc.h} header file.
+
+@node Disabling the Library,  , Extensions, Usage
+@subsection How to compile/link without the library.
+
+When you are finished with the development and debugging sessions, you
+may want to disable the malloc-debug library and put in its place either
+the system's memory-allocation routines, gnu-malloc, or maybe your own.
+I have tried to make this a reasonably painless process.
+
+First off, if you are not using the uppercase allocation macros in
+@file{malloc.h} or any of the special functions provided by the
+malloc-debug library, then all you need to do is relink with a new
+malloc library.
+
+If you are using any of the special malloc-debug library functions, you
+will need to disable or #ifdef them out if you want to switch to another
+malloc library.  If you are using the uppercase allocation macros then
+you can switch to a new malloc library at link or compilation time.
+
+To change the malloc-library at link time, just relink with a new malloc
+library and include on the link-line the @file{malloc_lp.o} file.  This
+means that your memory routines will still be calling malloc_leap, etc.
+although the new malloc library will not be using the file and line
+information that the leap routines make available.  This means that the
+program will incur the small overhead of an extra function call.
+
+@example
+        gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
+@end example
+
+If you want to totally disable the malloc-debug library while still
+using the allocation macros then you will need to recompile all the C
+files that include @file{malloc.h} while defining MALLOC_DEBUG_DISABLE.
+
+@example
+        gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
+@end example
 
 @node Code, Plugs, Usage, Top
 @section Information on the source and general concerns.

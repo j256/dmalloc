@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.12 1992/12/22 18:01:38 gray Exp $
+ * $Id: malloc.h,v 1.13 1992/12/28 01:05:33 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -77,33 +77,59 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
  * alloc macros to provide for memory debugging features.
  */
 #undef ALLOC
+#undef CALLOC
+#undef MALLOC
+#undef REALLOC
+#undef REMALLOC
+#undef FREE
+
+#ifndef MALLOC_DEBUG_DISABLE
+
 #define ALLOC(type, count) \
   (type *)_malloc_leap(__FILE__, __LINE__, \
 		       (unsigned int)(sizeof(type) * (count)))
 
+#define MALLOC(size) \
+  (char *)_malloc_leap(__FILE__, __LINE__, (unsigned int)(size))
+
 /* WARNING: notice that the arguments are REVERSED from normal calloc() */
-#undef CALLOC
 #define CALLOC(type, count) \
   (type *)_calloc_leap(__FILE__, __LINE__, (unsigned int)(count), \
 		       (unsigned int)sizeof(type))
 
-#undef  FREE
-#define FREE(ptr) \
-  _free_leap(__FILE__, __LINE__, (char *)(ptr))
-
-#undef  MALLOC
-#define MALLOC(size) \
-  (char *)_malloc_leap(__FILE__, __LINE__, (unsigned int)(size))
-
-#undef REALLOC
 #define REALLOC(ptr, type, count) \
   (type *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
 			(unsigned int)(sizeof(type) * (count)))
 
-#undef REMALLOC
 #define REMALLOC(ptr, size) \
   (char *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
 			(unsigned int)(size))
+
+#define FREE(ptr) \
+  _free_leap(__FILE__, __LINE__, (char *)(ptr))
+
+#else /* MALLOC_DEBUG_DISABLE */
+
+#define ALLOC(type, count) \
+  (type *)malloc((unsigned int)(sizeof(type) * (count)))
+
+#define MALLOC(size) \
+  (char *)malloc((unsigned int)(size))
+
+/* WARNING: notice that the arguments are REVERSED from normal calloc() */
+#define CALLOC(type, count) \
+  (type *)calloc((unsigned int)(count), (unsigned int)sizeof(type))
+
+#define REALLOC(ptr, type, count) \
+  (type *)realloc((char *)(ptr), (unsigned int)(sizeof(type) * (count)))
+
+#define REMALLOC(ptr, size) \
+  (char *)realloc((char *)(ptr), (unsigned int)(size))
+
+#define FREE(ptr) \
+  free((char *)(ptr))
+
+#endif /* MALLOC_DEBUG_DISABLE */
 
 /*
  * some small allocation macros

@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.14 1992/12/22 18:01:36 gray Exp $";
+  "$Id: malloc.c,v 1.15 1992/12/28 01:05:31 gray Exp $";
 #endif
 
 /*
@@ -442,6 +442,8 @@ EXPORT	int	malloc_debug(long debug)
   debug &= ~DEBUG_NOT_CHANGEABLE;
   _malloc_debug = debug | hold;
   
+  in_alloc = FALSE;
+  
   return NOERROR;
 }
 
@@ -476,6 +478,8 @@ EXPORT	char	*malloc_strerror(int errnum)
 {
   if (check_debug_vars(NULL, 0) != NOERROR)
     return ERROR;
+  
+  in_alloc = FALSE;
   
   if (! IS_MALLOC_ERRNO(errnum))
     return malloc_errlist[MALLOC_BAD_ERRNO];
