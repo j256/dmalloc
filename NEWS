@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.29 1994/07/22 15:49:51 gray Exp $
+$Id: NEWS,v 1.30 1994/08/02 02:59:05 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.1.1:
@@ -21,7 +21,7 @@ Version 2.1.0:
 	* Fixed some race conditions with sbrk failure.
 	* Added -p max-pointers argument to malloc_t.
 	* Added 'log-nonfree-space' token for logging unfreed memory space.
-	* Added iteration count lable to all logfile output.  See conf.h.
+	* Added iteration count label to all logfile output.  See conf.h.
 	* Added xmalloc,xrealloc,etc. override functions.
 	* Added better mechanisms for const definition.
 	* Lots of install, notes, misc. changes from net feedback.
@@ -56,12 +56,12 @@ Version 1.3.5:
 	* Added 'never-reuse' token to never reuse free'd memory.
 	* Added on_exit and atexit support to auto-call malloc_shutdown.
 	* Added hooks to all malloc utility functions to malloc_lp.o.
-	* removed debug token log-ra since log-unknown should be enough.
+	* Removed debug token log-ra since log-unknown should be enough.
 	* malloc_heap_map() -> malloc_log_heap_map() for consistency.
 	* Added malloc_log_unfreed() to dump non-free memory to logfile.
 	* Added -m (minus) option to malloc_dbg to allow removing of tokens.
 	* Added -p flag to malloc_dbg to allow adding of tokens to debug value.
-	* added DEBUG_LOG_STAMP to add timestamps to log entries.
+	* Added DEBUG_LOG_STAMP to add timestamps to log entries.
 	* Added malloc_log_stats() to dump stats to a file.
 	* Re-added cfree() call.  No reason not to have it.
 
@@ -75,7 +75,7 @@ Version 1.3.4:
 Version 1.3.3:
 
 	* Fixed configuration problems with memcpy/bcopy and memcmp/bcmp.
-	* added free's file/line to log_bad_pnt messages.
+	* Added free's file/line to log_bad_pnt messages.
 	* Renamed all error codes to ERROR_*.
 
 Version 1.3.2:
@@ -86,7 +86,7 @@ Version 1.3.2:
 
 Version 1.3.1:
 
-	* Added 'log-ra' token to log info on non-freed return-address memory
+	* Added 'log-ra' token to log return-address info (NOTE: later removed)
 	* Added the beginnings of return-address handling
 	* Added -L or --list to malloc_dbg to list all the rc-file tags.
 
