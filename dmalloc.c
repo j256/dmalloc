@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.70 1997/12/05 21:09:40 gray Exp $";
+  "$Id: dmalloc.c,v 1.71 1997/12/08 01:57:10 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -163,13 +163,13 @@ static	argv_t	args[] = {
       NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHAR_P,	&logpath,
       "path",			"file to log messages to" },
-  { 'm',	"minus",	ARGV_CHAR_P | ARGV_ARRAY,	&minus,
+  { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
       "token(s)",		"del tokens from current debug" },
   { 'n',	"no-changes",	ARGV_BOOL,	&no_changes_b,
       NULL,			"make no changes to the env" },
   { 'o',	"lock-on",	ARGV_INT,	&thread_lock_on,
       "number",			"number of times to not lock" },
-  { 'p',	"plus",		ARGV_CHAR_P | ARGV_ARRAY,	&plus,
+  { 'p',	"plus",		ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&plus,
       "token(s)",		"add tokens to current debug" },
   { 'r',	"remove",	ARGV_BOOL,	&remove_auto_b,
       NULL,			"remove other settings if tag" },
