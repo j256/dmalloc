@@ -9,10 +9,13 @@
 #include "useful.h"
 #include "alloc.h"
 #if defined(ANTAIRE)
-#include "logger.h"
+#include "assert.h"
+#include "ourstring.h"
+#include "random.h"
+#include "terminate.h"
 #endif
 
-RCS_ID("$Id: dmalloc_t.c,v 1.3 1992/09/04 20:46:49 gray Exp $");
+RCS_ID("$Id: dmalloc_t.c,v 1.4 1992/09/04 20:50:40 gray Exp $");
 
 /* hexadecimal STR to integer translation */
 LOCAL	int	htoi(str)
@@ -51,10 +54,6 @@ main(argc, argv)
   
   argc--, argv++;
   
-#if defined(ANTAIRE)
-  logger_level = LOGGER_DEBUG;
-#endif
-  
   (void)printf("------------------------------------------------------\n");
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
   
@@ -73,6 +72,9 @@ main(argc, argv)
       (void)printf("free      - deallocate memory\n");
       (void)printf("realloc   - reallocate memory\n\n");
       
+#if defined(ANTAIRE)
+      (void)printf("assert    - assert fail for diagnostic purposed\n");
+#endif
       (void)printf("map       - map the heap to the logfile\n");
       (void)printf("overwrite - overwrite some memory to test errors\n");
       (void)printf("random    - randomly to a number of malloc/frees\n");
@@ -117,6 +119,15 @@ main(argc, argv)
       continue;
     }
     
+#if defined(ANTAIRE)
+    if (strcmp(line, "assert") == 0) {
+      ASSERTM(malloc_verify(NULL) == MALLOC_VERIFY_NOERROR,
+	      "malloc_verify(NULL) failed");
+      ASSERT(FALSE);
+      continue;
+    }
+#endif
+    
     if (strcmp(line, "map") == 0) {
       malloc_heap_map();
       continue;
@@ -155,7 +166,7 @@ main(argc, argv)
   }
   
   /* shutdown the alloc routines */
-  alloc_shutdown();
+  malloc_shutdown();
   
   (void)printf("------------------------------------------------------\n");
   (void)printf("final malloc_verify returned: %s\n",
@@ -163,5 +174,9 @@ main(argc, argv)
 		"failure"));
   (void)printf("------------------------------------------------------\n");
   
+#if defined(ANTAIRE)
+  terminate(0);
+#else
   (void)exit(0);
+#endif
 }

@@ -3,7 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation
  *
- * $Id: chunk.h,v 1.3 1992/09/04 20:46:36 gray Exp $
+ * $Id: chunk.h,v 1.4 1992/09/04 20:50:23 gray Exp $
  */
 
 #define CHUNK_CHECK_LEVEL	0	/* check depending on level only */
@@ -20,19 +20,11 @@ IMPORT	int		_malloc_debug_level;
 
 IMPORT	int		_malloc_errno;  /* error number */
 
+IMPORT	int		_malloc_interval;  /* check every X */
+
+IMPORT	int		_malloc_start;  /* start after X */
+
 IMPORT	int		_calloc_count;  /* # callocs, done in alloc */
-
-/*
- * Internal message writter
- * NOTE: this is here so the users will not see it in alloc.h
- */
-IMPORT	void	_malloc_message(/* format, va_alist */);
-/* char		*format; */
-/* va_dcl */
-
-/* malloc version of perror of an error in STR */
-IMPORT	void	_malloc_perror(/* str */);
-/* char		*str; */
 
 /* startup the low level malloc routines */
 IMPORT	int	_chunk_startup(/* VOID */);
@@ -72,7 +64,7 @@ IMPORT	char	*_chunk_realloc(/* file, line, oldp, new_size */);
 /* unsigned int	new_size; */
 
 /* log present free and used lists */
-IMPORT	void	_chunk_count(/* VOID */);
+IMPORT	void	_chunk_list_count(/* VOID */);
 
 /* log statistics on the heap */
 IMPORT	void	_chunk_stats(/* VOID */);

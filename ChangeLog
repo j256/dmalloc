@@ -1,0 +1,6 @@
+Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
+
+	* Fixed a large problem with chunk.c not reporting the correct
+	memory address when listing unfreed memory.  This was discovered
+	when MALLOC_ADDRESS was not working correctly.
+

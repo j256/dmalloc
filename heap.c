@@ -20,10 +20,11 @@
 #include "useful.h"
 
 #include "chunk.h"
+#include "debug.h"
 #include "heap.h"
 #include "malloc_err.h"
 
-RCS_ID("$Id: heap.c,v 1.3 1992/09/04 20:46:39 gray Exp $");
+RCS_ID("$Id: heap.c,v 1.4 1992/09/04 20:50:29 gray Exp $");
 
 /*
  * system functions
