@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.110 2003/09/06 15:12:44 gray Exp $
+ * $Id: dmalloc.c,v 1.111 2003/11/17 22:25:31 gray Exp $
  */
 
 /*
@@ -111,13 +111,15 @@ static	default_t	defaults[] = {
 };
 
 /* argument variables */
-static	char	*address = NULL;		/* for ADDRESS */
 static	int	bourne_b = 0;			/* set bourne shell output */
 static	int	cshell_b = 0;			/* set c-shell output */
+static	int	gdb_b = 0;			/* set gdb output */
+static	int	rcshell_b = 0;			/* set rc shell output */
+
+static	char	*address = NULL;		/* for ADDRESS */
 static	int	clear_b = 0;			/* clear variables */
 static	int	debug = 0;			/* for DEBUG */
 static	int	errno_to_print = 0;		/* to print the error string */
-static	int	gdb_b = 0;			/* set gdb output */
 static	int	help_b = 0;			/* print help message */
 static	char	*inpath = NULL;			/* for config-file path */
 static	unsigned long interval = 0;		/* for setting INTERVAL */
@@ -139,7 +141,7 @@ static	int	very_verbose_b = 0;		/* very-verbose flag */
 static	char	*tag = NULL;			/* maybe a tag argument */
 
 static	argv_t	args[] = {
-  { 'b',	"bourne",	ARGV_BOOL_INT,	&bourne_b,
+  { 'b',	"bourne-shell",	ARGV_BOOL_INT,	&bourne_b,
     NULL,			"set output for bourne shells" },
   { ARGV_OR },
   { 'C',	"c-shell",	ARGV_BOOL_INT,	&cshell_b,
@@ -147,6 +149,9 @@ static	argv_t	args[] = {
   { ARGV_OR },
   { 'g',	"gdb",		ARGV_BOOL_INT,	&gdb_b,
     NULL,			"set output for gdb parsing" },
+  { ARGV_OR },
+  { 'R',	"rc-shell",	ARGV_BOOL_INT,	&rcshell_b,
+    NULL,			"set output for rc shell" },
   
   { 'L',	"long-tokens",	ARGV_BOOL_INT,	&long_tokens_b,
     NULL,			"output long-tokens not 0x..." },
@@ -227,6 +232,13 @@ static	void	choose_shell(void)
     shell_p++;
   }
   
+  /* look for the rc shell specifically */
+  if (strcmp("rc", shell_p) == 0) {
+    rcshell_b = 1;
+    return;
+  }
+  
+  /* look for the shells which are bourne-shell compatible */
   for (shell_c = 0; sh_shells[shell_c] != NULL; shell_c++) {
     if (strcmp(sh_shells[shell_c], shell_p) == 0) {
       bourne_b = 1;
@@ -234,6 +246,7 @@ static	void	choose_shell(void)
     }
   }
   
+  /* otherwise set to c-shell */
   cshell_b = 1;
 }
 
@@ -773,6 +786,9 @@ static	void    set_variable(const char *var, const char *value)
     (void)loc_snprintf(comm, sizeof(comm), "%s=%s\nexport %s\n",
 		       var, value, var);
   }
+  else if (rcshell_b) {
+    (void)loc_snprintf(comm, sizeof(comm), "%s='%s'\n", var, value);
+  }
   else if (gdb_b) {
     (void)loc_snprintf(comm, sizeof(comm), "set env %s %s\n", var, value);
   }
@@ -864,7 +880,7 @@ int	main(int argc, char **argv)
   }
   
   /* try to figure out the shell we are using */
-  if ((! bourne_b) && (! cshell_b) && (! gdb_b)) {
+  if ((! bourne_b) && (! cshell_b) && (! gdb_b) && (! rcshell_b)) {
     choose_shell();
   }
   

@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.241 2003/10/17 14:17:02 gray Exp $
+@c $Id: dmalloc.texi,v 1.242 2003/11/17 22:25:32 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -364,6 +364,15 @@ output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
+@end example
+
+@cindex rc shell
+
+If you are using rc shell, you should add the following to your
+@file{.cshrc} file (notice the @kbd{-C} option for c-shell output):
+
+@example
+fn dmalloc {eval `{/usr/local/bin/dmalloc $*}}
 @end example
 
 By the way, if you are looking for a shell, I heartily recommend trying
