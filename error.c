@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.61 1995/06/21 18:19:39 gray Exp $";
+  "$Id: error.c,v 1.62 1995/06/28 23:49:02 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -88,14 +88,13 @@ EXPORT	long		_dmalloc_start = 0;
 /*
  * print the time into local buffer which is returned
  */
-EXPORT	char	*_dmalloc_ptime(
 #if STORE_TIMEVAL
-				const struct timeval * timevalp,
+EXPORT	char	*_dmalloc_ptime(const struct timeval * timevalp,
+				const char elapsed)
 #else
-				const long * timep,
+EXPORT	char	*_dmalloc_ptime(const long * timep,
+				const char elapsed)
 #endif
-				const char elapsed
-				)
 {
   static char	buf[64];
   long		hrs, mins, secs;

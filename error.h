@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.26 1995/06/21 18:19:06 gray Exp $
+ * $Id: error.h,v 1.27 1995/06/28 23:49:07 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -58,14 +58,13 @@ IMPORT	long		_dmalloc_start;
 /*
  * print the time into local buffer which is returned
  */
-IMPORT	char	*_dmalloc_ptime(
 #if STORE_TIMEVAL
-				const struct timeval * timevalp,
+IMPORT	char	*_dmalloc_ptime(const struct timeval * timevalp,
+				const char elapsed);
 #else
-				const long * timep,
+IMPORT	char	*_dmalloc_ptime(const long * timep,
+				const char elapsed);
 #endif
-				const char elapsed
-				);
 
 /*
  * message writer with printf like arguments
