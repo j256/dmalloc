@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.119 1997/03/21 14:31:53 gray Exp $
+@c $Id: dmalloc.texi,v 1.120 1997/03/21 20:28:59 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -50,8 +50,8 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 3.2.0
-@subtitle January 1997
+@subtitle Version 3.2.1
+@subtitle March 1997
 @author Gray Watson <gray@@letters.com>
 
 @page
@@ -79,7 +79,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 3.2.0 -- January 1997
+Version 3.2.1 -- March 1997
 @end ifinfo
 
 @cindex introduction
@@ -621,9 +621,11 @@ created by configure to make sure it did its job correctly.
 @cindex settings.h file
 
 @item You might want to tune the settings in @file{settings.h} file to
-tune the library to the local architecture -- for instance handling
-local thread library features.  The @file{configure} script created this
-file from the @file{settings.dist} file.
+tune the library to the local architecture -- especially if you are
+using pthreads or another thread library.  The @file{configure} script
+created this file from the @file{settings.dist} file.  Any permanent
+changes to these settings should made to the dist file.  You then can
+run @file{config.status} to re-create the @file{settings.h} file.
 
 @cindex DMALLOC_SIZE variable
 

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.11 1997/03/20 20:43:50 gray Exp $
+ * $Id: settings.dist,v 1.12 1997/03/21 20:29:00 gray Exp $
  */
 
 /*
@@ -227,40 +227,51 @@
 
 /*
  * The problem is that the pthreads library uses malloc itself.  If we
- * attempt to call the global lock while inside of the pthreads
- * initialization code, the pthread library core dumps.  So we have
- * the dmalloc library not do the lock the first X times.  This is a
- * HACK, however necessary.
+ * attempt to call the mutex lock while inside of the pthreads
+ * initialization code, the pthread library may core dump because it
+ * might not expect to go recursive.  So we have the dmalloc library
+ * not do the lock the first X times.  This is a HACK, however
+ * necessary.
  *
  * NOTE: you may have to play with the IGNORE value.  Too many will cause
  * two threads to march into the dmalloc code generating a
- * ERROR_IN_TWICE -- the library is not thread safe.  Too few and you
- * will get a core dump in the pthreads init code.  Weeee!
+ * ERROR_IN_TWICE -- the library is not thread safe and needs to
+ * protect itself here.  Too few and you will get a core dump in the
+ * pthreads init code.  Weeee!
  */
 #define THREAD_LOCK_IGNORE		5
 
-/* if set, we add code to not lock the first X calls */
+/* if more than 0, we need add code to not lock the first X calls -- Ugh! */
 #if THREAD_LOCK_IGNORE
 
-/* define a global variable we use as a lock counter */
+/* define the global variable(s) we need to mutex lock */
 #define THREAD_LOCK_GLOBAL	\
-	static int thread_lock_ignore = THREAD_LOCK_IGNORE;
-
+	static int thread_lock_ignore = THREAD_LOCK_IGNORE; \
+	static pthread_mutex_t dmalloc_mutex;
+/* initialization code for mutex variable(s) */
+#define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, NULL)
+/* lock dmalloc functions */
 #define THREAD_LOCK		do { \
 				  if (thread_lock_ignore <= 0) \
-				    pthread_lock_global_np(); \
+				    pthread_mutex_lock(&dmalloc_mutex); \
 				} while (0)
+/* un-lock dmalloc functions */
 #define THREAD_UNLOCK		do { \
 				  if (thread_lock_ignore > 0) \
 				    thread_lock_ignore--; \
 				  else \
-				    pthread_unlock_global_np(); \
+				    pthread_mutex_unlock(&dmalloc_mutex); \
 				} while (0)
 #else /* THREAD_LOCK_IGNORE */
 
-#undef THREAD_LOCK_GLOBAL
-#define THREAD_LOCK			pthread_lock_global_np()
-#define THREAD_UNLOCK			pthread_unlock_global_np()
+/* define the global variable(s) we need to mutex lock */
+#define THREAD_LOCK_GLOBAL	static pthread_mutex_t dmalloc_mutex;
+/* initialization code for mutex variable(s) */
+#define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, NULL)
+/* lock dmalloc functions */
+#define THREAD_LOCK		pthread_mutex_lock(&dmalloc_mutex)
+/* un-lock dmalloc functions */
+#define THREAD_UNLOCK		pthread_mutex_unlock(&dmalloc_mutex)
 
 #endif /* ! THREAD_LOCK_IGNORE */
 

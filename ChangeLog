@@ -1,5 +1,7 @@
 Fri Mar 21 09:29:46 1997  Gray Watson  <gray@burger.letters.com>
 
+	* Released version 3.2.1.
+
 	* Added to dmalloc the ability to recognize its internal tags.
 
 	* Added better documentation of auto-dmalloc_shutdown.
@@ -1170,5 +1172,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.173 1997/03/21 14:33:54 gray Exp $
+$Id: ChangeLog,v 1.174 1997/03/21 20:28:56 gray Exp $
 -------------------------------------------------------------------------------
