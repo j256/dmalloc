@@ -2896,7 +2896,7 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
 static	int	process_env(void)
 {
   static int	done_b = ARGV_FALSE;
-  char		*environ, *tok_p, *env_p;
+  char		*env_val, *tok_p, *env_p;
   int		len;
   
   /* make sure we only do this once */
@@ -2907,18 +2907,18 @@ static	int	process_env(void)
   done_b = ARGV_TRUE;
   
   /* get the argv information */
-  environ = getenv(GLOBAL_NAME);
-  if (environ == NULL) {
+  env_val = getenv(GLOBAL_NAME);
+  if (env_val == NULL) {
     return NOERROR;
   }
   
   /* save a copy of it */
-  environ = string_copy(environ);
-  if (environ == NULL) {
+  env_val = string_copy(env_val);
+  if (env_val == NULL) {
     return ERROR;
   }
   
-  env_p = environ;
+  env_p = env_val;
   
   for (;;) {
     tok_p = strsep(&env_p, " \t,:");
@@ -3087,7 +3087,7 @@ static	int	process_env(void)
     }
   }
   
-  free(environ);
+  free(env_val);
   return NOERROR;
 }
 
