@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.80 1994/12/15 15:57:28 gray Exp $
+@c $Id: dmalloc.texi,v 1.81 1994/12/16 19:47:20 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -490,15 +490,15 @@ file for more information.
 edit this file and remake to get things to stop complaining about the
 size arguments to malloc routines.
 
-@item Typing @kbd{make tests} should build the @file{malloc_t} test
+@item Typing @kbd{make tests} should build the @file{dmalloc_t} test
 program.
 
-@item Typing @kbd{make light} should run the @file{malloc_t} test
+@item Typing @kbd{make light} should run the @file{dmalloc_t} test
 program through a set of light trials.  By default this will execute
-@file{malloc_t} 5 times -- each time will execute 10,000 malloc
+@file{dmalloc_t} 5 times -- each time will execute 10,000 malloc
 operations in a very random manner.  Very anal folks can type @kbd{make
-heavy} to up the ante.  Use @kbd{malloc_t --usage} for the list of all
-@file{malloc_t} options.
+heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
+@file{dmalloc_t} options.
 
 @end enumerate
 
