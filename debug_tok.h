@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.20 1997/01/17 19:26:19 gray Exp $
+ * $Id: debug_tok.h,v 1.21 1997/03/21 21:22:37 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -65,6 +65,7 @@ LOCAL	attr_t		attributes[] = {
       "dump space from bad pnt" },
   { "log-nonfree-space","lns",	DEBUG_LOG_NONFREE_SPACE,
       "dump space from non-freed pointers" },
+  
   { "log-elapsed-time",	"let",	DEBUG_LOG_ELAPSED_TIME,
       "log elapsed-time for allocated pointer" },
   { "log-current-time",	"lct",	DEBUG_LOG_CURRENT_TIME,
@@ -83,6 +84,9 @@ LOCAL	attr_t		attributes[] = {
       "PLEASE USE AND SEE CHECK-BLANK" },
   { "check-funcs",	"cfu",	DEBUG_CHECK_FUNCS,
       "check functions" },
+  
+  { "catch-signals",	"csi",	DEBUG_CATCH_SIGNALS,
+      "shutdown lib on SIGHUP, SIGINT, SIGTERM"},
   
   { "realloc-copy",	"rco",	DEBUG_REALLOC_COPY,
       "copy all re-allocations" },
@@ -106,8 +110,6 @@ LOCAL	attr_t		attributes[] = {
       "allow allocs of 0 bytes, frees of NULL"},
   { "error-dump",	"edu",	DEBUG_ERROR_DUMP,
       "dump core on error and then continue"},
-  { "catch-signals",	"csi",	DEBUG_CATCH_SIGNALS,
-      "shutdown lib on SIGHUP, SIGINT, SIGTERM"},
   
   { NULL }
 };
