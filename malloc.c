@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.133 1999/03/10 22:04:57 gray Exp $
+ * $Id: malloc.c,v 1.134 1999/03/10 22:22:30 gray Exp $
  */
 
 /*
@@ -76,10 +76,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.133 1999/03/10 22:04:57 gray Exp $";
+#ident "$Id: malloc.c,v 1.134 1999/03/10 22:22:30 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.133 1999/03/10 22:04:57 gray Exp $";
+  "$Id: malloc.c,v 1.134 1999/03/10 22:22:30 gray Exp $";
 #endif
 #endif
 
@@ -503,21 +503,21 @@ void	_dmalloc_shutdown(void)
 #if STORE_TIMEVAL
   {
     TIMEVAL_TYPE	now;
-    char		buf[64];
+    char		time_buf1[64], time_buf2[64];
     GET_TIMEVAL(now);
-    _dmalloc_message("ending time = %lu.%lu, elapsed since start = %s",
-		     (unsigned long)now.tv_sec,
-		     (unsigned long)now.tv_usec,
-		     _dmalloc_ptimeval(&now, buf, sizeof(buf), 1));
+    _dmalloc_message("ending time = %s, elapsed since start = %s",
+		     _dmalloc_ptimeval(&now, time_buf1, sizeof(time_buf1), 0),
+		     _dmalloc_ptimeval(&now, time_buf2, sizeof(time_buf2), 1));
   }
 #else
 #if HAVE_TIME /* NOT STORE_TIME */
   {
-    TIME_TYPE	now = time(NULL);
-    char	buf[64];
-    _dmalloc_message("ending time = %lu, elapsed since start = %s",
-		     (unsigned long)now,
-		     _dmalloc_ptime(&now, buf, sizeof(buf), 1));
+    TIME_TYPE	now;
+    char	time_buf1[64], time_buf2[64];
+    now = time(NULL);
+    _dmalloc_message("ending time = %s, elapsed since start = %s",
+		     _dmalloc_ptime(&now, time_buf1, sizeof(time_buf1), 0),
+		     _dmalloc_ptime(&now, time_buf2, sizeof(time_buf2), 1));
   }
 #endif
 #endif
