@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.106 1998/09/19 00:12:12 gray Exp $
+# $Id: Makefile.in,v 1.107 1998/09/19 00:24:45 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -191,17 +191,17 @@ dmalloc.dvi : dmalloc.texi
 
 INSTALL : $(srcdir)/INSTALL.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
-	cp $(srcdir)/INSTALL.1 $(.TARGET).t
+	echo ------------------------------------------------------------------------------- \
+		> $(.TARGET).t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
-		-e '/,  Node: Details/,$$d' \
+		-e '/,  Node: Using With Threads/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	echo ------------------------------------------------------------------------------- \
-		>> $(.TARGET).t
+	cat $(srcdir)/INSTALL.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
 PERMISSIONS : $(INFOFILE)
