@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.134 1998/09/19 00:27:04 gray Exp $
+@c $Id: dmalloc.texi,v 1.135 1998/09/19 00:33:05 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -848,10 +848,10 @@ the locks, the thread library will probably core dump.  If it waits too
 long then it can't protect itself from multiple execution and it will
 abort or other bad things might happen.  You adjust the number of times
 to wait at runtime with the ``lock-on'' option to the dmalloc program
-(for example @kbd{dmalloc -o 20}).  Times values between 2 and 30 are
-probably good although operating systems will vary significantly.  You
-know its too low if your program core dumps and too high if the library
-generates an exception.
+(for example @kbd{dmalloc -o 20}).  @xref{Dmalloc Program}.  Times
+values between 2 and 30 are probably good although operating systems
+will vary significantly.  You know its too low if your program core
+dumps and too high if the library generates an exception.
 
 An additional complexity is when we are initializing the lock before
 mutex locking around the library.  As mentioned, the init itself may
