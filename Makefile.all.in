@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.52 1994/11/13 00:38:02 gray Exp $
+# $Id: Makefile.all.in,v 1.53 1995/03/23 15:35:33 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -20,9 +20,10 @@ CC = @CC@
 
 DEFS =
 INCS = -I. -I$(srcdir)
-LIBS = @LIBS@
+LIBS = -L. @LIBS@
 
-LIBRARY	= libdmalloc.a
+LIBNAME	= dmalloc
+LIBRARY	= lib$(LIBNAME).a
 # library with dmalloc disabled
 LIB_DIS	= libdmalloclp.a
 UTIL = dmalloc
@@ -117,7 +118,7 @@ tests : $(TEST)
 
 $(TEST) : $(TEST).o argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
+	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) -l$(LIBNAME)
 	mv a.out $@
 
 #.PHONY : check light
