@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.61 2000/03/21 18:19:07 gray Exp $
+ * $Id: chunk_loc.h,v 1.62 2000/03/24 21:57:08 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -133,10 +133,11 @@
 #define BBLOCK_DBLOCK		0x0008		/* pointing to divided block */
 #define BBLOCK_DBLOCK_ADMIN	0x0010		/* pointing to dblock admin */
 #define BBLOCK_FREE		0x0020		/* block is free */
-#define BBLOCK_EXTERNAL		0x0040		/* externally used block */
-#define BBLOCK_ADMIN_FREE	0x0080		/* ba_free_n pnt to free slot*/
-#define BBLOCK_STRING		0x0100		/* block is a string (unused)*/
-#define BBLOCK_VALLOC		0x0200		/* block is aligned alloc */
+#define BBLOCK_START_FREE	0x0040		/* start of free block */
+#define BBLOCK_EXTERNAL		0x0080		/* externally used block */
+#define BBLOCK_ADMIN_FREE	0x0100		/* ba_free_n pnt to free slot*/
+#define BBLOCK_STRING		0x0200		/* block is a string (unused)*/
+#define BBLOCK_VALLOC		0x0400		/* block is aligned alloc */
 
 #define BBLOCK_FLAG_TYPE(f)	((f) & BBLOCK_ALLOCATED)
 
@@ -186,10 +187,7 @@ typedef struct dblock_st {
   
   struct dblock_st	*db_next;		/* next in the free list */
   const char		*db_file;		/* .c filename where alloced */
-  
-#if FREED_POINTER_DELAY
-  unsigned long		db_reuse_iter;		/* when avail for reuse */
-#endif
+  unsigned long		db_use_iter;		/* when last ``used'' */
   
   overhead_t		db_overhead;		/* configured overhead adds */
 } dblock_t;
@@ -221,12 +219,9 @@ typedef struct bblock_st {
   void			*bb_mem;		/* extern user dblock mem */
   struct bblock_st	*bb_next;		/* next in free list */
   const char		*bb_file;		/* .c filename where alloced */
+  unsigned long		bb_use_iter;		/* when last ``used'' */
   
-#if FREED_POINTER_DELAY
-  unsigned long	bb_reuse_iter;			/* when avail for reuse */
-#endif
-  
-  overhead_t	bb_overhead;			/* configured overhead adds */
+  overhead_t		bb_overhead;		/* configured overhead adds */
 } bblock_t;
 
 /*
