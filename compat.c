@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.48 2000/03/21 18:19:08 gray Exp $
+ * $Id: compat.c,v 1.49 2000/04/18 01:55:55 gray Exp $
  */
 
 /*
@@ -42,10 +42,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.48 2000/03/21 18:19:08 gray Exp $";
+#ident "$Id: compat.c,v 1.49 2000/04/18 01:55:55 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.48 2000/03/21 18:19:08 gray Exp $";
+  "$Id: compat.c,v 1.49 2000/04/18 01:55:55 gray Exp $";
 #endif
 #endif
 
@@ -97,11 +97,11 @@ int	loc_snprintf(char *buf, const int buf_size, const char *format, ...)
 /*
  * Copy LEN characters from SRC to DEST
  */
-void	memcpy(char *dest, const char *src, DMALLOC_SIZE len)
+void	*memcpy(void *dest, const void *src, DMALLOC_SIZE len)
 {
-  char		*dest_p;
-  const	char	*src_p;
-  int		byte_c;
+  unsigned char		*dest_p;
+  const	unsigned char	*src_p;
+  int			byte_c;
   
   if (len <= 0) {
     return;
@@ -122,6 +122,8 @@ void	memcpy(char *dest, const char *src, DMALLOC_SIZE len)
       *dest_p++ = *src_p++;
     }
   }
+  
+  return dest;
 }
 #endif /* HAVE_MEMCPY == 0 */
 
@@ -129,11 +131,13 @@ void	memcpy(char *dest, const char *src, DMALLOC_SIZE len)
 /*
  * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len)
+int	memcmp(const void *str1, const void *str2, DMALLOC_SIZE len)
 {
-  for (; len > 0; len--, str1++, str2++) {
-    if (*str1 != *str2) {
-      return *str1 - *str2;
+  const unsigned char	*str1_p, *str2_p;
+  
+  for (str1_p = str1, str2_p = str2; len > 0; len--, str1_p++, str2_p++) {
+    if (*str1_p != *str2_p) {
+      return *str1_p - *str2_p;
     }
   }
   
@@ -145,15 +149,15 @@ int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len)
 /*
  * Set LEN characters in STR to character CH
  */
-char	*memset(char *str, int ch, DMALLOC_SIZE len)
+void	*memset(void *str, const int ch, DMALLOC_SIZE len)
 {
-  char	*hold = str;
+  unsigned char	*str_p = str;
   
-  for (; len > 0; len--, str++) {
-    *str = (char)ch;
+  for (; len > 0; len--, str_p++) {
+    *(unsigned char *)str_p = (unsigned char)ch;
   }
   
-  return hold;
+  return str;
 }
 #endif /* HAVE_MEMSET == 0 */
 
@@ -161,16 +165,18 @@ char	*memset(char *str, int ch, DMALLOC_SIZE len)
 /*
  * Find CH in STR by searching backwards through the string
  */
-char	*strchr(const char *str, int ch)
+char	*strchr(const char *str, const int ch)
 {
-  for (; *str != '\0'; str++) {
-    if (*str == (char)ch) {
-      return (char *)str;
+  const char	*str_p;
+  
+  for (str_p = str; *str_p != '\0'; str_p++) {
+    if (*str_p == (char)ch) {
+      return (char *)str_p;
     }
   }
   
   if (ch == '\0') {
-    return (char *)str;
+    return (char *)str_p;
   }
   else {
     return NULL;
@@ -182,21 +188,21 @@ char	*strchr(const char *str, int ch)
 /*
  * Find CH in STR by searching backwards through the string
  */
-char	*strrchr(const char *str, int ch)
+char	*strrchr(const char *str, const int ch)
 {
-  const char	*pnt = NULL;
+  const char	*str_p, *pnt = NULL;
   
-  for (; *str != '\0'; str++) {
-    if (*str == (char)ch) {
-      pnt = (char *)str;
+  for (str_p = str; *str_p != '\0'; str_p++) {
+    if (*str_p == (char)ch) {
+      pnt = str_p;
     }
   }
   
   if (ch == '\0') {
-    return (char *)str;
+    return (char *)str_p;
   }
   else {
-    return (char *)pnt;
+    return (char *)pnt_p;
   }
 }
 #endif /* HAVE_STRRCHR == 0 */
@@ -207,17 +213,17 @@ char	*strrchr(const char *str, int ch)
  */
 char	*strcat(char *str1, const char *str2)
 {
-  char	*hold = str1;
+  char	*str1_p;
   
-  for (; *str1 != '\0'; str1++) {
+  for (str1_p = str1; *str1_p != '\0'; str1_p++) {
   }
   
   while (*str2 != '\0') {
-    *str1++ = *str2++;
+    *str1_p++ = *str2++;
   }
-  *str1 = '\0';
+  *str1_p = '\0';
   
-  return hold;
+  return str1;
 }
 #endif /* HAVE_STRCAT == 0 */
 

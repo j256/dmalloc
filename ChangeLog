@@ -1,3 +1,8 @@
+Mon Apr 17 21:55:39 2000  Gray Watson  <gray@256.com>
+
+	* Cleaned up some of the compat.[ch] headers to better match
+ 	reality.
+
 Thu Mar 30 10:05:01 2000  Gray Watson  <gray@whopper.256.com>
 
 	* Reorganized the dmalloc.texi documentation and moved to using
@@ -1565,5 +1570,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.241 2000/03/30 17:45:15 gray Exp $
+$Id: ChangeLog,v 1.242 2000/04/18 01:58:22 gray Exp $
 -------------------------------------------------------------------------------

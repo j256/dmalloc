@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.h,v 1.38 2000/03/21 18:19:08 gray Exp $
+ * $Id: compat.h,v 1.39 2000/04/18 01:55:56 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -52,7 +52,7 @@ int	loc_snprintf(char *buf, const int buf_size, const char *format, ...);
  * Copy LEN characters from SRC to DEST
  */
 extern
-void	memcpy(char *dest, const char *src, DMALLOC_SIZE len);
+void	*memcpy(void *dest, const void *src, DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCPY == 0 */
 
 #if HAVE_MEMCMP == 0
@@ -60,7 +60,7 @@ void	memcpy(char *dest, const char *src, DMALLOC_SIZE len);
  * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
 extern
-int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len);
+int	memcmp(const void *str1, const void *str2, DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCMP == 0 */
 
 #if HAVE_MEMSET == 0
@@ -68,7 +68,7 @@ int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len);
  * Set LEN characters in STR to character CH
  */
 extern
-char	*memset(char *str, int ch, DMALLOC_SIZE len);
+void	*memset(void *str, const int ch, DMALLOC_SIZE len);
 #endif /* if HAVE_MEMSET == 0 */
 
 #if HAVE_STRCHR == 0
@@ -76,7 +76,7 @@ char	*memset(char *str, int ch, DMALLOC_SIZE len);
  * Find CH in STR by searching backwards through the string
  */
 extern
-char	*strchr(const char *str, int ch);
+char	*strchr(const char *str, const int ch);
 #endif /* if HAVE_STRCHR == 0 */
 
 #if HAVE_STRRCHR == 0
@@ -84,7 +84,7 @@ char	*strchr(const char *str, int ch);
  * Find CH in STR by searching backwards through the string
  */
 extern
-char	*strrchr(const char *str, int ch);
+char	*strrchr(const char *str, const int ch);
 #endif /* if HAVE_STRRCHR == 0 */
 
 #if HAVE_STRCAT == 0

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.24 2000/03/21 18:19:06 gray Exp $
+ * $Id: arg_check.c,v 1.25 2000/04/18 01:56:44 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.24 2000/03/21 18:19:06 gray Exp $";
+#ident "$Id: arg_check.c,v 1.25 2000/04/18 01:56:44 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.24 2000/03/21 18:19:06 gray Exp $";
+  "$Id: arg_check.c,v 1.25 2000/04/18 01:56:44 gray Exp $";
 #endif
 #endif
 
@@ -115,7 +115,7 @@ void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memset's arguments.
  */
-void	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len)
+void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memset", buf, CHUNK_PNT_LOOSE, len) != NOERROR)
@@ -240,7 +240,7 @@ void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memccpy's arguments.
  */
-void	*_dmalloc_memccpy(void *s1, const void *s2, const char ch,
+void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
 			  const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
@@ -257,7 +257,7 @@ void	*_dmalloc_memccpy(void *s1, const void *s2, const char ch,
 /*
  * Dummy function for checking memchr's arguments.
  */
-void	*_dmalloc_memchr(const void *s1, const char ch, const DMALLOC_SIZE len)
+void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memchr", s1, CHUNK_PNT_LOOSE, len) != NOERROR)
