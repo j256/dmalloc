@@ -1,3 +1,9 @@
+Fri Dec 11 00:04:04 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing dmalloc version 4.1.2.
+
+	* Fixed really bad bug which basically killed pthread support.
+
 Mon Nov 16 11:51:39 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.1.1.
@@ -1382,5 +1388,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.205 1998/11/16 22:21:23 gray Exp $
+$Id: ChangeLog,v 1.206 1998/12/11 05:06:37 gray Exp $
 -------------------------------------------------------------------------------
