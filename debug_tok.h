@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: debug_tok.h,v 1.25 1998/11/09 18:09:33 gray Exp $
+ * $Id: debug_tok.h,v 1.26 1998/11/12 16:25:49 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -49,12 +49,12 @@ static	attr_t		attributes[] = {
       "log general statistics" },
   { "log-non-free",	"lnf",	DEBUG_LOG_NONFREE,
       "log non-freed pointers" },
-  { "log-thread-id",	"lti",	DEBUG_LOG_THREAD_ID,
-      "log thread-id for allocated pointer" },
+  { "log-thread-id",	"lti",	0,
+      "Disabled token -- see LOG_THREAD_ID in settings.h" },
   { "log-trans",	"ltr",	DEBUG_LOG_TRANS,
       "log memory transactions" },
-  { "log-stamp",	"lst",	DEBUG_LOG_STAMP,
-      "add time-stamp to log" },
+  { "log-stamp",	"lst",	0,
+      "Disabled token -- see LOG_TIME_NUMBER in settings.h" },
   { "log-admin",	"lad",	DEBUG_LOG_ADMIN,
       "log administrative info" },
   { "log-blocks",	"lbl",	DEBUG_LOG_BLOCKS,
@@ -83,8 +83,7 @@ static	attr_t		attributes[] = {
       "check functions" },
   
   { "catch-signals",	"csi",	DEBUG_CATCH_SIGNALS,
-      "shutdown lib on SIGHUP, SIGINT, SIGTERM"},
-  
+      "shutdown lib on SIGHUP, SIGINT, SIGTERM" },
   { "realloc-copy",	"rco",	DEBUG_REALLOC_COPY,
       "copy all re-allocations" },
   { "free-blank",	"fbl",	DEBUG_FREE_BLANK,
@@ -95,21 +94,24 @@ static	attr_t		attributes[] = {
       "blank newly alloced memory" },
   { "heap-check-map",	"hcm",	DEBUG_HEAP_CHECK_MAP,
       "log heap-map on heap-check" },
-  /* old version -- can be removed later */
-  { "print-error",	"per",	DEBUG_PRINT_MESSAGES,
-      "old version -- please use print-messages" },
   { "print-messages",	"pme",	DEBUG_PRINT_MESSAGES,
       "write messages to stderr" },
+  /* OLD VERSION -- can be removed later */
+  { "print-error",	"per",	DEBUG_PRINT_MESSAGES,
+      "old version -- please use print-messages" },
   { "catch-null",	"cnu",	DEBUG_CATCH_NULL,
       "abort if no memory available" },
   { "never-reuse",	"nre",	DEBUG_NEVER_REUSE,
       "never re-use freed memory" },
   { "allow-nonlinear",	"ano",	DEBUG_ALLOW_NONLINEAR,
-      "allow non-linear heap space"},
-  { "allow-zero",	"aze",	DEBUG_ALLOW_ZERO,
-      "allow allocs of 0 bytes, frees of NULL"},
+      "allow non-linear heap space" },
+  { "allow-free-null",	"afn",	DEBUG_ALLOW_FREE_NULL,
+      "allow the frees of NULL pointers" },
+  /* OLD VERSION -- can be removed later */
+  { "allow-zero",	"aze",	DEBUG_ALLOW_FREE_NULL,
+      "old version -- please use allow-free-null" },
   { "error-dump",	"edu",	DEBUG_ERROR_DUMP,
-      "dump core on error and then continue"},
+      "dump core on error and then continue" },
   
   { NULL }
 };
