@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.84 1994/09/12 17:13:23 gray Exp $";
+  "$Id: chunk.c,v 1.85 1994/09/26 15:58:41 gray Exp $";
 #endif
 
 /*
@@ -274,6 +274,8 @@ LOCAL	void	log_error_info(const char * file, const unsigned int line,
 			       const char pnt_known, const void * pnt,
 			       const char * reason, const char dump)
 {
+  static char	dump_bottom = FALSE;
+  
   /* dump the pointer information */
   if (pnt_known)
     _dmalloc_message("%s: pointer '%#lx' from '%s'",
@@ -283,6 +285,11 @@ LOCAL	void	log_error_info(const char * file, const unsigned int line,
   
   /* NOTE: this has the potential for generating a seg-fault */
   if (dump && pnt_known && BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_BAD_SPACE)) {
+    if (! dump_bottom) {
+      _dmalloc_message("Dump of proper fence-bottom bytes: '%s'",
+		       expand_buf(fence_bottom, FENCE_BOTTOM));
+      dump_bottom = TRUE;
+    }
     if (IS_IN_HEAP((char *)pnt - pnt_below_adm))
       _dmalloc_message("Dump of '%#lx'-%d: '%s'",
 		       pnt, pnt_below_adm,
