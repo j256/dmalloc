@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.173 2003/06/14 05:19:05 gray Exp $
+# $Id: Makefile.in,v 1.174 2003/09/08 19:19:57 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -166,12 +166,17 @@ settings.h : $(srcdir)/settings.dist config.status
 	$(SHELL) config.status
 	touch $@
 
-dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5
+dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
+	$(srcdir)/arg_check.h $(srcdir)/dmalloc.h.6
 	rm -f $@ $@.t malloc.h.t
-	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</d' $(srcdir)/malloc.h > malloc.h.t
-	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 > $@.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/malloc.h \
+		> malloc.h.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' \
+		-e '/^#endif/d' $(srcdir)/arg_check.h > arg_check.h.t
+	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 \
+		arg_check.h.t $(srcdir)/dmalloc.h.6 > $@.t
 	mv $@.t $@
-	rm -f malloc.h.t
+	rm -f malloc.h.t arg_check.h.t
 
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t

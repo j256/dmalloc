@@ -133,9 +133,6 @@
 #endif /* DMALLOC_FUNC_CHECK */
 #endif /* ! DMALLOC_DISABLE */
 
-/* we start FUNC_CHECK again because we had to stop it above */
-#ifdef DMALLOC_FUNC_CHECK
-
 /*
  * feel free to add your favorite functions here and to arg_check.[ch]
  */
@@ -144,69 +141,3 @@
 extern "C" {
 #endif
 
-/*
- * copied in from arg_check.h with all comments removed
- */
-extern
-int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
-extern
-void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len);
-extern
-int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
-extern
-void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len);
-extern
-void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len);
-extern
-char	*_dmalloc_index(const char *str, const char ch);
-extern
-char	*_dmalloc_rindex(const char *str, const char ch);
-extern
-char	*_dmalloc_strcat(char *to, const char *from);
-extern
-int	_dmalloc_strcmp(const char *s1, const char *s2);
-extern
-DMALLOC_SIZE	_dmalloc_strlen(const char *str);
-extern
-char	*_dmalloc_strtok(char *str, const char *sep);
-extern
-void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
-extern
-void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
-			  const DMALLOC_SIZE len);
-extern
-void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len);
-extern
-char	*_dmalloc_strchr(const char *str, const int ch);
-extern
-char	*_dmalloc_strrchr(const char *str, const int ch);
-extern
-char	*_dmalloc_strcpy(char *to, const char *from);
-extern
-char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len);
-extern
-int	_dmalloc_strcasecmp(const char *s1, const char *s2);
-extern
-int	_dmalloc_strncasecmp(const char *s1, const char *s2,
-			     const DMALLOC_SIZE len);
-extern
-int	_dmalloc_strspn(const char *str, const char *list);
-extern
-int	_dmalloc_strcspn(const char *str, const char *list);
-extern
-char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len);
-extern
-int	_dmalloc_strncmp(const char *s1, const char *s2,
-			 const DMALLOC_SIZE len);
-extern
-char	*_dmalloc_strpbrk(const char *str, const char *list);
-extern
-char	*_dmalloc_strstr(const char *str, const char *pat);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* DMALLOC_FUNC_CHECK */
-
-#endif /* ! __DMALLOC_H__ */
