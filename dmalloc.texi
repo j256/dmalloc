@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.168 1999/10/11 23:59:41 gray Exp $
+@c $Id: dmalloc.texi,v 1.169 1999/10/18 16:10:15 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -674,15 +674,33 @@ You may also want to install the @file{dmallocrc} file in your home
 directory as @file{.dmallocrc}.  This allows you to add your own
 combination of debug tokens.  @xref{RC File}.
 
+@cindex log-unknown
+@item You may also want to enable the @samp{log-unknown} token
+(@kbd{dmalloc -p log-unknown}) which will log non-freed information
+about ``unknown'' memory to the log file.  Unknown means memory that
+does not have associated file and line information.  This is necessary
+if you are @emph{not} including @file{dmalloc.h} in your C files or if
+you want to track possible memory leaks in system functions.
+
 @item Run your program, examine the logfile that should have been created by
 dmalloc_shutdown, and use its information to help debug your program.
 
+@cindex env
+@cindex printenv
+@cindex DMALLOC_OPTIONS
 @cindex ident
+@cindex strings
+@emph{NOTE}: If a logfile is not created, use the @kbd{env} or
+@kbd{printenv} commands to make sure that the @samp{DMALLOC_OPTIONS}
+variable is set in your exported environment.
 
-@emph{NOTE}: If a log file has not been created then go back and repeat
-these items carefully.  You may want to use @kbd{ident} or @kbd{strings}
-on your program and @kbd{grep} for @samp{chunk.c,v} to make sure that
-the library is actually getting linked into your program.
+Also make sure that your program has been compiled correctly with the
+dmalloc library.  The @kbd{ident} program should show chunk.c and other
+dmalloc files compiled into your program.  You can also do @kbd{strings
+-a your-program | grep chunk.c} and look for something like @samp{$Id:
+chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $} with different versions
+and date information.  If this doesn't show up then chances are dmalloc
+was not linked into your program.
 
 @end enumerate
 
@@ -797,6 +815,7 @@ architecture/compilers.  @xref{Portability}.
 
 @cindex assembly hacks
 
+@cindex log-unknown
 The library attempts to use some assembly hacks to get the the
 return-address or the address of the line that called the dmalloc
 function.  If you have the @samp{log-unknown} token enabled and you run
