@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.20 1994/01/25 21:33:08 gray Exp $
+ * $Id: heap.h,v 1.21 1994/04/07 21:16:19 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -29,7 +29,7 @@
 /*
  * error code returned by heap allocation routine
  */
-#define HEAP_ALLOC_ERROR	((char *)-1)
+#define HEAP_ALLOC_ERROR	0L
 
 /*
  * probably machine specific defines used for certain calculations
