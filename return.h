@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: return.h,v 1.5 1993/09/10 21:17:39 gray Exp $
+ * $Id: return.h,v 1.6 1993/10/03 01:59:49 gray Exp $
  */
 
 /*
@@ -41,6 +41,9 @@
 
 #ifndef __RETURN_H__
 #define __RETURN_H__
+
+/* from conf.h */
+#if USE_RET_ADDRESS
 
 /* for DEC Alphas */
 #if __alpha
@@ -95,6 +98,8 @@
   } while(0)
 
 #endif /* __i386 */
+
+#endif /* USE_RET_ADDRESS */
 
 /* for all others, do nothing */
 #ifndef SET_RET_ADDR

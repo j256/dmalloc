@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.22 1993/09/21 00:38:00 gray Exp $
+ * $Id: conf.h.in,v 1.23 1993/10/03 01:59:48 gray Exp $
  */
 
 /*
@@ -52,24 +52,34 @@
  * should we allow the free of a NULL pointer and if it happens,
  * should a message be generated to that effect?  I don't see how this
  * would be useful but some systems can, and I guess require this.  I
- * would recommend considering the message to point out the offenders
- * because this is certainly not a portable feature of most malloc
- * libraries.
+ * would recommend using the message to point out the offenders
+ * because I would guess that this is not a portable feature of most
+ * malloc libraries.
  */
 #define ALLOW_FREE_NULL 0
 #define ALLOW_FREE_NULL_MESSAGE 1
 
 /*
+ * should we use the ra-address macros in return.h.  These are system
+ * specific macros designed to return the return-address for logging
+ * purposes.  You should only want to disable them if you are storing
+ * code which makes calls to the malloc function *in* the heap.  This
+ * is unlikely but will confuse the library.  Please mail me if you
+ * have any questions or if you indeed have this problem.
+ */
+#define USE_RET_ADDRESS 1
+
+/*
  * the largest allowable allocations in bits.  This is only for
  * verification purposes.  Any allocation larger than this (in bits)
  * will generate a MALLOC_TOO_BIG error.  the default (24) indicates
- * that an allocation of 16mb or more will generate an error.
+ * that an allocation of more than 16mb (2^24) will generate an error.
  */
 #define LARGEST_BLOCK 24
 
 /*
  ************************************************************************
- * CONFIGURE DEFINES:
+ * CONFIGURE DEFINES: Should not need to tune by hand
  ************************************************************************
  */
 
@@ -91,12 +101,12 @@
  * this is the basic block size in bits.  if possible, the configure
  * script will set this to be the value returned by the getpagesize()
  * function.  if not then some sort of best guess will be necessary.
- * 12 or 13 (meaning basic block size of 4 or 8k) will probably be good.
- *
- * NOTE: some sbrk functions round to the correct page-size.  If this
- * value is too low, the malloc-dbg library may think someone is using
- * sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR error.  No
- * problems should happen if this value is too high.
+ * 12 or 13 (meaning basic block size of 4 or 8k) will probably be
+ * good.  * NOTE: some sbrk functions round to the correct page-size.
+ * If this value is too low, the malloc-dbg library may think someone
+ * is using sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR
+ * error.  No problems aside from a possible increase in the
+ * administration overhead should happen if this value is too high.
  */
 #define BASIC_BLOCK 12
 
@@ -107,12 +117,12 @@
  * sizeof(long) which in most systems is the register width.
  *
  * NOTE: the value will never be auto-configured to be less than 3
- * bits (i.e. sizeof(long) == 8) because some system (like sparc for
+ * bits (where sizeof(long) == 8) because some system (like sparc for
  * instance) report the sizeof(long) == 4 while the register size is
  * 8 bytes.  Because of the register size, certain memory needs to be
  * base 8 (stack frames, code, etc.).
  *
- * NOTE: larger the number the more memory may be wasted with certain
+ * NOTE: larger the number the more memory may be wasted by certain
  *       combinations of requested admin info like fence-post checking.
  */
 #define ALLOCATION_ALIGNMENT 3
@@ -123,7 +133,7 @@
 
 /*
  * the Malloc-Debug library provides its own versions of the following
- * functions,  or knows how to work around their absence.
+ * functions, or knows how to work around their absence.
  */
 #define HAVE_BCMP 0
 #define HAVE_BCOPY 0
@@ -140,7 +150,9 @@
 #define HAVE_GETPID 0
 
 /*
- * the below functions are here to provide function argument checking only.
+ * the below functions are here to provide function argument checking
+ * only.  the library only has stubs for these and does not use them
+ * internally.
  */
 #define HAVE_MEMCMP 0
 #define HAVE_MEMCPY 0
