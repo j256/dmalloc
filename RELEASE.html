@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.12 2000/07/25 16:06:54 gray Exp $ -->
+<!-- $Id: RELEASE.html,v 1.13 2000/11/07 17:03:34 gray Exp $ -->
 <TITLE> Dmalloc Release Notes - 4.7.1 </TITLE>
 </HEAD>
 <BODY>
@@ -8,10 +8,10 @@
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.7.1 <BR>
+Version: Release 4.7.2 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.7.0.html">4.7.0</A> <BR>
-Date: July 25, 2000
+Last-Version: <A HREF="dmalloc-4.7.1.html">4.7.1</A> <BR>
+Date: October 11, 2000
 </H4>
 </CENTER>
 
@@ -32,7 +32,9 @@ Date: July 25, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Quick patch release to fix some problems with check-blank token.
+<P> Quick patch release to fix problems with #ident on newer gcc
+versions.  I really hate Unix sometimes for its blatant disregard for
+anything approaching a standard.
 
 <P>
 <HR>
@@ -107,9 +109,8 @@ Date: July 25, 2000
 
 <UL>
 
-<P><LI> Fixed problems when the check-blank token was enabled but the
-free-blank token or the alloc-blank tokens were not enabled.  Now
-check-blank implies both of the others automatically.
+<P><LI> Added autoconfiguration handling of #ident directives which
+broke on newer GCC versions.  Idiots.
 
 </UL>
 
