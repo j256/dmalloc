@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.67 1997/12/08 06:34:11 gray Exp $
+# $Id: Makefile.all.in,v 1.68 1997/12/08 07:24:11 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -56,7 +56,7 @@ OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o malloc.o
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
 
-all : $(LIBRARY) $(LIB_DIS) $(UTIL) $(INFOFILE)
+all : $(LIBRARY) $(LIB_DIS) $(UTIL)
 
 clean :
 	rm -f a.out core *.o *.t
@@ -70,22 +70,33 @@ distclean : clean
 #	rm -f configure
 
 installdirs :
-	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(infodir) $(bindir)
+	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(bindir)
 # may want to add $(shlibdir) to this list
 
 installincs : $(HFLS)
+	$(srcdir)/mkinstalldirs $(incdir)
 	$(INSTALL_DATA) $(HFLS) $(incdir)
 
-installlib : installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
+installlib : installincs $(LIBRARY) $(LIB_DIS)
+	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
 	$(INSTALL_DATA) $(LIB_DIS) $(libdir)
 	@RANLIB@ $(libdir)/$(LIB_DIS)
-	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
-#	$(INSTALL_DATA) $(srcdir)/$(SHLIBRARY)   $(shlibdir)
 
 install : installdirs installlib $(UTIL)
+	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
+	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
+	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
+
+installinfo : $(INFOFILE)
+	$(srcdir)/mkinstalldirs $(infodir)
+	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
+
+installshlib : $(SHLIBRARY)
+	$(srcdir)/mkinstalldirs $(shlibdir)
+	$(INSTALL_DATA) $(srcdir)/$(SHLIBRARY) $(shlibdir)
 
 dmalloc.h.2 : configure
 	$(SHELL) configure
@@ -100,8 +111,11 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 
 shlib : ${SHLIBRARY}
 
+# NOTE: you may have to edit the following to have it work on your system
 ${SHLIBRARY} : $(LIBRARY)
-#	ld -shared -o $@ -all $(LIBRARY) -all -soname $@ -none -lc
+	rm -f $@ $@.t
+	ld -shared -o $@.t -all $(LIBRARY) -all -soname $@ -none -lc
+	mv $@.t $@
 
 $(LIBRARY) : $(OBJS)
 	ar cr $(LIBRARY) $?
