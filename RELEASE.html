@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.0.0 </title>
+<title> Dmalloc Release Notes - 5.0.2 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.0.1 <br />
+Version: Release 5.0.2 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.0.0.html">5.0.0</a> <br />
-Date: May 20, 2003
+Last-Version: <a href="dmalloc-5.0.1.html">5.0.1</a> <br />
+Date: June 4, 2003
 </h4>
 
 <p>
@@ -26,17 +26,19 @@ Date: May 20, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Bug fix release after the big 5.0.0 last week.  Couple of bug
+<p> Bug fix release after the big 5.0.0 last month.  Couple of bug
 fixes and improvements. </p>
 
 <h3><a name="func"> New Functionality </a></h3>
 
 <ul>
 
-<li> Added dmalloc_page_size() function which returns the internal
-library page/block size. </li>
+<li> Integrated an internal random number generator to stop recursion
+with the <tt>random()</tt> function under some operating
+systems. </li>
 
-<li> Compressed the per-pointer admin structure by 8 bytes. </li>
+<li> Added build support for a.exe and other cc output forms for
+Windoze. </li>
 
 </ul>
 
@@ -54,21 +56,20 @@ None.
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+<li> Improved some of the configure script internals. </li>
+<li> Added support for a.exe and other cc output forms for Windoze. </li>
+</ul>
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
 <ul>
 
-<li> Reduced the per-pointer administrative overhead by 8 bytes down
-to ~32 bytes on an i386. </li>
-
-<li> Added a number of auto-testing sections to dmalloc_t.  Still need
-to flesh this out to be more inclusive of library features. </li>
-
-<li> Added testing of the free-list during heap-check. </li>
+<li> The <tt>random()</tt> function on some architectures was calling
+malloc() causing some recursion.  I stuck in an old random
+implementation that I had lying around as a replacement.  Feel free to
+point me to a good implementation online if the one I chose is
+lacking. </li>
 
 </ul>
 
@@ -82,8 +83,16 @@ None.
 
 <ul>
 
-<li> Found a [bad] problem where the library was not putting pointers
-back on the free list properly.  Ugh. </li>
+<li> Fixed some problems and improved code in the test utility
+dmalloc_t.  Dmalloc_t was not propagating error codes correctly and
+some of the tests were giving false errors. </li>
+
+<li> Integrated an internal random number generator to stop recursion
+with the <tt>random()</tt> function under some operating
+systems. </li>
+
+<li> To facilitate building under Windoze, added support for a.exe and
+other cc output forms. </li>
 
 </ul>
 

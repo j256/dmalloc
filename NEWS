@@ -1,8 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.105 2003/05/21 04:33:41 gray Exp $
+$Id: NEWS,v 1.106 2003/06/04 23:54:06 gray Exp $
 -------------------------------------------------------------------------------
 
+Version 5.0.2:
+	* Fixed some problems and improved code in the test utility dmalloc_t.
+	* Integrated an internal random number generator to stop recursion.
+	* Improved some of the configure script internals.
+	* Added support for a.exe and other cc output forms for Windoze.
+
 Version 5.0.1:
+
 	* Updated configure.ac script.
 	* Added dmalloc_page_size() function.
 	* Improved the auto-testing in dmalloc_t.

@@ -1,3 +1,12 @@
+2003-06-04  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.0.2.
+
+	* Fixed some problems and improved the code in dmalloc_t.
+
+	* Integrated an internal random number generator since random()
+	often calls malloc.  Ugh.
+
 2003-05-22  Gray Watson  <gray@outside.256.com>
 
 	* Removed protection filler to not confuse stuff.
@@ -6,7 +15,7 @@
 
 	* Improved some of the configure script internals.
 
-	* Added support for a.exe and other cc output forms.
+	* Added support for a.exe and other cc output forms for Windoze.
 
 2003-05-20  Gray Watson  <gray@outside.256.com>
 
@@ -1904,5 +1913,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.291 2003/05/23 03:05:19 gray Exp $
+$Id: ChangeLog,v 1.292 2003/06/04 23:54:05 gray Exp $
 -------------------------------------------------------------------------------

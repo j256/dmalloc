@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.112 2003/05/23 03:05:19 gray Exp $
+ * $Id: version.h,v 1.113 2003/06/04 23:54:07 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -31,7 +31,7 @@
  *	Changlog
  *	NEWS
  *	RELEASE.html
- *	Makefile.bsd.ports
+ *	ports/*/Makefile
  *	configure.ac (in AC_INIT)
  *	dmalloc.spec
  *	dmalloc.texi (2 places)
@@ -42,6 +42,6 @@
  */
 static	char	*dmalloc_version = "5.0.2" ;
 
-/* Version Date: $Date: 2003/05/23 03:05:19 $ */
+/* Version Date: $Date: 2003/06/04 23:54:07 $ */
 
 #endif /* ! __VERSION_H__ */

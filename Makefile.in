@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.167 2003/06/04 23:44:34 gray Exp $
+# $Id: Makefile.in,v 1.168 2003/06/04 23:54:06 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -84,7 +84,7 @@ FLS	=  conf.h.in configure.ac config.help \
 	settings.dist dmalloc_argv.c dmalloc_argv.h dmalloc_argv_loc.h \
 	dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
-	$(srcdir)/configure Makefile.bsd.ports
+	$(srcdir)/configure
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
