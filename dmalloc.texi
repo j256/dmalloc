@@ -21,14 +21,14 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.202 2000/12/01 00:06:42 gray Exp $
+@c $Id: dmalloc.texi,v 1.203 2001/03/10 22:49:10 gray Exp $
 @c ================================================================
 
 @ifinfo
 This file is an introduction to the Dmalloc library which handles general
 memory heap management.
 
-Copyright 1992 to 1998 by Gray Watson.
+Copyright 1992 to 2001 by Gray Watson.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -134,7 +134,7 @@ Gray Watson.
 @cindex library permissions
 @cindex permissions of the library
 
-Copyright 1992 to 2000 by Gray Watson.
+Copyright 1992 to 2001 by Gray Watson.
 
 Permission to use, copy, modify, and distribute this software for any
 purpose and without fee is hereby granted, provided that the above
