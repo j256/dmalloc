@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.6 1995/07/04 02:04:55 gray Exp $
+ * $Id: settings.dist,v 1.7 1995/09/06 17:37:53 gray Exp $
  */
 
 /*
@@ -195,22 +195,37 @@
 #define TIMEVAL_INCLUDE		<sys/time.h>
 #define GET_TIMEVAL(t)		(void)gettimeofday(&(t), NULL)
 
+/****************************** thread settings ******************************/
+
 /*
- * For those systems that have threaded programs, this logs the thread
- * ID that allocated the pointer -- it shows up as a t... (for
- * thread-id) in the logfile.  ... is determined by the
- * THREAD_ID_TO_STRING macro below.  THREAD_TYPE defines the type of
- * id storage field.  THREAD_INCLUDE will be included if necessary and
- * GET_THREAD_ID returns the current thread id.
- *
- * NOTE: You may have to change the GET_THREAD_ID macro which is
- * supposed to return the thread-id integer to be stored in the
- * pointer structures.
+ * the following definition allows use of the library in threaded
+ * programs.  The most common package is MIT's pthreads so this is the
+ * default.  Please send me mail if these definitions are configurable
+ * enough to work with your thread package.
  */
+#define LOCK_THREADS 0
+#define THREAD_LOCK			pthread_lock_global_np()
+#define THREAD_UNLOCK			pthread_unlock_global_np()
+#define THREAD_INCLUDE			<pthread.h>
+
+/*
+ * For those threaded programs, this logs the thread ID that allocated
+ * the pointer -- it shows up as a t... (for thread-id) in the
+ * logfile.  The ... is determined by the THREAD_ID_TO_STRING macro
+ * below.  THREAD_TYPE defines the type of id storage field.
+ * GET_THREAD_ID returns the current thread id.  It is assumed that
+ * the THREAD_TYPE and GET_THREAD_ID macros are defined in the above
+ * THREAD_INCLUDE file.
+ *
+ * NOTE: You may have to change the GET_THREAD_ID macro which is supposed
+ * to return the thread-id integer to be stored in the pointer
+ * structures.
+ */
+#if LOCK_THREADS
 #define STORE_THREAD_ID 0
 #define THREAD_TYPE			int
-#define THREAD_INCLUDE			<pthread.h>
 #define GET_THREAD_ID			gettid()
 #define THREAD_ID_TO_STRING(b, t)	(void)sprintf((b), "%d", (int)(t))
+#endif
 
 #endif /* ! __SETTINGS_H__ */
