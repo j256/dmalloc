@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.262 2004/09/13 05:13:46 gray Exp $
+@c $Id: dmalloc.texi,v 1.263 2004/09/27 20:18:07 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -2368,15 +2368,16 @@ do this.
 @node Debugging A Server,, Using With Cygwin, Programming
 @section Debugging Memory in a Server or Cgi-Bin Process
 
-@cindex daemon process debugging
-@cindex debugging daemon processes
-@cindex server process debugging
-@cindex debugging server processes
 @cindex cgi-bin process debugging
-@cindex debugging cgi-bin processes
-@cindex child process debugging
-@cindex debugging child processes
 @cindex cgi-bin usage of dmalloc
+@cindex child process debugging
+@cindex daemon process debugging
+@cindex debugging cgi-bin processes
+@cindex debugging child processes
+@cindex debugging daemon processes
+@cindex debugging server processes
+@cindex server process debugging
+@cindex usage of dmalloc in a daemon
 @cindex usage of dmalloc in a server
 @cindex usage of dmalloc with cgi-bin
 
@@ -2524,11 +2525,11 @@ each transaction is processed.  Then for each transaction you can use
 @code{dmalloc_log_changed} to show the unfreed memory.
 @xref{Extensions}.
 
-@item You can also use the @code{dmalloc_log_stats} and
-@code{dmalloc_log_heap_map} functions to dump general information about
-the heap.  Also, remember that you can use the @code{dmalloc_message}
-and @code{dmalloc_vmessage} routines to annotate the dmalloc logfile
-with details to help you debug memory problems.  @xref{Extensions}.
+@item You can also use the @code{dmalloc_log_stats} function to dump
+general information about the heap.  Also, remember that you can use
+the @code{dmalloc_message} and @code{dmalloc_vmessage} routines to
+annotate the dmalloc logfile with details to help you debug memory
+problems.  @xref{Extensions}.
 
 @end enumerate
 
