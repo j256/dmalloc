@@ -12,7 +12,7 @@
  * advertising or publicity pertaining to distribution of the document
  * or software without specific, written prior permission.
  *
- * Please see the LICENSE file or contact the author for information
+ * Please see the PERMISSIONS file or contact the author for information
  * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.60 1995/06/20 22:37:27 gray Exp $";
+  "$Id: error.c,v 1.61 1995/06/21 18:19:39 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -213,11 +213,11 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
        * NOTE: this makes it go recursive here but it will never enter
        * this section of code.
        */
-#ifdef DMALLOC_LICENSE
-      _dmalloc_message("Dmalloc version '%s'.  Licensed copy #%d."
+#if DMALLOC_LICENSE
+      _dmalloc_message("Dmalloc version '%s'.  Licensed copy #%d.",
 		       dmalloc_version, DMALLOC_LICENSE);
 #else
-      _dmalloc_message("Dmalloc version '%s'.  Licensed for NON-COMMERCIAL use only.",
+      _dmalloc_message("Dmalloc version '%s'.  UN-LICENSED copy.",
 		       dmalloc_version);
 #endif
       _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
