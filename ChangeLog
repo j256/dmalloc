@@ -1,3 +1,10 @@
+Tue Sep 29 09:26:50 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Aligned valloc to block alignment as it should have been with
+        fence post checking installed.
+
+	* Renamed some internal variables and macros better names.
+
 Mon Sep 28 17:55:24 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Added better auto-configuration of valloc.
@@ -1279,5 +1286,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.188 1998/09/28 21:58:29 gray Exp $
+$Id: ChangeLog,v 1.189 1998/09/29 13:33:26 gray Exp $
 -------------------------------------------------------------------------------
