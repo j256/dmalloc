@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.13 1993/05/24 17:00:47 gray Exp $";
+  "$Id: dmalloc.c,v 1.14 1993/05/25 00:50:15 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -69,7 +69,9 @@ LOCAL	int	debug		= NO_VALUE;	/* for DEBUG */
 LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
 LOCAL	char	*inpath		= NULL;		/* for config-file path */
 LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
+LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
+LOCAL	char	remove		= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	*tag		= NULL;		/* the debug tag */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
@@ -111,7 +113,7 @@ LOCAL	void	usage(void)
   (void)fprintf(stderr,	"  [-a address:#]    = stop when malloc sees ");
   (void)fprintf(stderr,   "address [for #th time] %%s\n");
   (void)fprintf(stderr,	"  [-b]              = set the output for bourne ");
-  (void)fprintf(stderr,   "shells (sh, ksh) %%t\n");
+  (void)fprintf(stderr,   "shells (sh, ksh, zsh) %%t\n");
   (void)fprintf(stderr,	"  [-c]              = clear all variables not ");
   (void)fprintf(stderr,   "specified %%t\n");
   (void)fprintf(stderr,	"  [-d bitmask]      = hex flag to directly set ");
@@ -122,7 +124,11 @@ LOCAL	void	usage(void)
   (void)fprintf(stderr,    "when not ~/.mallocrc %%s\n");
   (void)fprintf(stderr, "  [-i number]       = check heap every number ");
   (void)fprintf(stderr,    "times %%d\n");
+  (void)fprintf(stderr,	"  [-k]              = keep other settings ");
+  (void)fprintf(stderr,   "(overrides -r) %%t\n");
   (void)fprintf(stderr,	"  [-l file]         = file to log messages to %%s\n");
+  (void)fprintf(stderr,	"  [-r]              = remove other settings when ");
+  (void)fprintf(stderr,   "tag specified %%t\n");
   (void)fprintf(stderr, "  [-s file:line]    = start checking heap after ");
   (void)fprintf(stderr,    "seeing file [and line] %%s\n");
   (void)fprintf(stderr, "  [-v]              = turn on verbose output\n");
@@ -162,7 +168,7 @@ LOCAL	void	process_arguments(int argc, char ** argv)
     
     /* special version message */
     if (strcmp(*argv, VERSION_STRING) == 0) {
-      (void)fprintf(stderr, "Version '%s'\n", malloc_version);
+      (void)fprintf(stderr, "%s: Version '%s'\n", program, malloc_version);
       exit(0);
     }
     
@@ -170,7 +176,8 @@ LOCAL	void	process_arguments(int argc, char ** argv)
     if (**argv != '-') {
       if (tag != NULL) {
 	(void)fprintf(stderr,
-		      "Usage problem: debug-tag was already specified\n");
+		      "%s: usage problem, debug-tag was already specified\n",
+		      program);
 	usage();
 	exit(1);
       }
@@ -180,8 +187,9 @@ LOCAL	void	process_arguments(int argc, char ** argv)
     
     /* can only handle -a not -ab */
     if ((*argv)[1] == NULLC || (*argv)[2] != NULLC) {
-      (void)fprintf(stderr, "Usage problem: incorrect argument format '%s'\n",
-		    *argv);
+      (void)fprintf(stderr,
+		    "%s: usage problem, incorrect argument format '%s'\n",
+		    *argv, program);
       usage();
       exit(1);
     }
@@ -241,6 +249,10 @@ LOCAL	void	process_arguments(int argc, char ** argv)
       }
       break;
       
+    case 'k':
+      keep = TRUE;
+      break;
+      
     case 'l':
       if (argc <= 1)
 	missing = TRUE;
@@ -248,6 +260,10 @@ LOCAL	void	process_arguments(int argc, char ** argv)
 	argc--, argv++;
 	logpath = *argv;
       }
+      break;
+      
+    case 'r':
+      remove = TRUE;
       break;
       
     case 's':
@@ -405,10 +421,10 @@ LOCAL	int	process(int debug_value, char ** strp)
 LOCAL	void	dump_debug(const int val)
 {
   attr_t	*attrp;
-  int		tokc = 0;
+  int		tokc = 0, work = val;
   
   for (attrp = attributes; attrp->at_string != NULL; attrp++) {
-    if (attrp->at_value != 0 && (val & attrp->at_value) == attrp->at_value) {
+    if (attrp->at_value != 0 && (work & attrp->at_value) == attrp->at_value) {
       if (tokc == 0)
 	(void)fprintf(stderr, "   %s", attrp->at_string);
       else if (tokc == TOKENS_PER_LINE - 1)
@@ -416,11 +432,16 @@ LOCAL	void	dump_debug(const int val)
       else
 	(void)fprintf(stderr, ", %s", attrp->at_string);
       tokc = (tokc + 1) % TOKENS_PER_LINE;
+      work &= ~attrp->at_value;
     }
   }
   
   if (tokc != 0)
     (void)fprintf(stderr, "\n");
+  
+  if (work != 0)
+    (void)fprintf(stderr, "%s: warning, unknown debug flags: %#x\n",
+		  program, work);
 }
 
 /*
@@ -525,9 +546,13 @@ EXPORT	int	main(int argc, char ** argv)
     debug = process(0, NULL);
   }
   
-  if (tag != NULL || debug != NO_VALUE) {
+  if (debug != NO_VALUE) {
     (void)sprintf(buf, "%#lx", debug);
     set_variable(DEBUG_ENVIRON, buf);
+    
+    /* should we clear the rest? */
+    if (remove && ! keep)
+      clear = TRUE;
   }
   
   if (address != NULL)

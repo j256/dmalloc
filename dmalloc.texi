@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.16 1993/05/19 01:31:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.17 1993/05/25 00:50:11 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -93,12 +93,12 @@ or general comments.
 Gray Watson, Antaire Corporation.
 
 @menu
-* Copying::             Library copying conditions.
-* Allocation Basics::   Basic description of terms and functions.
-* Features::            Description of the benefits of the library.
-* Usage::               How to run programs with the library.
-* Code::                Information on the source and general concerns.
-* Plugs::               A couple soapbox comments.
+* Copying::                     Library copying conditions.
+* Allocation Basics::           Basic description of terms and functions.
+* Features::                    Description of the benefits of the library.
+* Usage::                       How to run programs with the library.
+* Code::                        Information on the source and general concerns.
+* Plugs::                       A couple soapbox comments.
 @end menu
 
 @node Copying, Allocation Basics, Top, Top
@@ -169,11 +169,11 @@ examples of their use.  It is quite unnecessary for you to read this
 section if you are familiar with using the heap allocation functions.
 
 @menu
-* Basic definitions::   For defining general terms and concepts.
-* Malloc functions::    Functionality supported by all malloc libs.
+* Basic Definitions::           For defining general terms and concepts.
+* Malloc Functions::            Functionality supported by all malloc libs.
 @end menu
 
-@node Basic definitions, Malloc functions,  , Allocation Basics
+@node Basic Definitions, Malloc Functions,  , Allocation Basics
 @section Basic Definitions of Terms and Concepts.
 
 Any program can be divided into 2 logical parts: text and data.  Text is
@@ -248,7 +248,7 @@ into memory.  The program will only be using the system resources
 necessary for the job and you will be guaranteed that your program can
 handle any sized file.
 
-@node Malloc functions,  , Basic definitions, Allocation Basics
+@node Malloc Functions,  , Basic Definitions, Allocation Basics
 @section Malloc functions Supported by all Malloc Libraries.
 
 All malloc libraries support 4 basic memory allocation commands.  These
@@ -305,20 +305,20 @@ the calloc routine will zero the memory space it returns.
 
 @menu
 * Overview::                    General debugging concepts.
-* Environment variables::       The variable names and their features.
-* malloc_dbg program::          Env variable setting utility.
-* RC file::                     Format of the run-time configuration file.
-* Debug tokens::                Description of the debugging token flags.
-* Argument checking::           Special checking of function arguments.
+* Environment Variables::       The variable names and their features.
+* Malloc_dbg Program::          Env variable setting utility.
+* RC File::                     Format of the run-time configuration file.
+* Debug Tokens::                Description of the debugging token flags.
+* Argument Checking::           Special checking of function arguments.
 @end menu
 
-@node Overview, Environment variables,  , Features
+@node Overview, Environment Variables,  , Features
 @section Overview of General Debugging Concepts.
 
 The features of this library are controlled by a number of environmental
 variables.  They enable the memory debugging features at runtime to help
 locate problems, chart memory leaks, provide basic bounds checking, log
-statistics, etc.. @xref{Environment variables}.
+statistics, etc.. @xref{Environment Variables}.
 
 The debugging features that are available can be broken down into a
 couple basic classifications:
@@ -417,7 +417,7 @@ your system's library routines.  It took me four hours once to finally
 come to the conclusion that the localtime call, included in SunOS
 release 4.1, was overwriting one of its fence-post markers.
 
-@node Environment variables, malloc_dbg program, Overview, Features
+@node Environment Variables, Malloc_dbg Program, Overview, Features
 @section Environment Variables - Their Names and Features.
 
 @dfn{Environment variables} are variables that are part of the user's
@@ -426,7 +426,7 @@ variables are used by the malloc library to enable or disable the memory
 debugging features, at runtime.
 
 They can be set either by hand or with the help of the malloc_dbg
-program.  @xref{malloc_dbg program}.
+program.  @xref{Malloc_dbg Program}.
 
 To set them by hand, C shell (csh or tcsh) users need to invoke:
 
@@ -445,7 +445,7 @@ Bourne shell (sh, bash, ksh, or zsh) users should use:
 @item MALLOC_DEBUG
 This env variable should be set to a value in hexadecimal which
 corresponds to the functionality token values added together.
-@xref{Debug tokens}.  For instance, if the user wanted to enable the
+@xref{Debug Tokens}.  For instance, if the user wanted to enable the
 logging of memory transactions (value @samp{0x008}) and wanted to check
 fence-post memory (value @samp{0x400}) then @samp{MALLOC_DEBUG} should
 be set to @samp{0x408} (@samp{0x008} + @samp{0x400}).
@@ -497,12 +497,12 @@ This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.
 @end table
 
-@node malloc_dbg program, RC file, Environment variables, Features
+@node Malloc_dbg Program, RC File, Environment Variables, Features
 @section Malloc_dbg program: An Env Variable Setting Utility.
 
 The malloc_dbg program is designed to assist in the setting of the
 environmental variables, especially @samp{MALLOC_DEBUG}.
-@xref{Environment variables}.  It is designed to print the shell
+@xref{Environment Variables}.  It is designed to print the shell
 commands necessary to make the appropriate changes to the environment.
 Unfortunately, it cannot make the changes on its own so the output from
 malloc_dbg should be sent through the @code{eval} shell command which
@@ -522,7 +522,7 @@ This allows the user to execute @code{malloc args}.
 The most basic usage for the program is @code{malloc_dbg [-b] tag}.  The
 -b flag is for generating Bourne shell type commands (C shell type are
 the default).  The tag argument should match a line from the user's
-run-time configuration file.  @xref{RC file}.
+run-time configuration file.  @xref{RC File}.
 
 Here is a detailed list of the flags that can passed to malloc_dbg:
 
@@ -555,8 +555,16 @@ Use this configuration file instead of the RC file
 @item -i number
 Set the @samp{MALLOC_INTERVAL} env variable to number.
 
+@item -k
+Keep the variables set when setting a tag.  This overrides -r.
+
 @item -l filename
 Set the @samp{MALLOC_LOGFILE} env variable to filename.
+
+@item -r
+Remove (unset) all variables when setting a tag.  This is useful when
+you are returning to a standard development tag and want the logfile,
+address, and interval variables to be cleared automatically.
 
 @item -s number
 Set the @samp{MALLOC_START} env variable to number (alternatively
@@ -577,10 +585,10 @@ that you have for the malloc environmental variables.  For example:
         MALLOC_START not set
 @end example
 
-@node RC file, Debug tokens, malloc_dbg program, Features
+@node RC File, Debug Tokens, Malloc_dbg Program, Features
 @section Run-Time Configuration File.
 
-The name of default @dfn{RC file} (or run-time configuration file) is
+The name of default @dfn{RC File} (or run-time configuration file) is
 @file{$HOME/.mallocrc}.  The @samp{$HOME} environmental variable should
 be set by the system to point to your home-directory.
 
@@ -590,7 +598,7 @@ The rc file file should contain lines in the general form of:
 
 tag is to be matched with the tag argument passed to the malloc_dbg
 program, token1, token2, ... are debug capability tokens.
-@xref{malloc_dbg program} and @ref{Debug tokens}.
+@xref{Malloc_dbg Program} and @ref{Debug Tokens}.
 
 A line can be finished with a '\' meaning it continues onto the next
 line.  Lines beginning with '#' are treated as comments and are ignored
@@ -629,13 +637,13 @@ of fence-post memory areas.
 When I say @code{eval `malloc_dbg none`}, all memory debugging features
 are disabled.
 
-@node Debug tokens, Argument Checking, RC file, Features
+@node Debug Tokens, Argument Checking, RC File, Features
 @section Debugging Tokens.
 
 The below tokens and their corresponding descriptions are for the
 setting of the @samp{MALLOC_DEBUG} environmental variable
-@xref{Environment variables}.  They should be specified in the user's
-@file{.mallocrc} file @xref{RC file}.
+@xref{Environment Variables}.  They should be specified in the user's
+@file{.mallocrc} file @xref{RC File}.
 
 @table @samp
 @item none
@@ -709,14 +717,14 @@ log a heap-map to the logfile every time the heap is checked
 log any errors and messages to the screen via standard-error
 @end table
 
-@node Argument Checking,  , Debug tokens, Features
+@node Argument Checking,  , Debug Tokens, Features
 @section Argument Checking of Certain Function Arguments.
 
 One potential problem with the library and its multitude of checks and
 diagnoses is that they only get performed when a malloc function is
 called.  One solution this is to include @file{malloc_dbg.h} and compile
 your source code with the @code{MALLOC_FUNC_CHECK} flag defined and
-enable the @code{check-funcs} token @xref{Debug tokens}.
+enable the @code{check-funcs} token @xref{Debug Tokens}.
 
 @example
         gcc -DMALLOC_FUNC_CHECK file.c
@@ -748,12 +756,12 @@ may still be lurking.
 @chapter How to Run Programs With the Library.
 
 @menu
-* Allocation macros::           For providing file and line information.
+* Allocation Macros::           For providing file and line information.
 * Extensions::                  Additional non-standard routines.
 * Disabling the Library::       How to compile/link without the library.
 @end menu
 
-@node Allocation macros, Extensions,  , Usage
+@node Allocation Macros, Extensions,  , Usage
 @section Allocation macros.
 
 By including @file{malloc_dbg.h} in your C files, your calls to calloc,
@@ -844,7 +852,7 @@ return-values from macros.  I have included a gcc form of these 2 macros
 a superior compiler and future releases of this library may require its
 use.
 
-@node Extensions, Disabling the Library, Allocation macros, Usage
+@node Extensions, Disabling the Library, Allocation Macros, Usage
 @section Extensions: Non-Standard Malloc Routines.
 
 The library has a number of variables and routines that are not a
@@ -917,7 +925,7 @@ the logging of more verbose memory error messages.
 
 You can also display the string representation of an error value by a
 call to the @file{malloc_dbg} program with a @samp{-e #} option
-@xref{malloc_dbg program}.
+@xref{Malloc_dbg Program}.
 @end table
 
 @node Disabling the Library,  , Extensions, Usage
@@ -948,7 +956,7 @@ need to @code{#ifdef}, remove, or comment them out of your code.
 If you want to @emph{totally} disable the malloc-debug library then you
 will need to recompile all the C files that include @file{malloc_dbg.h}
 while defining @code{MALLOC_DEBUG_DISABLE}.  This will cause the malloc
-leap macros to not be applied @xref{Allocation macros}.
+leap macros to not be applied @xref{Allocation Macros}.
 
 @example
         gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
@@ -980,9 +988,9 @@ been.
 @chapter Information on the Source and General Concerns.
 
 @menu
-* Definitions::         Some terms and other information.
-* Compatibility::       General compatibility concerns.
-* Portability::         Issues important for porting the library.
+* Definitions::                 Some terms and other information.
+* Compatibility::               General compatibility concerns.
+* Portability::                 Issues important for porting the library.
 @end menu
 
 @node Definitions, Compatibility,  , Code

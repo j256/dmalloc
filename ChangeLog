@@ -1,5 +1,8 @@
 Mon May 24 12:58:06 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Added -r and -k options for auto-unseting of variables or
+	keeping of variables with malloc_dbg when setting a tag.
+
 	* Added const checking to configure and reordered some include
 	files to put conf.h on top.
 
