@@ -1,3 +1,9 @@
+Thu Mar 30 10:05:01 2000  Gray Watson  <gray@whopper.256.com>
+
+	* Releasing dmalloc version 4.5.1.
+
+	* Fixed a problem with compilation of dmalloc_lp.c.  Thanks Chip.
+
 Wed Mar 29 17:40:43 2000  Gray Watson  <gray@whopper.256.com>
 
 	* Releasing dmalloc version 4.5.0.
@@ -1556,5 +1562,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.239 2000/03/29 22:41:11 gray Exp $
+$Id: ChangeLog,v 1.240 2000/03/30 15:39:37 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.6 2000/03/24 21:59:12 gray Exp $ -->
-<TITLE> Dmalloc Release Notes - 4.5.0 </TITLE>
+<!-- $Id: RELEASE.html,v 1.7 2000/03/30 15:39:38 gray Exp $ -->
+<TITLE> Dmalloc Release Notes - 4.5.1 </TITLE>
 </HEAD>
 <BODY>
 
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.5.0 <BR>
+Version: Release 4.5.1 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.4.0.html">4.4.0</A> <BR>
-Date: March 24, 2000
+Last-Version: <A HREF="dmalloc-4.5.0.html">4.5.0</A> <BR>
+Date: March 30, 2000
 </H4>
 </CENTER>
 
@@ -31,9 +31,7 @@ Date: March 24, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Added the ability to checkpoint a place in memory and then dump
-the not-freed or freed memory that has changed since the checkpoint.
-See the dmalloc_mark and dmalloc_log_changed functions.
+<P> Quick bug fix release to repair a compilation error.
 
 <P>
 <HR>
@@ -42,10 +40,7 @@ See the dmalloc_mark and dmalloc_log_changed functions.
 
 <UL>
 
-<P><LI> The dmalloc_mark function returns a mark value.  When passed
-at a later point to dmalloc_log_changed, the library will log the
-memory pointers that have changed the call to dmalloc_mark.  Multiple
-marks can be recorded and used.
+<P> None.
 
 </UL>
 
@@ -78,8 +73,7 @@ marks can be recorded and used.
 
 <UL>
 
-<P><LI> Added a new BBLOCK_START_FREE basic-block type which marks the
-start of a multiple block free section.
+<P> None.
 
 </UL>
 
@@ -101,7 +95,9 @@ start of a multiple block free section.
 
 <UL>
 
-<P> None.
+<P><LI> Fixed a compilation problem in dmalloc_lp.c where I was
+returning a void from another function call.  Not sure why gcc -Wall
+didn't catch this.
 
 </UL>
 
