@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.123 1997/11/05 16:26:34 gray Exp $
+@c $Id: dmalloc.texi,v 1.124 1997/11/06 14:15:39 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -52,12 +52,12 @@ translation approved by the author instead of in the original English.
 @title Debug Malloc Library
 @subtitle Version 3.2.1
 @subtitle March 1997
-@author Gray Watson <gray@@letters.com>
+@author Gray Watson
 
 @page
 Copyright 1992 to 1997 by Gray Watson.
 
-Published by Gray Watson @samp{<gray@@letters.com>}
+Published by Gray Watson
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -104,10 +104,10 @@ texi, info, and ps).  Documentation is available online at URL
 @code{http://www.letters.com/dmalloc/}.
 
 The library is available via ftp from @samp{ftp.letters.com} in the
-@file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached at
-@samp{gray@@letters.com} with any questions or feedback.  Please include
-the version number of the library that you are using as well as your
-machine and operating system types.
+@file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached via
+my web page @samp{http://www.letters.com/~gray} with any questions or
+feedback.  Please include the version number of the library that you are
+using as well as your machine and operating system types.
 
 Gray Watson.
 
@@ -552,10 +552,9 @@ ftp from @samp{ftp.letters.com} in the @file{/src/dmalloc} directory.
 
 To use anonymous ftp, you ftp to the site and when the system prompts
 you for a login-id or username you enter @kbd{anonymous}.  When it
-prompts you for a password you enter your email address.  I, for
-example, enter @kbd{gray@@letters.com}.  You then can change-directory
-(cd) into @file{/src/dmalloc} and get the @file{README} and
-@file{dmalloc.tar.gz} files.
+prompts you for a password you enter your email address.  You then can
+change-directory (cd) into @file{/src/dmalloc} and get the @file{README}
+and @file{dmalloc.tar.gz} files.
 
 The versions in this repository include such stuff as a postscript
 version of the manual and other large files which may not have been
