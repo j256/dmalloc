@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.61 1994/04/08 17:51:03 gray Exp $";
+  "$Id: malloc.c,v 1.62 1994/05/11 19:29:29 gray Exp $";
 #endif
 
 /*
@@ -167,10 +167,8 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   /* checking heap every X times */
   _malloc_iterc++;
   if (check_interval != -1) {
-    if (_malloc_iterc >= check_interval) {
+    if (check_interval <= 0 || _malloc_iterc % check_interval == 0)
       BIT_SET(_malloc_flags, DEBUG_CHECK_HEAP);
-      _malloc_iterc = 0;
-    }
     else
       BIT_CLEAR(_malloc_flags, DEBUG_CHECK_HEAP);
   }
@@ -380,7 +378,7 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return MALLOC_ERROR;
   
-  /* yes, this could be always true of size is unsigned */
+  /* yes, this could be always false if size is unsigned */
   if (size < 0) {
     malloc_errno = ERROR_BAD_SIZE;
     _malloc_error("malloc");
@@ -442,7 +440,7 @@ EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
   
   check_pnt(_malloc_file, _malloc_line, old_pnt, "realloc-in");
   
-  /* yes, this could be always true of new_size is unsigned */
+  /* yes, this could be always false if new_size is unsigned */
   if (new_size < 0) {
     malloc_errno = ERROR_BAD_SIZE;
     _malloc_error("realloc");
@@ -683,7 +681,8 @@ EXPORT	int	_malloc_examine(const char * pnt, MALLOC_SIZE * size,
   if (check_debug_vars(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE) != NOERROR)
     return ERROR;
   
-  ret = _chunk_read_info(pnt, size, file, line, ret_attr);
+  /* NOTE: we do not need the alloc-size info */
+  ret = _chunk_read_info(pnt, size, NULL, file, line, ret_attr);
   
   in_alloc = FALSE;
   
