@@ -47,7 +47,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.16 1993/07/12 06:07:07 gray Exp $";
+  "$Id: dmalloc.c,v 1.17 1993/07/13 05:54:19 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -70,7 +70,7 @@ LOCAL	char	*inpath		= NULL;		/* for config-file path */
 LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
-LOCAL	char	remove		= FALSE;	/* auto-remove settings */
+LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	*tag		= NULL;		/* the debug tag */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
@@ -94,7 +94,7 @@ LOCAL	argv_t	args[] = {
       NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHARP,	&logpath,
       "path",			"file to log messages to" },
-  { 'r',	"remove",	ARGV_BOOL,	&remove,
+  { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHARP,	&start,
       "file:line",		"start check heap after this" },
@@ -397,7 +397,7 @@ EXPORT	int	main(int argc, char ** argv)
     set_variable(DEBUG_ENVIRON, buf);
     
     /* should we clear the rest? */
-    if (remove && ! keep)
+    if (remove_auto && ! keep)
       clear = TRUE;
   }
   
