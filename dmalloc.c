@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.51 1994/11/13 00:14:30 gray Exp $";
+  "$Id: dmalloc.c,v 1.52 1994/12/15 15:18:21 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -466,21 +466,18 @@ LOCAL	void	dump_current(void)
  */
 LOCAL void    set_variable(const char * var, const char * value)
 {
-  if (bourne) {
-    if (! no_changes) {
-      (void)printf("%s=%s;\n", var, value);
-      (void)printf("export %s;\n", var);
-    }
-    if (no_changes || verbose) {
-      (void)fprintf(stderr, "Outputed: %s=%s;\n", var, value);
-      (void)fprintf(stderr, "export %s;\n", var);
-    }
-  }
-  else {
-    if (! no_changes)
-      (void)printf("setenv %s %s;\n", var, value);
-    if (no_changes || verbose)
-      (void)fprintf(stderr, "Outputed: setenv %s %s;\n", var, value);
+  char	comm[1024];
+  
+  if (bourne)
+    (void)sprintf(comm, "%s=%s;\nexport %s;\n", var, value, var);
+  else
+    (void)sprintf(comm, "setenv %s %s;\n", var, value);
+  
+  if (! no_changes)
+    (void)printf("%s", comm);
+  if (no_changes || verbose) {
+    (void)fprintf(stderr, "Outputed:\n");
+    (void)fprintf(stderr, "%s", comm);
   }
 }
 
