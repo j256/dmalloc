@@ -1,3 +1,7 @@
+2003-05-21  Gray Watson  <gray@outside.256.com>
+
+	* Added support for a.exe and other cc output forms.
+
 2003-05-20  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.0.1.
@@ -1894,5 +1898,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.289 2003/05/21 04:11:53 gray Exp $
+$Id: ChangeLog,v 1.290 2003/05/23 02:48:30 gray Exp $
 -------------------------------------------------------------------------------

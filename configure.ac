@@ -1,10 +1,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# NOTE: the beginning comments should be #'ed so we get the #!/bin/sh
-# at the very top of the configure script.
-#
-# Copyright 2000 by Gray Watson
+# Copyright 2003 by Gray Watson
 #
 # This file is part of the dmalloc package.
 #
@@ -21,10 +18,10 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.5 2003/05/21 15:59:46 gray Exp $
+# $Id: configure.ac,v 1.6 2003/05/23 02:48:30 gray Exp $
 #
-AC_REVISION($Revision: 1.5 $)
-AC_INIT(dmalloc, 5.0.1, [http://dmalloc.org/])
+AC_REVISION($Revision: 1.6 $)
+AC_INIT(dmalloc, 5.0.1, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
@@ -414,7 +411,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.5 2003/05/21 15:59:46 gray Exp $"
+#ident "$Id: configure.ac,v 1.6 2003/05/23 02:48:30 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
