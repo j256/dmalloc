@@ -34,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.19 1993/08/30 20:14:12 gray Exp $";
+  "$Id: compat.c,v 1.20 1993/09/10 21:22:41 gray Exp $";
 #endif
 
 #if HAVE_GETPID == 0
@@ -47,26 +47,41 @@ EXPORT	int	getpid(void)
 }
 #endif /* HAVE_GETPID == 0 */
 
-#if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
+#if HAVE_BCOPY == 0
 /*
- * copy LEN characters from FROM to TO
+ * copy LEN characters from DEST to SRC
  */
-EXPORT	char	*memcpy(char * to, const char * from, MALLOC_SIZE len)
+EXPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len)
 {
-  char	*hold = to;
+  char		*destp;
+  const	char	*srcp;
+  int		bytec;
   
-  for (; len > 0; len--, to++, from++)
-    *to = *from;
+  if (len <= 0)
+    return dest;
   
-  return hold;
+  srcp = src;
+  destp = dest;
+  
+  if (srcp <= destp && srcp + (len - 1) >= destp) {
+    /* overlap, must copy right-to-left. */
+    srcp += len - 1;
+    destp += len - 1;
+    for (bytec = 0; bytec < len; bytec++)
+      *destp-- = *srcp--;
+  } else
+    for (bytec = 0; bytec < len; bytec++)
+      *destp++ = *srcp++;
+  
+  return dest;
 }
-#endif /* HAVE_MEMCPY == 0 && HAVE_BCOPY == 0 */
+#endif /* HAVE_BCOPY == 0 */
 
-#if HAVE_MEMCMP == 0 && HAVE_BCMP == 0
+#if HAVE_BCMP == 0
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-EXPORT	int	memcmp(const char * str1, const char * str2, MALLOC_SIZE len)
+EXPORT	int	bcmp(const char * str1, const char * str2, MALLOC_SIZE len)
 {
   for (; len > 0; len--, str1++, str2++)
     if (*str1 != *str2)
@@ -74,11 +89,12 @@ EXPORT	int	memcmp(const char * str1, const char * str2, MALLOC_SIZE len)
   
   return 0;
 }
-#endif /* HAVE_MEMCMP == 0 && HAVE_BCMP == 0 */
+#endif /* HAVE_BCMP == 0 */
 
 #if HAVE_MEMSET == 0
 /*
  * set LEN characters in STR to character CH
+ * NOTE: remember Gray, there is no bset().
  */
 EXPORT	char	*memset(char * str, int ch, MALLOC_SIZE len)
 {
@@ -101,7 +117,10 @@ EXPORT	char	*index(const char * str, int ch)
     if (*str == (char)ch)
       return (char *)str;
   
-  return NULL;
+  if (ch == NULLC)
+    return (char *)str;
+  else
+    return NULL;
 }
 #endif /* HAVE_INDEX == 0 */
 
@@ -117,7 +136,10 @@ EXPORT	char	*rindex(const char * str, int ch)
     if (*str == (char)ch)
       pnt = (char *)str;
   
-  return pnt;
+  if (ch == NULLC)
+    return (char *)str;
+  else
+    return pnt;
 }
 #endif /* HAVE_RINDEX == 0 */
 

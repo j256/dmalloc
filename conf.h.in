@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.20 1993/08/30 20:16:17 gray Exp $
+ * $Id: conf.h.in,v 1.21 1993/09/10 21:22:36 gray Exp $
  */
 
 /*
@@ -112,9 +112,6 @@
  */
 #define HAVE_BCMP 0
 #define HAVE_BCOPY 0
-
-#define HAVE_MEMCMP 0
-#define HAVE_MEMCPY 0
 #define HAVE_MEMSET 0
 
 #define HAVE_INDEX 0
@@ -130,6 +127,8 @@
 /*
  * the below functions are here to provide function argument checking only.
  */
+#define HAVE_MEMCMP 0
+#define HAVE_MEMCPY 0
 #define HAVE_BZERO 0
 
 #define HAVE_MEMCCPY 0

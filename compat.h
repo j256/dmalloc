@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.14 1993/08/30 20:14:14 gray Exp $
+ * $Id: compat.h,v 1.15 1993/09/10 21:22:43 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -37,17 +37,17 @@ IMPORT	int	getpid(void);
 #endif
 
 /*
- * copy LEN characters from FROM to TO
+ * copy LEN characters from SRC to DEST
  */
-#if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
-IMPORT	char	*memcpy(char * to, const char * from, MALLOC_SIZE len);
+#if HAVE_BCOPY == 0
+IMPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len);
 #endif
 
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-#if HAVE_MEMCMP == 0 && HAVE_BCMP == 0
-IMPORT	int	memcmp(const char * str1, const char * str2, MALLOC_SIZE len);
+#if HAVE_BCMP == 0
+IMPORT	int	bcmp(const char * str1, const char * str2, MALLOC_SIZE len);
 #endif
 
 /*
