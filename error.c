@@ -5,12 +5,15 @@
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for
- * any purpose and without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all
- * copies, and that the name of Gray Watson not be used in advertising
- * or publicity pertaining to distribution of the document or software
- * without specific, written prior permission.
+ * Permission to use, copy, modify, and distribute this software for any
+ * NON-COMMERCIAL purpose and without fee is hereby granted, provided
+ * that the above copyright notice and this permission notice appear
+ * in all copies, and that the name of Gray Watson not be used in
+ * advertising or publicity pertaining to distribution of the document
+ * or software without specific, written prior permission.
+ *
+ * Please see the LICENSE file or contact the author for information
+ * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -53,10 +56,11 @@
 #include "error.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
+#include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.59 1995/05/30 15:09:34 gray Exp $";
+  "$Id: error.c,v 1.60 1995/06/20 22:37:27 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -206,9 +210,16 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
       }
       
       /*
-       * NOTE: this makes it go recursive once but it will never get
-       * back here
+       * NOTE: this makes it go recursive here but it will never enter
+       * this section of code.
        */
+#ifdef DMALLOC_LICENSE
+      _dmalloc_message("Dmalloc version '%s'.  Licensed copy #%d."
+		       dmalloc_version, DMALLOC_LICENSE);
+#else
+      _dmalloc_message("Dmalloc version '%s'.  Licensed for NON-COMMERCIAL use only.",
+		       dmalloc_version);
+#endif
       _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags, dmalloc_address);
       

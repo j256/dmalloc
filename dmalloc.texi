@@ -14,14 +14,14 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.94 1995/06/20 18:28:02 gray Exp $
+@c $Id: dmalloc.texi,v 1.95 1995/06/20 22:37:22 gray Exp $
 @c ================================================================
 
 @ifinfo
 This file is an introduction to the Dmalloc library which handles general
 memory heap management.
 
-Copyright @copyright{} 1992 - 1994 by Gray Watson.
+Copyright @copyright{} 1992 - 1995 by Gray Watson.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -48,12 +48,12 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 3.0.4
-@subtitle November 1994
+@subtitle Version 3.0.7
+@subtitle June 1995
 @author Gray Watson <gray@@letters.com>
 
 @page
-Copyright @copyright{} 1992 - 1994 by the Letters Corporation.
+Copyright @copyright{} 1992 - 1995 by Gray Watson.
 
 Published by Gray Watson @samp{<gray@@letters.com>}
 
@@ -77,7 +77,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 3.0.6 -- May 1995
+Version 3.0.7 -- June 1995
 @end ifinfo
 
 @cindex introduction
@@ -125,16 +125,54 @@ Gray Watson.
 
 @cindex copying
 
-Permission to use, copy, modify, and distribute this software for any
-purpose and without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies, and
-that the name of Gray Watson not be used in advertising or publicity
-pertaining to distribution of the document or software without specific,
-written prior permission.
-
 Gray Watson makes no representations about the suitability of the
 software described herein for any purpose.  It is provided ``as is''
 without express or implied warranty.
+
+Permission to use, copy, modify, and distribute this software for any
+@emph{non-commercial} purpose without fee is hereby granted, provided
+that the above copyright notice and this permission notice appear in all
+copies, and that the name of Gray Watson not be used in advertising or
+publicity pertaining to distribution of the document or software without
+specific, written prior permission.
+
+Due to the fact that I am a consultant these days (read no stable
+revenue source) and given that I still spend a lot of time developing
+and maintaining this library, I have added the requirement that
+commercial entities license the software for a nominal fee.  This also
+allows me to provide better support and updates on a more frequent
+basis.
+
+A @emph{commercially} licensed copy of the software which allows the
+licensee to use, copy, or modify the software for any @emph{commercial}
+purpose is available for US$35.  The license is good for a single
+installed copy of the library.  For site licenses or any other
+reasonable agreements, please contact me directly.  Licensees get a
+registered copy of the software as well as more attentive product
+support.
+
+A copy of the software on a Unix tar floppy is available for US$10 and a
+printed and bound copy of the manual is available for US$15.
+Internation shipping costs not included.
+
+Please include the following registration information with your check.
+
+@table @asis
+@item Name
+@item Position
+@item Company/Organization
+@item Postal Mail Address
+@item Email-Address
+@item Telephone Number
+@end table
+
+Send it along with any other correspondence to:
+
+@example
+Gray Watson
+330 Harmar St.
+Pittsburgh, PA  15219-3748
+@end example
 
 @node Overview, Details, Copying, Top
 @chapter How to Debug with the Library
@@ -466,6 +504,10 @@ To configure, compile, and install the library, follow these steps
 carefully.
 
 @enumerate
+
+@item First, please examine the LICENSE file.  If you are using
+the library in a commercial setting, please consider paying for a
+licensed copy of the software.
 
 @item Type @kbd{sh ./configure} to configure the library.  You may want
 to first examine the @file{config.help} file for some information about
@@ -981,12 +1023,12 @@ of zero if the library has not detected any problems.
 
 @item int dmalloc_address
 @cindex dmalloc_address variable
-This variable hold the address to be specifically looked for when
+This variable holds the address to be specifically looked for when
 allocating or freeing by the library.
 
 @item int dmalloc_address_count
 @cindex dmalloc_address_count variable
-This variable hold the argument to the address library setting.  If it
+This variable stores the argument to the address library setting.  If it
 is set to a greater than 0 value then after the library has seen the
 @samp{addr} address this many times, it will call
 @code{dmalloc_error()}.
@@ -999,9 +1041,9 @@ routines:
 @deftypefun void dmalloc_shutdown ( void )
 @cindex dmalloc_shutdown function
 
-Shuts the library down and logs the final statistics and information
-especially the non-freed memory pointers.  The library has code to
-support auto-shutdown if your system has @code{on_exit()} or
+This function shuts the library down and logs the final statistics and
+information especially the non-freed memory pointers.  The library has
+code to support auto-shutdown if your system has @code{on_exit()} or
 @code{atexit()} calls.  If you do not have these routines, then
 @code{dmalloc_shutdown} should be called right before @code{exit()} or
 as the last function in @code{main()}.
@@ -1019,30 +1061,30 @@ main()
 @deftypefun void dmalloc_log_heap_map ( void )
 @cindex dmalloc_log_heap_map function
 
-Logs to the logfile (if it is enabled) a graphical representation of the
-current heap space.
+This routine logs to the logfile (if it is enabled) a graphical
+representation of the current heap space.
 @end deftypefun
 
 @deftypefun void dmalloc_log_stats ( void )
 @cindex dmalloc_log_stats function
 
-Outputs the current dmalloc statistics to the log file.
+This routine outputs the current dmalloc statistics to the log file.
 @end deftypefun
 
 @deftypefun void dmalloc_log_unfreed( void )
 @cindex dmalloc_log_unfreed function
 
-Dumps the unfreed-memory information to the log file.  This is also
-useful to dump the currently allocated points to the log file to be
-diff'ed against another dump later on.
+This function dumps the unfreed-memory information to the log file.
+This is also useful to dump the currently allocated points to the log
+file to be diff'ed against another dump later on.
 @end deftypefun
 
 @deftypefun int dmalloc_verify ( char * @var{pnt} )
 @cindex dmalloc_verify function
 
-Verifies individual memory pointers that are suspect of memory problems.
-To check the entire heap pass in a NULL or 0 pointer.  The routine
-returns DMALLOC_VERIFY_ERROR or DMALLOC_VERIFY_NOERROR.
+This function verifies individual memory pointers that are suspect of
+memory problems.  To check the entire heap pass in a NULL or 0 pointer.
+The routine returns DMALLOC_VERIFY_ERROR or DMALLOC_VERIFY_NOERROR.
 
 @emph{NOTE}: @samp{dmalloc_verify()} can only check the heap with the
 functions that have been enabled.  For example, if fence-post checking
@@ -1053,11 +1095,11 @@ areas in the heap.
 @deftypefun void dmalloc_debug ( long @var{debug} )
 @cindex dmalloc_debug function
 
-Overrides the debug setting from the environment variable and sets the
-library debugging features explicitly.  For instance, if debugging
-should never be enabled for a program, a call to @code{dmalloc_debug(0)}
-as the first call in @code{main()} will disable all the memory debugging
-from that point on.
+This routine overrides the debug setting from the environment variable
+and sets the library debugging features explicitly.  For instance, if
+debugging should never be enabled for a program, a call to
+@code{dmalloc_debug(0)} as the first call in @code{main()} will disable
+all the memory debugging from that point on.
 
 One problem however is that some systems make calls to memory allocation
 functions @emph{before} @code{main()} is reached therefore before
@@ -1068,18 +1110,18 @@ may be generated regardless.
 @deftypefun long dmalloc_debug_current ( void )
 @cindex dmalloc_debug_current function
 
-Returns the current debug value from the environment variable.  This
-allows you to save a copy of the debug dmalloc settings to be changed
-and then restored later.
+This routine returns the current debug value from the environment
+variable.  This allows you to save a copy of the debug dmalloc settings
+to be changed and then restored later.
 @end deftypefun
 
 @deftypefun int dmalloc_examine ( char * @var{pnt}, int * @var{size},
 char ** @var{file}, int * @var{line}, void ** @var{ret_address} )
 @cindex dmalloc_examine function
 
-Returns the size of a pnt's allocation as well as the file and line or
-the return-address from where it was allocated.  It will return NOERROR
-or ERROR depending on whether pnt is good or not.
+This function returns the size of a pnt's allocation as well as the file
+and line or the return-address from where it was allocated.  It will
+return NOERROR or ERROR depending on whether pnt is good or not.
 
 @emph{NOTE}: This function is @emph{certainly} not provided by most if
 not all other malloc libraries.
@@ -1088,9 +1130,9 @@ not all other malloc libraries.
 @deftypefun char * dmalloc_strerror ( int @var{errnum} )
 @cindex dmalloc_strerror function
 
-Returns the string representation of the error value in errnum (which
-probably should be dmalloc_errno).  This allows the logging of more
-verbose memory error messages.
+This function returns the string representation of the error value in
+errnum (which probably should be dmalloc_errno).  This allows the
+logging of more verbose memory error messages.
 
 You can also display the string representation of an error value by a
 call to the @file{dmalloc} program with a @samp{-e #} option.
@@ -1179,7 +1221,7 @@ been.
 @cindex DMALLOC_OPTIONS
 
 An @dfn{environment variable} is a variable that is part of the user's
-working environment and are shared by all the programs.  The
+working environment and it is shared by all the programs.  The
 @samp{DMALLOC_OPTIONS} variable is used by the dmalloc library to enable
 or disable the memory debugging features, at runtime.  It can be set
 either by hand or with the help of the dmalloc program.  @xref{Dmalloc

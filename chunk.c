@@ -5,12 +5,15 @@
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for
- * any purpose and without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all
- * copies, and that the name of Gray Watson not be used in advertising
- * or publicity pertaining to distribution of the document or software
- * without specific, written prior permission.
+ * Permission to use, copy, modify, and distribute this software for any
+ * NON-COMMERCIAL purpose and without fee is hereby granted, provided
+ * that the above copyright notice and this permission notice appear
+ * in all copies, and that the name of Gray Watson not be used in
+ * advertising or publicity pertaining to distribution of the document
+ * or software without specific, written prior permission.
+ *
+ * Please see the LICENSE file or contact the author for information
+ * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -40,11 +43,10 @@
 #include "error_val.h"
 #include "heap.h"
 #include "dmalloc_loc.h"
-#include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.93 1995/06/20 02:10:15 gray Exp $";
+  "$Id: chunk.c,v 1.94 1995/06/20 22:37:14 gray Exp $";
 #endif
 
 /*
@@ -2681,9 +2683,9 @@ EXPORT	void	_chunk_stats(void)
   wasted = tot_space - alloc_max_given;
   
   /* version information */
-  _dmalloc_message("version '%s', basic-block %d bytes, alignment %d bytes, heap grows %s",
-		  malloc_version, BLOCK_SIZE, ALLOCATION_ALIGNMENT,
-		  (HEAP_GROWS_UP ? "up" : "down"));
+  _dmalloc_message("basic-block %d bytes, alignment %d bytes, heap grows %s",
+		   BLOCK_SIZE, ALLOCATION_ALIGNMENT,
+		   (HEAP_GROWS_UP ? "up" : "down"));
   
   /* general heap information */
   _dmalloc_message("heap: start %#lx, end %#lx, size %ld bytes, checked %ld",

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.29 1995/06/20 18:02:46 gray Exp $
+$Id: Manifest,v 1.30 1995/06/20 22:37:10 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
@@ -9,6 +9,9 @@ Deansify.pl		Perl script to attempt to convert the code to
 			non-ansi format. (yeaauuck!)
 
 INSTALL			Installation guide.
+
+LICENSE			File detailing commercial and non-commercial
+			copying and distrbution conditions.
 
 Makefile.in		Used by configure to create the Makefile.
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.76 1995/06/13 21:34:37 gray Exp $
+# $Id: Makefile.in,v 1.77 1995/06/20 22:37:09 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -156,6 +156,16 @@ INSTALL : INSTALL.1 dmalloc.info
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Prev: Getting Started/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+	echo ------------------------------------------------------------------------------- \
+		>> $(.TARGET).t
+	mv $(.TARGET).t $(.TARGET)
+
+LICENSE : dmalloc.info
+	rm -f $(.TARGET) $(.TARGET).t
+	echo ------------------------------------------------------------------------------- \
+		> $(.TARGET).t
+	sed -e '1,/,  Node: Copying/d' -e '/,  Prev: Copying/,$$d' \
 		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
