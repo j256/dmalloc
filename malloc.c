@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.46 1993/09/25 17:46:31 gray Exp $";
+  "$Id: malloc.c,v 1.47 1993/09/29 18:43:23 gray Exp $";
 #endif
 
 /*
@@ -417,7 +417,7 @@ EXPORT	int	free(void * pnt)
   if (pnt == NULL) {
 #if ALLOW_FREE_NULL_MESSAGE
     _malloc_message("WARNING: tried to free(0) from '%s'",
-		    _chunk_display_pnt(file, line));
+		    _chunk_display_pnt(_malloc_file, _malloc_line));
 #endif
     ret = FREE_NOERROR;
   }
