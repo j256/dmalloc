@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.28 1995/05/12 20:49:35 gray Exp $
+$Id: TODO,v 1.29 1995/05/13 00:34:55 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -133,6 +133,7 @@ TESTING / STATISTICS:
 
 GENERAL:
 
+- add display_pnt calls mostly everywhere display_where calls in chunk.
 - maybe show the upper-end of a pointer if it is over fence post
 	- need to pass size into log_error_info
 - maybe with no 'log-unknown' token, don't print ANY info about

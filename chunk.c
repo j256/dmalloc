@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.91 1995/05/12 21:05:33 gray Exp $";
+  "$Id: chunk.c,v 1.92 1995/05/13 00:34:45 gray Exp $";
 #endif
 
 /*
@@ -291,13 +291,14 @@ LOCAL	char	*display_pnt(const void * pnt, const overhead_t * overp)
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
+#if STORE_TIMEVAL
+    (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&overp->ov_timeval, FALSE));
+    (void)strcat(buf, buf2);
+#else
 #if STORE_TIME
     (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&overp->ov_time, FALSE));
     (void)strcat(buf, buf2);
 #endif
-#if STORE_TIMEVAL
-    (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&overp->ov_timeval, FALSE));
-    (void)strcat(buf, buf2);
 #endif
   }
   
@@ -982,10 +983,8 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
 #endif
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
-#if HAVE_TIME
-#if STORE_TIME
+#if STORE_TIME && HAVE_TIME
     dblockp->db_overhead.ov_time = time(NULL);
-#endif
 #endif
 #if STORE_TIMEVAL
     GET_TIMEVAL(dblockp->db_overhead.ov_timeval);
@@ -2226,10 +2225,8 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 #endif
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
-#if HAVE_TIME
-#if STORE_TIME
+#if STORE_TIME && HAVE_TIME
       bblockp->bb_overhead.ov_time = time(NULL);
-#endif
 #endif
 #if STORE_TIMEVAL
       GET_TIMEVAL(bblockp->bb_overhead.ov_timeval);
@@ -2547,6 +2544,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   
   /* if we are not realloc copying and the size is the same */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_REALLOC_COPY)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)
       || old_bitn != new_bitn
       || NUM_BLOCKS(old_size) != NUM_BLOCKS(new_size)) {
     
