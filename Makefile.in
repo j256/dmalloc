@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.137 2000/05/16 18:40:25 gray Exp $
+# $Id: Makefile.in,v 1.138 2000/05/17 18:30:19 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -58,7 +58,7 @@ INFOFILE= $(MODULE).info
 # the end on purpose
 #
 FLS	=  conf.h.in configure.in config.help \
-	ChangeLog Manifest INSTALL NEWS NOTES README TODO \
+	ChangeLog Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
 	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
