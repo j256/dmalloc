@@ -3,7 +3,7 @@
 # Rename this to .dmallocrc and place in your $HOME directory to
 # activate.  See dmalloc.info for more information.
 #
-# $Id: dmallocrc,v 1.30 1995/05/16 01:58:21 gray Exp $
+# $Id: dmallocrc,v 1.31 1995/07/04 01:53:02 gray Exp $
 #
 
 #
@@ -70,7 +70,7 @@ runtime		log-stats, log-non-free, log-blocks, log-bad-space, \
 
 # minimal checking
 low		log-stats, log-non-free, log-blocks, log-bad-space, \
-		log-unknown, \
+		log-unknown, log-elapsed-time, \
 		check-fence, \
 		free-blank, error-abort, alloc-blank, catch-null
 
@@ -113,6 +113,7 @@ all		log-stats, log-non-free, log-trans, log-stamp, log-admin, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
 		heap-check-map, catch-null, never-reuse
+
 # NOTE: for specific occasions:
 #	log-thread-id, log-current-time, allow-nonlinear, print-error,
 #	dump-continue

@@ -58,7 +58,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.61 1995/06/28 23:51:51 gray Exp $";
+  "$Id: dmalloc.c,v 1.62 1995/07/04 01:53:03 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -82,6 +82,7 @@ typedef struct {
 			 DEBUG_CHECK_FENCE | \
 			 DEBUG_CATCH_NULL)
 #define LOW_FLAGS	(RUNTIME_FLAGS | \
+			 DEBUG_LOG_ELAPSED_TIME | \
 			 DEBUG_FREE_BLANK | DEBUG_ERROR_ABORT | \
 			 DEBUG_ALLOC_BLANK)
 #define MEDIUM_FLAGS	(LOW_FLAGS | \
