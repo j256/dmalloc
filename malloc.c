@@ -38,6 +38,12 @@
 #endif
 #endif
 
+#if LOCK_THREADS
+#ifdef THREAD_INCLUDE
+#include THREAD_INCLUDE
+#endif
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
@@ -55,7 +61,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.85 1995/09/03 16:35:49 gray Exp $";
+  "$Id: malloc.c,v 1.86 1995/09/06 17:39:44 gray Exp $";
 #endif
 
 /*
@@ -118,11 +124,11 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
     /*NOTREACHED*/
   }
   
-  in_alloc = TRUE;
-  
 #if LOCK_THREADS
   THREAD_LOCK;
 #endif  
+  
+  in_alloc = TRUE;
   
   if (! enabled)
     if (dmalloc_startup() != NOERROR)
