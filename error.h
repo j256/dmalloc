@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.46 2000/03/21 18:19:13 gray Exp $
+ * $Id: error.h,v 1.47 2000/05/16 18:36:51 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -54,7 +54,7 @@ DMALLOC_PNT	_dmalloc_address;
 
 /* when to stop at an address */
 extern
-long		_dmalloc_address_seen_n;
+unsigned long	_dmalloc_address_seen_n;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
 extern
@@ -81,6 +81,10 @@ extern
 TIME_TYPE	_dmalloc_start;
 #endif /* if HAVE_TIME */
 #endif /* if STORE_TIMEVAL == 0 */
+
+/* when we are going to startup our locking subsystem */
+extern
+int		_dmalloc_lock_on;
 
 /* global flag which indicates when we are aborting */
 extern

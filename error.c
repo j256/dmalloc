@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.93 2000/05/15 22:22:49 gray Exp $
+ * $Id: error.c,v 1.94 2000/05/16 18:36:51 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.93 2000/05/15 22:22:49 gray Exp $";
+#ident "$Id: error.c,v 1.94 2000/05/16 18:36:51 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.93 2000/05/15 22:22:49 gray Exp $";
+  "$Id: error.c,v 1.94 2000/05/16 18:36:51 gray Exp $";
 #endif
 #endif
 
@@ -95,11 +95,11 @@ extern	char		*_dmalloc_strerror(const int errnum);
  * exported variables
  */
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-char		*_dmalloc_logpath = LOGPATH_INIT;
+char		*_dmalloc_logpath = NULL;
 /* address to look for.  when discovered call dmalloc_error() */
-DMALLOC_PNT	_dmalloc_address = ADDRESS_INIT;
+DMALLOC_PNT	_dmalloc_address = NULL;
 /* when to stop at an address */
-long		_dmalloc_address_seen_n = ADDRESS_COUNT_INIT;
+unsigned long	_dmalloc_address_seen_n = 0;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
 unsigned int	_dmalloc_flags = 0;
@@ -108,7 +108,7 @@ unsigned int	_dmalloc_flags = 0;
 unsigned long	_dmalloc_iter_c = 0;
 
 /* how often to check the heap */
-unsigned long	_dmalloc_check_interval = INTERVAL_INIT;
+unsigned long	_dmalloc_check_interval = 0;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
@@ -121,6 +121,9 @@ TIMEVAL_TYPE	_dmalloc_start;
 TIME_TYPE	_dmalloc_start = 0;
 #endif
 #endif
+
+/* when we are going to startup our locking subsystem */
+int		_dmalloc_lock_on = 0;
 
 /* global flag which indicates when we are aborting */
 int		_dmalloc_aborting_b = 0;
@@ -138,7 +141,7 @@ void	_dmalloc_open_log(void)
   
   /* if it's already open or if we don't have a log file configured */
   if (outfile_fd >= 0
-      || _dmalloc_logpath == LOGPATH_INIT) {
+      || _dmalloc_logpath == NULL) {
     return;
   }
   
@@ -150,7 +153,7 @@ void	_dmalloc_open_log(void)
 		       _dmalloc_logpath);
     (void)write(STDERR, str, strlen(str));
     /* disable log_path */
-    _dmalloc_logpath = LOGPATH_INIT;
+    _dmalloc_logpath = NULL;
     return;
   }
   
@@ -163,19 +166,13 @@ void	_dmalloc_open_log(void)
 		   dmalloc_version, DMALLOC_HOME);
   _dmalloc_message("flags = %#x, logfile '%s'",
 		   _dmalloc_flags, _dmalloc_logpath);
-  if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT) {
-    _dmalloc_message("interval = %lu, addr = %#lx",
-		     _dmalloc_check_interval,
-		     (unsigned long)_dmalloc_address);
-  }
-  else {
-    _dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
-		     _dmalloc_check_interval,
-		     (unsigned long)_dmalloc_address,
-		     _dmalloc_address_seen_n);
-  }
+  _dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
+		   _dmalloc_check_interval,
+		   (unsigned long)_dmalloc_address,
+		   _dmalloc_address_seen_n);
 #if LOCK_THREADS
-  _dmalloc_message("threads enabled, lock-init = %d", THREAD_INIT_LOCK);
+  _dmalloc_message("threads enabled, lock-on = %d, lock-init = %d",
+		   _dmalloc_lock_on, THREAD_INIT_LOCK);
 #endif
     
 #if STORE_TIMEVAL
@@ -277,13 +274,13 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   bounds_p = str_p + sizeof(str);
   
   /* no logpath and no print then no workie */
-  if (_dmalloc_logpath == LOGPATH_INIT
+  if (_dmalloc_logpath == NULL
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     return;
   }
   
   /* do we need to open the logfile? */
-  if (_dmalloc_logpath != LOGPATH_INIT && outfile_fd < 0) {
+  if (_dmalloc_logpath != NULL && outfile_fd < 0) {
     _dmalloc_open_log();
   }
   
@@ -331,7 +328,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   len = str_p - str;
   
   /* do we need to write the message to the logfile */
-  if (_dmalloc_logpath != LOGPATH_INIT) {
+  if (_dmalloc_logpath != NULL) {
     (void)write(outfile_fd, str, len);
   }
   
