@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.36 2003/05/13 16:38:43 gray Exp $
+$Id: Manifest,v 1.37 2003/05/15 02:43:55 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
@@ -48,8 +48,6 @@ contrib/		directory of contributions from other sources
 
 debug_tok.h		Tokens that correspond to debugging
 			functionality.
-
-debug_val.h		Values corresponding to the debug tokens.
 
 dmalloc.c		Program that assists in the setting of the
 			DMALLOC_DEBUG and other debug environmental

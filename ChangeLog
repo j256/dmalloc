@@ -1,3 +1,11 @@
+2003-05-14  Gray Watson  <gray@outside.256.com>
+
+	* Removed debug_val.h and error_str.h.
+
+	* Lots of bugs fixed.
+
+	* Removed a number of old error codes.
+
 2003-05-13  Gray Watson  <gray@outside.256.com>
 
 	* Deprecated log-blocks and heap-check-map debug tokens.
@@ -1855,5 +1863,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.280 2003/05/13 18:16:47 gray Exp $
+$Id: ChangeLog,v 1.281 2003/05/15 02:47:27 gray Exp $
 -------------------------------------------------------------------------------
