@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.2 1999/03/10 16:41:16 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.3 1999/03/10 21:40:08 gray Exp $
  */
 
 /*
@@ -28,6 +28,9 @@
  * Inspired by code from PSM <psm @ sics.se>.  Thanks much.
  */
 
+#if HAVE_STDLIB_H
+# include <stdlib.h>				/* for qsort */
+#endif
 #if HAVE_STRING_H
 # include <string.h>
 #endif
@@ -45,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.2 1999/03/10 16:41:16 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.3 1999/03/10 21:40:08 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.2 1999/03/10 16:41:16 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.3 1999/03/10 21:40:08 gray Exp $";
 #endif
 #endif
 
