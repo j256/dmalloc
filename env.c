@@ -27,6 +27,8 @@
  * variable(s) used by the library to get the runtime option(s).
  */
 
+#include <stdio.h>				/* for sprintf */
+
 #define DMALLOC_DISABLE
 
 #if HAVE_STDLIB_H
@@ -34,6 +36,9 @@
 #endif
 #if HAVE_STRING_H
 # include <string.h>
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>				/* for getpid */
 #endif
 
 #include "conf.h"
@@ -46,7 +51,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: env.c,v 1.13 1997/12/22 00:32:01 gray Exp $";
+  "$Id: env.c,v 1.14 1998/09/19 00:12:53 gray Exp $";
 #endif
 
 /* local variables */

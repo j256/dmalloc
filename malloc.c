@@ -28,8 +28,11 @@
  * chunk.c which is the real heap manager.
  */
 
+#if HAVE_STDLIB_H
+# include <stdlib.h>				/* for atexit */
+#endif
+
 #include "conf.h"				/* up here for _INCLUDE */
-#include "return.h"				/* up here for asm includes */
 
 /* for timeval type -- see conf.h */
 #if STORE_TIMEVAL
@@ -65,10 +68,11 @@
 #include "heap.h"
 #include "dmalloc_loc.h"
 #include "dmalloc_lp.h"
+#include "return.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.107 1998/09/18 19:12:57 gray Exp $";
+  "$Id: malloc.c,v 1.108 1998/09/19 00:12:54 gray Exp $";
 #endif
 
 /*

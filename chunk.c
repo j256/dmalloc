@@ -28,6 +28,7 @@
  */
 
 #include <ctype.h>
+#include <stdio.h>			/* for sprintf */
 
 #if HAVE_STRING_H
 # include <string.h>
@@ -49,7 +50,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.115 1998/09/18 19:07:54 gray Exp $";
+  "$Id: chunk.c,v 1.116 1998/09/19 00:11:59 gray Exp $";
 #endif
 
 /* local routines */

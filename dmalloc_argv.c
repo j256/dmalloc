@@ -28,6 +28,9 @@
 #if HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
+#if HAVE_UNISTD_H
+# include <unistd.h>				/* for read */
+#endif
 
 #ifdef LOCAL
 #include "dmalloc.h"
@@ -38,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.2 1997/12/07 23:20:10 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.3 1998/09/19 00:12:34 gray Exp $";
 #endif
 
 /* internal routines */

@@ -29,6 +29,11 @@
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
 #include <stdarg.h>				/* for message vsprintf */
+#include <stdio.h>				/* for sprintf */
+
+#if HAVE_UNISTD_H
+# include <unistd.h>				/* for write */
+#endif
 
 #include "conf.h"				/* up here for _INCLUDE */
 
@@ -60,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: error.c,v 1.69 1998/09/17 12:42:10 gray Exp $";
+  "$Id: error.c,v 1.70 1998/09/19 00:11:48 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
