@@ -1,3 +1,14 @@
+2004-01-28  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.3.0.
+
+	* Fixed a bad bug where calls to _dmalloc_chunk_pnt_check from the
+	arg_check.c functions were not locking.  Ugh.  Thanks much to
+	Guy (guyresh).
+
+	* Added dmalloc_verify_pnt function for proper external pointer
+	checking.
+
 2004-01-14  Gray Watson  <gray@outside.256.com>
 
 	* Added a dmalloc_memory_allocated function to assist with the
@@ -2138,5 +2149,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.315 2004/01/14 16:17:56 gray Exp $
+$Id: ChangeLog,v 1.316 2004/01/28 14:51:35 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,6 +1,16 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.114 2003/11/18 15:28:28 gray Exp $
+$Id: NEWS,v 1.115 2004/01/28 14:51:35 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.3.0 (01/28/2004):
+
+	* Fixed bad bug where arch_check funcs weren't locking point checks.
+	* Added dmalloc_verify_pnt function for proper external pointer checks.
+	* Added dmalloc_memory_allocated function to help memory size checks.
+	* Added --start-size to dmalloc to start checks after alloc X bytes.
+	* Added check-shutdown token and support to check pointers on shutdown.
+	* Added dmalloc_count_changed function.
+	* Added ability to disable the LARGEST_ALLOCATION setting it to 0.
 
 Version 5.2.4 (11/18/2003):
 

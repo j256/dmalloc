@@ -1,22 +1,23 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.2.4 </title>
+<title> Dmalloc Release Notes - 5.3.0 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.2.4 <br />
+Version: Release 5.3.0 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.2.3.html">5.2.3</a> <br />
-Date: November 18, 2003
+Last-Version: <a href="dmalloc-5.2.4.html">5.2.4</a> <br />
+Date: January 28, 2004
 </h4>
 
 <p>
 <a href="#overview">Overview</a> &nbsp;&nbsp;
 <a href="#func">New Functionality</a> &nbsp;&nbsp;
 <a href="#dmalloc">Dmalloc Utility</a> &nbsp;&nbsp;
+<a href="#tokens">Debug Tokens</a> &nbsp;&nbsp;
 <a href="#settings.dist">settings.dist</a> &nbsp;&nbsp;
 <a href="#install">Installation</a> &nbsp;&nbsp;
 <a href="#programming">Programming</a> &nbsp;&nbsp;
@@ -28,15 +29,37 @@ Date: November 18, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Fixed a interaction bug between check-funcs and check-fence.
-Other fixes and documentation addtions. </p>
+<p> A feature addition release with a number of new features plus 1
+bad bug fix. </p>
 
 <!--========================================================================-->
 
 <h3><a name="func"> New Functionality </a></h3>
 
 <ul>
-<li> Added support for Plan9's RC shell.  Thanks Michael. </li>
+
+<li> Added ability to disable the <tt>LARGEST_ALLOCATION</tt> setting
+by defining it to be 0 in settings.h. </li>
+
+<li> Added <tt>dmalloc_count_changed</tt> function which allows you to
+count the memory that has has either been freed or allocated since a
+certain mark.  Thanks to Brian O'Kelley. </li>
+
+<li> Added the <tt>check-shutdown</tt> token support to check the
+pointers in the heap when we are shutting the library down.  Thanks to
+Charles for the idea. </li>
+
+<li> Added a <tt>--start-size argument</tt> to the dmalloc utility to
+start the library checking the heap after we allocate a certain size
+of memory.  Thanks to andyc_2k. </li>
+
+<li> Added a <tt>dmalloc_memory_allocated</tt> function which returns
+the total number of bytes allocated by the programs so far. </li>
+
+<li> Added the <tt>dmalloc_verify_pnt</tt> function to better check a
+single pointer by external functions.  See the bugs section
+below. </li>
+
 </ul>
 
 <!--========================================================================-->
@@ -44,7 +67,19 @@ Other fixes and documentation addtions. </p>
 <h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
 <ul>
-<li> Added support for Plan9's RC shell.  Thanks Michael. </li>
+<li> Added a <tt>--start-size argument</tt> to the dmalloc utility to
+start the library checking the heap after we allocate a certain size
+of memory.  Thanks to andyc_2k. </li>
+</ul>
+
+<!--========================================================================-->
+
+<h3><a name="tokens"> Changes in the Debug Tokens </a></h3>
+
+<ul>
+<li> Added the <tt>check-shutdown</tt> token support to check the
+pointers in the heap when we are shutting the library down.  Thanks to
+Charles for the idea. </li>
 </ul>
 
 <!--========================================================================-->
@@ -59,29 +94,35 @@ None.
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<ul>
-
-<li> Added a section to the configure script to test for the existance
-of destructors.  These are currently not used by dmalloc but should if
-atext or on_exit are not supported. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <!--========================================================================-->
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+<li> Added ability to disable the <tt>LARGEST_ALLOCATION</tt> setting
+by defining it to be 0 in settings.h. </li>
+</ul>
 
 <!--========================================================================-->
 
 <h3><a name="env"> Environmental Variable Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> The <tt>start</tt> part of the environmental variable now has 3
+different forms.  It can be an integer in which case the library will
+enable checking of the heap after that many calls to it have occurred.
+It can be a filename:line-number in which case heap checking will be
+started when that location is reached.  The 3rd and new form is an
+integer preceded with the letter <tt>'s'</tt> in which case heap
+checking will be enabled after that man bytes have been allocated by
+the library. </li>
+
+</ul>
 
 <!--========================================================================-->
 
@@ -89,21 +130,16 @@ None.
 
 <ul>
 
-<li> Fixed a problem where check-fence and check-funcs could not
-coexist.  Big one.  Thanks much John. </li>
-
-<li> Fixed a logfile NULL pointer in a printf message.  Thanks
-John. </li>
-
-<li> Fixed Makefile.in to properly refer to the documents directory.
-Thanks Mike. </li>
+<li> Fixed a bad bug in where calls to the heap pointer checking code
+by the arg_check.c functions were not doing the thread-locking.  Ugh.
+Thanks much to Guy (guyresh). </li>
 
 </ul>
 
 <p>
 <font size="-1">
 <a href="http://dmalloc.com/">Dmalloc Home Page</a>.
-Copyright 2003 <a href="http://256.com/gray/">Gray Watson</a>.
+Copyright 2004 <a href="http://256.com/gray/">Gray Watson</a>.
 </font>
 </p>
 
