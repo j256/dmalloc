@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab_loc.h,v 1.5 1999/03/11 05:22:36 gray Exp $
+ * $Id: dmalloc_tab_loc.h,v 1.6 1999/03/11 22:16:07 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_LOC_H__
@@ -29,11 +29,21 @@
 #define MEM_ENTRIES_N	(MEMORY_TABLE_SIZE * 2)
 
 /*
- * Maximum number of qsort splits.  This should mean that these
- * routines can handle at least 2^128 different values (that's _quite_
- * a few).  And then you can always increase the value.
+ * Maximum number of splits.  This should mean that these routines can
+ * handle at least 2^128 different values (that's _quite_ a few).  And
+ * then you can always increase the value.
  */
-#define MAX_SPLITS	128
+#define MAX_QSORT_SPLITS	128
+
+/*
+ * Maximum number of entries that must be in list for it to be
+ * partitioned.  If there are fewer elements then just do our
+ * insertion sort.
+ */
+#define MAX_QSORT_PARTITION	8
+
+/* comparison function */
+typedef int	(*compare_t)(const void *element1_p, const void *element2_p);
 
 /* entry in our memory table */
 typedef struct mem_table_st {

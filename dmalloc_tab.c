@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.7 1999/03/11 01:18:59 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.8 1999/03/11 22:16:07 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.7 1999/03/11 01:18:59 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.8 1999/03/11 22:16:07 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.7 1999/03/11 01:18:59 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.8 1999/03/11 22:16:07 gray Exp $";
 #endif
 #endif
 
@@ -164,7 +164,45 @@ static	unsigned int	hash(const unsigned char *key,
   return c;
 }
 
-#if QSORT_OKAY
+/*
+ * static unsigned int which_bucket
+ *
+ * DESCRIPTION:
+ *
+ * Determine the bucket with our file/line and hash function.
+ *
+ * RETURNS:
+ *
+ * Bucket number.
+ *
+ * ARGUMENTS:
+ *
+ * file -> File name or return address of the allocation. 
+ *
+ * line -> Line number of the allocation.
+ */
+static	unsigned int	which_bucket(const char *file, const unsigned int line)
+{
+  unsigned int	bucket;
+  
+  if (line == 0) {
+    if (file == NULL) {
+      bucket = 0;
+    }
+    else {
+      /* we hash on the address in file -- should be a return-address */
+      bucket = hash((unsigned char *)&file, sizeof(char *), 0);
+    }
+  }
+  else {
+    bucket = hash((unsigned char *)file, strlen(file), 0);
+    bucket = hash((unsigned char *)&line, sizeof(line), bucket);
+  }
+  
+  bucket %= MEM_ENTRIES_N;
+  return bucket;
+}
+
 /*
  * static int entry_cmp
  *
@@ -205,9 +243,272 @@ static	int	entry_cmp(const void *entry1_p, const void *entry2_p)
   }
   
   /* NOTE: we want the top entries to be ahead so we reverse the sort */
-  return size2 - size1;
+  if (size1 > size2) {
+    return -1;
+  }
+  else if (size1 == size2) {
+    return 0;
+  }
+  else {
+    return 1;
+  }
 }
-#endif
+
+/*
+ * static void swap_bytes
+ *
+ * DESCRIPTION:
+ *
+ * Swap the values between two items of a specified size.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * item1_p -> Pointer to the first item.
+ *
+ * item2_p -> Pointer to the first item.
+ *
+ * ele_size -> Size of the two items.
+ */
+static	void	swap_bytes(unsigned char *item1_p, unsigned char *item2_p,
+			   int ele_size)
+{
+  unsigned char	char_temp;
+  
+  for (; ele_size > 0; ele_size--) {
+    char_temp = *item1_p;
+    *item1_p = *item2_p;
+    *item2_p = char_temp;
+    item1_p++;
+    item2_p++;
+  }
+}
+
+/*
+ * static void insert_sort
+ *
+ * DESCRIPTION:
+ *
+ * Do an insertion sort which is faster for small numbers of items and
+ * better if the items are already sorted.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * first_p <-> Start of the list that we are splitting.
+ *
+ * last_p <-> Last entry in the list that we are splitting.
+ *
+ * holder_p <-> Location of hold area we can store an entry.
+ *
+ * ele_size -> Size of the each element in the list.
+ */
+static	void	insert_sort(unsigned char *first_p, unsigned char *last_p,
+			    unsigned char *holder_p,
+			    const unsigned int ele_size)
+{
+  unsigned char	*inner_p, *outer_p;
+  
+  for (outer_p = first_p + ele_size; outer_p <= last_p; ) {
+    
+    /* look for the place to insert the entry */
+    for (inner_p = outer_p - ele_size;
+	 inner_p >= first_p && entry_cmp(outer_p, inner_p) < 0;
+	 inner_p -= ele_size) {
+    }
+    inner_p += ele_size;
+    
+    /* do we need to insert the entry in? */
+    if (outer_p != inner_p) {
+      /*
+       * Now we shift the entry down into its place in the already
+       * sorted list.
+       */
+      memcpy(holder_p, outer_p, ele_size);
+      memmove(inner_p + ele_size, inner_p, outer_p - inner_p);
+      memcpy(inner_p, holder_p, ele_size);
+    }
+    
+    outer_p += ele_size;
+  }
+}
+
+/*
+ * static void split
+ *
+ * DESCRIPTION:
+ *
+ * This sorts an array of longs via the quick sort algorithm (it's
+ * pretty quick)
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * first_p -> Start of the list that we are splitting.
+ *
+ * last_p -> Last entry in the list that we are splitting.
+ *
+ * ele_size -> Size of the each element in the list.
+ */
+static	void	split(unsigned char *first_p, unsigned char *last_p,
+		      const unsigned int ele_size)
+{
+  unsigned char	*left_p, *right_p, *pivot_p, *left_last_p, *right_first_p;
+  unsigned char	*firsts[MAX_QSORT_SPLITS], *lasts[MAX_QSORT_SPLITS], *pivot;
+  unsigned int	width, split_c = 0, min_qsort_size, size1, size2;
+  
+  /*
+   * Allocate some space for our pivot value.  We also use this as
+   * holder space for our insert sort.
+   */
+  pivot = alloca(ele_size);
+  if (pivot == NULL) {
+    /* what else can we do? */
+    abort();
+  }
+  
+  min_qsort_size = MAX_QSORT_PARTITION * ele_size;
+  
+  while (1) {
+    
+    /* find the left, right, and mid point */
+    left_p = first_p;
+    right_p = last_p;
+    /* is there a faster way to find this? */
+    width = (last_p - first_p) / ele_size;
+    pivot_p = first_p + ele_size * (width >> 1);
+    
+    /*
+     * Find which of the left, middle, and right elements is the
+     * median (Knuth vol3 p123).
+     */
+    if (entry_cmp(first_p, pivot_p) > 0) {
+      swap_bytes(first_p, pivot_p, ele_size);
+    }
+    if (entry_cmp(pivot_p, last_p) > 0) {
+      swap_bytes(pivot_p, last_p, ele_size);
+      if (entry_cmp(first_p, pivot_p) > 0) {
+	swap_bytes(first_p, pivot_p, ele_size);
+      }
+    }
+    
+    /*
+     * save our pivot so we don't have to worry about hitting and
+     * swapping it elsewhere while we iterate across the list below.
+     */
+    memcpy(pivot, pivot_p, ele_size);
+    
+    do {
+      
+      /* shift the left side up until we reach the pivot value */
+      while (entry_cmp(left_p, pivot) < 0) {
+	left_p += ele_size;
+      }
+      /* shift the right side down until we reach the pivot value */
+      while (entry_cmp(pivot, right_p) < 0) {
+	right_p -= ele_size;
+      }
+      
+      /* if we met in the middle then we are done */
+      if (left_p == right_p) {
+	left_p += ele_size;
+	right_p -= ele_size;
+	break;
+      }
+      else if (left_p < right_p) {
+	/*
+	 * swap the left and right since they both were on the wrong
+	 * size of the pivot and continue
+	 */
+	swap_bytes(left_p, right_p, ele_size);
+	left_p += ele_size;
+	right_p -= ele_size;
+      }
+    } while (left_p <= right_p);
+    
+    /* Rename variables to make more sense.  This will get optimized out. */
+    right_first_p = left_p;
+    left_last_p = right_p;
+    
+    /* determine the size of the left and right hand parts */
+    size1 = left_last_p - first_p;
+    size2 = last_p - right_first_p;
+    
+    /* is the 1st half small enough to just insert-sort? */
+    if (size1 < min_qsort_size) {
+      
+      /* use the pivot as our temporary space */
+      insert_sort(first_p, left_last_p, pivot, ele_size);
+      
+      /* is the 2nd part small as well? */
+      if (size2 < min_qsort_size) {
+	
+	/* use the pivot as our temporary space */
+	insert_sort(right_first_p, last_p, pivot, ele_size);
+	
+	/* pop a partition off our stack */
+	if (split_c == 0) {
+	  /* we are done */
+	  return;
+	}
+	split_c--;
+	first_p = firsts[split_c];
+	last_p = lasts[split_c];
+      }
+      else {
+	/* we can just handle the right side immediately */
+	first_p = right_first_p;
+	/* last_p = last_p */
+      }
+    }
+    else if (size2 < min_qsort_size) {
+      
+      /* use the pivot as our temporary space */
+      insert_sort(right_first_p, last_p, pivot, ele_size);
+      
+      /* we can just handle the left side immediately */
+      /* first_p = first_p */
+      last_p = left_last_p;
+    }
+    else {
+      /*
+       * neither partition is small, we'll have to push the larger one
+       * of them on the stack
+       */
+      if (split_c >= MAX_QSORT_SPLITS) {
+	/* sanity check here -- we should never get here */
+	abort();
+      }
+      if (size1 > size2) {
+	/* push the left partition on the stack */
+	firsts[split_c] = first_p;
+	lasts[split_c] = left_last_p;
+	split_c++;
+	/* continue handling the right side */
+	first_p = right_first_p;
+	/* last_p = last_p */
+      }
+      else {
+	/* push the right partition on the stack */
+	firsts[split_c] = right_first_p;
+	lasts[split_c] = last_p;
+	split_c++;
+	/* continue handling the left side */
+	/* first_p = first_p */
+	last_p = left_last_p;
+      }
+    }
+  }
+}
 
 /*
  * static void log_slot
@@ -315,14 +616,7 @@ void	_table_alloc(const char *file, const unsigned int line,
   unsigned int	bucket;
   mem_table_t	*tab_p, *tab_end_p, *tab_bounds_p;
   
-  /*
-   * Get our start bucket.  We calculate the hash value by referencing
-   * the file/line information directly because of problems with
-   * putting them in a structure.
-   */
-  bucket = hash((unsigned char *)file, strlen(file), 0);
-  bucket = hash((unsigned char *)&line, sizeof(line), bucket);
-  bucket %= MEM_ENTRIES_N;
+  bucket = which_bucket(file, line);
   tab_p = memory_table + bucket;
   
   /* the end is if we come around to the start again */
@@ -361,10 +655,8 @@ void	_table_alloc(const char *file, const unsigned int line,
       /* we found an open slot */
       tab_p->mt_file = file;
       tab_p->mt_line = line;
-#if QSORT_OKAY
       /* remember its position in the table so we can unsort it later */
       tab_p->mt_entry_pos_p = tab_p;
-#endif
       table_entry_c++;
     }
   }
@@ -403,14 +695,7 @@ void	_table_free(const char *old_file, const unsigned int old_line,
   int		found_b = 0;
   mem_table_t	*tab_p, *tab_end_p, *tab_bounds_p;
   
-  /*
-   * Get our start bucket.  We calculate the hash value by referencing
-   * the file/line information directly because of problems with
-   * putting them in a structure.
-   */
-  bucket = hash((unsigned char *)old_file, strlen(old_file), 0);
-  bucket = hash((unsigned char *)&old_line, sizeof(old_line), bucket);
-  bucket %= MEM_ENTRIES_N;
+  bucket = which_bucket(old_file, old_line);
   tab_p = memory_table + bucket;
   
   /* the end is if we come around to the start again */
@@ -483,12 +768,10 @@ void	_table_log_info(const int entry_n, const int in_use_b)
     return;
   }
   
-  /* sort the entry by the total size if we have qsort */
-#if QSORT_OKAY
-  qsort(memory_table, MEM_ENTRIES_N, sizeof(mem_table_t), entry_cmp);
-#else
-  _dmalloc_message("qsort not available, displaying first entries");
-#endif
+  /* sort the entries by their total-size */
+  split((unsigned char *)memory_table,
+	(unsigned char *)(memory_table + MEM_ENTRIES_N - 1),
+	sizeof(mem_table_t));
   
   /* display the column headers */  
   if (in_use_b) {
@@ -525,7 +808,6 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   (void)loc_snprintf(source, sizeof(source), "Total of %d", entry_c);
   log_entry(&total, in_use_b, source);
   
-#if QSORT_OKAY
   /*
    * If we sorted the array, we have to put it back the way it was if
    * we want to continue and handle memory transactions.  We should be
@@ -550,5 +832,4 @@ void	_table_log_info(const int entry_n, const int in_use_b)
     *tab_p->mt_entry_pos_p = *tab_p;
     *tab_p = swap_entry;
   }
-#endif
 }
