@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.27 1994/06/02 21:40:52 gray Exp $
+ * $Id: chunk_loc.h,v 1.28 1994/07/22 15:47:03 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -49,7 +49,7 @@
 #define MAX_SLOTS		(BITS(long) - 1)	/* # of bit slots */
 
 /* pointer to the start of the block which holds PNT */
-#define WHAT_BLOCK(pnt)		(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
+#define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
 
 /* adjust internal PNT to user-space */
 #define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_below_adm)
