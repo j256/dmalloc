@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: version.h,v 1.85 1999/10/13 22:40:28 gray Exp $
+ * $Id: version.h,v 1.86 1999/10/14 14:09:35 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -33,8 +33,8 @@
  *	NEWS
  *	dmalloc.texi (2 places)
  */
-static	char	*dmalloc_version = "4.3.0b2";
+static	char	*dmalloc_version = "4.3.0b3";
 
-/* Version Date: $Date: 1999/10/13 22:40:28 $ */
+/* Version Date: $Date: 1999/10/14 14:09:35 $ */
 
 #endif /* ! __VERSION_H__ */
