@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.81 1999/03/10 22:06:05 gray Exp $
+ * $Id: dmalloc_t.c,v 1.82 1999/03/10 23:16:13 gray Exp $
  */
 
 /*
@@ -38,22 +38,29 @@
 # include <unistd.h>
 #endif
 
+#include "conf.h"
+
+#if HAVE_TIME
+# ifdef TIME_INCLUDE
+#  include TIME_INCLUDE
+# endif
+#endif
+
 #include "dmalloc_argv.h"
 #include "dmalloc.h"
 
 /*
  * NOTE: these are only needed to test certain features of the library.
  */
-#include "conf.h"
 #include "debug_val.h"
 #include "error_val.h"
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.81 1999/03/10 22:06:05 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.82 1999/03/10 23:16:13 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.81 1999/03/10 22:06:05 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.82 1999/03/10 23:16:13 gray Exp $";
 #endif
 #endif
 
