@@ -3,9 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation.
  *
- * Written by Gray Watson
- *
- * $Id: dmalloc_loc.h,v 1.6 1992/09/26 19:18:10 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.7 1992/10/14 09:30:02 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__

@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.4 1992/09/04 21:22:41 gray Exp $
+$Id: NOTES,v 1.5 1992/10/14 09:29:35 gray Exp $
 -------------------------------------------------------------------------------
+
 TERMS:
 
 bblock_adm	administration for a set of basic blocks
@@ -9,7 +10,9 @@ dblock_adm	administration for a set of divided blocks
 dblock		divided block containing some base 2 number of blocks smaller
 		than a basic block.
 chunk		some anonymous amount of memory
+
 -------------------------------------------------------------------------------
+
 IDEAS:
 
 - maybe turn realloc into an intelligent beasty that looks on either side
@@ -24,7 +27,9 @@ IDEAS:
 	block or are continuations of an earlier block
 
 	- won't have to reset all the pointers in a set of blocks
+
 -------------------------------------------------------------------------------
+
 ALGORITHM IDEAS:
 
 - look in your free_list for first block.
@@ -33,12 +38,16 @@ ALGORITHM IDEAS:
 
 - maybe try a finite number of free_bins above the one you want to limit
 	fragmentation, test this thing
+
 -------------------------------------------------------------------------------
+
 WARNING:
 	- watch for heaps growing up or down (all subtraction or other position
 		dependent code must be changed to macros in heap.h) >,<,-,+,etc
 	- watch for bounds checking assuming + or - code.
+
 -------------------------------------------------------------------------------
+
 NOTES:
 
 - administration blocks are relocatable:
@@ -56,7 +65,9 @@ NOTES:
 	- when you find the free block, find out if it is lower (or higher)
 		than the highest admin block and bcopy the admin block down and
 		redo the pointers
+
 -------------------------------------------------------------------------------
+
 DBLOCK METHOD:
 
 - have the bblock admin struct point to the dblock admin structure block which
@@ -74,4 +85,5 @@ DBLOCK METHOD:
 - the bblock tells you of the number of bits in the chunk, etc.
 - have some way to run through the dblock admin slot blocks to verify that
 	crc's have not been overwritten.
+
 -------------------------------------------------------------------------------

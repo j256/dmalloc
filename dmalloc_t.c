@@ -17,9 +17,11 @@
 #include "terminate.h"
 #endif
 
-RCS_ID("$Id: dmalloc_t.c,v 1.5 1992/09/04 21:23:13 gray Exp $");
+RCS_ID("$Id: dmalloc_t.c,v 1.6 1992/10/14 09:30:04 gray Exp $");
 
-/* hexadecimal STR to integer translation */
+/*
+ * hexadecimal STR to integer translation
+ */
 LOCAL	int	hex_to_int(char * str)
 {
   int		ret;
@@ -45,8 +47,10 @@ LOCAL	int	hex_to_int(char * str)
   return ret;
 }
 
-/* read an address from the user */
-LOCAL	long	get_address()
+/*
+ * read an address from the user
+ */
+LOCAL	long	get_address(void)
 {
   char	line[80];
   long	pnt;

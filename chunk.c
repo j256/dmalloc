@@ -28,7 +28,7 @@
 #include "malloc_levels.h"
 #include "malloc_loc.h"
 
-RCS_ID("$Id: chunk.c,v 1.6 1992/09/22 03:20:15 gray Exp $");
+RCS_ID("$Id: chunk.c,v 1.7 1992/10/14 09:29:44 gray Exp $");
 
 /* for formating */
 #define FREE_COLUMN		    5		/* for dump_free formating */
@@ -108,7 +108,9 @@ LOCAL	void	LOGGER(int level, char * format, ...)
 
 /************************* fence-post error functions ************************/
 
-/* check PNT of SIZE for fence-post magic numbers, returns ERROR or NOERROR */
+/*
+ * check PNT of SIZE for fence-post magic numbers, returns ERROR or NOERROR
+ */
 LOCAL	int	fence_read(char * pnt, unsigned int size, char * file,
 			   int line)
 {
@@ -150,7 +152,9 @@ LOCAL	int	fence_read(char * pnt, unsigned int size, char * file,
   return NOERROR;
 }
 
-/* load PNT of SIZE bytes with fence-post magic numbers */
+/*
+ * load PNT of SIZE bytes with fence-post magic numbers
+ */
 LOCAL	void	fence_write(char * pnt, unsigned int size)
 {
   long		top = FENCE_MAGIC_TOP;
@@ -169,8 +173,10 @@ LOCAL	void	fence_write(char * pnt, unsigned int size)
 
 /************************** administration functions *************************/
 
-/* startup the low level malloc routines */
-EXPORT	int	_chunk_startup()
+/*
+ * startup the low level malloc routines
+ */
+EXPORT	int	_chunk_startup(void)
 {
   int	binc;
   
@@ -210,7 +216,9 @@ EXPORT	int	_chunk_startup()
   return NOERROR;
 }
 
-/* return the number of bits in number SIZE */
+/*
+ * return the number of bits in number SIZE
+ */
 LOCAL	int	num_bits(unsigned int size)
 {
   unsigned int	tmp = size;
@@ -239,7 +247,7 @@ LOCAL	int	num_bits(unsigned int size)
  * "allocate" another bblock administrative block
  * NOTE: some logistic problems with getting from free list
  */
-LOCAL	bblock_adm_t	*get_bblock_admin()
+LOCAL	bblock_adm_t	*get_bblock_admin(void)
 {
   bblock_adm_t	*new;
   bblock_t	*bblockp;
@@ -286,7 +294,9 @@ LOCAL	bblock_adm_t	*get_bblock_admin()
   return new;
 }
 
-/* get MANY of bblocks, return a pointer to the first one */
+/*
+ * get MANY of bblocks, return a pointer to the first one
+ */
 LOCAL	bblock_t	*get_bblocks(int bitc)
 {
   static int	free_slots = 0;		/* free slots in last bb_admin */
@@ -358,7 +368,9 @@ LOCAL	bblock_t	*get_bblocks(int bitc)
   return &bblock_admp->ba_block[mark];
 }
 
-/* get MANY of contiguous dblock administrative slots */
+/*
+ * get MANY of contiguous dblock administrative slots
+ */
 LOCAL	dblock_t	*get_dblock_admin(int many)
 {
   static int		free_slots = 0;
@@ -414,7 +426,9 @@ LOCAL	dblock_t	*get_dblock_admin(int many)
   return dblock_admp->da_block;
 }
 
-/* get a dblock of 1<<BITC sized chunks, also asked for the slot memory */
+/*
+ * get a dblock of 1<<BITC sized chunks, also asked for the slot memory
+ */
 LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
 {
   bblock_t	*bblockp;
@@ -499,6 +513,14 @@ LOCAL	bblock_t	*find_bblock(char * pnt, int * block_num,
   int		bblockc;
   bblock_adm_t	*bblock_admp;
   
+  if (pnt == NULL) {
+    if (_malloc_debug_level >= DEBUG_LOG_BAD_POINTER)
+      _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
+    _malloc_errno = MALLOC_POINTER_NULL;
+    _malloc_perror("find_bblock");
+    return NULL;
+  }
+  
   /*
    * check validity of the pointer
    */
@@ -541,7 +563,9 @@ LOCAL	bblock_t	*find_bblock(char * pnt, int * block_num,
   return &bblock_admp->ba_block[bblockc];
 }
 
-/* run extensive tests on the entire heap depending on TYPE */
+/*
+ * run extensive tests on the entire heap depending on TYPE
+ */
 EXPORT	int	_chunk_heap_check(int type)
 {
   bblock_adm_t	*this, *last_admp;
@@ -1070,8 +1094,10 @@ EXPORT	int	_chunk_heap_check(int type)
   return NOERROR;
 }
 
-/* run extensive tests on PNT */
-EXPORT	int	_chunk_pnt_check(char *pnt)
+/*
+ * run extensive tests on PNT
+ */
+EXPORT	int	_chunk_pnt_check(char * pnt)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
@@ -1221,7 +1247,9 @@ EXPORT	int	_chunk_pnt_check(char *pnt)
 
 /**************************** information routines ***************************/
 
-/* return some information associated with PNT, ERROR on error */
+/*
+ * return some information associated with PNT, returns [NO]ERROR
+ */
 EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
 				unsigned int * line)
 {
@@ -1292,7 +1320,9 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
   return NOERROR;
 }
 
-/* write new FILE, LINE, SIZE info into PNT */
+/*
+ * write new FILE, LINE, SIZE info into PNT
+ */
 LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
 				 unsigned int line)
 {
@@ -1391,7 +1421,9 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
 
 /************************** low-level user functions *************************/
 
-/* get a SIZE chunk of memory for FILE at LINE */
+/*
+ * get a SIZE chunk of memory for FILE at LINE
+ */
 EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
 			       unsigned int size)
 {
@@ -1532,7 +1564,9 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   return mem + pnt_below_adm;
 }
 
-/* frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR */
+/*
+ * frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR
+ */
 EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
 {
   int		bblockc, bitc;
@@ -1699,7 +1733,9 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   return FREE_NOERROR;
 }
 
-/* reallocate a section of memory */
+/*
+ * reallocate a section of memory
+ */
 EXPORT	char	*_chunk_realloc(char * file, unsigned int line, char * oldp,
 				unsigned int new_size)
 {
@@ -1812,8 +1848,10 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line, char * oldp,
 
 /***************************** diagnostic routines ***************************/
 
-/* log present free and used lists */
-EXPORT	void	_chunk_list_count()
+/*
+ * log present free and used lists
+ */
+EXPORT	void	_chunk_list_count(void)
 {
   int		bitc, count;
   char		info[256], tmp[80];
@@ -1849,8 +1887,10 @@ EXPORT	void	_chunk_list_count()
   LOGGER(LOGGER_INFO, "free: %s", info);
 }
 
-/* log statistics on the heap */
-EXPORT	void	_chunk_stats()
+/*
+ * log statistics on the heap
+ */
+EXPORT	void	_chunk_stats(void)
 {
   long		overhead;
   
@@ -1904,8 +1944,10 @@ EXPORT	void	_chunk_stats()
 	 (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
 }
 
-/* dump the unfreed memory, logs the unfreed information to logger */
-EXPORT	void	_chunk_dump_not_freed()
+/*
+ * dump the unfreed memory, logs the unfreed information to logger
+ */
+EXPORT	void	_chunk_dump_not_freed(void)
 {
   bblock_adm_t	*this;
   bblock_t	*bblockp;
@@ -2056,8 +2098,10 @@ EXPORT	void	_chunk_dump_not_freed()
     }
 }
 
-/* log an entry for the heap structure */
-EXPORT	void	_chunk_log_heap_map()
+/*
+ * log an entry for the heap structure
+ */
+EXPORT	void	_chunk_log_heap_map(void)
 {
   bblock_adm_t	*bblock_admp;
   char		line[BB_PER_ADMIN + 10];

@@ -2,8 +2,6 @@
  * system specific memory routines
  *
  * Copyright 1991 by the Antaire Corporation
- *
- * Written by Gray Watson
  */
 
 /*
@@ -24,7 +22,7 @@
 #include "heap.h"
 #include "malloc_err.h"
 
-RCS_ID("$Id: heap.c,v 1.5 1992/09/04 21:22:59 gray Exp $");
+RCS_ID("$Id: heap.c,v 1.6 1992/10/14 09:29:53 gray Exp $");
 
 /*
  * system functions
@@ -38,7 +36,9 @@ IMPORT	caddr_t		sbrk(/* int incr */);	/* to extend the heap */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */
 EXPORT	char		*_heap_last = NULL;	/* end of our heap */
 
-/* function to get SIZE memory bytes from the end of the heap */
+/*
+ * function to get SIZE memory bytes from the end of the heap
+ */
 EXPORT	char	*_heap_alloc(unsigned int size)
 {
   char		*ret = HEAP_ALLOC_ERROR;
@@ -56,8 +56,10 @@ EXPORT	char	*_heap_alloc(unsigned int size)
   return ret;
 }
 
-/* return a pointer to the current end of the heap */
-EXPORT	char	*_heap_end()
+/*
+ * return a pointer to the current end of the heap
+ */
+EXPORT	char	*_heap_end(void)
 {
   char		*ret = HEAP_ALLOC_ERROR;
   
@@ -71,13 +73,17 @@ EXPORT	char	*_heap_end()
   return ret;
 }
 
-/* initialize heap pointers */
-EXPORT	void	_heap_startup()
+/*
+ * initialize heap pointers
+ */
+EXPORT	void	_heap_startup(void)
 {
   _heap_base = _heap_last = _heap_end();
 }
 
-/* align (by extending) _heap_base to BASE byte boundary */
+/*
+ * align (by extending) _heap_base to BASE byte boundary
+ */
 EXPORT	char	*_heap_align_base(int base)
 {
   int	diff;

@@ -3,7 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation
  *
- * $Id: heap.h,v 1.5 1992/09/04 21:23:00 gray Exp $
+ * $Id: heap.h,v 1.6 1992/10/14 09:29:54 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -55,16 +55,24 @@ IMPORT	char		*_heap_base;  /* base of our heap */
 
 IMPORT	char		*_heap_last;  /* end of our heap */
 
-/* function to get SIZE memory bytes from the end of the heap */
+/*
+ * function to get SIZE memory bytes from the end of the heap
+ */
 IMPORT	char	*_heap_alloc(unsigned int size);
 
-/* return a pointer to the current end of the heap */
+/*
+ * return a pointer to the current end of the heap
+ */
 IMPORT	char	*_heap_end(void);
 
-/* initialize heap pointers */
+/*
+ * initialize heap pointers
+ */
 IMPORT	void	_heap_startup(void);
 
-/* align (by extending) _heap_base to BASE byte boundary */
+/*
+ * align (by extending) _heap_base to BASE byte boundary
+ */
 IMPORT	char	*_heap_align_base(int base);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */

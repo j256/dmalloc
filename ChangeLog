@@ -1,3 +1,13 @@
+Tue Oct 13 16:14:17 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Made various cosmetic changes.  Fixed realloc inbound pointer
+	checking per MALLOC_ADDRESS.  Fixed problem with MALLOC_ADDRESS
+	initialization to NULL causing free to "find" NULL pointers.  :-)
+
+	* Separated the PERROR debug level and the KILL_SELF level.  Now
+	(by default) all memory errors are logged at level 1 and above and
+	malloc kills itself at level 2 and above.
+
 Mon Sep 28 23:24:36 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added MALLOC_ADDRESS support for free.  MALLOC_ADDRESS counts
@@ -13,8 +23,9 @@ Mon Sep 21 20:39:38 1992  Gray Watson  (gray at toaster)
 
 Thu Sep  3 03:23:39 1992  Gray Watson  (gray at toaster)
 
-	* Added ability to realloc(NULL with an ifdef to disable.  Useful
-	in realloc loops where the first time you don't have to alloc it.
+	* Added ability to realloc a NULL pointer with an ifdef to
+	disable.  Useful in realloc loops where the first time you don't
+	have to alloc it.
 
 Fri Aug 14 15:54:03 1992  Gray Watson  (gray at toaster)
 
