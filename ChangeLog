@@ -1,5 +1,7 @@
 Mon Nov 16 11:51:39 1998  Gray Watson  <gray@burger.letters.com>
 
+	* Fixed signal autoconfiguration.  Bad dog.
+
 	* Releasing dmalloc version 4.1.0.
 
 Thu Nov 12 10:08:58 1998  Gray Watson  <gray@burger.letters.com>
@@ -1378,5 +1380,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.203 1998/11/16 16:56:02 gray Exp $
+$Id: ChangeLog,v 1.204 1998/11/16 18:48:27 gray Exp $
 -------------------------------------------------------------------------------
