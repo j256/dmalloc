@@ -1,5 +1,14 @@
 Tue Oct 10 19:03:14 2000  Gray Watson  <gray@whopper.be.256.com>
 
+	* Reorged dmalloc.h.3.  Ugh.
+
+	* malloc_verify and dmalloc_verify now return
+ 	[D]MALLOC_VERIFY_[NO]ERROR.
+
+	* dmalloc_debug now takes an unsigned-int flags and returns the
+ 	old debug flag value.  debug_current now returns an unsigned int
+ 	flag value.
+
 	* Added autoconfig handling of #ident.  I really hate Unix
 	sometimes for its blatant disregard for anything approaching a
 	standard.  Idiots.
@@ -1677,5 +1686,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.260 2000/10/10 23:06:27 gray Exp $
+$Id: ChangeLog,v 1.261 2000/10/11 16:50:27 gray Exp $
 -------------------------------------------------------------------------------
