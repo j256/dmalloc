@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.74 1998/10/08 15:07:16 gray Exp $
+# $Id: Makefile.all.in,v 1.75 1998/10/15 15:31:00 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -63,7 +63,7 @@ THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
 
-all : $(LIBRARY) $(LIB_DIS) $(UTIL)
+all : dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL)
 	@echo "To make the thread version of the library type 'make threads'"
 
 clean :

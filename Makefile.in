@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.110 1998/10/13 21:16:08 gray Exp $
+# $Id: Makefile.in,v 1.111 1998/10/15 15:31:01 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -62,7 +62,7 @@ DOCFLS	= dmalloc.ps texinfo.tex
 # NOTE: the wc level should be below 90k due to shar overhead
 SHARSIZE= 85k
 
-all :: $(LIBRARY) $(LIB_DIS) $(UTIL)
+all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL)
 
 clean ::
 	$(CLEAN)
