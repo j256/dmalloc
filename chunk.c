@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.62 1993/11/30 10:36:45 gray Exp $";
+  "$Id: chunk.c,v 1.63 1993/12/05 18:43:59 gray Exp $";
 #endif
 
 /*
@@ -408,9 +408,10 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
    * level jump or do something to try and limit the number of chunks.
    */
   
-  NUM_BITS(many * BLOCK_SIZE, bitc);
+  /* start at correct bit-size and work up till we find a match */
+  NUM_BITS(many, bitc);
+  bitc += BASIC_BLOCK;
   
-  /* start at correct size and go up */
   for (; bitc < MAX_SLOTS; bitc++) {
     for (bblockp = free_bblock[bitc], prevp = NULL; bblockp != NULL;
 	 prevp = bblockp, bblockp = bblockp->bb_next) {
@@ -488,7 +489,9 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
   }
   bblockp->bb_blockn -= many;
   
-  NUM_BITS(bblockp->bb_blockn * BLOCK_SIZE, bitn);
+  NUM_BITS(bblockp->bb_blockn, bitn);
+  bitn += BASIC_BLOCK;
+  
   bblockp->bb_next = free_bblock[bitn];
   free_bblock[bitn] = bblockp;
   
