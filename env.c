@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.27 2000/11/13 15:46:52 gray Exp $
+ * $Id: env.c,v 1.28 2001/03/29 00:11:44 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: env.c,v 1.27 2000/11/13 15:46:52 gray Exp $"
+#ident "$Id: env.c,v 1.28 2001/03/29 00:11:44 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.27 2000/11/13 15:46:52 gray Exp $";
+  "$Id: env.c,v 1.28 2001/03/29 00:11:44 gray Exp $";
 #endif
 #endif
 
@@ -125,7 +125,8 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
   
   start_p = strchr(start_all, ':');
   if (start_p != NULL) {
-    (void)strcpy(start_file, start_all);
+    (void)strncpy(start_file, start_all, sizeof(start_file));
+    start_file[sizeof(start_file) - 1] = '\0';
     SET_POINTER(sfile_p, start_file);
     start_p = start_file + (start_p - start_all);
     *start_p = '\0';
@@ -170,7 +171,8 @@ void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
   }
   
   /* make a copy */
-  (void)strcpy(buf, env);
+  (void)strncpy(buf, env, sizeof(buf));
+  buf[sizeof(buf) - 1] = '\0';
   
   /* handle each of tokens, in turn */
   for (env_p = buf, this_p = buf; ! done_b; env_p++, this_p = env_p) {
@@ -238,7 +240,8 @@ void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
        */
       (void)loc_snprintf(log_path, sizeof(log_path), this_p, getpid());
 #else
-      (void)strcpy(log_path, this_p);
+      (void)strncpy(log_path, this_p, sizeof(log_path));
+      log_path[sizeof(log_path) - 1] = '\0';
 #endif
       if (logpath_p != NULL) {
 	*logpath_p = log_path;
