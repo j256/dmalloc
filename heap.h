@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.h,v 1.38 2000/05/15 22:22:28 gray Exp $
+ * $Id: heap.h,v 1.39 2000/05/17 15:18:12 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -45,7 +45,7 @@
   (((char *)(pnt) - (char *)_heap_base) / BLOCK_SIZE)
 
 /* get a pointer to the memory block number BLOCKN */
-#define BLOCK_POINTER(blockn)	((char *)_heap_base + (blockn) * BLOCK_SIZE)
+#define BLOCK_POINTER(block_n)	((char *)_heap_base + (block_n) * BLOCK_SIZE)
 
 /* test whether pointer PNT is on a block boundary */
 #define ON_BLOCK(pnt)		\
@@ -64,6 +64,10 @@
 /* increment the heap point PNT by SIZE */
 #define HEAP_INCR(pnt, size)	((char *)(pnt) + (size))
 
+/* round the pointer to the block pointer */
+#define BLOCK_ROUND(pnt)	((char *)(pnt) - \
+				 ((unsigned long)(pnt) % BLOCK_SIZE))
+
 #else /* ! HEAP_GROWS_UP */
 
 /* test whether pointer PNT is in the heap space */
@@ -75,7 +79,7 @@
   (((char *)(_heap_base) - (char *)pnt) / BLOCK_SIZE)
 
 /* get a pointer to the memory block number BLOCKN */
-#define BLOCK_POINTER(blockn)	((char *)_heap_base - (blockn) * BLOCK_SIZE)
+#define BLOCK_POINTER(block_n)	((char *)_heap_base - (block_n) * BLOCK_SIZE)
 
 /* test whether pointer P is on a block boundary */
 #define ON_BLOCK(pnt)		\
@@ -93,6 +97,10 @@
 
 /* increment the heap point PNT by SIZE */
 #define HEAP_INCR(pnt, size)	((char *)(pnt) - (size))
+
+/* round the pointer to the block pointer */
+#define BLOCK_ROUND(pnt)	((char *)(pnt) + \
+				 ((unsigned long)(pnt) % BLOCK_SIZE))
 
 #endif /* ! HEAP_GROWS_UP */
 
