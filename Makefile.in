@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.120 1999/03/08 19:24:32 gray Exp $
+# $Id: Makefile.in,v 1.121 1999/03/09 05:00:04 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -102,27 +102,27 @@ settings.h : $(srcdir)/settings.dist config.status
 	touch $@
 
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
-	rm -f $(.TARGET) $(.TARGET).t
+	rm -f $@ $@.t
 	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > \
-		$(.TARGET).t
-	mv $(.TARGET).t $(.TARGET)
+		$@.t
+	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
-	ar cr $(.TARGET) $?
-	ranlib $(.TARGET)
+	ar cr $@ $?
+	ranlib $@
 
 $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
-	ar cr $(.TARGET) $?
-	ranlib $(.TARGET)
+	ar cr $@ $?
+	ranlib $@
 
 $(LIB_DIS) : dmalloc_lp.o
-	ar cr $(.TARGET) $?
-	ranlib $(.TARGET)
+	ar cr $@ $?
+	ranlib $@
 
 $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
-	rm -f $(.TARGET)
+	rm -f $@
 	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
-	mv a.out $(.TARGET)
+	mv a.out $@
 
 threads : $(LIB_TH)
 
@@ -135,19 +135,19 @@ chunk_th.o : chunk.c
 error_th.o : error.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
-		-c error.c -o $(.TARGET)
+		-c error.c -o $@
 
 malloc_th.o : malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
-		-c malloc.c -o $(.TARGET)
+		-c malloc.c -o $@
 
 tests :: $(TEST)
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
-	rm -f $(.TARGET)
+	rm -f $@
 	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) $(LIBRARY)
-	mv a.out $(.TARGET)
+	mv a.out $@
 
 check light :: $(TEST)
 	$(TEST) -s -t 10000
@@ -168,20 +168,20 @@ continuous :: $(TEST)
 		done
 
 port :: $(FLS) $(CONTFLS) Makefile.all.in
-	@ answer 'Is it okay to remove the $(.TARGET) directory? '
-	rm -rf $(.TARGET)
-	mkdir $(.TARGET) $(.TARGET)/contrib
-	cp $(FLS) Makefile.all.in $(.TARGET)
-	cp $(CONTFLS) $(.TARGET)/contrib
-	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
+	@ answer 'Is it okay to remove the $@ directory? '
+	rm -rf $@
+	mkdir $@ $@/contrib
+	cp $(FLS) Makefile.all.in $@
+	cp $(CONTFLS) $@/contrib
+	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
-	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
+	@ echo 'Please rename $@ to dmalloc-version and tar up file'
 
 dmalloc.ps : dmalloc.texi
 	rm -rf work
 	mkdir work
 	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; \
-		dvips -o ../$(.TARGET) dmalloc.dvi )
+		dvips -o ../$@ dmalloc.dvi )
 	rm -rf work
 
 dmalloc.html : $(srcdir)/dmalloc.texi
@@ -195,48 +195,41 @@ dmalloc.dvi : dmalloc.texi
 	rm -rf work
 
 INSTALL : $(srcdir)/INSTALL.1 $(INFOFILE)
-	rm -f $(.TARGET) $(.TARGET).t
+	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
-		> $(.TARGET).t
+		> $@.t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- \
-		>> $(.TARGET).t
+		>> $@.t
 	sed -e '1,/,  Node: Getting Started/d' \
-		-e '/,  Node: Using With Threads/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	cat $(srcdir)/INSTALL.1 >> $(.TARGET).t
-	mv $(.TARGET).t $(.TARGET)
+		-e '/,  Node: Details/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	cat $(srcdir)/INSTALL.1 >> $@.t
+	mv $@.t $@
 
 README : $(srcdir)/README.1 $(INFOFILE)
-	rm -f $(.TARGET) $(.TARGET).t
+	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
-		> $(.TARGET).t
+		> $@.t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- \
-		>> $(.TARGET).t
-	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	cat $(srcdir)/README.1 >> $(.TARGET).t
-	mv $(.TARGET).t $(.TARGET)
+		>> $@.t
+	mv $@.t $@
 
 README_ftp : $(srcdir)/README_ftp.1 $(INFOFILE)
-	rm -f $(.TARGET) $(.TARGET).t
+	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
-		> $(.TARGET).t
+		> $@.t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	echo ------------------------------------------------------------------------------- \
-		>> $(.TARGET).t
-	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	cat $(srcdir)/README_ftp.1 >> $(.TARGET).t
-	mv $(.TARGET).t $(.TARGET)
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	cat $(srcdir)/README_ftp.1 >> $@.t
+	mv $@.t $@
 
 $(INFOFILE) : $(srcdir)/dmalloc.texi
-	rm -f $(.TARGET)
+	rm -f $@
 	makeinfo --no-split $(.OODATE)
 
 #
