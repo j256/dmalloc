@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.50 2003/05/13 14:55:24 gray Exp $
+ * $Id: error.h,v 1.51 2003/05/16 04:09:13 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -95,32 +95,92 @@ extern
 int		_dmalloc_aborting_b;
 
 /*
+ * void _dmalloc_open_log
+ *
+ * DESCRIPTION:
+ *
  * Open up our log file and write some version of settings
  * information.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
  */
 extern
 void	_dmalloc_open_log(void);
 
+/*
+ * void _dmalloc_reopen_log
+ *
+ * DESCRIPTION:
+ *
+ * Re-open our log file which basically calls close() on the
+ * logfile-fd.  If we change the name of the log-file then we will
+ * re-open the file.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+extern
+void	_dmalloc_reopen_log(void);
+
 #if STORE_TIMEVAL
 /*
- * print the time into local buffer which is returned
+ * char *_dmalloc_ptimeval
+ *
+ * DESCRIPTION:
+ *
+ * Print the time into local buffer.
+ *
+ * RETURNS:
+ *
+ * Poiner to the buf argument.
+ *
+ * ARGUMENTS:
+ *
+ * timeval_p -> Pointer to a time value.
+ *
+ * buf -> Internal buffer into which we are writing the time.
+ *
+ * buf_size -> Size of the buffer.
+ *
+ * elapsed_b -> Set to 1 to dump the elapsed instead of global time.
  */
 extern
 char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 			   const int buf_size, const int elapsed_b);
 #endif /* if STORE_TIMEVAL */
 
-/*
- * Re-open our log file which basically calls close() on the
- * logfile-fd.  If we change the name of the log-file then we will
- * re-open the file.
- */
-extern
-void	_dmalloc_reopen_log(void);
-
 #if STORE_TIMEVAL == 0 && HAVE_TIME
 /*
- * print the time into local buffer which is returned
+ * char *_dmalloc_ptime
+ *
+ * DESCRIPTION:
+ *
+ * Print the time into local buffer.
+ *
+ * RETURNS:
+ *
+ * Poiner to the buf argument.
+ *
+ * ARGUMENTS:
+ *
+ * time_p -> Pointer to a time value.
+ *
+ * buf -> Internal buffer into which we are writing the time.
+ *
+ * buf_size -> Size of the buffer.
+ *
+ * elapsed_b -> Set to 1 to dump the elapsed instead of global time.
  */
 extern
 char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
@@ -128,13 +188,43 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 #endif /* if STORE_TIMEVAL == 0 && HAVE_TIME */
 
 /*
- * message writer with vprintf like arguments
+ * void dmalloc_vmessage
+ *
+ * DESCRIPTION:
+ *
+ * Message writer with vprintf like arguments which adds a line to the
+ * dmalloc logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * format -> Printf-style format statement.
+ *
+ * args -> Already converted pointer to a stdarg list.
  */
 extern
-void	_dmalloc_vmessage(const char *format, va_list args);
+void	dmalloc_vmessage(const char *format, va_list args);
 
 /*
- * message writer with printf like arguments
+ * void dmalloc_message
+ *
+ * DESCRIPTION:
+ *
+ * Message writer with printf like arguments which adds a line to the
+ * dmalloc logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * format -> Printf-style format statement.
+ *
+ * ... -> Variable argument list.
  */
 extern
 void	dmalloc_message(const char *format, ...)
@@ -144,14 +234,37 @@ void	dmalloc_message(const char *format, ...)
 ;
 
 /*
- * kill the program because of an internal malloc error
+ * void _dmalloc_die
+ *
+ * DESCRIPTION:
+ *
+ * Kill the program because of an internal malloc error.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * silent_b -> Set to 1 to not drop log entries.
  */
 extern
 void	_dmalloc_die(const int silent_b);
 
 /*
- * handler of error codes from procedure FUNC.  the procedure should
- * have set the errno already.
+ * void dmalloc_error
+ *
+ * DESCRIPTION:
+ *
+ * Handler of error codes.  The caller should have set the errno already
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * func -> Function name for the logs.
  */
 extern
 void	dmalloc_error(const char *func);

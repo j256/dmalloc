@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.102 2003/05/15 02:39:29 gray Exp $
+ * $Id: error.c,v 1.103 2003/05/16 04:09:13 gray Exp $
  */
 
 /*
@@ -134,8 +134,20 @@ int		_dmalloc_aborting_b = 0;
 static int	outfile_fd = -1;		/* output file descriptor */
 
 /*
+ * void _dmalloc_open_log
+ *
+ * DESCRIPTION:
+ *
  * Open up our log file and write some version of settings
  * information.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
  */
 void	_dmalloc_open_log(void)
 {
@@ -196,9 +208,64 @@ void	_dmalloc_open_log(void)
 #endif
 }
 
+/*
+ * void _dmalloc_reopen_log
+ *
+ * DESCRIPTION:
+ *
+ * Re-open our log file which basically calls close() on the
+ * logfile-fd.  If we change the name of the log-file then we will
+ * re-open the file.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+void	_dmalloc_reopen_log(void)
+{
+  /* no need to reopen it if it hasn't been reopened yet */
+  if (outfile_fd < 0) {
+    return;
+  }
+  
+  if (dmalloc_logpath == NULL) {
+    dmalloc_message("Closing logfile to be reopened as '%s'",
+		     dmalloc_logpath);
+  }
+  else {
+    dmalloc_message("Closing logfile to not be reopened");
+  }
+  
+  (void)close(outfile_fd);
+  outfile_fd = -1;
+  /* we don't call open here, we'll let the next message do it */
+}
+
 #if STORE_TIMEVAL
 /*
- * print the time into local buffer which is returned
+ * char *_dmalloc_ptimeval
+ *
+ * DESCRIPTION:
+ *
+ * Print the time into local buffer.
+ *
+ * RETURNS:
+ *
+ * Poiner to the buf argument.
+ *
+ * ARGUMENTS:
+ *
+ * timeval_p -> Pointer to a time value.
+ *
+ * buf -> Internal buffer into which we are writing the time.
+ *
+ * buf_size -> Size of the buffer.
+ *
+ * elapsed_b -> Set to 1 to dump the elapsed instead of global time.
  */
 char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 			   const int buf_size, const int elapsed_b)
@@ -234,35 +301,28 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 }
 #endif
 
-/*
- * Re-open our log file which basically calls close() on the
- * logfile-fd.  If we change the name of the log-file then we will
- * re-open the file.
- */
-void	_dmalloc_reopen_log(void)
-{
-  /* no need to reopen it if it hasn't been reopened yet */
-  if (outfile_fd < 0) {
-    return;
-  }
-  
-  if (dmalloc_logpath == NULL) {
-    dmalloc_message("Closing logfile to be reopened as '%s'",
-		     dmalloc_logpath);
-  }
-  else {
-    dmalloc_message("Closing logfile to not be reopened");
-  }
-  
-  (void)close(outfile_fd);
-  outfile_fd = -1;
-  /* we don't call open here, we'll let the next message do it */
-}
-
 /* NOTE: we do the ifdef this way for fillproto */
 #if STORE_TIMEVAL == 0 && HAVE_TIME
 /*
- * print the time into local buffer which is returned
+ * char *_dmalloc_ptime
+ *
+ * DESCRIPTION:
+ *
+ * Print the time into local buffer.
+ *
+ * RETURNS:
+ *
+ * Poiner to the buf argument.
+ *
+ * ARGUMENTS:
+ *
+ * time_p -> Pointer to a time value.
+ *
+ * buf -> Internal buffer into which we are writing the time.
+ *
+ * buf_size -> Size of the buffer.
+ *
+ * elapsed_b -> Set to 1 to dump the elapsed instead of global time.
  */
 char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 			const int elapsed_b)
@@ -289,9 +349,24 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 #endif
 
 /*
- * message writer with vprintf like arguments
+ * void dmalloc_vmessage
+ *
+ * DESCRIPTION:
+ *
+ * Message writer with vprintf like arguments which adds a line to the
+ * dmalloc logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * format -> Printf-style format statement.
+ *
+ * args -> Already converted pointer to a stdarg list.
  */
-void	_dmalloc_vmessage(const char *format, va_list args)
+void	dmalloc_vmessage(const char *format, va_list args)
 {
   char		str[1024], *str_p, *bounds_p;
   int		len;
@@ -365,7 +440,22 @@ void	_dmalloc_vmessage(const char *format, va_list args)
 }
 
 /*
- * message writer with printf like arguments
+ * void dmalloc_message
+ *
+ * DESCRIPTION:
+ *
+ * Message writer with printf like arguments which adds a line to the
+ * dmalloc logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * format -> Printf-style format statement.
+ *
+ * ... -> Variable argument list.
  */
 void	dmalloc_message(const char *format, ...)
   /* __attribute__ ((format (printf, 1, 2))) */
@@ -373,12 +463,24 @@ void	dmalloc_message(const char *format, ...)
   va_list	args;
   
   va_start(args, format);
-  _dmalloc_vmessage(format, args);
+  dmalloc_vmessage(format, args);
   va_end(args);
 }
 
 /*
- * kill the program because of an internal malloc error
+ * void _dmalloc_die
+ *
+ * DESCRIPTION:
+ *
+ * Kill the program because of an internal malloc error.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * silent_b -> Set to 1 to not drop log entries.
  */
 void	_dmalloc_die(const int silent_b)
 {
@@ -429,8 +531,19 @@ void	_dmalloc_die(const int silent_b)
 }
 
 /*
- * handler of error codes from procedure FUNC.  the procedure should
- * have set the errno already.
+ * void dmalloc_error
+ *
+ * DESCRIPTION:
+ *
+ * Handler of error codes.  The caller should have set the errno already
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * func -> Function name for the logs.
  */
 void	dmalloc_error(const char *func)
 {

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.162 2003/05/16 00:09:57 gray Exp $
+ * $Id: malloc.c,v 1.163 2003/05/16 04:09:12 gray Exp $
  */
 
 /*
@@ -417,106 +417,6 @@ static	int	dmalloc_startup(const char *debug_str)
 }
 
 /*
- * Shutdown memory-allocation module, provide statistics if necessary
- */
-void	dmalloc_shutdown(void)
-{
-  /* NOTE: do not generate errors for IN_TWICE here */
-  
-  /* if we're already in die mode leave fast and quietly */
-  if (_dmalloc_aborting_b) {
-    return;
-  }
-  
-  /*
-   * Make sure that the log file is open.  We do this here because we
-   * might cause an allocation in the open() and don't want to go
-   * recursive.
-   */
-  _dmalloc_open_log();
-  
-#if LOCK_THREADS
-  lock_thread();
-#endif
-  
-  /* if we've died in dmalloc somewhere then leave fast and quietly */
-  if (in_alloc_b) {
-    return;
-  }
-  
-  in_alloc_b = 1;
-  
-  /*
-   * Check the heap since we are dumping info from it.  We check it
-   * when check-blank is enabled do make sure all of the areas have
-   * not been overwritten.  Thanks Randell.
-   */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-    (void)_dmalloc_chunk_heap_check();
-  }
-  
-  /* dump some statistics to the logfile */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STATS)) {
-    _dmalloc_chunk_log_stats();
-  }
-  
-  /* report on non-freed pointers */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE)) {
-    _dmalloc_chunk_log_changed(0, 1, 0,
-#if DUMP_UNFREED_SUMMARY_ONLY
-		       0
-#else
-		       1
-#endif
-		       );
-  }
-  
-#if STORE_TIMEVAL
-  {
-    TIMEVAL_TYPE	now;
-    char		time_buf1[64], time_buf2[64];
-    GET_TIMEVAL(now);
-    dmalloc_message("ending time = %s, elapsed since start = %s",
-		    _dmalloc_ptimeval(&now, time_buf1, sizeof(time_buf1), 0),
-		    _dmalloc_ptimeval(&now, time_buf2, sizeof(time_buf2), 1));
-  }
-#else
-#if HAVE_TIME /* NOT STORE_TIME */
-  {
-    TIME_TYPE	now;
-    char	time_buf1[64], time_buf2[64];
-    now = time(NULL);
-    dmalloc_message("ending time = %s, elapsed since start = %s",
-		    _dmalloc_ptime(&now, time_buf1, sizeof(time_buf1), 0),
-		    _dmalloc_ptime(&now, time_buf2, sizeof(time_buf2), 1));
-  }
-#endif
-#endif
-  
-  in_alloc_b = 0;
-  
-#if LOCK_THREADS
-  unlock_thread();
-#endif
-  
-  /* NOTE: do not set enabled_b to false here */
-}
-
-#if FINI_DMALLOC
-/*
- * Automatic OSF function to close dmalloc.  Pretty cool OS/compiler
- * hack.  By default it is not necessary because we use atexit() and
- * on_exit() to register the close functions.  These are more
- * portable.
- */
-void	__fini_dmalloc()
-{
-  dmalloc_shutdown();
-}
-#endif
-
-/*
  * Call to the alloc routines has been made.  Do some initialization,
  * locking, and check some debug variables.
  *
@@ -613,15 +513,161 @@ static	void	dmalloc_out(void)
   }
 }
 
-/******************************* memory calls ********************************/
+/***************************** exported routines *****************************/
 
 /*
- * Allocate and return a SIZE block of bytes.  FUNC_ID contains the
- * type of function.  If we are aligning our malloc then ALIGNMENT is
- * greater than 0.  If XALLOC_B is 1 then print an error and exit if
- * we run out of memory.
+ * void dmalloc_shutdown
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Shutdown the dmalloc library and provide statistics if necessary.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+void	dmalloc_shutdown(void)
+{
+  /* NOTE: do not generate errors for IN_TWICE here */
+  
+  /* if we're already in die mode leave fast and quietly */
+  if (_dmalloc_aborting_b) {
+    return;
+  }
+  
+  /*
+   * Make sure that the log file is open.  We do this here because we
+   * might cause an allocation in the open() and don't want to go
+   * recursive.
+   */
+  _dmalloc_open_log();
+  
+#if LOCK_THREADS
+  lock_thread();
+#endif
+  
+  /* if we've died in dmalloc somewhere then leave fast and quietly */
+  if (in_alloc_b) {
+    return;
+  }
+  
+  in_alloc_b = 1;
+  
+  /*
+   * Check the heap since we are dumping info from it.  We check it
+   * when check-blank is enabled do make sure all of the areas have
+   * not been overwritten.  Thanks Randell.
+   */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+    (void)_dmalloc_chunk_heap_check();
+  }
+  
+  /* dump some statistics to the logfile */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STATS)) {
+    _dmalloc_chunk_log_stats();
+  }
+  
+  /* report on non-freed pointers */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE)) {
+    _dmalloc_chunk_log_changed(0, 1, 0,
+#if DUMP_UNFREED_SUMMARY_ONLY
+		       0
+#else
+		       1
+#endif
+		       );
+  }
+  
+#if STORE_TIMEVAL
+  {
+    TIMEVAL_TYPE	now;
+    char		time_buf1[64], time_buf2[64];
+    GET_TIMEVAL(now);
+    dmalloc_message("ending time = %s, elapsed since start = %s",
+		    _dmalloc_ptimeval(&now, time_buf1, sizeof(time_buf1), 0),
+		    _dmalloc_ptimeval(&now, time_buf2, sizeof(time_buf2), 1));
+  }
+#else
+#if HAVE_TIME /* NOT STORE_TIME */
+  {
+    TIME_TYPE	now;
+    char	time_buf1[64], time_buf2[64];
+    now = time(NULL);
+    dmalloc_message("ending time = %s, elapsed since start = %s",
+		    _dmalloc_ptime(&now, time_buf1, sizeof(time_buf1), 0),
+		    _dmalloc_ptime(&now, time_buf2, sizeof(time_buf2), 1));
+  }
+#endif
+#endif
+  
+  in_alloc_b = 0;
+  
+#if LOCK_THREADS
+  unlock_thread();
+#endif
+  
+  /* NOTE: do not set enabled_b to false here */
+}
+
+#if FINI_DMALLOC
+/*
+ * void __fini_dmalloc
+ *
+ * DESCRIPTION:
+ *
+ * Automatic function to close dmalloc supported by some operating
+ * systems.  Pretty cool OS/compiler hack.  By default it is not
+ * necessary because we use atexit() and on_exit() to register the
+ * close functions which are more portable.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+void	__fini_dmalloc(void)
+{
+  dmalloc_shutdown();
+}
+#endif
+
+/*
+ * DMALLOC_PNT dmalloc_malloc
+ *
+ * DESCRIPTION:
+ *
+ * Allocate and return a memory block of a certain size.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.
+ *
+ * line -> Line-number of the caller.
+ *
+ * size -> Number of bytes requested.
+ *
+ * func_id -> Function-id to identify the type of call.  See
+ * dmalloc.h.
+ *
+ * alignment -> To align the new block to a certain number of bytes,
+ * set this to a value greater than 0.
+ *
+ * xalloc_b -> If set to 1 then print an error and exit if we run out
+ * of memory.
  */
 DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
 			       const DMALLOC_SIZE size, const int func_id,
@@ -700,14 +746,34 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
 }
 
 /*
- * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
- * either copying all of OLD_PNT to the new area or truncating.  If
- * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
- * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
- * equivalent of free(OLD_PNT) and will return 0L.  If XALLOC_B is 1
- * then print an error and exit if we run out of memory.
+ * DMALLOC_PNT dmalloc_realloc
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Resizes and old pointer to a new number of bytes.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.
+ *
+ * line -> Line-number of the caller.
+ *
+ * old_pnt -> Pointer to an existing memory chunk that we are
+ * resizing.  If this is NULL then it basically does a malloc.
+ *
+ * new_size -> New number of bytes requested for the old pointer.
+ *
+ * func_id -> Function-id to identify the type of call.  See
+ * dmalloc.h.
+ *
+ * xalloc_b -> If set to 1 then print an error and exit if we run out
+ * of memory.
  */
 DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
 				DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
@@ -787,9 +853,31 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
 }
 
 /*
- * Release PNT in the heap.
+ * int dmalloc_free
  *
- * Returns FREE_ERROR, FREE_NOERROR.
+ * DESCRIPTION:
+ *
+ * Release a pointer back into the heap.
+ *
+ * RETURNS:
+ *
+ * Success - FREE_NOERROR
+ *
+ * Failure - FREE_ERROR
+ *
+ * Note: many operating systems define free to return (void) so this
+ * return values may be filtered.  Dumb.
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.
+ *
+ * line -> Line-number of the caller.
+ *
+ * pnt -> Existing pointer we are freeing.
+ *
+ * func_id -> Function-id to identify the type of call.  See
+ * dmalloc.h.
  */
 int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
 		     const int func_id)
@@ -817,11 +905,29 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
 }
 
 /*
- * Allocate and return a copy of STRING which must be \0 terminated.
- * If XALLOC_B is 1 then print an error and exit if we run out of
- * memory.
+ * DMALLOC_PNT dmalloc_strdup
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Allocate and return an allocated block of memory holding a copy of
+ * a string.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.
+ *
+ * line -> Line-number of the caller.
+ *
+ * string -> String we are duplicating.
+ *
+ * xalloc_b -> If set to 1 then print an error and exit if we run out
+ * of memory.
  */
 DMALLOC_PNT	dmalloc_strdup(const char *file, const int line,
 			       const char *string, const int xalloc_b)
@@ -844,9 +950,22 @@ DMALLOC_PNT	dmalloc_strdup(const char *file, const int line,
 /*************************** external memory calls ***************************/
 
 /*
- * Allocate and return a SIZE block of bytes.
+ * DMALLOC_PNT malloc
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overloading the malloc(3) function.  Allocate and return a memory
+ * block of a certain size.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * size -> Number of bytes requested.
  */
 #undef malloc
 DMALLOC_PNT	malloc(DMALLOC_SIZE size)
@@ -859,10 +978,23 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
 }
 
 /*
- * Allocate and return a block of _zeroed_ bytes able to hold
- * NUM_ELEMENTS, each element contains SIZE bytes.
+ * DMALLOC_PNT malloc
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overloading the calloc(3) function.  Returns a block of zeroed memory.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * num_elements -> Number of elements being allocated.
+ *
+ * size -> The number of bytes in each element.
  */
 #undef calloc
 DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
@@ -876,13 +1008,25 @@ DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 }
 
 /*
- * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
- * either copying all of OLD_PNT to the new area or truncating.  If
- * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
- * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
- * equivalent of free(OLD_PNT) and will return 0L.
+ * DMALLOC_PNT realloc
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overload of realloc(3).  Resizes and old pointer to a new number of
+ * bytes.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * old_pnt -> Pointer to an existing memory chunk that we are
+ * resizing.  If this is NULL then it basically does a malloc.
+ *
+ * new_size -> New number of bytes requested for the old pointer.
  */
 #undef realloc
 DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
@@ -895,14 +1039,26 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 }
 
 /*
- * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
- * either copying all of OLD_PNT to the new area or truncating.  If
- * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
- * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
- * equivalent of free(OLD_PNT) and will return 0L.  Any extended
- * memory space will be zeroed like calloc.
+ * DMALLOC_PNT recalloc
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overload of recalloc(3) which exists on some systems.  Resizes and
+ * old pointer to a new number of bytes.  If we are expanding, then
+ * any new bytes will be zeroed.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * old_pnt -> Pointer to an existing memory chunk that we are
+ * resizing.
+ *
+ * new_size -> New number of bytes requested for the old pointer.
  */
 #undef recalloc
 DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
@@ -915,11 +1071,27 @@ DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 }
 
 /*
- * Allocate and return a SIZE block of bytes that has been aligned to
- * ALIGNMENT bytes.  ALIGNMENT must be a power of two and must be less
- * than or equal to the block-size.
+ * DMALLOC_PNT memalign
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overloading the memalign(3) function.  Allocate and return a memory
+ * block of a certain size which have been aligned to a certain
+ * alignment.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * alignment -> Value to which the allocation must be aligned.  This
+ * should probably be a multiple of 2 with a maximum value equivalent
+ * to the block-size which is often 1k or 4k.
+ *
+ * size -> Number of bytes requested.
  */
 #undef memalign
 DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size)
@@ -933,10 +1105,23 @@ DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size)
 }
 
 /*
- * Allocate and return a SIZE block of bytes that has been aligned to
- * a page-size.
+ * DMALLOC_PNT valloc
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overloading the valloc(3) function.  Allocate and return a memory
+ * block of a certain size which have been aligned to page boundaries
+ * which are often 1k or 4k.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * size -> Number of bytes requested.
  */
 #undef valloc
 DMALLOC_PNT	valloc(DMALLOC_SIZE size)
@@ -950,13 +1135,25 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size)
 
 #ifndef DMALLOC_STRDUP_MACRO
 /*
- * Allocate and return a block of bytes that contains the string STR
- * including the \0.
+ * DMALLOC_PNT strdup
  *
- * Returns 0L on error.
+ * DESCRIPTION:
+ *
+ * Overload of strdup(3).  Allocate and return an allocated block of
+ * memory holding a copy of a string.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * string -> String we are duplicating.
  */
 #undef strdup
-char	*strdup(const char *str)
+char	*strdup(const char *string)
 {
   int	len;
   char	*buf, *file;
@@ -964,12 +1161,12 @@ char	*strdup(const char *str)
   GET_RET_ADDR(file);
   
   /* len + \0 */
-  len = strlen(str) + 1;
+  len = strlen(string) + 1;
   
   buf = dmalloc_malloc(file, DMALLOC_DEFAULT_LINE, len, DMALLOC_FUNC_STRDUP,
 		       0 /* no alignment */, 0 /* no xalloc messages */);
   if (buf != NULL) {
-    (void)memcpy(buf, str, len);
+    (void)memcpy(buf, string, len);
   }
   
   return buf;
@@ -977,10 +1174,20 @@ char	*strdup(const char *str)
 #endif
 
 /*
- * Release PNT in the heap.
+ * DMALLOC_FREE_RET free
+ *
+ * DESCRIPTION:
+ *
+ * Release a pointer back into the heap.
+ *
+ * RETURNS:
  *
  * Returns FREE_ERROR, FREE_NOERROR or void depending on whether STDC
  * is defined by your compiler.
+ *
+ * ARGUMENTS:
+ *
+ * pnt -> Existing pointer we are freeing.
  */
 #undef free
 DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
@@ -998,7 +1205,20 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 }
 
 /*
- * same as free PNT
+ * DMALLOC_FREE_RET cfree
+ *
+ * DESCRIPTION:
+ *
+ * Same as free.
+ *
+ * RETURNS:
+ *
+ * Returns FREE_ERROR, FREE_NOERROR or void depending on whether STDC
+ * is defined by your compiler.
+ *
+ * ARGUMENTS:
+ *
+ * pnt -> Existing pointer we are freeing.
  */
 #undef cfree
 DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
@@ -1018,51 +1238,22 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 /******************************* utility calls *******************************/
 
 /*
- * Dump dmalloc statistics to logfile.
- */
-void	dmalloc_log_stats(void)
-{
-  if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
-    return;
-  }
-  
-  _dmalloc_chunk_log_stats();
-  
-  dmalloc_out();
-}
-
-/*
- * Dump unfreed-memory info to logfile.
- */
-void	dmalloc_log_unfreed(void)
-{
-  if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
-    return;
-  }
-  
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    dmalloc_message("dumping the unfreed pointers");
-  }
-  
-  /*
-   * to log the non-free we are interested in the pointers currently
-   * being used
-   */
-  _dmalloc_chunk_log_changed(0, 1, 0,
-#if DUMP_UNFREED_SUMMARY_ONLY
-			0
-#else
-			1
-#endif
-			);
-  
-  dmalloc_out();
-}
-
-/*
- * Verify pointer PNT, if PNT is 0 then check the entire heap.
+ * int dmalloc_verify
  *
- * Returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
+ * DESCRIPTION:
+ *
+ * Verify a pointer which has previously been allocated by the
+ * library.
+ *
+ * RETURNS:
+ *
+ * Success - MALLOC_VERIFY_NOERROR
+ *
+ * Failure - MALLOC_VERIFY_ERROR
+ *
+ * ARGUMENTS:
+ *
+ * pnt -> Pointer we are verifying.  If 0L then check the entire heap.
  */
 int	dmalloc_verify(const DMALLOC_PNT pnt)
 {
@@ -1093,9 +1284,22 @@ int	dmalloc_verify(const DMALLOC_PNT pnt)
 }
 
 /*
- * Verify pointer PNT, if PNT is 0 then check the entire heap.
+ * int malloc_verify
  *
- * Returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
+ * DESCRIPTION:
+ *
+ * Verify a pointer which has previously been allocated by the
+ * library.  Same as dmalloc_verify.
+ *
+ * RETURNS:
+ *
+ * Success - MALLOC_VERIFY_NOERROR
+ *
+ * Failure - MALLOC_VERIFY_ERROR
+ *
+ * ARGUMENTS:
+ *
+ * pnt -> Pointer we are verifying.  If 0L then check the entire heap.
  */
 int	malloc_verify(const DMALLOC_PNT pnt)
 {
@@ -1103,15 +1307,25 @@ int	malloc_verify(const DMALLOC_PNT pnt)
 }
 
 /*
- * Set the global debug functionality FLAGS (0 to disable all
- * debugging).
+ * unsigned int dmalloc_debug
  *
- * NOTE: you cannot remove certain flags such as signal handlers since
+ * DESCRIPTION:
+ *
+ * Set the global debug functionality flags.  You can also use
+ * dmalloc_debug_setup.
+ *
+ * Note: you cannot remove certain flags such as signal handlers since
  * they are setup at initialization time only.  Also you cannot add
  * certain flags such as free-space checking since they must be on
  * from the start.
  *
- * Returns the old debug flag value.
+ * RETURNS:
+ *
+ * The old debug flag value.
+ *
+ * ARGUMENTS:
+ *
+ * flags -> Flag value to set.  Pass in 0 to disable all debugging.
  */
 unsigned int	dmalloc_debug(const unsigned int flags)
 {
@@ -1167,7 +1381,7 @@ unsigned int	dmalloc_debug_current(void)
  * Normally this would be pased in in the DMALLOC_OPTIONS
  * environmental variable.  This is here to override the env or for
  * circumstances where modifying the environment is not possible or
- * does not apply.
+ * does not apply such as servers or cgi-bin programs.
  *
  * RETURNS:
  *
@@ -1200,9 +1414,9 @@ void	dmalloc_debug_setup(const char *options_str)
  *
  * DESCRIPTION:
  *
- * Examine a pointer and return information on its allocation size as
- * well as the file and line-number where it was allocated.  If the
- * file and line number is not available, then it will return the
+ * Examine a pointer and pass back information on its allocation size
+ * as well as the file and line-number where it was allocated.  If the
+ * file and line number is not available, then it will pass back the
  * allocation location's return-address if available.
  *
  * RETURNS:
@@ -1257,8 +1471,21 @@ int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
 }
 
 /*
+ * void dmalloc_track
+ *
+ * DESCRIPTION:
+ *
  * Register an allocation tracking function which will be called each
- * time an allocation occurs.  Pass in NULL to disable.
+ * time an allocation occurs.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * track_func -> Function to register as the tracking function.  Set
+ * to NULL to disable.
  */
 void	dmalloc_track(const dmalloc_track_t track_func)
 {
@@ -1266,9 +1493,21 @@ void	dmalloc_track(const dmalloc_track_t track_func)
 }
 
 /*
- * Return to the caller the current ``mark'' which can be used later
- * to dmalloc_log_changed pointers since this point.  Multiple marks
- * can be saved and used.
+ * unsigned long dmalloc_mark
+ *
+ * DESCRIPTION:
+ *
+ * Return to the caller the current "mark" which can be used later by
+ * dmalloc_log_changed to log the changed pointers since this point.
+ * Multiple marks can be saved and used.
+ *
+ * RETURNS:
+ *
+ * Current mark value
+ *
+ * ARGUMENTS:
+ *
+ * None.
  */
 unsigned long	dmalloc_mark(void)
 {
@@ -1280,12 +1519,91 @@ unsigned long	dmalloc_mark(void)
 }
 
 /*
- * Dump the pointers that have changed since the mark which was
- * returned by dmalloc_mark.  If not_freed_b is set to non-0 then log
- * the new pointers that are non-freed.  If free_b is set to non-0
- * then log the new pointers that are freed.  If details_b set to
- * non-0 then dump the individual pointers that have changed otherwise
- * just dump the summaries.
+ * void dmalloc_log_status
+ *
+ * DESCRIPTION:
+ *
+ * Dump dmalloc statistics to logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+void	dmalloc_log_stats(void)
+{
+  if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
+    return;
+  }
+  
+  _dmalloc_chunk_log_stats();
+  
+  dmalloc_out();
+}
+
+/*
+ * void dmalloc_log_unfreed
+ *
+ * DESCRIPTION:
+ *
+ * Dump unfreed-memory info to logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+void	dmalloc_log_unfreed(void)
+{
+  if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
+    return;
+  }
+  
+  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
+    dmalloc_message("dumping the unfreed pointers");
+  }
+  
+  /*
+   * to log the non-free we are interested in the pointers currently
+   * being used
+   */
+  _dmalloc_chunk_log_changed(0, 1, 0,
+#if DUMP_UNFREED_SUMMARY_ONLY
+			0
+#else
+			1
+#endif
+			);
+  
+  dmalloc_out();
+}
+
+/*
+ * void dmalloc_log_changed
+ *
+ * DESCRIPTION:
+ *
+ * Dump the pointers that have changed since a point in time.
+ *
+ * RETURNS:
+ *
+ * mark -> Sets the point to compare against.  You can use
+ * dmalloc_mark to get the current mark value which can later be
+ * passed in here.  Pass in 0 to log what has changed since the
+ * program started.
+ *
+ * not_freed_b -> Set to 1 to log the new pointers that are non-freed.
+ *
+ * free_b -> Set to 1 to log the new pointers that are freed.
+ *
+ * details_b -> Set to 1 to dump the individual pointers that have
+ * changed otherwise the summaries will be logged.
  */
 void	dmalloc_log_changed(const unsigned long mark, const int not_freed_b,
 			    const int free_b, const int details_b)
@@ -1299,10 +1617,21 @@ void	dmalloc_log_changed(const unsigned long mark, const int not_freed_b,
 }
 
 /*
- * Dmalloc version of strerror to return the string version of
- * ERROR_NUM.
+ * const char *dmalloc_strerror
  *
- * Returns an invaid errno string if ERROR_NUM is out-of-range.
+ * DESCRIPTION:
+ *
+ * Convert a dmalloc error code into its string equivalent.
+ *
+ * RETURNS:
+ *
+ * Success - String version of the error
+ *
+ * Failure - The string "unknown error"
+ *
+ * ARGUMENTS:
+ *
+ * error_num -> Error number we are converting.
  */
 const char	*dmalloc_strerror(const int error_num)
 {
