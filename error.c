@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.62 1995/06/28 23:49:02 gray Exp $";
+  "$Id: error.c,v 1.63 1995/08/30 18:06:55 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -85,6 +85,10 @@ EXPORT	struct timeval	_dmalloc_start;
 #else
 EXPORT	long		_dmalloc_start = 0;
 #endif
+
+/* global flag which indicates when we are aborting */
+EXPORT	char		_dmalloc_aborting = FALSE;
+
 /*
  * print the time into local buffer which is returned
  */
@@ -264,6 +268,12 @@ EXPORT	void	_dmalloc_die(const char silent)
       (void)write(STDERR, str, strlen(str));
     }
   }
+  
+  /*
+   * set this in case the following generates a recursive call for
+   * some dumb reason
+   */
+  _dmalloc_aborting = TRUE;
   
   /* do I need to drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)

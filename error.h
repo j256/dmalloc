@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.27 1995/06/28 23:49:07 gray Exp $
+ * $Id: error.h,v 1.28 1995/08/30 18:06:56 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -54,6 +54,9 @@ IMPORT	struct timeval	_dmalloc_start;
 #else
 IMPORT	long		_dmalloc_start;
 #endif
+
+/* global flag which indicates when we are aborting */
+IMPORT	char		_dmalloc_aborting;
 
 /*
  * print the time into local buffer which is returned
