@@ -51,7 +51,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.76 1995/05/13 00:34:25 gray Exp $";
+  "$Id: malloc.c,v 1.77 1995/05/16 00:12:43 gray Exp $";
 #endif
 
 /*
@@ -107,7 +107,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
     dmalloc_errno = ERROR_IN_TWICE;
     dmalloc_error("check_debug_vars");
     /* NOTE: dmalloc_error may die already */
-    _dmalloc_die();
+    _dmalloc_die(FALSE);
     /*NOTREACHED*/
   }
   
@@ -539,7 +539,7 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
     dmalloc_errno = ERROR_IN_TWICE;
     dmalloc_error("check_debug_vars");
     /* NOTE: dmalloc_error may die already */
-    _dmalloc_die();
+    _dmalloc_die(FALSE);
     /*NOTREACHED*/
   }
   

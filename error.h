@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.22 1995/05/13 00:34:24 gray Exp $
+ * $Id: error.h,v 1.23 1995/05/16 00:12:10 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -70,7 +70,7 @@ IMPORT	void	_dmalloc_message(const char * format, ...);
 /*
  * kill the program because of an internal malloc error
  */
-IMPORT	void	_dmalloc_die(void);
+IMPORT	void	_dmalloc_die(const char silent);
 
 /*
  * handler of error codes from procedure FUNC.  the procedure should

@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.39 1995/03/03 17:38:16 gray Exp $";
+  "$Id: heap.c,v 1.40 1995/05/16 00:12:10 gray Exp $";
 #endif
 
 /* external routines */
@@ -113,7 +113,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
       (void)sprintf(str, "\r\ndmalloc: critical error: could not allocate %u more bytes from heap\r\n",
 		    size);
       (void)write(STDERR, str, strlen(str));
-      _dmalloc_die();
+      _dmalloc_die(FALSE);
     }
     return HEAP_ALLOC_ERROR;
   }
@@ -148,7 +148,7 @@ EXPORT	void	*_heap_end(void)
       char	str[128];
       (void)sprintf(str, "\r\ndmalloc: critical error: could not find the end of the heap\r\n");
       (void)write(STDERR, str, strlen(str));
-      _dmalloc_die();
+      _dmalloc_die(FALSE);
     }
     ret = HEAP_ALLOC_ERROR;
   }
