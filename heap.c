@@ -34,13 +34,14 @@
 #define HEAP_MAIN
 
 #include "malloc.h"
+#include "malloc_loc.h"
 #include "chunk.h"
 #include "error.h"
 #include "heap.h"
 #include "malloc_errno.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.8 1992/11/06 01:13:48 gray Exp $";
+  "$Id: heap.c,v 1.9 1992/11/06 05:41:02 gray Exp $";
 
 /* exported variables */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */

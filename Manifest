@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.7 1992/11/06 03:36:21 gray Exp $
+$Id: Manifest,v 1.8 1992/11/06 05:40:51 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -57,5 +57,7 @@ malloc_test.c		Meager test program for testing the malloc routines.
 mallocrc		Sample RC file that is used to set the debug flags.
 
 proto.h			Some machine specific functions and defines.
+
+sample.c		A sample file to demonstrate the usage of the library.
 
 -------------------------------------------------------------------------------

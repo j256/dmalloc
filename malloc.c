@@ -27,16 +27,18 @@
 #define MALLOC_MAIN
 
 #include "malloc.h"
+#include "malloc_loc.h"
 #include "chunk.h"
 #include "error.h"
-#include "error_strings.h"
+#include "error_str.h"
 #include "heap.h"
 #include "malloc_errno.h"
+#include "malloc_leap.h"
 #include "malloc_loc.h"
 #include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.4 1992/11/06 03:36:37 gray Exp $";
+  "$Id: malloc.c,v 1.5 1992/11/06 05:41:04 gray Exp $";
 
 /*
  * exported variables
@@ -241,25 +243,24 @@ EXPORT	void	malloc_shutdown(void)
   /* NOTE: do not set malloc_enabled to false here */
 }
 
-/******************************** calloc calls *******************************/
+/******************************** memory calls *******************************/
 
 /*
- * allocate ELEN of elements of SIZE, then zero's the block
+ * allocate NUM_ELEMENTS of elements of SIZE, then zero's the block
  */
-EXPORT	char	*_calloc_info(char * file, int line, unsigned int elen,
-			      unsigned int size)
+EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
 {
   char		*newp;
-  unsigned int	len = elen * size;
+  unsigned int	len = num_elements * size;
   
-  if (check_debug_vars(file, line) != NOERROR)
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return CALLOC_ERROR;
   
   /* needs to be done here */
   _calloc_count++;
   
   /* alloc and watch for the die address */
-  newp = (char *)_chunk_malloc(file, line, len);
+  newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, len);
   
   /* is this the address we are looking for? */
   if (malloc_address != NULL && newp == malloc_address) {
@@ -277,27 +278,13 @@ EXPORT	char	*_calloc_info(char * file, int line, unsigned int elen,
 }
 
 /*
- * non-debug version of calloc_info
+ * release PNT in the heap
  */
-EXPORT	char	*calloc(unsigned int elen, unsigned int size)
-{
-  char		*newp;
-  
-  newp = _calloc_info(DEFAULT_FILE, DEFAULT_LINE, elen, size);
-  
-  return newp;
-}
-
-/********************************* free calls ********************************/
-
-/*
- * release PNT in the heap from FILE at LINE
- */
-EXPORT	int	_free_info(char * file, int line, char * pnt)
+EXPORT	int	free(char * pnt)
 {
   int		ret;
   
-  if (check_debug_vars(file, line) != NOERROR)
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return FREE_ERROR;
   
   /* is this the address we are looking for? */
@@ -308,7 +295,7 @@ EXPORT	int	_free_info(char * file, int line, char * pnt)
       address_count--;
   }
   
-  ret = _chunk_free(file, line, pnt);
+  ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
   
@@ -316,42 +303,24 @@ EXPORT	int	_free_info(char * file, int line, char * pnt)
 }
 
 /*
- * non-debug version of free_info
- */
-EXPORT	int	free(char * pnt)
-{
-  int		ret;
-  
-  ret = _free_info(DEFAULT_FILE, DEFAULT_LINE, pnt);
-  
-  return ret;
-}
-
-/*
- * another non-debug version of free_info
+ * same as free
  */
 EXPORT	int	cfree(char * pnt)
 {
-  int		ret;
-  
-  ret = _free_info(DEFAULT_FILE, DEFAULT_LINE, pnt);
-  
-  return ret;
+  return free(pnt);
 }
 
-/******************************* malloc calls ********************************/
-
 /*
- * allocate a SIZE block of bytes from FILE at LINE
+ * allocate a SIZE block of bytes
  */
-EXPORT	char	*_malloc_info(char * file, int line, unsigned int size)
+EXPORT	char	*malloc(unsigned int size)
 {
   char		*newp;
   
-  if (check_debug_vars(file, line) != NOERROR)
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return MALLOC_ERROR;
   
-  newp = (char *)_chunk_malloc(file, line, size);
+  newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, size);
   
   /* is this the address we are looking for? */
   if (malloc_address != NULL && newp == malloc_address) {
@@ -367,44 +336,29 @@ EXPORT	char	*_malloc_info(char * file, int line, unsigned int size)
 }
 
 /*
- * non-debug version of malloc_info
+ * resizes OLD_PNT to SIZE bytes either copying or truncating
  */
-EXPORT	char	*malloc(unsigned int size)
-{
-  char		*newp;
-  
-  newp = _malloc_info(DEFAULT_FILE, DEFAULT_LINE, size);
-  
-  return newp;
-}
-
-/******************************* realloc calls *******************************/
-
-/*
- * resizes PNT to SIZE bytes either copying or truncating
- */
-EXPORT	char	*_realloc_info(char * file, int line, char * oldp,
-			       unsigned int new_size)
+EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
 {
   char		*newp;
   
 #ifndef NO_REALLOC_NULL
-  if (oldp == NULL)
-    return _malloc_info(file, line, new_size);
+  if (old_pnt == NULL)
+    return malloc(new_size);
 #endif /* ! NO_REALLOC_NULL */
   
-  if (check_debug_vars(file, line) != NOERROR)
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
   /* is the old address the one we are looking for? */
-  if (malloc_address != NULL && oldp == malloc_address) {
+  if (malloc_address != NULL && old_pnt == malloc_address) {
     if (address_count - 1 <= 0)
       _malloc_die();
     else
       address_count--;
   }
   
-  newp = (char *)_chunk_realloc(file, line, oldp, new_size);
+  newp = (char *)_chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
   
   /* is the new address the one we are looking for? */
   if (malloc_address != NULL && newp == malloc_address) {
@@ -415,18 +369,6 @@ EXPORT	char	*_realloc_info(char * file, int line, char * oldp,
   }
   
   in_alloc = FALSE;
-  
-  return newp;
-}
-
-/*
- * non-debug version of realloc_info
- */
-EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
-{
-  char		*newp;
-  
-  newp = _realloc_info(DEFAULT_FILE, DEFAULT_LINE, old_pnt, new_size);
   
   return newp;
 }

@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.9 1992/11/06 01:14:05 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.10 1992/11/06 05:41:16 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -49,5 +49,69 @@
 #define INTERVAL_ENVIRON	"MALLOC_INTERVAL"
 #define LOGFILE_ENVIRON		"MALLOC_LOGFILE"
 #define START_ENVIRON		"MALLOC_START"
+
+/******************************* useful defines ******************************/
+
+/*
+ * standard int return codes
+ */
+#ifndef ERROR
+
+#undef	ERROR
+#define	ERROR		(-1)
+
+#undef	NOERROR
+#define	NOERROR		0
+
+#endif /* ! ERROR */
+
+/*
+ * generic constants
+ */
+#undef	NULL
+#define NULL		0
+
+#ifndef NULLC
+
+#undef	NULLC
+#define NULLC		'\0'
+
+#undef	FALSE
+#define FALSE		0
+
+#undef	TRUE
+#define TRUE		(! FALSE)
+
+#endif /* ! NULLC */
+
+/*
+ * min/max macros
+ *
+ * WARNING: these use their arguments multiple times which may be bad
+ */
+#ifndef MAX
+
+#undef MAX
+#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
+#undef MIN
+#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
+
+#endif /* ! MAX */
+
+/*
+ * bitflag tools for Variable and a Flag
+ */
+#ifndef BIT_FLAG
+
+#undef BIT_FLAG
+#define BIT_FLAG(x)		(1 << (x))
+#undef BIT_SET
+#define BIT_SET(v,f)		(v) |= (f)
+#undef BIT_CLEAR
+#define BIT_CLEAR(v,f)		(v) &= ~(f)
+#undef BIT_IS_SET
+#define BIT_IS_SET(v,f)		((v) & (f))
+
+#endif /* ! BIT_FLAG */
 
 #endif /* ! __MALLOC_LOC_H__ */

@@ -21,24 +21,13 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.4 1992/11/06 03:36:39 gray Exp $
+ * $Id: malloc.h,v 1.5 1992/11/06 05:41:06 gray Exp $
  */
 
 #ifndef __MALLOC_H__
 #define __MALLOC_H__
 
-/*
- * global variable and procedure scoping for code readability
- */
-#undef	EXPORT
-#define	EXPORT
-
-#undef	IMPORT
-#define	IMPORT		extern
-
-#undef	LOCAL
-#define	LOCAL		static
-
+#include "malloc_leap.h"			/* leap-frog routines */
 
 /*
  * malloc function return codes
@@ -54,68 +43,16 @@
 #define MALLOC_VERIFY_NOERROR	1		/* checks passed, no error */
 
 /*
- * standard int return codes
+ * global variable and procedure scoping for code readability
  */
-#ifndef ERROR
+#undef	EXPORT
+#define	EXPORT
 
-#undef	ERROR
-#define	ERROR		(-1)
+#undef	IMPORT
+#define	IMPORT		extern
 
-#undef	NOERROR
-#define	NOERROR		0
-
-#endif /* ! ERROR */
-
-/*
- * generic constants
- */
-#undef	NULL
-#define NULL		0
-
-#ifndef NULLC
-
-#undef	NULLC
-#define NULLC		'\0'
-
-#undef	FALSE
-#define FALSE		0
-
-#undef	TRUE
-#define TRUE		(! FALSE)
-
-#endif /* ! NULLC */
-
-/*
- * min/max macros
- *
- * WARNING: these use their arguments multiple times which may be bad
- */
-#ifndef MAX
-
-#undef MAX
-#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
-#undef MIN
-#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
-
-#endif /* ! MAX */
-
-/*
- * bitflag tools for Variable and a Flag
- */
-#ifndef BIT_FLAG
-
-#undef BIT_FLAG
-#define BIT_FLAG(x)		(1 << (x))
-#undef BIT_SET
-#define BIT_SET(v,f)		(v) |= (f)
-#undef BIT_CLEAR
-#define BIT_CLEAR(v,f)		(v) &= ~(f)
-#undef BIT_IS_SET
-#define BIT_IS_SET(v,f)		((v) & (f))
-
-#endif /* ! BIT_FLAG */
-
-/*****************************************************************************/
+#undef	LOCAL
+#define	LOCAL		static
 
 /*
  * system function prototype for memory copy.  needed for below macros.
@@ -128,38 +65,36 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 #define MEMORY_COPY(from, to, size)	(void)memcpy((char *)to, \
 						     (char *)from, size)
 
-/*****************************************************************************/
-
 /*
  * alloc macros to provide for memory debugging features.
  */
 #undef ALLOC
 #define ALLOC(type, count) \
-  (type *)_malloc_info(__FILE__, __LINE__, \
+  (type *)_malloc_leap(__FILE__, __LINE__, \
 		       (unsigned int)(sizeof(type) * (count)))
 
 /* WARNING: notice that the arguments are REVERSED from normal calloc() */
 #undef CALLOC
 #define CALLOC(type, count) \
-  (type *)_calloc_info(__FILE__, __LINE__, (unsigned int)(count), \
+  (type *)_calloc_leap(__FILE__, __LINE__, (unsigned int)(count), \
 		       (unsigned int)sizeof(type))
 
 #undef  FREE
 #define FREE(ptr) \
-  _free_info(__FILE__, __LINE__, (char *)(ptr))
+  _free_leap(__FILE__, __LINE__, (char *)(ptr))
 
 #undef  MALLOC
 #define MALLOC(size) \
-  (char *)_malloc_info(__FILE__, __LINE__, (unsigned int)(size))
+  (char *)_malloc_leap(__FILE__, __LINE__, (unsigned int)(size))
 
 #undef REALLOC
 #define REALLOC(ptr, type, count) \
-  (type *)_realloc_info(__FILE__, __LINE__, (char *)(ptr), \
+  (type *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
 		       (unsigned int)(sizeof(type) * (count)))
 
 #undef REMALLOC
 #define REMALLOC(ptr, size) \
-  (char *)_realloc_info(__FILE__, __LINE__, (char *)(ptr), \
+  (char *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
 			(unsigned int)(size))
 
 /*
@@ -234,49 +169,27 @@ IMPORT	int		malloc_errno;
 IMPORT	void	malloc_shutdown(void);
 
 /*
- * allocate ELEN of elements of SIZE, then zero's the block
+ * allocate NUM_ELEMENTS of elements of SIZE, then zero's the block
  */
-IMPORT	char	*_calloc_info(char * file, int line, unsigned int elen,
-			      unsigned int size);
+IMPORT	char	*calloc(unsigned int num_elements, unsigned int size);
 
 /*
- * non-debug version of calloc_info
- */
-IMPORT	char	*calloc(unsigned int elen, unsigned int size);
-
-/*
- * release PNT in the heap from FILE at LINE
- */
-IMPORT	int	_free_info(char * file, int line, char * pnt);
-
-/*
- * non-debug version of free_info
+ * release PNT in the heap
  */
 IMPORT	int	free(char * pnt);
 
 /*
- * another non-debug version of free_info
+ * same as free
  */
 IMPORT	int	cfree(char * pnt);
 
 /*
- * allocate a SIZE block of bytes from FILE at LINE
- */
-IMPORT	char	*_malloc_info(char * file, int line, unsigned int size);
-
-/*
- * non-debug version of malloc_info
+ * allocate a SIZE block of bytes
  */
 IMPORT	char	*malloc(unsigned int size);
 
 /*
- * resizes PNT to SIZE bytes either copying or truncating
- */
-IMPORT	char	*_realloc_info(char * file, int line, char * oldp,
-			       unsigned int new_size);
-
-/*
- * non-debug version of realloc_info
+ * resizes OLD_PNT to SIZE bytes either copying or truncating
  */
 IMPORT	char	*realloc(char * old_pnt, unsigned int new_size);
 

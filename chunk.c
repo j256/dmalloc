@@ -39,7 +39,7 @@
 #include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.11 1992/11/06 03:36:23 gray Exp $";
+  "$Id: chunk.c,v 1.12 1992/11/06 05:40:55 gray Exp $";
 
 /* checking information */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
@@ -1414,6 +1414,11 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   
   malloc_count++;				/* counts calls to malloc */
   
+  if (file == NULL) {
+    file = DEFAULT_FILE;
+    line = DEFAULT_LINE;
+  }
+  
   /* do we need to check the levels */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
@@ -1552,6 +1557,12 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   dblock_t	*dblockp;
   
   free_count++;					/* counts calls to free */
+  
+  if (file == NULL) {
+    file = DEFAULT_FILE;
+    line = DEFAULT_LINE;
+  }
+  
   alloc_cur_pnts--;
   
   /* do we need to check the levels */
@@ -1721,6 +1732,11 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
   int		old_bitc, new_bitc;
   
   realloc_count++;				/* counts calls to realloc */
+  
+  if (file == NULL) {
+    file = DEFAULT_FILE;
+    line = DEFAULT_LINE;
+  }
   
   /* do we need to check the levels */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))

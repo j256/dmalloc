@@ -30,12 +30,13 @@
 #define ERROR_MAIN
 
 #include "malloc.h"
+#include "malloc_loc.h"
 #include "chunk.h"
 #include "error.h"
 #include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.4 1992/11/06 03:36:30 gray Exp $";
+  "$Id: error.c,v 1.5 1992/11/06 05:40:58 gray Exp $";
 
 /*
  * exported variables
