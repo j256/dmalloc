@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.123 1999/03/09 19:29:08 gray Exp $
+# $Id: Makefile.in,v 1.124 1999/03/10 21:40:24 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -19,10 +19,9 @@ DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	$(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
+CFLAGS	= -g $(CCFLS) -Wall -Wpointer-arith -Wshadow -Waggregate-return \
+	-Wmissing-prototypes
 
-CFLAGS	= -g $(CCFLS) -W -Wunused -Wpointer-arith \
-	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
-	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= /usr/local/local
 TEST	= dmalloc_t
