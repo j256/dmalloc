@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.138 1998/09/29 13:43:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.139 1998/09/29 13:50:32 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -919,31 +919,6 @@ _valloc_leap, _strdup_leap, and _free_leap.  Additionally the library
 replaces calls to xmalloc, xcalloc, xrealloc, xrecalloc, xvalloc,
 xstrdup, and xfree with associated _leap calls.
 
-@cindex valloc
-@cindex strdup
-@cindex recalloc
-
-Valloc is like malloc by insures that the returned pointer will be
-aligned to a page boundary.  This may or may not be supported natively
-by your operating system.  Strdup is a string duplicating routine which
-takes in a null terminated string pointer and returns an allocated copy
-of the string that will need to be passed to free later to deallocate.
-Recalloc is a routine like realloc that reallocates previously allocated
-memory to a new size.  If the new memory size is larger than the old,
-recalloc initializes the new space to all zeros.  This may or may not be
-supported natively by your operating system.
-
-The X versions of the standard memory functions (xmalloc, xfree, etc.)
-will print out an error message to standard error and will stop if the
-library is unable to allocate any additional memory.  It is useful to
-use these routines instead of checking everywhere in your program for
-allocation routines returning NULL pointers.
-
-@emph{WARNING}: You should be sure to have @file{dmalloc.h} included at
-the end of your include file list because dmalloc uses macros and may
-try to change declarations of the malloc functions if they come after
-it.
-
 @cindex leap macros
 
 These @dfn{leap macros} use the c-preprocessor @code{__FILE__} and
@@ -958,6 +933,32 @@ not freed: '0x38410' (22 bytes) from 'dmalloc_t.c:92'
 
 This line from a log file shows that memory was not freed from file
 @file{dmalloc_t.c} line 92.  @xref{Memory Leaks}.
+
+@cindex valloc
+@cindex strdup
+@cindex recalloc
+
+You may notice some non standard memory allocation functions in the
+above leap list.  Recalloc is a routine like realloc that reallocates
+previously allocated memory to a new size.  If the new memory size is
+larger than the old, recalloc initializes the new space to all zeros.
+This may or may not be supported natively by your operating system.
+Valloc is like malloc but insures that the returned pointer will be
+aligned to a page boundary.  This may or may not be supported natively
+by your operating system.  Strdup is a string duplicating routine which
+takes in a null terminated string pointer and returns an allocated copy
+of the string that will need to be passed to free later to deallocate.
+
+The X versions of the standard memory functions (xmalloc, xfree, etc.)
+will print out an error message to standard error and will stop if the
+library is unable to allocate any additional memory.  It is useful to
+use these routines instead of checking everywhere in your program for
+allocation routines returning NULL pointers.
+
+@emph{WARNING}: If you are including the @file{dmalloc.h} file in your
+sources, it is recommended that it be at the end of your include file
+list because dmalloc uses macros and may try to change declarations of
+the malloc functions if they come after it.
 
 @node Return Address, Argument Checking, Allocation Macros, Programming
 @subsection Return Address Information
