@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.93 1997/03/21 17:23:16 gray Exp $";
+  "$Id: malloc.c,v 1.94 1997/07/07 06:44:32 gray Exp $";
 #endif
 
 /*
@@ -108,6 +108,7 @@ LOCAL	char		*start_file = START_FILE_INIT; /* file to start at */
 LOCAL	int		start_line = START_LINE_INIT; /* line to start */
 LOCAL	int		start_count = START_COUNT_INIT; /* start after X */
 LOCAL	int		check_interval = INTERVAL_INIT; /* check every X */
+LOCAL	int		thread_lock_on = LOCK_ON_INIT;	/* turn locking on */
 
 /****************************** local utilities ******************************/
 
@@ -132,9 +133,10 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   
   in_alloc = TRUE;
   
-  if (! enabled)
+  if (! enabled) {
     if (dmalloc_startup() != NOERROR)
       return ERROR;
+  }
   
   /* check start file/line specifications */
   if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
@@ -196,7 +198,7 @@ LOCAL	void	process_environ(void)
 {
   _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&dmalloc_address,
 		       &dmalloc_address_count, &_dmalloc_flags,
-		       &check_interval, &dmalloc_logpath,
+		       &check_interval, &thread_lock_on, &dmalloc_logpath,
 		       &start_file, &start_line, &start_count);
   
   /* if it was not set then no flags set */
@@ -322,11 +324,6 @@ LOCAL	int	dmalloc_startup(void)
 #endif
   }
 #endif /* SIGNAL_OKAY */
-  
-#ifdef THREAD_LOCK_INIT
-  /* initialize any thread mutex locking variables */
-  THREAD_LOCK_INIT;
-#endif
   
   return NOERROR;
 }
