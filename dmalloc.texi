@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.117 1997/01/17 22:26:20 gray Exp $
+@c $Id: dmalloc.texi,v 1.118 1997/01/18 00:10:38 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -366,7 +366,8 @@ include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
 more information about their capabilities, check your system's manual
 pages -- in unix, do a @code{man 3 malloc}.
 
-@deftypefun void * malloc ( unsigned int @var{size} )
+@deftypefun
+void * malloc ( unsigned int @var{size} )
 @cindex malloc
 
 Usage: @code{pnt = (type *)malloc(size)}
@@ -376,7 +377,8 @@ an area of @code{size} bytes.  It will return a pointer to the space
 requested.
 
 @end deftypefun
-@deftypefun void * calloc ( unsigned int @var{number}, unsigned int
+@deftypefun
+void * calloc ( unsigned int @var{number}, unsigned int
 @var{size} )
 @cindex calloc
 @cindex Allocation of zeros
@@ -391,7 +393,8 @@ Also, calloc nulls the space that it returns, assuring that the memory
 is all zeros.
 
 @end deftypefun
-@deftypefun void * realloc ( void * @var{old_pnt}, unsigned int
+@deftypefun
+void * realloc ( void * @var{old_pnt}, unsigned int
 @var{new_size} )
 @cindex realloc
 
@@ -403,7 +406,8 @@ much of the information from @code{old_pnt} as it can into the
 @code{new_pnt} space it returns, up to @code{new_size} bytes.
 
 @end deftypefun
-@deftypefun void free ( void * @var{pnt} )
+@deftypefun
+void free ( void * @var{pnt} )
 @cindex free
 
 Usage: @code{free(pnt)}
@@ -825,19 +829,22 @@ Along with the above leap functionality, @file{dmalloc.h} also adds the
 following macros which take care of all the type-casting and make the
 code look much cleaner (IMHO).
 
-@deftypefun void * ALLOC(@var{type}, int @var{count})
+@deftypefun
+void * ALLOC(@var{type}, int @var{count})
 
 Usage: @code{long_pnt = ALLOC(long, 30)}.  This means allocate space
 for 30 longs.
 @end deftypefun
 
-@deftypefun void * MALLOC ( int @var{size} )
+@deftypefun
+void * MALLOC ( int @var{size} )
 
 Usage: @code{char_pnt = MALLOC(1000)}.  This is like ALLOC but for
 characters only.  It means allocate space for 1000 characters.
 @end deftypefun
 
-@deftypefun void * CALLOC ( @var{type}, int @var{count} )
+@deftypefun
+void * CALLOC ( @var{type}, int @var{count} )
 
 Usage: @code{info_pnt = CALLOC(struct info_st, 100)}.  This means
 allocate space for 100 info_st structures and zero them all.
@@ -846,7 +853,8 @@ allocate space for 100 info_st structures and zero them all.
 from calloc(unsigned int count, unsigned int size).
 @end deftypefun
 
-@deftypefun void * REALLOC ( void * @var{pnt}, @var{type}, int @var{count} )
+@deftypefun
+void * REALLOC ( void * @var{pnt}, @var{type}, int @var{count} )
 
 Usage: @code{long_pnt = REALLOC(old_pnt, long, 10)}.  This takes
 old_pnt and and changes its size to accommodate 10 longs.
@@ -855,14 +863,16 @@ old_pnt and and changes its size to accommodate 10 longs.
 realloc function.
 @end deftypefun
 
-@deftypefun void * REMALLOC ( void * @var{pnt}, int @var{size} )
+@deftypefun
+void * REMALLOC ( void * @var{pnt}, int @var{size} )
 
 Usage: @code{char_pnt = REMALLOC(char_pnt, 100)}.  This is like REALLOC
 but for characters only.  It takes char_pnt and changes its size to 100
 characters.
 @end deftypefun
 
-@deftypefun void FREE ( void * @var{pnt} )
+@deftypefun
+void FREE ( void * @var{pnt} )
 
 Usage: @code{FREE(pnt)}.  This frees memory pointers.
 @end deftypefun
@@ -1003,7 +1013,8 @@ This works well in conjunction with the @code{STORE_SEEN_COUNT} option.
 Additionally the library provides a number of non-standard malloc
 routines:
 
-@deftypefun void dmalloc_shutdown ( void )
+@deftypefun
+void dmalloc_shutdown ( void )
 
 @cindex dmalloc_shutdown function
 @cindex shutdown the library
@@ -1025,7 +1036,8 @@ main()
 @end example
 @end deftypefun
 
-@deftypefun void dmalloc_log_heap_map ( void )
+@deftypefun
+void dmalloc_log_heap_map ( void )
 
 @cindex dmalloc_log_heap_map function
 @cindex log a heap map
@@ -1035,7 +1047,8 @@ This routine logs to the logfile (if it is enabled) a graphical
 representation of the current heap space.
 @end deftypefun
 
-@deftypefun void dmalloc_log_stats ( void )
+@deftypefun
+void dmalloc_log_stats ( void )
 @cindex dmalloc_log_stats function
 @cindex log statistics
 @cindex statistics logging
@@ -1043,7 +1056,8 @@ representation of the current heap space.
 This routine outputs the current dmalloc statistics to the log file.
 @end deftypefun
 
-@deftypefun void dmalloc_log_unfreed( void )
+@deftypefun
+void dmalloc_log_unfreed( void )
 
 @cindex dmalloc_log_unfreed function
 @cindex log unfreed memory
@@ -1054,7 +1068,8 @@ This is also useful to dump the currently allocated points to the log
 file to be diff'ed against another dump later on.
 @end deftypefun
 
-@deftypefun int dmalloc_verify ( char * @var{pnt} )
+@deftypefun
+int dmalloc_verify ( char * @var{pnt} )
 
 @cindex dmalloc_verify function
 @cindex verify pointers
@@ -1070,7 +1085,8 @@ is not enabled, @samp{dmalloc_verify()} cannot check the fence-post
 areas in the heap.
 @end deftypefun
 
-@deftypefun void dmalloc_debug ( long @var{debug} )
+@deftypefun
+void dmalloc_debug ( long @var{debug} )
 
 @cindex dmalloc_debug function
 @cindex override debug settings
@@ -1087,7 +1103,8 @@ functions @emph{before} @code{main()} is reached therefore before
 may be generated regardless.
 @end deftypefun
 
-@deftypefun long dmalloc_debug_current ( void )
+@deftypefun
+long dmalloc_debug_current ( void )
 
 @cindex dmalloc_debug_current function
 @cindex current debug value
@@ -1097,7 +1114,8 @@ variable.  This allows you to save a copy of the debug dmalloc settings
 to be changed and then restored later.
 @end deftypefun
 
-@deftypefun int dmalloc_examine ( char * @var{pnt}, int * @var{size},
+@deftypefun
+int dmalloc_examine ( char * @var{pnt}, int * @var{size},
 char ** @var{file}, int * @var{line}, void ** @var{ret_address} )
 
 @cindex dmalloc_examine function
@@ -1112,7 +1130,8 @@ return NOERROR or ERROR depending on whether pnt is good or not.
 not all other malloc libraries.
 @end deftypefun
 
-@deftypefun char * dmalloc_strerror ( int @var{errnum} )
+@deftypefun
+char * dmalloc_strerror ( int @var{errnum} )
 
 @cindex dmalloc_strerror function
 @cindex string error message
