@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.224 2003/06/09 18:16:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.225 2003/06/09 22:58:24 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1188,7 +1188,7 @@ environmental variable.  This is here to override the env or for
 circumstances where modifying the environment is not possible or does
 not apply such as servers or cgi-bin programs.
 
-#end deftypefun
+@end deftypefun
 
 @c --------------------------------
 
