@@ -21,11 +21,11 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.16 1997/12/08 04:23:35 gray Exp $
+ * $Id: return.h,v 1.17 1998/09/17 12:41:41 gray Exp $
  */
 
 /*
- * this file contains the definition of the SET_RET_ADDR macro which
+ * This file contains the definition of the SET_RET_ADDR macro which
  * is designed to contain the archecture/compiler specific hacks to
  * determine the return-address from inside the malloc library.  With
  * this information, the library can display caller information from
@@ -37,9 +37,9 @@
  *
  * PLEASE send all submissions, comments, problems to the author.
  *
- * NOTE: examining the assembly code for x = __builtin_return_address(0);
- * with gcc version 2+ should give you a good start on building a hack
- * for your box.
+ * NOTE: examining the assembly code for x =
+ * __builtin_return_address(0); with gcc version 2+ should give you a
+ * good start on building a hack for your box.
  */
 
 #ifndef __RETURN_H__
@@ -48,6 +48,8 @@
 #include "conf.h"			/* for USE_RET_ADDRESS */
 
 #if USE_RET_ADDRESS
+
+/*************************************/
 
 /* for Sun SparcStations with GCC */
 #if __sparc && __GNUC__ > 1
@@ -59,36 +61,32 @@
  * some bogus data -- it seems to return the last return-address or
  * something like that.
  */
-#define SET_RET_ADDR(file, line)	\
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      asm("st %%i7,%0" : \
-	  "=g" (file) : \
-	  /* no inputs */ ); \
-  } while(0)
+#define GET_RET_ADDR(file)	asm("st %%i7,%0" : \
+				    "=g" (file) : \
+				    /* no inputs */ )
 
 #if 0
       asm("ld [%%fp+4],%%o0; st %%o0,%0" : \
 	  "=g" (file) : \
 	  /* no inputs */ : \
-	  "o0");
+	  "o0")
 #endif
 
 #endif /* __sparc */
 
+/*************************************/
+
 /* for i[34]86 machines with GCC */
 #if __i386 && __GNUC__ > 1
 
-#define SET_RET_ADDR(file, line)	\
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      asm("movl 4(%%ebp),%%eax ; movl %%eax,%0" : \
-	  "=g" (file) : \
-	  /* no inputs */ : \
-	  "eax"); \
-  } while(0)
+#define GET_RET_ADDR(file)	asm("movl 4(%%ebp),%%eax ; movl %%eax,%0" : \
+				    "=g" (file) : \
+				    /* no inputs */ : \
+				    "eax")
 
 #endif /* __i386 */
+
+/*************************************/
 
 /*
  * For DEC Mips machines running Ultrix
@@ -108,11 +106,7 @@
  * $31 is the frame pointer.  $2 looks to be the return address but maybe
  * not consistently.
  */
-#define SET_RET_ADDR(file, line)        \
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      asm("sw $2, file"); \
-  } while(0)
+#define GET_RET_ADDR(file, line)        asm("sw $2, file")
 
 #endif
 
@@ -128,25 +122,19 @@
 
 #ifdef __GNUC__
 
-#define SET_RET_ADDR(file, line)	\
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      asm("bis $26, $26, %0" : "=r" (file)); \
-  } while(0)
+#define GET_RET_ADDR(file, line)	asm("bis $26, $26, %0" : "=r" (file))
 
 #else /* __GNUC__ */
 
 #include <c_asm.h>
 
-#define SET_RET_ADDR(file, line)	\
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      file = (char *)asm("bis %ra,%ra,%v0"); \
-  } while(0)
+#define GET_RET_ADDR(file)		file = (char *)asm("bis %ra,%ra,%v0")
 
 #endif /* __GNUC__ */
 
 #endif /* __alpha */
+
+/*************************************/
 
 /*
  * for Data General workstations running DG/UX 5.4R3.00 from Joerg
@@ -167,17 +155,15 @@
 # define M88K_RET_ADDR	"ld %0,#r30,4"
 #endif
 
-#define SET_RET_ADDR(file, line)	\
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      asm(M88K_RET_ADDR : \
-	  "=r" (file) : \
-	  /* no inputs */); \
-  } while(0)
+#define GET_RET_ADDR(file)	asm(M88K_RET_ADDR : \
+				    "=r" (file) : \
+				    /* no inputs */)
 
 #endif /* m88k */
 
 #endif /* USE_RET_ADDRESS */
+
+/*************************************/
 
 /*
  * SGI compilers implement a C level method of accessing the return
@@ -186,19 +172,50 @@
  */
 #if defined(__sgi)
 
-#define SET_RET_ADDR(file, line)	\
-  do { \
-    if (file == DMALLOC_DEFAULT_FILE) \
-      file = (void *)__return_address; \
-  } while(0)
+#define GET_RET_ADDR(file)	file = (void *)__return_address
 
 #endif /* __sgi */
+
+/*************************************/
+
+/*
+ * Stratus FTX system (UNIX_System_V 4.0 FTX release 2.3.1.1 XA/R
+ * Model 310 Intel i860XP processor)
+ *
+ * I ended up with compiling according to full-ANSI rules (using the
+ * -Xa compiler option).  This I could only do after modifying the
+ * "dmalloc.h.3" in such a way that the malloc/calloc/realloc/free
+ * definitions would no longer cause the compiler to bark with
+ * 'identifier redeclared' (I just put an #ifdef _STDLIB_H ... #endif
+ * around those functions).
+ *
+ * -- Wim_van_Duuren@stratus.com
+ */
+#if defined(_FTX) & defined(i860)
+
+/*
+ * we first have the define the little assembly code function
+ */
+asm void ASM_GET_RET_ADDR(file)
+{
+%       reg     file;
+        mov     %r1, file
+%       mem     file;
+        st.l    %r31,-40(%fp)
+        orh     file@ha, %r0, %r31
+        st.l    %r1, file@l(%r31)
+        ld.l    -40(%fp),%r31
+%       error
+}
+#define GET_RET_ADDR(file, line)	ASM_GET_RET_ADDR(file)
+
+#endif
 
 /********************************** default **********************************/
 
 /* for all others, do nothing */
-#ifndef SET_RET_ADDR
-#define SET_RET_ADDR(file, line)
+#ifndef GET_RET_ADDR
+#define GET_RET_ADDR(file)
 #endif
 
 #endif /* ! __RETURN_H__ */
