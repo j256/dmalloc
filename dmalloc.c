@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.47 1994/10/14 01:59:52 gray Exp $";
+  "$Id: dmalloc.c,v 1.48 1994/10/14 16:36:47 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -302,17 +302,13 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   }
   
   infile = fopen(inpath, "r");
-  if (infile == NULL) {
-    (void)fprintf(stderr, "%s: could not read '%s': ", argv_program, inpath);
-    perror("");
-    exit(1);
-  }
+  /* do not test for error here */
   
   /* read each of the lines looking for the tag */
   found = FALSE;
   cont = FALSE;
   
-  while (fgets(buf, sizeof(buf), infile) != NULL) {
+  while (infile != NULL && fgets(buf, sizeof(buf), infile) != NULL) {
     char	*tokp, *endp;
     
     /* ignore comments and empty lines */
@@ -377,14 +373,18 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       break;
   }
   
-  (void)fclose(infile);
+  if (infile != NULL)
+    (void)fclose(infile);
   
   /* did we find the correct value in the file? */
-  if (tag_find == NULL && ! found) {
+  if (found)
+    return new_debug;
+  
+  if (tag_find == NULL) {
     if (strp != NULL)
       *strp = "unknown";
   }
-  else if (! found && tag_find != NULL) {
+  else {
     default_t	*defp;
     
     for (defp = defaults; defp->de_string != NULL; defp++) {
@@ -392,8 +392,15 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
 	break;
     }
     if (defp->de_string == NULL) {
-      (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		    argv_program, tag_find, inpath);
+      if (infile == NULL) {
+	(void)fprintf(stderr, "%s: could not read '%s': ",
+		      argv_program, inpath);
+	perror("");
+      }
+      else {
+	(void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
+		      argv_program, tag_find, inpath);
+      }
       exit(1);
     }
     new_debug = defp->de_flags;
