@@ -2,6 +2,9 @@ Tue Nov 14 15:09:02 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Releasing dmalloc version 4.8.1.
 
+	* Added --enable-shlib to configure which enables the building of
+ 	shared libraries.
+
 	* Added autoconf handling of the shlibdir for installing of shared
  	libraries.
 
@@ -1725,5 +1728,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.268 2000/11/14 20:10:55 gray Exp $
+$Id: ChangeLog,v 1.269 2000/11/14 23:59:39 gray Exp $
 -------------------------------------------------------------------------------

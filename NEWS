@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.99 2000/11/14 20:10:56 gray Exp $
+$Id: NEWS,v 1.100 2000/11/14 23:59:39 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 4.8.1:
 
+	* Added --enable-shlib to configure to enable building of shared libs.
 	* Added autoconf handling of the shlibdir for installing shared libs.
 	* Added improvements to the shared library creation in the Makefile.
 	* Fixed the #ident "..."; semi-colon problem.

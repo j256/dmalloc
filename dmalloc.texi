@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.197 2000/11/13 17:01:28 gray Exp $
+@c $Id: dmalloc.texi,v 1.198 2000/11/14 23:58:20 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -486,10 +486,11 @@ which is where you should be adding per-architecture settings.
 @item Type @kbd{sh ./configure} to configure the library.  You may want
 to first examine the @file{config.help} file for some information about
 configure.  You may want to use the @kbd{--disable-cxx} option if you do
-not want the Makefile to build the C++ version of dmalloc.  You may also
-want to use the @kbd{--enable-threads} option to build the threaded
-version of dmalloc.  Configure should generate the @file{Makefile} and
-configuration files automatically.
+not want the Makefile to build the C++ version of dmalloc.  You may want
+to use the @kbd{--enable-threads} option to build the threaded version
+of dmalloc.  You may want to use the @kbd{--enable-shlib} option to
+build the shared versions of the dmalloc libraries.  Configure should
+generate the @file{Makefile} and configuration files automatically.
 
 @emph{NOTE}: It seems that some versions of tr (especially from HP-UX)
 don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr

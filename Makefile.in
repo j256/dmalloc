@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.148 2000/11/14 20:34:48 gray Exp $
+# $Id: Makefile.in,v 1.149 2000/11/14 23:57:07 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -33,7 +33,6 @@ LIBS	= $(LIBRARIES)
 MODULE	= dmalloc
 
 LIBRARY	= lib$(MODULE).a
-SHLIBRARY = lib$(MODULE).so
 
 # thread version of the library
 LIB_TH	= lib$(MODULE)th.a
@@ -48,6 +47,9 @@ SHLIB_CXX = lib$(MODULE)xx.so
 @CXX_ON@BUILD_CXX = $(LIB_CXX)
 @CXX_ON@INSTALL_CXX = installcxx
 @CXX_ON@BUILD_TH_CXX = $(LIB_TH_CXX)
+
+# shared versions of the library
+LIB_SH = lib$(MODULE).so
 
 # threads + C++
 LIB_TH_CXX = lib$(MODULE)thcxx.a
@@ -159,11 +161,7 @@ shlib : $(SHLIBRARY)
 
 $(SHLIBRARY) : $(LIBRARY)
 	rm -f $@ $@.t
-	if (ld --version | grep '^GNU' >/dev/null 2>&1); then \
-	  ld -shared -soname $@ --whole-archive $(LIBRARY) -o $@.t ; \
-	else \
-	  ld -shared -soname $@ -all -none -lc $(LIBRARY) -o $@.t ; \
-	fi
+	@shlinkargs@
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)

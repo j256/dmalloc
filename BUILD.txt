@@ -40,7 +40,9 @@ and run tests.
 	8) Compare pkg/PLIST with pkg/PLIST-auto
 	9) make package
 	10) try a pkg_add and pkg_delete on the package
-	11) Copy the resulting package to the repository
+	11) make clean
+	12) tar up the /usr/ports/devel/dmalloc directory
+	13) Copy the resulting tarball to the repository as -ports.tgz
 
 9) Copy to RPM and build the package.
 
