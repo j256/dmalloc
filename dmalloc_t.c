@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.32 1993/12/20 19:42:47 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.33 1994/01/25 21:27:18 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -370,6 +370,9 @@ static	void	do_interactive(void)
       (void)printf("\tverify    - check out a memory address (or all heap)\n");
       (void)printf("\tmap       - map the heap to the logfile\n");
       (void)printf("\toverwrite - overwrite some memory to test errors\n");
+#if HAVE_SBRK
+      (void)printf("\tsbrk       - call sbrk directly to get external area\n");
+#endif
       
       (void)printf("\trandom    - randomly execute a number of [de] allocs\n");
       (void)printf("\tspecial   - run some special tests\n");
@@ -384,7 +387,7 @@ static	void	do_interactive(void)
     if (strncmp(line, "malloc", len) == 0) {
       int	size;
       
-      (void)printf("How much: ");
+      (void)printf("How much to malloc: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
       (void)printf("malloc(%d) returned: %#lx\n", size, (long)MALLOC(size));
@@ -402,7 +405,7 @@ static	void	do_interactive(void)
       
       pnt = get_address();
       
-      (void)printf("How much: ");
+      (void)printf("How much to realloc: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
       
@@ -427,6 +430,19 @@ static	void	do_interactive(void)
       continue;
     }
     
+#if HAVE_SBRK
+    /* call sbrk directly */
+    if (strncmp(line, "sbrk", len) == 0) {
+      int	size;
+      
+      (void)printf("How much to sbrk: ");
+      (void)fgets(line, sizeof(line), stdin);
+      size = atoi(line);
+      (void)printf("sbrk(%d) returned: %#lx\n", size, (long)sbrk(size));
+      continue;
+    }
+#endif
+    
     /* do random heap hits */
     if (strncmp(line, "random", len) == 0) {
       int	itern;
@@ -446,7 +462,7 @@ static	void	do_interactive(void)
       continue;
     }
     
-    /* do random heap hits */
+    /* do special checks */
     if (strncmp(line, "special", len) == 0) {
       if (check_special())
 	(void)printf("It succeeded.\n");
