@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.21 1993/11/23 09:04:00 gray Exp $
+ * $Id: chunk_loc.h,v 1.22 1993/11/30 02:41:33 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -46,8 +46,9 @@
  */
 #define DEFAULT_SMALLEST_BLOCK	4
 
-/* size of a block */
-#define BLOCK_SIZE		(1 << BASIC_BLOCK)
+#define BLOCK_SIZE		(1 << BASIC_BLOCK)	/* size of a block */
+#define BITS(type)		(sizeof(type) * 8)	/* # bits in TYPE */
+#define MAX_SLOTS		(BITS(long) - 1)	/* # of bit slots */
 
 /* pointer to the start of the block which holds PNT */
 #define WHAT_BLOCK(pnt)		(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
@@ -67,6 +68,20 @@
 			  (sizeof(long) + sizeof(int) + \
 			   sizeof(struct bblock_adm_st *) + \
 			   sizeof(long))) / sizeof(bblock_t))
+
+/*
+ * calculate the number of bits in SIZE and put in ANS
+ */
+#define NUM_BITS(size, ans)	do { \
+				  unsigned int	_amt = (size), _b; \
+				   \
+				  for (_b = 0; _b <= LARGEST_BLOCK; _b++) \
+				    if (_amt <= bits[_b]) \
+				      break; \
+				   \
+				  (ans) = _b; \
+				} while (0)
+  
 /*
  * number of da_block entries in a dblock_adm_t which must fit in a
  * basic block

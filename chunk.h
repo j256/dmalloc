@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.29 1993/11/23 09:03:59 gray Exp $
+ * $Id: chunk.h,v 1.30 1993/11/30 02:41:31 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -72,6 +72,11 @@ IMPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 				 void ** ret_attr);
 
 /*
+ * log the heap structure plus information on the blocks if necessary
+ */
+IMPORT	void	_chunk_log_heap_map(void);
+
+/*
  * get a SIZE chunk of memory for FILE at LINE
  */
 IMPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
@@ -103,11 +108,6 @@ IMPORT	void	_chunk_stats(void);
  * dump the unfreed memory, logs the unfreed information to logger
  */
 IMPORT	void	_chunk_dump_unfreed(void);
-
-/*
- * log the heap structure plus information on the blocks if necessary
- */
-IMPORT	void	_chunk_log_heap_map(void);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.60 1993/11/23 09:47:17 gray Exp $";
+  "$Id: chunk.c,v 1.61 1993/11/30 02:41:26 gray Exp $";
 #endif
 
 /*
@@ -53,18 +53,19 @@ LOCAL	char	*rcs_id =
 EXPORT	char		*_malloc_unknown_file = MALLOC_UNKNOWN_FILE;
 
 /* local routines */
-LOCAL	void	log_heap_map(void);
+EXPORT	void	_chunk_log_heap_map(void);
 
 /* local variables */
 
 /* free lists of bblocks and dblocks */
-LOCAL	bblock_t	*free_bblock[LARGEST_BLOCK + 1];
+LOCAL	bblock_t	*free_bblock[MAX_SLOTS];
 LOCAL	dblock_t	*free_dblock[BASIC_BLOCK];
 
 /* administrative structures */
 LOCAL	bblock_adm_t	*bblock_adm_head = NULL; /* pointer to 1st bb_admin */
 LOCAL	bblock_adm_t	*bblock_adm_tail = NULL; /* pointer to last bb_admin */
 LOCAL	int		smallest_block	= 0;	/* smallest size in bits */
+LOCAL	unsigned int	bits[MAX_SLOTS];
 
 /* user information shifts for display purposes */
 LOCAL	int		pnt_below_adm	= 0;	/* add to pnt for display */
@@ -104,7 +105,7 @@ LOCAL	int		realloc_count	= 0;	/* count the reallocs */
  */
 EXPORT	int	_chunk_startup(void)
 {
-  int	binc;
+  unsigned int	binc, value;
   
   /* calculate the smallest possible block */
   for (smallest_block = DEFAULT_SMALLEST_BLOCK;
@@ -130,10 +131,15 @@ EXPORT	int	_chunk_startup(void)
   }
   
   /* initialize free bins */
-  for (binc = 0; binc <= LARGEST_BLOCK; binc++)
+  for (binc = 0; binc < MAX_SLOTS; binc++)
     free_bblock[binc] = NULL;
   for (binc = 0; binc < BASIC_BLOCK; binc++)
     free_dblock[binc] = NULL;
+  
+  /* make array for NUM_BITS calculation */ 
+  bits[0] = 1;
+  for (binc = 1, value = 2; binc < MAX_SLOTS; binc++, value *= 2)
+    bits[binc] = value;
   
   /* assign value to add to pointers when displaying */
   if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FENCE)) {
@@ -252,33 +258,6 @@ LOCAL	void	log_bad_pnt(const char * file, const unsigned int line,
     _malloc_message("Dump of '%#lx'-%d: '%s'",
 		    pnt, DUMP_OFFSET,
 		    expand_buf((char *)pnt - DUMP_OFFSET, DUMP_SPACE));
-}
-
-/*
- * return the number of bits in number SIZE
- */
-LOCAL	int	num_bits(const unsigned int size)
-{
-  unsigned int	tmp = size;
-  int		bitc;
-  
-#if ALLOW_ALLOC_ZERO_SIZE == 0
-  if (size == 0) {
-    malloc_errno = ERROR_BAD_SIZE;
-    _malloc_error("num_bits");
-    return ERROR;
-  }
-#endif
-  
-  /* shift right until 0, 2 ^ 0 == 1 */
-  for (bitc = -1; tmp > 0; bitc++)
-    tmp >>= 1;
-  
-  /* are we not a base 2 number? */
-  if (size > (1 << bitc))
-    bitc++;
-  
-  return bitc;
 }
 
 /************************* fence-post error functions ************************/
@@ -409,10 +388,11 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
 }
 
 /*
- * parse the free lists looking for a slot of MANY bblocks.
- * returns NULL if none.
+ * parse the free lists looking for a slot of MANY bblocks returning
+ * such a slot in RETP or NULL if none.
+ * returns [NO]ERROR
  */
-LOCAL	bblock_t	*find_free_bblocks(const int many)
+LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
 {
   bblock_t	*bblockp, *prevp;
   bblock_t	*bestp = NULL, *best_prevp;
@@ -425,8 +405,10 @@ LOCAL	bblock_t	*find_free_bblocks(const int many)
    * level jump or do something to try and limit the number of chunks.
    */
   
+  NUM_BITS(many * BLOCK_SIZE, bitc);
+  
   /* start at correct size and go up */
-  for (bitc = num_bits(many * BLOCK_SIZE); bitc <= LARGEST_BLOCK; bitc++) {
+  for (; bitc < MAX_SLOTS; bitc++) {
     for (bblockp = free_bblock[bitc], prevp = NULL; bblockp != NULL;
 	 prevp = bblockp, bblockp = bblockp->bb_next) {
       
@@ -459,8 +441,10 @@ LOCAL	bblock_t	*find_free_bblocks(const int many)
   }
   
   /* did we not find one? */
-  if (bestp == NULL)
-    return NULL;
+  if (bestp == NULL) {
+    *retp = NULL;
+    return NOERROR;
+  }
   
   /* take it off the free list */
   if (best_prevp == NULL)
@@ -468,8 +452,10 @@ LOCAL	bblock_t	*find_free_bblocks(const int many)
   else
     best_prevp->bb_next = bestp->bb_next;
   
-  if (bestp->bb_blockn == many)
-    return bestp;
+  if (bestp->bb_blockn == many) {
+    *retp = bestp;
+    return NOERROR;
+  }
   
   /*
    * now we need to split the block.  we return the start of the
@@ -487,7 +473,7 @@ LOCAL	bblock_t	*find_free_bblocks(const int many)
     if (admp == NULL) {
       malloc_errno = ERROR_BAD_ADMIN_LIST;
       _malloc_error("find_free_bblocks");
-      return NULL;
+      return ERROR;
     }
   }
   
@@ -495,25 +481,24 @@ LOCAL	bblock_t	*find_free_bblocks(const int many)
   if (bblockp->bb_flags != BBLOCK_FREE) {
     malloc_errno = ERROR_BAD_FREE_MEM;
     _malloc_error("find_free_bblocks");
-    return NULL;
+    return ERROR;
   }
   bblockp->bb_blockn -= many;
   
-  bitn = num_bits(bblockp->bb_blockn * BLOCK_SIZE);
-  if (bitn == ERROR)
-    return NULL;
-  
+  NUM_BITS(bblockp->bb_blockn * BLOCK_SIZE, bitn);
   bblockp->bb_next = free_bblock[bitn];
   free_bblock[bitn] = bblockp;
   
   set_bblock_admin(bblockp->bb_blockn, bblockp, BBLOCK_FREE, bitn, 0,
 		   bblockp->bb_next);
   
-  return bestp;
+  *retp = bestp;
+  return NOERROR;
 }
 
 /*
- * get MANY new bblock block(s) from the free list physically allocation
+ * get MANY new bblock block(s) from the free list physically allocation.
+ * returns the blocks or NULL on error.
  */
 LOCAL	bblock_t	*get_bblocks(const int many)
 {
@@ -529,7 +514,11 @@ LOCAL	bblock_t	*get_bblocks(const int many)
   
   /* is there anything on the user-free list(s)? */
   if (! BIT_IS_SET(_malloc_flags, DEBUG_NEVER_REUSE)) {
-    bblockp = find_free_bblocks(many);
+    
+    if (find_free_bblocks(many, &bblockp) != NOERROR)
+      return NULL;
+    
+    /* did we find anything? */
     if (bblockp != NULL) {
       free_space_count -= many * BLOCK_SIZE;
       
@@ -855,7 +844,7 @@ EXPORT	int	_chunk_heap_check(void)
   void		*pnt;
   int		bitc, dblockc = 0, bblockc = 0, freec = 0;
   int		bbc = 0, len;
-  int		free_bblockc[LARGEST_BLOCK + 1];
+  int		free_bblockc[MAX_SLOTS];
   int		free_dblockc[BASIC_BLOCK];
   
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_TRANS))
@@ -870,7 +859,7 @@ EXPORT	int	_chunk_heap_check(void)
   if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_LISTS)) {
     
     /* count the bblock free lists */
-    for (bitc = 0; bitc < LARGEST_BLOCK + 1; bitc++) {
+    for (bitc = 0; bitc < MAX_SLOTS; bitc++) {
       free_bblockc[bitc] = 0;
       
       /* parse bblock free list doing minimal pointer checking */
@@ -1003,9 +992,7 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* mark the size in bits */
-      bitc = num_bits(bblockp->bb_size);
-      if (bitc == ERROR)
-	return ERROR;
+      NUM_BITS(bblockp->bb_size, bitc);
       bblockc = NUM_BLOCKS(bblockp->bb_size);
       start = 1;
       
@@ -1350,7 +1337,7 @@ EXPORT	int	_chunk_heap_check(void)
   if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_LISTS)) {
     
     /* any free bblock entries not accounted for? */
-    for (bitc = 0; bitc < LARGEST_BLOCK + 1; bitc++)
+    for (bitc = 0; bitc < MAX_SLOTS; bitc++)
       if (free_bblockc[bitc] != 0) {
 	malloc_errno = ERROR_BAD_FREE_LIST;
 	_malloc_error("_chunk_heap_check");
@@ -1368,7 +1355,7 @@ EXPORT	int	_chunk_heap_check(void)
   }
   
   if (BIT_IS_SET(_malloc_flags, DEBUG_HEAP_CHECK_MAP))
-    log_heap_map();
+    _chunk_log_heap_map();
   
   return NOERROR;
 }
@@ -1759,7 +1746,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
 /*
  * log the heap structure plus information on the blocks if necessary
  */
-LOCAL	void	log_heap_map(void)
+EXPORT	void	_chunk_log_heap_map(void)
 {
   bblock_adm_t	*bblock_admp;
   bblock_t	*bblockp;
@@ -1916,9 +1903,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   byten += pnt_total_adm;
   
   /* count the bits */
-  bitn = num_bits(byten);
-  if (bitn == ERROR)
-    return MALLOC_ERROR;
+  NUM_BITS(byten, bitn);
   
   /* have we exceeded the upper bounds */
   if (bitn > LARGEST_BLOCK) {
@@ -2115,9 +2100,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
       return FREE_ERROR;
   
   /* count the bits */
-  bitn = num_bits(bblockp->bb_size);
-  if (bitn == ERROR)
-    return FREE_ERROR;
+  NUM_BITS(bblockp->bb_size, bitn);
   
   if (bitn < BASIC_BLOCK) {
     log_bad_pnt(file, line, CHUNK_TO_USER(pnt), "bad administration info",
@@ -2198,13 +2181,8 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
       return REALLOC_ERROR;
   
   /* get the old and new bit sizes */
-  old_bitn = num_bits(old_size);
-  if (old_bitn == ERROR)
-    return REALLOC_ERROR;
-  
-  new_bitn = num_bits(new_size);
-  if (new_bitn == ERROR)
-    return REALLOC_ERROR;
+  NUM_BITS(old_size, old_bitn);
+  NUM_BITS(new_size, new_bitn);
   
   /* if we are not realloc copying and the size is the same */
   if (BIT_IS_SET(_malloc_flags, DEBUG_REALLOC_COPY)
@@ -2300,7 +2278,7 @@ EXPORT	void	_chunk_list_count(void)
   
   /* dump the free (and later used) list counts */
   info[0] = NULLC;
-  for (bitc = smallest_block; bitc <= LARGEST_BLOCK; bitc++) {
+  for (bitc = smallest_block; bitc < MAX_SLOTS; bitc++) {
     if (bitc < BASIC_BLOCK)
       for (count = 0, dblockp = free_dblock[bitc]; dblockp != NULL;
 	   count++, dblockp = dblockp->db_next);
@@ -2535,15 +2513,4 @@ EXPORT	void	_chunk_dump_unfreed(void)
 		      unknown_blockc, (unknown_blockc == 1 ? "" : "s"),
 		      unknown_sizec);
   }
-}
-
-/*
- * log the heap structure plus information on the blocks if necessary
- */
-EXPORT	void	_chunk_log_heap_map(void)
-{
-  /* did we map the heap second ago? */
-  if (! BIT_IS_SET(_malloc_flags, DEBUG_CHECK_HEAP) ||
-      ! BIT_IS_SET(_malloc_flags, DEBUG_HEAP_CHECK_MAP))
-    log_heap_map();
 }
