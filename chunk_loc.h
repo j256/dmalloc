@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.46 1997/12/08 09:50:52 gray Exp $
+ * $Id: chunk_loc.h,v 1.47 1998/09/18 19:10:50 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -142,6 +142,9 @@
 #define BBLOCK_EXTERNAL		0x0040		/* externally used block */
 #define BBLOCK_ADMIN_FREE	0x0080		/* ba_freen pnt to free slot */
 #define BBLOCK_STRING		0x0100		/* block is a string (unused)*/
+#define BBLOCK_VALLOC		0x0200		/* block is aligned alloc */
+
+#define BBLOCK_FLAG_TYPE(f)	((f) & BBLOCK_ALLOCATED)
 
 /*
  * some overhead fields for recording information about the pointer.
