@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.34 1999/03/04 19:09:42 gray Exp $
+ * $Id: settings.dist,v 1.35 1999/03/07 23:01:29 gray Exp $
  */
 
 /*
@@ -318,6 +318,24 @@
  * your system however.
  */
 #define FREED_POINTER_DELAY 20
+
+/*
+ * Size of the table of file and line number memory entries.  This
+ * memory table records the top locations by file/line or
+ * return-address of all pointers allocated.  It also tabulates the
+ * freed memory pointers so you can easily locate the large memory
+ * leaks.  To disable the table, enable the log-no-table token.
+ *
+ * NOTE: the library will actually allocation 2 times this many
+ * entries for speed reasons.
+ */
+#define MEMORY_TABLE_SIZE 4096
+
+/*
+ * This indicates how many of the top entries from the memory table
+ * you want to log by default to the log file.  Set to 0 for none.
+ */
+#define MEMORY_TABLE_LOG 10
 
 /****************************** thread settings ******************************/
 
