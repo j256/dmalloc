@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.42 1995/03/31 21:52:10 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.43 1995/05/05 15:37:37 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -167,7 +167,7 @@ static	int	do_random(const int itern)
     int		which;
     
     if (dmalloc_errno != last && ! silent) {
-      (void)printf("ERROR: iter %d: %s (err %d)\n",
+      (void)printf("ERROR: iter %d, %s (err %d)\n",
 		   iterc, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       last = dmalloc_errno;
     }
@@ -433,7 +433,7 @@ static	void	do_interactive(void)
       (void)printf("How much to malloc: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
-      (void)printf("malloc(%d) returned: %#lx\n", size, (long)MALLOC(size));
+      (void)printf("malloc(%d) returned '%#lx'\n", size, (long)MALLOC(size));
       continue;
     }
     
@@ -443,7 +443,7 @@ static	void	do_interactive(void)
       (void)printf("How much to calloc: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
-      (void)printf("calloc(%d) returned: %#lx\n",
+      (void)printf("calloc(%d) returned '%#lx'\n",
 		   size, (long)CALLOC(char, size));
       continue;
     }
@@ -457,7 +457,7 @@ static	void	do_interactive(void)
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
       
-      (void)printf("realloc(%#lx, %d) returned: %#lx\n",
+      (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
 		   (long)pnt, size, (long)REMALLOC(pnt, size));
       
       continue;
@@ -504,7 +504,7 @@ static	void	do_interactive(void)
       (void)printf("How much to sbrk: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
-      (void)printf("sbrk(%d) returned: %#lx\n", size, (long)sbrk(size));
+      (void)printf("sbrk(%d) returned '%#lx'\n", size, (long)sbrk(size));
       continue;
     }
 #endif
@@ -544,7 +544,7 @@ static	void	do_interactive(void)
       (void)printf("If the address is 0, verify will check the whole heap.\n");
       pnt = get_address();
       ret = malloc_verify((char *)pnt);
-      (void)printf("malloc_verify(%#lx) returned: %s\n",
+      (void)printf("malloc_verify(%#lx) returned '%s'\n",
 		   (long)pnt,
 		   (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
       continue;
@@ -596,7 +596,7 @@ int	main(int argc, char ** argv)
   
   ret = malloc_verify(NULL);
   if (! silent)
-    (void)printf("Final malloc_verify returned: %s\n",
+    (void)printf("Final malloc_verify returned '%s'\n",
 		 (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
   
   if (dmalloc_errno == 0)
