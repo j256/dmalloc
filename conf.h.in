@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.92 2003/09/10 15:28:40 gray Exp $
+ * $Id: conf.h.in,v 1.93 2003/09/12 05:55:57 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -163,6 +163,12 @@
  * compilers do as well.
  */
 #define CONSTRUCTOR_WORKS 0
+
+/*
+ * See if we have the GetEnvironmentVariableA Cygwin function.  This
+ * is used as a getenv replacement.
+ */
+#define HAVE_GETENVIRONMENTVARIABLEA 0
 
 /*
  * LIBRARY DEFINES:

@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.16 2003/09/10 15:28:40 gray Exp $
+# $Id: configure.ac,v 1.17 2003/09/12 05:55:57 gray Exp $
 #
-AC_REVISION($Revision: 1.16 $)
+AC_REVISION($Revision: 1.17 $)
 AC_INIT(dmalloc, 5.2.2, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -435,8 +435,11 @@ if test x$getenv_safe != xyes; then
   AC_MSG_WARN([[    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
   AC_MSG_WARN([[  #endif]])
   AC_MSG_WARN([You will need to compile your program with: -DDMALLOC])
-  AC_MSG_WARN([See the CYGWIN section in the documentation for details.])
+  AC_MSG_WARN([See the Cygwin section in the documentation for details.])
 fi
+
+# now check to see if we can replace getenv with this
+AC_CHECK_FUNCS(GetEnvironmentVariableA)
 
 ############
 
@@ -498,7 +501,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.16 2003/09/10 15:28:40 gray Exp $"
+#ident "$Id: configure.ac,v 1.17 2003/09/12 05:55:57 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

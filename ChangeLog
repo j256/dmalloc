@@ -1,3 +1,8 @@
+2003-09-12  Gray Watson  <gray@outside.256.com>
+
+	* Added new GetEnvironmentVariableA Cygwin call.  Thanks to Rolf
+	Banting.
+
 2003-09-10  Gray Watson  <gray@outside.256.com>
 
 	* Added quick checks for the constructor attribute.
@@ -2068,5 +2073,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.308 2003/09/10 15:29:05 gray Exp $
+$Id: ChangeLog,v 1.309 2003/09/12 05:55:56 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.173 2003/09/08 14:43:21 gray Exp $
+ * $Id: malloc.c,v 1.174 2003/09/12 05:55:57 gray Exp $
  */
 
 /*
@@ -36,6 +36,15 @@
 #endif
 #if HAVE_UNISTD_H
 # include <unistd.h>				/* for write */
+#endif
+
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#if HAVE_STDARG_H
+# include <stdarg.h>
+#endif
+#include <w32api/windef.h>
+#include <w32api/winbase.h>
 #endif
 
 #include "conf.h"				/* up here for _INCLUDE */
@@ -316,6 +325,9 @@ static	int	dmalloc_startup(const char *debug_str)
 {
   static int	some_up_b = 0;
   const char	*env_str;
+#ifdef __CYGWIN__
+  char		env_buf[256];
+#endif
   
   /* have we started already? */
   if (enabled_b) {
@@ -334,6 +346,15 @@ static	int	dmalloc_startup(const char *debug_str)
 #endif
 #endif
     
+    /*
+     * If we are running under Cygwin then getenv may not be safe.  We
+     * try to use the GetEnvironmentVariableA function instead.
+     */
+#if defined(__CYGWIN__) && HAVE_GETENVIRONMENTVARIABLEA
+    /* use this function instead of getenv */
+    GetEnvironmentVariableA(OPTIONS_ENVIRON, env_buf, sizeof(env_buf));
+    env_str = env_buf;
+#else /* ! __CYGWIN__ */
 #if GETENV_SAFE
     /* get the options flag */
     if (debug_str == NULL) {
@@ -345,7 +366,8 @@ static	int	dmalloc_startup(const char *debug_str)
     
     /* process the environmental variable(s) */
     process_environ(env_str);
-#endif
+#endif /* GETENV_SAFE */
+#endif /* ! __CYGWIN__ */
     
     /*
      * Tune the environment here.  If we have a start-file,
