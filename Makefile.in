@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.67 1994/11/12 23:41:17 gray Exp $
+# $Id: Makefile.in,v 1.68 1994/11/12 23:52:31 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -62,7 +62,7 @@ all : $(LIBRARY) $(LIB_DIS) $(UTIL)
 .PHONY : clobber
 clobber :
 	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL)
-	rm -f part.? dmalloc.head dmalloc.info dmalloc.h
+	rm -f part.? dmalloc.info dmalloc.h
 	rm -f INSTALL README README_ftp
 
 .PHONY : distclean
@@ -173,15 +173,12 @@ dmalloc.ps : dmalloc.texi
 INSTALL : INSTALL.1 dmalloc.info
 	rm -f $@ $@.t
 	cp INSTALL.1 $@.t
-	echo '' >> $@.t
-	echo 'INSTALLATION:' >> $@.t
 	sed -e '1,/,  Node: Installation/d' -e '/,  Prev: Installation/,$$d' \
 		< dmalloc.info | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- \
 		>> $@.t
-	echo '' >> $@.t
-	echo 'QUICK START:' >> $@.t
-	sed -e '1,/,  Node: Quick Start/d' -e '/,  Prev: Quick Start/,$$d' \
+	sed -e '1,/,  Node: Getting Started/d' \
+		-e '/,  Prev: Getting Started/,$$d' \
 		< dmalloc.info | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- \
 		>> $@.t
@@ -213,21 +210,12 @@ README_ftp : README_ftp.1 dmalloc.info
 	cat README_ftp.1 >> $@.t
 	mv $@.t $@
 
-dmalloc.head : dmalloc.info
-	rm -f $@ $@.t
-	sed -e '/^Debug Malloc Library/,/Gray Watson/p' -e 'd' < \
-		dmalloc.info > $@.t
-	echo '' >> $@.t
-	echo ---------------------------------------------------------------- \
-		>> $@.t
-	mv $@.t $@
-
 dmalloc.info : dmalloc.texi
 	rm -f $@
 	makeinfo --no-split $^
 
 .PHONY : shar
-shar : dmalloc.head
+shar : $(SHARFLS)
 	rm -f part.?? part.t Makefile.in.bak
 	mv Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
@@ -236,8 +224,11 @@ shar : dmalloc.head
 		${SHARFLS}
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
-	cat dmalloc.head part.01 > part.t
-	rm -f part.01
+	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
+		< dmalloc.info | tr -d '\037'  > part.t
+	echo ---------------------------------------------------------------- \
+		>> part.t
+	cat part.01 >> part.t
 	mv part.t part.01
 
 #
