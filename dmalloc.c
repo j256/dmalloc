@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.22 1993/07/23 21:24:46 gray Exp $";
+  "$Id: dmalloc.c,v 1.23 1993/08/12 22:12:01 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -71,6 +71,7 @@ LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
+LOCAL	char	*trace		= NULL;		/* for TRACE */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
 LOCAL	char	*tag		= NULL;		/* maybe a tag argument */
 
@@ -100,6 +101,8 @@ LOCAL	argv_t	args[] = {
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHARP,	&start,
       "file:line",		"start check heap after this" },
+  { 't',	"trace",	ARGV_CHARP,	&trace,
+      "address",		"trace activity on this address" },
   { 'v',	"verbose",	ARGV_BOOL,	&verbose,
       NULL,			"turn on verbose output" },
   { ARGV_MAYBE,	NULL,		ARGV_CHARP,	&tag,
@@ -365,6 +368,12 @@ LOCAL	void	dump_current(void)
     (void)fprintf(stderr, "%s not set\n", START_ENVIRON);
   else
     (void)fprintf(stderr, "%s == '%s'\n", START_ENVIRON, str);
+  
+  str = (char *)getenv(TRACE_ENVIRON);
+  if (str == NULL)
+    (void)fprintf(stderr, "%s not set\n", TRACE_ENVIRON);
+  else
+    (void)fprintf(stderr, "%s == '%s'\n", TRACE_ENVIRON, str);
 }
 
 /*
@@ -463,6 +472,11 @@ EXPORT	int	main(int argc, char ** argv)
     set_variable(START_ENVIRON, start);
   else if (clear)
     unset_variable(START_ENVIRON);
+  
+  if (trace != NULL)
+    set_variable(TRACE_ENVIRON, trace);
+  else if (clear)
+    unset_variable(TRACE_ENVIRON);
   
   if (errno_to_print != NO_VALUE) {
     (void)fprintf(stderr, "%s: malloc_errno value '%d' = \n",

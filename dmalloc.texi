@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.26 1993/08/11 02:33:48 gray Exp $
+@c $Id: dmalloc.texi,v 1.27 1993/08/12 22:11:58 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -491,6 +491,13 @@ it sees a call from anywhere in the @file{malloc_t.c} file.
 
 This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.
+
+@item MALLOC_TRACE
+@cindex MALLOC_TRACE variable
+When this env variable is set to a hex address (taken from the malloc
+log-file for instance) malloc will log all activity on this address
+along with a count.  This assists in tracking problem addresses or
+locating memory leaks.
 @end table
 
 @node Malloc_dbg Program, RC File, Environment Variables, Features
@@ -533,12 +540,17 @@ run-time configuration file.  @xref{RC File}.  If no tag is specified
 and no other option-commands used, malloc_dbg will disply the current
 settings of the environmental variables.
 
+To find out the usage for the malloc debug program try @code{malloc_dbg
+--usage} or @code{malloc_dbg --usage-long}.  This is one of the many
+features of the argv library included with this package.  See
+@file{argv.info} for more information.
+
 Here is a detailed list of the flags that can passed to malloc_dbg:
 
 @table @samp
 @item -a address
-Set the @samp{MALLOC_ADDRESS} variable with the string address (or
-alternatively address:number).
+Set the @samp{MALLOC_ADDRESS} variable to address (or alternatively
+address:number).
 
 @item -b
 Output Bourne shell type commands.
@@ -582,6 +594,9 @@ by default in my malloc alias.
 Set the @samp{MALLOC_START} env variable to number (alternatively
 @samp{file:line}).
 
+@item -t address
+Set the @samp{MALLOC_TRACE} variable to address.
+
 @item -v
 Give verbose output.  Especially useful when dumping current settings.
 @end table
@@ -591,10 +606,11 @@ that you have for the malloc environmental variables.  For example:
 
 @example
         MALLOC_DEBUG == '0x4000417 (runtime)
-        MALLOC_ADDRESS == '0'
+        MALLOC_ADDRESS not set
         MALLOC_INTERVAL not set
         MALLOC_LOGFILE == 'malloc'
         MALLOC_START not set
+        MALLOC_TRACE not set
 @end example
 
 With a -v option and no arguments, malloc_dbg dumps out the current
@@ -608,23 +624,24 @@ settings in a verbose manner.  For example:
         MALLOC_INTERVAL not set
         MALLOC_LOGFILE not set
         MALLOC_START not set
+        MALLOC_TRACE not set
 @end example
 
 Here are some more examples:
 
 @example
-        # start tough debugging, check the heap every 1000 times,
+        # start tough debugging (5), check the heap every 1000 times,
         # send the log information to 'malloc'
         malloc -l malloc -i 1000 5
 
-        # find out what error code 20 is (you got it from the logfile)
+        # find out what error code 20 is (from the logfile)
         malloc -e 20
 
         # after finding a corrupted address, cause the program to signal
-        # itself when it sees the address for the 6th time.
+        # itself when it sees the address 0x34238 for the 6th time.
         malloc -a 0x34238:6
 
-        # return to the normal runtime settings and clear out all
+        # return to the normal 'runtime' settings and clear out all
         # other variables
         malloc -r runtime
 @end example

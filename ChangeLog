@@ -1,3 +1,8 @@
+Thu Aug 12 18:11:01 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added MALLOC_TRACE variable and malloc_dbg -t functionality for
+	tracing an address and logging messages about it.
+
 Tue Aug 10 16:43:07 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Made some minor fixes via feedback from Marc Evans.

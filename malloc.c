@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.35 1993/07/23 21:24:41 gray Exp $";
+  "$Id: malloc.c,v 1.36 1993/08/12 22:11:55 gray Exp $";
 #endif
 
 /*
@@ -57,6 +57,12 @@ EXPORT	int		malloc_errno = 0;
 EXPORT	void		*malloc_address	= NULL;
 #else
 EXPORT	char		*malloc_address	= NULL;
+#endif
+/* address to trace activity on. */
+#if __STDC__
+EXPORT	void		*malloc_trace	= NULL;
+#else
+EXPORT	char		*malloc_trace	= NULL;
 #endif
 
 /* local routines */
@@ -74,6 +80,7 @@ LOCAL	char		start_file[128] = { NULLC }; /* file to start at */
 LOCAL	int		start_line	= 0;	/* line in module to start */
 LOCAL	int		start_count	= -1;	/* start after X */
 LOCAL	int		check_interval	= -1;	/* check every X */
+LOCAL	int		trace_count	= 0;	/* times trace address seen */
 
 /****************************** local utilities ******************************/
 
@@ -160,12 +167,30 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
  * check out a pointer to see if we were looking for it.
  * may not return.
  */
-LOCAL	void	check_pnt(const char * file, const int line, char * pnt)
+LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
+			  const char allocing)
 {
   static int	addc = 0;
   
-  if (malloc_address == NULL || pnt != malloc_address)
+  if ((malloc_address == NULL || pnt != malloc_address)
+      && (malloc_trace == NULL || pnt != malloc_trace))
     return;
+  
+  /* handle trace address */
+  if (malloc_trace != NULL && pnt == malloc_trace) {
+    trace_count++;
+    
+    if (allocing)
+      _malloc_message("trace address '%#lx' allocing at pass %d from '%s:%u'",
+		      pnt, trace_count, file, line);
+    else
+      _malloc_message("trace address '%#lx' freeing at pass %d from '%s:%u'",
+		      pnt, trace_count, file, line);
+    
+    /* we may need to continue to handle address */
+    if (malloc_address == NULL || pnt != malloc_address)
+      return;
+  }
   
   if (++addc < address_count)
     return;
@@ -237,6 +262,11 @@ LOCAL	void	get_environ(void)
     else
       start_count = atoi(env);
   }
+  
+  /* watch for a certain address */
+  env = (char *)getenv(TRACE_ENVIRON);
+  if (env != NULL)
+    malloc_trace = (char *)hex_to_long(env);
 }
 
 /************************** startup/shutdown calls ***************************/
@@ -303,7 +333,7 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
     return MALLOC_ERROR;
   
   newp = _chunk_malloc(_malloc_file, _malloc_line, size);
-  check_pnt(_malloc_file, _malloc_line, newp);
+  check_pnt(_malloc_file, _malloc_line, newp, TRUE);
   
   in_alloc = FALSE;
   
@@ -327,7 +357,7 @@ EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
   
   /* alloc and watch for the die address */
   newp = _chunk_malloc(_malloc_file, _malloc_line, len);
-  check_pnt(_malloc_file, _malloc_line, newp);
+  check_pnt(_malloc_file, _malloc_line, newp, TRUE);
   
   (void)memset(newp, NULLC, len);
   
@@ -352,9 +382,9 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
-  check_pnt(_malloc_file, _malloc_line, old_pnt);
+  check_pnt(_malloc_file, _malloc_line, old_pnt, FALSE);
   newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
-  check_pnt(_malloc_file, _malloc_line, newp);
+  check_pnt(_malloc_file, _malloc_line, newp, TRUE);
   
   in_alloc = FALSE;
   
@@ -381,7 +411,7 @@ EXPORT	int	free(void * pnt)
 #endif
   }
   
-  check_pnt(_malloc_file, _malloc_line, pnt);
+  check_pnt(_malloc_file, _malloc_line, pnt, FALSE);
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
