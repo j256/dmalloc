@@ -53,7 +53,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.58 1995/06/20 22:37:19 gray Exp $";
+  "$Id: dmalloc.c,v 1.59 1995/06/21 16:50:31 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -363,7 +363,7 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
     
     if (list_tags && ! cont) {
       if (verbose) {
-	(void)fprintf(stderr, "%s:\n", token);
+	(void)fprintf(stderr, "%s (%#lx):\n", token, new_debug);
 	dump_debug(new_debug);
       }
       else
@@ -394,13 +394,16 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   else {
     default_t	*defp;
     
-    if (list_tags)
+    if (list_tags) {
+      (void)fprintf(stderr, "\n");
       (void)fprintf(stderr, "Tags available by default:\n");
+    }
     
     for (defp = defaults; defp->de_string != NULL; defp++) {
       if (list_tags) {
 	if (verbose) {
-	  (void)fprintf(stderr, "%s:\n", defp->de_string);
+	  (void)fprintf(stderr, "%s (%#lx):\n",
+			defp->de_string, defp->de_flags);
 	  dump_debug(defp->de_flags);
 	}
 	else
