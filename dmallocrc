@@ -1,0 +1,85 @@
+#
+# Sample Malloc rc file for the debug malloc library
+# Rename this to .mallocrc and place in your home directory to activate.
+# See malloc.info for more information
+#
+# $Id: dmallocrc,v 1.1 1992/11/06 03:36:43 gray Exp $
+#
+
+#
+# Lines in this file should have the form:
+#
+#	tag	token1, token2, ...
+#
+# The above 'tag' is then passed to the 'malloc' alias to set the current
+# debugging functionality to token1, token2, ...
+#
+# Tag lines can be finished with a \ meaning it continues onto the next line.
+# Lines begining with '#' or empty lines are ignored
+#
+
+#
+# Token:			Description:
+###########################################################################
+# none				no debuging functionality
+#
+# log-stats			log general statistics
+# log-non-free			log non-freed memory pointers on shutdown
+# log-perror			log error codes and messages
+# log-trans			log memory transactions
+# log-bad-pnt			log information about bad-pointers
+# log-admin			log full administrative information
+#
+# check-fence			check fence-post areas
+# check-heap			do general heap checking
+# check-lists			verify internal heap linked-lists
+# check-dblock			do detailed checking on small allocations
+# check-dblock-fence		check the fence-post areas of small allocations
+# check-free			check to see if free space has been overwritten
+#
+# realloc-copy			always copy data to a new pointer when realloc
+# free-blank			overwrite space that is freed
+# error-abort			abort the program (and dump core) on errors
+# alloc-blank			overwrite space that is to be alloced
+#
+
+# no debugging
+none	none
+
+# basic runtime
+runtime	log-stats, log-non-free, log-perror, log-bad-pnt, \
+	check-fence
+
+# more logging and some heap checking
+2	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+	check-fence, check-heap, check-lists, \
+	error-abort
+
+# good utilities
+3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+	log-admin, \
+	check-fence, check-heap, check-lists, \
+	realloc-copy, free-blank, alloc-blank, error-abort
+
+# extensive checking
+4	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+	log-admin, \
+	check-fence, check-heap, check-lists, check-dblock, \
+	check-fence-dblock, \
+	realloc-copy, free-blank, alloc-blank, error-abort
+
+# ultra-extensive checking
+5	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+	log-admin, \
+	check-fence, check-heap, check-lists, check-dblock, \
+	check-dblock-fence, check-free, \
+	realloc-copy, free-blank, alloc-blank, error-abort
+
+# full fence-post checking
+fence	log-stats, log-non-free, log-perror, log-bad-pnt, \
+	check-fence, check-dblock-fence
+
+# full logging of statistics
+log	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+	log-admin, \
+	check-fence

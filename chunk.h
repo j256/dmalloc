@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.9 1992/11/06 01:13:41 gray Exp $
+ * $Id: chunk.h,v 1.10 1992/11/06 03:36:26 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -51,8 +51,8 @@ IMPORT	int	_chunk_pnt_check(char * pnt);
 /*
  * return some information associated with PNT, returns [NO]ERROR
  */
-IMPORT	int	chunk_read_info(char * pnt, unsigned int * size,
-				char ** file, unsigned int * line);
+IMPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
+				 char ** file, unsigned int * line);
 
 /*
  * get a SIZE chunk of memory for FILE at LINE

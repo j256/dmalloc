@@ -39,16 +39,14 @@
 #include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.10 1992/11/06 01:13:38 gray Exp $";
-
-/* for formating */
-#define FREE_COLUMN		    5		/* for dump_free formating */
+  "$Id: chunk.c,v 1.11 1992/11/06 03:36:23 gray Exp $";
 
 /* checking information */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
 #define MAX_FILE_LENGTH		   40		/* max __FILE__ length */
 #define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
 
+#define FREE_COLUMN		    5		/* for dump_free formatting */
 #define FREE_CHAR		'\305'		/* to blank free space with */
 
 /* free lists of bblocks and dblocks */
@@ -364,7 +362,7 @@ LOCAL	dblock_t	*get_dblock_admin(int many)
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("need %d dblock slots", many);
   
-  /* do we have anough right now */
+  /* do we have enough right now */
   if (free_slots >= many) {
     free_slots -= many;
     return &dblock_admp->da_block[DB_PER_ADMIN - (free_slots + many)];
@@ -1227,8 +1225,8 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
 /*
  * return some information associated with PNT, returns [NO]ERROR
  */
-EXPORT	int	chunk_read_info(char * pnt, unsigned int * size,
-				char ** file, unsigned int * line)
+EXPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
+				 char ** file, unsigned int * line)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
@@ -1253,7 +1251,7 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size,
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
       malloc_errno = MALLOC_NOT_ON_BLOCK;
-      _malloc_perror("chunk_read_info");
+      _malloc_perror("_chunk_read_info");
       return ERROR;
     }
     
@@ -1266,7 +1264,7 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size,
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
       malloc_errno = MALLOC_ALREADY_FREE;
-      _malloc_perror("chunk_read_info");
+      _malloc_perror("_chunk_read_info");
       return ERROR;
     }
     
@@ -1285,7 +1283,7 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size,
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
       malloc_errno = MALLOC_NOT_USER;
-      _malloc_perror("chunk_read_info");
+      _malloc_perror("_chunk_read_info");
       return ERROR;
     }
     
@@ -1729,7 +1727,7 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
     (void)_chunk_heap_check();
   
   /* get info about old pointer */
-  if (chunk_read_info(oldp, &old_size, &old_file, &old_line) != NOERROR)
+  if (_chunk_read_info(oldp, &old_size, &old_file, &old_line) != NOERROR)
     return REALLOC_ERROR;
   
   /* adjust the pointer down if fence-posting */

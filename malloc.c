@@ -29,14 +29,14 @@
 #include "malloc.h"
 #include "chunk.h"
 #include "error.h"
+#include "error_strings.h"
 #include "heap.h"
 #include "malloc_errno.h"
-#include "malloc_errors.h"
 #include "malloc_loc.h"
 #include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.3 1992/11/06 01:13:51 gray Exp $";
+  "$Id: malloc.c,v 1.4 1992/11/06 03:36:37 gray Exp $";
 
 /*
  * exported variables
@@ -139,7 +139,7 @@ LOCAL	int	check_debug_vars(char * file, int line)
   return NOERROR;
 }
 
-/*************************** startup/shudown calls ***************************/
+/*************************** startup/shutdown calls **************************/
 
 /*
  * get the values of malloc environ variables
@@ -177,7 +177,7 @@ LOCAL	void	get_environ(void)
     check_interval = atoi(env);
   
   /*
-   * start checking the heap after X interations OR
+   * start checking the heap after X iterations OR
    * start at a file:line combination
    */
   if ((env = GET_ENV(START_ENVIRON)) != NULL) {
@@ -490,6 +490,7 @@ EXPORT	int	malloc_debug(long debug)
 
 /*
  * examine pointer PNT and returns SIZE, and FILE / LINE info on it
+ * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
 EXPORT	int	malloc_examine(char * pnt, int * size, char ** file,
@@ -500,7 +501,7 @@ EXPORT	int	malloc_examine(char * pnt, int * size, char ** file,
   if (check_debug_vars(NULL, 0) != NOERROR)
     return ERROR;
   
-  ret = chunk_read_info(pnt, size, file, line);
+  ret = _chunk_read_info(pnt, size, file, line);
   
   in_alloc = FALSE;
   

@@ -32,11 +32,10 @@
 #include "malloc.h"
 #include "chunk.h"
 #include "error.h"
-#include "malloc_errors.h"
 #include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.3 1992/11/06 01:13:44 gray Exp $";
+  "$Id: error.c,v 1.4 1992/11/06 03:36:30 gray Exp $";
 
 /*
  * exported variables
@@ -45,7 +44,7 @@ LOCAL	char	*rcs_id =
 EXPORT	int		_malloc_debug = 0;
 
 /*
- * message writter with printf like arguments
+ * message writer with printf like arguments
  */
 EXPORT	void	_malloc_message(char * format, ...)
 {
@@ -117,7 +116,7 @@ EXPORT	void	_malloc_perror(char * str)
     
     /* print the malloc error message */
     _malloc_message("ERROR: %s: %s(%d)",
-		    str, malloc_errlist[malloc_errno], malloc_errno);
+		    str, malloc_strerror(malloc_errno), malloc_errno);
   }
   
   /* do I need to abort? */

@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: error.h,v 1.2 1992/11/06 01:13:46 gray Exp $
+ * $Id: error.h,v 1.3 1992/11/06 03:36:34 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -68,7 +68,7 @@
 IMPORT	int		_malloc_debug;
 
 /*
- * message writter with printf like arguments
+ * message writer with printf like arguments
  */
 IMPORT	void	_malloc_message(char * format, ...);
 

@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.3 1992/11/06 01:13:54 gray Exp $
+ * $Id: malloc.h,v 1.4 1992/11/06 03:36:39 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -125,9 +125,8 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 /*
  * memory copy: copy SIZE bytes from pointer FROM to pointer TO
  */
-#define MEMORY_COPY(from, to, size)		(void)memcpy((char *)to, \
-							     (char *)from, \
-							     size)
+#define MEMORY_COPY(from, to, size)	(void)memcpy((char *)to, \
+						     (char *)from, size)
 
 /*****************************************************************************/
 
@@ -300,6 +299,7 @@ IMPORT	int	malloc_debug(long debug);
 
 /*
  * examine pointer PNT and returns SIZE, and FILE / LINE info on it
+ * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
 IMPORT	int	malloc_examine(char * pnt, int * size, char ** file,

@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.6 1992/10/21 07:33:56 gray Exp $
+$Id: Manifest,v 1.7 1992/11/06 03:36:21 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
-COPYING			The famous GNU Publib License.
+COPYING-LIB		The famous GNU Library Public License.
 
 Changelog		Change log entries detailing major module changes.
 
@@ -24,7 +24,11 @@ chunk.[ch]		Lower level allocation routines.  This is the meat of
 
 chunk_loc.h		Local defines specific to the chunk routines only.
 
-debug.[ch]		Debugging routines and others that provide user output.
+debug_tokens.h		Tokens that correspond to debug-flags.
+
+error.[ch]		Debugging routines and others that provide user output.
+
+error_strings.h		Strings that correspond to malloc error codes.
 
 heap.[ch]		Possibly machine specific routines for allocating space
 			on and manipulating the heap.
@@ -36,25 +40,22 @@ malloc.[ch]		Higher level alloc routines including malloc, free,
 			realloc, etc.  These are the routines to be called
 			from user space.
 
-malloc-tutorial		User-level gnu info manual file for the malloc
+malloc.info		User-level gnu info manual file for the malloc
 			routines.  Suitable as a text manual also.
 
 malloc.texinfo		Texinfo user manual for TeX or Info formats.
 
-malloc_dbg.h		How the routines in libmalloc respond to different
-			setting of the MALLOC_DEBUG environmental variable.
-malloc_levels.h		General debug level message for the malloc module.
+malloc_debug.c		Program that assists in the setting of the MALLOC_DEBUG
+			and other debug environmental variables.
 
 malloc_errno.h		General error codes for the malloc module.
 
-malloc_errors.h		General error message for the malloc module.
-
-malloc_levels.h		Strings corresponding to the debug levels.
-
 malloc_loc.h		Local defines for all of the malloc routines.
 
-malloc_mach.h		Machine dependant defines for handling porting issues.
+malloc_test.c		Meager test program for testing the malloc routines.
 
-malloc_t.c		Meager test program for testing the malloc routines.
+mallocrc		Sample RC file that is used to set the debug flags.
+
+proto.h			Some machine specific functions and defines.
 
 -------------------------------------------------------------------------------
