@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.106 2003/05/15 02:39:28 gray Exp $
+ * $Id: dmalloc.c,v 1.107 2003/05/16 16:06:24 gray Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 #define DEBUG_ARG		'd'		/* debug argument */
 #define INTERVAL_ARG		'i'		/* interval argument */
 #define THREAD_LOCK_ON_ARG	'o'		/* lock-on argument */
+#define LIMIT_ARG		'M'		/* memory-limit argument */
 #define LINE_WIDTH		75		/* num debug toks per line */
 
 #define FILE_NOT_FOUND		1
@@ -172,7 +173,7 @@ static	argv_t	args[] = {
     "path",			"file to log messages to" },
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
     "token(s)",			"del tokens from current debug" },
-  { 'M',	"memory-limit",	ARGV_U_SIZE,	&limit_arg,
+  { LIMIT_ARG,	"memory-limit",	ARGV_U_SIZE,	&limit_arg,
     "value",			"limit allocates to this amount" },
   { 'n',	"no-changes",	ARGV_BOOL_NEG,	&make_changes_b,
     NULL,			"make no changes to the env" },
@@ -765,7 +766,10 @@ static	void    set_variable(const char *var, const char *value)
 {
   char	comm[1024];
   
-  if (bourne_b) {
+  if (value == NULL || *value == '\0') {
+    (void)loc_snprintf(comm, sizeof(comm), "unset %s\n", var);
+  }
+  else if (bourne_b) {
     (void)loc_snprintf(comm, sizeof(comm), "%s=%s\nexport %s\n",
 		       var, value, var);
   }
@@ -970,7 +974,7 @@ int	main(int argc, char **argv)
     scount = 0;
   }
   
-  if (limit_arg > 0) {
+  if (argv_was_used(args, LIMIT_ARG)) {
     limit_val = limit_arg;
     set_b = 1;
   }
