@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: env.h,v 1.2 1994/10/12 17:07:14 gray Exp $
+ * $Id: env.h,v 1.3 1994/11/12 23:08:00 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -62,7 +62,8 @@ IMPORT	void	_dmalloc_start_break(const char * start_all,
 				     int * scountp);
 
 /*
- * process the values of dmalloc environ variable(s)
+ * process the values of dmalloc environ variable(s) from ENVIRON
+ * string.
  */
 IMPORT	void	_dmalloc_environ_get(const char * environ,
 				     unsigned long * addrp,
@@ -74,7 +75,8 @@ IMPORT	void	_dmalloc_environ_get(const char * environ,
 				     void (*message)());
 
 /*
- * set dmalloc environ variable(s) with the values
+ * set dmalloc environ variable(s) with the values (maybe SHORT debug
+ * info) into BUF
  */
 IMPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
 				     const char short_tokens,
