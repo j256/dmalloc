@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.25 1993/08/04 04:09:09 gray Exp $
+# $Id: Makefile.in,v 1.26 1993/08/18 02:06:07 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -32,6 +32,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
 	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h malloc_str.[ch] \
 	version.h malloc_t.c sample.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
+PORTCFG	= contrib/README contrib/dec_notes
 
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
@@ -88,7 +89,7 @@ port : malloc.info
 	rm -rf $@
 	mkdir $@ $@/contrib
 	cp $(PORTFLS) $@
-	cp contrib/* $@/contrib
+	cp $(PORTCFG) $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'

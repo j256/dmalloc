@@ -18,7 +18,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.20 1993/07/23 21:25:03 gray Exp $
+ * $Id: version.h,v 1.21 1993/08/18 02:06:32 gray Exp $
  */
 
 #include "malloc_loc.h"				/* for LOCAL */
@@ -27,6 +27,6 @@
  * NOTE to gray: whenever this is changed, a corresponding Changlog
  * entry *must* be entered.
  */
-LOCAL	char	*malloc_version = "1.2.6";
+LOCAL	char	*malloc_version = "1.3.0";
 
-/* Version Date: $Date: 1993/07/23 21:25:03 $ */
+/* Version Date: $Date: 1993/08/18 02:06:32 $ */

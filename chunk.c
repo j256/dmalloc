@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.42 1993/08/11 02:33:43 gray Exp $";
+  "$Id: chunk.c,v 1.43 1993/08/18 02:06:16 gray Exp $";
 #endif
 
 /* checking information */
@@ -1292,7 +1292,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
     _malloc_message("checking pointer '%#lx'", pnt);
   
   /* adjust the pointer down if fence-posting */
-  (char *)pnt -= pnt_below_adm;
+  pnt = (char *)pnt - pnt_below_adm;
   if (min != 0)
     min += pnt_total_adm;
   
@@ -1328,7 +1328,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
       if (BIT_IS_SET(check, CHUNK_PNT_LOOSE)) {
 	if (min != 0)
 	  min += diff;
-	(char *)pnt -= diff;
+	pnt = (char *)pnt - diff;
       }
       else {
 	log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE,
@@ -1409,7 +1409,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
        * starting user block to test things.
        */
       diff = (char *)pnt - BLOCK_POINTER(WHICH_BLOCK(pnt));
-      (char *)pnt -= diff;
+      pnt = (char *)pnt - diff;
       if (min != 0)
 	min += diff;
     }
@@ -1497,7 +1497,7 @@ EXPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
     _malloc_message("reading info about pointer '%#lx'", pnt);
   
   /* adjust the pointer down if fence-posting */
-  (char *)pnt -= pnt_below_adm;
+  pnt = (char *)pnt - pnt_below_adm;
   
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, NULL);
@@ -1797,7 +1797,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
     fence_write(pnt, byten);
   
-  (char *)pnt += pnt_below_adm;
+  pnt = (char *)pnt + pnt_below_adm;
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_TRANS))
@@ -1824,7 +1824,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   alloc_cur_pnts--;
   
   /* adjust the pointer down if fence-posting */
-  (char *)pnt -= pnt_below_adm;
+  pnt = (char *)pnt - pnt_below_adm;
   
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, &bblock_admp);
@@ -1952,7 +1952,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
    * initialize the bblocks
    */
   for (bblockc = 0; bblockc < (1 << (bitc - BASIC_BLOCK));
-       bblockc++, bblockp++, (char *)pnt += BLOCK_SIZE) {
+       bblockc++, bblockp++, pnt = ((char *)pnt + BLOCK_SIZE)) {
     
     /* do we need to hop to a new bblock_admp header? */
     if (bblockp == &bblock_admp->ba_block[BB_PER_ADMIN]) {
@@ -1998,7 +1998,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     return REALLOC_ERROR;
   
   /* adjust the pointer down if fence-posting */
-  (char *)oldp -= pnt_below_adm;
+  oldp = (char *)oldp - pnt_below_adm;
   new_size += pnt_total_adm;
   
   /* check the fence-posting */
@@ -2019,7 +2019,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   if (BIT_IS_SET(_malloc_debug, DEBUG_REALLOC_COPY) || old_bitc != new_bitc) {
     
     /* readjust info */
-    (char *)oldp += pnt_below_adm;
+    oldp = (char *)oldp + pnt_below_adm;
     old_size -= pnt_total_adm;
     new_size -= pnt_total_adm;
     
@@ -2068,8 +2068,8 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
       fence_write(newp, new_size);
     
-    (char *)newp += pnt_below_adm;
-    (char *)oldp += pnt_below_adm;
+    newp = (char *)newp + pnt_below_adm;
+    oldp = (char *)oldp + pnt_below_adm;
     old_size -= pnt_total_adm;
     new_size -= pnt_total_adm;
   }

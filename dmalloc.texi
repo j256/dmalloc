@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.27 1993/08/12 22:11:58 gray Exp $
+@c $Id: dmalloc.texi,v 1.28 1993/08/18 02:06:27 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -100,6 +100,7 @@ Gray Watson, Antaire Corporation.
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    Description of the benefits of the library.
 * Usage::                       How to run programs with the library.
+* Programming::                 How to program with the library.
 * Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
@@ -280,8 +281,6 @@ the calloc routine will zero the memory space it returns.
 @menu
 * Overview::                    General debugging concepts.
 * Environment Variables::       The variable names and their features.
-* Malloc_dbg Program::          Env variable setting utility.
-* RC File::                     Format of the run-time configuration file.
 * Debug Tokens::                Description of the debugging token flags.
 * Argument Checking::           Special checking of function arguments.
 @end menu
@@ -404,7 +403,7 @@ your system's library routines.  It took me four hours once to finally
 come to the conclusion that the localtime call, included in SunOS
 release 4.1, overwrites one of its fence-post markers.
 
-@node Environment Variables, Malloc_dbg Program, Overview, Features
+@node Environment Variables, Debug Tokens, Overview, Features
 @section Environment Variables - Their Names and Features.
 
 @cindex environment variables
@@ -500,7 +499,137 @@ along with a count.  This assists in tracking problem addresses or
 locating memory leaks.
 @end table
 
-@node Malloc_dbg Program, RC File, Environment Variables, Features
+@node Debug Tokens, Argument Checking, Environment Variables, Features
+@section Debugging Tokens.
+
+@cindex debug tokens
+
+The below tokens and their corresponding descriptions are for the
+setting of the @samp{MALLOC_DEBUG} environmental variable
+@xref{Environment Variables}.  They should be specified in the user's
+@file{.mallocrc} file @xref{RC File}.
+
+Each token, when specified, enables a specific debugging feature.  For
+instance, if you have the log-stats token enabled, the library will log
+general statistics to the logfile.
+
+@table @samp
+@item none
+no debugging functionality
+
+@item log-stats
+log general statistics when malloc_shutdown is called
+
+@item log-non-free
+log non-freed memory pointers when malloc_shutdown is called
+
+@item log-perror
+log internal error-messages
+
+@item log-trans
+log general memory transactions (quite verbose)
+
+@item log-bad-pnt
+log information about bad-pointers
+
+@item log-admin
+log full administrative information (quite verbose)
+
+@item log-blocks
+log detailed block information when malloc_heap_map is called
+
+@item log-unknown
+like log-non-free but logs unknown non-freed memory pointers
+
+@item log-bad-space
+log actual bytes in and around bad pointers
+
+@item check-fence
+check fence-post memory areas
+
+@item check-heap
+verify heap administrative structure
+
+@item check-lists
+examine internal heap linked-lists
+
+@item check-free
+check to see if free space has been overwritten
+
+@item check-funcs
+check the arguments of some functions (mostly string operations) looking
+for bad pointers
+
+@item alloc-blank
+write special values (non-0) into space when it is alloced
+
+@item catch-null
+abort the program immediately if the library fails to get more heap
+space from sbrk
+
+@item error-abort
+abort the program (and dump core) on errors
+
+@item free-blank
+write special values (non-0) into space when it is freed
+
+@item heap-check-map
+log a heap-map to the logfile every time the heap is checked
+
+@item print-perror
+log any errors and messages to the screen via standard-error
+
+@item realloc-copy
+always copy data to a new pointer when realloc
+@end table
+
+@node Argument Checking,  , Debug Tokens, Features
+@section Argument Checking of Certain Function Arguments.
+
+@cindex argument checking
+@cindex MALLOC_FUNC_CHECK flag
+
+One potential problem with the library and its multitude of checks and
+diagnoses is that they only get performed when a malloc function is
+called.  One solution this is to include @file{malloc_dbg.h} and compile
+your source code with the @code{MALLOC_FUNC_CHECK} flag defined and
+enable the @code{check-funcs} token @xref{Debug Tokens}.
+
+@example
+        gcc -DMALLOC_FUNC_CHECK file.c
+@end example
+
+@emph{NOTE}: Once you have compiled your source with MALLOC_FUNC_CHECK
+enabled, you will have to recompile with it off to disconnect the
+library @xref{Disabling the Library}.
+
+When this is defined malloc will override a number of functions and will
+insert a routine which knows how to check its own arguments and then
+call the real function.  Malloc can check such functions as bcopy,
+index, strcat, and strcasecmp (for the full list see the end of
+@file{malloc_dbg.h}).
+
+When you call strlen, for instance, malloc will make sure the string
+argument's fence-post areas have not been overwritten, its file and line
+number locations are good, etc.  With bcopy, malloc will make sure that
+the destination string has enough space to store the number of bytes
+specified.
+
+For all of the arguments checked, if the pointer is not in the heap then
+it is ignored since malloc does not know anything about it.
+
+@emph{NOTE}: this is one of the newest parts of the library so problems
+may still be lurking.
+
+@node Usage, Programming, Features, Top
+@chapter How to Run Programs With the Library.
+
+@menu
+* Malloc_dbg Program::          Env variable setting utility.
+* RC File::                     Format of the run-time configuration file.
+@end menu
+
+@node Malloc_dbg Program, RC File,  , Usage
 @section Malloc_dbg program: An Env Variable Setting Utility.
 
 @cindex malloc_dbg program
@@ -646,7 +775,7 @@ Here are some more examples:
         malloc -r runtime
 @end example
 
-@node RC File, Debug Tokens, Malloc_dbg Program, Features
+@node RC File,  , Malloc_dbg Program, Usage
 @section Run-Time Configuration File.
 
 @cindex rc file
@@ -655,23 +784,30 @@ Here are some more examples:
 @cindex .mallocrc file
 @cindex debug tags
 
-The name of default @dfn{RC File} (or run-time configuration file) is
-@file{$HOME/.mallocrc}.  The @samp{$HOME} environmental variable should
-be set by the system to point to your home-directory.
+By using a @dfn{RC File} (or run-time configuration file) you can alias
+tags to combinations of debug tokens.  @xref{Debug Tokens}.  A sample
+@file{mallocrc} file has been provided but you are encouraged to roll
+your own combinations.
 
-The rc file file should contain lines in the general form of:
+The name of default rc-file is @file{$HOME/.mallocrc}.  The @samp{$HOME}
+environmental variable should be set by the system to point to your
+home-directory.
 
-        @code{tag token1, token2, ...}
+The rc-file file should contain lines in the general form of:
+
+@example
+        tag     token1, token2, ...
+@end example
 
 tag is to be matched with the tag argument passed to the malloc_dbg
-program, token1, token2, ... are debug capability tokens.
+program, while token1, token2, ... are debug capability tokens.
 @xref{Malloc_dbg Program} and @ref{Debug Tokens}.
 
 A line can be finished with a '\' meaning it continues onto the next
 line.  Lines beginning with '#' are treated as comments and are ignored
 along with empty lines.
 
-I have the below contents in my @file{.mallocrc} file:
+Here is an example of a @file{.mallocrc} file:
 
 @example
 #
@@ -696,134 +832,16 @@ debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 @dots{}
 @end example
 
-With the above file, when I say @code{eval `malloc_dbg debug1`}, I
-enable the logging of statistics, the logging of non-freed memory,
-logging of errors, logging of bad pointer information, and the checking
-of fence-post memory areas.
+With the above file, when I say @code{eval `malloc_dbg debug1`}, for
+example, I enable the logging of statistics, the logging of non-freed
+memory, logging of errors, logging of bad pointers, and the checking of
+fence-post memory areas.
 
 When I say @code{eval `malloc_dbg none`}, all memory debugging features
 are disabled.
 
-@node Debug Tokens, Argument Checking, RC File, Features
-@section Debugging Tokens.
-
-@cindex debug tokens
-
-The below tokens and their corresponding descriptions are for the
-setting of the @samp{MALLOC_DEBUG} environmental variable
-@xref{Environment Variables}.  They should be specified in the user's
-@file{.mallocrc} file @xref{RC File}.
-
-@table @samp
-@item none
-no debugging functionality
-
-@item log-stats
-log general statistics when malloc_shutdown is called
-
-@item log-non-free
-log non-freed memory pointers when malloc_shutdown is called
-
-@item log-perror
-log internal error-messages
-
-@item log-trans
-log general memory transactions (quite verbose)
-
-@item log-bad-pnt
-log information about bad-pointers
-
-@item log-admin
-log full administrative information (quite verbose)
-
-@item log-blocks
-log detailed block information when malloc_heap_map is called
-
-@item log-unknown
-like log-non-free but logs unknown non-freed memory pointers
-
-@item log-bad-space
-log actual bytes in and around bad pointers
-
-@item check-fence
-check fence-post memory areas
-
-@item check-heap
-verify heap administrative structure
-
-@item check-lists
-examine internal heap linked-lists
-
-@item check-free
-check to see if free space has been overwritten
-
-@item check-funcs
-check the arguments of some functions (mostly string operations) looking
-for bad pointers
-
-@item alloc-blank
-write special values (non-0) into space when it is alloced
-
-@item catch-null
-abort the program immediately if the library fails to get more heap
-space from sbrk
-
-@item error-abort
-abort the program (and dump core) on errors
-
-@item free-blank
-write special values (non-0) into space when it is freed
-
-@item heap-check-map
-log a heap-map to the logfile every time the heap is checked
-
-@item print-perror
-log any errors and messages to the screen via standard-error
-
-@item realloc-copy
-always copy data to a new pointer when realloc
-@end table
-
-@node Argument Checking,  , Debug Tokens, Features
-@section Argument Checking of Certain Function Arguments.
-
-@cindex argument checking
-@cindex MALLOC_FUNC_CHECK flag
-
-One potential problem with the library and its multitude of checks and
-diagnoses is that they only get performed when a malloc function is
-called.  One solution this is to include @file{malloc_dbg.h} and compile
-your source code with the @code{MALLOC_FUNC_CHECK} flag defined and
-enable the @code{check-funcs} token @xref{Debug Tokens}.
-
-@example
-        gcc -DMALLOC_FUNC_CHECK file.c
-@end example
-
-@emph{NOTE}: Once you have compiled your source with MALLOC_FUNC_CHECK
-enabled, you will have to recompile with it off to disconnect the
-library @xref{Disabling the Library}.
-
-When this is defined malloc will override a number of functions and will
-insert a routine which knows how to check its own arguments and then
-call the real function.  Malloc can check such functions as bcopy,
-index, strcat, and strcasecmp (for the full list see the end of
-@file{malloc_dbg.h}).
-
-When you call strlen, for instance, malloc will make sure the string
-argument's fence-post areas have not been overwritten, its file and line
-number locations are good, etc.  With bcopy, malloc will make sure that
-the destination string has enough space to store the number of bytes
-specified.
-
-For all of the arguments checked, if the pointer is not in the heap then
-it is ignored since malloc does not know anything about it.
-
-@emph{NOTE}: this is one of the newest parts of the library so problems
-may still be lurking.
-
-@node Usage, Source Code, Features, Top
-@chapter How to Run Programs With the Library.
+@node Programming, Source Code, Usage, Top
+@chapter How to Program With the Library.
 
 @cindex usage
 
@@ -835,7 +853,7 @@ may still be lurking.
 * Disabling the Library::       How to compile/link without the library.
 @end menu
 
-@node Allocation Macros, Running with the Library,  , Usage
+@node Allocation Macros, Running with the Library,  , Programming
 @section Allocation macros.
 
 @cindex Allocation Macros
@@ -933,7 +951,7 @@ return-values from macros.  I have included a gcc form of these 2 macros
 a superior compiler and future releases of this library may even require
 its use.
 
-@node Running with the Library, Extensions, Allocation Macros, Usage
+@node Running with the Library, Extensions, Allocation Macros, Programming
 @section Debugging program with the library.
 
 Here is one possible scenario for using the malloc_dbg library.
@@ -959,7 +977,7 @@ there's always the chance that some other code caused the
 problem of course.
 @end itemize
 
-@node Extensions, C++ and the Library, Running with the Library, Usage
+@node Extensions, C++ and the Library, Running with the Library, Programming
 @section Extensions: Non-Standard Malloc Routines.
 
 @cindex extensions
@@ -1044,7 +1062,7 @@ call to the @file{malloc_dbg} program with a @samp{-e #} option
 @xref{Malloc_dbg Program}.
 @end table
 
-@node C++ and the Library, Disabling the Library, Extensions, Usage
+@node C++ and the Library, Disabling the Library, Extensions, Programming
 @section Using the Library with C++.
 
 For those people using the C++ language, some special things need to be
@@ -1080,7 +1098,7 @@ also give the known error behaviour, too.
 I am not a C++ hacker so feedback in the form of other hints and ideas
 for C++ users would be much appreciated.
 
-@node Disabling the Library,  , C++ and the Library, Usage
+@node Disabling the Library,  , C++ and the Library, Programming
 @section Disabling the Library.
 
 @cindex disabling the library
@@ -1138,7 +1156,7 @@ If you get unresolved references like @code{_malloc_leap} or
 been.
 @end itemize
 
-@node Source Code, Plugs, Usage, Top
+@node Source Code, Plugs, Programming, Top
 @chapter Information on the Source and General Concerns.
 
 @cindex coding concerns

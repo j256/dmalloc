@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.18 1993/07/23 05:37:33 gray Exp $
+$Id: Manifest,v 1.19 1993/08/18 02:06:09 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -60,6 +60,8 @@ malloc.c		Higher level alloc routines including malloc,
 
 malloc.info		User-level gnu info manual file for the malloc
 			routines.  Suitable as a text manual also.
+
+malloc.ps		Possible postcript file for TeX-less folks.
 
 malloc.texi		Texinfo user manual for generating TeX or Info
 			formats.

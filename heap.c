@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.27 1993/07/23 21:24:37 gray Exp $";
+  "$Id: heap.c,v 1.28 1993/08/18 02:06:23 gray Exp $";
 #endif
 
 /* external routines */
@@ -89,7 +89,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
     }
     else {
       /* increment last pointer */
-      (char *)_heap_last += size;
+      _heap_last = (char *)_heap_last + size;
     }
   }
 #endif
@@ -139,7 +139,7 @@ EXPORT	void	*_heap_align_base(const long base)
   long	diff;
   
   diff = (long)_heap_base % base;
-  (char *)_heap_base += base - diff;
+  _heap_base = (char *)_heap_base + (base - diff);
   
   return _heap_alloc(base - diff);
 }
