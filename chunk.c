@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.173 2001/07/12 22:28:25 gray Exp $
+ * $Id: chunk.c,v 1.174 2001/11/30 16:04:53 gray Exp $
  */
 
 /*
@@ -63,10 +63,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "@(#) $Id: chunk.c,v 1.173 2001/07/12 22:28:25 gray Exp $"
+#ident "@(#) $Id: chunk.c,v 1.174 2001/11/30 16:04:53 gray Exp $"
 #else
 static	char	*rcs_id =
-  "@(#) $Id: chunk.c,v 1.173 2001/07/12 22:28:25 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.174 2001/11/30 16:04:53 gray Exp $";
 #endif
 #endif
 
@@ -843,7 +843,7 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
   bblock_adm_t		*adm_p, *adm_store[MAX_ADMIN_STORE];
   bblock_t		*bblock_p, *ret_p = NULL;
   void			*mem = NULL, *extern_mem = NULL;
-  int			bblock_c, count, adm_c = 0, extern_c = 0;
+  int			bblock_c, count, adm_c = 0, extern_n = 0, ext_n;
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
@@ -879,22 +879,22 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
    * because we need to know if external blocks we sbrk'd so we can
    * account for them in terms of admin slots
    */
-  mem = _heap_alloc(many * BLOCK_SIZE, &extern_mem, &extern_c);
+  mem = _heap_alloc(many * BLOCK_SIZE, &extern_mem, &extern_n);
   if (mem == HEAP_ALLOC_ERROR) {
     return NULL;
   }
   
   /* account for allocated and any external blocks */
-  bblock_count += many + extern_c;
+  bblock_count += many + extern_n;
   
   /*
    * do we have enough bblock-admin slots for the blocks we need, the
    * bblock-admin blocks themselves, and any external blocks found?
    */
-  while (many + adm_c + extern_c > free_c) {
+  while (many + adm_c + extern_n > free_c) {
     
     /* get some more space for a bblock_admin structure */
-    adm_p = (bblock_adm_t *)_heap_alloc(BLOCK_SIZE, NULL, &count);
+    adm_p = (bblock_adm_t *)_heap_alloc(BLOCK_SIZE, NULL, &ext_n);
     if (adm_p == (bblock_adm_t *)HEAP_ALLOC_ERROR) {
       return NULL;
     }
@@ -903,7 +903,7 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
     /* NOTE: bblock_adm_count handled below */
     
     /* this means that someone ran sbrk while we were in here */
-    if (count > 0) {
+    if (ext_n > 0) {
       dmalloc_errno = ERROR_ALLOC_NONLINEAR;
       dmalloc_error("get_bblocks");
       return NULL;
@@ -986,7 +986,7 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
   bblock_p = free_p->ba_blocks + bblock_c;
   
   /* first off, handle external referenced blocks */
-  for (count = 0; count < extern_c; count++) {
+  for (count = 0; count < extern_n; count++) {
     bblock_p->bb_flags = BBLOCK_EXTERNAL;
     bblock_p->bb_mem = extern_mem;
     
