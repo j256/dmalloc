@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.35 1993/08/30 21:24:41 gray Exp $
+# $Id: Makefile.in,v 1.36 1993/10/07 05:55:31 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -75,11 +75,11 @@ install : installlibs $(UTIL)
 config.status :
 	sh ./configure
 
-const.h : const.h.in config.status
+const.h : const.h.in
 	rm -f $@
 	sh ./config.status
 
-conf.h : conf.h.in config.status
+conf.h : conf.h.in
 	rm -f $@
 	sh ./config.status
 
@@ -122,7 +122,7 @@ fill : $(FILLFLS)
 
 tests : $(TESTS)
 
-malloc_t : malloc_t.o $(LIBRARY)
+malloc_t : malloc_t.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 
 malloc.head : malloc.info
 	rm -f $@ $@.t
