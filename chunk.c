@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.90 1995/05/12 20:46:58 gray Exp $";
+  "$Id: chunk.c,v 1.91 1995/05/12 21:05:33 gray Exp $";
 #endif
 
 /*
@@ -280,7 +280,7 @@ LOCAL	char	*display_pnt(const void * pnt, const overhead_t * overp)
   (void)sprintf(buf, "%#lx", (long)pnt);
   
 #if STORE_SEEN_COUNT
-  (void)sprintf(buf2, "|c%d", overp->ov_seenc);
+  (void)sprintf(buf2, "|s%d", overp->ov_seenc);
   (void)strcat(buf, buf2);
 #endif
   

@@ -1,4 +1,26 @@
+Fri May 12 16:33:44 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Fixed up logging of time.  Lots of ifdefs.
+
+	* Added a pointer overhead structure.
+
+Fri May  5 11:39:39 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Renamed a number of chunk fields to remove the use of count.
+
+	* Logged starting/ending time in logfile.
+
+	* Added thread-id tracking with conf.h option.
+
+	* Added pointer-count tracking with conf.h option.
+
+	* Added interation-count tracking with conf.h option.
+
+	* Added global/relative time tracking with conf.h option.
+
 Fri Mar 31 16:51:52 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Better tag output from dmalloc -t.
 
 	* New version of argv files.
 
@@ -940,5 +962,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.142 1995/03/31 23:01:54 gray Exp $
+$Id: ChangeLog,v 1.143 1995/05/12 21:05:30 gray Exp $
 -------------------------------------------------------------------------------

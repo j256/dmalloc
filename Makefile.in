@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.72 1995/05/05 16:53:33 gray Exp $
+# $Id: Makefile.in,v 1.73 1995/05/12 21:05:31 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -9,8 +9,7 @@ OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
 # not argv.c because from argv module
 # not compat.c because of HAVE_...,
 # not dmalloc.c cause no associated .h file dmalloc.h
-FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c error.c heap.c \
-	malloc.c
+FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c heap.c malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= $(DEFINES)

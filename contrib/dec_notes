@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: dec_notes,v 1.5 1994/01/20 01:47:52 gray Exp $
+$Id: dec_notes,v 1.6 1995/05/12 21:05:36 gray Exp $
 -------------------------------------------------------------------------------
 
 From Dave Hill <ddhill@zk3.dec.com>:
@@ -18,8 +18,8 @@ read:
 
 To create a shared library from the static library:
 
-	ld -shared -o libmalloc_dbg.so -all libmalloc_dbg.a -all \
-		-soname libmalloc_dbg.so -none -lc
+	ld -shared -o libdmalloc.so -all libdmalloc.a -all \
+		-soname libdmalloc.so -none -lc
 
 The OSF1/AXP shared library loader has the capabilities to override the
 shared libraries used, even to the extent that it takes symbols from a
@@ -27,7 +27,7 @@ library that the program was not linked with.  Using this technique, you
 may override the standard malloc in libc with the debug malloc shared
 library.
 
-	_RLD_LIST=/path_to_the_dir/libmalloc_dbg.so:DEFAULT;export _RLD_LIST
+	_RLD_LIST=/path_to_the_dir/libdmalloc.so:DEFAULT;export _RLD_LIST
 
 Remember though, setting this variable will affect ALL commands invoked
 from the shell that it is set inside of.  You may wish to do this inside
@@ -35,13 +35,13 @@ of a shell script that sets the variable just before starting your
 program.  Another option with sh and ksh is to list the environment
 variables on the program invocation line, for example:
 
-	_RLD_LIST=/path_to_the_dir/libmalloc_dbg.so:DEFAULT program
+	_RLD_LIST=/path_to_the_dir/libdmalloc.so:DEFAULT program
 
 This command will set the specified env variable and then run program.
 
 -------------------------------------------------------------------------------
 
-[The malloc_dbg library currently supports the at_exit() auto-shutdown
+[The dmalloc library currently supports the at_exit() auto-shutdown
 routine.  If this is not working, however, you may want to consider
 the following.]
 
@@ -50,13 +50,13 @@ prefixed with '__init_' will be executed prior to main() and any function
 prefixed with '__fini_' will be executed after any call to exit() or
 after main() returns.
 
-A fini routine can be used with the debug library to invoke malloc_shutdown
+A fini routine can be used with the debug library to invoke dmalloc_shutdown
 to get final statistics from the library package. For example:
 
 	void
-	__fini_mallocdbg()
+	__fini_dmalloc()
 	{
-	    malloc_shutdown();
+	    dmalloc_shutdown();
 	}
 
 Try putting this code in a separate .o file and linking it into your

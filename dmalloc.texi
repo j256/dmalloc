@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.86 1995/04/02 23:26:01 gray Exp $
+@c $Id: dmalloc.texi,v 1.87 1995/05/12 21:05:12 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -697,6 +697,36 @@ At the bottom of the sample it totals the memory for you and breaks it
 down to known memory (those calls which supplied the file/line
 information) and unknown (the rest).
 
+Often, you may allocate memory in via @code{strdup()} or another
+routine, so the logfile listing where in the strdup routine the memory
+was allocated does not help locate the true source of the memory leak --
+the routined that called strdup.  Without a mechanism to trace the
+calling stack, there is no way for the library to see who the caller of
+the caller (so to speak) was.
+
+However, there is a way to track down unfreed memory in this
+circumstance.  You need to compile the library with
+@code{STORE_SEEN_COUNT} defined in @file{conf.h>.  The library will then
+record how many times a pointer has been allocated or freed.  It
+will diskplay the unfreed memory as:
+
+@example
+not freed: 0x45008|s3 (      12 bytes) from 'ra=0x1f8f4'
+@end example
+
+In the above example, @samp{0x45008} was seen @samp{3} times.  The last
+time it was allocated, it was not freed.  How can a pointer be ``seen''
+3 times?  Let say you ask for @samp{12 bytes} and get @samp{0x45008} --
+this is (seen 1).  You then free this pointer (seen 2) but later ask for
+another 12 bytes and it gets the block from the free list (seen 3).
+
+So you want to find out who is allocating this particular 12 bytes the
+3rd time.  Try @samp{dmalloc -a 0x45008:3}.  The library will stop the
+program the third time it sees @samp{0x45008}.  You then enter a
+debugger and put a break point at @code{dmalloc_error}.  Run the program
+and when the breakpoint is reached you can examine the stack frame to
+determine who allocated the pointer.
+
 @node Fence-Post Overruns,  , Memory Leaks, Using a Debugger
 @subsection Diagnosing Fence-Post Overwritten Memory
 
@@ -1306,6 +1336,11 @@ called
 log non-freed memory pointers when dmalloc_shutdown or dmalloc_log_unfreed
 is called
 
+@item log-thread-id
+for systems that have multi-threaded programs (don't worry if this does
+not make sense to you), log thread-id for allocated pointer (see
+@file{conf.h})
+
 @item log-trans
 log general memory transactions (quite verbose)
 
@@ -1320,13 +1355,19 @@ log detailed block information when dmalloc_log_heap_map is called
 
 @item log-unknown
 like log-non-free but logs non-freed memory pointers that did not have
-file/line information associated with them.
+file/line information associated with them
 
 @item log-bad-space
 log actual bytes in and around bad pointers
 
 @item log-nonfree-space
 log actual bytes in non-freed pointers
+
+@item log-elapsed-time
+log elapsed-time for allocated pointers (see @file{conf.h})
+
+@item log-current-time
+log current-time for allocated pointers (see @file{conf.h})
 
 @item check-fence
 check fence-post memory areas
@@ -1339,7 +1380,7 @@ examine internal heap linked-lists
 
 @item check-blank
 check to see if space that was blanked by free-blank or alloc-blank has
-been overwritten.
+been overwritten
 
 @item check-funcs
 check the arguments of some functions (mostly string operations) looking
@@ -1521,9 +1562,9 @@ variable to determine whether bourne or c shell commands should be
 generated but you may want to explicitly specify -b or -C.
 
 The tag argument to dmalloc should match a line from the user's run-time
-configuration file.  @xref{RC File}.  If no tag is specified and no
-other option-commands used, dmalloc will display the current settings of
-the environment variable.
+configuration file or should be one of the built-in tags.  @xref{RC
+File}.  If no tag is specified and no other option-commands used,
+dmalloc will display the current settings of the environment variable.
 
 To find out the usage for the debug malloc program try @samp{dmalloc
 --usage}.  The standardized usage message that will be displayed is one
@@ -1646,7 +1687,7 @@ Here are some examples of dmalloc usage:
 @example
 # start tough debugging, check the heap every 1000 times,
 # send the log information to file 'dmalloc'
-dmalloc tough -i 1000 -l dmalloc
+dmalloc high -i 1000 -l dmalloc
 
 # find out what error code 20 is (from the logfile)
 dmalloc -e 20
@@ -1659,9 +1700,9 @@ dmalloc -a 0x34238:6
 # other settings
 dmalloc -c runtime
 
-# enable basic settings (1) plus (-p) the logging of
+# enable basic 'low' settings plus (-p) the logging of
 # transactions (log-trans) to file 'dmalloc'
-dmalloc 1 -p log-trans -l dmalloc
+dmalloc low -p log-trans -l dmalloc
 
 # print out the current settings with Very-verbose output
 dmalloc -V
