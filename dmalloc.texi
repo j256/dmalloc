@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.150 1998/11/09 19:36:26 gray Exp $
+@c $Id: dmalloc.texi,v 1.151 1998/11/10 20:34:15 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1345,6 +1345,13 @@ Now you can enter your debugger (I use the @emph{excellent} GNU debugger
 gdb), and put a break-point in @code{dmalloc_error()} which is the
 internal error routine for the library.  When your program is run, it
 will stop there if a memory problem is detected.
+
+If you are using GDB, I would recommend adding the contents of
+@file{dmalloc.gdb} in the @file{contrib} subdirectory to your
+@file{.gdbinit} file in your home directory.  This enables the
+@code{dmalloc} command which will prompt you for the arguments to the
+dmalloc command and will set a break point in @code{dmalloc_error()}
+automatically.
 
 @menu
 * General Errors::              Diagnosing general problems with a debugger.

@@ -20,6 +20,7 @@
 # November 10, 1998 - Jens Krinke <j.krinke@gmx.net>
 #
 define dmalloc
+  echo Enter dmalloc options: 
   shell read arg; dmalloc -g $arg > /tmp/dmalloc-gdb
   source /tmp/dmalloc-gdb
   shell rm -f /tmp/dmalloc-gdb
