@@ -1,5 +1,10 @@
 Fri Mar 26 04:00:14 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Fixed post 1.1.6 problem with chunk.c.  Boy do I need some
+	automated testing tools.  Discovered an illusive localtime
+	fence-post error.  Had a hard time tracking it down.  Maybe due to
+	the fact that the checks were not being made on dblock fence posts.
+
 	* Upgraded to 1.1.6
 
 	* Found some problems with malloc debug codes.  Use of DB_FENCE

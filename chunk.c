@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.25 1993/03/26 09:16:21 gray Exp $";
+  "$Id: chunk.c,v 1.26 1993/03/26 15:27:27 gray Exp $";
 #endif
 
 /* checking information */
@@ -423,7 +423,7 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
-  char		*mem, *freep = NULL;
+  char		*mem;
   
   /* is there anything on the dblock free list? */
   dblockp = free_dblock[bitc];
@@ -687,7 +687,7 @@ EXPORT	int	_chunk_heap_check(void)
 {
   bblock_adm_t	*this, *last_admp;
   bblock_t	*bblockp, *bblistp, *last_bblockp;
-  dblock_t	*dblockp, *dblistp;
+  dblock_t	*dblockp;
   int		undef = 0, start = 0;
   char		*bytep;
   char		*mem;
@@ -960,6 +960,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  if (dblockp->db_next == NULL || IS_IN_HEAP(dblockp->db_next)) {
 	    
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_LISTS)) {
+	      dblock_t	*dblistp;
 	      
 	      /* find the free block in the free list */
 	      for (dblistp = free_dblock[bblockp->bb_bitc]; dblistp != NULL;
@@ -992,15 +993,15 @@ EXPORT	int	_chunk_heap_check(void)
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
+	  
+	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)
+	      && BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DB_FENCE)) {
+	    mem = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
+	    if (fence_read(dblockp->db_file, dblockp->db_line,
+			   mem, dblockp->db_size) != NOERROR)
+	      return ERROR;
+	  }
 	}
-      }
-      
-      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)
-	  && BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DB_FENCE)) {
-	mem = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
-	if (fence_read(dblockp->db_file, dblockp->db_line,
-		       mem, dblockp->db_size) != NOERROR)
-	  return ERROR;
       }
       break;
       
