@@ -1,3 +1,8 @@
+Sat Mar 22 12:28:45 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Added return-address tracking for gcc on alphas.  Thanks
+        Alexandre.
+
 Fri Mar 21 09:29:46 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Released version 3.2.1.
@@ -1172,5 +1177,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.174 1997/03/21 20:28:56 gray Exp $
+$Id: ChangeLog,v 1.175 1997/03/22 17:31:33 gray Exp $
 -------------------------------------------------------------------------------

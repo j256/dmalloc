@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.13 1995/07/04 02:05:11 gray Exp $
+ * $Id: return.h,v 1.14 1997/03/22 17:29:10 gray Exp $
  */
 
 /*
@@ -121,9 +121,20 @@
 /******************************* contributions *******************************/
 
 /*
- * For DEC Alphas running OSF.  from Dave Hill <ddhill@zk3.dec.com>.
+ * For DEC Alphas running OSF.  from Dave Hill <ddhill@zk3.dec.com>
+ * and Alexandre Oliva <oliva@dcc.unicamp.br>.  Thanks guys.
  */
 #if __alpha
+
+#ifdef __GNUC__
+
+#define SET_RET_ADDR(file, line)	\\
+  do { \\
+    if (file == DMALLOC_DEFAULT_FILE) \\
+      asm("bis \$26, \$26, %0" : "=r" (file)); \\
+  } while(0)
+
+#else /* __GNUC__ */
 
 #include <c_asm.h>
 
@@ -132,6 +143,8 @@
     if (file == DMALLOC_DEFAULT_FILE) \
       file = (char *)asm("bis %ra,%ra,%v0"); \
   } while(0)
+
+#endif /* __GNUC__ */
 
 #endif /* __alpha */
 
