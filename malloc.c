@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.128 1999/03/08 17:25:01 gray Exp $
+ * $Id: malloc.c,v 1.129 1999/03/10 16:17:54 gray Exp $
  */
 
 /*
@@ -78,10 +78,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.128 1999/03/08 17:25:01 gray Exp $";
+#ident "$Id: malloc.c,v 1.129 1999/03/10 16:17:54 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.128 1999/03/08 17:25:01 gray Exp $";
+  "$Id: malloc.c,v 1.129 1999/03/10 16:17:54 gray Exp $";
 #endif
 #endif
 
@@ -867,7 +867,7 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   GET_RET_ADDR(file);
   ret = _loc_free(file, DMALLOC_DEFAULT_LINE, pnt);
   
-#if defined(__STDC__) && __STDC__ == 1
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
 #else
   return ret;
 #endif
@@ -885,7 +885,7 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
   GET_RET_ADDR(file);
   ret = _loc_free(file, DMALLOC_DEFAULT_LINE, pnt);
   
-#if defined(__STDC__) && __STDC__ == 1
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
 #else
   return ret;
 #endif

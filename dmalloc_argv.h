@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv.h,v 1.7 1999/03/08 15:52:31 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.8 1999/03/10 16:17:52 gray Exp $
  */
 
 #ifndef __ARGV_H__
@@ -38,7 +38,7 @@
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.7 1999/03/08 15:52:31 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.8 1999/03/10 16:17:52 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments
@@ -52,7 +52,7 @@
 #include <stdio.h>			/* have to for FILE * below */
 
 /* this defines what type the standard void memory-pointer is */
-#if defined(__STDC__) && __STDC__ == 1
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
 #define ARGV_PNT	void *
 #else
 #define ARGV_PNT	char *
