@@ -5,7 +5,7 @@
  *
  * Written by Gray Watson
  *
- * $Id: dmalloc_loc.h,v 1.5 1992/09/04 21:23:11 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.6 1992/09/26 19:18:10 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -22,7 +22,7 @@
 #define FENCE_BOTTOM		WORD_BOUNDARY
 #define FENCE_TOP		sizeof(long)
 #define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
-#define FENCE_MAGIC_BASE	0x9EF1FE3
-#define FENCE_MAGIC_TOP		0x127AFBE
+#define FENCE_MAGIC_BASE	0xC0C0AB1B
+#define FENCE_MAGIC_TOP		0xFACADE69
 
 #endif /* ! __MALLOC_LOC_H__ */
