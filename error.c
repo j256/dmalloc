@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.105 2003/06/08 19:31:11 gray Exp $
+ * $Id: error.c,v 1.106 2003/06/09 23:15:56 gray Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
 #endif
 #endif
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 # ifdef TIMEVAL_INCLUDE
 #  include TIMEVAL_INCLUDE
 # endif
@@ -109,13 +109,13 @@ unsigned long	_dmalloc_iter_c = 0;
 /* how often to check the heap */
 unsigned long	_dmalloc_check_interval = 0;
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
 TIMEVAL_TYPE	_dmalloc_start;
 #endif
 
 /* NOTE: we do the ifdef this way for fillproto */
-#if STORE_TIMEVAL == 0
+#if LOG_PNT_TIMEVAL == 0
 #if HAVE_TIME
 TIME_TYPE	_dmalloc_start = 0;
 #endif
@@ -185,7 +185,7 @@ void	_dmalloc_open_log(void)
 		  _dmalloc_lock_on, THREAD_INIT_LOCK);
 #endif
     
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
   {
     char	time_buf[64];
     dmalloc_message("starting time = %s",
@@ -193,7 +193,7 @@ void	_dmalloc_open_log(void)
 				       sizeof(time_buf), 0));
   }
 #else
-#if HAVE_TIME /* NOT STORE_TIME */
+#if HAVE_TIME /* NOT LOG_PNT_TIME */
   {
     char	time_buf[64];
     dmalloc_message("starting time = %s",
@@ -241,7 +241,7 @@ void	_dmalloc_reopen_log(void)
   /* we don't call open here, we'll let the next message do it */
 }
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 /*
  * char *_dmalloc_ptimeval
  *
@@ -298,7 +298,7 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 #endif
 
 /* NOTE: we do the ifdef this way for fillproto */
-#if STORE_TIMEVAL == 0 && HAVE_TIME
+#if LOG_PNT_TIMEVAL == 0 && HAVE_TIME
 /*
  * char *_dmalloc_ptime
  *
@@ -397,7 +397,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
 #endif /* HAVE_CTIME */
 #endif /* HAVE_TIME */
   
-#if LOG_ITERATION_COUNT
+#if LOG_ITERATION
   /* add the iteration number */
   str_p += loc_snprintf(str_p, bounds_p - str_p, "%lu: ", _dmalloc_iter_c);
 #endif
