@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: error_val.h,v 1.9 1994/01/22 04:46:23 gray Exp $
+ * $Id: error_val.h,v 1.10 1994/05/22 22:40:12 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -35,7 +35,7 @@
 #define ERROR_BAD_ERRNO			3	/* bad errno value */
 
 /* pointer verification errors */
-#define ERROR_IS_NULL			4	/* pointer is not in heap */
+#define ERROR_IS_NULL			4	/* pointer is NULL */
 #define ERROR_NOT_IN_HEAP		5	/* pointer is not in heap */
 #define ERROR_NOT_FOUND			6	/* pointer not-found */
 #define ERROR_IS_FOUND			7	/* found special pointer */
