@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.60 1995/09/05 16:40:47 gray Exp $
+# $Id: Makefile.all.in,v 1.61 1995/09/18 14:15:45 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -88,10 +88,10 @@ install : installdirs installlib $(UTIL)
 dmalloc.h.2 : configure
 	$(SHELL) configure
 
-settings.h : settings.dist configure
-	$(SHELL) configure
+settings.h : $(srcdir)/settings.dist $(srcdir)/configure
+	$(SHELL) $(srcdir)/configure
 
-dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
+dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 	rm -f $@ $@.t
 	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > $@.t
 	mv $@.t $@
@@ -148,16 +148,16 @@ heavy : $(TEST) light
 #
 # auto configure settings
 #
-Makefile : Makefile.in
+Makefile : $(srcdir)/Makefile.in
 	$(SHELL) config.status
 
-conf.h : conf.h.in
+conf.h : $(srcdir)/conf.h.in
 	$(SHELL) config.status
 
-config.status : configure
+config.status : $(srcdir)/configure
 	$(SHELL) config.status --recheck
 
-configure : configure.in
+$(srcdir)/configure : $(srcdir)/configure.in
 	cd $(srcdir); autoconf
 
 ###############################################################################

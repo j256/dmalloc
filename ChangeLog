@@ -1,4 +1,11 @@
+Mon Sep 18 10:14:36 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Finally tested fore myself the configure --srcdir option.  Found
+	lots of places with missing $(srcdir) entries.
+
 Wed Sep  6 13:33:59 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Released version 3.1.2-gamma.
 
 	* Added sbrk handling in the dmalloc_t test program.
 
@@ -46,7 +53,7 @@ Sat Sep  2 15:34:01 1995  Gray Watson  <gray@burger.letters.com>
 
 Fri Sep  1 15:53:50 1995  Gray Watson  <gray@burger.letters.com>
 
-	* Added better autoconfiguring of dmalloc size variable.
+	* Started better autoconfiguring of DMALLOC_SIZE variable.
 
 Wed Aug 30 14:05:39 1995  Gray Watson  <gray@burger.letters.com>
 
@@ -1103,5 +1110,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.163 1995/09/06 18:08:00 gray Exp $
+$Id: ChangeLog,v 1.164 1995/09/18 14:15:43 gray Exp $
 -------------------------------------------------------------------------------

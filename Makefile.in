@@ -1,8 +1,11 @@
 #
-# $Id: Makefile.in,v 1.88 1995/09/05 16:40:46 gray Exp $
+# $Id: Makefile.in,v 1.89 1995/09/18 14:15:46 gray Exp $
 #
 
 SHELL	= /bin/sh
+
+srcdir = @srcdir@
+VPATH = @srcdir@
 
 HFLS	= dmalloc.h
 OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
@@ -15,7 +18,7 @@ FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c heap.c malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= -DSTDC_HEADERS=@STDC_HEADERS@ $(DEFINES)
-INCS	= -I. $(INCLUDES)
+INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
 
 CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith \
@@ -28,8 +31,6 @@ LIBRARY	= libdmalloc.a
 LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
 INFOFILE= dmalloc.info
-
-MANFILE	= dmalloc.info
 
 FLS	=  conf.h.in configure configure.in config.help \
 	ChangeLog Manifest INSTALL PERMISSIONS NEWS NOTES README TODO \
@@ -65,10 +66,10 @@ distclean :: clean
 installincs :: $(HFLS)
 	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
 
-installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(MANFILE)
+installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
-	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
+	install -cev -m 444 $(srcdir)/$(INFOFILE) $(DESTDIR)/info
 
 install :: installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
@@ -83,12 +84,13 @@ installftp :: README_ftp $(DOCS)
 dmalloc.h.2 : configure
 	$(SHELL) configure -v
 
-settings.h : settings.dist configure
-	$(SHELL) configure -v
+settings.h : $(srcdir)/settings.dist $(srcdir)/configure
+	$(SHELL) $(srcdir)/configure -v
 
-dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
+dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 	rm -f $(.TARGET) $(.TARGET).t
-	cat dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $(.TARGET).t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > \
+		$(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
 $(LIBRARY) : $(OBJS)
@@ -160,22 +162,22 @@ dmalloc.dvi : dmalloc.texi
 	( cd work ; texi2dvi ../dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
-INSTALL : INSTALL.1 $(INFOFILE)
+INSTALL : $(srcdir)/INSTALL.1 $(srcdir)/$(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
-	cp INSTALL.1 $(.TARGET).t
+	cp $(srcdir)/INSTALL.1 $(.TARGET).t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Node: Details/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-PERMISSIONS : $(INFOFILE)
+PERMISSIONS : $(srcdir)/$(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
@@ -183,35 +185,35 @@ PERMISSIONS : $(INFOFILE)
 		-e '/,  Node: Overview/,$$d' \
 		-e '/^\* Menu/,/^File: $(INFOFILE)/d' \
 		-e '/^File: $(INFOFILE)/d' < \
-		$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		$(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-README : README.1 $(INFOFILE)
+README : $(srcdir)/README.1 $(srcdir)/$(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	cat README.1 >> $(.TARGET).t
+		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+	cat $(srcdir)/README.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-README_ftp : README_ftp.1 $(INFOFILE)
+README_ftp : $(srcdir)/README_ftp.1 $(srcdir)/$(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $$(srcdir)/(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
-	cat README_ftp.1 >> $(.TARGET).t
+	cat $(srcdir)/README_ftp.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
 $(INFOFILE) : dmalloc.texi
@@ -237,16 +239,16 @@ shar :: $(FLS) $(CFGFLS)
 #
 # auto configure settings
 #
-Makefile : Makefile.in
+Makefile : $(srcdir)/Makefile.in
 	$(SHELL) config.status
 
-conf.h : conf.h.in
+conf.h : $(srcdir)/conf.h.in
 	$(SHELL) config.status
 
-config.status : configure
+config.status : $(srcdir)/configure
 	$(SHELL) config.status --recheck
 
-configure : configure.in
-	autoconf
+$(srcdir)/configure : $(srcdir)/configure.in
+	cd $(srcdir); autoconf
 
 .include <local.mk>
