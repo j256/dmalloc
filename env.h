@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: env.h,v 1.8 1997/01/16 15:25:06 gray Exp $
+ * $Id: env.h,v 1.9 1997/07/07 06:26:56 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -32,6 +32,7 @@
 #define ADDRESS_COUNT_INIT	(-1)
 #define DEBUG_INIT		(-1L)
 #define INTERVAL_INIT		(-1)
+#define LOCK_ON_INIT		(-1)
 #define LOGPATH_INIT		NULL
 #define START_FILE_INIT		NULL
 #define START_LINE_INIT		(-1)
@@ -41,6 +42,7 @@
 #define ADDRESS_LABEL		"addr"
 #define DEBUG_LABEL		"debug"
 #define INTERVAL_LABEL		"inter"
+#define LOCK_ON_LABEL		"lockon"
 #define LOGFILE_LABEL		"log"
 #define START_LABEL		"start"
 
@@ -70,6 +72,7 @@ extern	void	_dmalloc_environ_get(const char * environ,
 				     unsigned long * addrp,
 				     int * addr_countp,
 				     long * debugp, int * intervalp,
+				     int * lock_onp,
 				     char ** logpathp,
 				     char ** sfilep, int * slinep,
 				     int * scountp);
@@ -83,6 +86,7 @@ extern	void	_dmalloc_environ_set(char * buf, const char long_tokens,
 				     const unsigned long address,
 				     const int addr_count, const long debug,
 				     const int interval,
+				     const int lock_on,
 				     const char * logpath,
 				     const char * sfile,
 				     const int sline,

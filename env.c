@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.9 1997/06/03 16:20:04 gray Exp $";
+  "$Id: env.c,v 1.10 1997/07/07 06:26:56 gray Exp $";
 #endif
 
 /* local variables */
@@ -134,6 +134,7 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
 				     unsigned long * addrp,
 				     int * addr_countp,
 				     long * debugp, int * intervalp,
+				     int * lock_onp,
 				     char ** logpathp,
 				     char ** sfilep, int * slinep,
 				     int * scountp)
@@ -153,6 +154,8 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
     *debugp = DEBUG_INIT;
   if (intervalp != NULL)
     *intervalp = INTERVAL_INIT;
+  if (lock_onp != NULL)
+    *lock_onp = LOCK_ON_INIT;
   if (logpathp != NULL)
     *logpathp = LOGPATH_INIT;
   if (sfilep != NULL)
@@ -213,6 +216,15 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
       thisp += len + 1;
       if (intervalp != NULL)
 	*intervalp = atoi(thisp);
+      continue;
+    }
+    
+    len = strlen(LOCK_ON_LABEL);
+    if (strncmp(thisp, LOCK_ON_LABEL, len) == 0
+	&& *(thisp + len) == ASSIGNMENT_CHAR) {
+      thisp += len + 1;
+      if (lock_onp != NULL)
+	*lock_onp = atoi(thisp);
       continue;
     }
     
@@ -277,6 +289,7 @@ EXPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
 				     const unsigned long address,
 				     const int addr_count, const long debug,
 				     const int interval,
+				     const int lock_on,
 				     const char * logpath,
 				     const char * sfile,
 				     const int sline,
@@ -313,6 +326,10 @@ EXPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
   }
   if (interval != INTERVAL_INIT) {
     (void)sprintf(bufp, "%s%c%d,", INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
+    for (; *bufp != NULLC; bufp++);
+  }
+  if (lock_on != LOCK_ON_INIT) {
+    (void)sprintf(bufp, "%s%c%d,", LOCK_ON_LABEL, ASSIGNMENT_CHAR, lock_on);
     for (; *bufp != NULLC; bufp++);
   }
   if (logpath != LOGPATH_INIT) {
