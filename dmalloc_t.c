@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.67 1998/10/15 15:33:27 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.68 1998/10/15 16:55:48 gray Exp $";
 #endif
 
 /* external routines */
@@ -813,36 +813,7 @@ int	main(int argc, char **argv)
     }
   }
   
-  /* don't allow silent dumps */
-  if ((! no_special_b)
-      && (! (silent_b
-	     && (dmalloc_debug_current() & DEBUG_ERROR_ABORT)))) {
-    if (! silent_b) {
-      (void)printf("Running special tests...\n");
-    }
-    ret = check_special();
-    if (! silent_b) {
-      (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
-    }
-  }
-  
-  /* you will need this if you can't auto-shutdown */
-#if HAVE_ATEXIT == 0 && HAVE_ON_EXIT == 0 && FINI_DMALLOC == 0
-  /* shutdown the alloc routines */
-  malloc_shutdown();
-#endif
-  
-  argv_cleanup(arg_list);
-  
-  ret = malloc_verify(NULL);
-  if (ret != DMALLOC_VERIFY_NOERROR) {
-    (void)fprintf(stderr, "Final malloc_verify returned failure.\n");
-  }
-  
-  if (dmalloc_errno == ERROR_NONE) {
-    exit(0);
-  }
-  else {
+  if (dmalloc_errno != ERROR_NONE) {
     /*
      * Even if we are silent, we must give the random seed which is
      * the only way we can reproduce the problem.
@@ -858,4 +829,34 @@ int	main(int argc, char **argv)
     }
     exit(1);
   }
+  
+  /* check the special malloc functions but don't allow silent dumps */
+  if ((! no_special_b)
+      && (! (silent_b
+	     && (dmalloc_debug_current() & DEBUG_ERROR_ABORT)))) {
+    if (! silent_b) {
+      (void)printf("Running special tests...\n");
+    }
+    ret = check_special();
+    if (! silent_b) {
+      (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
+    }
+  }
+  
+  argv_cleanup(arg_list);
+  
+  /* last thing is to verify the heap */
+  ret = malloc_verify(NULL);
+  if (ret != DMALLOC_VERIFY_NOERROR) {
+    (void)fprintf(stderr, "Final malloc_verify returned failure: %s (%d)\n",
+		  dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+  }
+  
+  /* you will need this if you can't auto-shutdown */
+#if HAVE_ATEXIT == 0 && HAVE_ON_EXIT == 0 && FINI_DMALLOC == 0
+  /* shutdown the alloc routines */
+  malloc_shutdown();
+#endif
+  
+  exit(0);
 }
