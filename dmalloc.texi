@@ -14,14 +14,14 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.82 1994/12/16 20:07:09 gray Exp $
+@c $Id: dmalloc.texi,v 1.83 1995/03/03 17:01:45 gray Exp $
 @c ================================================================
 
 @ifinfo
 This file is an introduction to the Dmalloc library which handles general
 memory heap management.
 
-Copyright @copyright{} 1992 - 1994 by the Antaire Corporation.
+Copyright @copyright{} 1992 - 1994 by Gray Watson.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -50,12 +50,12 @@ translation approved by the author instead of in the original English.
 @title Debug Malloc Library
 @subtitle Version 3.0.4
 @subtitle November 1994
-@author Gray Watson <gray@@antaire.com>
+@author Gray Watson <gray@@letters.com>
 
 @page
-Copyright @copyright{} 1992 - 1994 by the Antaire Corporation.
+Copyright @copyright{} 1992 - 1994 by the Letters Corporation.
 
-Published by Gray Watson @samp{<gray@@antaire.com>}
+Published by Gray Watson @samp{<gray@@letters.com>}
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -99,12 +99,13 @@ The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
 texi, info, and ps).
 
-The library is available via ftp from @samp{ftp.antaire.com} in the
-@file{antaire/src/dmalloc} directory.  @xref{How To Get}.  I can be
-reached at @samp{gray@@antaire.com} with any questions, feedback, or
-general comments.
+The library is available via ftp from @samp{ftp.letters.com} in the
+@file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached at
+@samp{gray@@letters.com} with any questions, feedback, or general
+comments.  Please include the version number of the library that you are
+using as well as your machine and operating system types.
 
-Gray Watson, Antaire Corporation.
+Gray Watson.
 
 @menu
 * Copying::                     Library copying conditions.
@@ -126,13 +127,13 @@ Gray Watson, Antaire Corporation.
 Permission to use, copy, modify, and distribute this software for any
 purpose and without fee is hereby granted, provided that the above
 copyright notice and this permission notice appear in all copies, and
-that the name of Antaire not be used in advertising or publicity
+that the name of Gray Watson not be used in advertising or publicity
 pertaining to distribution of the document or software without specific,
 written prior permission.
 
-The Antaire Corporation makes no representations about the suitability
-of the software described herein for any purpose.  It is provided "as
-is" without express or implied warranty.
+Gray Watson makes no representations about the suitability of the
+software described herein for any purpose.  It is provided "as is"
+without express or implied warranty.
 
 @node Overview, Details, Copying, Top
 @chapter How to Debug with the Library
@@ -425,14 +426,14 @@ overwrites one of its fence-post markers.
 @item Standard Repository:
 
 The newest version(s) of the dmalloc library are available via anonymous
-ftp from @samp{ftp.antaire.com} in the @file{/antaire/src/dmalloc}
+ftp from @samp{ftp.letters.com} in the @file{/src/dmalloc}
 directory.
 
 To use anonymous ftp, you ftp to the site and when the system prompts
 you for a login-id or username you enter @kbd{anonymous}.  When it
 prompts you for a password you enter your email address.  I, for
-example, enter @kbd{gray@@antaire.com}.  You then can change-directory
-(cd) into @file{/antaire/src/dmalloc} and get the @file{README} and
+example, enter @kbd{gray@@letters.com}.  You then can change-directory
+(cd) into @file{/src/dmalloc} and get the @file{README} and
 @file{dmalloc.tar.gz} files.
 
 The versions in this repository include such stuff as a postscript
@@ -442,9 +443,10 @@ included in the distribution you received.
 @item Other Repositories:
 
 You can also get a recent version from anonymous ftp via
-@samp{gatekeeper.dec.com} in the @file{/pub/misc/dmalloc} directory.
-This repository has been made available through the generosity of the
-Digital Equipment Corporation with special help from Dave Hill and the
+@samp{gatekeeper.dec.com} in the @file{/pub/misc/malloc_dbg} directory
+or maybe @file{/pub/misc/dmalloc} if they've changed it.  This
+repository has been made available through the generosity of the Digital
+Equipment Corporation with special help from Dave Hill and the
 gatekeepers.
 
 Thanks much to them all.
@@ -1492,8 +1494,9 @@ the environment variable.
 To find out the usage for the debug malloc program try @samp{dmalloc
 --usage}.  The standardized usage message that will be displayed is one
 of the many features of the argv library included with this package.  It
-is available via ftp from ftp.antaire.com in the @file{antaire/src/argv}
-directory.  See @file{argv.info} there for more information.
+is available via ftp from @samp{ftp.letters.com} in the
+@file{/src/argv} directory.  See @file{argv.info} there for more
+information.
 
 Here is a detailed list of the flags that can passed to dmalloc:
 
@@ -1794,14 +1797,13 @@ values and priorities.  <cpsr@@csli.stanford.edu>
 @cindex BSDI
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
-We at the Antaire Corporation are the proud and enthusiastic owners,
-users, and distributors of the BSD/386 operating system.  For $1+k you
-get a @emph{complete} BSD-flavor operating system with @emph{full
-source} for 386 and 486 systems (binary licenses are available).  Along
-with the obvious benefits of full source code come excellent customer
-support/service and system features such as a MS-DOG runtime
-environment, complete tcp/ip networking facilities including nfs, full
-software development utilities, X, etc.  <bsdi-info@@bsdi.com>
+I am a proud and enthusiastic owner and user of the BSD/386 operating
+system.  For $1+k you get a @emph{complete} BSD-flavor operating system
+with @emph{full source} for 386 and 486 systems (binary licenses are
+available).  Along with the obvious benefits of full source code come
+excellent customer support/service and system features such as a MS-DOG
+runtime environment, complete tcp/ip networking facilities including
+nfs, full software development utilities, X, etc.  <bsdi-info@@bsdi.com>
 @end table
 
 @node Index of Concepts, Full Node Listings, Plugs, Top
