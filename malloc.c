@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.115 1998/11/09 16:53:26 gray Exp $
+ * $Id: malloc.c,v 1.116 1998/11/09 18:11:54 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.115 1998/11/09 16:53:26 gray Exp $";
+#ident "$Id: malloc.c,v 1.116 1998/11/09 18:11:54 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.115 1998/11/09 16:53:26 gray Exp $";
+  "$Id: malloc.c,v 1.116 1998/11/09 18:11:54 gray Exp $";
 #endif
 #endif
 
@@ -85,8 +85,8 @@ static	char	*rcs_id =
 static	int	dmalloc_startup(void);
 void		_dmalloc_shutdown(void);
 DMALLOC_PNT	_loc_malloc(const char *file, const int line,
-			    DMALLOC_SIZE size, const int calloc_b,
-			    const int valloc_b);
+			    const DMALLOC_SIZE size, const int calloc_b,
+			    const DMALLOC_SIZE alignment);
 DMALLOC_PNT	_loc_realloc(const char *file, const int line,
 			     DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
 			     const int recalloc_b);
@@ -176,7 +176,6 @@ static	void	lock_thread(void)
     pthread_mutex_lock(&dmalloc_mutex);
 #endif
   }
-#else /* ! LOCK_THREADS */
   /* was thread-lock-on specified but not configured? */
   if (thread_lock_on != LOCK_ON_INIT) {
     dmalloc_errno = ERROR_LOCK_NOT_CONFIG;
@@ -336,6 +335,14 @@ static	void	process_environ(void)
   if (_dmalloc_debug_preset != DEBUG_PRE_NONE) {
     _dmalloc_flags = _dmalloc_debug_preset;
   }
+  
+#if LOCK_THREADS == 0
+  /* was thread-lock-on specified but not configured? */
+  if (thread_lock_on != LOCK_ON_INIT) {
+    dmalloc_errno = ERROR_LOCK_NOT_CONFIG;
+    _dmalloc_die(0);
+  }
+#endif
 }
 
 /************************** startup/shutdown calls ***************************/
@@ -461,7 +468,9 @@ void	_dmalloc_shutdown(void)
     return;
   }
   
-  thread_lock();
+#if LOCK_THREADS
+  lock_thread();
+#endif
   
   /* if we've died in dmalloc somewhere then leave fast and quietly */
   if (in_alloc_b) {
@@ -539,6 +548,7 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
 			    const DMALLOC_SIZE alignment)
 {
   void		*new_p;
+  DMALLOC_SIZE	align;
   
 #if DMALLOC_SIZE_UNSIGNED == 0
   if (size < 0) {
@@ -552,7 +562,28 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
     return MALLOC_ERROR;
   }
   
-  new_p = _chunk_malloc(file, line, size, calloc_b, 0, alignment);
+  if (alignment == 0) {
+    align = 0;
+  }
+  else if (alignment >= BLOCK_SIZE) {
+    align = BLOCK_SIZE;
+  }
+  else {
+    /*
+     * NOTE: Currently, there is no support in the library for
+     * memalign on less than block boundaries.  It will be non-trivial
+     * to support valloc with fence-post checking and the lack of the
+     * flag width for dblock allocations.
+     */
+    if (! memalign_warn_b) {
+      _dmalloc_message("WARNING: memalign called without library support");
+      memalign_warn_b = 1;
+    }
+    align = 0;
+    /* align = alignment */
+  }
+  
+  new_p = _chunk_malloc(file, line, size, calloc_b, 0, align);
   in_alloc_b = FALSE;
   
   check_pnt(file, line, new_p, "malloc");
@@ -734,28 +765,9 @@ DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size)
 {
   char		*file;
-  DMALLOC_SIZE	align;
   
   GET_RET_ADDR(file);
-  
-  if (alignment >= BLOCK_SIZE) {
-    align = BLOCK_SIZE;
-  }
-  else {
-    /*
-     * NOTE: Currently, there is no support in the library for
-     * memalign on less than block boundaries.  It will be non-trivial
-     * to support valloc with fence-post checking and the lack of the
-     * flag width for dblock allocations.
-     */
-    if (! memalign_warn_b) {
-      _dmalloc_message("WARNING: memalign called without library support");
-    }
-    align = 0;
-    /* align = alignment */
-  }
-  
-  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, align);
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, alignment);
 }
 
 /*
@@ -923,7 +935,9 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
     return DMALLOC_VERIFY_ERROR;
   }
   
-  thread_lock();
+#if LOCK_THREADS
+  lock_thread();
+#endif
   
   if (in_alloc_b) {
     dmalloc_errno = ERROR_IN_TWICE;
