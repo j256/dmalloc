@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.164 2003/05/21 04:15:18 gray Exp $
+# $Id: Makefile.in,v 1.165 2003/05/21 15:59:10 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -33,6 +33,7 @@ DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	$(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
+A_OUT	= aout@EXEEXT@
 
 MODULE	= dmalloc
 
@@ -101,7 +102,7 @@ all :: dmalloc.h $(LIBRARY) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
+	rm -f $(A_OUT) $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
 	rm -f $(UTIL) dmalloc.h dmalloc.h.3
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
 	rm -f ChangeLog.1
@@ -198,8 +199,9 @@ $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 
 $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
-	mv a.out $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(UTIL).o dmalloc_argv.o compat.o \
+		env.o $(LIBS)
+	mv $(A_OUT) $@
 
 threads : $(LIB_TH) $(BUILD_TH_CXX)
 
@@ -225,8 +227,9 @@ tests :: $(TEST) compile_test
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) $(LIBRARY)
-	mv a.out $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST).o dmalloc_argv.o \
+		$(LIBS) $(LIBRARY)
+	mv $(A_OUT) $@
 
 check light :: $(TEST)
 	$(TEST) -s -t 10000

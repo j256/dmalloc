@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.115 2003/05/21 04:11:22 gray Exp $
+# $Id: Makefile.all.in,v 1.116 2003/05/21 15:59:10 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -31,6 +31,7 @@ DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	$(DEFINES)
 INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@
+A_OUT = aout@EXEEXT@
 
 MODULE	= dmalloc
 LIBRARY	= lib$(MODULE).a
@@ -154,7 +155,7 @@ all : $(BUILD_ALL)
 @SL_OFF@	@echo "To make the shared version of the library type 'make shlib'"
 
 clean :
-	rm -f a.out core *.o *.t
+	rm -f $(A_OUT) core *.o *.t
 	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
 	rm -f $(LIB_TH_SL) $(LIB_CXX_SL) $(LIB_TH_CXX_SL) $(LIB_SL)
 	rm -f $(UTIL) dmalloc.h
@@ -306,8 +307,9 @@ utils : $(UTIL)
 
 $(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $(UTIL).o dmalloc_argv.o compat.o env.o $(LIBS)
-	mv a.out $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(UTIL).o dmalloc_argv.o compat.o env.o \
+		$(LIBS)
+	mv $(A_OUT) $@
 
 # special _th versions of objects with the LOCK_THREADS variable defined to 1
 chunk_th.o : $(srcdir)/chunk.c
@@ -329,8 +331,9 @@ tests : $(TEST)
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) -l$(MODULE)
-	mv a.out $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST).o dmalloc_argv.o $(LIBS) \
+		-l$(MODULE)
+	mv $(A_OUT) $@
 
 check light : $(TEST)
 	./$(TEST) -s -t 10000
