@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.13 1993/04/05 01:28:47 gray Exp $
+$Id: Manifest,v 1.14 1993/04/30 22:38:59 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -54,7 +54,7 @@ error_val.h		General error codes for the malloc module.
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.
 
-malloc.[ch]		Higher level alloc routines including malloc,
+malloc.c		Higher level alloc routines including malloc,
 			free, realloc, etc.  These are the routines to
 			be called from user space.
 
@@ -69,6 +69,10 @@ malloc.texi		Texinfo user manual for generating TeX or Info
 malloc_dbg.c		Program that assists in the setting of the
 			MALLOC_DEBUG and other debug environmental
 			variables.
+
+malloc_dbg.h		Installed malloc .h file to be included in
+			those .c files where file and line debugging
+			information is required.
 
 malloc_loc.h		Local defines for all of the malloc routines.
 
