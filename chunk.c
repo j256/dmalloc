@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.81 1994/08/29 15:10:18 gray Exp $";
+  "$Id: chunk.c,v 1.82 1994/09/08 14:08:52 gray Exp $";
 #endif
 
 /*
@@ -965,7 +965,7 @@ EXPORT	int	_chunk_heap_check(void)
 	 * NOTE: this should not present problems since the bb_next is
 	 * NOT unioned with bb_file.
 	 */
-	if (bblockp->bb_next != NULL && ! IS_IN_HEAP(bblockp->bb_next)) {
+	if (! IS_IN_HEAP(bblockp)) {
 	  dmalloc_errno = ERROR_BAD_FREE_LIST;
 	  _dmalloc_error("_chunk_heap_check");
 	  return ERROR;
@@ -985,7 +985,7 @@ EXPORT	int	_chunk_heap_check(void)
 	 * db_file (unioned with db_next) points to a return address
 	 * in the heap
 	 */
-	if (dblockp->db_next != NULL && ! IS_IN_HEAP(dblockp->db_next)) {
+	if (! IS_IN_HEAP(dblockp)) {
 	  dmalloc_errno = ERROR_BAD_FREE_LIST;
 	  _dmalloc_error("_chunk_heap_check");
 	  return ERROR;
