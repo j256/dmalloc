@@ -33,7 +33,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.13 1993/04/05 01:29:12 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.14 1993/04/05 22:30:23 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -64,18 +64,6 @@ LOCAL	int	hex_to_int(char * str)
   }
   
   return ret;
-}
-
-/*
- * little index function
- */
-LOCAL	char	*find(char * str, char ch)
-{
-  for (; *str != '\0'; str++)
-    if (*str == (char)ch)
-      return str;
-  
-  return NULL;
 }
 
 /*
@@ -112,7 +100,7 @@ EXPORT	int	main(int argc, char ** argv)
     (void)printf("------------------------------------------------------\n");
     (void)printf("prompt> ");
     (void)fgets(line, sizeof(line), stdin);
-    linep = find(line, '\n');
+    linep = index(line, '\n');
     if (linep != NULL)
       *linep = '\0';
     

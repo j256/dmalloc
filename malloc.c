@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.21 1993/04/05 01:29:05 gray Exp $";
+  "$Id: malloc.c,v 1.22 1993/04/05 22:30:13 gray Exp $";
 #endif
 
 /*
@@ -406,7 +406,7 @@ EXPORT	int	malloc_verify(char * pnt)
     return MALLOC_VERIFY_ERROR;
   
   if (pnt != 0)
-    ret = _chunk_pnt_check(pnt);
+    ret = _chunk_pnt_check("malloc_verify", pnt, 0, 0);
   else
     ret = _chunk_heap_check();
   

@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.7 1993/04/05 01:28:59 gray Exp $
+ * $Id: conf.h.in,v 1.8 1993/04/05 22:30:00 gray Exp $
  */
 
 /*
@@ -102,6 +102,27 @@
 #define HAVE_STRCMP 0
 #define HAVE_STRLEN 0
 #define HAVE_STRTOK 0
+
+/*
+ * the below functions are here to provide malloc string checking only.
+ */
+#define HAVE_BZERO 0
+
+#define HAVE_MEMCCPY 0
+#define HAVE_MEMCHR 0
+
+#define HAVE_STRCHR 0
+#define HAVE_STRRCHR 0
+#define HAVE_STRCPY 0
+#define HAVE_STRNCPY 0
+#define HAVE_STRCASECMP 0
+#define HAVE_STRNCASECMP 0
+#define HAVE_STRSPN 0
+#define HAVE_STRCSPN 0
+#define HAVE_STRNCAT 0
+#define HAVE_STRNCMP 0
+#define HAVE_STRPBRK 0
+#define HAVE_STRSTR 0
 
 /*
  * some defines to standardize memory functions

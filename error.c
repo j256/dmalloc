@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.18 1993/04/05 01:29:02 gray Exp $";
+  "$Id: error.c,v 1.19 1993/04/05 22:30:07 gray Exp $";
 #endif
 
 /*
@@ -56,7 +56,7 @@ EXPORT	int		_malloc_debug = 0;
 /*
  * message writer with printf like arguments
  */
-EXPORT	void	_malloc_message(char * format, ...)
+EXPORT	void	_malloc_message(const char * format, ...)
 {
   static int	outfile = -1;
   int		len;
@@ -128,19 +128,19 @@ EXPORT	void	_malloc_die(void)
 /*
  * malloc version of perror of an error in STR
  */
-EXPORT	void	_malloc_perror(char * str)
+EXPORT	void	_malloc_perror(const char * func)
 {
   /* do we need to log or print the error? */
   if ((BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR) && malloc_logpath != NULL)
       || BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR)) {
     
     /* default str value */
-    if (str == NULL)
-      str = "malloc_perror";
+    if (func == NULL)
+      func = "malloc_perror";
     
     /* print the malloc error message */
     _malloc_message("ERROR: %s: %s(%d)",
-		    str, malloc_strerror(malloc_errno), malloc_errno);
+		    func, malloc_strerror(malloc_errno), malloc_errno);
   }
   
   /* do I need to abort? */

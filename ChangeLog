@@ -1,3 +1,9 @@
+Mon Apr  5 18:28:05 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Finished adding token "check-funcs" to check the arguments of
+	some common string functions to see whether they are in the heap.
+	if so it tries to verify that the pointers are good.
+
 Sun Apr  4 21:24:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added token "log-unknown" to dump non-free unknown pointers as

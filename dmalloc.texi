@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.10 1993/04/05 01:29:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.11 1993/04/05 22:30:17 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -660,6 +660,9 @@ log full administrative information
 @item log-blocks
 log detailed block information when malloc_heap_map is called
 
+@item log-unknown
+log unknown non-freed memory pointers as well as known
+
 @item check-fence
 check fence-post memory areas
 
@@ -679,7 +682,8 @@ check the fence-post areas of small allocations
 check to see if free space has been overwritten
 
 @item check-funcs
-check the arguments of some functions looking for bad pointers
+check the arguments of some functions (mostly string operations) looking
+for bad pointers
 
 @item realloc-copy
 always copy data to a new pointer when realloc

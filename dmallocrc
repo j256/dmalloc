@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.6 1993/04/05 01:29:14 gray Exp $
+# $Id: dmallocrc,v 1.7 1993/04/05 22:30:25 gray Exp $
 #
 
 #
@@ -38,6 +38,7 @@
 # check-dblock			do detailed checking on small allocations
 # check-dblock-fence		check the fence-post areas of small allocations
 # check-free			check to see if free space has been overwritten
+# check-funcs			check the arguments of some routines
 #
 # realloc-copy			always copy data to a new pointer when realloc
 # free-blank			overwrite space that is freed
@@ -62,24 +63,25 @@ runtime		log-stats, log-non-free, log-perror, log-bad-pnt, \
 		check-fence, check-heap, check-lists, check-dblock-fence, \
 		error-abort
 
-# good utilities
+# good checking functionality
 3		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
-		check-fence, check-heap, check-lists, check-dblock-fence, \
+		check-fence, check-heap, check-lists, check-dblock-fence,
+		check-funcs, \
 		realloc-copy, free-blank, alloc-blank, error-abort
 
 # extensive checking
 4		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock, \
-		check-fence-dblock, \
+		check-fence-dblock, check-funcs, \
 		realloc-copy, free-blank, alloc-blank, error-abort
 
 # ultra-extensive checking
 5		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock, \
-		check-dblock-fence, check-free, \
+		check-dblock-fence, check-free, check-funcs, \
 		realloc-copy, free-blank, alloc-blank, error-abort
 
 # full fence-post checking

@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.18 1993/04/01 04:59:19 gray Exp $
+ * $Id: malloc.h,v 1.19 1993/04/05 22:30:15 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -254,6 +254,75 @@ IMPORT	char	*malloc_strerror(int errnum);
   _realloc_leap(__FILE__, __LINE__, ptr, size)
 #define free(ptr) \
   _free_leap(__FILE__, __LINE__, ptr)
+
+#ifndef MALLOC_STRING_DISABLE
+
+/*
+ * do debugging on the following functions.  this may cause compilation or
+ * other problems depending on your architecture, hence the need for the
+ * MALLOC_STRING_DISABLE define.
+ */
+#define bcmp(b1, b2, len) \
+  _malloc_bcmp(__FILE__, __LINE__, b1, b2, len)
+#define bcopy(from, to, len) \
+  _malloc_bcopy(__FILE__, __LINE__, from, to, len)
+
+#define memcmp(b1, b2, len) \
+  _malloc_memcmp(__FILE__, __LINE__, b1, b2, len)
+#define memcpy(to, from, len) \
+  _malloc_memcpy(__FILE__, __LINE__, to, from, len)
+#define memset(buf, ch, len) \
+  _malloc_memset(__FILE__, __LINE__, buf, ch, len)
+
+#define index(str, ch) \
+  _malloc_index(__FILE__, __LINE__, str, ch)
+#define rindex(str, ch) \
+  _malloc_rindex(__FILE__, __LINE__, str, ch)
+
+#define strcat(to, from) \
+  _malloc_strcat(__FILE__, __LINE__, to, from)
+#define strcmp(s1, s2) \
+  _malloc_strcmp(__FILE__, __LINE__, s1, s2)
+#define strlen(str) \
+  _malloc_strlen(__FILE__, __LINE__, str)
+#define strtok(str, sep) \
+  _malloc_strtok(__FILE__, __LINE__, str, sep)
+
+#define bzero(buf, len) \
+  _malloc_bzero(__FILE__, __LINE__, buf, len)
+
+#define memccpy(s1, s2, ch, len) \
+  _malloc_memccpy(__FILE__, __LINE__, s1, s2, ch, len)
+#define memchr(s1, ch, len) \
+  _malloc_memchr(__FILE__, __LINE__, s1, ch, len)
+
+#define strchr(str, ch) \
+  _malloc_strchr(__FILE__, __LINE__, str, ch)
+#define strrchr(str, ch) \
+  _malloc_strrchr(__FILE__, __LINE__, str, ch)
+
+#define strcpy(to, from) \
+  _malloc_strcpy(__FILE__, __LINE__, to, from)
+#define strncpy(to, from, len) \
+  _malloc_strncpy(__FILE__, __LINE__, to, from, len)
+#define strcasecmp(s1, s2) \
+  _malloc_strcasecmp(__FILE__, __LINE__, s1, s2)
+#define strncasecmp(s1, s2, len) \
+  _malloc_strncasecmp(__FILE__, __LINE__, s1, s2, len)
+#define strspn(str, list) \
+  _malloc_strspn(__FILE__, __LINE__, str, list)
+#define strcspn(str, list) \
+  _malloc_strcspn(__FILE__, __LINE__, str, list)
+#define strncat(to, from, len) \
+  _malloc_strncat(__FILE__, __LINE__, to, from, len)
+#define strncmp(s1, s2, len) \
+  _malloc_strncmp(__FILE__, __LINE__, s1, s2, len)
+#define strpbrk(str, list) \
+  _malloc_strpbrk(__FILE__, __LINE__, str, list)
+#define strstr(str, pat) \
+  _malloc_strstr(__FILE__, __LINE__, str, pat)
+
+#endif /* ! MALLOC_STRING_DISABLE */
 
 /*
  * copied directly from malloc_lp.h
