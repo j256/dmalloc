@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.139 1999/03/08 04:26:45 gray Exp $
+ * $Id: chunk.c,v 1.140 1999/03/08 05:08:30 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.139 1999/03/08 04:26:45 gray Exp $";
+#ident "$Id: chunk.c,v 1.140 1999/03/08 05:08:30 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.139 1999/03/08 04:26:45 gray Exp $";
+  "$Id: chunk.c,v 1.140 1999/03/08 05:08:30 gray Exp $";
 #endif
 #endif
 
@@ -78,35 +78,35 @@ static	int		fence_bottom_size = 0;	/* add to pnt for display */
 static	int		fence_overhead_size = 0; /* total adm per pointer */
 
 /* memory stats */
-static	long		alloc_current = 0;	/* current memory usage */
-static	long		alloc_maximum = 0;	/* maximum memory usage  */
-static	long		alloc_cur_given = 0;	/* current mem given */
-static	long		alloc_max_given = 0;	/* maximum mem given  */
-static	long		alloc_total = 0;	/* total allocation */
+static	unsigned long	alloc_current = 0;	/* current memory usage */
+static	unsigned long	alloc_maximum = 0;	/* maximum memory usage  */
+static	unsigned long	alloc_cur_given = 0;	/* current mem given */
+static	unsigned long	alloc_max_given = 0;	/* maximum mem given  */
+static	unsigned long	alloc_total = 0;	/* total allocation */
 static	unsigned long	alloc_one_max = 0;	/* maximum at once */
-static	long		free_space_count = 0;	/* count the free bytes */
+static	unsigned long	free_space_count = 0;	/* count the free bytes */
 
 /* pointer stats */
-static	long		alloc_cur_pnts = 0;	/* current pointers */
-static	long		alloc_max_pnts = 0;	/* maximum pointers */
-static	long		alloc_tot_pnts = 0;	/* current pointers */
+static	unsigned long	alloc_cur_pnts = 0;	/* current pointers */
+static	unsigned long	alloc_max_pnts = 0;	/* maximum pointers */
+static	unsigned long	alloc_tot_pnts = 0;	/* current pointers */
 
 /* admin counts */
-static	long		bblock_adm_count = 0;	/* count of bblock_admin */
-static	long		dblock_adm_count = 0;	/* count of dblock_admin */
-static	long		bblock_count = 0;	/* count of basic-blocks */
-static	long		dblock_count = 0;	/* count of divided-blocks */
-static	long		extern_count = 0;	/* count of external blocks */
-static	long		check_count = 0;	/* count of heap-checks */
+static	unsigned long	bblock_adm_count = 0;	/* count of bblock_admin */
+static	unsigned long	dblock_adm_count = 0;	/* count of dblock_admin */
+static	unsigned long	bblock_count = 0;	/* count of basic-blocks */
+static	unsigned long	dblock_count = 0;	/* count of divided-blocks */
+static	unsigned long	extern_count = 0;	/* count of external blocks */
+static	unsigned long	check_count = 0;	/* count of heap-checks */
 
 /* alloc counts */
-static	long		malloc_count = 0;	/* count the mallocs */
-static	long		calloc_count = 0;	/* # callocs, done in alloc */
-static	long		realloc_count = 0;	/* count the reallocs */
-static	long		recalloc_count = 0;	/* count the reallocs */
-static	long		memalign_count = 0;	/* count the memaligns */
-static	long		valloc_count = 0;	/* count the veallocs */
-static	long		free_count = 0;		/* count the frees */
+static	unsigned long	malloc_count = 0;	/* count the mallocs */
+static	unsigned long	calloc_count = 0;	/* # callocs, done in alloc */
+static	unsigned long	realloc_count = 0;	/* count the reallocs */
+static	unsigned long	recalloc_count = 0;	/* count the reallocs */
+static	unsigned long	memalign_count = 0;	/* count the memaligns */
+static	unsigned long	valloc_count = 0;	/* count the veallocs */
+static	unsigned long	free_count = 0;		/* count the frees */
 
 /******************************* misc routines *******************************/
 
@@ -2507,10 +2507,10 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   }
   
   /* monitor current allocation level */
-  alloc_current += byte_n;
+  alloc_current += size;
   alloc_maximum = MAX(alloc_maximum, alloc_current);
-  alloc_total += byte_n;
-  alloc_one_max = MAX(alloc_one_max, byte_n);
+  alloc_total += size;
+  alloc_one_max = MAX(alloc_one_max, size);
   
   /* monitor pointer usage */
   alloc_cur_pnts++;
@@ -2761,7 +2761,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     bit_n = bblock_p->bb_bit_n;
     
     /* monitor current allocation level */
-    alloc_current -= dblock_p->db_size;
+    alloc_current -= dblock_p->db_size - fence_overhead_size;
     alloc_cur_given -= 1 << bit_n;
     free_space_count += 1 << bit_n;
     
@@ -2863,7 +2863,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   }
   
   /* monitor current allocation level */
-  alloc_current -= bblock_p->bb_size;
+  alloc_current -= bblock_p->bb_size - fence_overhead_size;
   alloc_cur_given -= given;
   free_space_count += given;
   
@@ -3203,7 +3203,7 @@ void	_chunk_list_count(void)
  */
 void	_chunk_stats(void)
 {
-  long		overhead, tot_space, wasted;
+  unsigned long	overhead, tot_space, wasted;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     _dmalloc_message("dumping chunk statistics");
@@ -3224,19 +3224,19 @@ void	_chunk_stats(void)
 		   (long)HEAP_SIZE, bblock_count, check_count);
   
   /* log user allocation information */
-  _dmalloc_message("alloc calls: malloc %ld, calloc %ld, realloc %ld, free %ld",
+  _dmalloc_message("alloc calls: malloc %lu, calloc %lu, realloc %lu, free %lu",
 		   malloc_count, calloc_count, realloc_count, free_count);
-  _dmalloc_message("alloc calls: recalloc %ld, memalign %ld, valloc %ld",
+  _dmalloc_message("alloc calls: recalloc %lu, memalign %lu, valloc %lu",
 		   recalloc_count, memalign_count, valloc_count);
-  _dmalloc_message(" total memory allocated: %ld bytes (%ld pnts)",
+  _dmalloc_message(" total memory allocated: %lu bytes (%lu pnts)",
 		  alloc_total, alloc_tot_pnts);
   
   /* maximum stats */
-  _dmalloc_message(" max in use at one time: %ld bytes (%ld pnts)",
+  _dmalloc_message(" max in use at one time: %lu bytes (%lu pnts)",
 		  alloc_maximum, alloc_max_pnts);
-  _dmalloc_message("max alloced with 1 call: %ld bytes",
+  _dmalloc_message("max alloced with 1 call: %lu bytes",
 		  alloc_one_max);
-  _dmalloc_message("max alloc rounding loss: %ld bytes (%ld%%)",
+  _dmalloc_message("max alloc rounding loss: %lu bytes (%lu%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
 		   ((alloc_max_given - alloc_maximum) * 100) /
@@ -3246,7 +3246,7 @@ void	_chunk_stats(void)
     _dmalloc_message("max memory space wasted: 0 bytes (0%%)");
   }
   else {
-    _dmalloc_message("max memory space wasted: %ld bytes (%ld%%)",
+    _dmalloc_message("max memory space wasted: %lu bytes (%lu%%)",
 		    wasted,
 		    (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   }
