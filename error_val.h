@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.23 2000/03/20 23:19:27 gray Exp $
+ * $Id: error_val.h,v 1.24 2000/03/21 01:34:56 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -45,7 +45,7 @@
 #define ERROR_UNDER_FENCE		26	/* failed picket fence lower */
 #define ERROR_OVER_FENCE		27	/* failed picket fence upper */
 #define ERROR_WOULD_OVERWRITE		28	/* would overwrite fence */
-#define ERROR_IS_FREE			29	/* free space should be 0's */
+#define ERROR_IS_FREE			29	/* pointer is already free */
 
 /* allocation errors */
 #define ERROR_BAD_SIZE			40	/* bad bblock size value */
