@@ -1,9 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.54 1995/03/31 23:01:55 gray Exp $
+$Id: NEWS,v 1.55 1995/05/12 20:49:35 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.6:
 
+	* Logged starting/ending time in logfile.
+	* Added thread-id tracking with conf.h option.
+	* Added pointer-count tracking with conf.h option.
+	* Added interation-count tracking with conf.h option.
+	* Added global/relative time tracking with conf.h option.
+	* Better tag output from dmalloc -t.
 	* New version of argv files.
 	* Fixed problem with dmalloc -c and start-count.
 	* Added some messages about upcoming errors in dmalloc_t.

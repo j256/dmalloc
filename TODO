@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.27 1995/03/31 21:52:28 gray Exp $
+$Id: TODO,v 1.28 1995/05/12 20:49:35 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -24,12 +24,14 @@ HEAP OPERATIONS:
 NEW HEAP ADMIN:
 	- need a list of block-ids:
 		- flag/size (bblock/free/dblock/external/unused)
-			- combine with size?
 			- 1... = bblock # bytes allocated (max alloc = 2gb)
 			- 01... = free # bblocks till used block
 			- 00... = where ... > 1 = dblock # bits/# used
 			- external == 00...1 (all zeros then a 1)
 			- unused == 00...0 (all zeros)
+		- pointer: for info-block if used, next free if not
+			- next pointer for free-list (is this necessary?)
+			- pointer to [first] info block below
 	- need to search on pnt to find allocations: file, line, size
 		- key: pnt
 		- data:
@@ -41,8 +43,12 @@ NEW HEAP ADMIN:
 			- [iteration # when last touched]
 			- [time when allocated]
 			- [time when last touched]
-			- [memory crc to track changes, need ~MD5]
-
+			- [memory crc to track changes, need ~MD5 (token?)]
+			- [some sort of use counter]
+				- idea is to keep the info struct
+				around even the section was freed.
+				That way we can track how many times a
+				pointer was returned
 	- time could be global or elapsed
 		- always save start-time and dump it on shutdown if LOG_STAMP
 		- ifdef the global or elapsed
@@ -57,17 +63,7 @@ NEW HEAP ADMIN:
 		a skip-list for easy location, or walk free-list
 	- with fence overruns, dump the pointer info on either side
 		- easy with allocation tree
-		- maybe have a #ifdef to define how many on either side
-		- default 1
-
-SKIP LISTS:
-	- have free lists of the different #-of-pointers blocks
-	- ask for 3-pointer block, check free lists, if not then go to
-		last block of skip entries to see if there is space,
-		if not then create new heap block and continue
-	- maybe if ask for 3-pointer block, give 4-pointer and turn back
-		into a 4-pointer after done, put ifdef for both and
-		test for fragmentmentation
+		- maybe have a #ifdef to define how many pnts on either side
 
 -------------------------------------------------------------------------------
 
@@ -121,12 +117,13 @@ DOCUMENTATION:
 - need to make sure the manual works for the brand new user
 - need an overview early on about its purpose (at a very high level)
 - need a section to explain all the error codes
+- put in a section about other malloc libraries and commercial versions
 
 -------------------------------------------------------------------------------
 
 TESTING / STATISTICS:
 
-- maybe use the new gnu testing code
+- maybe use the new gnu testing code (GCT)
 - general tons of small blocks and watch for dblock_admin entry leak
 	like with large ndb_shell scripts
 - maybe a program that would try a standard set of tests on a number of
@@ -166,15 +163,12 @@ GENERAL:
 	- should only happen if alloc-blank used
 	- could be dangerous if folks are changing 'type' of allocation
 		from string to ...
+	- maybe some special strdup flag or something
 - write perl script to summarize the memory usage per file.
 - for fence underflow, print out the pointer below's info and for fence
 	overflow the pointer above's info
 - handle memalign, valloc, maybe some form of mallopt
 	- maybe mallopt could be mapped into dmalloc_debug()
-
-- maybe store the time and iteration count in the allocated structure
-	for when dumping non-freed blocks list
-- maybe add another time logging flag to dump the elapsed time since start
 
 - maybe an environment variable to designate which program(s) you want to
 	debug. found with strstr.
