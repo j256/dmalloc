@@ -28,7 +28,7 @@
  * chunk.c which is the real heap manager.
  */
 
-#define MALLOC_MAIN
+#define MALLOC_DEBUG_DISABLE
 
 #include "malloc.h"
 #include "malloc_loc.h"
@@ -39,13 +39,13 @@
 #include "dbg_values.h"
 #include "error.h"
 #include "error_str.h"
+#include "error_val.h"
 #include "heap.h"
-#include "malloc_err.h"
 #include "malloc_lp.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.18 1993/03/26 09:16:43 gray Exp $";
+  "$Id: malloc.c,v 1.19 1993/03/31 00:35:51 gray Exp $";
 #endif
 
 /*
@@ -152,6 +152,24 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
     (void)_chunk_heap_check();
   
   return NOERROR;
+}
+
+/*
+ * check out a pointer to see if we were looking for it.
+ * may not return.
+ */
+LOCAL	void	check_var(char * pnt)
+{
+  if (malloc_address == NULL || pnt != malloc_address)
+    return;
+  
+  if (address_count - 1 > 0) {
+    address_count--;
+    return;
+  }
+  
+  malloc_errno = MALLOC_POINTER_FOUND;
+  _malloc_perror("check_var");
 }
 
 /*
@@ -280,14 +298,7 @@ EXPORT	char	*malloc(unsigned int size)
     return MALLOC_ERROR;
   
   newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, size);
-  
-  /* is this the address we are looking for? */
-  if (malloc_address != NULL && newp == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
+  check_var(newp);
   
   in_alloc = FALSE;
   
@@ -311,14 +322,7 @@ EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
   
   /* alloc and watch for the die address */
   newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, len);
-  
-  /* is this the address we are looking for? */
-  if (malloc_address != NULL && newp == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
+  check_var(newp);
   
   (void)memset(newp, NULLC, len);
   
@@ -343,23 +347,9 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
-  /* is the old address the one we are looking for? */
-  if (malloc_address != NULL && old_pnt == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
-  
+  check_var(old_pnt);
   newp = (char *)_chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
-  
-  /* is the new address the one we are looking for? */
-  if (malloc_address != NULL && newp == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
+  check_var(newp);
   
   in_alloc = FALSE;
   
@@ -376,14 +366,7 @@ EXPORT	int	free(char * pnt)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return FREE_ERROR;
   
-  /* is this the address we are looking for? */
-  if (malloc_address != NULL && pnt == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
-  
+  check_var(pnt);
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;

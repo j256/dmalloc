@@ -27,8 +27,6 @@
  * manipulation and administration of chunks of memory.
  */
 
-#define CHUNK_MAIN
-
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -38,13 +36,13 @@
 #include "conf.h"
 #include "dbg_values.h"
 #include "error.h"
+#include "error_val.h"
 #include "heap.h"
-#include "malloc_err.h"
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.26 1993/03/26 15:27:27 gray Exp $";
+  "$Id: chunk.c,v 1.27 1993/03/31 00:35:36 gray Exp $";
 #endif
 
 /* checking information */

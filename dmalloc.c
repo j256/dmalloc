@@ -26,13 +26,14 @@
  * This is the malloc_dbg program which is designed to enable the user
  * to easily enable the multitude of malloc-debug capabilities.
  *
- * NOTE: all printf in this file should be fprintf to stderr unless you want
- * them to be eval'ed by the shell.
+ * NOTE: all stdout output from this program is designed to be run through
+ *   eval by default.  Any messages for the user should be fprintf to stderr.
  */
 
+#include <stdarg.h>				/* for vsprintf handling */
 #include <stdio.h>				/* for stderr */
 
-#define MALLOC_DBG_MAIN
+#define MALLOC_DEBUG_DISABLE
 
 #include "malloc.h"
 #include "malloc_loc.h"
@@ -44,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.3 1993/03/26 09:16:47 gray Exp $";
+  "$Id: dmalloc.c,v 1.4 1993/03/31 00:35:59 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -53,6 +54,7 @@ LOCAL	char	*rcs_id =
 
 #define USAGE_STRING	"--usage"		/* show the usage message */
 #define VERSION_STRING	"--version"		/* show the version message */
+#define NO_VALUE	(-1)			/* no value ... value */
 
 /* local variables */
 LOCAL	char	printed		= FALSE;	/* did we outputed anything? */
@@ -62,10 +64,10 @@ LOCAL	char	*program	= NULL;		/* our program name */
 LOCAL	char	*address	= NULL;		/* for ADDRESS */
 LOCAL	char	bourne		= FALSE;	/* set bourne shell output */
 LOCAL	char	clear		= FALSE;	/* clear variables */
-LOCAL	int	debug		= -1;		/* for DEBUG */
-LOCAL	int	errno_to_print	= -1;		/* to print the error string */
+LOCAL	int	debug		= NO_VALUE;	/* for DEBUG */
+LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
 LOCAL	char	*inpath		= NULL;		/* for config-file path */
-LOCAL	int	interval	= -1;		/* for setting INTERVAL */
+LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	*tag		= NULL;		/* the debug tag */
@@ -75,7 +77,7 @@ LOCAL	char	*tag		= NULL;		/* the debug tag */
  */
 LOCAL	int	hex_to_int(char * str)
 {
-  long		ret;
+  int		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++);
@@ -263,13 +265,17 @@ LOCAL	void	process_arguments(int argc, char ** argv)
 }
 
 /*
- * process the user configuration looking for tag.
+ * process the user configuration looking for the tag.  if tag is null then
+ * look for DEBUG_VALUE in the file and return the token for it in STR.
+ * routine returns the new debug value matching tag.
  */
-LOCAL	void	process(void)
+LOCAL	int	process(int debug_value, char ** strp)
 {
+  static char	token[128];
   FILE		*infile = NULL;
   char		path[1024], buf[1024], *homep;
   char		found, cont;
+  int		new_debug = 0;
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -290,8 +296,6 @@ LOCAL	void	process(void)
     (void)perror("");
     exit(1);
   }
-  
-  debug = 0;
   
   /* read each of the lines looking for the tag */
   found = FALSE;
@@ -314,7 +318,10 @@ LOCAL	void	process(void)
     
     /* if we're not continuing then we need to process a tag */
     if (! cont) {
-      if (strcmp(tag, tokp) == 0)
+      (void)strcpy(token, tokp);
+      new_debug = 0;
+      
+      if (tag != NULL && strcmp(tag, tokp) == 0)
 	found = TRUE;
       
       tokp = strtok(NULL, TOKENIZE_CHARS);
@@ -330,7 +337,7 @@ LOCAL	void	process(void)
       }
       
       /* are we processing the tag of choice? */
-      if (found) {
+      if (found || tag == NULL) {
 	for (attrc = 0; attributes[attrc].at_string != NULL; attrc++) {
 	  if (strcmp(tokp, attributes[attrc].at_string) == 0)
 	    break;
@@ -339,12 +346,20 @@ LOCAL	void	process(void)
 	if (attributes[attrc].at_string == NULL) {
 	  (void)fprintf(stderr, "%s: unknown token '%s'\n",
 			program, tokp);
-	  continue;
 	}
-	
-	debug |= attributes[attrc].at_value;
+	else
+	  new_debug |= attributes[attrc].at_value;
       }
-    } while ((tokp = strtok(NULL, TOKENIZE_CHARS)) != NULL);
+      
+      tokp = strtok(NULL, TOKENIZE_CHARS);
+    } while (tokp != NULL);
+    
+    if (tag == NULL && ! cont && new_debug == debug_value) {
+      found = TRUE;
+      if (strp != NULL)
+	*strp = token;
+      break;
+    }
     
     /* are we done? */
     if (found && ! cont)
@@ -353,11 +368,18 @@ LOCAL	void	process(void)
   
   (void)fclose(infile);
   
-  if (! found) {
+  /* did we find the correct value in the file? */
+  if (tag == NULL && ! found) {
+    if (strp != NULL)
+      *strp = "unknown";
+  }
+  else if (! found && tag != NULL) {
     (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
 		  program, tag, inpath);
     exit(1);
   }
+  
+  return new_debug;
 }
 
 /*
@@ -366,57 +388,61 @@ LOCAL	void	process(void)
 LOCAL	void	dump_current(void)
 {
   char		*str;
-  long		num;
+  int		num;
   
   str = (char *)getenv(DEBUG_ENVIRON);
   if (str == NULL)
-    (void)fprintf(stderr, "%s not set;\n", DEBUG_ENVIRON);
+    (void)fprintf(stderr, "%s not set\n", DEBUG_ENVIRON);
   else {
     num = hex_to_int(str);
-    (void)fprintf(stderr, "%s == '%#lx';\n", DEBUG_ENVIRON, num);
+    (void)process(num, &str);
+    (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
   }
   
   str = (char *)getenv(ADDRESS_ENVIRON);
   if (str == NULL)
-    (void)fprintf(stderr, "%s not set;\n", ADDRESS_ENVIRON);
+    (void)fprintf(stderr, "%s not set\n", ADDRESS_ENVIRON);
   else
-    (void)fprintf(stderr, "%s == '%s';\n", ADDRESS_ENVIRON, str);
+    (void)fprintf(stderr, "%s == '%s'\n", ADDRESS_ENVIRON, str);
   
   str = (char *)getenv(INTERVAL_ENVIRON);
   if (str == NULL)
-    (void)fprintf(stderr, "%s not set;\n", INTERVAL_ENVIRON);
+    (void)fprintf(stderr, "%s not set\n", INTERVAL_ENVIRON);
   else {
     num = atoi(str);
-    (void)fprintf(stderr, "%s == '%d';\n", INTERVAL_ENVIRON, num);
+    (void)fprintf(stderr, "%s == '%d'\n", INTERVAL_ENVIRON, num);
   }
   
   str = (char *)getenv(LOGFILE_ENVIRON);
   if (str == NULL)
-    (void)fprintf(stderr, "%s not set;\n", LOGFILE_ENVIRON);
+    (void)fprintf(stderr, "%s not set\n", LOGFILE_ENVIRON);
   else
-    (void)fprintf(stderr, "%s == '%s';\n", LOGFILE_ENVIRON, str);
+    (void)fprintf(stderr, "%s == '%s'\n", LOGFILE_ENVIRON, str);
   
   str = (char *)getenv(START_ENVIRON);
   if (str == NULL)
-    (void)fprintf(stderr, "%s not set;\n", START_ENVIRON);
+    (void)fprintf(stderr, "%s not set\n", START_ENVIRON);
   else
-    (void)fprintf(stderr, "%s == '%s';\n", START_ENVIRON, str);
+    (void)fprintf(stderr, "%s == '%s'\n", START_ENVIRON, str);
 }
 
 /*
  * output the code to set env VAR to VALUE using printf FORMAT
  */
-LOCAL	void	set_variable (char * var, char * format, void * value)
+LOCAL	void	set_variable(char * var, char * format, ...)
 {
-  char	buf[256];
+  char		value[256];
+  va_list	args;
   
-  /* get the value into string format */
-  (void)sprintf(buf, format, value);
+  /* write the format + info into str */
+  va_start(args, format);
+  (void)vsprintf(value, format, args);
+  va_end(args);
   
   if (bourne)
-    (void)printf("%s=%s; export %s;\n", var, buf, var);
+    (void)printf("%s=%s; export %s;\n", var, value, var);
   else
-    (void)printf("setenv %s %s;\n", var, buf);
+    (void)printf("setenv %s %s;\n", var, value);
   
   printed = TRUE;
 }
@@ -441,19 +467,25 @@ EXPORT	int	main(int argc, char ** argv)
   
   process_arguments(argc, argv);
   
-  if (tag != NULL)
-    process();
+  /* get a new debug value from tag */
+  if (tag != NULL) {
+    if (debug != NO_VALUE)
+      (void)fprintf(stderr, "%s: warning -d option ignored, processing tag "
+		    "'%s'\n",
+		    program, tag);
+    debug = process(0, NULL);
+  }
   
-  if (tag != NULL || debug != -1)
-    set_variable(DEBUG_ENVIRON, "%#lx", (void *)debug);
+  if (tag != NULL || debug != NO_VALUE)
+    set_variable(DEBUG_ENVIRON, "%#lx", debug);
   
   if (address != NULL)
     set_variable(ADDRESS_ENVIRON, "%s", address);
   else if (clear)
     unset_variable(ADDRESS_ENVIRON);
   
-  if (interval != -1)
-    set_variable(INTERVAL_ENVIRON, "%d", (void *)interval);
+  if (interval != NO_VALUE)
+    set_variable(INTERVAL_ENVIRON, "%d", interval);
   else if (clear)
     unset_variable(INTERVAL_ENVIRON);
   
@@ -467,7 +499,7 @@ EXPORT	int	main(int argc, char ** argv)
   else if (clear)
     unset_variable(START_ENVIRON);
   
-  if (errno_to_print != (-1)) {
+  if (errno_to_print != NO_VALUE) {
     (void)fprintf(stderr, "%s: malloc_errno value '%d' = \n",
 		  program, errno_to_print);
     (void)fprintf(stderr, "   '%s'\n", malloc_strerror(errno_to_print));

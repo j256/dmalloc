@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.5 1993/03/26 09:16:30 gray Exp $
+ * $Id: compat.h,v 1.6 1993/03/31 00:35:40 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -34,12 +34,16 @@
 /*
  * copy LEN characters from FROM to TO
  */
+#if __GNUC__ < 2
 IMPORT	char	*memcpy(char * to, const char * from, int len);
+#endif
 
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
+#if __GNUC__ < 2
 IMPORT	int	memcmp(const char * str1, const char * str2, int len);
+#endif
 
 /*
  * set LEN characters in STR to character CH

@@ -27,8 +27,6 @@
  * your system does not have them.
  */
 
-#define COMPAT_MAIN
-
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -37,7 +35,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.6 1993/03/26 09:16:28 gray Exp $";
+  "$Id: compat.c,v 1.7 1993/03/31 00:35:38 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0

@@ -27,8 +27,6 @@
  * heap as well as reporting the current position of the heap.
  */
 
-#define HEAP_MAIN
-
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -36,12 +34,12 @@
 #include "compat.h"
 #include "conf.h"
 #include "error.h"
+#include "error_val.h"
 #include "heap.h"
-#include "malloc_err.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.16 1993/03/26 09:16:39 gray Exp $";
+  "$Id: heap.c,v 1.17 1993/03/31 00:35:49 gray Exp $";
 #endif
 
 /* external routines */

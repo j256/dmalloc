@@ -31,8 +31,6 @@
 #include <signal.h>				/* for kill signals */
 #include <stdarg.h>				/* for message vsprintf */
 
-#define ERROR_MAIN
-
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -44,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.16 1993/03/26 09:16:33 gray Exp $";
+  "$Id: error.c,v 1.17 1993/03/31 00:35:45 gray Exp $";
 #endif
 
 /*

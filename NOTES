@@ -1,12 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.11 1993/03/26 09:16:17 gray Exp $
+$Id: NOTES,v 1.12 1993/03/31 00:35:31 gray Exp $
 -------------------------------------------------------------------------------
 
-WARNING:
+WARNINGS:
 
-- watch for heaps growing up or down (all subtraction or other position
-	dependent code must be changed to macros in heap.h) >,<,-,+,etc
-- watch for bounds checking assuming + or - code.
+- do not be surprised if the library catches problems with your
+	system's library routines.  It took me 6 hours once to finally
+	come to the conclusion that the localtime call, included in
+	SunOS release 4.1 (and maybe before/after), was overwriting
+	one of its fence-post markers.
 
 -------------------------------------------------------------------------------
 
@@ -33,6 +35,14 @@ GENERAL:
 	- when you find the free block, find out if it is lower (or higher)
 		than the highest admin block and bcopy the admin block down and
 		redo the pointers
+
+-------------------------------------------------------------------------------
+
+CODING WARNINGS:
+
+- watch for heaps growing up or down (all subtraction or other position
+	dependent code must be changed to macros in heap.h) >,<,-,+,etc
+- watch for bounds checking assuming + or - code.
 
 -------------------------------------------------------------------------------
 

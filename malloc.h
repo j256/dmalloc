@@ -1,5 +1,5 @@
 /*
- * defines for the Malloc module
+ * defines for the malloc-debug library
  *
  * Copyright 1992 by Gray Watson and the Antaire Corporation
  *
@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.16 1993/03/26 09:16:45 gray Exp $
+ * $Id: malloc.h,v 1.17 1993/03/31 00:35:54 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -74,7 +74,7 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 						     (char *)from, size)
 
 /*
- * alloc macros to provide for memory debugging features.
+ * alloc macros to improve memory usage readibility...
  */
 #undef ALLOC
 #undef CALLOC
@@ -82,33 +82,6 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 #undef REALLOC
 #undef REMALLOC
 #undef FREE
-
-#ifndef MALLOC_DEBUG_DISABLE
-
-#define ALLOC(type, count) \
-  (type *)_malloc_leap(__FILE__, __LINE__, \
-		       (unsigned int)(sizeof(type) * (count)))
-
-#define MALLOC(size) \
-  (char *)_malloc_leap(__FILE__, __LINE__, (unsigned int)(size))
-
-/* WARNING: notice that the arguments are REVERSED from normal calloc() */
-#define CALLOC(type, count) \
-  (type *)_calloc_leap(__FILE__, __LINE__, (unsigned int)(count), \
-		       (unsigned int)sizeof(type))
-
-#define REALLOC(ptr, type, count) \
-  (type *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
-			(unsigned int)(sizeof(type) * (count)))
-
-#define REMALLOC(ptr, size) \
-  (char *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
-			(unsigned int)(size))
-
-#define FREE(ptr) \
-  _free_leap(__FILE__, __LINE__, (char *)(ptr))
-
-#else /* MALLOC_DEBUG_DISABLE */
 
 #define ALLOC(type, count) \
   (type *)malloc((unsigned int)(sizeof(type) * (count)))
@@ -128,8 +101,6 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 
 #define FREE(ptr) \
   free((char *)(ptr))
-
-#endif /* MALLOC_DEBUG_DISABLE */
 
 /*
  * some small allocation macros
@@ -268,5 +239,55 @@ IMPORT	int	malloc_examine(char * pnt, unsigned int * size,
 IMPORT	char	*malloc_strerror(int errnum);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
+
+/*
+ * alloc macros to provide for memory FILE/LINE debugging information.
+ */
+
+#ifndef MALLOC_DEBUG_DISABLE
+
+#define malloc(size) \
+  _malloc_leap(__FILE__, __LINE__, size)
+#define calloc(count, size) \
+  _calloc_leap(__FILE__, __LINE__, count, size)
+#define realloc(ptr, size) \
+  _realloc_leap(__FILE__, __LINE__, ptr, size)
+#define free(ptr) \
+  _free_leap(__FILE__, __LINE__, ptr)
+
+/*
+ * copied directly from malloc_lp.h
+ */
+
+/* to inform the malloc-debug library from which file the call comes from */
+IMPORT	char		*_malloc_file;
+
+/* to inform the library from which line-number the call comes from */
+IMPORT	unsigned int	_malloc_line;
+
+/*
+ * leap routine to calloc
+ */
+IMPORT	char	*_calloc_leap(const char * file, const int line,
+			      unsigned int elen, unsigned int size);
+
+/*
+ * leap routine to free
+ */
+IMPORT	int	_free_leap(const char * file, const int line, char * pnt);
+
+/*
+ * leap routine to malloc
+ */
+IMPORT	char	*_malloc_leap(const char * file, const int line,
+			      unsigned int size);
+
+/*
+ * leap routine to realloc
+ */
+IMPORT	char	*_realloc_leap(const char * file, const int line, char * oldp,
+			       unsigned int new_size);
+
+#endif /* MALLOC_DEBUG_DISABLE */
 
 #endif /* ! __MALLOC_H__ */

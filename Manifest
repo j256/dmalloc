@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.11 1992/12/22 04:55:20 gray Exp $
+$Id: Manifest,v 1.12 1993/03/31 00:35:29 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -73,6 +73,8 @@ malloc_loc.h		Local defines for all of the malloc routines.
 
 malloc_lp.[ch]		Leap-frog routines to provide file/line info
 			to lib.
+
+malloc_str.[ch]		Malloc string routines for string testing.
 
 malloc_t.c		Meager test program for testing the malloc
 			routines.

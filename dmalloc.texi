@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.7 1993/02/12 04:50:12 gray Exp $
+@c $Id: dmalloc.texi,v 1.8 1993/03/31 00:35:57 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -404,10 +404,15 @@ around this area is recommended.
 The library can be configured to quit immediately when an error is
 detected and to dump a core-image file.  This is especially useful when
 using a debugger.  When running our programs in gdb (the
-@emph{excellent} GNU debugger), I always put a break-point in
-@code{_malloc_perror()} which is the internal error routine for the
-library.  The program will then hit the break-point as soon as a memory
-problem is detected.
+@emph{excellent} GNU debugger), I always put break-points in
+@code{_malloc_perror()} and @code{_malloc_die()} which is the
+internal error routine for the library.  The program will then hit the
+break-point as soon as a memory problem is detected.
+
+Other malloc-debug libraries also support the ability to dump core and
+then continue.  I decided not to support this once it was determined
+that some versions of fork make calls to malloc making the library go
+recursive.
 
 @emph{NOTE}: do not be surprised if the library catches problems with
 your system's library routines.  It took me 6 hours once to finally come
@@ -561,6 +566,17 @@ file:line).
 
 @end table
 
+If no arguments are specified, malloc_dbg dumps out the current settings
+that you have for the malloc environmental variables.
+
+@example
+        MALLOC_DEBUG == '0x6417' (debug1);
+        MALLOC_ADDRESS == '0';
+        MALLOC_INTERVAL not set;
+        MALLOC_LOGFILE == 'malloc';
+        MALLOC_START not set;
+@end example
+
 @node RC file, Debug tokens, malloc_dbg program, Features
 @section Format of the Run-Time Configuration File.
 
@@ -583,19 +599,22 @@ with empty lines.
 I have the below contents in my @file{.mallocrc} file:
 
 @example
-# # Malloc run-time configuration file for our malloc-debug library #
+#
+# Malloc run-time configuration file for our malloc-debug library
+#
 
-# no debugging none	none
+# no debugging
+none    none
 
-# basic debugging debug1	log-stats, log-non-free, log-perror,
-log-bad-pnt, check-fence
+# basic debugging
+debug1	log-stats, log-non-free, log-perror, log-bad-pnt, check-fence
 
-# more logging and some heap checking debug2	log-stats, log-non-free,
-log-perror, log-trans, log-bad-pnt, \
+# more logging and some heap checking
+debug2	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 	check-fence, check-heap, check-lists, error-abort
 
-# good utilities debug3	log-stats, log-non-free, log-perror, log-trans,
-log-bad-pnt, \
+# good utilities
+debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 	log-admin, check-fence, check-heap, check-lists, realloc-copy, \
 	free-blank, error-abort
 

@@ -29,8 +29,6 @@
 
 #include <stdio.h>				/* for stdin */
 
-#define MALLOC_T_MAIN
-
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -39,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.11 1993/03/26 09:16:55 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.12 1993/03/31 00:36:04 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
