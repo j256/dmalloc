@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.79 1998/11/09 19:36:25 gray Exp $
+$Id: NEWS,v 1.80 1998/11/10 20:28:08 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 4.1.0:
 
+	* Added -g (-gdb) flag to dmalloc along with gdb script.
+	* Added missing delete[] function to the C++ code.
 	* Moved some settings from chunk_loc.h into settings.dist.
 	* Improved the handling of free(NULL) and malloc(0) settings.
 	* Added initial memalign support with a first-time error message.

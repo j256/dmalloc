@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.112 1998/10/21 22:58:36 gray Exp $
+# $Id: Makefile.in,v 1.113 1998/11/10 20:28:07 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -48,8 +48,9 @@ FLS	=  conf.h.in configure.in config.help \
 	install-sh mkinstalldirs Deansify.pl \
 	configure
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
-	contrib/atexit.c contrib/dec_notes contrib/dmalloc_summarize.pl \
-	contrib/next_notes contrib/ra_info.pl contrib/stratus_ftx_notes
+	contrib/atexit.c contrib/dec_notes contrib/dmalloc.gdb \
+	contrib/dmalloc_summarize.pl contrib/next_notes contrib/ra_info.pl \
+	contrib/stratus_ftx_notes
 
 DOCFLS	= dmalloc.ps texinfo.tex
 
