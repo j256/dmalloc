@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.92 1997/01/16 22:31:53 gray Exp $
+# $Id: Makefile.in,v 1.93 1997/01/17 20:28:44 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -69,7 +69,7 @@ installincs :: $(HFLS)
 installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
-	install -cev -m 444 $(srcdir)/$(INFOFILE) $(DESTDIR)/info
+	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
 
 install :: installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
@@ -162,22 +162,22 @@ dmalloc.dvi : dmalloc.texi
 	( cd work ; texi2dvi ../dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
-INSTALL : $(srcdir)/INSTALL.1 $(srcdir)/$(INFOFILE)
+INSTALL : $(srcdir)/INSTALL.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	cp $(srcdir)/INSTALL.1 $(.TARGET).t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
-		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Node: Details/,$$d' \
-		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-PERMISSIONS : $(srcdir)/$(INFOFILE)
+PERMISSIONS : $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
@@ -185,30 +185,30 @@ PERMISSIONS : $(srcdir)/$(INFOFILE)
 		-e '/,  Node: Overview/,$$d' \
 		-e '/^\* Menu/,/^File: $(INFOFILE)/d' \
 		-e '/^File: $(INFOFILE)/d' < \
-		$(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-README : $(srcdir)/README.1 $(srcdir)/$(INFOFILE)
+README : $(srcdir)/README.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
-		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	cat $(srcdir)/README.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-README_ftp : $(srcdir)/README_ftp.1 $(srcdir)/$(INFOFILE)
+README_ftp : $(srcdir)/README_ftp.1 $(INFOFILE)
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
@@ -216,7 +216,7 @@ README_ftp : $(srcdir)/README_ftp.1 $(srcdir)/$(INFOFILE)
 	cat $(srcdir)/README_ftp.1 >> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)
 
-$(INFOFILE) : dmalloc.texi
+$(INFOFILE) : $(srcdir)/dmalloc.texi
 	rm -f $(.TARGET)
 	makeinfo --no-split $(.OODATE)
 
