@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.10 1994/09/26 16:20:08 gray Exp $
+ * $Id: debug_tok.h,v 1.11 1994/10/14 01:59:32 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -70,6 +70,8 @@ LOCAL	attr_t		attributes[] = {
   { "check-lists",	"cli",	DEBUG_CHECK_LISTS,
       "check free lists" },
   { "check-free",	"cfr",	DEBUG_CHECK_BLANK,
+      "please use and see check-blank" },
+  { "check-blank",	"cbl",	DEBUG_CHECK_BLANK,
       "check blanked memory" },
   { "check-funcs",	"cfu",	DEBUG_CHECK_FUNCS,
       "check functions" },
