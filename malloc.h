@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.30 2000/04/18 01:53:58 gray Exp $
+ * $Id: malloc.h,v 1.31 2000/05/15 22:30:11 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -193,10 +193,40 @@ extern
 int	_dmalloc_debug_current(void);
 
 /*
- * examine pointer PNT and returns SIZE, and FILE / LINE info on it,
- * or return-address RET_ADDR if any of the pointers are not 0L.
- * if FILE returns 0L then RET_ATTR may have a value and vice versa.
- * returns NOERROR or ERROR depending on whether PNT is good or not
+ * int _dmalloc_examine
+ *
+ * DESCRIPTION:
+ *
+ * Examine a pointer and return information on its allocation size as
+ * well as the file and line-number where it was allocated.  If the
+ * file and line number is not available, then it will return the
+ * allocation location's return-address if available.
+ *
+ * RETURNS:
+ *
+ * Success - DMALLOC_NOERROR
+ *
+ * Failure - DMALLOC_ERROR
+ *
+ * ARGUMENTS:
+ *
+ * file -> File were we are examining the pointer.
+ *
+ * line -> Line-number from where we are examining the pointer.
+ *
+ * pnt -> Pointer we are checking.
+ *
+ * size_p <- Pointer to an unsigned int which, if not NULL, will be
+ * set to the size of bytes from the pointer.
+ *
+ * file_p <- Pointer to a character pointer which, if not NULL, will
+ * be set to the file where the pointer was allocated.
+ *
+ * line_p <- Pointer to a character pointer which, if not NULL, will
+ * be set to the line-number where the pointer was allocated.
+ *
+ * ret_attr_p <- Pointer to a void pointer, if not NULL, will be set
+ * to the return-address where the pointer was allocated.
  */
 extern
 int	_dmalloc_examine(const char *file, const int line,

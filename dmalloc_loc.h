@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_loc.h,v 1.44 2000/03/21 18:19:11 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.45 2000/05/15 22:25:26 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -37,27 +37,12 @@
 #define DMALLOC_HOME		"http://dmalloc.com/"
 
 /*
- * standard int return codes
- */
-#undef	ERROR
-#define	ERROR		(-1)
-
-#undef	NOERROR
-#define	NOERROR		0
-
-/*
  * generic constants
  */
 /* special consideration for NULL.  some compilers bitch if I redefine it */
 #ifndef NULL
 #define NULL		0L
 #endif
-
-#undef	FALSE
-#define FALSE		0
-
-#undef	TRUE
-#define TRUE		(! FALSE)
 
 /*
  * standard i/o file descriptors

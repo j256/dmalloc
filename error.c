@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.92 2000/03/21 18:19:13 gray Exp $
+ * $Id: error.c,v 1.93 2000/05/15 22:22:49 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.92 2000/03/21 18:19:13 gray Exp $";
+#ident "$Id: error.c,v 1.93 2000/05/15 22:22:49 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.92 2000/03/21 18:19:13 gray Exp $";
+  "$Id: error.c,v 1.93 2000/05/15 22:22:49 gray Exp $";
 #endif
 #endif
 
@@ -123,7 +123,7 @@ TIME_TYPE	_dmalloc_start = 0;
 #endif
 
 /* global flag which indicates when we are aborting */
-int		_dmalloc_aborting_b = FALSE;
+int		_dmalloc_aborting_b = 0;
 
 /* local variables */
 static int	outfile_fd = -1;		/* output file descriptor */
@@ -385,7 +385,7 @@ void	_dmalloc_die(const int silent_b)
    * set this in case the following generates a recursive call for
    * some dumb reason
    */
-  _dmalloc_aborting_b = TRUE;
+  _dmalloc_aborting_b = 1;
   
   /* do I need to drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)
@@ -427,14 +427,14 @@ void	dmalloc_error(const char *func)
   
   /* do I need to abort? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)) {
-    _dmalloc_die(FALSE);
+    _dmalloc_die(0);
   }
   
 #if HAVE_FORK
   /* how about just drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
     if (fork() == 0) {
-      _dmalloc_die(TRUE);
+      _dmalloc_die(1);
     }
   }
 #endif

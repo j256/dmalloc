@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.145 2000/05/15 15:43:22 gray Exp $
+ * $Id: malloc.c,v 1.146 2000/05/15 22:25:14 gray Exp $
  */
 
 /*
@@ -80,18 +80,18 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.145 2000/05/15 15:43:22 gray Exp $";
+#ident "$Id: malloc.c,v 1.146 2000/05/15 22:25:14 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.145 2000/05/15 15:43:22 gray Exp $";
+  "$Id: malloc.c,v 1.146 2000/05/15 22:25:14 gray Exp $";
 #endif
 #endif
 
 /* local variables */
-static	int		enabled_b = FALSE;	/* have we started yet? */
-static	int		in_alloc_b = FALSE;	/* can't be here twice */
-static	int		do_shutdown_b = FALSE;	/* execute shutdown soon */
-static	int		memalign_warn_b = FALSE; /* memalign warning printed?*/
+static	int		enabled_b = 0;		/* have we started yet? */
+static	int		in_alloc_b = 0;		/* can't be here twice */
+static	int		do_shutdown_b = 0;	/* execute shutdown soon */
+static	int		memalign_warn_b = 0;	 /* memalign warning printed?*/
 static	dmalloc_track_t	tracking_func = NULL;	/* memory trxn tracking func */
 
 /* debug variables */
@@ -286,7 +286,7 @@ static	RETSIGTYPE	signal_handler(const int sig)
   _dmalloc_message("caught signal %d", sig);
   /* if we are already inside malloc then do the shutdown later */
   if (in_alloc_b) {
-    do_shutdown_b = TRUE;
+    do_shutdown_b = 1;
   }
   else {
     _dmalloc_shutdown();
@@ -303,7 +303,7 @@ static	int	dmalloc_startup(void)
   
   /* have we started already? */
   if (enabled_b) {
-    return ERROR;
+    return 0;
   }
   
   if (! some_up_b) {
@@ -322,13 +322,13 @@ static	int	dmalloc_startup(void)
     process_environ();
     
     /* startup heap code */
-    if (_heap_startup() == ERROR) {
-      return ERROR;
+    if (! _heap_startup()) {
+      return 0;
     }
     
     /* startup the chunk lower-level code */
-    if (_chunk_startup() == ERROR) {
-      return ERROR;
+    if (! _chunk_startup()) {
+      return 0;
     }
     
     /* set leap variables */
@@ -354,7 +354,7 @@ static	int	dmalloc_startup(void)
   
 #if LOCK_THREADS
   if (thread_lock_c > 0) {
-    return NOERROR;
+    return 1;
   }
 #endif
   
@@ -406,7 +406,7 @@ static	int	dmalloc_startup(void)
   }
 #endif /* SIGNAL_OKAY */
   
-  return NOERROR;
+  return 1;
 }
 
 /*
@@ -438,7 +438,7 @@ void	_dmalloc_shutdown(void)
     return;
   }
   
-  in_alloc_b = TRUE;
+  in_alloc_b = 1;
   
   /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)) {
@@ -486,7 +486,7 @@ void	_dmalloc_shutdown(void)
 #endif
 #endif
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -515,7 +515,7 @@ void	__fini_dmalloc()
 static	int	check_debug_vars(const char *file, const int line)
 {
   if (_dmalloc_aborting_b) {
-    return ERROR;
+    return 0;
   }
   
   /*
@@ -524,8 +524,8 @@ static	int	check_debug_vars(const char *file, const int line)
    * the THREAD_LOCK will flip.
    */
   if (! enabled_b) {
-    if (dmalloc_startup() != NOERROR) {
-      return ERROR;
+    if (! dmalloc_startup()) {
+      return 0;
     }
   }
   
@@ -537,11 +537,11 @@ static	int	check_debug_vars(const char *file, const int line)
     dmalloc_errno = ERROR_IN_TWICE;
     dmalloc_error("check_debug_vars");
     /* NOTE: dmalloc_error may die already */
-    _dmalloc_die(FALSE);
+    _dmalloc_die(0);
     /*NOTREACHED*/
   }
   
-  in_alloc_b = TRUE;
+  in_alloc_b = 1;
   
   /* check start file/line specifications */
   if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
@@ -575,7 +575,7 @@ static	int	check_debug_vars(const char *file, const int line)
     (void)_chunk_check();
   }
   
-  return NOERROR;
+  return 1;
 }
 
 /******************************* memory calls ********************************/
@@ -603,7 +603,7 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
   }
 #endif
   
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     if (tracking_func != NULL) {
       tracking_func(file, line, func_id, size, alignment, NULL, NULL);
     }
@@ -632,7 +632,7 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
   }
   
   new_p = _chunk_malloc(file, line, size, func_id, align);
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
   check_pnt(file, line, new_p, "malloc");
   
@@ -676,7 +676,7 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
   }
 #endif
   
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     if (tracking_func != NULL) {
       tracking_func(file, line, func_id, new_size, 0, old_pnt, NULL);
     }
@@ -713,7 +713,7 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
 #endif
       new_p = _chunk_realloc(file, line, old_pnt, new_size, func_id);
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
   if (new_p != NULL) {
     check_pnt(file, line, new_p, "realloc-out");
@@ -741,7 +741,7 @@ int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt)
 {
   int		ret;
   
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     if (tracking_func != NULL) {
       tracking_func(file, line, DMALLOC_FUNC_FREE, 0, 0, pnt, NULL);
     }
@@ -752,7 +752,7 @@ int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt)
   
   ret = _chunk_free(file, line, pnt, 0);
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -935,13 +935,13 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 void	_dmalloc_log_heap_map(const char *file, const int line)
 {
   /* check the heap since we are dumping info from it */
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     return;
   }
   
   _chunk_log_heap_map();
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -958,14 +958,14 @@ void	_dmalloc_log_heap_map(const char *file, const int line)
  */
 void	_dmalloc_log_stats(const char *file, const int line)
 {
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     return;
   }
   
   _chunk_list_count();
   _chunk_stats();
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -982,7 +982,7 @@ void	_dmalloc_log_stats(const char *file, const int line)
  */
 void	_dmalloc_log_unfreed(const char *file, const int line)
 {
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     return;
   }
   
@@ -1002,7 +1002,7 @@ void	_dmalloc_log_unfreed(const char *file, const int line)
 #endif
 		     );
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -1025,7 +1025,7 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
   /* should not check heap here because we will be doing it below */
   
   if (_dmalloc_aborting_b) {
-    return DMALLOC_VERIFY_ERROR;
+    return DMALLOC_ERROR;
   }
   
 #if LOCK_THREADS
@@ -1036,11 +1036,11 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
     dmalloc_errno = ERROR_IN_TWICE;
     dmalloc_error("dmalloc_verify");
     /* NOTE: dmalloc_error may die already */
-    _dmalloc_die(FALSE);
+    _dmalloc_die(0);
     /*NOTREACHED*/
   }
   
-  in_alloc_b = TRUE;
+  in_alloc_b = 1;
   
   if (pnt == NULL) {
     ret = _chunk_check();
@@ -1049,7 +1049,7 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
     ret = _chunk_pnt_check("dmalloc_verify", pnt, CHUNK_PNT_EXACT, 0);
   }
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -1059,11 +1059,11 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
     _dmalloc_shutdown();
   }
   
-  if (ret == NOERROR) {
-    return DMALLOC_VERIFY_NOERROR;
+  if (ret) {
+    return DMALLOC_NOERROR;
   }
   else {
-    return DMALLOC_VERIFY_ERROR;
+    return DMALLOC_ERROR;
   }
 }
 
@@ -1094,10 +1094,40 @@ int	_dmalloc_debug_current(void)
 }
 
 /*
- * examine pointer PNT and returns SIZE, and FILE / LINE info on it,
- * or return-address RET_ADDR if any of the pointers are not 0L.
- * if FILE returns 0L then RET_ATTR may have a value and vice versa.
- * returns NOERROR or ERROR depending on whether PNT is good or not
+ * int _dmalloc_examine
+ *
+ * DESCRIPTION:
+ *
+ * Examine a pointer and return information on its allocation size as
+ * well as the file and line-number where it was allocated.  If the
+ * file and line number is not available, then it will return the
+ * allocation location's return-address if available.
+ *
+ * RETURNS:
+ *
+ * Success - DMALLOC_NOERROR
+ *
+ * Failure - DMALLOC_ERROR
+ *
+ * ARGUMENTS:
+ *
+ * file -> File were we are examining the pointer.
+ *
+ * line -> Line-number from where we are examining the pointer.
+ *
+ * pnt -> Pointer we are checking.
+ *
+ * size_p <- Pointer to an unsigned int which, if not NULL, will be
+ * set to the size of bytes from the pointer.
+ *
+ * file_p <- Pointer to a character pointer which, if not NULL, will
+ * be set to the file where the pointer was allocated.
+ *
+ * line_p <- Pointer to a character pointer which, if not NULL, will
+ * be set to the line-number where the pointer was allocated.
+ *
+ * ret_attr_p <- Pointer to a void pointer, if not NULL, will be set
+ * to the return-address where the pointer was allocated.
  */
 int	_dmalloc_examine(const char *file, const int line,
 			 const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
@@ -1108,14 +1138,14 @@ int	_dmalloc_examine(const char *file, const int line,
   unsigned int	size_map;
   
   /* need to check the heap here since we are geting info from it below */
-  if (check_debug_vars(file, line) != NOERROR) {
-    return ERROR;
+  if (! check_debug_vars(file, line)) {
+    return DMALLOC_ERROR;
   }
   
   /* NOTE: we do not need the alloc-size info */
-  ret = _chunk_read_info(pnt, &size_map, NULL, file_p, line_p, ret_attr_p,
-			 "dmalloc_examine", NULL, NULL);
-  in_alloc_b = FALSE;
+  ret = _chunk_read_info(pnt, "dmalloc_examine", &size_map, NULL, file_p,
+			 line_p, ret_attr_p, NULL, NULL);
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();
@@ -1125,14 +1155,14 @@ int	_dmalloc_examine(const char *file, const int line,
     _dmalloc_shutdown();
   }
   
-  if (ret == NOERROR) {
+  if (ret) {
     if (size_p != NULL) {
       *size_p = size_map;
     }
-    return NOERROR;
+    return DMALLOC_NOERROR;
   }
   else {
-    return ERROR;
+    return DMALLOC_ERROR;
   }
 }
 
@@ -1167,13 +1197,13 @@ void	_dmalloc_log_changed(const char *file, const int line,
 			     const unsigned long mark, const int not_freed_b,
 			     const int free_b, const int details_b)
 {
-  if (check_debug_vars(file, line) != NOERROR) {
+  if (! check_debug_vars(file, line)) {
     return;
   }
   
   _chunk_log_changed(mark, not_freed_b, free_b, details_b);
   
-  in_alloc_b = FALSE;
+  in_alloc_b = 0;
   
 #if LOCK_THREADS
   unlock_thread();

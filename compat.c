@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.49 2000/04/18 01:55:55 gray Exp $
+ * $Id: compat.c,v 1.50 2000/05/15 22:23:12 gray Exp $
  */
 
 /*
@@ -42,10 +42,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.49 2000/04/18 01:55:55 gray Exp $";
+#ident "$Id: compat.c,v 1.50 2000/05/15 22:23:12 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.49 2000/04/18 01:55:55 gray Exp $";
+  "$Id: compat.c,v 1.50 2000/05/15 22:23:12 gray Exp $";
 #endif
 #endif
 
@@ -296,12 +296,12 @@ char	*strcpy(char *str1, const char *str2)
  */
 char	*strncpy(char *str1, const char *str2, const int len)
 {
-  char		*str1_p, null_reached_b = FALSE;
+  char		*str1_p, null_reached_b = 0;
   int		len_c;
   
   for (len_c = 0, str1_p = str1; len_c < len; len_c++, str1_p++, str2++) {
     if (null_reached || *str2 == '\0') {
-      null_reached = TRUE;
+      null_reached = 1;
       *str1_p = '\0';
     }
     else {
