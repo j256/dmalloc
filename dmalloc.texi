@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.209 2001/11/30 16:04:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.210 2002/02/14 22:27:13 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -100,9 +100,9 @@ statistics.
 
 The library is reasonably portable having been run successfully on at
 least the following operating systems: AIX, BSD/OS, DG/UX,
-Free/Net/OpenBSD, HPUX, Irix, Linux, MS-DOG, NeXT, OSF, SCO, Solaris,
-SunOS, Ultrix, Unixware, Windoze, and even Unicos on a Cray T3E.  It
-also provides support for the debugging of threaded programs.
+Free/Net/OpenBSD, GNU/Hurd, HPUX, Irix, Linux, MS-DOG, NeXT, OSF, SCO,
+Solaris, SunOS, Ultrix, Unixware, Windoze, and even Unicos on a Cray
+T3E.  It also provides support for the debugging of threaded programs.
 @xref{Using With Threads}.
 
 The package includes the library, configuration scripts, debug utility
@@ -267,10 +267,7 @@ appreciated.
 @cindex testing the library
 @cindex dmalloc_t test program
 
-@item Typing @kbd{make tests} should build the @file{dmalloc_t} test
-program.
-
-@item Typing @kbd{make light} should run the @file{dmalloc_t} test
+@item Typing @kbd{make light} should build and run the @file{dmalloc_t} test
 program through a set of light trials.  By default this will execute
 @file{dmalloc_t} 5 times -- each time will execute 10,000 malloc
 operations in a very random manner.  Anal folks can type @kbd{make
@@ -885,6 +882,7 @@ system version/type, and the version of Dmalloc you are using.
 * Disabling the Library::       How to disable the library.
 * Using With a Debugger::       Using a debugger with the library.
 * Using With Threads::          Using the library with a thread package.
+* Debugging A Daemon::          Debugging allocations in a daemon process.
 @end menu
 
 @node Allocation Macros, Return Address, Programming, Programming
@@ -1558,7 +1556,7 @@ interval setting to a low number, you should be able to locate
 approximately when this problem happened.  @xref{Debug Tokens},
 @xref{Dmalloc Program}.
 
-@node Using With Threads, , Using With a Debugger, Programming
+@node Using With Threads, Debugging A Daemon, Using With a Debugger, Programming
 @section Using the Library with a Thread Package
 
 @cindex threads
@@ -1641,6 +1639,69 @@ about recursion.
 If you have any specific questions or would like addition information
 posted in this section, please let me know.  Experienced thread
 programmers only please.
+
+@node Debugging A Daemon,, Using With Threads, Programming
+@section Debugging Allocations in a Daemon Process
+
+@cindex daemon process debugging
+@cindex debugging daemon processes
+@cindex server process debugging
+@cindex debugging server processes
+@cindex cgi-bin process debugging
+@cindex debugging cgi-bin processes
+@cindex child process debugging
+@cindex debugging child processes
+
+There are some specified challenges when trying to debug allocations in
+processes which do not startup, run, and then shutdown.  Daemon
+processes are those that are spawned (often at system boot time) and run
+perpetually.  Other processes which are difficult to debug are CGI
+programs which are spawned by web servers or when you want to start
+debugging inside of a child process.
+
+The first issue is how to enable the library's flags to perform certain
+checks.  Since these programs often do not run from the command line,
+you cannot use the dmalloc utility program and modify the process
+environment.  @xref{Dmalloc Program}.  The library provides a couple of
+functions to set the debugging flags when a program is running.  The
+@code{dmalloc_debug} function allows you to set the library flags
+directly.  For example, if @code{dmalloc -v} shows that the debug flags
+you want are @code{0x4f47d03} then you can pass this number to the
+@code{dmalloc_debug} function and get the same library behavior if you'd
+have used the environmental variable.
+
+In version 5 and above of the library, you can also use the
+@code{dmalloc_debug_setup} function which takes a string in the same
+format of the @samp{DMALLOC_OPTIONS}.  @xref{Environment Variable}.  So,
+for example, if you want to turn on high debugging and log to the file
+@file{malloc} then you would call
+@code{dmalloc_debug_setup("debug=0x4f47d03,log=malloc");}.  Even if you
+get the settings enabled, you may have problems getting the logfile to
+be written if your program is running as @samp{nobody} or another user
+without permissions for security reasons.  In this case you should
+specify a full path to your malloc logfile in a world writable directory
+(ex. @file{/var/tmp/malloc}).  Watch for programs which change into
+other directories and which may cause logfiles specified as relative or
+local paths to be dropped in other locations.  You may always want to
+use a full path logfile.
+
+Once you have your settings being enabled and your log is being
+generated, you may now want to check out how your process is doing in
+terms of unfreed memory.  Since it is not shutting down, the automatic
+unfreed log entries are not being dropped to the logfile.  By using the
+@code{dmalloc_mark} and @code{dmalloc_log_changed} functions, you can
+set a mark point at a certain place inside of your program, and then
+later see whether there are any unfreed pointers since the mark.
+Usually you would set the mark after the initializations are complete
+and before the transactions are processed.  Then for each transaction
+you can use @code{dmalloc_log_changed} to show the unfreed memory.
+@xref{Extensions}.
+
+You can also use the @code{dmalloc_log_stats} and
+@code{dmalloc_log_heap_map} functions to dump general information about
+the geap.  Also, remember that you can use the @code{dmalloc_message}
+and @code{dmalloc_vmessage} routines to annotate the dmalloc logfile
+with details to help you debug memory problems.  @xref{Extensions}.
 
 @node Dmalloc Program, Source Code, Programming, Top
 @chapter Dmalloc Utility Program
