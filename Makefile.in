@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.83 1995/07/03 23:57:28 gray Exp $
+# $Id: Makefile.in,v 1.84 1995/09/02 19:33:54 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -36,7 +36,7 @@ FLS	=  conf.h.in configure configure.in config.help \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
-	dmalloc_t.c return.h settings.h version.h \
+	dmalloc_t.c return.h settings.dist version.h \
 	argv.[ch] argv_loc.h dmalloc.cc \
 	dmalloc.texi dmalloc.info \
 	install.sh mkinstalldirs Deansify.pl
@@ -58,7 +58,7 @@ clean ::
 
 distclean :: clean
 	rm -f configure config.status config.log config.cache conf.h
-	rm -f Makefile dmalloc.h.2 dmalloc.ps dmalloc.dvi
+	rm -f Makefile dmalloc.h.2 dmalloc.ps dmalloc.dvi settings.h
 	rm -rf port
 
 installincs :: $(HFLS)
@@ -80,6 +80,9 @@ installftp :: README_ftp $(DOCS)
 
 # put situation specific lines here
 dmalloc.h.2 : configure
+	$(SHELL) configure -v
+
+settings.h : settings.dist configure
 	$(SHELL) configure -v
 
 dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
@@ -216,10 +219,10 @@ dmalloc.info : dmalloc.texi
 
 shar :: $(FLS) $(CFGFLS)
 	rm -f part.?? part.t Makefile.in.bak
-	mv -i Makefile.in Makefile.in.bak
+	mv Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
-	makekit -n part. -s${SHARSIZE} -t \
-		"Do a 'sh ./configure' to configure the library" \
+	makekit -n part. -s ${SHARSIZE} \
+		-t "Do a 'sh ./configure' to configure the library" \
 		$(FLS) Makefile.in $(CFGFLS)
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
