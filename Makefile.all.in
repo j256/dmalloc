@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.17 1993/07/13 05:54:16 gray Exp $
+# $Id: Makefile.all.in,v 1.18 1993/07/22 21:38:10 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -15,9 +15,12 @@ infodir = $(prefix)/info
 # default c-compiler
 CC = @CC@
 
+# argv subdirectory
+ARGV = argv
+
 DEFS =
-INCS = -I$(srcdir) -I$(srcdir)/argv
-LIBS = @LIBS@ -L$(srcdir) -L$(srcdir)/argv -largv -lmalloc_dbg
+INCS = -I$(srcdir) -I$(srcdir)/$(ARGV)
+LIBS = @LIBS@ -L$(srcdir) -L$(srcdir)/$(ARGV) -l$(ARGV) -lmalloc_dbg
 
 LIBRARY	= libmalloc_dbg.a
 UTIL = malloc_dbg
@@ -83,10 +86,13 @@ $(LIBRARY) : $(OBJS)
 	@RANLIB@ $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(LIBRARY)
+$(UTIL) : malloc_dbg.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
+
+$(ARGV)/lib$(ARGV).a :
+	( cd $(ARGV) ; $(MAKE) )
 
 # .PHONY : tests
 tests : $(TEST)

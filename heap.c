@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.24 1993/07/19 16:31:48 gray Exp $";
+  "$Id: heap.c,v 1.25 1993/07/22 21:38:24 gray Exp $";
 #endif
 
 /* external routines */
@@ -66,7 +66,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
   ret = sbrk(size);
   if (ret == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
-    _malloc_perror("_heap_alloc");
+    _malloc_error("_heap_alloc");
     ret = HEAP_ALLOC_ERROR;
   }
 #endif
@@ -87,7 +87,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
     /* did someone else extend the heap in our absence.  VERY BAD! */
     if (ret != _heap_last) {
       malloc_errno = MALLOC_ALLOC_NONLINEAR;
-      _malloc_perror("_heap_alloc");
+      _malloc_error("_heap_alloc");
       ret = HEAP_ALLOC_ERROR;
     }
     else {
@@ -111,7 +111,7 @@ EXPORT	void	*_heap_end(void)
   ret = sbrk(0);
   if (ret == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
-    _malloc_perror("_heap_end");
+    _malloc_error("_heap_end");
     if (BIT_IS_SET(_malloc_debug, DEBUG_CATCH_NULL)) {
       char	str[128];
       (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not find the end of the heap\r\n");

@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.32 1993/07/20 05:53:43 gray Exp $";
+  "$Id: malloc.c,v 1.33 1993/07/22 21:38:26 gray Exp $";
 #endif
 
 /*
@@ -55,7 +55,7 @@ LOCAL	char	*rcs_id =
 EXPORT	char		*malloc_logpath	= NULL;
 /* internal malloc error number for reference purposes only */
 EXPORT	int		malloc_errno = 0;
-/* address to look for.  when discovered call _malloc_perror() */
+/* address to look for.  when discovered call _malloc_error() */
 #if __STDC__
 EXPORT	void		*malloc_address	= NULL;
 #else
@@ -118,8 +118,8 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   
   if (in_alloc) {
     malloc_errno = MALLOC_IN_TWICE;
-    _malloc_perror("check_debug_vars");
-    /* malloc_perror may die already */
+    _malloc_error("check_debug_vars");
+    /* malloc_error may die already */
     _malloc_die();
     /*NOTREACHED*/
   }
@@ -177,7 +177,7 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt)
     _malloc_message("found address '%#lx' after %d pass%s from '%s:%u'",
 		    pnt, addc, (addc == 1 ? "" : "es"), file, line);
   malloc_errno = MALLOC_POINTER_FOUND;
-  _malloc_perror("check_pnt");
+  _malloc_error("check_pnt");
 }
 
 /*
@@ -485,7 +485,7 @@ EXPORT	int	malloc_examine(void * pnt, MALLOC_SIZE * size,
  */
 EXPORT	char	*malloc_strerror(int errnum)
 {
-  /* should not check_debug_vars here because _malloc_perror calls this */
+  /* should not check_debug_vars here because _malloc_error calls this */
   
   if (! IS_MALLOC_ERRNO(errnum))
     return malloc_errlist[MALLOC_BAD_ERRNO];

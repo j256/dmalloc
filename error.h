@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: error.h,v 1.9 1993/04/30 20:02:34 gray Exp $
+ * $Id: error.h,v 1.10 1993/07/22 21:38:21 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -48,7 +48,7 @@ IMPORT	void	_malloc_die(void);
 /*
  * malloc version of perror of an error in STR
  */
-IMPORT	void	_malloc_perror(const char * func);
+IMPORT	void	_malloc_error(const char * func);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
