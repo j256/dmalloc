@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.60 1994/04/07 20:06:40 gray Exp $";
+  "$Id: malloc.c,v 1.61 1994/04/08 17:51:03 gray Exp $";
 #endif
 
 /*
@@ -380,6 +380,7 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return MALLOC_ERROR;
   
+  /* yes, this could be always true of size is unsigned */
   if (size < 0) {
     malloc_errno = ERROR_BAD_SIZE;
     _malloc_error("malloc");
@@ -441,9 +442,10 @@ EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
   
   check_pnt(_malloc_file, _malloc_line, old_pnt, "realloc-in");
   
-  if (size < 0) {
+  /* yes, this could be always true of new_size is unsigned */
+  if (new_size < 0) {
     malloc_errno = ERROR_BAD_SIZE;
-    _malloc_error("malloc");
+    _malloc_error("realloc");
     return MALLOC_ERROR;
   }
   
