@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.74 1994/05/11 19:31:57 gray Exp $";
+  "$Id: chunk.c,v 1.75 1994/05/22 22:38:29 gray Exp $";
 #endif
 
 /*
@@ -1453,6 +1453,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
     else {
       log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "not in heap", FALSE);
+      /* errno set in find_bblock */
       _malloc_error(func);
       return ERROR;
     }
@@ -1654,6 +1655,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
 		   CHUNK_TO_USER(pnt), "not in heap", FALSE);
     _malloc_message("bad pointer '%#lx'", pnt);
+    /* errno set in find_bblock */
     _malloc_error("_chunk_read_info");
     return ERROR;
   }
@@ -1753,6 +1755,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
   bblockp = find_bblock(pnt);
   if (bblockp == NULL) {
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt), "not in heap", FALSE);
+    /* errno set in find_bblock */
     _malloc_error("chunk_write_info");
     return ERROR;
   }
@@ -2089,8 +2092,8 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   
   if (pnt == NULL) {
     log_error_info(file, line, TRUE, pnt, "zero pointer", FALSE);
-    _malloc_error("_chunk_free");
     malloc_errno = ERROR_IS_NULL;
+    _malloc_error("_chunk_free");
     return FREE_ERROR;
   }
   
@@ -2101,6 +2104,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   bblockp = find_bblock(pnt);
   if (bblockp == NULL) {
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt), "not in heap", FALSE);
+    /* errno set in find_bblock */
     _malloc_error("_chunk_free");
     return FREE_ERROR;
   }
@@ -2265,8 +2269,8 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   /* by now malloc.c should have taken care of the realloc(NULL) case */
   if (oldp == NULL) {
     log_error_info(file, line, TRUE, oldp, "zero pointer", FALSE);
-    _malloc_error("_chunk_realloc");
     malloc_errno = ERROR_IS_NULL;
+    _malloc_error("_chunk_realloc");
     return REALLOC_ERROR;
   }
   
