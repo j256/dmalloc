@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.12 1997/03/21 20:29:00 gray Exp $
+ * $Id: settings.dist,v 1.13 1997/07/07 07:13:19 gray Exp $
  */
 
 /*
@@ -225,55 +225,54 @@
 
 #define THREAD_INCLUDE			<pthread.h>
 
+/* define a global variable we use as a lock counter */
+#define THREAD_LOCK_GLOBAL	static pthread_mutex_t dmalloc_mutex;
+#define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, \
+						   pthread_mutexattr_default);
+
 /*
  * The problem is that the pthreads library uses malloc itself.  If we
- * attempt to call the mutex lock while inside of the pthreads
- * initialization code, the pthread library may core dump because it
- * might not expect to go recursive.  So we have the dmalloc library
- * not do the lock the first X times.  This is a HACK, however
+ * attempt to call the global lock while inside of the pthreads
+ * initialization code, the pthread library may core dump.  So we have
+ * the dmalloc library not do the lock the first X times with the
+ * lock-on dmalloc program env setting.  This is a HACK, however
  * necessary.
  *
- * NOTE: you may have to play with the IGNORE value.  Too many will cause
- * two threads to march into the dmalloc code generating a
- * ERROR_IN_TWICE -- the library is not thread safe and needs to
- * protect itself here.  Too few and you will get a core dump in the
- * pthreads init code.  Weeee!
+ * You will have to play with the lock-on value.  Too many will cause two
+ * threads to march into the dmalloc code generating a ERROR_IN_TWICE
+ * -- the library is not thread safe.  Too few and you will get a core
+ * dump in the pthreads init code.  Weeee!
+ *
+ * The pthreads library does not like to go recursive (I mean who does).
+ * There are two places where this might happen.  One is for dmalloc
+ * to try an mutex-lock when pthreads is starting up in a shaky state.
+ * We hopefully solve this with the lock-on setting above.  The other
+ * is when we go to initialize our mutex-lock.  Chances are that we
+ * may cause a recursive call with this.  Below you will see that the
+ * LOCK_INIT is called when the lock-on setting gets down to 2 -- not
+ * 0.  0 is when the lock will be used so if we init then, the
+ * recursive call into dmalloc will try to use a non-initialized lock
+ * causing a seg-fault -- at least in OSF.  Sigh.
  */
-#define THREAD_LOCK_IGNORE		5
 
-/* if more than 0, we need add code to not lock the first X calls -- Ugh! */
-#if THREAD_LOCK_IGNORE
+/* when we should initialize our mutex variable */
+#define INIT_LOCK_ON		2
 
-/* define the global variable(s) we need to mutex lock */
-#define THREAD_LOCK_GLOBAL	\
-	static int thread_lock_ignore = THREAD_LOCK_IGNORE; \
-	static pthread_mutex_t dmalloc_mutex;
-/* initialization code for mutex variable(s) */
-#define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, NULL)
-/* lock dmalloc functions */
 #define THREAD_LOCK		do { \
-				  if (thread_lock_ignore <= 0) \
+				  if (thread_lock_on <= 0) \
 				    pthread_mutex_lock(&dmalloc_mutex); \
 				} while (0)
-/* un-lock dmalloc functions */
 #define THREAD_UNLOCK		do { \
-				  if (thread_lock_ignore > 0) \
-				    thread_lock_ignore--; \
+				  if (thread_lock_on > 0) { \
+				    thread_lock_on--; \
+				    if (thread_lock_on == INIT_LOCK_ON) { \
+				      /* we init here to avoid recursion */ \
+				      THREAD_LOCK_INIT; \
+				    } \
+				  } \
 				  else \
 				    pthread_mutex_unlock(&dmalloc_mutex); \
 				} while (0)
-#else /* THREAD_LOCK_IGNORE */
-
-/* define the global variable(s) we need to mutex lock */
-#define THREAD_LOCK_GLOBAL	static pthread_mutex_t dmalloc_mutex;
-/* initialization code for mutex variable(s) */
-#define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, NULL)
-/* lock dmalloc functions */
-#define THREAD_LOCK		pthread_mutex_lock(&dmalloc_mutex)
-/* un-lock dmalloc functions */
-#define THREAD_UNLOCK		pthread_mutex_unlock(&dmalloc_mutex)
-
-#endif /* ! THREAD_LOCK_IGNORE */
 
 /*
  * For those threaded programs, this logs the thread ID that allocated

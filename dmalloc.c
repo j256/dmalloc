@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.67 1997/06/03 16:20:34 gray Exp $";
+  "$Id: dmalloc.c,v 1.68 1997/07/07 07:13:07 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -118,6 +118,7 @@ LOCAL	int	debug		= NO_VALUE;	/* for DEBUG */
 LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
 LOCAL	char	*inpath		= NULL;		/* for config-file path */
 LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
+LOCAL	int	thread_lock_on	= NO_VALUE;	/* for setting LOCK_ON */
 LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	list_tags	= FALSE;	/* list rc tags */
 LOCAL	char	debug_tokens	= FALSE;	/* list debug tokens */
@@ -144,7 +145,7 @@ LOCAL	argv_t	args[] = {
   { ARGV_OR },
   { 'S',	"short-tokens",	ARGV_BOOL,	&short_tokens,
       NULL,			"output short-tokens not 0x..." },
-  { 'a',	"address",	ARGV_CHARP,	&address,
+  { 'a',	"address",	ARGV_CHAR_P,	&address,
       "address:#",		"stop when malloc sees address" },
   { 'c',	"clear",	ARGV_BOOL,	&clear,
       NULL,			"clear all variables not set" },
@@ -154,23 +155,25 @@ LOCAL	argv_t	args[] = {
       NULL,			"list debug tokens" },
   { 'e',	"errno",	ARGV_INT,	&errno_to_print,
       "errno",			"print error string for errno" },
-  { 'f',	"file",		ARGV_CHARP,	&inpath,
+  { 'f',	"file",		ARGV_CHAR_P,	&inpath,
       "path",			"config if not ~/.mallocrc" },
   { 'i',	"interval",	ARGV_INT,	&interval,
       "value",			"check heap every number times" },
   { 'k',	"keep",		ARGV_BOOL,	&keep,
       NULL,			"keep settings (override -r)" },
-  { 'l',	"logfile",	ARGV_CHARP,	&logpath,
+  { 'l',	"logfile",	ARGV_CHAR_P,	&logpath,
       "path",			"file to log messages to" },
-  { 'm',	"minus",	ARGV_CHARP | ARGV_ARRAY,	&minus,
+  { 'm',	"minus",	ARGV_CHAR_P | ARGV_ARRAY,	&minus,
       "token(s)",		"del tokens from current debug" },
   { 'n',	"no-changes",	ARGV_BOOL,	&no_changes,
       NULL,			"make no changes to the env" },
-  { 'p',	"plus",		ARGV_CHARP | ARGV_ARRAY,	&plus,
+  { 'o',	"lock-on",	ARGV_INT,	&thread_lock_on,
+      "number",			"number of times to not lock" },
+  { 'p',	"plus",		ARGV_CHAR_P | ARGV_ARRAY,	&plus,
       "token(s)",		"add tokens to current debug" },
   { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
       NULL,			"remove other settings if tag" },
-  { 's',	"start",	ARGV_CHARP,	&start,
+  { 's',	"start",	ARGV_CHAR_P,	&start,
       "file:line",		"start check heap after this" },
   { 't',	"list-tags",	ARGV_BOOL,	&list_tags,
       NULL,			"list tags in rc file" },
@@ -178,7 +181,7 @@ LOCAL	argv_t	args[] = {
       NULL,			"turn on verbose output" },
   { 'V',	"very-verbose",	ARGV_BOOL,	&very_verbose,
       NULL,			"turn on very-verbose output" },
-  { ARGV_MAYBE,	NULL,		ARGV_CHARP,	&tag,
+  { ARGV_MAYBE,	NULL,		ARGV_CHAR_P,	&tag,
       "tag",			"debug token to find in rc" },
   { ARGV_LAST }
 };
@@ -459,11 +462,11 @@ LOCAL	void	dump_current(void)
   char		*tokp;
   char		*lpath, *start_file;
   unsigned long	addr;
-  int		addr_count, inter, start_line, start_count;
+  int		addr_count, inter, lock_on, start_line, start_count;
   long		flags;
   
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
-		       &inter, &lpath,
+		       &inter, &lock_on, &lpath,
 		       &start_file, &start_line, &start_count);
   
   if (flags == DEBUG_INIT)
@@ -489,6 +492,11 @@ LOCAL	void	dump_current(void)
     (void)fprintf(stderr, "Interval     not-set\n");
   else
     (void)fprintf(stderr, "Interval     %d\n", inter);
+  
+  if (lock_on == LOCK_ON_INIT)
+    (void)fprintf(stderr, "Lock-On      not-set\n");
+  else
+    (void)fprintf(stderr, "Lock-On      %d\n", lock_on);
   
   if (lpath == LOGPATH_INIT)
     (void)fprintf(stderr, "Logpath      not-set\n");
@@ -542,6 +550,7 @@ EXPORT	int	main(int argc, char ** argv)
   char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
   unsigned long	addr = ADDRESS_INIT;
   int		addr_count = ADDRESS_COUNT_INIT, inter = INTERVAL_INIT;
+  int		lock_on = LOCK_ON_INIT;
   int		sline = START_LINE_INIT, scount = START_COUNT_INIT;
   long		flags = DEBUG_INIT;
   
@@ -559,7 +568,7 @@ EXPORT	int	main(int argc, char ** argv)
   
   /* get the current debug information from the env variable */
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags, &inter,
-		       &lpath, &sfile, &sline, &scount);
+		       &lock_on, &lpath, &sfile, &sline, &scount);
   
   /* get a new debug value from tag */
   if (tag != NULL) {
@@ -570,7 +579,7 @@ EXPORT	int	main(int argc, char ** argv)
     debug_set = TRUE;
   }
   
-  if (plus.aa_entryn > 0) {
+  if (plus.aa_entry_n > 0) {
     int		plusc;
     
     /* get current debug value and add tokens if possible */
@@ -580,11 +589,11 @@ EXPORT	int	main(int argc, char ** argv)
       else
 	debug = flags;
     
-    for (plusc = 0; plusc < plus.aa_entryn; plusc++)
+    for (plusc = 0; plusc < plus.aa_entry_n; plusc++)
       debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
   }
   
-  if (minus.aa_entryn > 0) {
+  if (minus.aa_entry_n > 0) {
     int		minusc;
     
     /* get current debug value and add tokens if possible */
@@ -594,7 +603,7 @@ EXPORT	int	main(int argc, char ** argv)
       else
 	debug = flags;
     
-    for (minusc = 0; minusc < minus.aa_entryn; minusc++)
+    for (minusc = 0; minusc < minus.aa_entry_n; minusc++)
       debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minusc));
   }
   
@@ -621,7 +630,7 @@ EXPORT	int	main(int argc, char ** argv)
     addr = ADDRESS_INIT;
   
   if (interval != NO_VALUE) {
-    /* NOTE: special case, interval == 0 causes it to be undefed */
+    /* NOTE: special case, == 0 causes it to be undef'ed */
     if (interval == 0)
       inter = INTERVAL_INIT;
     else
@@ -630,6 +639,17 @@ EXPORT	int	main(int argc, char ** argv)
   }
   else if (clear)
     inter = INTERVAL_INIT;
+  
+  if (thread_lock_on != NO_VALUE) {
+    /* NOTE: special case, == 0 causes it to be undef'ed */
+    if (thread_lock_on == 0)
+      lock_on = LOCK_ON_INIT;
+    else
+      lock_on = thread_lock_on;
+    set = TRUE;
+  }
+  else if (clear)
+    lock_on = LOCK_ON_INIT;
   
   if (logpath != NULL) {
     lpath = logpath;
@@ -673,7 +693,7 @@ EXPORT	int	main(int argc, char ** argv)
   
   if (set) {
     _dmalloc_environ_set(buf, long_tokens, short_tokens, addr, addr_count,
-			 flags, inter, lpath, sfile, sline, scount);
+			 flags, inter, lock_on, lpath, sfile, sline, scount);
     set_variable(OPTIONS_ENVIRON, buf);
   }
   else if (errno_to_print == NO_VALUE && ! list_tags && ! debug_tokens)
