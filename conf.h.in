@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.44 1995/05/12 20:47:35 gray Exp $
+ * $Id: conf.h.in,v 1.45 1995/05/16 01:59:07 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -38,9 +38,10 @@
 
 /*
  * should we allow zero length allocations?  this will generate the
- * smallest possible allocation.  FYI: if fence post checking is
- * requested, the top and bottom of the fence post information will be
- * touching.
+ * smallest possible allocation.
+ *
+ * FYI: if fence post checking is requested, the top and bottom of the
+ * fence post information will be touching.
  */
 #define ALLOW_ALLOC_ZERO_SIZE 0
 
@@ -112,16 +113,32 @@
 #define AUTO_SHUTDOWN 1
 
 /*
- * this macro is used to kill the current process and produce a
- * core-dump image.  Most Unix-like systems should use the kill line
- * (maybe with another signal from signal.h) although others may want
- * to substiture in the abort.
+ * the USE_ABORT is auto-configured but may have to be tuned.  On some
+ * OS's, abort calls fclose() which may want to free memory making the
+ * library go recursive.  The configure script tries to test for this
+ * but may have failed.
  *
- * WARNING: On some OS's, abort calls fclose() which may want to free
- * memory making the library go recursive.
+ * In these cased, set USE_ABORT to 0 and set KILL_PROCESS to the
+ * proper way to stop the program.  Killing the current process (id 0)
+ * with SIGABRT works on a number of Unix systems.  You may have to
+ * define some include file to get the value for the SIGABRT signal.
  */
-#define KILL_PROCESS()		(void)kill(0, SIGABRT)
-/* #define KILL_PROCESS()		abort() */
+#define USE_ABORT		0
+#define KILL_PROCESS		(void)kill(0,SIGABRT)
+#define SIGNAL_INCLUDE		<signal.h>
+
+/*
+ * try to fork the process when there is an error, and have the child
+ * dump-core.  This allows the parent process to continue running.  Of
+ * course multiple dumps will overwrite each other so you may get only
+ * the last of the dumps.  This allows the runtime token 'error-dump'
+ * to be used which enables this behavior during execution.
+ *
+ * NOTE: I may have encountered some problems on an archetecture with
+ * fork causing the library to go recursive.  It is for this reason
+ * that this feature is not enabled here as a default.
+ */
+#define DUMP_CONTINUE		0
 
 /*
  * number of bytes to write at the top of allocations (if fence-post
@@ -140,8 +157,8 @@
 
 /*
  * Store the number of times a pointer is seen being allocated or
- * freed -- it shows up as a s# (for seen) in the logfile.  NOTE: This
- * creates a certain amount of memory overhead.
+ * freed -- it shows up as a s# (for seen) in the logfile.
+ * NOTE: This creates a certain amount of memory overhead.
  */
 #define STORE_SEEN_COUNT 1
 
@@ -149,8 +166,8 @@
  * Store the interation count or when a pointer is allocated -- it
  * shows up as a i# (for iteration) in the logfile.  This is to give
  * you some idea when during program execution, a pointer was
- * allocated but not freed.  NOTE: This creates a certain amount of
- * memory overhead.
+ * allocated but not freed.
+ * NOTE: This creates a certain amount of memory overhead.
  */
 #define STORE_ITERATION_COUNT 0
 
@@ -162,6 +179,7 @@
  * starting and the ending time if either of these flags is set.
  * TIMEVAL_INCLUDE is the include file to define struct timeval and
  * GET_TIMEVAL does the actual reading of the current time of day.
+ *
  * WARNING: only TIME _or_ TIMEVAL can be defined at one time.
  * NOTE: This creates a certain amount of memory overhead.
  */
@@ -196,17 +214,20 @@
 
 /*
  * (char *)sbrk(const int incr) is the main heap-memory allocation
- * routine that most systems define/employ.  this extends the
- * program's data space by INCR number of bytes.  please mail me if
- * your system does not have this function.
+ * routine that most systems employ.  this extends the program's data
+ * space by INCR number of bytes.
+ *
+ * NOTE: please mail me if your system does not have this function.
  */
 #define HAVE_SBRK 0
 
 /*
  * does your heap grow up?  hopefully it does because there is not too
  * much support for growing-down heaps because I do not have a system
- * to test it on.  please mail me if configure generates a 0 for this
- * on your system.
+ * to test it on.
+ *
+ * NOTE: please send me mail if configure generates a 0 for this on
+ * your system.
  */
 #define HEAP_GROWS_UP 1
 
@@ -238,7 +259,7 @@
  * fashion?
  *
  * NOTE: larger the number the more memory may be wasted by certain
- *       debugging settings like fence-post checking.
+ * debugging settings like fence-post checking.
  */
 #define ALLOCATION_ALIGNMENT 8
 
