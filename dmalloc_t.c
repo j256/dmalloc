@@ -30,7 +30,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.25 1993/08/30 20:14:41 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.26 1993/09/25 18:10:49 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -191,7 +191,7 @@ int	main(int argc, char ** argv)
       else
 	max = atoi(line);
       
-      for (count = 1; count < max; count += 10) {
+      for (count = 1; count < max + 1; count++) {
 	int	amount;
 	char	*data;
 	

@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.51 1993/09/22 05:02:12 gray Exp $";
+  "$Id: chunk.c,v 1.52 1993/09/25 18:10:46 gray Exp $";
 #endif
 
 /* checking information */
@@ -99,6 +99,7 @@ LOCAL	int		bblock_adm_count = 0;	/* count of bblock_admin */
 LOCAL	int		dblock_adm_count = 0;	/* count of dblock_admin */
 LOCAL	int		bblock_count	 = 0;	/* count of basic-blocks */
 LOCAL	int		dblock_count	 = 0;	/* count of divided-blocks */
+LOCAL	int		check_count	 = 0;	/* count of heap-checks */
 
 /* alloc counts */
 EXPORT	int		_calloc_count	= 0;	/* # callocs, done in alloc */
@@ -514,6 +515,7 @@ LOCAL	dblock_t	*get_dblock_admin(const int many)
     return NULL;
   
   dblock_adm_count++;
+  dblock_count++;
   
   /* allocate the block if needed */
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_ALLOCATED))
@@ -827,6 +829,8 @@ EXPORT	int	_chunk_heap_check(void)
   /* if the heap is empty then no need to check anything */
   if (bblock_adm_head == NULL)
     return NOERROR;
+  
+  check_count++;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_LISTS)) {
     
@@ -1945,7 +1949,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
       (1 << bblockp->bb_bitc);
     
     if (dblockp->db_bblock == bblockp) {
-      /* NOTE: we should run through free list here */
+      /* NOTE: we should run through free list here? */
       log_bad_pnt(file, line, CHUNK_TO_USER(pnt), "bad administration info",
 		  FALSE);
       malloc_errno = ERROR_ALREADY_FREE;
@@ -1953,7 +1957,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
       return FREE_ERROR;
     }
     
-    /* do we need to print transaction info? */
+    /* print transaction info? */
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_TRANS))
       _malloc_message("*** free: at '%s' pnt '%#lx': size %u, alloced at '%s'",
 		      _chunk_display_pnt(file, line), CHUNK_TO_USER(pnt),
@@ -2023,10 +2027,6 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   if (bitc == ERROR)
     return FREE_ERROR;
   
-  /* monitor current allocation level */
-  alloc_current -= bblockp->bb_size;
-  alloc_cur_given -= 1 << bitc;
-  
   if (bitc < BASIC_BLOCK) {
     log_bad_pnt(file, line, CHUNK_TO_USER(pnt), "bad administration info",
 		FALSE);
@@ -2035,12 +2035,15 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     return FREE_ERROR;
   }
   
-  /* setup free linked-list */
+  /* monitor current allocation level */
+  alloc_current -= bblockp->bb_size;
+  alloc_cur_given -= 1 << bitc;
+  
+  /* setup free linked-list, save first for below */
   first = free_bblock[bitc];
   free_bblock[bitc] = bblockp;
-  free_space_count += 1 << bitc;
-  
   bblockp->bb_next = first;
+  free_space_count += 1 << bitc;
   
   /*
    * initialize the bblocks
@@ -2200,15 +2203,6 @@ EXPORT	void	_chunk_list_count(void)
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   
-  /* print header bit-counts */
-  info[0] = NULLC;
-  for (bitc = smallest_block; bitc <= LARGEST_BLOCK; bitc++) {
-    (void)sprintf(tmp, "%*d", FREE_COLUMN, bitc);
-    (void)strcat(info, tmp);
-  }
-  
-  _malloc_message("bits: %s", info);
-  
   /* dump the free (and later used) list counts */
   info[0] = NULLC;
   for (bitc = smallest_block; bitc <= LARGEST_BLOCK; bitc++) {
@@ -2219,11 +2213,13 @@ EXPORT	void	_chunk_list_count(void)
       for (count = 0, bblockp = free_bblock[bitc]; bblockp != NULL;
 	   count++, bblockp = bblockp->bb_next);
     
-    (void)sprintf(tmp, "%*d", FREE_COLUMN, count);
-    (void)strcat(info, tmp);
+    if (count > 0) {
+      (void)sprintf(tmp, " %d/%d", count, bitc);
+      (void)strcat(info, tmp);
+    }
   }
   
-  _malloc_message("free: %s", info);
+  _malloc_message("free count/bits: %s", info);
 }
 
 /*
@@ -2231,48 +2227,53 @@ EXPORT	void	_chunk_list_count(void)
  */
 EXPORT	void	_chunk_stats(void)
 {
-  long		overhead;
+  long		overhead, tot_space;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("dumping chunk statistics");
   
+  tot_space = alloc_current + free_space_count;
+  overhead = HEAP_SIZE - tot_space;
+  
   /* version information */
   _malloc_message("malloc version '%s'", malloc_version);
+  _malloc_message("basic-block %d bytes, alignment %d bytes, heap grows %s",
+		  1 << BASIC_BLOCK, 1 << ALLOCATION_ALIGNMENT,
+		  (HEAP_GROWS_UP ? "up" : "down"));
   
   /* general heap information */
-  _malloc_message("heap start %#lx, heap end %#lx, heap size %ld bytes",
-		  _heap_base, _heap_last, HEAP_SIZE);
+  _malloc_message("heap: start %#lx, end %#lx, size %ld bytes, checked %d",
+		  _heap_base, _heap_last, HEAP_SIZE, check_count);
   
   /* log user allocation information */
   _malloc_message("alloc calls: malloc %d, realloc %d, calloc %d, free %d",
 		  malloc_count - _calloc_count, realloc_count, _calloc_count,
 		  free_count);
-  
-  _malloc_message("total amount of memory allocated:   %ld bytes (%ld pnts)",
+  _malloc_message(" total memory allocated: %ld bytes (%ld pnts)",
 		  alloc_total, alloc_tot_pnts);
   
-  _malloc_message("maximum memory in use at one time:  %ld bytes (%ld pnts)",
+  /* maximum stats */
+  _malloc_message(" max in use at one time: %ld bytes (%ld pnts)",
 		  alloc_maximum, alloc_max_pnts);
-  
-  _malloc_message("maximum memory alloced with 1 call: %ld bytes",
+  _malloc_message("max alloced with 1 call: %ld bytes",
 		  alloc_one_max);
-  
-  _malloc_message("max base 2 allocation loss: %ld bytes (%d%%)",
+  _malloc_message("  max base 2 alloc loss: %ld bytes (%d%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
 		   100 - ((alloc_maximum * 100) / alloc_max_given)));
   
-  _malloc_message("final user memory space: %ld bytes",
-		  alloc_current + free_space_count);
+  _malloc_message("max memory space wasted: %ld bytes (%d%%)",
+		  tot_space - alloc_maximum,
+		  (tot_space == 0 ? 0 :
+		   100 - ((alloc_maximum * 100) / tot_space)));
   
-  /* log administration information */
-  _malloc_message("final admin: basic-blocks %d, divided blocks %d",
-		  bblock_count, dblock_count);
-  
-  overhead = HEAP_SIZE - (alloc_current + free_space_count);
-  
-  _malloc_message("final heap admin overhead: %ld bytes (%d%%)",
-		  overhead,
+  /* final stats */
+  _malloc_message("final user memory space: basic %d, divided %d, %ld bytes"
+		  , bblock_count - bblock_adm_count - dblock_count,
+		  dblock_count - dblock_adm_count, tot_space);
+  _malloc_message("   final admin overhead: basic %d, divided %d, %ld bytes"
+		  " (%d%%)",
+		  bblock_adm_count, dblock_adm_count, overhead,
 		  (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
 }
 
@@ -2286,9 +2287,9 @@ EXPORT	void	_chunk_dump_not_freed(void)
   dblock_t	*dblockp;
   void		*pnt;
   char		unknown, ra;
-  int		unknown_sizec = 0, unknown_dblockc = 0, unknown_bblockc = 0;
-  int		ra_sizec = 0, ra_dblockc = 0, ra_bblockc = 0;
-  int		sizec = 0, dblockc = 0, bblockc = 0;
+  int		unknown_sizec = 0, unknown_blockc = 0;
+  int		ra_sizec = 0, ra_blockc = 0;
+  int		sizec = 0, blockc = 0;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("dumping the unfreed pointers");
@@ -2334,12 +2335,12 @@ EXPORT	void	_chunk_dump_not_freed(void)
       if ((bblockp->bb_file == _malloc_unknown_file
 	   || bblockp->bb_file == NULL)
 	  && bblockp->bb_line == MALLOC_DEFAULT_LINE) {
-	unknown_bblockc++;
+	unknown_blockc++;
 	unknown_sizec += bblockp->bb_size - pnt_total_adm;
 	unknown = 1;
       }
       else if (bblockp->bb_line == MALLOC_DEFAULT_LINE) {
-	ra_bblockc++;
+	ra_blockc++;
 	ra_sizec += bblockp->bb_size - pnt_total_adm;
 	ra = 1;
       }
@@ -2353,7 +2354,7 @@ EXPORT	void	_chunk_dump_not_freed(void)
 					   bblockp->bb_line));
       
       sizec += bblockp->bb_size - pnt_total_adm;
-      bblockc++;
+      blockc++;
       break;
       
     case BBLOCK_DBLOCK_ADMIN:
@@ -2418,12 +2419,12 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	if ((dblockp->db_file == _malloc_unknown_file
 	     || dblockp->db_file == NULL)
 	    && dblockp->db_line == MALLOC_DEFAULT_LINE) {
-	  unknown_dblockc++;
+	  unknown_blockc++;
 	  unknown_sizec += dblockp->db_size - pnt_total_adm;
 	  unknown = 1;
 	}
 	else if (dblockp->db_line == MALLOC_DEFAULT_LINE) {
-	  ra_dblockc++;
+	  ra_blockc++;
 	  ra_sizec += dblockp->db_size - pnt_total_adm;
 	  ra = 1;
 	}
@@ -2437,25 +2438,23 @@ EXPORT	void	_chunk_dump_not_freed(void)
 					     dblockp->db_line));
 	
 	sizec += dblockp->db_size - pnt_total_adm;
-	dblockc++;
+	blockc++;
       }
       break;
     }
   }
   
   /* copy out size of pointers */
-  if (bblockc + dblockc > 0) {
-    _malloc_message("known memory not freed: %d bblock, %d dblock, %d byte%s",
-		    bblockc - unknown_bblockc, dblockc - unknown_dblockc,
-		    sizec - unknown_sizec, (sizec == 1 ? "" : "s"));
-    
-    _malloc_message("unknown memory not freed: %d pointers, %d byte%s",
-		    unknown_bblockc + unknown_dblockc, unknown_sizec,
-		    (unknown_sizec == 1 ? "" : "s"));
-    
-    _malloc_message("ret-addr memory not freed: %d pointers, %d byte%s",
-		    ra_bblockc + ra_dblockc, ra_sizec,
-		    (ra_sizec == 1 ? "" : "s"));
+  if (blockc > 0) {
+    _malloc_message("   known memory not freed: %d pointer%s, %d bytes",
+		    blockc - unknown_blockc - ra_blockc,
+		    (blockc - unknown_blockc - ra_blockc == 1 ? "" : "s"),
+		    sizec - unknown_sizec - ra_sizec);
+    _malloc_message(" unknown memory not freed: %d pointer%s, %d bytes",
+		    unknown_blockc, (unknown_blockc == 1 ? "" : "s"),
+		    unknown_sizec);
+    _malloc_message("ret-addr memory not freed: %d pointer%s, %d bytes",
+		    ra_blockc, (ra_blockc == 1 ? "" : "s"), ra_sizec);
   }
 }
 
