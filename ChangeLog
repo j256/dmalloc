@@ -1,33 +1,43 @@
+Wed May 17 11:29:55 2000  Gray Watson  <gray@256.com>
+
+	* Releasing dmalloc version 4.6.0 beta 1.
+
 Tue May 16 14:34:14 2000  Gray Watson  <gray@256.com>
+
+	* Added BLOCK_ROUND macros to heap.h.
+
+	* Made initial attempt to protect blocks in chunk.c.  Got pretty
+ 	hairy way too fast so backed it out.
 
 	* Added SET_POINTER macro and cleaned some code.
 
 	* Completely reworked the internal initialization values for the
- 	environmental variables to fix problems pointed out by Carlton
- 	Teel.
+	environmental variables to fix problems pointed out by Carlton
+	Teel.  I was doing a (unsigned int)-1.  Yuck.
 
 	* Fixed a bug found by Mcvey where the 1st dblock allocation in a
- 	block would not have been found in non-freed memory lists.
+	block would not have been found in non-freed memory lists.  Yuck.
 
 Mon May 15 11:46:21 2000  Gray Watson  <gray@256.com>
 
 	* Moved to 'make cxx' and 'make installcxx' for building and
- 	installing the C++ version of the library.
+	installing the C++ version of the library.
 
 	* Added autoconfiguration of the presence of a C++ compiler so it
- 	will attempt to build and install libdmallocxx.a if it can.
+	will attempt to build and install libdmallocxx.a if it can.
 
 	* Removed DMALLOC_VERIFY_[NO]ERROR and replaced with
 	DMALLOC_[NO]ERROR.
 
 	* dmalloc_examine now returns DMALLOC_[NO]ERROR not [NO]ERROR.
 
- 	* Added initial mprotect support to the library.  About time.
+	* Added initial mprotect configuration and stub function to the
+	library.
 
 Mon May  8 08:19:45 2000  Gray Watson  <gray@256.com>
 
 	* Renamed dmalloc.cc to dmallocc.cc and added the building of
- 	libdmalloc++.a per Dimitri's comments.
+	libdmalloc++.a per Dimitri's comments.
 
 	* Renamed rpm.spec to dmalloc.rpm per Dimitri's comments.
 
@@ -46,7 +56,7 @@ Tue Apr 18 15:41:30 2000  Gray Watson  <gray@256.com>
 Mon Apr 17 21:55:39 2000  Gray Watson  <gray@256.com>
 
 	* Cleaned up some of the compat.[ch] headers to better match
- 	reality.
+	reality.
 
 Thu Mar 30 10:05:01 2000  Gray Watson  <gray@whopper.256.com>
 
@@ -1615,5 +1625,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.250 2000/05/16 19:48:28 gray Exp $
+$Id: ChangeLog,v 1.251 2000/05/17 15:41:40 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,0 +1,15 @@
+-------------------------------------------------------------------------------
+
+The following set of tasks should be performed when the dmalloc
+library gets released.
+
+1) Update the version number in version.h, rpm.sec, dmalloc.texi, and
+dmalloc.h.3.
+
+2) Update the ChangeLog and NEWS files.
+
+3) Update the RELEASE.html file.
+
+4) cvs tag the release with dmalloc_release_X_X_X[_bX]
+
+-------------------------------------------------------------------------------

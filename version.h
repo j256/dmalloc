@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.97 2000/04/18 19:46:09 gray Exp $
+ * $Id: version.h,v 1.98 2000/05/17 15:41:42 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -31,14 +31,14 @@
  *	Changlog
  *	RELEASE.html
  *	NEWS
- *	rpm.spec
+ *	dmalloc.rpm
  *	dmalloc.texi (2 places)
  *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
  *
  * Make sure to also cvs tag the release.  dmalloc_release_X_X_X[_bX]
  */
-static	char	*dmalloc_version = "4.5.2";
+static	char	*dmalloc_version = "4.6.0-beta1";
 
-/* Version Date: $Date: 2000/04/18 19:46:09 $ */
+/* Version Date: $Date: 2000/05/17 15:41:42 $ */
 
 #endif /* ! __VERSION_H__ */

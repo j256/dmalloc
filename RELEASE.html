@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.9 2000/04/18 19:46:08 gray Exp $ -->
-<TITLE> Dmalloc Release Notes - 4.5.2 </TITLE>
+<!-- $Id: RELEASE.html,v 1.10 2000/05/17 15:41:40 gray Exp $ -->
+<TITLE> Dmalloc Release Notes - 4.6.0 </TITLE>
 </HEAD>
 <BODY>
 
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.5.2 <BR>
+Version: Release 4.6.0 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.5.1.html">4.5.1</A> <BR>
-Date: April 18, 2000
+Last-Version: <A HREF="dmalloc-4.5.2.html">4.5.2</A> <BR>
+Date: May 17, 2000
 </H4>
 </CENTER>
 
@@ -31,8 +31,7 @@ Date: April 18, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Quick bug fix release to repair a problem in the chunk pointer
-checking.
+<P> General feature release with some bug repairs as well.
 
 <P>
 <HR>
@@ -41,7 +40,13 @@ checking.
 
 <UL>
 
-<P> None.
+<P><LI> Added autoconfiguration of the presence of a C++ compiler so
+the Makefile will attempt to build and install libdmallocxx.a if it
+can.
+
+<P><LI> Added initial mprotect autoconfiguration and stub functions to
+the library.  They don't do anything right now however it is able time
+dmalloc had this functionality.
 
 </UL>
 
@@ -63,7 +68,12 @@ checking.
 
 <UL>
 
-<P> None.
+<P><LI> Added PROTECT_BLOCKS setting which defaults to 1 (on).  Set it
+0 if you don't want dmalloc to be using mprotect to restrict accesses
+to memory blocks.  This is a newer part of the library and still may
+have bugs.  Protection will only be on if the auto-configuration
+scripts find the mprotect function and the PROT_NONE, PROT_READ, and
+PROT_WRITE defines.
 
 </UL>
 
@@ -74,7 +84,14 @@ checking.
 
 <UL>
 
-<P> None.
+<P><LI> The dmalloc_examine function now returns DMALLOC_[NO]ERROR not
+[NO]ERROR which was not exported.
+
+<P><LI> The dmalloc_verify function now returns DMALLOC_[NO]ERROR
+instead of DMALLOC_VERIFY_[NO]ERROR.
+
+<P><LI> Moved to 'make cxx' and 'make installcxx' for building and
+installing the C++ version of the library.
 
 </UL>
 
@@ -96,8 +113,11 @@ checking.
 
 <UL>
 
-<P><LI> Fixed a bug with the way the library checks pointers.
-Introduced when we added a flag to the dblock allocation structures.
+<P><LI> Fixed a bug found by Mcvey where the 1st dblock allocation in
+a block would not have been found in non-freed memory lists.  Yuck.
+
+<P><LI> Fixed some portability problems with the environmental
+variable initialization values.
 
 </UL>
 

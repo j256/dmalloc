@@ -1,6 +1,17 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.92 2000/04/18 19:46:08 gray Exp $
+$Id: NEWS,v 1.93 2000/05/17 15:41:40 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.6.0:
+
+	* Reworked internal init values for env vars pointed out by Carlton.
+	* Fixed bug found by Mcvey where the 1st dblock alloc in block missed.
+	* Moved to 'make cxx' and 'make installcxx' for building C++ library.
+	* Removed DMALLOC_VERIFY_[NO]ERROR and replaced with DMALLOC_[NO]ERROR.
+	* dmalloc_examine now returns DMALLOC_[NO]ERROR not [NO]ERROR.
+	* Added initial mprotect configuration and stub functions.
+	* Added autoconf building of cxx library per Dimitri's comments.
+	* Revamped rpm.spec and renamed to dmalloc.rpm per Dimitri's comments.
 
 Version 4.5.2:
 
