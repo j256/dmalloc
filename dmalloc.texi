@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.34 1993/09/03 01:20:03 gray Exp $
+@c $Id: dmalloc.texi,v 1.35 1993/09/07 04:57:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -397,7 +397,7 @@ with a debugger to determine the source of the problem.
 @cindex gdb, usage with
 When running our programs in a debugger such as gdb (the
 @emph{excellent} GNU debugger), I always put a break-point in
-@code{_malloc_perror()} which is the internal error routine for the
+@code{_malloc_error()} which is the internal error routine for the
 library.  The program will then hit the break-point as soon as a memory
 problem is detected.
 
@@ -1026,7 +1026,7 @@ Here is one possible scenario for using the malloc_dbg library.
 
 @itemize
 @item
-set a breakpoint at _malloc_perror()
+set a breakpoint at _malloc_error()
 
 @item
 run the program until it stops there indicating that before this
