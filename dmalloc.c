@@ -58,7 +58,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.63 1995/08/18 15:50:27 gray Exp $";
+  "$Id: dmalloc.c,v 1.64 1997/03/18 20:34:35 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -457,7 +457,7 @@ LOCAL	void	dump_current(void)
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
   else {
     (void)process(flags, NULL, &tokp);
-    (void)fprintf(stderr, "Debug-Flags  '%#lx' (%s)\n", flags, tokp);
+    (void)fprintf(stderr, "Debug-Flags %#lx (%ld) (%s)\n", flags, flags, tokp);
     if (verbose)
       dump_debug(flags);
   }
