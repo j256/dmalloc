@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.185 2003/06/06 19:06:21 gray Exp $
+ * $Id: chunk.c,v 1.186 2003/06/08 19:39:24 gray Exp $
  */
 
 /*
@@ -121,6 +121,12 @@ static	entry_block_t	*entry_blocks[MAX_SKIP_LEVEL];
 static	char		fence_bottom[FENCE_BOTTOM_SIZE];
 static	char		fence_top[FENCE_TOP_SIZE];
 static	int		bit_sizes[BASIC_BLOCK]; /* number bits for div-blocks*/
+
+/* memory tables */
+static	mem_table_t	mem_table_alloc[MEM_ALLOC_ENTRIES];
+static	int		mem_table_alloc_c = 0;
+static	mem_table_t	mem_table_changed[MEM_CHANGED_ENTRIES];
+static	int		mem_table_changed_c = 0;
 
 /* memory stats */
 static	unsigned long	alloc_current = 0;	/* current memory usage */
@@ -458,6 +464,10 @@ static	void	*alloc_slots(const int level_n, void **extern_mem_pp,
   entry_block_t	*block_p;
   unsigned int	*magic3_p, magic3;
   int		size, new_c;
+  
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
+    dmalloc_message("need a block of slots for level %d", level_n);
+  }
   
   /* we need to allocate a new block of the slots of this level */
   block_p = _dmalloc_heap_alloc(BLOCK_SIZE, extern_mem_pp, extern_np);
@@ -1233,29 +1243,33 @@ static	int	fence_read(const pnt_info_t *info_p)
 static	void	clear_alloc(pnt_info_t *info_p, const unsigned int old_size,
 			    const int func_id)
 {
-  char	*old_bounds;
+  char	*start_p;
+  int	num;
   
   /*
-   * if we have a fence post protected valloc then there is almost a
-   * full block at the front what is "free"
+   * If we have a fence post protected valloc then there is almost a
+   * full block at the front what is "free".  Set it with blank chars.
    */
-  if (info_p->pi_valloc_b
-      && info_p->pi_fence_b
-      && info_p->pi_fence_bottom > info_p->pi_alloc_start) {
-    memset(info_p->pi_alloc_start, FREE_BLANK_CHAR,
-	   (char *)info_p->pi_fence_bottom - (char *)info_p->pi_alloc_start);
+  num = (char *)info_p->pi_fence_bottom - (char *)info_p->pi_alloc_start;
+  if (num > 0 && (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
+		  || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))) {
+    memset(info_p->pi_alloc_start, FREE_BLANK_CHAR, num);
   }
   
-  /* if we are extending memory, write in our alloc chars */
-  old_bounds = (char *)info_p->pi_user_start + old_size;
-  if ((char *)info_p->pi_alloc_bounds > old_bounds) {
+  /*
+   * If we are allocating or extending memory, write in our alloc
+   * chars.
+   */
+  start_p = (char *)info_p->pi_user_start + old_size;
+  
+  num = (char *)info_p->pi_user_bounds - start_p;
+  if (num > 0) {
     if (func_id == DMALLOC_FUNC_CALLOC || func_id == DMALLOC_FUNC_RECALLOC) {
-      memset(old_bounds, 0, (char *)info_p->pi_alloc_bounds - old_bounds);
+      memset(start_p, 0, num);
     }
     else if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
 	     || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-      memset(old_bounds, ALLOC_BLANK_CHAR,
-	     (char *)info_p->pi_alloc_bounds - old_bounds);
+      memset(start_p, ALLOC_BLANK_CHAR, num);
     }
   }
   
@@ -1263,6 +1277,26 @@ static	void	clear_alloc(pnt_info_t *info_p, const unsigned int old_size,
   if (info_p->pi_fence_b) {
     memcpy(info_p->pi_fence_bottom, fence_bottom, FENCE_BOTTOM_SIZE);
     memcpy(info_p->pi_fence_top, fence_top, FENCE_TOP_SIZE);
+  }
+  
+  /*
+   * now clear the rest of the block above any fence post space with
+   * free characters
+   */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+    
+    if (info_p->pi_fence_b) {
+      start_p = (char *)info_p->pi_fence_top + FENCE_TOP_SIZE;
+    }
+    else {
+      start_p = info_p->pi_user_bounds;
+    }
+    
+    num = (char *)info_p->pi_alloc_bounds - start_p;
+    if (num > 0) {
+      memset(start_p, FREE_BLANK_CHAR, num);
+    }
   }
 }
 
@@ -1310,6 +1344,7 @@ static	int	create_divided_chunks(const unsigned int div_size)
       /* error set in insert_address */
       return 0;
     }
+    free_space_bytes += div_size;
   }
   
   return 1;
@@ -1359,7 +1394,6 @@ static	skip_alloc_t	*use_free_memory(const unsigned int size,
     /* error reported in remove_slot */
     return NULL;
   }
-  free_space_bytes -= slot_p->sa_total_size;
   
   /* set to user allocated space */
   slot_p->sa_flags = ALLOC_FLAG_USER;
@@ -1369,6 +1403,8 @@ static	skip_alloc_t	*use_free_memory(const unsigned int size,
     /* error set in insert_slot */
     return NULL;
   }
+  
+  free_space_bytes -= slot_p->sa_total_size;
   
   return slot_p;
 }
@@ -1622,7 +1658,13 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
 #endif
   
 #if STORE_SEEN_COUNT
-  if (slot_p->sa_seen_c > _dmalloc_iter_c) {
+  /*
+   * We divide by 2 here because realloc which returns the same
+   * pointer will seen_c += 2.  However, it will never be more than
+   * twice the iteration value.  We divide by two to not overflow
+   * iter_c * 2.
+   */
+  if (slot_p->sa_seen_c / 2 > _dmalloc_iter_c) {
     dmalloc_errno = ERROR_SLOT_CORRUPT;
     return 0;
   }
@@ -1667,7 +1709,13 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
   }
   
 #if STORE_SEEN_COUNT
-  if (slot_p->sa_seen_c > _dmalloc_iter_c) {
+  /*
+   * We divide by 2 here because realloc which returns the same
+   * pointer will seen_c += 2.  However, it will never be more than
+   * twice the iteration value.  We divide by two to not overflow
+   * iter_c * 2.
+   */
+  if (slot_p->sa_seen_c / 2 > _dmalloc_iter_c) {
     dmalloc_errno = ERROR_SLOT_CORRUPT;
     return 0;
   }
@@ -2364,10 +2412,9 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
 				      sizeof(disp_buf)));
   }
   
-#if MEMORY_TABLE_LOG
-  if (func_id != DMALLOC_FUNC_REALLOC && func_id != DMALLOC_FUNC_RECALLOC) {
-    _dmalloc_table_alloc(file, line, size);
-  }
+#if MEMORY_TABLE_TOP_LOG
+  _dmalloc_table_insert(mem_table_alloc, MEM_ALLOC_ENTRIES, file, line,
+			size, &mem_table_alloc_c);
 #endif
   
   /* monitor current allocation level */
@@ -2448,12 +2495,10 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
       return FREE_ERROR;
     }
     
-#if ALLOW_FREE_NULL
-    return FREE_NOERROR;
-#else
+#if ALLOW_FREE_NULL == 0
     dmalloc_errno = ERROR_IS_NULL;
-    return FREE_ERROR;
 #endif
+    return FREE_ERROR;
   }
   
   update_p = skip_update;
@@ -2491,17 +2536,14 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 					    slot_p->sa_file, slot_p->sa_line));
   }
   
-  /* update the file/line */
+#if MEMORY_TABLE_TOP_LOG
+  _dmalloc_table_delete(mem_table_alloc, MEM_ALLOC_ENTRIES, slot_p->sa_file,
+			slot_p->sa_line, slot_p->sa_user_size);
+#endif
+  
+  /* update the file/line -- must be after _dmalloc_table_delete */
   slot_p->sa_file = file;
   slot_p->sa_line = line;
-  
-#if MEMORY_TABLE_LOG
-  if (func_id != DMALLOC_FUNC_REALLOC
-      && func_id != DMALLOC_FUNC_RECALLOC) {
-    _dmalloc_table_free(slot_p->sa_file, slot_p->sa_line,
-			slot_p->sa_user_size);
-  }
-#endif
   
   /* monitor current allocation level */
   alloc_current -= slot_p->sa_user_size;
@@ -2529,10 +2571,12 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
    * because we are encorporating in this newly freed block.
    */
   
-  /* put slot on free list */
-  if (! insert_slot(slot_p, 1 /* free list */)) {
-    /* error dumped in insert_slot */
-    return FREE_ERROR;
+  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+    /* put slot on free list */
+    if (! insert_slot(slot_p, 1 /* free list */)) {
+      /* error dumped in insert_slot */
+      return FREE_ERROR;
+    }
   }
   
   return FREE_NOERROR;
@@ -2568,10 +2612,11 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
 				const unsigned long new_size,
 				const int func_id)
 {
+  const char	*old_file;
   skip_alloc_t	*slot_p;
   pnt_info_t	pnt_info;
   void		*new_user_pnt;
-  unsigned int	old_size;
+  unsigned int	old_size, old_line;
   
   /* counts calls to realloc */
   if (func_id == DMALLOC_FUNC_RECALLOC) {
@@ -2612,6 +2657,8 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   
   /* get info about the pointer */
   get_pnt_info(slot_p, &pnt_info);
+  old_file = slot_p->sa_file;
+  old_line = slot_p->sa_line;
   old_size = slot_p->sa_user_size;
   
   /* if we are not realloc copying and the size is the same */
@@ -2674,6 +2721,20 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
     /* we see in inbound and outbound so we need to increment by 2 */
     slot_p->sa_seen_c += 2;
 #endif
+    
+#if MEMORY_TABLE_TOP_LOG
+    _dmalloc_table_delete(mem_table_alloc, MEM_ALLOC_ENTRIES,
+			  slot_p->sa_file, slot_p->sa_line, old_size);
+    _dmalloc_table_insert(mem_table_alloc, MEM_ALLOC_ENTRIES, file, line,
+			  new_size, &mem_table_alloc_c);
+#endif
+  
+    /*
+     * finally, we update the file/line info -- must be after
+     * _dmalloc_table functions
+     */
+    slot_p->sa_file = file;
+    slot_p->sa_line = line;
   }
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
@@ -2693,18 +2754,9 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
 					    file, line),
 		    (unsigned long)old_user_pnt, old_size,
 		    _dmalloc_chunk_desc_pnt(where_buf2, sizeof(where_buf2),
-					    slot_p->sa_file, slot_p->sa_line),
+					    old_file, old_line),
 		    (unsigned long)new_user_pnt, new_size);
   }
-  
-#if MEMORY_TABLE_LOG
-  _dmalloc_table_free(slot_p->sa_file, slot_p->sa_line, old_size);
-  _dmalloc_table_alloc(file, line, new_size);
-#endif
-  
-  /* finally, we update the file/line info */
-  slot_p->sa_file = file;
-  slot_p->sa_line = line;
   
   return new_user_pnt;
 }
@@ -2728,7 +2780,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
  */
 void	_dmalloc_chunk_log_stats(void)
 {
-  unsigned long	overhead, tot_space, wasted;
+  unsigned long	overhead, tot_space, wasted, ext_space;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     dmalloc_message("dumping chunk statistics");
@@ -2748,11 +2800,23 @@ void	_dmalloc_chunk_log_stats(void)
 		  BLOCK_SIZE, ALLOCATION_ALIGNMENT,
 		  (HEAP_GROWS_UP ? "up" : "down"));
   
-  /* general heap information */
-  dmalloc_message("heap: %#lx to %#lx, size %ld bytes (%ld blocks)",
+  /* general heap information with blocks */
+  dmalloc_message("heap address range: %#lx to %#lx, %ld bytes",
 		  (unsigned long)_dmalloc_heap_base,
-		  (unsigned long)_dmalloc_heap_last,
-		  (long)HEAP_SIZE, user_block_c + admin_block_c);
+		  (unsigned long)_dmalloc_heap_last, (long)HEAP_SIZE);
+  dmalloc_message("    user blocks: %ld blocks, %ld bytes (%ld%%)",
+		  user_block_c, tot_space,
+		  (HEAP_SIZE == 0 ? 0 : tot_space / (HEAP_SIZE / 100)));
+  dmalloc_message("   admin blocks: %ld blocks, %ld bytes (%ld%%)",
+		  admin_block_c, overhead,
+		  (HEAP_SIZE == 0 ? 0 : overhead / (HEAP_SIZE / 100)));
+  ext_space = extern_block_c * BLOCK_SIZE;
+  dmalloc_message("external blocks: %ld blocks, %ld bytes (%ld%%)",
+		  extern_block_c, ext_space,
+		  (HEAP_SIZE == 0 ? 0 : ext_space / (HEAP_SIZE / 100)));
+  dmalloc_message("   total blocks: %ld blocks",
+		  user_block_c + admin_block_c + extern_block_c);
+  
   dmalloc_message("heap checked %ld", heap_check_c);
   
   /* log user allocation information */
@@ -2762,7 +2826,7 @@ void	_dmalloc_chunk_log_stats(void)
 		  func_recalloc_c, func_memalign_c, func_valloc_c);
   dmalloc_message("alloc calls: new %lu, delete %lu",
 		  func_new_c, func_delete_c);
-  dmalloc_message(" currently in use: %lu bytes (%lu pnts)",
+  dmalloc_message("  current memory in use: %lu bytes (%lu pnts)",
 		  alloc_current, alloc_cur_pnts);
   dmalloc_message(" total memory allocated: %lu bytes (%lu pnts)",
 		  alloc_total, alloc_tot_pnts);
@@ -2781,18 +2845,11 @@ void	_dmalloc_chunk_log_stats(void)
 		  wasted,
 		  (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   
-  /* final stats */
-  dmalloc_message("final user memory space: %ld blocks (%ld bytes)",
-		  user_block_c, tot_space);
-  dmalloc_message(" final admin overhead: %ld blocks, %ld bytes (%ld%%)",
-		  admin_block_c, overhead,
-		  (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
-  dmalloc_message(" final external space: %ld bytes (%ld blocks)",
-		  extern_block_c * BLOCK_SIZE, extern_block_c);
-  
-#if MEMORY_TABLE_LOG
-  dmalloc_message("top %d allocations:", MEMORY_TABLE_LOG);
-  _dmalloc_table_log_info(MEMORY_TABLE_LOG, 1);
+#if MEMORY_TABLE_TOP_LOG
+  dmalloc_message("top %d allocations:", MEMORY_TABLE_TOP_LOG);
+  _dmalloc_table_log_info(mem_table_alloc, mem_table_alloc_c,
+			  MEM_ALLOC_ENTRIES, MEMORY_TABLE_TOP_LOG,
+			  1 /* have in-use column */);
 #endif
 }
 
@@ -2856,7 +2913,8 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
   }
   
   /* clear out our memory table so we can fill it with pointer info */
-  _dmalloc_table_clear();
+  _dmalloc_table_clear(mem_table_changed, MEM_CHANGED_ENTRIES,
+		       &mem_table_changed_c);
   
   /* run through the blocks */
   for (slot_p = skip_address_list->sa_next_p[0];
@@ -2929,14 +2987,16 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 			  (unsigned long)pnt_info.pi_user_start, out_len, out);
 	}
       }
-      _dmalloc_table_alloc(slot_p->sa_file, slot_p->sa_line,
-			   slot_p->sa_user_size);
+      _dmalloc_table_insert(mem_table_changed, MEM_CHANGED_ENTRIES,
+			    slot_p->sa_file, slot_p->sa_line,
+			    slot_p->sa_user_size, &mem_table_changed_c);
     }
   }
   
-  /* dump the summary and clear the table */
-  _dmalloc_table_log_info(0, 0);
-  _dmalloc_table_clear();
+  /* dump the summary from the table table */
+  _dmalloc_table_log_info(mem_table_changed, mem_table_changed_c,
+			  MEM_CHANGED_ENTRIES, 0 /* log all entries */,
+			  0 /* no in-use column */);
   
   /* copy out size of pointers */
   if (block_c > 0) {
