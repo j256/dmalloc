@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.107 2003/11/10 23:59:55 gray Exp $
+ * $Id: dmalloc_t.c,v 1.108 2003/11/18 15:20:39 gray Exp $
  */
 
 /*
@@ -1519,7 +1519,78 @@ static	int	check_special(void)
   
   /********************/
   
-  /* NOTE: add tests which get errors before the ------- message above */
+  /*
+   * Verify that the check-funcs work with check-fence.  Thanks to
+   * John Hetherington for reporting this.
+   */
+  {
+    unsigned int	old_flags = dmalloc_debug_current();
+    int			our_errno_hold = dmalloc_errno;
+    
+    dmalloc_debug(DEBUG_CHECK_FUNCS);
+    
+    if (! silent_b) {
+      (void)printf("  Checking check-funcs with check-fence\n");
+    }
+    
+#define BUF_SIZE	64
+    
+    pnt = malloc(BUF_SIZE);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    dmalloc_errno = ERROR_NONE;
+    _dmalloc_memset(pnt, 0, BUF_SIZE);
+    if (dmalloc_errno != ERROR_NONE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: memset on buf of %d bytes failed.\n",
+		     BUF_SIZE);
+      }
+      final = 0;
+    }
+    
+    free(pnt);
+    
+    /* now turn on the check-fence token */
+    dmalloc_debug(DEBUG_CHECK_FENCE | DEBUG_CHECK_FUNCS);
+    
+    pnt = malloc(BUF_SIZE);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    dmalloc_errno = ERROR_NONE;
+    _dmalloc_memset(pnt, 0, BUF_SIZE);
+    if (dmalloc_errno != ERROR_NONE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: memset of %d bytes with check-fence failed.\n",
+		     BUF_SIZE);
+      }
+      final = 0;
+    }
+    
+    free(pnt);
+    dmalloc_debug(old_flags);
+    
+    /* recover the errno if necessary */
+    if (dmalloc_errno == ERROR_NONE) {
+      dmalloc_errno = our_errno_hold;
+    }
+  }
+  
+  /********************/
+  
+  /*
+   * NOTE: add tests which should result in errors before the -------
+   * message above
+   */
   
   return final;
 }

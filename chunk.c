@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.196 2003/11/10 23:46:16 gray Exp $
+ * $Id: chunk.c,v 1.197 2003/11/18 15:20:18 gray Exp $
  */
 
 /*
@@ -2216,6 +2216,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
 {
   skip_alloc_t	*slot_p;
   unsigned int	min;
+  pnt_info_t	pnt_info;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     dmalloc_message("checking pointer '%#lx'", (unsigned long)user_pnt);
@@ -2251,16 +2252,16 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
       min = min_size;
     }
     else {
+      /* length of the string + 1 for the \0 */
       min = strlen((char *)user_pnt) + 1;
     }
     
-    if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE)) {
-      min += FENCE_OVERHEAD_SIZE;
-    }
+    /* get info about the pointer */
+    get_pnt_info(slot_p, &pnt_info);
     
-    /* do we overflow the memory slot */
-    if ((char *)user_pnt + min >
-	(char *)slot_p->sa_mem + slot_p->sa_user_size) {
+    /* are we within bounds on the user pointer and size */
+    if ((char *)user_pnt < (char *)pnt_info.pi_user_start
+	|| (char *)user_pnt + min > (char *)pnt_info.pi_user_bounds) {
       dmalloc_errno = ERROR_WOULD_OVERWRITE;
       log_error_info(NULL, 0, slot_p->sa_file, slot_p->sa_line,
 		     user_pnt, 0, NULL, "pointer-check");
