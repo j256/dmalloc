@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.31 1995/06/21 18:21:01 gray Exp $
+$Id: Manifest,v 1.32 1997/07/07 07:13:53 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
@@ -104,7 +104,7 @@ error_val.h		General error codes for the dmalloc module.
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.
 
-install.sh		A shell script for systems without a sane install.
+instal-sh		A shell script for systems without a sane install.
 
 malloc.c		Higher level alloc routines including malloc,
 			free, realloc, etc.  These are the routines to
