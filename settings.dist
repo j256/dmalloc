@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.13 1997/07/07 07:13:19 gray Exp $
+ * $Id: settings.dist,v 1.14 1997/07/07 07:25:24 gray Exp $
  */
 
 /*
@@ -211,6 +211,20 @@
 #define STORE_TIMEVAL 0
 #define TIMEVAL_INCLUDE		<sys/time.h>
 #define GET_TIMEVAL(t)		(void)gettimeofday(&(t), NULL)
+
+/*
+ * In OSF (anyone else?) you can setup __fini_* functions in each
+ * module which will be called automagically at shutdown of the
+ * program.  This means that dmalloc can shut itself down and log
+ * statistics when the program closes.  Pretty cool.
+ */
+#define FINI_DMALLOC 0
+
+/* If you enable this, you probably want the AUTO_SHUTDOWN flag turned off */
+#if FINI_DMALLOC
+#undef AUTO_SHUTDOWN
+#define AUTO_SHUTDOWN 0
+#endif
 
 /****************************** thread settings ******************************/
 

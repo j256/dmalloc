@@ -1,3 +1,11 @@
+Mon Jul  7 03:12:28 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Added a FINI_DMALLOC setting to the settings.dist file to
+        support the OSF __fini_ stuff.
+
+	* Added pthread lock_on -o environmental settings.  You will need
+        to have LOCK_THREADS set to 1 in the settings.h file.
+
 Sat Mar 22 12:28:45 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Added return-address tracking for gcc on alphas.  Thanks
@@ -1177,5 +1185,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.175 1997/03/22 17:31:33 gray Exp $
+$Id: ChangeLog,v 1.176 1997/07/07 07:25:25 gray Exp $
 -------------------------------------------------------------------------------

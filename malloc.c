@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.94 1997/07/07 06:44:32 gray Exp $";
+  "$Id: malloc.c,v 1.95 1997/07/07 07:25:23 gray Exp $";
 #endif
 
 /*
@@ -385,6 +385,17 @@ EXPORT	void	_dmalloc_shutdown(void)
   
   /* NOTE: do not set enabled to false here */
 }
+
+#ifdef FINI_DMALLOC
+/*
+ * Automatic OSF function to close dmalloc.  Pretty cool OS/compiler
+ * hack.
+ */
+EXPORT	void	__fini_dmalloc()
+{
+  dmalloc_shutdown();
+}
+#endif
 
 /******************************* memory calls ********************************/
 
