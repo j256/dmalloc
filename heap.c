@@ -34,6 +34,7 @@
 
 #include "chunk.h"
 #include "compat.h"
+#include "dbg_values.h"
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
@@ -41,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.22 1993/05/24 17:00:42 gray Exp $";
+  "$Id: heap.c,v 1.23 1993/07/12 06:07:02 gray Exp $";
 #endif
 
 /* external routines */
@@ -68,7 +69,21 @@ EXPORT	void	*_heap_alloc(unsigned int size)
     _malloc_perror("_heap_alloc");
     ret = HEAP_ALLOC_ERROR;
   }
-  else {
+#endif
+  
+  /* did we not allocate any heap space? */
+  if (ret == HEAP_ALLOC_ERROR) {
+    if (BIT_IS_SET(_malloc_debug, DEBUG_CATCH_NULL)) {
+      char	str[128];
+      (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not allocate %u more bytes from heap\r\n",
+		    size);
+      (void)write(STDERR, str, strlen(str));
+      _malloc_die();
+    }
+  }
+  
+#if HAVE_SBRK
+  if (ret != HEAP_ALLOC_ERROR) {
     /* did someone else extend the heap in our absence.  VERY BAD! */
     if (ret != _heap_last) {
       malloc_errno = MALLOC_ALLOC_NONLINEAR;
@@ -97,6 +112,12 @@ EXPORT	void	*_heap_end(void)
   if (ret == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_end");
+    if (BIT_IS_SET(_malloc_debug, DEBUG_CATCH_NULL)) {
+      char	str[128];
+      (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not find the end of the heap\r\n");
+      (void)write(STDERR, str, strlen(str));
+      _malloc_die();
+    }
     ret = HEAP_ALLOC_ERROR;
   }
 #endif
@@ -109,7 +130,8 @@ EXPORT	void	*_heap_end(void)
  */
 EXPORT	void	_heap_startup(void)
 {
-  _heap_base = _heap_last = _heap_end();
+  _heap_base = _heap_end();
+  _heap_last = _heap_base;
 }
 
 /*

@@ -35,6 +35,8 @@
 
 #define MALLOC_DEBUG_DISABLE
 
+#include "argv.h"				/* for argument processing */
+
 #include "malloc_dbg.h"
 #include "conf.h"
 
@@ -45,21 +47,18 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.15 1993/06/15 14:30:48 gray Exp $";
+  "$Id: dmalloc.c,v 1.16 1993/07/12 06:07:07 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
 #define DEFAULT_CONFIG	"%s/.mallocrc"		/* default config file */
 #define TOKENIZE_CHARS	" \t,="			/* for tag lines */
 
-#define USAGE_STRING	"--usage"		/* show the usage message */
-#define VERSION_STRING	"--version"		/* show the version message */
-#define NO_VALUE	(-1)			/* no value ... value */
-#define TOKENS_PER_LINE	4			/* num debug toks per line */
+#define NO_VALUE		(-1)		/* no value ... value */
+#define TOKENS_PER_LINE		4		/* num debug toks per line */
 
 /* local variables */
 LOCAL	char	printed		= FALSE;	/* did we outputed anything? */
-LOCAL	char	*program	= NULL;		/* our program name */
 
 /* argument variables */
 LOCAL	char	*address	= NULL;		/* for ADDRESS */
@@ -75,6 +74,36 @@ LOCAL	char	remove		= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	*tag		= NULL;		/* the debug tag */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
+
+LOCAL	argv_t	args[] = {
+  { 'a',	"address",	ARGV_CHARP,	&address,
+      "address:#",		"stop when malloc sees address" },
+  { 'b',	"bourne",	ARGV_BOOL,	&bourne,
+      NULL,			"set output for bourne shells" },
+  { 'c',	"clear",	ARGV_BOOL,	&clear,
+      NULL,			"clear all variables not set" },
+  { 'd',	"debug-mask",	ARGV_HEX,	&debug,
+      "value",			"hex flag to set debug mask" },
+  { 'e',	"errno",	ARGV_INT,	&errno_to_print,
+      "errno",			"print error string for errno" },
+  { 'f',	"file",		ARGV_CHARP,	&inpath,
+      "path",			"configs if not ~/.mallocrc" },
+  { 'i',	"interval",	ARGV_INT,	&interval,
+      "value",			"check heap every number times" },
+  { 'k',	"keep",		ARGV_BOOL,	&keep,
+      NULL,			"keep settings (override -r)" },
+  { 'l',	"logfile",	ARGV_CHARP,	&logpath,
+      "path",			"file to log messages to" },
+  { 'r',	"remove",	ARGV_BOOL,	&remove,
+      NULL,			"remove other settings if tag" },
+  { 's',	"start",	ARGV_CHARP,	&start,
+      "file:line",		"start check heap after this" },
+  { 'v',	"verbose",	ARGV_BOOL,	&verbose,
+      NULL,			"turn on verbose output" },
+  { ARGV_MAND,	NULL,		ARGV_CHARP,	&tag,
+      "tag",			"debug token to find in rc" },
+  { ARGV_LAST }
+};
 
 /*
  * hexadecimal STR to long translation
@@ -105,199 +134,6 @@ LOCAL	int	hex_to_int(char * str)
 }
 
 /*
- * print a usage message for the program.
- */
-LOCAL	void	usage(void)
-{
-  (void)fprintf(stderr,	"Usage: %s\n", program);
-  (void)fprintf(stderr,	"  [-a address:#]    = stop when malloc sees ");
-  (void)fprintf(stderr,   "address [for #th time] %%s\n");
-  (void)fprintf(stderr,	"  [-b]              = set the output for bourne ");
-  (void)fprintf(stderr,   "shells (sh, ksh, zsh) %%t\n");
-  (void)fprintf(stderr,	"  [-c]              = clear all variables not ");
-  (void)fprintf(stderr,   "specified %%t\n");
-  (void)fprintf(stderr,	"  [-d bitmask]      = hex flag to directly set ");
-  (void)fprintf(stderr,   "debug mask %%x\n");
-  (void)fprintf(stderr,	"  [-e errno]        = print the error string for ");
-  (void)fprintf(stderr,    "errno %%d\n");
-  (void)fprintf(stderr,	"  [-f file]         = config file to read from ");
-  (void)fprintf(stderr,    "when not ~/.mallocrc %%s\n");
-  (void)fprintf(stderr, "  [-i number]       = check heap every number ");
-  (void)fprintf(stderr,    "times %%d\n");
-  (void)fprintf(stderr,	"  [-k]              = keep other settings ");
-  (void)fprintf(stderr,   "(overrides -r) %%t\n");
-  (void)fprintf(stderr,	"  [-l file]         = file to log messages to %%s\n");
-  (void)fprintf(stderr,	"  [-r]              = remove other settings when ");
-  (void)fprintf(stderr,   "tag specified %%t\n");
-  (void)fprintf(stderr, "  [-s file:line]    = start checking heap after ");
-  (void)fprintf(stderr,    "seeing file [and line] %%s\n");
-  (void)fprintf(stderr, "  [-v]              = turn on verbose output\n");
-  (void)fprintf(stderr, "  [tag]             = debug token to find in ");
-  (void)fprintf(stderr,    "mallocrc\n");
-  (void)fprintf(stderr, "\n");
-  (void)fprintf(stderr, "--usage             = print this usage message\n");
-  (void)fprintf(stderr, "--version           = print version number\n");
-  (void)fprintf(stderr, "\n");
-  (void)fprintf(stderr, "if no arguments are specified then it dumps the ");
-  (void)fprintf(stderr,    "current env setings.\n");
-}
-
-/*
- * process the command-line arguments
- * I've got a great library to do this automatically.  sigh.
- */
-LOCAL	void	process_arguments(int argc, char ** argv)
-{
-  char	missing = FALSE, wrong = FALSE;
-  
-  program = (char *)rindex(*argv, '/');
-  if (program == NULL)
-    program = *argv;
-  else
-    program++;
-  
-  argc--, argv++;
-  
-  for (; argc > 0; argc--, argv++) {
-    
-    /* special usage message */
-    if (strcmp(*argv, USAGE_STRING) == 0) {
-      usage();
-      exit(0);
-    }
-    
-    /* special version message */
-    if (strcmp(*argv, VERSION_STRING) == 0) {
-      (void)fprintf(stderr, "%s: Version '%s'\n", program, malloc_version);
-      exit(0);
-    }
-    
-    /* if no - then assume it is the tag */
-    if (**argv != '-') {
-      if (tag != NULL) {
-	(void)fprintf(stderr,
-		      "%s: usage problem, debug-tag was already specified\n",
-		      program);
-	usage();
-	exit(1);
-      }
-      tag = *argv;
-      continue;
-    }
-    
-    /* can only handle -a not -ab */
-    if ((*argv)[1] == NULLC || (*argv)[2] != NULLC) {
-      (void)fprintf(stderr,
-		    "%s: usage problem, incorrect argument format '%s'\n",
-		    *argv, program);
-      usage();
-      exit(1);
-    }
-    
-    switch ((*argv)[1]) {
-      
-    case 'a':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	address = *argv;
-      }
-      break;
-      
-    case 'b':
-      bourne = TRUE;
-      break;
-      
-    case 'c':
-      clear = TRUE;
-      break;
-      
-    case 'd':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	debug = hex_to_int(*argv);
-      }
-      break;
-      
-    case 'e':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	errno_to_print = atoi(*argv);
-      }
-      break;
-      
-    case 'f':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	inpath = *argv;
-      }
-      break;
-      
-    case 'i':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	interval = atoi(*argv);
-      }
-      break;
-      
-    case 'k':
-      keep = TRUE;
-      break;
-      
-    case 'l':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	logpath = *argv;
-      }
-      break;
-      
-    case 'r':
-      remove = TRUE;
-      break;
-      
-    case 's':
-      if (argc <= 1)
-	missing = TRUE;
-      else {
-	argc--, argv++;
-	start = *argv;
-      }
-      break;
-      
-    case 'v':
-      verbose = TRUE;
-      break;
-      
-    default:
-      wrong = TRUE;
-      break;
-    }
-    
-    if (wrong || missing) {
-      if (missing)
-	(void)fprintf(stderr, "%s: usage problem, missing argument to -%c\n",
-		      program, (*argv)[1]);
-      else
-	(void)fprintf(stderr, "%s: usage problem, unknown argument '%s'\n",
-		      program, *argv);
-      (void)fprintf(stderr, "   For usage type: %s --usage\n", program);
-      exit(1);
-    }
-  }
-}
-
-/*
  * process the user configuration looking for the tag.  if tag is null then
  * look for DEBUG_VALUE in the file and return the token for it in STR.
  * routine returns the new debug value matching tag.
@@ -315,7 +151,7 @@ LOCAL	int	process(int debug_value, char ** strp)
     homep = (char *)getenv(HOME_ENVIRON);
     if (homep == NULL) {
       (void)fprintf(stderr, "%s: could not find variable '%s'\n",
-		    program, HOME_ENVIRON);
+		    argv_program, HOME_ENVIRON);
       exit(1);
     }
     
@@ -325,7 +161,7 @@ LOCAL	int	process(int debug_value, char ** strp)
   
   infile = fopen(inpath, "r");
   if (infile == NULL) {
-    (void)fprintf(stderr, "%s: could not read '%s': ", program, inpath);
+    (void)fprintf(stderr, "%s: could not read '%s': ", argv_program, inpath);
     perror("");
     exit(1);
   }
@@ -381,7 +217,7 @@ LOCAL	int	process(int debug_value, char ** strp)
 	
 	if (attributes[attrc].at_string == NULL) {
 	  (void)fprintf(stderr, "%s: unknown token '%s'\n",
-			program, tokp);
+			argv_program, tokp);
 	}
 	else
 	  new_debug |= attributes[attrc].at_value;
@@ -411,7 +247,7 @@ LOCAL	int	process(int debug_value, char ** strp)
   }
   else if (! found && tag != NULL) {
     (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		  program, tag, inpath);
+		  argv_program, tag, inpath);
     exit(1);
   }
   
@@ -444,7 +280,7 @@ LOCAL	void	dump_debug(const int val)
   
   if (work != 0)
     (void)fprintf(stderr, "%s: warning, unknown debug flags: %#x\n",
-		  program, work);
+		  argv_program, work);
 }
 
 /*
@@ -536,16 +372,23 @@ EXPORT	int	main(int argc, char ** argv)
 {
   char	buf[20];
   
-  /* turn off debugging for this program */
+  /*
+   * turn off debugging for this program
+   * NOTE: gcc has already called malloc unfortunately
+   */
   (void)malloc_debug(0);
   
-  process_arguments(argc, argv);
+  argv_usage_on_error = 0;
+  argv_help_string = "Sets malloc_dbg library env variables.";
+  argv_version_string = malloc_version;
+  
+  ARGV_PROCESS(args, argc, argv);
   
   /* get a new debug value from tag */
   if (tag != NULL) {
     if (debug != NO_VALUE)
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
-		    program, tag);
+		    argv_program, tag);
     debug = process(0, NULL);
   }
   
@@ -582,7 +425,7 @@ EXPORT	int	main(int argc, char ** argv)
   
   if (errno_to_print != NO_VALUE) {
     (void)fprintf(stderr, "%s: malloc_errno value '%d' = \n",
-		  program, errno_to_print);
+		  argv_program, errno_to_print);
     (void)fprintf(stderr, "   '%s'\n", malloc_strerror(errno_to_print));
     printed = TRUE;
   }

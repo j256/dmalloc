@@ -1,3 +1,14 @@
+Mon Jul 12 02:03:25 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added new catch-null token to abort program immediately if
+	library can't get more sbrk space.
+
+Tue Jul  6 16:04:17 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added 'catch-null' token for quiting as soon as we get a sbrk
+	failure (i.e. the swap is full or something) as opposed to
+	returning NULL.
+
 Sat Jun 19 14:49:42 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Minor changes to configuration and notes files.

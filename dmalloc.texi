@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.20 1993/06/19 18:50:33 gray Exp $
+@c $Id: dmalloc.texi,v 1.21 1993/07/12 06:07:04 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -759,23 +759,27 @@ check to see if free space has been overwritten
 check the arguments of some functions (mostly string operations) looking
 for bad pointers
 
-@item realloc-copy
-always copy data to a new pointer when realloc
+@item alloc-blank
+write special values (non-0) into space when it is alloced
 
-@item free-blank
-write special values (non-0) into space when it is freed
+@item catch-null
+abort the program immediately if the library fails to get more heap
+space from sbrk
 
 @item error-abort
 abort the program (and dump core) on errors
 
-@item alloc-blank
-write special values (non-0) into space when it is alloced
+@item free-blank
+write special values (non-0) into space when it is freed
 
 @item heap-check-map
 log a heap-map to the logfile every time the heap is checked
 
 @item print-perror
 log any errors and messages to the screen via standard-error
+
+@item realloc-copy
+always copy data to a new pointer when realloc
 @end table
 
 @node Argument Checking,  , Debug Tokens, Features

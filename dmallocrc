@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.10 1993/05/19 01:31:14 gray Exp $
+# $Id: dmallocrc,v 1.11 1993/07/12 06:07:09 gray Exp $
 #
 
 #
@@ -45,56 +45,68 @@
 # check-free			check to see if free space has been overwritten
 # check-funcs			check the arguments of some routines
 #
-# realloc-copy			always copy data to a new pointer when realloc
-# free-blank			overwrite space that is freed
-# error-abort			abort the program (and dump core) on errors
 # alloc-blank			overwrite space that is to be alloced
+# error-abort			abort the program (and dump core) on errors
+# catch-null			abort program if library can't get sbrk space
+# free-blank			overwrite space that is freed
 # heap-check-map		log a heap-map every time the heap is checked
 # print-perror			dump errors and messages to STDERR
+# realloc-copy			always copy data to a new pointer when realloc
 #
 
 # no debugging
 none	none
 
 # basic production combination
-production	log-stats, log-non-free, log-perror, log-bad-pnt
+production	log-stats, log-non-free, log-perror, log-bad-pnt, \
+		catch-null
 
 # basic runtime development combination
 runtime		log-stats, log-non-free, log-perror, log-bad-pnt, \
-		check-fence
+		check-fence, \
+		catch-null
 
 # more logging and some heap checking
 2		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		check-fence, check-heap, check-lists, check-dblock-fence, \
-		error-abort
+		catch-null, error-abort
 
 # good checking functionality
 3		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock-fence,
 		check-funcs, \
-		realloc-copy, free-blank, alloc-blank, error-abort
+		alloc-blank, catch-null, error-abort, free-blank, realloc-copy
 
 # extensive checking
 4		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock, \
 		check-dblock-fence, check-funcs, \
-		realloc-copy, free-blank, alloc-blank, error-abort
+		alloc-blank, catch-null, error-abort, free-blank, realloc-copy
 
 # ultra-extensive checking (the whole ball of wax)
 5		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock, \
 		check-dblock-fence, check-free, check-funcs, \
-		realloc-copy, free-blank, alloc-blank, error-abort
+		alloc-blank, catch-null, error-abort, free-blank, realloc-copy
 
 # full fence-post checking
 fence		log-stats, log-non-free, log-perror, log-bad-pnt, \
-		check-fence, check-dblock-fence
+		check-fence, check-dblock-fence, \
+		catch-null
 
 # full logging of statistics to logfile and screen
 log		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, log-bad-space, \
 		check-fence, \
-		heap-check-map, print-perror
+		heap-check-map, print-perror, catch-null
+
+# the kitchen-sink
+all		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
+		log-admin, log-blocks, log-unknown, log-bad-space, \
+		check-fence, check-heap, check-lists, check-dblock, \
+		check-dblock-fence, check-free, check-funcs \
+		alloc-blank, catch-null, error-abort, free-blank, \
+		heap-check-map, print-perror, realloc-copy
