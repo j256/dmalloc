@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: error.c,v 1.70 1998/09/19 00:11:48 gray Exp $";
+  "$Id: error.c,v 1.71 1998/09/28 21:36:08 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -165,6 +165,7 @@ char	*_dmalloc_ptime(const long *time_p, const int elapsed_b)
  * message writer with printf like arguments
  */
 void	_dmalloc_message(const char *format, ...)
+  /* __attribute__ ((format (printf, 1, 2))) */
 {
   static int	outfile = -1;
   char		str[1024], *str_p = str;
@@ -247,8 +248,9 @@ void	_dmalloc_message(const char *format, ...)
       _dmalloc_message("Dmalloc version '%s'.  UN-LICENSED copy.",
 		       dmalloc_version);
 #endif
-      _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
-		       dmalloc_logpath, _dmalloc_flags, dmalloc_address);
+      _dmalloc_message("dmalloc_logfile '%s': flags = %#x, addr = %#lx",
+		       dmalloc_logpath, _dmalloc_flags,
+		       (unsigned long)dmalloc_address);
       
 #if STORE_TIMEVAL
       _dmalloc_message("starting time = %ld.%ld",

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.33 1998/09/17 12:42:11 gray Exp $
+ * $Id: error.h,v 1.34 1998/09/28 21:36:09 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -93,7 +93,11 @@ char	*_dmalloc_ptime(const long *time_p, const int elapsed_b);
  * message writer with printf like arguments
  */
 extern
-void	_dmalloc_message(const char *format, ...);
+void	_dmalloc_message(const char *format, ...)
+#ifdef __GNUC__
+  __attribute__ ((format (printf, 1, 2)))
+#endif
+;
 
 /*
  * kill the program because of an internal malloc error

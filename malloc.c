@@ -72,7 +72,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.108 1998/09/19 00:12:54 gray Exp $";
+  "$Id: malloc.c,v 1.109 1998/09/28 21:36:20 gray Exp $";
 #endif
 
 /*
@@ -288,7 +288,8 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   
   addc++;
   _dmalloc_message("address '%#lx' found in '%s' at pass %d from '%s'",
-		   pnt, label, addc, _chunk_display_where(file, line));
+		   (unsigned long)pnt, label, addc,
+		   _chunk_display_where(file, line));
   
   /* NOTE: if dmalloc_address_count == 0 then never quit */
   if (dmalloc_address_count == ADDRESS_COUNT_INIT
