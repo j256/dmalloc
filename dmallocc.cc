@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmallocc.cc,v 1.2 2000/05/15 15:43:22 gray Exp $
+ * $Id: dmallocc.cc,v 1.3 2003/05/15 20:08:46 gray Exp $
  */
 
 /*
@@ -50,7 +50,8 @@ operator new(size_t size)
 {
   char	*file;
   GET_RET_ADDR(file);
-  return _malloc_leap(file, 0, size);
+  return dmalloc_malloc(file, 0, size, DMALLOC_FUNC_NEW,
+			0 /* no alignment */, 0 /* no xalloc messages */);
 }
 
 /*
@@ -61,7 +62,8 @@ operator new[](size_t size)
 {
   char	*file;
   GET_RET_ADDR(file);
-  return _malloc_leap(file, 0, size);
+  return dmalloc_malloc(file, 0, size, DMALLOC_FUNC_NEW_ARRAY,
+			0 /* no alignment */, 0 /* no xalloc messages */);
 }
 
 /*
@@ -72,7 +74,7 @@ operator delete(void *pnt)
 {
   char	*file;
   GET_RET_ADDR(file);
-  _free_leap(file, 0, pnt);
+  dmalloc_free(file, 0, pnt, DMALLOC_FUNC_DELETE);
 }
 
 /*
@@ -83,5 +85,5 @@ operator delete[](void *pnt)
 {
   char	*file;
   GET_RET_ADDR(file);
-  _free_leap(file, 0, pnt);
+  dmalloc_free(file, 0, pnt, DMALLOC_FUNC_DELETE_ARRAY);
 }

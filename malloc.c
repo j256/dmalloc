@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.160 2003/05/15 02:39:29 gray Exp $
+ * $Id: malloc.c,v 1.161 2003/05/15 20:08:46 gray Exp $
  */
 
 /*
@@ -791,13 +791,14 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
  *
  * Returns FREE_ERROR, FREE_NOERROR.
  */
-int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt)
+int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
+		     const int func_id)
 {
   int		ret;
   
   if (! dmalloc_in(file, line, 1)) {
     if (tracking_func != NULL) {
-      tracking_func(file, line, DMALLOC_FUNC_FREE, 0, 0, pnt, NULL);
+      tracking_func(file, line, func_id, 0, 0, pnt, NULL);
     }
     return FREE_ERROR;
   }
@@ -988,7 +989,7 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   int	ret;
   
   GET_RET_ADDR(file);
-  ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt);
+  ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_FREE);
   
 #if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
 #else
@@ -1006,7 +1007,7 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
   int	ret;
   
   GET_RET_ADDR(file);
-  ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt);
+  ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_CFREE);
   
 #if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
 #else

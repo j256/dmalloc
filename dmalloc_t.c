@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.97 2003/05/15 02:42:38 gray Exp $
+ * $Id: dmalloc_t.c,v 1.98 2003/05/15 20:09:15 gray Exp $
  */
 
 /*
@@ -897,6 +897,20 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
     break;
   case DMALLOC_FUNC_FREE:
     (void)printf("%s free %#lx\n", file_line, (long)old_addr);
+    break;
+  case DMALLOC_FUNC_NEW:
+    (void)printf("%s new %d bytes got %#lx\n",
+		 file_line, byte_size, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_NEW_ARRAY:
+    (void)printf("%s new[] %d bytes got %#lx\n",
+		 file_line, byte_size, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_DELETE:
+    (void)printf("%s delete %#lx\n", file_line, (long)old_addr);
+    break;
+  case DMALLOC_FUNC_DELETE_ARRAY:
+    (void)printf("%s delete[] %#lx\n", file_line, (long)old_addr);
     break;
   default:
     (void)printf("%s unknown function %d bytes, %d alignment, %#lx old-addr "
