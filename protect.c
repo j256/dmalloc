@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: protect.c,v 1.7 2003/05/15 02:39:29 gray Exp $
+ * $Id: protect.c,v 1.8 2003/05/23 03:03:16 gray Exp $
  */
 
 /*
@@ -46,7 +46,7 @@
 #include "protect.h"
 
 /*
- * void protect_set_read_only
+ * void _dmalloc_protect_set_read_only
  *
  * DESCRIPTION:
  *
@@ -62,7 +62,7 @@
  *
  * block_n -> Number of blocks that we are protecting.
  */
-void	protect_set_read_only(void *mem, const int block_n)
+void	_dmalloc_protect_set_read_only(void *mem, const int block_n)
 {
 #if PROTECT_ALLOWED && PROTECT_BLOCKS
   int	size = block_n * BLOCK_SIZE;
@@ -83,7 +83,7 @@ void	protect_set_read_only(void *mem, const int block_n)
 }
 
 /*
- * void protect_set_read_write
+ * void _dmalloc_protect_set_read_write
  *
  * DESCRIPTION:
  *
@@ -99,7 +99,7 @@ void	protect_set_read_only(void *mem, const int block_n)
  *
  * block_n -> Number of blocks that we are protecting.
  */
-void	protect_set_read_write(void *mem, const int block_n)
+void	_dmalloc_protect_set_read_write(void *mem, const int block_n)
 {
 #if PROTECT_ALLOWED && PROTECT_BLOCKS
   int	prot, size = block_n * BLOCK_SIZE;
@@ -128,7 +128,7 @@ void	protect_set_read_write(void *mem, const int block_n)
 }
 
 /*
- * void protect_set_no_access
+ * void _dmalloc_protect_set_no_access
  *
  * DESCRIPTION:
  *
@@ -144,7 +144,7 @@ void	protect_set_read_write(void *mem, const int block_n)
  *
  * block_n -> Number of blocks that we are protecting.
  */
-void	protect_set_no_access(void *mem, const int block_n)
+void	_dmalloc_protect_set_no_access(void *mem, const int block_n)
 {
 #if PROTECT_ALLOWED && PROTECT_BLOCKS
   int	size = block_n * BLOCK_SIZE;
