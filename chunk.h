@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.h,v 1.54 1999/03/05 00:30:32 gray Exp $
+ * $Id: chunk.h,v 1.55 1999/03/07 23:05:40 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -38,11 +38,11 @@ extern
 int	_chunk_startup(void);
 
 /*
- * Display a bad pointer with FILE and LINE information
+ * Describe pnt from its FILE, LINE into BUF.  Returns BUF.
  */
 extern
-char	*_chunk_display_where(const char *file, const unsigned int line,
-			      char *buf, const int buf_size);
+char	*_chunk_desc_pnt(char *buf, const int buf_size,
+			const char *file, const unsigned int line);
 
 /*
  * Run extensive tests on the entire heap
@@ -66,7 +66,8 @@ extern
 int	_chunk_read_info(const void *pnt, unsigned int *size_p,
 			 unsigned int *alloc_size_p, char **file_p,
 			 unsigned int *line_p, void **ret_attr_p,
-			 const char *where, unsigned long **seen_cp);
+			 const char *where, unsigned long **seen_cp,
+			 int *valloc_bp);
 
 /*
  * Log the heap structure plus information on the blocks if necessary
@@ -82,7 +83,7 @@ void	_chunk_log_heap_map(void);
  */
 extern
 void	*_chunk_malloc(const char *file, const unsigned int line,
-		       const unsigned int size, const int calloc_b,
+		       const unsigned long size, const int calloc_b,
 		       const int realloc_b, const unsigned int alignment);
 
 /*
@@ -101,7 +102,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
  */
 extern
 void	*_chunk_realloc(const char *file, const unsigned int line,
-			void *old_p, unsigned int new_size,
+			void *old_p, unsigned long new_size,
 			const int recalloc_b);
 
 /*

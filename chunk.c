@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.136 1999/03/05 00:30:28 gray Exp $
+ * $Id: chunk.c,v 1.137 1999/03/07 23:05:38 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.136 1999/03/05 00:30:28 gray Exp $";
+#ident "$Id: chunk.c,v 1.137 1999/03/07 23:05:38 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.136 1999/03/05 00:30:28 gray Exp $";
+  "$Id: chunk.c,v 1.137 1999/03/07 23:05:38 gray Exp $";
 #endif
 #endif
 
@@ -114,7 +114,8 @@ static	long		free_count = 0;		/* count the frees */
  */
 int	_chunk_startup(void)
 {
-  unsigned int	bin_c, num;
+  unsigned int	bin_c;
+  unsigned long	num;
   
   /* calculate the smallest possible block */
   for (smallest_block = DEFAULT_SMALLEST_BLOCK;
@@ -283,10 +284,10 @@ static	int	expand_chars(const void *buf, const int buf_size,
 }
 
 /*
- * Describe pnt from its FILE, LINE into BUF
+ * Describe pnt from its FILE, LINE into BUF.  Returns BUF.
  */
-static	void	desc_pnt(char *buf, const int buf_size, const char *file,
-			 const unsigned int line)
+char	*_chunk_desc_pnt(char *buf, const int buf_size,
+			const char *file, const unsigned int line)
 {
   if (file == DMALLOC_DEFAULT_FILE && line == DMALLOC_DEFAULT_LINE) {
     (void)loc_snprintf(buf, buf_size, "unknown");
@@ -300,15 +301,7 @@ static	void	desc_pnt(char *buf, const int buf_size, const char *file,
   else {
     (void)loc_snprintf(buf, buf_size, "%s:%u", file, line);
   }
-}
-
-/*
- * Display a bad pointer with FILE and LINE information
- */
-char	*_chunk_display_where(const char *file, const unsigned int line,
-			      char *buf, const int buf_size)
-{
-  desc_pnt(buf, buf_size, file, line);
+  
   return buf;
 }
 
@@ -388,14 +381,14 @@ static	void	log_error_info(const char *file, const unsigned int line,
   if (pnt == NULL) {
     _dmalloc_message("%s: %s: from '%s'",
 		     where, reason_str,
-		     _chunk_display_where(file, line, where_buf,
-					  sizeof(where_buf)));
+		     _chunk_desc_pnt(where_buf, sizeof(where_buf),
+				     file, line));
   }
   else {
     _dmalloc_message("%s: %s: pointer '%#lx' from '%s'",
 		     where, reason_str, (unsigned long)pnt,
-		     _chunk_display_where(file, line, where_buf,
-					  sizeof(where_buf)));
+		     _chunk_desc_pnt(where_buf, sizeof(where_buf),
+				     file, line));
   }
   
   /* if we are not displaying memory then quit */
@@ -2043,7 +2036,8 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
 int	_chunk_read_info(const void *pnt, unsigned int *size_p,
 			 unsigned int *alloc_size_p, char **file_p,
 			 unsigned int *line_p, void **ret_attr_p,
-			 const char *where, unsigned long **seen_cp)
+			 const char *where, unsigned long **seen_cp,
+			 int *valloc_bp)
 {
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
@@ -2117,11 +2111,14 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       else {
 	*ret_attr_p = NULL;
       }
+    }
 #if STORE_SEEN_COUNT
-      if (seen_cp != NULL) {
-	*seen_cp = &dblock_p->db_overhead.ov_seen_c;
-      }
+    if (seen_cp != NULL) {
+      *seen_cp = &dblock_p->db_overhead.ov_seen_c;
+    }
 #endif
+    if (valloc_bp != NULL) {
+      *valloc_bp = 0;
     }
   }
   else {
@@ -2176,6 +2173,14 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       *seen_cp = &bblock_p->bb_overhead.ov_seen_c;
     }
 #endif
+    if (valloc_bp != NULL) {
+      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)) {
+	*valloc_bp = 1;
+      }
+      else {
+	*valloc_bp = 0;
+      }
+    }
   }
   
   return NOERROR;
@@ -2374,12 +2379,12 @@ void	_chunk_log_heap_map(void)
       undef_b = 0;
       
       if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
-	_dmalloc_message("%d (%#lx): start-of-user block: %ld bytes from '%s'",
+	_dmalloc_message("%d (%#lx): start-of-user block: %lu bytes from '%s'",
 			 tblock_c, (unsigned long)BLOCK_POINTER(tblock_c),
 			 bblock_p->bb_size,
-			 _chunk_display_where(bblock_p->bb_file,
-					      bblock_p->bb_line, where_buf,
-					      sizeof(where_buf)));
+			 _chunk_desc_pnt(where_buf, sizeof(where_buf),
+					 bblock_p->bb_file,
+					 bblock_p->bb_line));
 	continue;
       }
       
@@ -2443,10 +2448,11 @@ void	_chunk_log_heap_map(void)
  * to align the returned block.
  */
 void	*_chunk_malloc(const char *file, const unsigned int line,
-		       const unsigned int size, const int calloc_b,
+		       const unsigned long size, const int calloc_b,
 		       const int realloc_b, const unsigned int alignment)
 {
-  unsigned int	bit_n, byte_n = size;
+  unsigned int	bit_n;
+  unsigned long	byte_n = size;
   int		valloc_b = 0, memalign_b = 0;
   char		where_buf[64], disp_buf[64];
   bblock_t	*bblock_p;
@@ -2620,9 +2626,9 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     else {
       trans_log = "alloc";
     }
-    _dmalloc_message("*** %s: at '%s' for %d bytes, got '%s'",
-		     trans_log, _chunk_display_where(file, line, where_buf,
-						     sizeof(where_buf)),
+    _dmalloc_message("*** %s: at '%s' for %ld bytes, got '%s'",
+		     trans_log, _chunk_desc_pnt(where_buf, sizeof(where_buf),
+						file, line),
 		     size, display_pnt(pnt, over_p, disp_buf,
 				       sizeof(disp_buf)));
   }
@@ -2654,8 +2660,8 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   if (pnt == NULL) {
 #if ALLOW_FREE_NULL_MESSAGE
     _dmalloc_message("WARNING: tried to free(0) from '%s'",
-		     _chunk_display_where(file, line, where_buf,
-					  sizeof(where_buf)));
+		     _chunk_desc_pnt(where_buf, sizeof(where_buf),
+				     file, line));
 #endif
     /*
      * NOTE: we have here both a default in the settings.h file and a
@@ -2719,14 +2725,14 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     /* print transaction info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
       _dmalloc_message("*** free: at '%s' pnt '%s': size %d, alloced at '%s'",
-		       _chunk_display_where(file, line, where_buf,
-					    sizeof(where_buf)),
+		       _chunk_desc_pnt(where_buf, sizeof(where_buf),
+				       file, line),
 		       display_pnt(CHUNK_TO_USER(pnt), &dblock_p->db_overhead,
 				   disp_buf, sizeof(disp_buf)),
 		       dblock_p->db_size - fence_overhead_size,
-		       _chunk_display_where(dblock_p->db_file,
-					    dblock_p->db_line, where_buf2,
-					    sizeof(where_buf2)));
+		       _chunk_desc_pnt(where_buf2, sizeof(where_buf2),
+				       dblock_p->db_file,
+				       dblock_p->db_line));
     }
     
     /* check fence-post, probably again */
@@ -2797,15 +2803,14 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    _dmalloc_message("*** free: at '%s' pnt '%s': size %ld, alloced at '%s'",
-		     _chunk_display_where(file, line, where_buf,
-					  sizeof(where_buf)),
+    _dmalloc_message("*** free: at '%s' pnt '%s': size %lu, alloced at '%s'",
+		     _chunk_desc_pnt(where_buf, sizeof(where_buf), file, line),
 		     display_pnt(CHUNK_TO_USER(pnt), &bblock_p->bb_overhead,
 				 disp_buf, sizeof(disp_buf)),
 		     bblock_p->bb_size - fence_overhead_size,
-		     _chunk_display_where(bblock_p->bb_file,
-					  bblock_p->bb_line, where_buf2,
-					  sizeof(where_buf2)));
+		     _chunk_desc_pnt(where_buf2, sizeof(where_buf2),
+				     bblock_p->bb_file,
+				     bblock_p->bb_line));
   }
   
   /* check fence-post, probably again */
@@ -2946,7 +2951,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
  * Reallocate a section of memory
  */
 void	*_chunk_realloc(const char *file, const unsigned int line,
-			void *old_p, unsigned int new_size,
+			void *old_p, unsigned long new_size,
 			const int recalloc_b)
 {
   void		*new_p, *ret_addr;
@@ -2954,6 +2959,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
   char		where_buf[64], where_buf2[64];
   const char	*trans_log;
   unsigned long	*seen_cp;
+  int		valloc_b;
   unsigned int	old_size, size, old_line, alloc_size;
   unsigned int	old_bit_n, new_bit_n;
   
@@ -2990,7 +2996,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
   
   /* get info about old pointer */
   if (_chunk_read_info(old_p, &old_size, &alloc_size, &old_file, &old_line,
-		       &ret_addr, "realloc", &seen_cp) != NOERROR) {
+		       &ret_addr, "realloc", &seen_cp, &valloc_b) != NOERROR) {
     return REALLOC_ERROR;
   }
   
@@ -3014,7 +3020,8 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
   NUM_BITS(new_size, new_bit_n);
   
   /* if we are not realloc copying and the size is the same */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_REALLOC_COPY)
+  if (valloc_b
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_REALLOC_COPY)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)
       || old_bit_n != new_bit_n
       || NUM_BLOCKS(old_size) != NUM_BLOCKS(new_size)) {
@@ -3112,12 +3119,12 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     else {
       trans_log = "realloc";
     }
-    _dmalloc_message("*** %s: at '%s' from '%#lx' (%u bytes) file '%s' to '%#lx' (%u bytes)",
-		     trans_log, _chunk_display_where(file, line, where_buf,
-						     sizeof(where_buf)),
+    _dmalloc_message("*** %s: at '%s' from '%#lx' (%u bytes) file '%s' to '%#lx' (%lu bytes)",
+		     trans_log, _chunk_desc_pnt(where_buf, sizeof(where_buf),
+						file, line),
 		     (unsigned long)old_p, old_size,
-		     _chunk_display_where(old_file, old_line, where_buf2,
-					  sizeof(where_buf2)),
+		     _chunk_desc_pnt(where_buf2, sizeof(where_buf2),
+				     old_file, old_line),
 		     (unsigned long)new_p, new_size);
   }
   
@@ -3295,9 +3302,9 @@ void	_chunk_dump_unfreed(void)
 				     &bblock_p->bb_overhead, disp_buf,
 				     sizeof(disp_buf)),
 			 bblock_p->bb_size - fence_overhead_size,
-			 _chunk_display_where(bblock_p->bb_file,
-					      bblock_p->bb_line, where_buf,
-					      sizeof(where_buf)));
+			 _chunk_desc_pnt(where_buf, sizeof(where_buf),
+					 bblock_p->bb_file,
+					 bblock_p->bb_line));
 	
 	if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
 	  out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
@@ -3389,9 +3396,9 @@ void	_chunk_dump_unfreed(void)
 				       &dblock_p->db_overhead, disp_buf,
 				       sizeof(disp_buf)),
 			   dblock_p->db_size - fence_overhead_size,
-			   _chunk_display_where(dblock_p->db_file,
-						dblock_p->db_line, where_buf,
-						sizeof(where_buf)));
+			   _chunk_desc_pnt(where_buf, sizeof(where_buf),
+					   dblock_p->db_file,
+					   dblock_p->db_line));
 	  
 	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
 	    out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
