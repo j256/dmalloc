@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.160 2000/05/15 22:28:44 gray Exp $
+ * $Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $
  */
 
 /*
@@ -63,13 +63,13 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.160 2000/05/15 22:28:44 gray Exp $";
-#ident "@(#) $Id: chunk.c,v 1.160 2000/05/15 22:28:44 gray Exp $";
+#ident "$Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
+#ident "@(#) $Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.160 2000/05/15 22:28:44 gray Exp $";
+  "$Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
 static	char	*rcs_id_w =
-  "@(#) $Id: chunk.c,v 1.160 2000/05/15 22:28:44 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
 #endif
 #endif
 
@@ -1002,9 +1002,7 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
   
   /* set up return values */
   ret_p = free_p->ba_blocks + bblock_c;
-  if (mem_p != NULL) {
-    *mem_p = mem;
-  }
+  SET_POINTER(mem_p, mem);
   
   /* now skip over those slots, set_bblock_admin will be done after return */
   bblock_c += many;
@@ -1291,6 +1289,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     
     /* add the rest to the free list (has to be at least 1 other dblock) */
     first_p = dblock_p;
+    dblock_p->db_bblock = bblock_p;
     dblock_p++;
     free_p = free_dblock[bit_n];
     free_dblock[bit_n] = dblock_p;
@@ -2245,9 +2244,7 @@ int	_chunk_read_info(const void *pnt, const char *where,
     _dmalloc_message("reading info about pointer '%#lx'", (unsigned long)pnt);
   }
   
-  if (seen_cp != NULL) {
-    *seen_cp = NULL;
-  }
+  SET_POINTER(seen_cp, NULL);
   
   /* adjust the pointer down if fence-posting */
   pnt = USER_TO_CHUNK(pnt);
@@ -2285,40 +2282,26 @@ int	_chunk_read_info(const void *pnt, const char *where,
     }
     
     /* write info back to user space */
-    if (size_p != NULL) {
-      *size_p = dblock_p->db_size;
+    SET_POINTER(size_p, dblock_p->db_size);
+    SET_POINTER(alloc_size_p, 1 << bblock_p->bb_bit_n);
+    if (dblock_p->db_file == DMALLOC_DEFAULT_FILE) {
+      SET_POINTER(file_p, NULL);
     }
-    if (alloc_size_p != NULL) {
-      *alloc_size_p = 1 << bblock_p->bb_bit_n;
+    else {
+      SET_POINTER(file_p, (char *)dblock_p->db_file);
     }
-    if (file_p != NULL) {
-      if (dblock_p->db_file == DMALLOC_DEFAULT_FILE) {
-	*file_p = NULL;
-      }
-      else {
-	*file_p = (char *)dblock_p->db_file;
-      }
+    SET_POINTER(line_p, dblock_p->db_line);
+    /* if the line is blank then the file will be 0 or the return address */
+    if (dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
+      SET_POINTER(ret_attr_p, (char *)dblock_p->db_file);
     }
-    if (line_p != NULL) {
-      *line_p = dblock_p->db_line;
-    }
-    if (ret_attr_p != NULL) {
-      /* if the line is blank then the file will be 0 or the return address */
-      if (dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
-	*ret_attr_p = (char *)dblock_p->db_file;
-      }
-      else {
-	*ret_attr_p = NULL;
-      }
+    else {
+      SET_POINTER(ret_attr_p, NULL);
     }
 #if STORE_SEEN_COUNT
-    if (seen_cp != NULL) {
-      *seen_cp = &dblock_p->db_overhead.ov_seen_c;
-    }
+    SET_POINTER(seen_cp, &dblock_p->db_overhead.ov_seen_c);
 #endif
-    if (valloc_bp != NULL) {
-      *valloc_bp = 0;
-    }
+    SET_POINTER(valloc_bp, 0);
   }
   else {
     
@@ -2331,54 +2314,41 @@ int	_chunk_read_info(const void *pnt, const char *where,
     }
     
     /* write info back to user space */
-    if (size_p != NULL) {
-      *size_p = bblock_p->bb_size;
+    SET_POINTER(size_p, bblock_p->bb_size);
+    /*
+     * if we have a valloc block and there is fence info, then
+     * another block was allocated
+     */
+    if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)
+	&& fence_bottom_size > 0) {
+      SET_POINTER(alloc_size_p,
+		  (NUM_BLOCKS(bblock_p->bb_size) + 1) * BLOCK_SIZE);
     }
-    if (alloc_size_p != NULL) {
-      /*
-       * if we have a valloc block and there is fence info, then
-       * another block was allocated
-       */
-      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)
-	  && fence_bottom_size > 0) {
-	*alloc_size_p = (NUM_BLOCKS(bblock_p->bb_size) + 1) * BLOCK_SIZE;
-      }
-      else {
-	*alloc_size_p = NUM_BLOCKS(bblock_p->bb_size) * BLOCK_SIZE;
-      }
+    else {
+      SET_POINTER(alloc_size_p, NUM_BLOCKS(bblock_p->bb_size) * BLOCK_SIZE);
     }
-    if (file_p != NULL) {
-      if (bblock_p->bb_file == DMALLOC_DEFAULT_FILE) {
-	*file_p = NULL;
-      }
-      else {
-	*file_p = (char *)bblock_p->bb_file;
-      }
+    if (bblock_p->bb_file == DMALLOC_DEFAULT_FILE) {
+      SET_POINTER(file_p, NULL);
     }
-    if (line_p != NULL) {
-      *line_p = bblock_p->bb_line;
+    else {
+      SET_POINTER(file_p, (char *)bblock_p->bb_file);
     }
-    if (ret_attr_p != NULL) {
-      /* if the line is blank then the file will be 0 or the return address */
-      if (bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
-	*ret_attr_p = (char *)bblock_p->bb_file;
-      }
-      else {
-	*ret_attr_p = NULL;
-      }
+    SET_POINTER(line_p, bblock_p->bb_line);
+    /* if the line is blank then the file will be 0 or the return address */
+    if (bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
+      SET_POINTER(ret_attr_p, (char *)bblock_p->bb_file);
+    }
+    else {
+      SET_POINTER(ret_attr_p, NULL);
     }
 #if STORE_SEEN_COUNT
-    if (seen_cp != NULL) {
-      *seen_cp = &bblock_p->bb_overhead.ov_seen_c;
-    }
+    SET_POINTER(seen_cp, &bblock_p->bb_overhead.ov_seen_c);
 #endif
-    if (valloc_bp != NULL) {
-      if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)) {
-	*valloc_bp = 1;
-      }
-      else {
-	*valloc_bp = 0;
-      }
+    if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)) {
+      SET_POINTER(valloc_bp, 1);
+    }
+    else {
+      SET_POINTER(valloc_bp, 0);
     }
   }
   
