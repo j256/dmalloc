@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.23 1994/03/30 06:06:38 gray Exp $
+$Id: NEWS,v 1.24 1994/04/07 03:03:26 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.2:
 
+	* Added 'log-nonfree-space' token for logging unfreed memory space.
 	* Added iteration count lable to all logfile output.  See conf.h.
 	* Added xmalloc,xrealloc,etc. override functions.
 	* Added better mechanisms for const definition.

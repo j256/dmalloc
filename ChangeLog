@@ -1,3 +1,8 @@
+Wed Apr  6 23:02:07 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added 'log-nonfree-space' token for logging unfreed memory
+	space.
+
 Wed Mar 30 01:03:56 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* Added iteration count lable to all logfile output.
@@ -679,5 +684,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.100 1994/03/30 06:06:35 gray Exp $
+$Id: ChangeLog,v 1.101 1994/04/07 03:03:21 gray Exp $
 -------------------------------------------------------------------------------

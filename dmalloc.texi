@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.46 1994/03/20 17:13:42 gray Exp $
+@c $Id: dmalloc.texi,v 1.47 1994/04/07 03:03:45 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -554,6 +554,9 @@ file/line information associated with them.
 
 @item log-bad-space
 log actual bytes in and around bad pointers
+
+@item log-nonfree-space
+log actual bytes in non-freed pointers
 
 @item check-fence
 check fence-post memory areas

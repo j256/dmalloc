@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.70 1994/03/30 19:37:17 gray Exp $";
+  "$Id: chunk.c,v 1.71 1994/04/07 03:03:33 gray Exp $";
 #endif
 
 /*
@@ -282,13 +282,13 @@ LOCAL	void	log_error_info(const char * file, const unsigned int line,
   
   /* NOTE: this has the potential for generating a seg-fault */
   if (dump && pnt_known && BIT_IS_SET(_malloc_flags, DEBUG_LOG_BAD_SPACE)) {
-    if (IS_IN_HEAP((char *)pnt - DUMP_OFFSET))
+    if (IS_IN_HEAP((char *)pnt - pnt_below_adm))
       _malloc_message("Dump of '%#lx'-%d: '%s'",
-		      pnt, DUMP_OFFSET,
-		      expand_buf((char *)pnt - DUMP_OFFSET, DUMP_SPACE));
+		      pnt, pnt_below_adm,
+		      expand_buf((char *)pnt - pnt_below_adm, DUMP_SPACE));
     else
       _malloc_message("Dump of '%#lx'-%d failed: not in heap",
-		      pnt, DUMP_OFFSET);
+		      pnt, pnt_below_adm);
   }
 }
 
@@ -2382,13 +2382,14 @@ EXPORT	void	_chunk_list_count(void)
  */
 EXPORT	void	_chunk_stats(void)
 {
-  long		overhead, tot_space;
+  long		overhead, tot_space, wasted;
   
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_TRANS))
     _malloc_message("dumping chunk statistics");
   
   tot_space = alloc_current + free_space_count;
   overhead = HEAP_SIZE - tot_space;
+  wasted = tot_space - alloc_maximum;
   
   /* version information */
   _malloc_message("version '%s', basic-block %d bytes, alignment %d bytes, heap grows %s",
@@ -2416,10 +2417,13 @@ EXPORT	void	_chunk_stats(void)
 		  (alloc_max_given == 0 ? 0 :
 		   ((alloc_max_given - alloc_maximum) * 100) /
 		   alloc_max_given));
-  _malloc_message("max memory space wasted: %ld bytes (%d%%)",
-		  tot_space - alloc_maximum,
-		  (tot_space == 0 ? 0 :
-		   (((tot_space - alloc_maximum) * 100) / tot_space)));
+  /* wasted could be < 0 */
+  if (wasted <= 0)
+    _malloc_message("max memory space wasted: 0 bytes (0%%)");
+  else
+    _malloc_message("max memory space wasted: %ld bytes (%d%%)",
+		    wasted,
+		    (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   
   /* final stats */
   _malloc_message("final user memory space: basic %d, divided %d, %ld bytes",
@@ -2486,11 +2490,17 @@ EXPORT	void	_chunk_dump_unfreed(void)
 	unknown = 1;
       }
       
-      if (! unknown || BIT_IS_SET(_malloc_flags, DEBUG_LOG_UNKNOWN))
+      if (! unknown || BIT_IS_SET(_malloc_flags, DEBUG_LOG_UNKNOWN)) {
 	_malloc_message("not freed: %#lx (%8d bytes) from '%s'",
 			CHUNK_TO_USER(pnt), bblockp->bb_size - pnt_total_adm,
 			_chunk_display_pnt(bblockp->bb_file,
 					   bblockp->bb_line));
+	
+	if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_NONFREE_SPACE))
+	  _malloc_message("Dump of '%#lx': '%s'",
+			  CHUNK_TO_USER(pnt),
+			  expand_buf((char *)CHUNK_TO_USER(pnt), DUMP_SPACE));
+      }
       
       sizec += bblockp->bb_size - pnt_total_adm;
       blockc++;
@@ -2563,11 +2573,18 @@ EXPORT	void	_chunk_dump_unfreed(void)
 	  unknown = 1;
 	}
 	
-	if (! unknown || BIT_IS_SET(_malloc_flags, DEBUG_LOG_UNKNOWN))
+	if (! unknown || BIT_IS_SET(_malloc_flags, DEBUG_LOG_UNKNOWN)) {
 	  _malloc_message("not freed: %#lx (%8d bytes) from '%s'",
 			  CHUNK_TO_USER(pnt), dblockp->db_size - pnt_total_adm,
 			  _chunk_display_pnt(dblockp->db_file,
 					     dblockp->db_line));
+	  
+	  if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_NONFREE_SPACE))
+	    _malloc_message("Dump of '%#lx': '%s'",
+			    CHUNK_TO_USER(pnt),
+			    expand_buf((char *)CHUNK_TO_USER(pnt),
+				       DUMP_SPACE));
+	}
 	
 	sizec += dblockp->db_size - pnt_total_adm;
 	blockc++;

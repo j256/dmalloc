@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.25 1994/01/22 06:35:30 gray Exp $
+ * $Id: chunk_loc.h,v 1.26 1994/04/07 03:03:38 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -36,8 +36,7 @@
 
 /* log-bad-space info */
 #define SPECIAL_CHARS		"e\033^^\"\"''\\\\n\nr\rt\tb\bf\fa\007"
-#define DUMP_OFFSET		2		/* offset back to dump */
-#define DUMP_SPACE		15		/* number of bytes to dump */
+#define DUMP_SPACE		20		/* number of bytes to dump */
 #define DUMP_SPACE_BUF		128		/* space for memory dump */
 
 /*

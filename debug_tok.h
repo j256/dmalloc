@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.3 1994/03/20 17:01:11 gray Exp $
+ * $Id: debug_tok.h,v 1.4 1994/04/07 03:03:40 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -49,6 +49,7 @@ LOCAL	attr_t		attributes[] = {
   { "log-blocks",	DEBUG_LOG_BLOCKS,	"log blocks when heap-map" },
   { "log-unknown",	DEBUG_LOG_UNKNOWN,	"report unknown non-freed" },
   { "log-bad-space",	DEBUG_LOG_BAD_SPACE,	"dump space from bad pnt" },
+  { "log-nonfree-space",DEBUG_LOG_NONFREE_SPACE,"dump space from non-freed pointers" },
   
   { "check-fence",	DEBUG_CHECK_FENCE,	"check fence-post errors" },
   { "check-heap",	DEBUG_CHECK_HEAP,	"examine heap adm structs" },
