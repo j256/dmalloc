@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.30 1993/08/25 00:25:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.31 1993/08/25 00:34:44 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1107,14 +1107,15 @@ to memory allocation functions @emph{before} @code{main()} is reached
 and @code{malloc_debug()} called meaning some debugging information may
 be generated regardless.
 
-@item int malloc_examine(char * pnt, int * size, char ** file, int * line);
+@item int malloc_examine(char * pnt, int * size, char ** file, int * line,
+void ** ret_address);
 @cindex malloc_examine function
 This routine provides some very interesting functionality.  It returns
-the size of a pnt's allocation as well as the file and line from which
-it was allocated.
+the size of a pnt's allocation as well as the file and line or the
+return-address from where it was allocated.
 
-@emph{NOTE}: This function is @emph{certainly} not portable and is not
-provided by most if not all other malloc libraries.
+@emph{NOTE}: This function is @emph{certainly} not provided by most if
+not all other malloc libraries.
 
 @item char * malloc_strerror(int errnum);
 @cindex malloc_strerror function

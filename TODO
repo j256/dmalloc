@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.6 1993/08/24 22:24:06 gray Exp $
+$Id: TODO,v 1.7 1993/08/25 00:34:37 gray Exp $
 -------------------------------------------------------------------------------
 
 IMPORTANT:
@@ -50,7 +50,8 @@ CHECKING:
 		some allocation factor
 	- maybe some sort of compact heap orientation like ndt organization.
 	- maybe generate some magical value which corresponds to the
-		orientation becasue you want to be able to reproduce the error
+		orientation becasue you want to be able to reproduce
+		the error
 
 -------------------------------------------------------------------------------
 
@@ -66,11 +67,12 @@ MANUALS:
 	- set a breakpoint at _malloc_perror()
 	- run the program until it stops there indicating that before this
 		malloc call, the heap got messed up somehow
-	- check the error code to determine what went specifically went wrong
+	- check the error code to determine what went specifically
+		went wrong
 		- print malloc_errno
 		- malloc_dbg -e value-returned-from-print
-	- look at the code between the last good call and the current call to
-		find the problem
+	- look at the code between the last good call and the current
+		call to find the problem
 		- there's always the chance that some other code caused the
 			problem of course.
 
@@ -78,9 +80,6 @@ MANUALS:
 
 GENERAL:
 
-- add a feature to malloc_dbg to dump all the tokens in the mallocrc
-	file with their hex values
-	- if -v then dump the tokens plus a break-down of the sub-tokens
 - non-graphical map of the heap. 
 	- just a long dump of all the addresses in the heap
 		addr: size, caller, crc?, expanded?
@@ -96,35 +95,36 @@ GENERAL:
 - maybe have bit in allocation struct somewhere that it is a string and
 	maybe have a checking level/value that runs though the strings
 	and makes sure they have a NULL in them.
-- have a function that summaries the memory usage per file.  runs through
-	the unfreed pointers and keeps a table per file.c in terms of number
-	of pointers and bytes per file.  Could be a perl script.
-- for fence underflow, print out the allocation below and for fence overflow
-	the allocation above if possible
-- add __builtin_return_value support for higher gcc versions (2.2.0+)
+- maybe have a function that summaries the memory usage per file.
+	runs through the unfreed pointers and keeps a table per file.c
+	in terms of number of pointers and bytes per file.  Could be a
+	perl script.
+- for fence underflow, print out the allocation below and for fence
+	overflow the allocation above if possible
 - have either a bunch of free or used bblocks be:
 	- start block and then a set of continuation blocks
 	- this would mean we do not have to hit each bblock entry to redo
 		the type flag
 - handle memalign, valloc, maybe some form of mallopt
 - handle 0 length allocations correctly if the #define is set
-	- i.e. maybe give back a small section with bounds-checking touching
+	- i.e. maybe give back a small section with bounds-checking
+		touching
 - manage dblock_admin entries better:
 	- map out usage and get some stats
-	- add to normal db_free lists, zero out each of the entries.  if they
-		are both zero or some magic X then we need to get more bblock
-		space for the dblocks.
+	- add to normal db_free lists, zero out each of the entries.
+		if they are both zero or some magic X then we need to
+		get more bblock space for the dblocks.
 - turn realloc into an intelligent beasty that looks on either side
-	of existing chunk (if expanding) for free space and manages free-lists
-	appropriately
+	of existing chunk (if expanding) for free space and manages
+	free-lists appropriately
 
 -------------------------------------------------------------------------------
 
 TESTING / STATISTICS:
 
 - need to write a set of fully automated test programs
-	- maybe start with a test shell like malloc_t but stripped and then
-		run a script through it and analyse the output
+	- maybe start with a test shell like malloc_t but stripped and
+		then run a script through it and analyse the output
 	- should be a killer that does a million hits
 	- maybe use the new gnu testing code
 - test define for allowing 0 length defines
@@ -132,21 +132,11 @@ TESTING / STATISTICS:
 - check out situation where sbrk calls return ERROR (from the beginning and
 	in the middle).  the library should return NULL's straight off and
 	log appropriate errors.
-- add free-list statistics whenever it gets more memory to see the viability of
-	dividing larger free entries in two
-- add statistics whenever it frees memory to see the viability of combining
-	adjacent blocks
+- add free-list statistics whenever it gets more memory to see the
+	viability of dividing larger free entries in two
+- add statistics whenever it frees memory to see the viability of
+	combining adjacent blocks
 - maybe a program that would try a standard set of tests on a number of
 	different combinations of debug-values to look for dependancies.
-
--------------------------------------------------------------------------------
-
-RMS COMMENTS:
-
-- integrate into gnu-malloc
-- change the bit-flags into the functionality strings themselves
-- get rid of the malloc_dbg program and the mallocrc file (too "hairy")
-- integrate __builtin_return_address functionality from gcc gdb command
-	'info line *ADDRESS' to get file/line
 
 -------------------------------------------------------------------------------
