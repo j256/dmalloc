@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.200 2000/11/20 17:44:26 gray Exp $
+@c $Id: dmalloc.texi,v 1.201 2000/11/20 17:56:24 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -708,9 +708,14 @@ See the next section for help with this.  @xref{Troubleshooting}.
 @cindex problems
 
 This section provides some answers to some common problems and
-questions.  Please feel free to send me mail with any additions to this
-list -- either problems you are still having or tips that you would like
-to pass on.
+questions.  Please send me mail with any additions to
+this list -- either problems you are still having or tips that you would
+like to pass on.
+
+When diagnosing a problem, if possible, always make sure you are running
+the most up to date version of Dmalloc available from the home page
+@uref{http://dmalloc.com/}.  Problems are often fixed and a new release
+is published before people encounter them.
 
 @table @samp
 
