@@ -8,10 +8,10 @@
 <center>
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.0.0 <br />
+Version: Release 5.0.1 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-4.8.1.html">4.8.1</a> <br />
-Date: May 15, 2003
+Last-Version: <a href="dmalloc-5.0.0.html">5.0.0</a> <br />
+Date: May 20, 2003
 </h4>
 </center>
 
@@ -28,139 +28,64 @@ Date: May 15, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Major release with a number of internal changes as well as some
-external features.  Reworked the entire pointer management structures
-to use skip-lists which simplified a good bit of the code and removed
-a number of functions and slimmed down many others. </p>
+<p> Bug fix release after the big 5.0.0 last week.  Couple of bug
+fixes and improvements. </p>
 
 <h3><a name="func"> New Functionality </a></h3>
 
 <ul>
 
-<li> Added dmalloc_debug_setup function to set the environment from a
-string.  This will allow servers or cgi-bin programs which cannot
-affect their environment to enable dmalloc checking. </li>
+<li> Added dmalloc_page_size() function which returns the internal
+library page/block size. </li>
 
-<li> Added -M --memory-limit argument to dmalloc to limit the amount
-of memory that dmalloc can allocate. </li>
-
-<li> Added an internal memory space feature where people can
-statically allocate a chunk of memory for dmalloc to manage.  This is
-for embedded systems without sbrk. </li>
-
-<li> Added separate characters for blanking allocations (0xda for
-dmalloc-allocation) versus freed pointers (0xdf for
-dmalloc-free). </li>
-
-<li> A couple of other features not annotated in the ChangeLog
-file. </li>
+<li> Compressed the per-pointer admin structure by 8 bytes. </li>
 
 </ul>
 
 <h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
-<ul>
-
-<li> Added -M --memory-limit argument to dmalloc to limit the amount
-of memory that dmalloc can allocate.  You can specify the limit as
-256k, 120m, or 2g to get kilobytes, megabytes, or gigabytes
-respectively.  </li>
-
-<li> Removed the -S --short-tokens flag and support for short version
-of the debug tokens.  I apologize to folks that used this. </li>
-
-<li> Added better usage information to the -u and --usage flags. </li>
-
-<li> Now when you clear out all of the debug tokens, dmalloc will tell
-the environment to unset the variable. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <h3><a name="settings.dist"> Changes to the settings.dist File </a></h3>
 
-<ul>
-
-<li> By popular demand, I've changed the default behavior for free(0L)
-[cheering heard in the distance].  By default now, freeing a 0L
-pointer is fine unless the ALLOW_FREE_NULL variable is set to 0. </li>
-
-<li> Removed the USE_DMALLOC_LEAP functionality to simplify a number
-of sections in the code.  I apologize to those developers who relied
-on this feature.  Please feel free to contact me with any questions
-for replacement functionality. </li>
-
-<li> Added the INTERNAL_MEMORY_SPACE setting which will statically
-allocate a chunk of memory for dmalloc to manage.  This is for
-embedded systems without sbrk. </li>
-
-<li> Removed the INCLUDE_RCS_IDS switch. </li> 
-
-<li> Changed BLANK_CHAR to be ALLOC_BLANK_CHAR and FREE_BLANK_CHAR.
-New allocations are now set with a different character than freed
-pointers. </li>
-
-<li> Removed the FIRST_FIT, BEST_FIT, and WORST_FIT settings which
-really weren't obeyed well in past versions and aren't supported in
-the current one. </li>
-
-<li> Changed the LARGEST_BLOCK setting from bits to be
-LARGEST_ALLOCATION and increased the default value from 64mb to
-256mb. </li>
-
-<li> Added the DEFAULT_SMALLEST_ALLOCATION with which you can set the
-smallest sized allocation allowed.  Any blocks smaller than this will
-be rounded up to this size. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<ul>
-
-<li> [Finally] fixed a long standing issue where the thread and C++
-shared libraries where linking with the wrong library. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
 <ul>
 
-<li> This new version of dmalloc utilized the skip-list data type to
-manage all of its pointers and freed memory.  Skip lists are
-alternatives to balanced trees with a significantly simpler
-implementation with low power overhead.  The code to implement the
-skip-list in dmalloc is 254 lines including 85 lines of function
-header comments. </li>
+<li> Reduced the per-pointer administrative overhead by 8 bytes down
+to ~32 bytes on an i386. </li>
+
+<li> Added a number of auto-testing sections to dmalloc_t.  Still need
+to flesh this out to be more inclusive of library features. </li>
+
+<li> Added testing of the free-list during heap-check. </li>
 
 </ul>
 
 <h3><a name="env"> Environmental Variable Changes </a></h3>
 
-<ul>
-
-<li> Removed the log-blocks and heap-check-map tokens.  Please contact
-me if you used these functions and would like to see something like
-them again. </li>
-
-<li> Added limit=XX setting with which you can limit the amount of
-memory that dmalloc can allocate.  This does not include it's
-administrative overhead. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <h3><a name="bugs"> Bugs Fixed </a></h3>
 
 <ul>
 
-<li> I believe that the long standing problem where the seen pointer
-in some situations would not be initialized has been fixed. </li>
-
-<li> [Finally] fixed a long standing issue where the thread and C++
-shared libraries where linking with the wrong library. </li>
-
-<li> This is a major release.  Many bugs were probably <i>created</i>
-not fixed. </li>
+<li> Found a [bad] problem where the library was not putting pointers
+back on the free list properly.  Ugh. </li>
 
 </ul>
 

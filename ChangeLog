@@ -1,3 +1,7 @@
+2003-05-20  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.0.1.
+
 2003-05-19  Gray Watson  <gray@outside.256.com>
 
 	* Added dmalloc_page_size() function.
@@ -13,7 +17,7 @@
 
 	* Added the per-pointer checking for cleared free memory.
 
-	* Compressed the admin per-pointer structure by 8 bytes.
+	* Compressed the per-pointer admin structure by 8 bytes.
 
 	* Cleaned up the production of dmalloc.h.3 from fillproto file.
 
@@ -1886,5 +1890,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.286 2003/05/20 04:05:58 gray Exp $
+$Id: ChangeLog,v 1.287 2003/05/20 04:14:08 gray Exp $
 -------------------------------------------------------------------------------

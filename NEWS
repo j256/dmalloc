@@ -1,6 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.103 2003/05/16 16:06:31 gray Exp $
+$Id: NEWS,v 1.104 2003/05/20 04:14:09 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.0.1:
+	* Added dmalloc_page_size() function.
+	* Improved the auto-testing in dmalloc_t.
+	* Found a [bad] problem with putting pointers back on the free list.
+	* Added some checking of pointers on the free list.
+	* Added the per-pointer checking for cleared free memory.
+	* Compressed the per-pointer admin structure by 8 bytes.
 
 Version 5.0.0:
 
