@@ -1,5 +1,7 @@
 Fri Aug 18 11:50:03 1995  Gray Watson  <gray@burger.letters.com>
 
+	* Releasing version 3.1.1.
+
 	* Located all non-linear heap checking to heap code and improved
         immensely (read it works now).
 
@@ -1040,5 +1042,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.158 1995/08/18 18:31:40 gray Exp $
+$Id: ChangeLog,v 1.159 1995/08/18 19:14:45 gray Exp $
 -------------------------------------------------------------------------------
