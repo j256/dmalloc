@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.82 1999/03/11 05:37:33 gray Exp $
+# $Id: Makefile.all.in,v 1.83 1999/10/13 22:50:54 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -221,7 +221,7 @@ heavy : $(TEST) light
 
 arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h \
  debug_val.h dmalloc_loc.h error.h arg_check.h
-chunk.o: chunk.c dmalloc.h conf.h settings.h chunk.h chunk_loc.h \
+chunk.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
  dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h error.h error_val.h \
  heap.h
 compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
@@ -231,13 +231,14 @@ dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
  dmalloc_argv_loc.h compat.h
 dmalloc_lp.o: dmalloc_lp.c dmalloc.h conf.h settings.h error_val.h \
- dmalloc_loc.h dmalloc_lp.h return.h
-dmalloc_t.o: dmalloc_t.c dmalloc_argv.h dmalloc.h conf.h settings.h \
+ dmalloc_loc.h dmalloc_lp.h malloc.h return.h
+dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h dmalloc.h \
  debug_val.h dmalloc_loc.h error_val.h
-dmalloc_tab.o: dmalloc_tab.c conf.h settings.h dmalloc.h dmalloc_loc.h \
- error_val.h dmalloc_tab.h dmalloc_tab_loc.h
-env.o: env.c conf.h settings.h dmalloc.h dmalloc_loc.h debug_tok.h \
- debug_val.h env.h error.h
+dmalloc_tab.o: dmalloc_tab.c conf.h settings.h chunk.h compat.h \
+ dmalloc.h dmalloc_loc.h error.h error_val.h dmalloc_tab.h \
+ dmalloc_tab_loc.h
+env.o: env.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h \
+ debug_tok.h debug_val.h env.h error.h
 error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
  dmalloc_loc.h env.h error.h error_val.h version.h
 heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
