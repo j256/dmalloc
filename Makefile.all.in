@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.107 2002/02/14 23:42:52 gray Exp $
+# $Id: Makefile.all.in,v 1.108 2003/05/13 14:52:51 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -84,10 +84,10 @@ LIB_SL = lib$(MODULE).so
 @TH_ON@@CXX_ON@INSTALL_SL_9 = installthcxxsl
 
 # now construct our build and install targets
-BUILD_ALL = dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) \
+BUILD_ALL = dmalloc.h $(LIBRARY) $(UTIL) \
 	$(BUILD_ALL_1) $(BUILD_ALL_2) $(BUILD_ALL_3) $(BUILD_ALL_4) \
 	$(BUILD_ALL_5) $(BUILD_ALL_6) $(BUILD_ALL_7) $(BUILD_ALL_8)
-INSTALL_LIB = $(LIBRARY) $(LIB_DIS) \
+INSTALL_LIB = $(LIBRARY) \
 	$(INSTALL_LIB_1) $(INSTALL_LIB_2) $(INSTALL_LIB_3) $(INSTALL_LIB_4) \
 	$(INSTALL_LIB_5) $(INSTALL_LIB_6) $(INSTALL_LIB_7) $(INSTALL_LIB_8)
 BUILD_THREADS = $(LIB_TH) \
@@ -119,9 +119,6 @@ INSTALL_SL = $(LIB_SL) \
 	$(INSTALL_SL_5) $(INSTALL_SL_6) $(INSTALL_SL_7) $(INSTALL_SL_8) \
 	$(INSTALL_SL_9)
 
-# library with dmalloc disabled
-LIB_DIS	= lib$(MODULE)lp.a
-
 UTIL = $(MODULE)
 INFOFILE = $(MODULE).info
 HTMLFILE = $(MODULE).html
@@ -142,7 +139,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = dmalloc.h
-OBJS = arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o protect.o
+OBJS = arg_check.o compat.o dmalloc_tab.o env.o heap.o protect.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o
@@ -157,7 +154,7 @@ all : $(BUILD_ALL)
 
 clean :
 	rm -f a.out core *.o *.t
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(LIB_DIS) $(TEST)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
 	rm -f $(LIB_TH_SL) $(LIB_CXX_SL) $(LIB_TH_CXX_SL) $(LIB_SL)
 	rm -f $(UTIL) dmalloc.h
 
@@ -214,8 +211,6 @@ installlib : $(INSTALL_LIB)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
-	$(INSTALL_DATA) $(LIB_DIS) $(libdir)
-	@RANLIB@ $(libdir)/$(LIB_DIS)
 @SL_OFF@	@echo "Enter 'make installsl' to install $(LIB_SL) in $(shlibdir)"
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
@@ -263,7 +258,7 @@ $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
 
 $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(LIB_TH_SL) : $(LIB_TH)
 	rm -f $@ $@.t
@@ -272,7 +267,7 @@ $(LIB_TH_SL) : $(LIB_TH)
 
 $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(LIB_CXX_SL) : $(LIB_CXX)
 	rm -f $@ $@.t
@@ -281,16 +276,12 @@ $(LIB_CXX_SL) : $(LIB_CXX)
 
 $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
 	rm -f $@ $@.t
 	@shlinkargs@
 	mv $@.t $@
-
-$(LIB_DIS) : dmalloc_lp.o
-	ar cr $@ $?
-	@RANLIB@ $@
 
 threadscxxsl : $(LIB_TH_CXX_SL)
 
@@ -395,8 +386,6 @@ dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
  error_val.h version.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
  dmalloc_argv_loc.h compat.h
-dmalloc_lp.o: dmalloc_lp.c dmalloc.h conf.h settings.h error_val.h \
- dmalloc_loc.h dmalloc_lp.h malloc_funcs.h error.h return.h
 dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h dmalloc.h \
  debug_val.h dmalloc_loc.h error_val.h
 dmalloc_tab.o: dmalloc_tab.c conf.h settings.h chunk.h compat.h \
@@ -410,7 +399,7 @@ heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h error.h error_val.h heap.h
 malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
- heap.h dmalloc_lp.h malloc_funcs.h return.h
+ heap.h malloc_funcs.h return.h
 protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
  heap.h protect.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
@@ -420,4 +409,4 @@ error_th.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
  dmalloc_loc.h env.h error.h error_val.h version.h
 malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
- heap.h dmalloc_lp.h malloc_funcs.h return.h
+ heap.h malloc_funcs.h return.h
