@@ -5,6 +5,11 @@
 @setchapternewpage odd
 @headings double
 @c %**end of header
+  
+@dircategory Libraries
+@direntry
+* Dmalloc: (dmalloc).			Malloc debug library.
+@end direntry
 
 @c ================================================================
 @c This file has the new style title page commands.
@@ -16,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.169 1999/10/18 16:10:15 gray Exp $
+@c $Id: dmalloc.texi,v 1.170 1999/11/08 20:41:15 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -155,6 +160,7 @@ without express or implied warranty.
 * Features::                    The general features of the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
+* Troubleshooting::             Some solutions to common problems.
 @end menu
 
 @node Allocation Basics, Features, Overview, Overview
@@ -585,12 +591,7 @@ which case @samp{/usr/local} will have been replaced with @samp{PATH}.
 See the ``Getting Started'' section to get up and running with the
 library.  @xref{Getting Started}.
 
-@emph{NOTE}: This library has never been (and maybe never will be)
-optimized for space nor speed.  in fact, some of its features make it
-unable to use some of the organizational methods of other more efficient
-heap libraries.
-
-@node Getting Started, , Installation, Overview
+@node Getting Started, Troubleshooting, Installation, Overview
 @section Getting Started with the Library
 
 @cindex quick start
@@ -627,7 +628,7 @@ call @code{dmalloc_shutdown} yourself before your program exits.
 @item Add an alias for dmalloc to your shell's rc file if supported.
 Bash, ksh, and zsh users should add the following to their
 @file{.bashrc}, @file{.profile}, or @file{.zshrc} file respectively
-(notice the -b option for bourne shell output):
+(notice the @kbd{-b} option for bourne shell output):
 
 @example
 function dmalloc @{ eval `command dmalloc -b $*`; @}
@@ -637,7 +638,7 @@ By the way, if you are looking for a shell, I heartily recommend trying
 out zsh.  It is a bourne shell written from scratch with much the same
 features as tcsh without the csh crap.  If you are @emph{still} using
 csh or tcsh, you should add the following to your @file{.cshrc} file
-(notice the -C option for c-shell output):
+(notice the @kbd{-C} option for c-shell output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
@@ -675,7 +676,7 @@ directory as @file{.dmallocrc}.  This allows you to add your own
 combination of debug tokens.  @xref{RC File}.
 
 @cindex log-unknown
-@item You may also want to enable the @samp{log-unknown} token
+@item You may also want to enable the @code{log-unknown} token
 (@kbd{dmalloc -p log-unknown}) which will log non-freed information
 about ``unknown'' memory to the log file.  Unknown means memory that
 does not have associated file and line information.  This is necessary
@@ -684,17 +685,55 @@ you want to track possible memory leaks in system functions.
 
 @item Run your program, examine the logfile that should have been created by
 dmalloc_shutdown, and use its information to help debug your program.
+See the next section for help with this.  @xref{Troubleshooting}.
+
+@end enumerate
+
+@node Troubleshooting, , Getting Started, Overview
+@section Troubleshooting Common Problems
+
+@cindex troubleshooting
+@cindex common problems
+@cindex help 
+@cindex how do i...
+@cindex faq
+@cindex questions
+@cindex problems
+
+This section provides some answers to some common problems and
+questions.  Please feel free to send me mail with any additions to this
+list -- either problems you are still having or tips that you would like
+to pass on.
+
+@table @samp
+
+@item Why does my program run so slow?
+
+@cindex check-heap
+This library has never been (and maybe never will be) optimized for
+space nor speed.  Some of its features make it unable to use some of the
+organizational methods of other more efficient heap libraries.  If you
+have the @code{check-heap} token enabled, see the @kbd{-i} option to the
+dmalloc utility.  @xref{Dmalloc Program}.
+
+@item Why was a log-file not produced after I ran my program?
+
+This could be caused by a number of different problems.
+
+@enumerate
 
 @cindex env
 @cindex printenv
 @cindex DMALLOC_OPTIONS
+
+@item Use the @kbd{env} or @kbd{printenv} commands to make sure that
+the @samp{DMALLOC_OPTIONS} variable is set in your exported environment.
+@xref{Environment Variable}.
+
 @cindex ident
 @cindex strings
-@emph{NOTE}: If a logfile is not created, use the @kbd{env} or
-@kbd{printenv} commands to make sure that the @samp{DMALLOC_OPTIONS}
-variable is set in your exported environment.
 
-Also make sure that your program has been compiled correctly with the
+@item Make sure that your program has been compiled correctly with the
 dmalloc library.  The @kbd{ident} program should show chunk.c and other
 dmalloc files compiled into your program.  You can also do @kbd{strings
 -a your-program | grep chunk.c} and look for something like @samp{$Id:
@@ -702,7 +741,24 @@ chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $} with different versions
 and date information.  If this doesn't show up then chances are dmalloc
 was not linked into your program.
 
+@item If your program changes its working directory, it may write the
+dmalloc log-file somewhere else in the filesystem.  You will need to
+check both where the program was started and to where it might change
+directory.
+
 @end enumerate
+
+@item I don't see any information about my non-freed (leaked) memory?
+
+The library will not (by default) report on ``unknown'' non-freed
+memory.  Unknown means memory that does not have associated file and
+line information.  To log information about unknown pointers you should
+enable the @code{log-unknown} token (@kbd{dmalloc -p log-unknown}).
+This will be necessary if you are @emph{not} including @file{dmalloc.h}
+in all of your C files or if you are interested in tracking leaks in
+system functions.
+
+@end table
 
 @node Details, Source Code, Overview, Top
 @chapter Details About How to Use the Library.
@@ -818,7 +874,7 @@ architecture/compilers.  @xref{Portability}.
 @cindex log-unknown
 The library attempts to use some assembly hacks to get the the
 return-address or the address of the line that called the dmalloc
-function.  If you have the @samp{log-unknown} token enabled and you run
+function.  If you have the @code{log-unknown} token enabled and you run
 your program, you might see the following non-freed memory messages.
 
 @example
@@ -845,8 +901,9 @@ In the above example, gdb was used to find that the two non-freed memory
 pointers were allocated in @code{_findbuf()} and in file argv.c line
 1092 respectively.  The @samp{x address} (for examine) can always be
 used on the return-addresses but the @samp{info line *(address)} will
-only work if that file was compiled using the -g option and has not been
-stripped.  This limitation may not be true in later versions of gdb.
+only work if that file was compiled using the @kbd{-g} option and has
+not been stripped.  This limitation may not be true in later versions of
+gdb.
 
 @node Argument Checking, Extensions, Return Address, Programming
 @subsection Argument Checking of Function Arguments
@@ -1290,7 +1347,7 @@ Each token, when specified, enables a specific debugging feature.  For
 instance, if you have the log-stats token enabled, the library will log
 general statistics to the logfile.
 
-To get this information on the fly, use @samp{dmalloc -DV}.  This will
+To get this information on the fly, use @kbd{dmalloc -DV}.  This will
 print out the Debug tokens in Very-verbose mode.  @xref{Dmalloc
 Program}.
 
@@ -1625,10 +1682,12 @@ Output Bourne shell type commands.
 Output C shell type commands.
 
 @item -c
-Clear/unset all of the settings not specified with other arguments.
+Clear/unset all of the settings not specified with other arguments.  You
+can do this automatically when you set to a new tag with the @kbd{-r}
+option.
 
 @emph{NOTE}: clear will never unset the @samp{debug} setting.  Use
-@samp{-d 0} or a tag to @samp{none} to achieve this.
+@kbd{-d 0} or a tag to @samp{none} to achieve this.
 
 @item -d bitmask
 Set the @samp{debug} part of the @samp{DMALLOC_OPTIONS} env variable to
@@ -1637,7 +1696,8 @@ unnecessary) if a tag is specified.
 
 @item -D
 List all of the debug-tokens.  Useful for finding a token to be used
-with the -p or -m options.  Use with -v or -V verbose options.
+with the @kbd{-p} or @kbd{-m} options.  Use with @kbd{-v} or @kbd{-V}
+verbose options.
 
 @item -e errno
 Print the dmalloc error string that corresponds to the error number
@@ -1649,13 +1709,19 @@ Use this configuration file instead of the RC file
 
 @item -i number
 @cindex interval setting
-Set the checking interval to number.
+Set the checking interval to number.  If the @code{check-heap} token is
+enabled, this causes the library to only check the heap every Nth time
+which can @emph{significantly} increase the running speed of your
+program.  If a problem is found, however, this limits your ability to
+determine when the problem occurred.  Try values of 50 or 100 initially.
 
 @item -k
-Keep the settings when using a tag.  This overrides -r.
+Do not reset all of the settings when a tag is specified.  This
+specifically overrides the @kbd{-r} option and is provided here to
+override @kbd{-r} if it has been added to the dmalloc alias.
 
 @item -l filename
-Set the log-file to filename.
+Write the debugging output and other log-file information to filename.
 
 @item -L
 Output the debug-value not in hex but by individual debug-tokens in long
@@ -1663,8 +1729,8 @@ form.
 
 @item -m token(s)
 Remove (minus) the debug capabilities of token(s) from the current debug
-setting or from the selected tag (or -d value).  Multiple -m's can be
-specified.
+setting or from the selected tag (or @kbd{-d} value).  Multiple @kbd{-m}
+options can be specified.
 
 @item -n
 Without changing the environment, output the commands resulting from the
@@ -1681,8 +1747,8 @@ library with threads.  @xref{Using With Threads}.
 
 @item -p token(s)
 Add (plus) the debug capabilities of token(s) to the current debug
-setting or to the selected tag (or -d value).  Multiple -p's can be
-specified.
+setting or to the selected tag (or @kbd{-d} value).  Multiple @kbd{-p}
+options can be specified.
 
 @item -r
 Remove (unset) all settings when using a tag.  This is useful when you
@@ -1699,7 +1765,8 @@ Output the debug-value not in hex but by individual debug-tokens in short
 form.
 
 @item -t
-List all of the tags in the rc-file.  Use with -v or -V verbose options.
+List all of the tags in the rc-file.  Use with @kbd{-v} or @kbd{-V}
+verbose options.
 
 @item -v
 Give verbose output.  Especially useful when dumping current settings or
@@ -1765,7 +1832,8 @@ dmalloc -tv
 @node Using With a Debugger, Using With Threads, Dmalloc Program, Details
 @section Using Dmalloc With a Debugger
 
-@cindex debugger usage with dmalloc
+@cindex debugger usag
+e with dmalloc
 @cindex using a debugger with dmalloc
 
 Here are a number of possible scenarios for using the dmalloc library to
@@ -1814,7 +1882,7 @@ is most likely that some code that has been executed was naughty.
 
 To get more information about the problem, first print via the debugger
 the dmalloc_errno variable to get the library's internal error code.
-You can suspend your debugger and run @samp{dmalloc -e
+You can suspend your debugger and run @kbd{dmalloc -e
 value-returned-from-print} to get an English translation of the error.
 A number of the error messages are designed to indicate specific
 problems with the library administrative structures and may not be
@@ -1905,7 +1973,7 @@ time the pointer is seen.  You then free the pointer (seen #2) but later
 address from the free list (seen #3).
 
 So to find out who is allocating this particular 12 bytes the 3rd time,
-try @samp{dmalloc -a 0x45008:3}.  The library will stop the program the
+try @kbd{dmalloc -a 0x45008:3}.  The library will stop the program the
 third time it sees the @samp{0x45008} address.  You then enter a
 debugger and put a break point at @code{dmalloc_error}.  Run the program
 and when the breakpoint is reached you can examine the stack frame to
@@ -2167,7 +2235,7 @@ Overview.
 * Features::                    The general features of the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
-* Using With Threads::          Using the library with a thread package.
+* Troubleshooting::             Some solutions to common problems.
 
 Allocation Basics.
 
@@ -2184,12 +2252,6 @@ Details.
 * Using With a Debugger::       Using a debugger with the library.
 * Using With Threads::          Using the library with a thread package.
 
-Source Code.
-
-* Definitions::                 Some terms and other information.
-* Compatibility::               General compatibility concerns.
-* Portability::                 Issues important for porting the library.
-
 Programming.
 
 * Allocation Macros::           For providing file and line information.
@@ -2204,6 +2266,12 @@ Using Dmalloc With a Debugger.
 * General Errors::              Diagnosing general problems with a debugger.
 * Memory Leaks::                Tracking down non-freed memory.
 * Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
+
+Source Code.
+
+* Definitions::                 Some terms and other information.
+* Compatibility::               General compatibility concerns.
+* Portability::                 Issues important for porting the library.
 @end menu
 
 @end ifinfo
