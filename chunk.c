@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.23 1993/02/12 04:49:54 gray Exp $";
+  "$Id: chunk.c,v 1.24 1993/02/20 19:33:36 gray Exp $";
 #endif
 
 /* checking information */
@@ -1488,7 +1488,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
     if (size != NULL)
       dblockp->db_size = size;
     if (file != NULL)
-      dblockp->db_file = file;
+      dblockp->db_file = (char *)file;
     if (line != NULL)
       dblockp->db_line = (unsigned short)line;
   }
@@ -1536,7 +1536,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
       
       /* set bblock info */
       bblockp->bb_size = size;
-      bblockp->bb_file = file;
+      bblockp->bb_file = (char *)file;
       bblockp->bb_line = (unsigned short)line;
     }
   }
@@ -1620,7 +1620,7 @@ EXPORT	char	*_chunk_malloc(const char * file, const unsigned int line,
     
     dblockp->db_line = (unsigned short)line;
     dblockp->db_size = (unsigned short)size;
-    dblockp->db_file = file;
+    dblockp->db_file = (char *)file;
   }
   else {
     
@@ -1665,7 +1665,7 @@ EXPORT	char	*_chunk_malloc(const char * file, const unsigned int line,
       
       bblockp->bb_line	= (unsigned short)line;
       bblockp->bb_size	= (unsigned int)size;
-      bblockp->bb_file	= file;
+      bblockp->bb_file	= (char *)file;
     }
   }
   
