@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.47 1994/03/20 17:13:28 gray Exp $
+# $Id: Makefile.in,v 1.48 1994/03/20 18:47:51 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -32,28 +32,24 @@ PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
 	malloc_dbg.c malloc_dbg.[12] malloc_loc.h malloc_lp.[ch] malloc_t.c \
 	return.h version.h \
 	argv.[ch] argv_loc.h \
-	malloc.info malloc.texi malloc.ps texinfo.tex \
+	malloc.texi malloc.info malloc.ps texinfo.tex \
 	Deansify.pl
 PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
-PARTS	= 1 2 3 4 5 6
-MAXPART	= 6
+MAXSIZE	= 85k
 # NOTE: the wc level should be below 90k due to shar overhead
-SHAR1	= conf.h.in const.h.in Makefile.in configure configure.in \
+SHARFLS	= conf.h.in const.h.in Makefile.in configure configure.in \
 	config.help \
-	ChangeLog Manifest INSTALL
-SHAR2	= chunk.[ch] chunk_loc.h
-SHAR3	= NEWS NOTES README TODO \
-	arg_check.[ch] compat.[ch] debug_tok.h \
-	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] \
-	malloc_lp.c
-SHAR4	= malloc_lp.h malloc_loc.h return.h \
-	version.h malloc_t.c malloc.info
-SHAR5	= malloc_dbg.c malloc_dbg.[12] \
-	malloc.texi
-SHAR6	= mallocrc Deansify.pl contrib contrib/README contrib/dec_notes \
-	contrib/ra_info.pl malloc.c \
-	argv.c argv.h argv_loc.h
+	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
+	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
+	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
+	malloc_dbg.c malloc_dbg.[12] malloc_loc.h malloc_lp.[ch] malloc_t.c \
+	return.h version.h \
+	argv.[ch] argv_loc.h \
+	malloc.texi malloc.info \
+	Deansify.pl \
+	contrib contrib/README contrib/dec_notes \
+	contrib/ra_info.pl
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -157,18 +153,24 @@ malloc.head : malloc.info
 
 .PHONY : shar
 shar : malloc.head
-	rm -f part.? part.t
-	cd port ; $(foreach part, $(PARTS), \
-		shar -n${part} -e${MAXPART} -o../part.${part} -t \
-			"Do a 'sh ./configure' to configure the library" \
-			${SHAR${part}} ; \
-		)
-	cat malloc.head part.1 > part.t
-	mv part.t part.1
+	rm -f part.?? part.t Makefile.in.bak
+	mv Makefile.in Makefile.in.bak
+	cp Makefile.all.in Makefile.in
+	makekit -n part. -s${MAXSIZE} -t \
+		"Do a 'sh ./configure' to configure the library" \
+		${SHARFLS}
+	rm -f Makefile.in
+	mv Makefile.in.bak Makefile.in
+	cat malloc.head part.01 > part.t
+	rm -f part.01
+	mv part.t part.01
 
 #
 # auto configure settings
 #
+Makefile : Makefile.in config.status
+	$(SHELL) config.status
+
 conf.h : conf.h.in config.status
 	$(SHELL) config.status
 

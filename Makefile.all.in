@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.37 1994/03/20 17:13:25 gray Exp $
+# $Id: Makefile.all.in,v 1.38 1994/03/20 18:47:48 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -127,12 +127,12 @@ heavy : $(TEST) light
 .texi.info :
 	makeinfo $<
 
-Makefile : Makefile.in config.status
-	$(SHELL) config.status
-
 #
 # auto configure settings
 #
+Makefile : Makefile.in config.status
+	$(SHELL) config.status
+
 conf.h : conf.h.in config.status
 	$(SHELL) config.status
 

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.25 1994/03/20 17:13:31 gray Exp $
+$Id: NOTES,v 1.26 1994/03/20 18:47:53 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -39,19 +39,27 @@ WARNINGS:
 
 GENERAL:
 
--	dumping core on errors and then continuing did not look to be
+-	Dumping core on errors and then continuing did not look to be
 	a problem to implement.  However it became "not recommended"
 	as soon as it was discovered that fork (which is needed) calls
 	malloc itself.  If the heap was corrupted or some other
 	critical error has occurred then the library would quickly go
 	recursive.
 
--	for coders, the library should have all the code that depends
+-	I've considered adding the mprotect features which would
+	signal if code READ into certain areas (writing is easy with
+	magic values).  This causes problems since most (all?)
+	mprotect implementations work with page-size resolutions which
+	means that every allocation (8 byte string) would require
+	8+pagesize (often > 4096 bytes).  Anyone have a easier way of
+	accomplishing this?
+
+-	For coders, the library should have all the code that depends
 	on heaps growing up or down in heap.[ch].  Any dependences on
 	>,<,-,+,etc are potential problems and should be brought to my
 	attention.
 
--	should the free and alloc-blank tokens write the address % 256
+-	Should the free and alloc-blank tokens write the address % 256
 	into bytes instead of a constant '\305'
 
 	- it would slow it down a bit
