@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.79 1994/12/15 14:56:38 gray Exp $
+@c $Id: dmalloc.texi,v 1.80 1994/12/15 15:57:28 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -428,9 +428,16 @@ The newest version(s) of the dmalloc library are available via anonymous
 ftp from @samp{ftp.antaire.com} in the @file{/antaire/src/dmalloc}
 directory.
 
-The versions in this repository also include such files as a
-postscript version of the manual and other large files which may not
-have been included in the distribution you received.
+To use anonymous ftp, you ftp to the site and when the system prompts
+you for a login-id or username you enter @kbd{anonymous}.  When it
+prompts you for a password you enter your email address.  I, for
+example, enter @kbd{gray@@antaire.com}.  You then can change-directory
+(cd) into @file{/antaire/src/dmalloc} and get the @file{README} and
+@file{dmalloc.tar.gz} files.
+
+The versions in this repository include such stuff as a postscript
+version of the manual and other large files which may not have been
+included in the distribution you received.
 
 @item Other Repositories:
 

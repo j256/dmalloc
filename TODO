@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.24 1994/12/12 21:27:16 gray Exp $
+$Id: TODO,v 1.25 1994/12/15 15:57:23 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -69,27 +69,6 @@ SKIP LISTS:
 
 -------------------------------------------------------------------------------
 
-ENVIRONMENT VARIABLES:
-
-- comma separated tokens
-
-	debug=0x40005c7
-	addr=0x23412ab
-	log=malloc
-	inter=100
-	start=file.c:100
-
-- also have:
-	- long and short options:
-			log-stats,log-non-free,log-error,...
-		or:
-			lst,lnf,ler,...
-
-- the dmalloc program would not change although you would have the
-option of having it generate one of the three above formats.
-
--------------------------------------------------------------------------------
-
 CHECKING:
 
 - maybe have a type as the first argument to message
@@ -105,8 +84,8 @@ CHECKING:
 	structure and then be able to dump which blocks have changed
 - maybe add 'use-mprotect' token to allow the user to access only
 	user-allocated pages
-- try and determine how purify gives the user per-allocation bounds
-	checking on READS.
+- a _big_ project could involve hacking gcc to allow some sort of heap
+	checking of every memory reference.
 - watch for non-contiguous memory and mark those blocks as external
 	- have some sort of EXTERNAL flag
 	- make sure checked/freed/realloced/etc. pointers are not in that area
@@ -137,7 +116,7 @@ DOCUMENTATION:
 	- use of MALLOC_START because a failure is found at some point
 		to find the last malloc call
 	- use of MALLOC_FUNC_CHECK by inserting dmalloc.h and FUNC_CHECK on
-- maybe re-write manual with a eye to the new user
+- need to make sure the manual works for the brand new user
 - need an overview early on about its purpose (at a very high level)
 
 -------------------------------------------------------------------------------
@@ -198,5 +177,6 @@ GENERAL:
 	debug. found with strstr.
 	- or could use .mallocrc entry
 	- could have program:tag entries for default behavior in program
+	- requires knowing the argv[0] argument
 
 -------------------------------------------------------------------------------
