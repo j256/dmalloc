@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.52 2003/05/19 18:14:16 gray Exp $
+ * $Id: error.h,v 1.53 2003/06/18 21:57:52 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -64,19 +64,19 @@ unsigned long	_dmalloc_iter_c;
 extern
 unsigned long	_dmalloc_check_interval;
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
 extern
 TIMEVAL_TYPE	_dmalloc_start;
-#endif /* if STORE_TIMEVAL */
+#endif /* if LOG_PNT_TIMEVAL */
 
-#if STORE_TIMEVAL == 0
+#if LOG_PNT_TIMEVAL == 0
 #if HAVE_TIME
 /* NOTE: we do the ifdef this way for fillproto */
 extern
 TIME_TYPE	_dmalloc_start;
 #endif /* if HAVE_TIME */
-#endif /* if STORE_TIMEVAL == 0 */
+#endif /* if LOG_PNT_TIMEVAL == 0 */
 
 /* when we are going to startup our locking subsystem */
 extern
@@ -125,7 +125,7 @@ void	_dmalloc_open_log(void);
 extern
 void	_dmalloc_reopen_log(void);
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 /*
  * char *_dmalloc_ptimeval
  *
@@ -150,9 +150,9 @@ void	_dmalloc_reopen_log(void);
 extern
 char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 			   const int buf_size, const int elapsed_b);
-#endif /* if STORE_TIMEVAL */
+#endif /* if LOG_PNT_TIMEVAL */
 
-#if STORE_TIMEVAL == 0 && HAVE_TIME
+#if LOG_PNT_TIMEVAL == 0 && HAVE_TIME
 /*
  * char *_dmalloc_ptime
  *
@@ -177,7 +177,7 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 extern
 char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 			const int elapsed_b);
-#endif /* if STORE_TIMEVAL == 0 && HAVE_TIME */
+#endif /* if LOG_PNT_TIMEVAL == 0 && HAVE_TIME */
 
 /*
  * void _dmalloc_vmessage
