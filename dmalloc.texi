@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.235 2003/09/09 23:24:59 gray Exp $
+@c $Id: dmalloc.texi,v 1.236 2003/09/10 00:09:35 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -886,12 +886,13 @@ system version/type, and the version of Dmalloc you are using.
 * Return Address::              Getting caller address information.
 * Argument Checking::           Checking of function arguments.
 * Extensions::                  Additional non-standard routines.
-* C++ and the Library::         Using the library with C++.
+* Error Codes::                 Description of the internal error numbers.
 * Disabling the Library::       How to disable the library.
+* Using With C++::              Using the library with C++.
 * Using With a Debugger::       Using a debugger with the library.
 * Using With Threads::          Using the library with a thread package.
+* Using With Cygwin::           Using the library with Cygwin environment.
 * Debugging A Daemon::          Debugging allocations in a daemon process.
-* Using with Cygwin::           Using the library with Cygwin environment.
 @end menu
 
 @node Allocation Macros, Return Address, Programming, Programming
@@ -1049,7 +1050,7 @@ number of bytes specified.
 For all of the arguments checked, if the pointer is not in the heap then
 it is ignored since dmalloc does not know anything about it.
 
-@node Extensions, C++ and the Library, Argument Checking, Programming
+@node Extensions, Error Codes, Argument Checking, Programming
 @section Additional Non-standard Routines
 
 @cindex extensions
@@ -1381,31 +1382,255 @@ call to the @file{dmalloc} program with a @samp{-e #} option.
 
 @c --------------------------------
 
-@node C++ and the Library, Disabling the Library, Extensions, Programming
-@section Using the Library with C++
+@node Error Codes, Disabling the Library, Extensions, Programming
+@section Description of the Internal Error Codes
 
-@cindex c++ usage
-@cindex dmallocc.cc file
+@cindex error codes
 
-@cindex libdmallocxx.a
-For those people using the C++ language, the library tries to configure
-and build @file{libdmallocxx.a} library.  This library should be linked
-into your C++ programs instead of @file{libdmalloc.a}.
+The following error codes are defined in @file{error_val.h}.  They are
+used by the library to indicate a detected problem.  They can be caused
+by the user (@samp{ERROR_TOO_BIG}) or can indicate an internal library
+problem (@samp{ERROR_OVER_LIMIT}).  The @file{dmalloc} utility can give
+you the string version of the error with the @code{-e} argument:
 
-@cindex dmallocc.cc
-Dmalloc is not as good with C++ as C because the dynamic memory routines
-in C++ are @code{new()} and @code{delete()} as opposed to
-@code{malloc()} and @code{free()}.  Since new and delete are usually not
-used as functions but rather as @code{x = new type}, there is no easy
-way for dmalloc to pass in file and line information unfortunately.  The
-@file{libdmallocxx.a} library provides the file @file{dmallocc.cc} which
-effectively redirects @code{new} to the more familiar @code{malloc} and
-@code{delete} to the more familiar @code{free}.
+@example
+> dmalloc -e 60
+dmalloc: dmalloc_errno value '60' = 
+   'pointer is not on block boundary'
+@end example
 
-@emph{NOTE}: The author is not a C++ hacker so feedback in the form of
-other hints and ideas for C++ users would be much appreciated.
+Here are the error codes set by the library.  They are non contiguous on
+purpose because I add and delete codes all of the time and there are
+sections for various error-code types.
 
-@node Disabling the Library, Using With a Debugger, C++ and the Library, Programming
+@table @code
+
+@cindex 1, error code
+@cindex error code, 1
+@cindex no error
+
+@item 1 (ERROR_NONE)
+No error.  It is good coding practice to set the no-error code to be
+non-0 value because it forces you to set it explicitly.
+
+@cindex 10, error code
+@cindex error code 10
+
+@item 10 (ERROR_BAD_SETUP)
+Bad setup value.  This is currently unused but it is intended to report
+on invalid setup configuration information.
+
+@cindex lock-on
+@cindex recursion
+@cindex in twice
+@cindex 11, error code
+@cindex error code 11
+
+@item 11 (ERROR_IN_TWICE)
+Library went recursive.  This usually indicates that you are not using
+the threaded version of the library.  Or if you are then you are not
+using the @samp{-o} "lock-on" option.  @xref{Using With Threads}.
+
+@cindex 12, error code
+@cindex error code 12
+
+@item 12 (ERROR_BAD_ERRNO)
+Errno value from user is out-of-bounds.  This is currently unused but is
+intended to report a bad errno argument to a function.
+
+@cindex lock-on not configured
+@cindex 13, error code
+@cindex error code 13
+
+@item 13 (ERROR_LOCK_NOT_CONFIG)
+Thread locking has not been configured.  This indicates that you
+attempted to use the @samp{-o} "lock-on" option without linking with the
+thread version of the library.
+
+@cindex error-free-null token
+@cindex free null token
+@cindex pointer is null error
+@cindex 20, error code
+@cindex error code 20
+
+@item 20 (ERROR_IS_NULL)
+Pointer is null.  The program passed a NULL pointer to @code{free} and
+you have the @samp{error-free-null} token enabled.
+
+@cindex pointer not in heap error
+@cindex not in heap error
+@cindex 21, error code
+@cindex error code 21
+
+@item 21 (ERROR_NOT_IN_HEAP)
+Pointer is not pointing to heap data space.  This means that the program
+passed an out-of-bounds pointer to @code{free} or @code{realloc}.  This
+could be someone trying to work with a wild pointer or trying to free a
+pointer from a different source than @code{malloc}.
+
+@cindex not found error
+@cindex pointer not found error
+@cindex 22, error code
+@cindex error code 22
+
+@item 22 (ERROR_NOT_FOUND)
+Cannot locate pointer in heap.
+
+@cindex 23, error code
+@cindex error code 23
+
+@item 23 (ERROR_IS_FOUND)
+Found pointer the user was looking for.
+
+@cindex 24, error code
+@cindex error code 24
+
+@item 24 (ERROR_BAD_FILE)
+Possibly bad .c filename pointer.
+
+@cindex 25, error code
+@cindex error code 25
+
+@item 25 (ERROR_BAD_LINE)
+Possibly bad .c file line-number.
+
+@cindex 26, error code
+@cindex error code 26
+
+@item 26 (ERROR_UNDER_FENCE)
+Failed UNDER picket-fence magic-number check.
+
+@cindex 27, error code
+@cindex error code 27
+
+@item 27 (ERROR_OVER_FENCE)
+Failed OVER picket-fence magic-number check.
+
+@cindex 28, error code
+@cindex error code 28
+
+@item 28 (ERROR_WOULD_OVERWRITE)
+Use of pointer would exceed allocation.
+
+@cindex 29, error code
+@cindex error code 29
+
+@item 29 (ERROR_IS_FREE)
+Pointer is on free list.
+
+@cindex 30, error code
+@cindex error code 30
+
+@item 30 (ERROR_NOT_START_BLOCK)
+Pointer is not to start of memory block.
+
+@cindex 40, error code
+@cindex error code 40
+
+@item 40 (ERROR_BAD_SIZE)
+Invalid allocation size.
+
+@cindex 41, error code
+@cindex error code 41
+
+@item 41 (ERROR_TOO_BIG)
+Largest maximum allocation size exceeded.
+
+@cindex 42, error code
+@cindex error code 42
+
+@item 42 (ERROR_USER_NON_CONTIG)
+User allocated space contiguous block error.
+
+@cindex 43, error code
+@cindex error code 43
+
+@item 43 (ERROR_ALLOC_FAILED)
+Could not grow heap by allocating memory.
+
+@cindex 44, error code
+@cindex error code 44
+
+@item 44 (ERROR_ALLOC_NONLINEAR)
+Heap failed to produce linear address space.
+
+@cindex 45, error code
+@cindex error code 45
+
+@item 45 (ERROR_OVER_LIMIT)
+Over user specified allocation limit.
+
+@cindex 60, error code
+@cindex error code 60
+
+@item 60 (ERROR_NOT_ON_BLOCK)
+Pointer is not on block boundary.
+
+@cindex 61, error code
+@cindex error code 61
+
+@item 61 (ERROR_ALREADY_FREE)
+Tried to free previously freed pointer.
+
+@cindex 63, error code
+@cindex error code 63
+
+@item 63 (ERROR_NOT_USER)
+Pointer does not point to user-alloc space.
+
+@cindex 64, error code
+@cindex error code 64
+
+@item 64 (ERROR_FREE_LIST)
+Inconsistency with free linked-list.
+
+@cindex 65, error code
+@cindex error code 65
+
+@item 65 (ERROR_FREE_NON_CONTIG)
+Free space contiguous block error.
+
+@cindex 66, error code
+@cindex error code 66
+
+@item 66 (ERROR_FREE_MEM)
+Bad basic-block mem pointer in free-list.
+
+@cindex 67, error code
+@cindex error code 67
+
+@item 67 (ERROR_FREE_OVERWRITTEN)
+Free space has been overwritten.
+
+@cindex 70, error code
+@cindex error code 70
+
+@item 70 (ERROR_ADMIN_LIST)
+Bad admin structure list.
+
+@cindex 71, error code
+@cindex error code 71
+
+@item 71 (ERROR_TABLE_CORRUPT)
+Internal memory table corruption.
+
+@cindex 72, error code
+@cindex error code 72
+
+@item 72 (ERROR_ADDRESS_LIST)
+Internal address list corruption.
+
+@cindex 73, error code
+@cindex error code 73
+
+@item 73 (ERROR_SLOT_CORRUPT)
+Internal memory slot corruption.
+
+@end table
+
+@c --------------------------------
+
+@node Disabling the Library, Using With C++, Error Codes, Programming
 @section How to Disable the library
 
 @cindex disabling the library
@@ -1474,7 +1699,35 @@ If you get unresolved references like @code{_dmalloc_malloc} or
 been.
 @end itemize
 
-@node Using With a Debugger, Using With Threads, Disabling the Library, Programming
+@c --------------------------------
+
+@node Using With C++, Using With a Debugger, Disabling the Library, Programming
+@section Using the Library with C++
+
+@cindex c++ usage
+@cindex dmallocc.cc file
+
+@cindex libdmallocxx.a
+For those people using the C++ language, the library tries to configure
+and build @file{libdmallocxx.a} library.  This library should be linked
+into your C++ programs instead of @file{libdmalloc.a}.
+
+@cindex dmallocc.cc
+Dmalloc is not as good with C++ as C because the dynamic memory routines
+in C++ are @code{new()} and @code{delete()} as opposed to
+@code{malloc()} and @code{free()}.  Since new and delete are usually not
+used as functions but rather as @code{x = new type}, there is no easy
+way for dmalloc to pass in file and line information unfortunately.  The
+@file{libdmallocxx.a} library provides the file @file{dmallocc.cc} which
+effectively redirects @code{new} to the more familiar @code{malloc} and
+@code{delete} to the more familiar @code{free}.
+
+@emph{NOTE}: The author is not a C++ hacker so feedback in the form of
+other hints and ideas for C++ users would be much appreciated.
+
+@c --------------------------------
+
+@node Using With a Debugger, Using With Threads, Using With C++, Programming
 @section Using Dmalloc With a Debugger
 
 @cindex debugger usage with dmalloc
@@ -1518,6 +1771,8 @@ commands initially to load in dmalloc and other library symbols:
 * Memory Leaks::                Tracking down non-freed memory.
 * Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
 @end menu
+
+@c --------------------------------
 
 @node General Errors, Memory Leaks, Using With a Debugger, Using With a Debugger
 @subsection Diagnosing General Problems with a Debugger
@@ -1678,7 +1933,9 @@ interval setting to a low number, you should be able to locate
 approximately when this problem happened.  @xref{Debug Tokens},
 @xref{Dmalloc Program}.
 
-@node Using With Threads, Debugging A Daemon, Using With a Debugger, Programming
+@c --------------------------------
+
+@node Using With Threads, Using With Cygwin, Using With a Debugger, Programming
 @section Using the Library with a Thread Package
 
 @cindex threads
@@ -1769,7 +2026,65 @@ If you have any specific questions or would like addition information
 posted in this section, please let me know.  Experienced thread
 programmers only please.
 
-@node Debugging A Daemon, Using with Cygwin, Using With Threads, Programming
+@c --------------------------------
+
+@node Using With Cygwin, Debugging A Daemon, Using With Threads, Programming
+@section Using the library with Cygwin environment.
+
+@cindex cygwin
+
+The Cygwin environment is a Linux-like environment for Windows.  It
+provides Linux look and feel as well as a programming environment.  See
+@uref{http://www.cygwin.com/} for more details.
+
+@cindex reading environment, problems with
+@cindex getenv, problems with
+
+The challenge with using dmalloc to debug Cygwin programs is that when
+it initializes, dmalloc makes a call to @code{getenv} to read the
+environmental variables.  It is looking for the value of the
+@samp{DMALLOC_OPTIONS} variable which sets the debugging options.
+@xref{Environment Variable}.  Because Cygwin calls a memory allocation
+function while it is loading it's shared libraries, it goes recursive
+when @code{getenv} is called from within @code{malloc} causing a
+segfault.
+
+To work around this, I have added to the configure script a check to
+make sure that calls to @code{getenv} are okay inside of malloc.  See
+@code{GETENV_SAFE} in @file{conf.h}.  If they are not then you are going
+to have to add some code into the @code{main} function in your program
+to initialize the dmalloc flags yourself.  Here is a code sample:
+
+@cindex dmalloc_debug_setup usage
+
+@example
+main(int argc, char **argv)
+@{
+#ifdef DMALLOC
+  /*
+   * Get environ variable DMALLOC_OPTIONS and pass the settings string
+   * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
+   */
+  dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
+#endif
+
+  /* rest of code in main starts here */
+  ...
+@}
+@end example
+
+The @code{#ifdef} is just a good idea.  I means that when debugging with
+dmalloc you need to compile your code with @code{-DDMALLOC}.  When you
+are done debugging you can remove the flag and the call to
+@code{dmalloc_debug_setup} will be removed.
+
+Please let me know if there is a different way to read the environment
+in Cygwin without calling @code{getenv} or if there is a better way to
+do this.
+
+@c --------------------------------
+
+@node Debugging A Daemon,, Using With Cygwin, Programming
 @section Debugging Allocations in a Daemon Process
 
 @cindex daemon process debugging
@@ -1834,59 +2149,7 @@ the heap.  Also, remember that you can use the @code{dmalloc_message}
 and @code{dmalloc_vmessage} routines to annotate the dmalloc logfile
 with details to help you debug memory problems.  @xref{Extensions}.
 
-@node Using with Cygwin,, Debugging A Daemon, Programming
-@section Using the library with Cygwin environment.
-
-@cindex cygwin
-
-The Cygwin environment is a Linux-like environment for Windows.  It
-provides Linux look and feel as well as a programming environment.  See
-@uref{http://www.cygwin.com/} for more details.
-
-@cindex reading environment, problems with
-@cindex getenv, problems with
-
-The challenge with using dmalloc to debug Cygwin programs is that when
-it initializes, dmalloc makes a call to @code{getenv} to read the
-environmental variables.  It is looking for the value of the
-@samp{DMALLOC_OPTIONS} variable which sets the debugging options.
-@xref{Environment Variable}.  Because Cygwin calls a memory allocation
-function while it is loading it's shared libraries, it goes recursive
-when @code{getenv} is called from within @code{malloc} causing a
-segfault.
-
-To work around this, I have added to the configure script a check to
-make sure that calls to @code{getenv} are okay inside of malloc.  See
-@code{GETENV_SAFE} in @file{conf.h}.  If they are not then you are going
-to have to add some code into the @code{main} function in your program
-to initialize the dmalloc flags yourself.  Here is a code sample:
-
-@cindex dmalloc_debug_setup usage
-
-@example
-main(int argc, char **argv)
-@{
-#ifdef DMALLOC
-  /*
-   * Get environ variable DMALLOC_OPTIONS and pass the settings string
-   * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
-   */
-  dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
-#endif
-
-  /* rest of code in main starts here */
-  ...
-@}
-@end example
-
-The @code{#ifdef} is just a good idea.  I means that when debugging with
-dmalloc you need to compile your code with @code{-DDMALLOC}.  When you
-are done debugging you can remove the flag and the call to
-@code{dmalloc_debug_setup} will be removed.
-
-Please let me know if there is a different way to read the environment
-in Cygwin without calling @code{getenv} or if there is a better way to
-do this.
+@c --------------------------------
 
 @node Dmalloc Program, Source Code, Programming, Top
 @chapter Dmalloc Utility Program
