@@ -49,7 +49,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.55 1995/05/12 20:34:34 gray Exp $";
+  "$Id: error.c,v 1.56 1995/05/13 00:34:23 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(60 * SECS_IN_MIN)
@@ -68,22 +68,19 @@ EXPORT	long		_dmalloc_flags = 0;
 EXPORT	unsigned long	_dmalloc_iterc = 0;
 
 /* overhead information storing when the library started up for elapsed time */
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-EXPORT	long		_dmalloc_start = 0;
-#endif
 #if STORE_TIMEVAL
 EXPORT	struct timeval	_dmalloc_start;
+#else
+EXPORT	long		_dmalloc_start = 0;
 #endif
-
 /*
  * print the time into local buffer which is returned
  */
 EXPORT	char	*_dmalloc_ptime(
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-				const long * timep,
-#endif
 #if STORE_TIMEVAL
 				const struct timeval * timevalp,
+#else
+				const long * timep,
 #endif
 				const char elapsed
 				)
@@ -96,18 +93,14 @@ EXPORT	char	*_dmalloc_ptime(
   
   buf[0] = NULLC;
   
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-  secs = *timep;
-#endif
 #if STORE_TIMEVAL
   secs = timevalp->tv_sec;
   usecs = timevalp->tv_usec;
+#else
+  secs = *timep;
 #endif
   
   if (elapsed || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-    secs -= _dmalloc_start;
-#endif
 #if STORE_TIMEVAL
     usecs -= _dmalloc_start.tv_usec;
     if (usecs < 0) {
@@ -115,6 +108,8 @@ EXPORT	char	*_dmalloc_ptime(
       usecs = - usecs;
     }
     secs -= _dmalloc_start.tv_sec;
+#else
+    secs -= _dmalloc_start;
 #endif
   }
   
@@ -122,11 +117,10 @@ EXPORT	char	*_dmalloc_ptime(
   mins = (secs / SECS_IN_MIN) % SECS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-  (void)sprintf(buf, "%ld:%ld:%ld", hrs, mins, secs);
-#endif
 #if STORE_TIMEVAL
   (void)sprintf(buf, "%ld:%ld:%ld.%ld", hrs, mins, secs, usecs);
+#else
+  (void)sprintf(buf, "%ld:%ld:%ld", hrs, mins, secs);
 #endif
   
   return buf;
@@ -209,12 +203,13 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
       _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags, dmalloc_address);
       
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-      _dmalloc_message("starting time = %ld", _dmalloc_start);
-#endif
 #if STORE_TIMEVAL
       _dmalloc_message("starting time = %ld.%ld",
 		       _dmalloc_start.tv_sec, _dmalloc_start.tv_usec);
+#else
+#if HAVE_TIME /* NOT STORE_TIME */
+      _dmalloc_message("starting time = %ld", _dmalloc_start);
+#endif
 #endif
     }
     

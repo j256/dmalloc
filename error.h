@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.21 1995/05/12 20:36:42 gray Exp $
+ * $Id: error.h,v 1.22 1995/05/13 00:34:24 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -44,22 +44,20 @@ IMPORT	long		_dmalloc_flags;
 IMPORT	unsigned long	_dmalloc_iterc;
 
 /* overhead information storing when the library started up for elapsed time */
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-IMPORT	long		_dmalloc_start;
-#endif
 #if STORE_TIMEVAL
 IMPORT	struct timeval	_dmalloc_start;
+#else
+IMPORT	long		_dmalloc_start;
 #endif
 
 /*
  * print the time into local buffer which is returned
  */
 IMPORT	char	*_dmalloc_ptime(
-#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
-				const long * timep,
-#endif
 #if STORE_TIMEVAL
 				const struct timeval * timevalp,
+#else
+				const long * timep,
 #endif
 				const char elapsed
 				);

@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.32 1995/05/12 20:46:59 gray Exp $
+ * $Id: chunk_loc.h,v 1.33 1995/05/13 00:34:27 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -140,10 +140,8 @@ typedef struct {
 #if STORE_ITERATION_COUNT
   long		ov_iteration;		/* interation when pointer alloced */
 #endif
-#if HAVE_TIME
 #if STORE_TIME
   long		ov_time;		/* time when pointer alloced */
-#endif
 #endif
 #if STORE_TIMEVAL
   struct timeval  ov_timeval;		/* time when pointer alloced */
@@ -151,8 +149,8 @@ typedef struct {
 #if STORE_THREAD_ID
   THREAD_TYPE	ov_thread_id;		/* thread id which allocaed pnt */
 #endif
-
-#if STORE_SEEN_COUNT == 0 && STORE_ITERATION_COUNT == 0 && STORE_TIME == 0 && STORE_THREAD_ID == 0
+  
+#if STORE_SEEN_COUNT == 0 && STORE_ITERATION_COUNT == 0 && STORE_TIME == 0 && STORE_TIMEVAL == 0 && STORE_THREAD_ID == 0
   int		ov_junk;		/* for compilers that hate 0 structs */
 #endif
 } overhead_t;
