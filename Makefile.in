@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.172 2003/06/10 17:17:34 gray Exp $
+# $Id: Makefile.in,v 1.173 2003/06/14 05:19:05 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -89,7 +89,8 @@ FLS	=  conf.h.in configure.ac config.help \
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
-	contrib/ra_info.pl contrib/stratus_ftx_notes contrib/tsecs
+	contrib/ra_info.pl contrib/stratus_ftx_notes contrib/tsecs \
+	contrib/z_os_notes contrib/aix_5l_notes
 
 DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi dmalloc.pdf \
 	dmalloc.dvi texinfo.tex
