@@ -36,12 +36,12 @@
 #include "dmalloc.h"
 #endif
 
-#include "dmalloc_argv.h"
-#include "dmalloc_argv_loc.h"
+#include "argv.h"
+#include "argv_loc.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.3 1998/09/19 00:12:34 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.4 1998/10/05 03:28:25 gray Exp $";
 #endif
 
 /* internal routines */
@@ -77,7 +77,9 @@ char 	argv_interactive = ARGV_TRUE;
 FILE 	*argv_error_stream = ERROR_STREAM_INIT;
 
 /* local variables */
-LOCAL_QUEUE_DECLARE(argv_t *);			/* args waiting for values */
+static	argv_t	**queue_list = NULL;		/* our little queue struct */
+static	int	queue_head = 0;			/* head of queue */
+static	int	queue_tail = 0;			/* tail of queue */
 static	argv_t	empty[] = {{ ARGV_LAST }};	/* empty argument array */
 static	char	enabled = ARGV_FALSE;		/* are the lights on? */
 
@@ -744,16 +746,16 @@ static	void	do_usage(const argv_t *args, const int flag)
 /******************************* preprocessing *******************************/
 
 /*
- * Preprocess argument array ARGS of NUM_ARGS entries and set the MAND
+ * Preprocess argument array ARGS of ARG_N entries and set the MAND
  * and MAYBE boolean arrays.  Returns [NO]ERROR.
  */
-static	int	preprocess_array(argv_t *args, const int num_args)
+static	int	preprocess_array(argv_t *args, const int arg_n)
 {
   argv_t	*arg_p;
   char		mand_array = ARGV_FALSE, maybe_field = ARGV_FALSE;
   
   /* count the args and find the first mandatory */
-  for (arg_p = args; arg_p < args + num_args; arg_p++) {
+  for (arg_p = args; arg_p < args + arg_n; arg_p++) {
     
     /* clear internal flags */
     arg_p->ar_type &= ~ARGV_FLAG_USED;
@@ -886,7 +888,7 @@ static	int	preprocess_array(argv_t *args, const int num_args)
 	|| arg_p->ar_short_arg == ARGV_XOR) {
       
       /* that they are not at the start or end of list */
-      if (arg_p == args || arg_p >= (args + num_args - 1)) {
+      if (arg_p == args || arg_p >= (args + arg_n - 1)) {
 	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, ARGV_[X]OR entries cannot be at start or end of array\n",
@@ -1584,7 +1586,7 @@ static	int	check_mand(const argv_t *args)
 	(void)fprintf(argv_error_stream, "%*.*s%s%c",
 		      (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
 		      SHORT_PREFIX, arg_p->ar_short_arg);
-	if ((arg_p - 1)->ar_long_arg != NULL) {
+	if (arg_p->ar_long_arg != NULL) {
 	  (void)fprintf(argv_error_stream, " (%s%s)",
 			LONG_PREFIX, arg_p->ar_long_arg);
 	}
@@ -1615,7 +1617,7 @@ static	int	check_opt(void)
 {
   int	queue_c;
   
-  queue_c = QUEUE_COUNT();
+  queue_c = queue_head - queue_tail;
   if (queue_c > 0) {
     if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
@@ -1783,13 +1785,43 @@ static	void	do_arg(argv_t *grid, argv_t *match_p, const char *close_p,
     }
   }
   else {
-    QUEUE_ENQUEUE(match_p);
+    queue_list[queue_head] = match_p;
+    queue_head++;
   }
 }
 
 /*
+ * Examine an argument string STR to see if it really is a negative
+ * number being passed into a previously specified argument.  Returns
+ * 1 if a number otherwise 0.  Thanks much to Nick Kisseberth
+ * <nkissebe@hera.itg.uiuc.edu> for pointing out this oversight.
+ */
+static	int	is_number(const char *str)
+{
+  const char	*str_p;
+  
+  /* empty strings are not numbers */
+  if (str[0] == '\0') {
+    return 0;
+  }
+  
+  /*
+   * All chars in the string should be number chars for it to be a
+   * number.  Yes this will return yes if the argument is "00-" but
+   * we'll chalk this up to user error.
+   */
+  for (str_p = str; *str_p != '\0'; str_p++) {
+    if (strchr(NUMBER_ARG_CHARS, *str_p) == NULL) {
+      return 0;
+    }
+  }
+  
+  return 1;
+}
+
+/*
  * Process a list of arguments ARGV and ARGV as it applies to ARGS.
- * on NUM_ARGS members.  OKAY_P is a pointer to the boolean error
+ * on ARG_N members.  OKAY_P is a pointer to the boolean error
  * marker.
  */
 static	void	do_list(argv_t *grid, const int argc, char **argv,
@@ -1797,7 +1829,7 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
 {
   argv_t	*grid_p, *match_p;
   int		len, char_c, unwant_c = 0;
-  char		last_arg = ARGV_FALSE;
+  int		last_arg_b = ARGV_FALSE;
   char		*close_p = NULL, **arg_p;
   
   /* run throught rest of arguments */
@@ -1805,20 +1837,21 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
     
     /* have we reached the LAST_ARG marker? */
     if (strcmp(LAST_ARG, *arg_p) == 0) {
-      if (last_arg) {
+      if (last_arg_b) {
 	if (global_lasttog == GLOBAL_LASTTOG_ENABLE) {
-	  last_arg = ARGV_FALSE;
+	  last_arg_b = ARGV_FALSE;
 	  continue;
 	}
       }
       else {
-	last_arg = ARGV_TRUE;
+	last_arg_b = ARGV_TRUE;
 	continue;
       }
     }
     
     /* are we processing a long option? */
-    if (! last_arg && strncmp(LONG_PREFIX, *arg_p, LONG_PREFIX_LENGTH) == 0) {
+    if ((! last_arg_b)
+	&& strncmp(LONG_PREFIX, *arg_p, LONG_PREFIX_LENGTH) == 0) {
       
       /*
        * check for close equals marker
@@ -1897,7 +1930,8 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
 	}
 	else {
 	  /* HACK: we enqueue null for the file argument */
-	  QUEUE_ENQUEUE(NULL);
+	  queue_list[queue_head] = NULL;
+	  queue_head++;
 	}
 	continue;
       }
@@ -1999,7 +2033,7 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
     }
     
     /* are we processing a short option? */
-    if (! last_arg
+    if ((! last_arg_b)
 	&& strncmp(SHORT_PREFIX, *arg_p, SHORT_PREFIX_LENGTH) == 0) {
       
       /*
@@ -2054,6 +2088,37 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
 	    continue;
 	  }
 	  
+	  /*
+	   * allow values with negative signs if we are at the start
+	   * of an argument list, and if the argument is a number, and
+	   * we already have a variable looking for a value.  Thanks
+	   * to Nick Kisseberth <nkissebe@hera.itg.uiuc.edu> for
+	   * pointing out this oversight.
+	   */
+	  if (char_c == 0 && is_number(*arg_p) && queue_head > queue_tail) {
+	    
+	    match_p = queue_list[queue_tail];
+	    /*
+	     * NOTE: we don't advance the queue tail here unless we
+	     * find out that we can use it below
+	     */
+	    
+	    switch (ARGV_TYPE(match_p->ar_type)) {
+	      
+	    case ARGV_SHORT:
+	    case ARGV_INT:
+	    case ARGV_LONG:
+	    case ARGV_FLOAT:
+	    case ARGV_DOUBLE:
+              translate_value(*arg_p, match_p->ar_variable, match_p->ar_type);
+	      char_c = len;
+	      /* we actually used it so we advance the queue tail position */
+	      queue_tail++;
+	      continue;
+	      break;
+	    }
+	  }
+	  
 	  /* create an error string */
 	  if (argv_error_stream != NULL) {
 	    (void)fprintf(argv_error_stream,
@@ -2072,8 +2137,12 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
     }
     
     /* could this be a value? */
-    if (grid->ar_short_arg != ARGV_LAST && QUEUE_COUNT() > 0) {
-      QUEUE_DEQUEUE(match_p);
+    if (grid->ar_short_arg != ARGV_LAST && queue_head > queue_tail) {
+      
+      /* pull the variable waiting for a value from the queue */
+      match_p = queue_list[queue_tail];
+      queue_tail++;
+      
       /* HACK: is this the file argument */
       if (match_p == NULL) {
 	file_args(*arg_p, grid, okay_p);
@@ -2382,7 +2451,7 @@ static	int	process_env(void)
  */
 static	int	process_args(argv_t *args, const int argc, char **argv)
 {
-  int		num_args;
+  int		arg_n;
   const char	*prog_p;
   char		okay = ARGV_TRUE;
   argv_t	*arg_p;
@@ -2439,19 +2508,25 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
   (void)strncpy(argv_program, prog_p, PROGRAM_NAME);
   
   /* count the args */
-  num_args = 0;
+  arg_n = 0;
   for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
-    num_args++;
+    arg_n++;
   }
   
   /* verify the argument array */
-  if (preprocess_array(args, num_args) != NOERROR) {
+  if (preprocess_array(args, arg_n) != NOERROR) {
     return ERROR;
   }
   
   /* allocate our value queue */
-  if (num_args > 0) {
-    QUEUE_ALLOC(argv_t *, num_args);
+  if (arg_n > 0) {
+    /* allocate our argument queue */
+    queue_list = (argv_t **)malloc(sizeof(argv_t *) * arg_n);
+    if (queue_list == NULL) {
+      return ERROR;
+    }
+    queue_head = 0;
+    queue_tail = 0;
   }
   
   /* do the env args before? */
@@ -2484,8 +2559,8 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
   }
   
   /* if we allocated the space then free it */
-  if (num_args > 0) {
-    QUEUE_FREE();
+  if (arg_n > 0) {
+    free(queue_list);
   }
   
   /* was there an error? */
