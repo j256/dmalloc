@@ -58,7 +58,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.64 1997/03/18 20:34:35 gray Exp $";
+  "$Id: dmalloc.c,v 1.65 1997/03/20 20:45:32 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -607,9 +607,12 @@ EXPORT	int	main(int argc, char ** argv)
   else if (clear)
     addr = ADDRESS_INIT;
   
-  /* NOTE: special case, interval == 0 causes it to be undefed */
-  if (interval != NO_VALUE && interval > 0) {
-    inter = interval;
+  if (interval != NO_VALUE) {
+    /* NOTE: special case, interval == 0 causes it to be undefed */
+    if (interval == 0)
+      inter = INTERVAL_INIT;
+    else
+      inter = interval;
     set = TRUE;
   }
   else if (clear)
