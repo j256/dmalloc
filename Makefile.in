@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.179 2004/07/10 03:49:51 gray Exp $
+# $Id: Makefile.in,v 1.180 2004/07/11 14:46:02 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -22,7 +22,7 @@ OBJS	= arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o
-VERSION	!= sed -e '/dmalloc_version/s/^.*\([0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*\(-b[0-9]\)*\).*$$/\1/p' -e d version.h
+VERSION	!= sed -e '/dmalloc_version/s/^.*\([0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*\(-b[0-9]\)*\(-beta\)*\).*$$/\1/p' -e d version.h
 
 DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
