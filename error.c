@@ -35,12 +35,13 @@
 
 #include "compat.h"
 #include "debug_val.h"
+#include "env.h"				/* for LOGPATH_INIT */
 #include "error.h"
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.43 1994/09/12 17:13:39 gray Exp $";
+  "$Id: error.c,v 1.44 1994/09/20 17:59:49 gray Exp $";
 #endif
 
 /*
@@ -64,7 +65,7 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
   va_list	args;
   
   /* no logpath and no print then no workie */
-  if (dmalloc_logpath == NULL
+  if (dmalloc_logpath == LOGPATH_INIT
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR))
     return;
   

@@ -39,6 +39,7 @@
 
 #include "compat.h"
 #include "debug_tok.h"
+#include "env.h"
 #include "error_str.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
@@ -46,7 +47,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.41 1994/09/16 18:53:31 gray Exp $";
+  "$Id: dmalloc.c,v 1.42 1994/09/20 17:59:54 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -56,9 +57,6 @@ LOCAL	char	*rcs_id =
 
 #define NO_VALUE		(-1)		/* no value ... value */
 #define TOKENS_PER_LINE		5		/* num debug toks per line */
-
-/* local variables */
-LOCAL	char	printed		= FALSE;	/* did we outputed anything? */
 
 /* argument variables */
 LOCAL	char	*address	= NULL;		/* for ADDRESS */
@@ -160,34 +158,6 @@ LOCAL	void	choose_shell(void)
     }
   
   cshell = TRUE;
-}
-
-/*
- * hexadecimal STR to long translation
- */
-LOCAL	long	hex_to_long(const char * str)
-{
-  long		ret;
-  
-  /* strip off spaces */
-  for (; *str == ' ' || *str == '\t'; str++);
-  
-  /* skip a leading 0[xX] */
-  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X'))
-    str += 2;
-  
-  for (ret = 0;; str++) {
-    if (*str >= '0' && *str <= '9')
-      ret = ret * 16 + (*str - '0');
-    else if (*str >= 'a' && *str <= 'f')
-      ret = ret * 16 + (*str - 'a' + 10);
-    else if (*str >= 'A' && *str <= 'F')
-      ret = ret * 16 + (*str - 'A' + 10);
-    else
-      break;
-  }
-  
-  return ret;
 }
 
 /*
@@ -380,59 +350,64 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
  */
 LOCAL	void	dump_current(void)
 {
-  const char	*str;
   char		*tokp;
-  int		num;
+  char		*lpath, *start_file;
+  unsigned long	addr;
+  int		addr_count, inter, start_line, start_count;
+  long		flags;
   
-  str = (const char *)getenv(DEBUG_ENVIRON);
-  if (str == NULL)
-    (void)fprintf(stderr, "%s not set\n", DEBUG_ENVIRON);
+  _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
+		       &inter, &lpath,
+		       &start_file, &start_line, &start_count, NULL);
+  
+  if (flags == DEBUG_INIT)
+    (void)fprintf(stderr, "Debug-Flags  not-set\n");
   else {
-    num = hex_to_long(str);
-    (void)process(num, NULL, &tokp);
-    (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, tokp);
-    
+    (void)process(flags, NULL, &tokp);
+    (void)fprintf(stderr, "Debug-Flags  '%#lx' (%s)\n", flags, tokp);
     if (verbose)
-      dump_debug(num);
+      dump_debug(flags);
   }
   
-  str = (const char *)getenv(ADDRESS_ENVIRON);
-  if (str == NULL)
-    (void)fprintf(stderr, "%s not set\n", ADDRESS_ENVIRON);
+  if (addr == ADDRESS_INIT)
+    (void)fprintf(stderr, "Address      not-set\n");
   else
-    (void)fprintf(stderr, "%s == '%s'\n", ADDRESS_ENVIRON, str);
+    (void)fprintf(stderr, "Address      %#lx, count = %d\n",
+		  (long)addr, addr_count);
   
-  str = (const char *)getenv(INTERVAL_ENVIRON);
-  if (str == NULL)
-    (void)fprintf(stderr, "%s not set\n", INTERVAL_ENVIRON);
-  else {
-    num = atoi(str);
-    (void)fprintf(stderr, "%s == '%d'\n", INTERVAL_ENVIRON, num);
-  }
-  
-  str = (const char *)getenv(LOGFILE_ENVIRON);
-  if (str == NULL)
-    (void)fprintf(stderr, "%s not set\n", LOGFILE_ENVIRON);
+  if (inter == INTERVAL_INIT)
+    (void)fprintf(stderr, "Interval     not-set\n");
   else
-    (void)fprintf(stderr, "%s == '%s'\n", LOGFILE_ENVIRON, str);
+    (void)fprintf(stderr, "Interval     %d\n", inter);
   
-  str = (const char *)getenv(START_ENVIRON);
-  if (str == NULL)
-    (void)fprintf(stderr, "%s not set\n", START_ENVIRON);
+  if (lpath == LOGPATH_INIT)
+    (void)fprintf(stderr, "Logpath      not-set\n");
   else
-    (void)fprintf(stderr, "%s == '%s'\n", START_ENVIRON, str);
+    (void)fprintf(stderr, "Logpath      '%s'\n", lpath);
+  
+  if (start_file == START_FILE_INIT && start_count == START_COUNT_INIT)
+    (void)fprintf(stderr, "Start-File   not-set\n");
+  else if (start_count != START_COUNT_INIT)
+    (void)fprintf(stderr, "Start-Count  %d\n", start_count);
+  else
+    (void)fprintf(stderr, "Start-File   '%s', line = %d\n",
+		  start_file, start_line);
 }
 
 /*
  * output the code to set env VAR to VALUE
  */
-LOCAL	void	set_variable(const char * var, const char * value)
+LOCAL void    set_variable(const char * var, const char * value)
 {
   if (bourne) {
-    if (! no_changes)
-      (void)printf("%s=%s; export %s;\n", var, value, var);
-    if (no_changes || verbose)
-      (void)fprintf(stderr, "Outputed: %s=%s; export %s;\n", var, value, var);
+    if (! no_changes) {
+      (void)printf("%s=%s;\n", var, value);
+      (void)printf("export %s;\n", var);
+    }
+    if (no_changes || verbose) {
+      (void)fprintf(stderr, "Outputed: %s=%s;\n", var, value);
+      (void)fprintf(stderr, "export %s;\n", var);
+    }
   }
   else {
     if (! no_changes)
@@ -440,29 +415,6 @@ LOCAL	void	set_variable(const char * var, const char * value)
     if (no_changes || verbose)
       (void)fprintf(stderr, "Outputed: setenv %s %s;\n", var, value);
   }
-  
-  printed = TRUE;
-}
-
-/*
- * output the code to un-set env VAR
- */
-LOCAL	void	unset_variable(const char * var)
-{
-  if (bourne) {
-    if (! no_changes)
-      (void)printf("unset %s;\n", var);
-    if (no_changes || verbose)
-      (void)fprintf(stderr, "Outputed: unset %s;\n", var);
-  }
-  else {
-    if (! no_changes)
-      (void)printf("unsetenv %s;\n", var);
-    if (no_changes || verbose)
-      (void)fprintf(stderr, "Outputed: unsetenv %s;\n", var);
-  }
-  
-  printed = TRUE;
 }
 
 /*
@@ -478,8 +430,13 @@ LOCAL	char	*local_strerror(const int errnum)
 
 EXPORT	int	main(int argc, char ** argv)
 {
-  char	buf[20];
-  char	debug_set = FALSE;
+  char		buf[1024];
+  char		debug_set = FALSE, set = FALSE;
+  char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
+  unsigned long	addr = ADDRESS_INIT;
+  int		addr_count = ADDRESS_COUNT_INIT, inter = INTERVAL_INIT;
+  int		sline = START_LINE_INIT, scount = START_COUNT_INIT;
+  long		flags = DEBUG_INIT;
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
   argv_version_string = malloc_version;
@@ -493,6 +450,10 @@ EXPORT	int	main(int argc, char ** argv)
   if (! bourne && ! cshell)
     choose_shell();
   
+  /* get the current debug information from the env variable */
+  _dmalloc_environ_get(OPTIONS_ENVIRON, NULL, NULL, &flags, NULL, NULL,
+		       NULL, NULL, NULL, NULL);
+  
   /* get a new debug value from tag */
   if (tag != NULL) {
     if (debug != NO_VALUE)
@@ -503,99 +464,109 @@ EXPORT	int	main(int argc, char ** argv)
   }
   
   if (plus.aa_entryn > 0) {
-    const char	*str;
     int		plusc;
     
     /* get current debug value and add tokens if possible */
-    if (debug == NO_VALUE) {
-      str = (const char *)getenv(DEBUG_ENVIRON);
-      if (str == NULL)
+    if (debug == NO_VALUE)
+      if (flags == DEBUG_INIT)
 	debug = 0;
       else
-	debug = hex_to_long(str);
-    }
+	debug = flags;
     
     for (plusc = 0; plusc < plus.aa_entryn; plusc++)
       debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
   }
   
   if (minus.aa_entryn > 0) {
-    const char	*str;
     int		minusc;
     
     /* get current debug value and add tokens if possible */
-    if (debug == NO_VALUE) {
-      str = (const char *)getenv(DEBUG_ENVIRON);
-      if (str == NULL)
+    if (debug == NO_VALUE)
+      if (flags == DEBUG_INIT)
 	debug = 0;
       else
-	debug = hex_to_long(str);
-    }
+	debug = flags;
     
     for (minusc = 0; minusc < minus.aa_entryn; minusc++)
       debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minusc));
   }
   
   if (debug != NO_VALUE) {
-    (void)sprintf(buf, "%#lx", debug);
-    set_variable(DEBUG_ENVIRON, buf);
-    
+    /* special case, undefine if 0 */
+    if (debug == 0)
+      flags = DEBUG_INIT;
+    else
+      flags = debug;
+    set = TRUE;
     /* should we clear the rest? */
     if (debug_set && remove_auto && ! keep)
       clear = TRUE;
   }
   
-  if (address != NULL)
-    set_variable(ADDRESS_ENVIRON, address);
+  if (clear)
+    set = TRUE;
+  
+  if (address != NULL) {
+    _dmalloc_address_break(address, &addr, &addr_count);
+    set = TRUE;
+  }
   else if (clear)
-    unset_variable(ADDRESS_ENVIRON);
+    addr = ADDRESS_INIT;
   
   /* NOTE: special case, interval == 0 causes it to be undefed */
   if (interval != NO_VALUE && interval > 0) {
-    (void)sprintf(buf, "%d", interval);
-    set_variable(INTERVAL_ENVIRON, buf);
+    inter = interval;
+    set = TRUE;
   }
   else if (clear)
-    unset_variable(INTERVAL_ENVIRON);
+    inter = INTERVAL_INIT;
   
-  if (logpath != NULL)
-    set_variable(LOGFILE_ENVIRON, logpath);
+  if (logpath != NULL) {
+    lpath = logpath;
+    set = TRUE;
+  }
   else if (clear)
-    unset_variable(LOGFILE_ENVIRON);
+    lpath = LOGPATH_INIT;
   
-  if (start != NULL)
-    set_variable(START_ENVIRON, start);
+  if (start != NULL) {
+    _dmalloc_start_break(start, &sfile, &sline, &scount);
+    set = TRUE;
+  }
   else if (clear)
-    unset_variable(START_ENVIRON);
+    sfile = START_FILE_INIT;
   
   if (errno_to_print != NO_VALUE) {
     (void)fprintf(stderr, "%s: dmalloc_errno value '%d' = \n",
 		  argv_program, errno_to_print);
     (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
-    printed = TRUE;
   }
   
-  if (list_tags || list_tokens) {
-    if (list_tags) {
-      (void)fprintf(stderr, "Available Tags:\n");
-      process(0L, NULL, NULL);
-    }
-    if (list_tokens) {
-      attr_t	*attrp;
-      (void)fprintf(stderr, "Debug Tokens:\n");
-      for (attrp = attributes; attrp->at_string != NULL; attrp++)
-	if (very_verbose)
-	  (void)fprintf(stderr, "%s (%s) -- %s (%#x)\n",
-			attrp->at_string, attrp->at_short, attrp->at_desc,
-			attrp->at_value);
-	else if (verbose)
-	  (void)fprintf(stderr, "%s -- %s\n",
-			attrp->at_string, attrp->at_desc);
-	else
-	  (void)fprintf(stderr, "%s\n", attrp->at_string);
-    }
+  if (list_tags) {
+    (void)fprintf(stderr, "Available Tags:\n");
+    process(0L, NULL, NULL);
   }
-  else if (! printed)
+  
+  if (list_tokens) {
+    attr_t	*attrp;
+    (void)fprintf(stderr, "Debug Tokens:\n");
+    for (attrp = attributes; attrp->at_string != NULL; attrp++)
+      if (very_verbose)
+	(void)fprintf(stderr, "%s (%s) -- %s (%#x)\n",
+		      attrp->at_string, attrp->at_short, attrp->at_desc,
+		      attrp->at_value);
+      else if (verbose)
+	(void)fprintf(stderr, "%s -- %s\n",
+		      attrp->at_string, attrp->at_desc);
+      else
+	(void)fprintf(stderr, "%s\n", attrp->at_string);
+  }
+  
+  if (set) {
+    _dmalloc_environ_set(buf, addr, addr_count, flags, inter, lpath, sfile,
+			 sline, scount);
+    set_variable(OPTIONS_ENVIRON, buf);
+  }
+  else if (errno_to_print == NO_VALUE && ! list_tags && ! list_tokens)
     dump_current();
   
   argv_cleanup(args);

@@ -33,6 +33,7 @@
 #include "chunk.h"
 #include "compat.h"
 #include "debug_val.h"
+#include "env.h"
 #include "error.h"
 #include "error_str.h"
 #include "error_val.h"
@@ -43,27 +44,27 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.67 1994/09/12 17:18:43 gray Exp $";
+  "$Id: malloc.c,v 1.68 1994/09/20 17:59:46 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-EXPORT	char		*dmalloc_logpath = NULL;
+EXPORT	char		*dmalloc_logpath = LOGPATH_INIT;
 /* internal dmalloc error number for reference purposes only */
 EXPORT	int		dmalloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call dmalloc_error() */
 #if defined(__STDC__) && __STDC__ == 1
-EXPORT	void		*dmalloc_address = NULL;
+EXPORT	void		*dmalloc_address = ADDRESS_INIT;
 #else
-EXPORT	char		*dmalloc_address = NULL;
+EXPORT	char		*dmalloc_address = ADDRESS_INIT;
 #endif
 /*
  * argument to dmalloc_address, if 0 then never call dmalloc_error()
  * else call it after seeing dmalloc_address for this many times.
  */
-EXPORT	int		dmalloc_address_count = 0;
+EXPORT	int		dmalloc_address_count = ADDRESS_COUNT_INIT;
 
 /* local routines */
 LOCAL	int		dmalloc_startup(void);
@@ -98,43 +99,14 @@ EXPORT	char		*_dmalloc_strerror(const int errnum);
 /* local variables */
 LOCAL	char		enabled		= FALSE; /* have we started yet? */
 LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
-LOCAL	char		log_path[512]	= { NULLC }; /* storage for env path */
 
 /* debug variables */
-LOCAL	char		start_file[512] = { NULLC }; /* file to start at */
-LOCAL	int		start_line	= 0;	/* line in module to start */
-LOCAL	int		start_count	= -1;	/* start after X */
-LOCAL	int		check_interval	= -1;	/* check every X */
+LOCAL	char		*start_file = START_FILE_INIT; /* file to start at */
+LOCAL	int		start_line = START_LINE_INIT; /* line to start */
+LOCAL	int		start_count = START_COUNT_INIT; /* start after X */
+LOCAL	int		check_interval = INTERVAL_INIT; /* check every X */
 
 /****************************** local utilities ******************************/
-
-/*
- * hexadecimal STR to int translation
- */
-LOCAL	long	hex_to_long(const char * str)
-{
-  long		ret;
-  
-  /* strip off spaces */
-  for (; *str == ' ' || *str == '\t'; str++);
-  
-  /* skip a leading 0[xX] */
-  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X'))
-    str += 2;
-  
-  for (ret = 0;; str++) {
-    if (*str >= '0' && *str <= '9')
-      ret = ret * 16 + (*str - '0');
-    else if (*str >= 'a' && *str <= 'f')
-      ret = ret * 16 + (*str - 'a' + 10);
-    else if (*str >= 'A' && *str <= 'F')
-      ret = ret * 16 + (*str - 'A' + 10);
-    else
-      break;
-  }
-  
-  return ret;
-}
 
 /*
  * a call to the alloc routines has been made, check the debug variables
@@ -158,20 +130,20 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   
   /* check start file/line specifications */
   if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      && start_file[0] != NULLC
-      && file != NULL
+      && start_file != START_FILE_INIT
+      && file != DMALLOC_DEFAULT_FILE
       && line != DMALLOC_DEFAULT_LINE
       && strcmp(start_file, file) == 0
       && (start_line == 0 || start_line == line))
     BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
   
   /* start checking heap after X times */
-  if (start_count != -1 && --start_count == 0)
+  if (start_count != START_COUNT_INIT && --start_count == 0)
     BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
   
   /* checking heap every X times */
   _dmalloc_iterc++;
-  if (check_interval > 0) {
+  if (check_interval != INTERVAL_INIT && check_interval > 0) {
     if (_dmalloc_iterc % check_interval == 0)
       BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
     else
@@ -194,7 +166,7 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
 {
   static int	addc = 0;
   
-  if (dmalloc_address == NULL || pnt != dmalloc_address)
+  if (dmalloc_address == ADDRESS_INIT || pnt != dmalloc_address)
     return;
   
   addc++;
@@ -202,80 +174,35 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
 		  pnt, label, addc, _chunk_display_pnt(file, line));
   
   /* NOTE: if dmalloc_address_count == 0 then never quit */
-  if (dmalloc_address_count > 0 && addc >= dmalloc_address_count) {
+  if (dmalloc_address_count == ADDRESS_COUNT_INIT
+      || (dmalloc_address_count > 0 && addc >= dmalloc_address_count)) {
     dmalloc_errno = ERROR_IS_FOUND;
     dmalloc_error("check_pnt");
   }
 }
 
 /*
- * get the values of dmalloc environ variables
+ * process the values of dmalloc environ variable(s)
  */
-LOCAL	void	get_environ(void)
+LOCAL	void	process_environ(void)
 {
-  const char	*env;
+  _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&dmalloc_address,
+		       &dmalloc_address_count, &_dmalloc_flags,
+		       &check_interval, &dmalloc_logpath,
+		       &start_file, &start_line, &start_count,
+		       _dmalloc_message);
   
-  /* get the dmalloc_debug value -- if we haven't called dmalloc yet */
+  /* if it was not set then no flags set */
+  if (_dmalloc_flags == DEBUG_INIT)
+    _dmalloc_flags = 0;
+  
+  /* if we set the start stuff, then check-heap comes on later */
+  if (start_count != -1)
+    BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
+  
+  /* override dmalloc_debug value if we we call dmalloc_debug() already */
   if (_dmalloc_debug_preset != DEBUG_PRE_NONE)
     _dmalloc_flags = _dmalloc_debug_preset;
-  else {
-    env = (const char *)getenv(DEBUG_ENVIRON);
-    if (env != NULL)
-      _dmalloc_flags = (int)hex_to_long(env);
-  }
-  
-  /* get the dmalloc logfile name into a holding variable */
-  env = (const char *)getenv(LOGFILE_ENVIRON);
-  if (env != NULL) {
-#if HAVE_GETPID
-    /* NOTE: this may cause core dumps if env contains a bad format string */
-    (void)sprintf(log_path, env, getpid());
-#else
-    (void)strcpy(log_path, env);
-#endif
-    dmalloc_logpath = log_path;
-  }
-  
-  /* watch for a specific address and die when we get it */
-  env = (const char *)getenv(ADDRESS_ENVIRON);
-  if (env != NULL) {
-    char	*addp;
-    
-    addp = (char *)index(env, ':');
-    if (addp != NULL)
-      dmalloc_address_count = atoi(addp + 1);
-    else
-      dmalloc_address_count = 1;
-    
-    dmalloc_address = (char *)hex_to_long(env);
-  }
-  
-  /* check the heap every X times */
-  env = (const char *)getenv(INTERVAL_ENVIRON);
-  if (env != NULL)
-    check_interval = atoi(env);
-  
-  /*
-   * start checking the heap after X iterations OR
-   * start at a file:line combination
-   */
-  env = (const char *)getenv(START_ENVIRON);
-  if (env != NULL) {
-    char	*startp;
-    
-    BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
-    
-    startp = (char *)index(env, ':');
-    if (startp != NULL) {
-      (void)strcpy(start_file, env);
-      startp = start_file + (startp - env);
-      *startp = NULLC;
-      start_line = atoi(startp + 1);
-      start_count = 0;
-    }
-    else
-      start_count = atoi(env);
-  }
 }
 
 /************************** startup/shutdown calls ***************************/
@@ -292,8 +219,8 @@ LOCAL	int	dmalloc_startup(void)
   /* set this here so if an error occurs below, it will not try again */
   enabled = TRUE;
   
-  /* get the environmental variables */
-  get_environ();
+  /* process the environmental variable(s) */
+  process_environ();
   
   /* startup heap code */
   if (_heap_startup() == ERROR)

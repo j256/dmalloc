@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.30 1994/09/12 17:18:09 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.31 1994/09/20 17:59:56 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -27,13 +27,9 @@
 #include "conf.h"			/* for HAVE_BCMP and BASIC_BLOCK */
 
 /*
- * env variables
+ * env variable(s)
  */
-#define ADDRESS_ENVIRON		"DMALLOC_ADDRESS"
-#define DEBUG_ENVIRON		"DMALLOC_DEBUG"
-#define INTERVAL_ENVIRON	"DMALLOC_INTERVAL"
-#define LOGFILE_ENVIRON		"DMALLOC_LOGFILE"
-#define START_ENVIRON		"DMALLOC_START"
+#define OPTIONS_ENVIRON		"DMALLOC_OPTIONS"
 
 /******************************* useful defines ******************************/
 
