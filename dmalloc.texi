@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.234 2003/09/08 16:10:54 gray Exp $
+@c $Id: dmalloc.texi,v 1.235 2003/09/09 23:24:59 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -104,9 +104,9 @@ detection, file/line number reporting, and general logging of
 statistics.
 
 The library is reasonably portable having been run successfully on at
-least the following operating systems: AIX, DG/UX, Free/Net/OpenBSD,
+least the following operating systems: AIX, DGUX, Free/Net/OpenBSD,
 GNU/Hurd, HPUX, Irix, Linux, NeXT, OSF, SCO, Solaris, Ultrix, Unixware,
-Windoze, and Unicos on a Cray T3E.  It also provides support for the
+MS Windows, and Unicos on a Cray T3E.  It also provides support for the
 debugging of threaded programs.  @xref{Using With Threads}.
 
 The package includes the library, configuration scripts, debug utility
@@ -712,13 +712,13 @@ allocation function.  When you allocate memory with these functions, the
 dmalloc library keeps track of a number of pieces of debugging
 information about your pointer including: where it was allocated,
 exactly how much memory was requested, when the call was made, etc..
-This information can then be verified when the pointer is freeds or
+This information can then be verified when the pointer is freed or
 reallocated and the details can be logged on any errors.
 
-Whenever you reallocate or free a memory addres, the dmalloc library
+Whenever you reallocate or free a memory address, the dmalloc library
 always performs a number of checks on the pointer to make sure that it
 is valid and has not been corrupted.  You can configure the library to
-perform additional checks suchs as detected fence-post writing.  The
+perform additional checks such as detected fence-post writing.  The
 library can also be configured to overwrite memory with non-zeros (only
 if calloc is not called) when it is allocated and erase the memory when
 the pointers are freed.
@@ -739,10 +739,10 @@ Performing a full heap check can take a good bit of CPU and it may be
 that you will want to run it sporadically.  This can be accomplished in
 a couple different ways including the '-i' interval argument to the
 dmalloc utility.  @xref{Dmalloc Program}.  This will cause the check to
-be run every Xth time.  For instance, 'dmalloc -i 3' will cause the heap
-to be checked before every 3rd call to a memory function.  Values of 100
-or even 1000 for high memory usage programs are more useful than smaller
-ones.
+be run every N-th time.  For instance, 'dmalloc -i 3' will cause the
+heap to be checked before every 3rd call to a memory function.  Values
+of 100 or even 1000 for high memory usage programs are more useful than
+smaller ones.
 
 You can also cause the program to start doing detailed heap checking
 after a certain point.  For instance, with 'dmalloc -s 1000' option, you
@@ -1190,7 +1190,7 @@ and then restored later.
 void dmalloc_debug_setup ( const char * @var{options_str} )
 
 This routine sets the global debugging functionality as an option
-string.  Normally this would be pased in in the DMALLOC_OPTIONS
+string.  Normally this would be passed in in the DMALLOC_OPTIONS
 environmental variable.  This is here to override the env or for
 circumstances where modifying the environment is not possible or does
 not apply such as servers or cgi-bin programs.
@@ -1220,7 +1220,7 @@ int dmalloc_examine ( const DMALLOC_PNT @var{pnt}, DMALLOC_SIZE *
 unsigned long * @var{user_mark_p}, unsigned long * @var{seen_p} )
 
 This function returns the size of a pointer's allocation as well as the
-total size given including adminstrative overhead, file and line or the
+total size given including administrative overhead, file and line or the
 return-address from where it was allocated, the last pointer when the
 pointer was "used", and the number of times the pointer has been "seen".
 It will return DMALLOC_NOERROR or DMALLOC_ERROR depending on whether pnt
@@ -1367,11 +1367,11 @@ Write a message into the dmalloc logfile using printf-like arguments.
 @cindex error message
 
 @deftypefun
-const char * dmalloc_strerror ( const int @var{errnum} )
+const char * dmalloc_strerror ( const int @var{error_number} )
 
 This function returns the string representation of the error value in
-@code{errnum} (which probably should be dmalloc_errno).  This allows the
-logging of more verbose memory error messages.
+@code{error_number} (which probably should be dmalloc_errno).  This
+allows the logging of more verbose memory error messages.
 
 You can also display the string representation of an error value by a
 call to the @file{dmalloc} program with a @samp{-e #} option.
@@ -1702,7 +1702,8 @@ result in multiple simultaneous execution.  One of the major problems is
 that most thread libraries uses malloc themselves.  Since all of
 dmalloc's initialization happens when a call to malloc is made, we may
 be attempting to initialize or lock the mutex while the thread library
-is booting up.  A baaaad thing since thread libraries aren't reentrant.
+is booting up.  A very bad thing since thread libraries don't expect to
+recurse.
 
 @cindex lock on
 
@@ -1741,7 +1742,7 @@ make, and install the library but make sure to add the
 @item Typing @kbd{make} should be enough to build the threaded versions
 of the libraries including @file{libdmallocth.a}.
 
-@item Link the dmalloc theaded library into your program.  The dmalloc
+@item Link the dmalloc threaded library into your program.  The dmalloc
 library should probably be placed at or near the end of the library
 list.
 
@@ -1829,7 +1830,7 @@ you can use @code{dmalloc_log_changed} to show the unfreed memory.
 
 You can also use the @code{dmalloc_log_stats} and
 @code{dmalloc_log_heap_map} functions to dump general information about
-the geap.  Also, remember that you can use the @code{dmalloc_message}
+the heap.  Also, remember that you can use the @code{dmalloc_message}
 and @code{dmalloc_vmessage} routines to annotate the dmalloc logfile
 with details to help you debug memory problems.  @xref{Extensions}.
 
