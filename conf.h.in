@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.82 2000/05/15 15:46:40 gray Exp $
+ * $Id: conf.h.in,v 1.83 2000/07/21 22:39:46 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -105,6 +105,14 @@
  */
 #define SIGNAL_OKAY 0
 #define RETSIGTYPE void
+
+/*
+ * This checks to see if we can include return.h and use the assembly
+ * macros there to call the callers address for logging.  If you do
+ * not want this behavior, then set the USE_RETURN_MACROS to 0 in the
+ * settings.h file.
+ */
+#define RETURN_MACROS_WORK 0
 
 /*
  * Which pthread include file to use.
