@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: return.h,v 1.2 1993/08/30 20:14:43 gray Exp $
+ * $Id: return.h,v 1.3 1993/09/03 01:20:06 gray Exp $
  */
 
 /*
@@ -56,14 +56,14 @@
 #endif /* __alpha */
 
 /* for Sun SparcStations with GCC */
-#if defined(__sparc) && __GNUC__ > 1
+#if __sparc && __GNUC__ > 1
 
 /*
  * NOTE: %i7 seems to be more reliable than the [%fp+4] used by
- * __builtin_return_address uses and since it is on the stack, it may
- * be better -- less prone to be erased.  The fp+4 produces some bogus
- * data -- it seems to return the last return-address or something
- * which I don't understand.
+ * __builtin_return_address.  [%fp+4] is on the stack however, meaning
+ * it may be better -- less prone to be erased.  However, it produces
+ * some bogus data -- it seems to return the last return-address or
+ * something like that.
  */
 #define SET_RET_ADDR(file, line)	\
   do { \

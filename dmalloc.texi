@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.33 1993/08/27 00:55:18 gray Exp $
+@c $Id: dmalloc.texi,v 1.34 1993/09/03 01:20:03 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1154,7 +1154,7 @@ malloc_dbg library in with the C++ program you want to debug.
 	@}
 
 	void
-	operator new(void * cp)
+	operator delete(void * cp)
 	@{
 		free(cp);
 	@}
