@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.232 2003/09/08 14:52:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.233 2003/09/08 15:25:56 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1768,7 +1768,7 @@ If you have any specific questions or would like addition information
 posted in this section, please let me know.  Experienced thread
 programmers only please.
 
-@node Debugging A Daemon, Using with CYGWIN, Using With Threads, Programming
+@node Debugging A Daemon, Using with Cygwin, Using With Threads, Programming
 @section Debugging Allocations in a Daemon Process
 
 @cindex daemon process debugging
