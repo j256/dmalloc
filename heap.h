@@ -1,19 +1,16 @@
 /*
  * defines for the system specific memory routines
  *
- * Copyright 1995 by Gray Watson
+ * Copyright 1999 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * NON-COMMERCIAL purpose and without fee is hereby granted, provided
- * that the above copyright notice and this permission notice appear
- * in all copies, and that the name of Gray Watson not be used in
- * advertising or publicity pertaining to distribution of the document
- * or software without specific, written prior permission.
- *
- * Please see the PERMISSIONS file or contact the author for information
- * about commercial licenses.
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -21,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: heap.h,v 1.34 1999/03/04 16:31:36 gray Exp $
+ * $Id: heap.h,v 1.35 1999/03/04 19:05:54 gray Exp $
  */
 
 #ifndef __HEAP_H__
