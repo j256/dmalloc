@@ -1,3 +1,11 @@
+Sun Dec 27 20:28:19 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Fixed problem with some external functions in malloc.c not
+	reseting the in_alloc flag.  Also removed some testing of unsigned
+	variables < 0 in chunk.c per gcc 2.3.3 warnings.
+
+	* Changed version to 1.1.3.
+
 Mon Dec 21 15:31:50 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Created the series of shar files in preparation to posting to

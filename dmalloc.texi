@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.5 1992/12/28 01:05:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.6 1993/01/02 00:17:13 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -847,9 +847,11 @@ With this routine, the value in the @samp{MALLOC_DEBUG} variable can be
 overridden and the library debugging features set explicitly.  For
 instance, if debugging should never be enabled for a program, a call to
 @code{malloc_debug(0);} as the first call in @code{main()} will disable
-all the memory debugging from that point on.  One problem however is gcc
-calls malloc @emph{before} main() which means some debugging information
-will be generated regardless.
+all the memory debugging from that point on.  One problem however is
+that some compilers (gcc for instance) make calls to memory allocation
+functions @emph{before} @code{main()} is reached and
+@code{malloc_debug()} called meaning some debugging information may be
+generated regardless.
 
 @item int malloc_examine(char * pnt, int * size, char ** file, int * line);
 This routine provides some very interesting functionality.  It returns
@@ -901,6 +903,14 @@ files that include @file{malloc.h} while defining MALLOC_DEBUG_DISABLE.
 
 @example
         gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
+@end example
+
+After recompiling all the sources with the MALLOC_DEBUG_DISABLE flag,
+you can then relink with another malloc library without the file
+@file{malloc_lp.o}.
+
+@example
+        gcc -O -g main.o -L/usr/local/lib -lgmalloc
 @end example
 
 @node Code, Plugs, Usage, Top

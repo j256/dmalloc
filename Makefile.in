@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.6 1992/12/22 04:55:17 gray Exp $
+# $Id: Makefile.in,v 1.7 1993/01/02 00:17:00 gray Exp $
 #
 
 HFLS	= malloc.h malloc_lp.h
@@ -78,7 +78,7 @@ malloc_t : malloc_t.o $(LIBRARY)
 shar : malloc.info
 	rm -f part*
 	$(foreach part, $(PARTS), \
-		shar -b -n${part} -e${MAXPART} -opart${part} -t \
+		shar -b -n${part} -e${MAXPART} -opart.${part} -t \
 			"Do a 'sh ./configure' to configure the library" \
 			`cat shar.${part}` ; \
 		)

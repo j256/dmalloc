@@ -32,14 +32,14 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.4 1992/11/14 21:45:22 gray Exp $";
+  "$Id: compat.c,v 1.5 1993/01/02 00:17:06 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
 /*
  * copy LEN characters from FROM to TO
  */
-EXPORT	char	*memcpy(char * to, char * from, int len)
+EXPORT	char	*memcpy(char * to, const char * from, int len)
 {
   char	*hold = to;
   
@@ -54,7 +54,7 @@ EXPORT	char	*memcpy(char * to, char * from, int len)
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-EXPORT	int	memcmp(char * str1, char * str2, int len)
+EXPORT	int	memcmp(const char * str1, const char * str2, int len)
 {
   for (; len > 0; len--, str1++, str2++)
     if (*str1 != *str2)
@@ -83,7 +83,7 @@ EXPORT	char	*memset(char * str, int ch, int len)
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*strchr(char * str, int ch)
+EXPORT	char	*strchr(const char * str, int ch)
 {
   for (; *str != NULLC; str++)
     if (*str == (char)ch)
@@ -97,7 +97,7 @@ EXPORT	char	*strchr(char * str, int ch)
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*strrchr(char * str, int ch)
+EXPORT	char	*strrchr(const char * str, int ch)
 {
   char	*pnt = NULL;
   
@@ -113,7 +113,7 @@ EXPORT	char	*strrchr(char * str, int ch)
 /*
  * concatenate STR2 onto the end of STR1
  */
-EXPORT	char	*strcat(char * str1, char * str2)
+EXPORT	char	*strcat(char * str1, const char * str2)
 {
   char	*hold = str1;
   
@@ -131,7 +131,7 @@ EXPORT	char	*strcat(char * str1, char * str2)
 /*
  * returns -1,0,1 on whether STR1 is <,==,> STR2
  */
-EXPORT	int	strcmp(char * str1, char * str2)
+EXPORT	int	strcmp(const char * str1, const char * str2)
 {
   for (; *str1 != NULLC && *str1 == *str2; str1++, str2++);
   return *str1 - *str2;
@@ -142,7 +142,7 @@ EXPORT	int	strcmp(char * str1, char * str2)
 /*
  * return the length in characters of STR
  */
-EXPORT	int	strlen(char * str)
+EXPORT	int	strlen(const char * str)
 {
   int	len;
   

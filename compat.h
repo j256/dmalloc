@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.3 1992/11/11 23:14:43 gray Exp $
+ * $Id: compat.h,v 1.4 1993/01/02 00:17:07 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -34,12 +34,12 @@
 /*
  * copy LEN characters from FROM to TO
  */
-IMPORT	char	*memcpy(char * to, char * from, int len);
+IMPORT	char	*memcpy(char * to, const char * from, int len);
 
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-IMPORT	int	memcmp(char * str1, char * str2, int len);
+IMPORT	int	memcmp(const char * str1, const char * str2, int len);
 
 /*
  * set LEN characters in STR to character CH
@@ -49,27 +49,27 @@ IMPORT	char	*memset(char * str, int ch, int len);
 /*
  * find CH in STR by searching backwards through the string
  */
-IMPORT	char	*strchr(char * str, int ch);
+IMPORT	char	*strchr(const char * str, int ch);
 
 /*
  * find CH in STR by searching backwards through the string
  */
-IMPORT	char	*strrchr(char * str, int ch);
+IMPORT	char	*strrchr(const char * str, int ch);
 
 /*
  * concatenate STR2 onto the end of STR1
  */
-IMPORT	char	*strcat(char * str1, char * str2);
+IMPORT	char	*strcat(char * str1, const char * str2);
 
 /*
  * returns -1,0,1 on whether STR1 is <,==,> STR2
  */
-IMPORT	int	strcmp(char * str1, char * str2);
+IMPORT	int	strcmp(const char * str1, const char * str2);
 
 /*
  * return the length in characters of STR
  */
-IMPORT	int	strlen(char * str);
+IMPORT	int	strlen(const char * str);
 
 /*
  * get the next token from STR (pass in NULL on the 2nd, 3rd, etc. calls),

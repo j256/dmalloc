@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.13 1992/12/28 01:05:33 gray Exp $
+ * $Id: malloc.h,v 1.14 1993/01/02 00:17:09 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -155,7 +155,7 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
  * the strdup() function in macro form.  duplicate string STR
  */
 #define STRDUP(str)	({ \
-			  char	*_strp = (str); \
+			  const char *_strp = (str); \
 			  char	*_ret; \
 			  int	_len; \
 			   \
@@ -187,7 +187,7 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
  * strdup() in macro form.  duplicate string STR and return a copy in OUT
  */
 #define STRDUP(str, out)	do { \
-				  char	*_strp = (str); \
+				  const char *_strp = (str); \
 				  char	*_ret; \
 				  int	_len; \
 				   \
