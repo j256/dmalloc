@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.49 1994/07/21 18:38:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.50 1994/07/21 22:20:05 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -498,10 +498,15 @@ heap after X times.  This means the intensive debugging can be started
 after a certain point in a program.
 
 @samp{MALLOC_START} also has the format file:line.  For instance, if it
-is set to @*@samp{malloc_t.c:126} malloc will start checking the heap
-after it sees a malloc call from the @file{malloc_t.c} file, line number
-126.  If line number is 0 then malloc will start checking the heap after
-it sees a call from anywhere in the @file{malloc_t.c} file.
+is set to 
+@iftex
+@*
+@end iftex
+@samp{malloc_t.c:126} malloc will start checking
+the heap after it sees a malloc call from the @file{malloc_t.c} file,
+line number 126.  If line number is 0 then malloc will start checking
+the heap after it sees a call from anywhere in the @file{malloc_t.c}
+file.
 
 This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.
@@ -829,7 +834,11 @@ standard part of most malloc libraries:
 @item char * malloc_logpath;
 @cindex malloc_logpath variable
 This variable can be used to set the malloc log filename.  The env
-variable @*MALLOC_LOGFILE overrides this variable.
+variable
+@iftex
+@*
+@end iftex
+MALLOC_LOGFILE overrides this variable.
 
 @item int malloc_errno;
 @cindex malloc_errno variable
@@ -1016,8 +1025,13 @@ gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
 @end example
 
 If you have disabled malloc with the @code{MALLOC_DEBUG_DISABLED} flag
-or never included @*@file{malloc_dbg.h} in any of your C files, then you
-will not need to include the @file{malloc_lp.o} file on the link line.
+or never included 
+@iftex
+@*
+@end iftex
+@file{malloc_dbg.h} in any of your C files,
+then you will not need to include the @file{malloc_lp.o} file on the
+link line.
 
 @example
 gcc -O -g main.o -L/usr/local/lib -lgmalloc
@@ -1360,9 +1374,9 @@ The systems which cannot provide return-address information show
 @samp{unknown} instead as in the 2nd line from the sample above.
 
 The @samp{argv.c:@dots{}} information from the 3rd line comes from the
-calls which used the uppercase macros from @file{malloc_dbg.h}.  These
-allow specific file/line information to be included which makes the
-locating of the callers much easier.
+calls from C files which included @file{malloc_dbg.h}.  The file
+overloads the malloc, calloc, free, and realloc calls and provides
+specific file/line information to the malloc function calls.
 
 At the bottom of the sample it totals the memory for you and breaks it
 down to known memory (those calls which supplied the file/line
@@ -1491,8 +1505,9 @@ system I would be interested in talking with you.
 @item
 @cindex return-address
 The locating of the caller's address from the malloc_dbg functions.
-This is useful to locate problems with malloc calls from functions not
-able to use the uppercase macros: library calls for instance.
+This is useful in locating problems from malloc functions called from C
+files which did not include @file{malloc_dbg.h}: C library calls for
+instance.
 
 See @file{return.h} for the available architecture/compiler
 combinations.  You may want to examine the assembly code from gcc
