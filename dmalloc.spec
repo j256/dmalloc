@@ -1,7 +1,7 @@
 #
 # Dmalloc RPM file for building of .rpm files for Redhat Linux systems.
 #
-# $Id: dmalloc.spec,v 1.13 2000/11/13 18:35:55 gray Exp $
+# $Id: dmalloc.spec,v 1.14 2000/11/15 00:06:45 gray Exp $
 #
 Summary: Debug Malloc (Dmalloc)
 Name: dmalloc
@@ -29,11 +29,11 @@ http://dmalloc.com/
 %setup
 
 %build
-CFLAGS="${RPM_OPT_FLAGS}" ./configure --prefix=${RPM_BUILD_ROOT}/usr --enable-threads
-make all light shlib
+CFLAGS="${RPM_OPT_FLAGS}" ./configure --prefix=${RPM_BUILD_ROOT}/usr --enable-threads --enable-shlib
+make all light
 
 %install
-make install installshlib
+make install
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
@@ -47,7 +47,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(755,root,root) /usr/bin/dmalloc
 /usr/include/dmalloc.h
 /usr/lib/libdmalloc.a
+/usr/lib/libdmalloc.so
 /usr/lib/libdmallocxx.a
+/usr/lib/libdmallocxx.so
 /usr/lib/libdmalloclp.a
 /usr/lib/libdmallocth.a
+/usr/lib/libdmallocth.so
 /usr/lib/libdmallocthcxx.a
+/usr/lib/libdmallocthcxx.so
