@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.75 1994/05/22 22:38:29 gray Exp $";
+  "$Id: chunk.c,v 1.76 1994/05/30 21:26:36 gray Exp $";
 #endif
 
 /*
@@ -512,7 +512,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
-    _malloc_message("need %d bblocks or %d bytes", many, many * BLOCK_SIZE);
+    _malloc_message("need %d bblocks (%d bytes)", many, many * BLOCK_SIZE);
   
   /* is there anything on the user-free list(s)? */
   if (! extend && ! BIT_IS_SET(_malloc_flags, DEBUG_NEVER_REUSE)) {
@@ -556,7 +556,7 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
     
     /* do we need to print admin info? */
     if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
-      _malloc_message("new bblock admin alloced for %d - 1 more admin slots",
+      _malloc_message("new bblock-admin alloced for %d - 1 more admin slots",
 		      BB_PER_ADMIN);
     
     /*
@@ -717,7 +717,7 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
-    _malloc_message("need %d dblock admin slots", many);
+    _malloc_message("need %d dblock-admin slots", many);
   
   /* do we have enough right now? */
   if (free_slots >= many) {
@@ -750,7 +750,7 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
-    _malloc_message("opened another %d dblock admin slots", DB_PER_ADMIN);
+    _malloc_message("opened another %d dblock-admin slots", DB_PER_ADMIN);
   
   dblock_admp->da_magic1 = CHUNK_MAGIC_BOTTOM;
   
@@ -1654,7 +1654,6 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
   if (bblockp == NULL) {
     log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
 		   CHUNK_TO_USER(pnt), "not in heap", FALSE);
-    _malloc_message("bad pointer '%#lx'", pnt);
     /* errno set in find_bblock */
     _malloc_error("_chunk_read_info");
     return ERROR;
@@ -2070,9 +2069,9 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_TRANS))
-    _malloc_message("*** alloc: at '%s' for %d bytes (%d bits), got '%#lx'",
+    _malloc_message("*** alloc: at '%s' for %d bytes, got '%#lx'",
 		    _chunk_display_pnt(file, line), byten - pnt_total_adm,
-		    bitn, pnt);
+		    pnt);
   
   return pnt;
 }
