@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.56 1994/01/20 01:46:59 gray Exp $";
+  "$Id: malloc.c,v 1.57 1994/02/18 23:19:41 gray Exp $";
 #endif
 
 /*
@@ -54,7 +54,7 @@ EXPORT	char		*malloc_logpath	= NULL;
 /* internal malloc error number for reference purposes only */
 EXPORT	int		malloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call _malloc_error() */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	void		*malloc_address	= NULL;
 #else
 EXPORT	char		*malloc_address	= NULL;
@@ -68,7 +68,7 @@ EXPORT	int		malloc_address_count	= 0;
 /* local routines */
 LOCAL	int		malloc_startup(void);
 EXPORT	void		_malloc_shutdown(void);
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	int		_malloc_verify(const void * pnt);
 #else
 EXPORT	int		_malloc_verify(const char * pnt);
@@ -78,7 +78,7 @@ EXPORT	void		_malloc_log_stats(void);
 EXPORT	void		_malloc_log_unfreed(void);
 EXPORT	void		_malloc_debug(const int debug);
 EXPORT	int		_malloc_debug_current(void);
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	int		_malloc_examine(const void * pnt, MALLOC_SIZE * size,
 					char ** file, unsigned int * line,
 					void ** ret_attr);
@@ -362,7 +362,7 @@ EXPORT	void	_malloc_shutdown(void)
 /*
  * allocate and return a SIZE block of bytes.  returns 0L on error.
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	void	*malloc(MALLOC_SIZE size)
 #else
 EXPORT	char	*malloc(MALLOC_SIZE size)
@@ -390,7 +390,7 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
  * of SIZE bytes and zero the block.  returns 0L on error.
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
 #else
 EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
@@ -425,7 +425,7 @@ EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
  * all of OLD_PNT to the new area or truncating.  returns 0L on error.
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
 #else
 EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
@@ -461,7 +461,7 @@ EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
  * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
  * depending on whether STDC is defined by your compiler.
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	void	free(void * pnt)
 #else
 EXPORT	int	free(void * pnt)
@@ -472,7 +472,7 @@ EXPORT	int	free(void * pnt)
   SET_RET_ADDR(_malloc_file, _malloc_line);
   
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR) {
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
     return;
 #else
     return FREE_ERROR;
@@ -500,7 +500,8 @@ EXPORT	int	free(void * pnt)
   _malloc_file = MALLOC_DEFAULT_FILE;
   _malloc_line = MALLOC_DEFAULT_LINE;
   
-#ifndef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
+#else
   return ret;
 #endif
 }
@@ -508,13 +509,13 @@ EXPORT	int	free(void * pnt)
 /*
  * same as free(PNT)
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	void	cfree(void * pnt)
 #else
 EXPORT	int	cfree(void * pnt)
 #endif
 {
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
   free(pnt);
 #else
   return free(pnt);
@@ -585,7 +586,7 @@ EXPORT	void	_malloc_log_unfreed(void)
  * NOTE: called by way of leap routine in malloc_lp.c
  * returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	int	_malloc_verify(const void * pnt)
 #else
 EXPORT	int	_malloc_verify(const char * pnt)
@@ -655,7 +656,7 @@ EXPORT	int	_malloc_debug_current(void)
  * if FILE returns 0L then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-#ifdef __STDC__
+#if defined(__STDC__) && __STDC__ == 1
 EXPORT	int	_malloc_examine(const void * pnt, MALLOC_SIZE * size,
 				char ** file, unsigned int * line,
 				void ** ret_attr)

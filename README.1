@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.35 1994/02/18 03:56:46 gray Exp $
+$Id: README.1,v 1.36 1994/02/18 23:19:30 gray Exp $
 -------------------------------------------------------------------------------
 
 MALLOC_DEBUG:
@@ -69,12 +69,15 @@ GENERAL:
 - the system is pretty dependent on a good ansi-c compiler like gcc.
 	Non-ansi folks might have to:
 
-	- add some sort of ansi option to your compiler
+	- add some sort of ansi option to your compiler.  if there
+		is one let me know and I will add it to the configure
+		script.
 	- first try 'make noansi' which will try and run the
 		Deansify.pl perl script.  It takes care of:
 			- changing stdarg.h and ... to varargs.h and va_alist
 			- changing all (void *) references to (char *).
 			- fixing all functions to remove foo(char * var) decls.
+	- if it doesn't work you may have to do Deansify.pl's job by hand.
 
 - the file Manifest contains a list of each of the files and what it does.
 

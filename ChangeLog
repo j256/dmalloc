@@ -1,5 +1,7 @@
 Fri Feb 18 02:32:53 1994  Gray Watson  (gray@fridge.antaire.com)
 
+	* Fixed tons of __STDC__ defines.  Finally I hope.
+
 	* Released version 2.0.0.
 
 	* Last minute fixes from Sparc and MIPS boxes.
@@ -641,5 +643,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.91 1994/02/18 07:34:02 gray Exp $
+$Id: ChangeLog,v 1.92 1994/02/18 23:19:23 gray Exp $
 -------------------------------------------------------------------------------

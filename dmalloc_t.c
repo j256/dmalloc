@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.34 1994/02/18 03:56:57 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.35 1994/02/18 23:19:52 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -361,21 +361,25 @@ static	void	do_interactive(void)
     
     if (strncmp(line, "?", len) == 0
 	|| strncmp(line, "help", len) == 0) {
-      (void)printf("\thelp      - print this message\n");
+      (void)printf("\thelp      - print this message\n\n");
       
       (void)printf("\tmalloc    - allocate memory\n");
+      (void)printf("\tcalloc    - allocate/clear memory\n");
       (void)printf("\trealloc   - reallocate memory\n");
-      (void)printf("\tfree      - deallocate memory\n");
+      (void)printf("\tfree      - deallocate memory\n\n");
+      
+      (void)printf("\tmap       - map the heap to the logfile\n");
+      (void)printf("\tstats     - dump heap stats to the logfile\n");
+      (void)printf("\tunfreed   - list the unfree memory to the logfile\n\n");
       
       (void)printf("\tverify    - check out a memory address (or all heap)\n");
-      (void)printf("\tmap       - map the heap to the logfile\n");
       (void)printf("\toverwrite - overwrite some memory to test errors\n");
 #if HAVE_SBRK
-      (void)printf("\tsbrk       - call sbrk directly to get external area\n");
+      (void)printf("\tsbrk       - call sbrk to test external areas\n\n");
 #endif
       
       (void)printf("\trandom    - randomly execute a number of [de] allocs\n");
-      (void)printf("\tspecial   - run some special tests\n");
+      (void)printf("\tspecial   - run some special tests\n\n");
       
       (void)printf("\tquit      - quit this test program\n");
       continue;
@@ -394,9 +398,14 @@ static	void	do_interactive(void)
       continue;
     }
     
-    if (strncmp(line, "free", len) == 0) {
-      pnt = get_address();
-      FREE(pnt);
+    if (strncmp(line, "calloc", len) == 0) {
+      int	size;
+      
+      (void)printf("How much to calloc: ");
+      (void)fgets(line, sizeof(line), stdin);
+      size = atoi(line);
+      (void)printf("calloc(%d) returned: %#lx\n",
+		   size, (long)CALLOC(char, size));
       continue;
     }
     
@@ -415,8 +424,26 @@ static	void	do_interactive(void)
       continue;
     }
     
+    if (strncmp(line, "free", len) == 0) {
+      pnt = get_address();
+      FREE(pnt);
+      continue;
+    }
+    
     if (strncmp(line, "map", len) == 0) {
       malloc_log_heap_map();
+      (void)printf("Done.\n");
+      continue;
+    }
+    
+    if (strncmp(line, "stats", len) == 0) {
+      malloc_log_stats();
+      (void)printf("Done.\n");
+      continue;
+    }
+    
+    if (strncmp(line, "unfreed", len) == 0) {
+      malloc_log_unfreed();
       (void)printf("Done.\n");
       continue;
     }
