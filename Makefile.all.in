@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.41 1994/03/30 06:28:58 gray Exp $
+# $Id: Makefile.all.in,v 1.42 1994/05/11 20:28:35 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -19,6 +19,8 @@ DEFS =
 INCS = -I$(srcdir)
 LIBS = @LIBS@
 
+# NOTE: you may have to rename this to libmallocdbg.a or libmalloc_db.a to
+# avoid the 14 character filename restrictions on non-BSD file-systems.
 LIBRARY	= libmalloc_dbg.a
 UTIL = malloc_dbg
 INFOFILE = malloc.info
