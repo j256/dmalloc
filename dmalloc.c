@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.94 2000/06/20 22:37:56 gray Exp $
+ * $Id: dmalloc.c,v 1.95 2000/06/20 22:42:33 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.94 2000/06/20 22:37:56 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.95 2000/06/20 22:42:33 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.94 2000/06/20 22:37:56 gray Exp $";
+  "$Id: dmalloc.c,v 1.95 2000/06/20 22:42:33 gray Exp $";
 #endif
 #endif
 
@@ -863,6 +863,7 @@ int	main(int argc, char **argv)
     int		plus_c;
     for (plus_c = 0; plus_c < plus.aa_entry_n; plus_c++) {
       debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plus_c));
+      set_b = 1;
     }
   }
   
@@ -870,6 +871,7 @@ int	main(int argc, char **argv)
     int		minus_c;
     for (minus_c = 0; minus_c < minus.aa_entry_n; minus_c++) {
       debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minus_c));
+      set_b = 1;
     }
   }
   
