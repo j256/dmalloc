@@ -18,16 +18,16 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: error_val.h,v 1.7 1993/09/07 04:50:35 gray Exp $
+ * $Id: error_val.h,v 1.8 1993/09/10 21:11:46 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
 #define __ERROR_VAL_H__
 
 /*
- * malloc ERROR_ codes
+ * malloc error codes
  */
-#define ERROR_NONE			0	/* no ERROR_ */
+#define ERROR_NONE			0	/* no error */
 
 /* administrative errors */
 #define ERROR_BAD_SETUP			1	/* bad setup value */
@@ -49,7 +49,7 @@
 /* allocation errors */
 #define ERROR_BAD_SIZE			14	/* bad bblock size value */
 #define ERROR_TOO_BIG			15	/* allocation too large */
-#define ERROR_USER_NON_CONTIG		16	/* user space contig ERROR_ */
+#define ERROR_USER_NON_CONTIG		16	/* user space not contiguous */
 #define ERROR_ALLOC_FAILED		17	/* could not get more space */
 #define ERROR_ALLOC_NONLINEAR		18	/* no linear address space */
 #define ERROR_BAD_SIZE_INFO		19	/* info doesn't match size */
@@ -60,7 +60,7 @@
 #define ERROR_NOT_START_USER		22	/* not start of user alloc */
 #define ERROR_NOT_USER			23	/* not user allocated */
 #define ERROR_BAD_FREE_LIST		24	/* free-list mess-up */
-#define ERROR_FREE_NON_CONTIG		25	/* free space contig ERROR_ */
+#define ERROR_FREE_NON_CONTIG		25	/* free space not contiguous */
 #define ERROR_BAD_FREE_MEM		26	/* bad memory pointer */
 #define ERROR_FREE_NON_BLANK		27	/* free space should be 0's */
 
