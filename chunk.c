@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.193 2003/09/08 14:43:40 gray Exp $
+ * $Id: chunk.c,v 1.194 2003/09/08 15:22:16 gray Exp $
  */
 
 /*
@@ -1234,6 +1234,8 @@ static	int	fence_read(const pnt_info_t *info_p)
  *
  * ARGUMENTS:
  *
+ * slot_p <-> Slot we are clearing.
+ *
  * info_p -> Pointer to information about the allocation.
  *
  * old_size -> If there was an old-size that we have copied into the
@@ -1243,8 +1245,8 @@ static	int	fence_read(const pnt_info_t *info_p)
  * func_id -> ID of the function which is doing the allocation.  Used
  * to determine if we should 0 memory for [re]calloc.
  */
-static	void	clear_alloc(pnt_info_t *info_p, const unsigned int old_size,
-			    const int func_id)
+static	void	clear_alloc(skip_alloc_t *slot_p, pnt_info_t *info_p,
+			    const unsigned int old_size, const int func_id)
 {
   char	*start_p;
   int	num;
@@ -1257,6 +1259,8 @@ static	void	clear_alloc(pnt_info_t *info_p, const unsigned int old_size,
   if (num > 0 && (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
 		  || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))) {
     memset(info_p->pi_alloc_start, FREE_BLANK_CHAR, num);
+    /* set our slot blank flag */
+    BIT_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
   }
   
   /*
@@ -1300,6 +1304,9 @@ static	void	clear_alloc(pnt_info_t *info_p, const unsigned int old_size,
     if (num > 0) {
       memset(start_p, FREE_BLANK_CHAR, num);
     }
+    
+    /* set our slot blank flag */
+    BIT_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
   }
 }
 
@@ -1654,8 +1661,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
     
     /* now check the below space to make sure it is still clear */
     num = (char *)pnt_info.pi_fence_bottom - (char *)pnt_info.pi_alloc_start;
-    if (num > 0 && (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
-		    || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))) {
+    if (num > 0 && BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
       for (mem_p = pnt_info.pi_alloc_start;
 	   mem_p < (char *)pnt_info.pi_fence_bottom;
 	   mem_p++) {
@@ -1675,8 +1681,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
   }
   
   /* check above the allocation to see if it's been overwritten */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
     
     if (pnt_info.pi_fence_b) {
       mem_p = (char *)pnt_info.pi_fence_top + FENCE_TOP_SIZE;
@@ -1830,7 +1835,7 @@ static	skip_alloc_t	*find_slot(const void *user_pnt,
   }
   
   /* try to find the address with loose match */
-  slot_p = find_address(user_pnt, exact_b, update_p);
+  slot_p = find_address(user_pnt, 0 /* not exact pointer */, update_p);
   if (slot_p == NULL) {
     /* not found */
     dmalloc_errno = ERROR_NOT_FOUND;
@@ -2016,7 +2021,7 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   }
   
   /* find the pointer with loose checking for fence */
-  slot_p = find_address(user_pnt, 0 /* loose checking */, skip_update);
+  slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
@@ -2197,7 +2202,8 @@ int	_dmalloc_chunk_heap_check(void)
      * now we look up the slot pointer itself and make sure it exists
      * in a valid block
      */
-    block_slot_p = find_address(slot_p, 0 /* loose */, skip_update);
+    block_slot_p = find_address(slot_p, 0 /* not exact pointer */,
+				skip_update);
     if (block_slot_p == NULL) {
       dmalloc_errno = ERROR_ADMIN_LIST;
       dmalloc_error("_dmalloc_chunk_heap_check");
@@ -2275,7 +2281,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   }
   
   /* try to find the address */
-  slot_p = find_address(user_pnt, exact_b, skip_update);
+  slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     if (exact_b) {
       dmalloc_errno = ERROR_NOT_FOUND;
@@ -2448,7 +2454,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   get_pnt_info(slot_p, &pnt_info);
   
   /* not clear the allocation */
-  clear_alloc(&pnt_info, 0 /* no old-size */, func_id);
+  clear_alloc(slot_p, &pnt_info, 0 /* no old-size */, func_id);
   
   slot_p->sa_file = file;
   slot_p->sa_line = line;
@@ -2811,7 +2817,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
     slot_p->sa_user_size = new_size;
     get_pnt_info(slot_p, &pnt_info);
     
-    clear_alloc(&pnt_info, old_size, func_id);
+    clear_alloc(slot_p, &pnt_info, old_size, func_id);
     
     slot_p->sa_use_iter = _dmalloc_iter_c;
 #if LOG_PNT_SEEN_COUNT
