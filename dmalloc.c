@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.76 1998/09/18 19:11:12 gray Exp $";
+  "$Id: dmalloc.c,v 1.77 1998/09/29 15:41:31 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -197,25 +197,26 @@ static	char	*sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
  */
 static	void	choose_shell(void)
 {
-  const char	*shell, *shellp;
+  const char	*shell, *shell_p;
   int		shell_c;
   
   shell = getenv(SHELL_ENVIRON);
   if (shell == NULL) {
+    /* oh well, we just guess on c-shell */
     cshell_b = TRUE;
     return;
   }
   
-  shellp = strrchr(shell, '/');
-  if (shellp == NULL) {
-    shellp = shell;
+  shell_p = strrchr(shell, '/');
+  if (shell_p == NULL) {
+    shell_p = shell;
   }
   else {
-    shellp++;
+    shell_p++;
   }
   
   for (shell_c = 0; sh_shells[shell_c] != NULL; shell_c++) {
-    if (strcmp(sh_shells[shell_c], shellp) == 0) {
+    if (strcmp(sh_shells[shell_c], shell_p) == 0) {
       bourne_b = TRUE;
       return;
     }
@@ -229,25 +230,25 @@ static	void	choose_shell(void)
  */
 static	void	dump_debug(const int val)
 {
-  attr_t	*attrp;
+  attr_t	*attr_p;
   int		tok_c = 0, work = val;
   
-  for (attrp = attributes; attrp->at_string != NULL; attrp++) {
+  for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
     /* the below is necessary to handle the 'none' HACK */
-    if ((work == 0 && attrp->at_value == 0)
-	|| (attrp->at_value != 0
-	    && (work & attrp->at_value) == attrp->at_value)) {
-      work &= ~attrp->at_value;
+    if ((work == 0 && attr_p->at_value == 0)
+	|| (attr_p->at_value != 0
+	    && (work & attr_p->at_value) == attr_p->at_value)) {
+      work &= ~attr_p->at_value;
       
       if (tok_c == 0) {
 	(void)fprintf(stderr, "   ");
       }
       
       if (very_verbose_b) {
-	(void)fprintf(stderr, "%s -- %s", attrp->at_string, attrp->at_desc);
+	(void)fprintf(stderr, "%s -- %s", attr_p->at_string, attr_p->at_desc);
       }
       else {
-	(void)fprintf(stderr, "%s", attrp->at_string);
+	(void)fprintf(stderr, "%s", attr_p->at_string);
 	if (work != 0) {
 	  (void)fprintf(stderr, ", ");
 	}
@@ -302,14 +303,15 @@ static	long	token_to_value(const char *tok)
 /*
  * process the user configuration looking for the TAG_FIND.  if it is
  * null then look for DEBUG_VALUE in the file and return the token for
- * it in STRP.  routine returns the new debug value matching tag.
+ * it in STR_P.  routine returns the new debug value matching tag.
  */
 static	long	process(const long debug_value, const char *tag_find,
-			char **strp)
+			char **str_p)
 {
   static char	token[128];
   FILE		*infile = NULL;
   char		path[1024], buf[1024];
+  default_t	*def_p;
   const char	*home_p;
   int		found_b, cont_b;
   long		new_debug = 0;
@@ -339,7 +341,7 @@ static	long	process(const long debug_value, const char *tag_find,
   cont_b = FALSE;
   
   while (infile != NULL && fgets(buf, sizeof(buf), infile) != NULL) {
-    char	*tok_p, *endp;
+    char	*tok_p, *end_p;
     
     /* ignore comments and empty lines */
     if (buf[0] == '#' || buf[0] == '\n') {
@@ -347,9 +349,9 @@ static	long	process(const long debug_value, const char *tag_find,
     }
     
     /* chop off the ending \n */
-    endp = strrchr(buf, '\n');
-    if (endp != NULL) {
-      *endp = '\0';
+    end_p = strrchr(buf, '\n');
+    if (end_p != NULL) {
+      *end_p = '\0';
     }
     
     /* get the first token on the line */
@@ -400,8 +402,8 @@ static	long	process(const long debug_value, const char *tag_find,
     }
     else if (tag_find == NULL && (! cont_b) && new_debug == debug_value) {
       found_b = TRUE;
-      if (strp != NULL) {
-	*strp = token;
+      if (str_p != NULL) {
+	*str_p = token;
       }
     }
     
@@ -420,46 +422,44 @@ static	long	process(const long debug_value, const char *tag_find,
     return new_debug;
   }
   
-  if (! list_tags_b && tag_find == NULL) {
-    default_t	*def_p;
+  if ((! list_tags_b) && tag_find == NULL) {
     
     /* check the default list to see if we have a match there */
-    if (strp != NULL) {
+    if (str_p != NULL) {
       for (def_p = defaults; def_p->de_string != NULL; def_p++) {
 	if (def_p->de_flags == debug_value) {
-	  *strp = def_p->de_string;
+	  *str_p = def_p->de_string;
 	  break;
 	}
       }
       if (def_p->de_string == NULL) {
-	*strp = "unknown";
+	*str_p = "unknown";
       }
     }
   }
   else {
-    default_t	*defp;
     
     if (list_tags_b) {
       (void)fprintf(stderr, "\n");
       (void)fprintf(stderr, "Tags available by default:\n");
     }
     
-    for (defp = defaults; defp->de_string != NULL; defp++) {
+    for (def_p = defaults; def_p->de_string != NULL; def_p++) {
       if (list_tags_b) {
 	if (verbose_b) {
 	  (void)fprintf(stderr, "%s (%#lx):\n",
-			defp->de_string, defp->de_flags);
-	  dump_debug(defp->de_flags);
+			def_p->de_string, def_p->de_flags);
+	  dump_debug(def_p->de_flags);
 	}
 	else
-	  (void)fprintf(stderr, "%s\n", defp->de_string);
+	  (void)fprintf(stderr, "%s\n", def_p->de_string);
       }
-      if (tag_find != NULL && strcmp(tag_find, defp->de_string) == 0) {
+      if (tag_find != NULL && strcmp(tag_find, def_p->de_string) == 0) {
 	break;
       }
     }
     if (! list_tags_b) {
-      if (defp->de_string == NULL) {
+      if (def_p->de_string == NULL) {
 	if (infile == NULL) {
 	  (void)fprintf(stderr, "%s: could not read '%s': ",
 			argv_program, inpath);
@@ -471,7 +471,7 @@ static	long	process(const long debug_value, const char *tag_find,
 	}
 	exit(1);
       }
-      new_debug = defp->de_flags;
+      new_debug = def_p->de_flags;
     }
   }
   
@@ -629,7 +629,7 @@ int	main(int argc, char **argv)
   }
   
   if (plus.aa_entry_n > 0) {
-    int		plusc;
+    int		plus_c;
     
     /* get current debug value and add tokens if possible */
     if (debug == NO_VALUE) {
@@ -641,13 +641,13 @@ int	main(int argc, char **argv)
       }
     }
     
-    for (plusc = 0; plusc < plus.aa_entry_n; plusc++) {
-      debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
+    for (plus_c = 0; plus_c < plus.aa_entry_n; plus_c++) {
+      debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plus_c));
     }
   }
   
   if (minus.aa_entry_n > 0) {
-    int		minusc;
+    int		minus_c;
     
     /* get current debug value and add tokens if possible */
     if (debug == NO_VALUE) {
@@ -659,8 +659,8 @@ int	main(int argc, char **argv)
       }
     }
     
-    for (minusc = 0; minusc < minus.aa_entry_n; minusc++) {
-      debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minusc));
+    for (minus_c = 0; minus_c < minus.aa_entry_n; minus_c++) {
+      debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minus_c));
     }
   }
   
@@ -757,20 +757,20 @@ int	main(int argc, char **argv)
   }
   
   if (debug_tokens_b) {
-    attr_t	*attrp;
+    attr_t	*attr_p;
     (void)fprintf(stderr, "Debug Tokens:\n");
-    for (attrp = attributes; attrp->at_string != NULL; attrp++) {
+    for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
       if (very_verbose_b) {
 	(void)fprintf(stderr, "%s (%s) -- %s (%#lx)\n",
-		      attrp->at_string, attrp->at_short, attrp->at_desc,
-		      attrp->at_value);
+		      attr_p->at_string, attr_p->at_short, attr_p->at_desc,
+		      attr_p->at_value);
       }
       else if (verbose_b) {
 	(void)fprintf(stderr, "%s -- %s\n",
-		      attrp->at_string, attrp->at_desc);
+		      attr_p->at_string, attr_p->at_desc);
       }
       else {
-	(void)fprintf(stderr, "%s\n", attrp->at_string);
+	(void)fprintf(stderr, "%s\n", attr_p->at_string);
       }
     }
   }
