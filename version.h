@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.89 1999/10/18 16:12:18 gray Exp $
+ * $Id: version.h,v 1.90 2000/03/20 23:19:29 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -38,6 +38,6 @@
  */
 static	char	*dmalloc_version = "4.3.0";
 
-/* Version Date: $Date: 1999/10/18 16:12:18 $ */
+/* Version Date: $Date: 2000/03/20 23:19:29 $ */
 
 #endif /* ! __VERSION_H__ */

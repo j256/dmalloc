@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.16 1999/03/05 00:28:39 gray Exp $
+ * $Id: env.h,v 1.17 2000/03/20 23:19:26 gray Exp $
  */
 
 #ifndef __ENV_H__

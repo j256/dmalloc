@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.h,v 1.1 1999/03/09 19:28:20 gray Exp $
+ * $Id: dmalloc_tab.h,v 1.2 2000/03/20 23:19:25 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_H__

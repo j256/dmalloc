@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.22 1999/03/10 16:41:16 gray Exp $
+ * $Id: env.c,v 1.23 2000/03/20 23:19:25 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.22 1999/03/10 16:41:16 gray Exp $";
+#ident "$Id: env.c,v 1.23 2000/03/20 23:19:25 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.22 1999/03/10 16:41:16 gray Exp $";
+  "$Id: env.c,v 1.23 2000/03/20 23:19:25 gray Exp $";
 #endif
 #endif
 

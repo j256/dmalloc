@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.52 1999/03/05 00:30:52 gray Exp $
+ * $Id: heap.c,v 1.53 2000/03/20 23:19:27 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: heap.c,v 1.52 1999/03/05 00:30:52 gray Exp $";
+#ident "$Id: heap.c,v 1.53 2000/03/20 23:19:27 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.52 1999/03/05 00:30:52 gray Exp $";
+  "$Id: heap.c,v 1.53 2000/03/20 23:19:27 gray Exp $";
 #endif
 #endif
 

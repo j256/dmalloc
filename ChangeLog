@@ -1,3 +1,7 @@
+Mon Mar 20 18:19:06 2000  Gray Watson  <gray@whopper.256.com>
+
+	* www.dmalloc.com -> dmalloc.com.
+
 Mon Mar  6 12:05:01 2000  Gray Watson  <gray@burger.256.com>
 
 	* Added better help messages to dmalloc.
@@ -1516,5 +1520,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.230 2000/03/06 17:05:19 gray Exp $
+$Id: ChangeLog,v 1.231 2000/03/20 23:19:17 gray Exp $
 -------------------------------------------------------------------------------

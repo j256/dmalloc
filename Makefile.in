@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.127 2000/02/17 14:06:06 gray Exp $
+# $Id: Makefile.in,v 1.128 2000/03/20 23:19:18 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -24,7 +24,7 @@ CFLAGS	= -g $(CCFLS) -Wall -Wpointer-arith -Wshadow -Waggregate-return \
 
 LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= /usr/local/local
-WWWDIR	= /var/httpd/root/www.dmalloc.com
+WWWDIR	= /var/httpd/root/dmalloc.com
 TEST	= dmalloc_t
 LIBRARY	= libdmalloc.a
 LIB_TH	= libdmallocth.a

@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.h,v 1.35 1999/03/04 19:05:54 gray Exp $
+ * $Id: heap.h,v 1.36 2000/03/20 23:19:27 gray Exp $
  */
 
 #ifndef __HEAP_H__

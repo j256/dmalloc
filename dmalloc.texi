@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.173 2000/03/06 17:04:46 gray Exp $
+@c $Id: dmalloc.texi,v 1.174 2000/03/20 23:19:23 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -123,9 +123,6 @@ Gray Watson.
 * Details::                     Details about how to use the library.
 * Source Code::                 Information on the source and general concerns.
 * Index of Concepts::           Index of concepts in the manual.
-@ifinfo
-* Full Node Listing::           Listing of all the nodes in the manual.
-@end ifinfo
 @end menu
 
 @node Copying, Overview, Top, Top
@@ -1666,8 +1663,8 @@ To find out the usage for the debug malloc program try @samp{dmalloc
 --usage-long}.  The standardized usage message that will be displayed is
 one of the many features of the argv library included with this package.
 
-It is available via ftp from @samp{ftp.256.com} in the @file{/src/argv}
-directory.  See @file{argv.info} there for more information.
+It is available on the web at @uref{http://256.com/sourcs/argv/}.  See
+the documentation there for more information.
 
 Here is a detailed list of the flags that can passed to dmalloc:
 

@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.90 2000/03/06 17:05:08 gray Exp $
+ * $Id: dmalloc.c,v 1.91 2000/03/20 23:19:22 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.90 2000/03/06 17:05:08 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.91 2000/03/20 23:19:22 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.90 2000/03/06 17:05:08 gray Exp $";
+  "$Id: dmalloc.c,v 1.91 2000/03/20 23:19:22 gray Exp $";
 #endif
 #endif
 
@@ -663,7 +663,7 @@ static	void	dump_current(void)
   int		lock_on, start_line, start_count;
   unsigned int	flags;
   
-  (void)fprintf(stderr, "Debug Malloc Utility: http://www.dmalloc.com/\n");
+  (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
   (void)fprintf(stderr,
 		"  For a list of the command-line options enter: %s --usage\n",
 		argv_argv[0]);
@@ -790,7 +790,7 @@ int	main(int argc, char **argv)
   argv_process(args, argc, argv);
   
   if (help_b) {
-    (void)fprintf(stderr, "Debug Malloc Utility: http://www.dmalloc.com/\n");
+    (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
     (void)fprintf(stderr,
 		  "  This utility helps set the Debug Malloc environment variables.\n");
     (void)fprintf(stderr,

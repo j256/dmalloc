@@ -16,9 +16,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.79 1999/03/11 05:22:17 gray Exp $
+ * $Id: conf.h.in,v 1.80 2000/03/20 23:19:21 gray Exp $
  */
 
 #ifndef __CONF_H__
