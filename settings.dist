@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.2 1995/06/20 01:31:36 gray Exp $
+ * $Id: settings.dist,v 1.3 1995/06/20 18:28:03 gray Exp $
  */
 
 #ifndef __SETTINGS_H__
@@ -31,30 +31,30 @@
 #define INCLUDE_RCS_IDS 1
 
 /*
- * should we allow zero length allocations?  this will generate the
+ * Should we allow zero length allocations?  This will generate the
  * smallest possible allocation.
- *
+ * 
  * FYI: if fence post checking is requested, the top and bottom of the
  * fence post information will be touching.
  */
 #define ALLOW_ALLOC_ZERO_SIZE 0
 
 /*
- * should we allow realloc of a NULL pointer?  if set to one, this
- * will call malloc when 0L is realloced.  this is useful when you are
+ * Should we allow realloc of a NULL pointer?  If set to one, this
+ * will call malloc when 0L is realloced.  This is useful when you are
  * extending an array in a loop and do not want to allocate it
  * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
 
 /*
- * should we allow the free of a NULL pointer and if it happens,
+ * Should we allow the free of a NULL pointer and if it happens,
  * should a message be generated to that effect?  I don't see how this
- * would be useful but some systems can, and I guess require this.  I
- * would recommend at least using the message to point out the
- * offenders because I would guess that this is not a portable feature
- * of most malloc libraries.
- *
+ * would be useful but some systems can, and I guess require this --
+ * especially X11 spaghetti code.  I would recommend at least using
+ * the message to point out the offenders because I would guess that
+ * this is not a portable feature of most malloc libraries.
+ * 
  * You can also enable the 'allow-zero' token which will not cause an
  * error when the user asks for 0 bytes and will not barf when it sees
  * a free(0L).
@@ -63,7 +63,7 @@
 #define ALLOW_FREE_NULL_MESSAGE 1
 
 /*
- * should we use the ra-address macros in return.h.  These are system
+ * Should we use the ra-address macros in return.h.  These are system
  * specific macros designed to return the return-address for logging
  * callers (i.e. possible offenders) of malloc routines.  You should
  * only want to disable them if you are storing code which makes calls
@@ -74,7 +74,7 @@
 #define USE_RET_ADDRESS 1
 
 /*
- * the largest allowable allocations in bits.  This is only for
+ * The largest allowable allocations in bits.  This is only for
  * verification purposes.  Any allocation larger than this (in bits)
  * will generate a ERROR_TOO_BIG error (#15).  the default (24)
  * indicates that an allocation of more than 16mb (2^24) will generate
@@ -83,11 +83,11 @@
 #define LARGEST_BLOCK 24
 
 /*
- * although I don't know why you would want to tune this since this is
+ * Although I don't know why you would want to tune this since this is
  * pretty dependent on my general heap mechanisms, here are some
- * options to use general first, best, and worst fit algorithms.  if
+ * options to use general first, best, and worst fit algorithms.  If
  * you don't know what these are, then DON'T TOUCH.
- *
+ * 
  * NOTES: they may go away in the future and/or be replaced by
  * debug-tokens.  I've tested all three and have not noticed any large
  * differences.  Also, they only apply for allocations > basic-block
@@ -98,7 +98,7 @@
 #define WORST_FIT 0
 
 /*
- * automatically call dmalloc_shutdown if on_exit or atexit is
+ * Automatically call dmalloc_shutdown if on_exit or atexit is
  * available.  See conf.h for whether configure found on_exit or
  * atexit calls.  If neither is available, take a look at atexit.c in
  * the contrib directory which may provide this useful functionality
@@ -107,22 +107,27 @@
 #define AUTO_SHUTDOWN 1
 
 /*
- * the USE_ABORT is auto-configured but may have to be tuned.  On some
- * OS's, abort calls fclose() which may want to free memory making the
- * library go recursive.  The configure script tries to test for this
- * but may have failed.
- *
- * In these cased, set USE_ABORT to 0 and set KILL_PROCESS to the
- * proper way to stop the program.  Killing the current process (id 0)
- * with SIGABRT works on a number of Unix systems.  You may have to
- * define some include file to get the value for the SIGABRT signal.
+ * The ABORT_OKAY is auto-configured but may have to be adjusted by
+ * forcing the USE_ABORT to be 1 or 0.  On some OS's, abort calls
+ * fclose() which may want to free memory making the library go
+ * recursive.  See ABORT_OKAY in the conf.h file for more information.
+ * 
+ * If you need to override it or if ABORT_OKAY is 0, set KILL_PROCESS to
+ * the proper way to stop the program.  Killing the current process
+ * (id 0) with SIGABRT works on a number of Unix systems.  You may
+ * have to define some include file to get the value for the signal
+ * that is used.
  */
+#if ABORT_OKAY
+#define USE_ABORT		1
+#else
 #define USE_ABORT		0
+#endif
 #define KILL_PROCESS		(void)kill(0,SIGABRT)
 #define SIGNAL_INCLUDE		<signal.h>
 
 /*
- * number of bytes to write at the top of allocations (if fence-post
+ * Number of bytes to write at the top of allocations (if fence-post
  * checking is enabled).  A larger number means more memory space used
  * up but better protection against fence overruns.  See the manual
  * for more information.
@@ -130,7 +135,18 @@
 #define FENCE_TOP 4
 
 /*
- * write the iteration count at the start of every log entry.  This is
+ * Number of bytes to write at the bottom of allocations. See the
+ * FENCE_TOP setting above or the manual for more information.
+ * 
+ * WARNING: this should changed with caution and should only be
+ * increased.  If you need to change it, use (ALLOCATION_ALIGNMENT +
+ * 8) or some such.  For more information see ALLOCATION_ALIGNMENT in
+ * conf.h.
+ */
+#define FENCE_BOTTOM		ALLOCATION_ALIGNMENT
+
+/*
+ * Write the iteration count at the start of every log entry.  This is
  * handy when you are using the DMALLOC_START variable and want to
  * begin the tough debugging at a certain point.
  */

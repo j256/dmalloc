@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.48 1995/06/13 21:34:39 gray Exp $
+ * $Id: conf.h.in,v 1.49 1995/06/20 18:27:59 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -33,7 +33,7 @@
 
 /*
  * (char *)sbrk(const int incr) is the main heap-memory allocation
- * routine that most systems employ.  this extends the program's data
+ * routine that most systems employ.  This extends the program's data
  * space by INCR number of bytes.
  *
  * NOTE: please mail me if your system does not have this function.
@@ -41,7 +41,7 @@
 #define HAVE_SBRK 0
 
 /*
- * does your heap grow up?  hopefully it does because there is not too
+ * Does your heap grow up?  Hopefully it does because there is not too
  * much support for growing-down heaps because I do not have a system
  * to test it on.
  *
@@ -51,9 +51,9 @@
 #define HEAP_GROWS_UP 1
 
 /*
- * this is the basic block size in bits.  if possible, the configure
+ * This is the basic block size in bits.  If possible, the configure
  * script will set this to be the value returned by the getpagesize()
- * function.  if not then some sort of best guess will be necessary.
+ * function.  If not then some sort of best guess will be necessary.
  * 14 (meaning basic block size of 16k) will probably be good.
  *
  * NOTE: some sbrk functions round to the correct page-size.  If this
@@ -65,15 +65,15 @@
 #define BASIC_BLOCK 12
 
 /*
- * the alignment value of all allocations in number of bytes for
- * loading admin information before an allocation.  if possible, the
+ * The alignment value of all allocations in number of bytes for
+ * loading admin information before an allocation.  If possible, the
  * configure script will set this to be the value returned by
  * sizeof(long) which in most systems is the register width.
  *
  * NOTE: the value will never be auto-configured to be less than 8
  * because some system (like sparc for instance) report the sizeof(long)
- * == 4 while the register size is 8 bytes.  certain memory needs to be of
- * the same base as the register size (stack frames, code, etc.).  any
+ * == 4 while the register size is 8 bytes.  Certain memory needs to be of
+ * the same base as the register size (stack frames, code, etc.).  Any
  * ideas how I can determine the register size in a better (and portable)
  * fashion?
  *
@@ -87,12 +87,12 @@
  */
 
 /*
- * some systems have functions which can register routines to be
- * called by exit(3) (or when the program returns from main).  this
+ * Some systems have functions which can register routines to be
+ * called by exit(3) (or when the program returns from main).  This
  * functionality allows the dmalloc_shutdown() routine to be called
  * automatically upon program completion so that the library can log
- * statistics.  use the AUTO_SHUTDOWN define above to disable this.
- * please send me mail if this functionality exists on your system but
+ * statistics.  Use the AUTO_SHUTDOWN define above to disable this.
+ * Please send me mail if this functionality exists on your system but
  * in another name.
  *
  * NOTE: If neither is available, take a look at atexit.c in the
@@ -103,7 +103,7 @@
 #define HAVE_ON_EXIT 0
 
 /*
- * the dmalloc library provides its own versions of the following
+ * The dmalloc library provides its own versions of the following
  * functions, or knows how to work around their absence.
  */
 #define HAVE_BCMP 0
@@ -130,10 +130,9 @@
 #define HAVE_STRNCPY 0
 #define HAVE_STRSTR 0
 
-
 /*
- * the below functions are here to provide function argument checking
- * only.  the library only has stubs for these and does not use them
+ * The below functions are here to provide function argument checking
+ * only.  The library only has stubs for these and does not use them
  * internally.
  */
 #define HAVE_BZERO 0

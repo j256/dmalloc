@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.36 1995/06/20 02:06:10 gray Exp $
+ * $Id: chunk_loc.h,v 1.37 1995/06/20 18:27:58 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -105,8 +105,6 @@
 				  (ans) = _b; \
 				} while (0)
   
-/* fence post checking defines */
-#define FENCE_BOTTOM		ALLOCATION_ALIGNMENT
 /* NOTE: FENCE_TOP defined in conf.h */
 #define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
 #define FENCE_MAGIC_BOTTOM	0xC0C0AB1B

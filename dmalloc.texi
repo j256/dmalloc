@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.93 1995/06/20 17:54:21 gray Exp $
+@c $Id: dmalloc.texi,v 1.94 1995/06/20 18:28:02 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -477,11 +477,11 @@ don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr
 often, you may need to either get GNU's tr (in their textutils package)
 or generate the @file{Makefile} and @file{conf.h} files by hand.
 
-@item You may want to examine the files created by configure to make sure
-it did its job correctly.
+@item You may want to examine the @file{Makefile} and @file{conf.h} files
+created by configure to make sure it did its job correctly.
 
-@item Examine the manual settings in @file{settings.h} to tune specific
-features of the library.
+@item You may also want ot Examine the manual settings in
+@file{settings.h} to tune specific features of the library.
 
 @item I was unable to auto-configure to my satisfaction the
 @code{DMALLOC_SIZE} variable in @file{dmalloc.h.3}.  You may have to
