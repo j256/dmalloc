@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.51 2000/10/10 23:06:24 gray Exp $
+ * $Id: compat.c,v 1.52 2000/11/13 15:47:17 gray Exp $
  */
 
 /*
@@ -42,10 +42,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: compat.c,v 1.51 2000/10/10 23:06:24 gray Exp $";
+#ident "$Id: compat.c,v 1.52 2000/11/13 15:47:17 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.51 2000/10/10 23:06:24 gray Exp $";
+  "$Id: compat.c,v 1.52 2000/11/13 15:47:17 gray Exp $";
 #endif
 #endif
 

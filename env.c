@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.26 2000/10/10 23:06:26 gray Exp $
+ * $Id: env.c,v 1.27 2000/11/13 15:46:52 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: env.c,v 1.26 2000/10/10 23:06:26 gray Exp $";
+#ident "$Id: env.c,v 1.27 2000/11/13 15:46:52 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.26 2000/10/10 23:06:26 gray Exp $";
+  "$Id: env.c,v 1.27 2000/11/13 15:46:52 gray Exp $";
 #endif
 #endif
 

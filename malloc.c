@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.149 2000/11/07 17:33:16 gray Exp $
+ * $Id: malloc.c,v 1.150 2000/11/13 15:46:31 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.149 2000/11/07 17:33:16 gray Exp $";
+#ident "$Id: malloc.c,v 1.150 2000/11/13 15:46:31 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.149 2000/11/07 17:33:16 gray Exp $";
+  "$Id: malloc.c,v 1.150 2000/11/13 15:46:31 gray Exp $";
 #endif
 #endif
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.14 2000/10/10 23:06:25 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.15 2000/11/13 15:46:52 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_tab.c,v 1.14 2000/10/10 23:06:25 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.15 2000/11/13 15:46:52 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.14 2000/10/10 23:06:25 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.15 2000/11/13 15:46:52 gray Exp $";
 #endif
 #endif
 

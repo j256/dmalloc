@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.57 2000/10/10 23:06:26 gray Exp $
+ * $Id: heap.c,v 1.58 2000/11/13 15:46:51 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: heap.c,v 1.57 2000/10/10 23:06:26 gray Exp $";
+#ident "$Id: heap.c,v 1.58 2000/11/13 15:46:51 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.57 2000/10/10 23:06:26 gray Exp $";
+  "$Id: heap.c,v 1.58 2000/11/13 15:46:51 gray Exp $";
 #endif
 #endif
 
