@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.124 1998/11/09 15:57:15 gray Exp $
+ * $Id: chunk.c,v 1.125 1998/11/09 16:54:25 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.124 1998/11/09 15:57:15 gray Exp $";
+#ident "$Id: chunk.c,v 1.125 1998/11/09 16:54:25 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.124 1998/11/09 15:57:15 gray Exp $";
+  "$Id: chunk.c,v 1.125 1998/11/09 16:54:25 gray Exp $";
 #endif
 #endif
 
@@ -107,6 +107,7 @@ static	long		malloc_count = 0;	/* count the mallocs */
 static	long		calloc_count = 0;	/* # callocs, done in alloc */
 static	long		realloc_count = 0;	/* count the reallocs */
 static	long		recalloc_count = 0;	/* count the reallocs */
+static	long		memalign_count = 0;	/* count the memaligns */
 static	long		valloc_count = 0;	/* count the veallocs */
 static	long		free_count = 0;		/* count the frees */
 
@@ -2386,14 +2387,15 @@ void	_chunk_log_heap_map(void)
 /*
  * Get a SIZE chunk of memory for FILE at LINE.  If CALLOC_B then
  * count this as a calloc not a malloc call.  If REALLOC_B then don't
- * count it as a malloc call.  If valloc_b then count it as a valloc_b
- * and force a basic block to be returned.
+ * count it as a malloc call.  If ALIGNMENT is greater than 0 then try
+ * to align the returned block.
  */
 void	*_chunk_malloc(const char *file, const unsigned int line,
 		       const unsigned int size, const int calloc_b,
-		       const int realloc_b, const int valloc_b)
+		       const int realloc_b, const unsigned int alignment)
 {
   unsigned int	bit_n, byte_n = size;
+  int		valloc_b = 0, memalign_b = 0;
   bblock_t	*bblock_p;
   overhead_t	*over_p;
   const char	*trans_log;
@@ -2403,8 +2405,13 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   if (calloc_b) {
     calloc_count++;
   }
-  else if (valloc_b) {
+  else if (alignment == BLOCK_SIZE) {
     valloc_count++;
+    valloc_b = 1;
+  }
+  else if (alignment > 0) {
+    memalign_count++;
+    memalign_b = 1;
   }
   else if (! realloc_b) {
     malloc_count++;
@@ -2552,6 +2559,9 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     if (calloc_b) {
       trans_log = "calloc";
+    }
+    else if (memalign_b) {
+      trans_log = "memalign";
     }
     else if (valloc_b) {
       trans_log = "valloc";
@@ -3092,8 +3102,8 @@ void	_chunk_stats(void)
   /* log user allocation information */
   _dmalloc_message("alloc calls: malloc %ld, calloc %ld, realloc %ld, free %ld",
 		   malloc_count, calloc_count, realloc_count, free_count);
-  _dmalloc_message("alloc calls: recalloc %ld, valloc %ld",
-		   recalloc_count, valloc_count);
+  _dmalloc_message("alloc calls: recalloc %ld, memalign %ld, valloc %ld",
+		   recalloc_count, memalign_count, valloc_count);
   _dmalloc_message(" total memory allocated: %ld bytes (%ld pnts)",
 		  alloc_total, alloc_tot_pnts);
   

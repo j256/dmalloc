@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.148 1998/11/09 15:57:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.149 1998/11/09 16:53:01 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -925,11 +925,12 @@ thread programmers only please.
 @cindex dmalloc.h file
 
 By including @file{dmalloc.h} in your C files, your calls to malloc,
-calloc, realloc, recalloc, valloc, strdup, and free are replaced with
-calls to _malloc_leap, _calloc_leap, _realloc_leap, _recalloc_leap,
-_valloc_leap, _strdup_leap, and _free_leap.  Additionally the library
-replaces calls to xmalloc, xcalloc, xrealloc, xrecalloc, xvalloc,
-xstrdup, and xfree with associated _leap calls.
+calloc, realloc, recalloc, memalign, valloc, strdup, and free are
+replaced with calls to _malloc_leap, _calloc_leap, _realloc_leap,
+_recalloc_leap, _memalign_leap, _valloc_leap, _strdup_leap, and
+_free_leap.  Additionally the library replaces calls to xmalloc,
+xcalloc, xrealloc, xrecalloc, xmemalign, xvalloc, xstrdup, and xfree
+with associated _leap calls.
 
 @cindex leap macros
 
@@ -946,20 +947,26 @@ not freed: '0x38410' (22 bytes) from 'dmalloc_t.c:92'
 This line from a log file shows that memory was not freed from file
 @file{dmalloc_t.c} line 92.  @xref{Memory Leaks}.
 
+@cindex recalloc
+@cindex memalign
 @cindex valloc
 @cindex strdup
-@cindex recalloc
 
 You may notice some non standard memory allocation functions in the
 above leap list.  Recalloc is a routine like realloc that reallocates
 previously allocated memory to a new size.  If the new memory size is
 larger than the old, recalloc initializes the new space to all zeros.
 This may or may not be supported natively by your operating system.
+Memalign is like malloc but should insure that the returned pointer is
+aligned to a certain number of specified bytes.  Currently, the memalign
+function is not supported by the library.  It defaults to returning
+possibly non-aligned memory for alignment values less than a block-size.
 Valloc is like malloc but insures that the returned pointer will be
 aligned to a page boundary.  This may or may not be supported natively
-by your operating system.  Strdup is a string duplicating routine which
-takes in a null terminated string pointer and returns an allocated copy
-of the string that will need to be passed to free later to deallocate.
+by your operating system but is fully supported by the library.  Strdup
+is a string duplicating routine which takes in a null terminated string
+pointer and returns an allocated copy of the string that will need to be
+passed to free later to deallocate.
 
 The X versions of the standard memory functions (xmalloc, xfree, etc.)
 will print out an error message to standard error and will stop if the

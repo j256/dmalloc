@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.h,v 1.49 1998/10/26 14:24:27 gray Exp $
+ * $Id: chunk.h,v 1.50 1998/11/09 16:54:26 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -79,13 +79,13 @@ void	_chunk_log_heap_map(void);
 /*
  * Get a SIZE chunk of memory for FILE at LINE.  If CALLOC_B then
  * count this as a calloc not a malloc call.  If REALLOC_B then don't
- * count it as a malloc call.  If valloc_b then count it as a valloc_b
- * and force a basic block to be returned.
+ * count it as a malloc call.  If ALIGNMENT is greater than 0 then try
+ * to align the returned block.
  */
 extern
 void	*_chunk_malloc(const char *file, const unsigned int line,
 		       const unsigned int size, const int calloc_b,
-		       const int realloc_b, const int valloc_b);
+		       const int realloc_b, const unsigned int alignment);
 
 /*
  * Frees PNT from the heap.  REALLOC_B set if realloc is freeing a

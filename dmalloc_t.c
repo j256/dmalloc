@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: dmalloc_t.c,v 1.71 1998/10/26 14:24:35 gray Exp $
+ * $Id: dmalloc_t.c,v 1.72 1998/11/09 16:55:03 gray Exp $
  */
 
 /*
@@ -47,10 +47,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.71 1998/10/26 14:24:35 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.72 1998/11/09 16:55:03 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.71 1998/10/26 14:24:35 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.72 1998/11/09 16:55:03 gray Exp $";
 #endif
 #endif
 
@@ -581,6 +581,7 @@ static	void	do_interactive(void)
       (void)printf("\tmalloc    - allocate memory\n");
       (void)printf("\tcalloc    - allocate/clear memory\n");
       (void)printf("\trealloc   - reallocate memory\n");
+      (void)printf("\tmemalign  - allocate aligned memory\n");
       (void)printf("\tvalloc    - allocate page-aligned memory\n");
       (void)printf("\tstrdup    - allocate a string\n");
       (void)printf("\tfree      - deallocate memory\n\n");
@@ -662,6 +663,24 @@ static	void	do_interactive(void)
       (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
 		   (long)pnt, size, (long)recalloc(pnt, size));
       
+      continue;
+    }
+    
+    if (strncmp(line, "memalign", len) == 0) {
+      int	alignment, size;
+      
+      (void)printf("Alignment in bytes: ");
+      if (fgets(line, sizeof(line), stdin) == NULL) {
+	break;
+      }
+      alignment = atoi(line);
+      (void)printf("How much to memalign: ");
+      if (fgets(line, sizeof(line), stdin) == NULL) {
+	break;
+      }
+      size = atoi(line);
+      (void)printf("memalign(%d, %d) returned '%#lx'\n",
+		   alignment, size, (long)memalign(alignment, size));
       continue;
     }
     

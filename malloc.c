@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.114 1998/11/09 15:57:18 gray Exp $
+ * $Id: malloc.c,v 1.115 1998/11/09 16:53:26 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.114 1998/11/09 15:57:18 gray Exp $";
+#ident "$Id: malloc.c,v 1.115 1998/11/09 16:53:26 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.114 1998/11/09 15:57:18 gray Exp $";
+  "$Id: malloc.c,v 1.115 1998/11/09 16:53:26 gray Exp $";
 #endif
 #endif
 
@@ -104,9 +104,10 @@ int	_dmalloc_examine(const char *file, const int line,
 const char	*_dmalloc_strerror(const int error_num);
 
 /* local variables */
-static	int		enabled_b	= FALSE; /* have we started yet? */
-static	int		in_alloc_b	= FALSE; /* can't be here twice */
-static	int		do_shutdown_b	= FALSE; /* execute shutdown soon */
+static	int		enabled_b = FALSE;	/* have we started yet? */
+static	int		in_alloc_b = FALSE;	/* can't be here twice */
+static	int		do_shutdown_b = FALSE;	/* execute shutdown soon */
+static	int		memalign_warn_b = FALSE; /* memalign warning printed?*/
 
 /* debug variables */
 static	int		address_seen_n = ADDRESS_COUNT_INIT; /* # stop addr */
@@ -530,12 +531,12 @@ void	__fini_dmalloc()
 
 /*
  * Allocate and return a SIZE block of bytes.  If it is a calloc then
- * the CALLOC_B is set to 1 else 0.  If valloc then CALLOC_B is set to
- * 1 else 0.  Returns 0L on error.
+ * the CALLOC_B is set to 1 else 0.  If we are aligning our malloc
+ * then ALIGNMENT is greater than 0.  Returns 0L on error.
  */
 DMALLOC_PNT	_loc_malloc(const char *file, const int line,
-			    DMALLOC_SIZE size, const int calloc_b,
-			    const int valloc_b)
+			    const DMALLOC_SIZE size, const int calloc_b,
+			    const DMALLOC_SIZE alignment)
 {
   void		*new_p;
   
@@ -551,7 +552,7 @@ DMALLOC_PNT	_loc_malloc(const char *file, const int line,
     return MALLOC_ERROR;
   }
   
-  new_p = _chunk_malloc(file, line, size, calloc_b, 0, valloc_b);
+  new_p = _chunk_malloc(file, line, size, calloc_b, 0, alignment);
   in_alloc_b = FALSE;
   
   check_pnt(file, line, new_p, "malloc");
@@ -726,6 +727,39 @@ DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 
 /*
  * Allocate and return a SIZE block of bytes that has been aligned to
+ * ALIGNMENT bytes.  ALIGNMENT must be a power of two and must be less
+ * than or equal to the block-size.  Returns 0L on error.
+ */
+#undef memalign
+DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size)
+{
+  char		*file;
+  DMALLOC_SIZE	align;
+  
+  GET_RET_ADDR(file);
+  
+  if (alignment >= BLOCK_SIZE) {
+    align = BLOCK_SIZE;
+  }
+  else {
+    /*
+     * NOTE: Currently, there is no support in the library for
+     * memalign on less than block boundaries.  It will be non-trivial
+     * to support valloc with fence-post checking and the lack of the
+     * flag width for dblock allocations.
+     */
+    if (! memalign_warn_b) {
+      _dmalloc_message("WARNING: memalign called without library support");
+    }
+    align = 0;
+    /* align = alignment */
+  }
+  
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, align);
+}
+
+/*
+ * Allocate and return a SIZE block of bytes that has been aligned to
  * a page-size.  Returns 0L on error.
  */
 #undef valloc
@@ -734,7 +768,7 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size)
   char	*file;
   
   GET_RET_ADDR(file);
-  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, 1);
+  return _loc_malloc(file, DMALLOC_DEFAULT_LINE, size, 0, BLOCK_SIZE);
 }
 
 /*
