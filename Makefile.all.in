@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.116 2003/05/21 15:59:10 gray Exp $
+# $Id: Makefile.all.in,v 1.117 2003/05/23 03:05:10 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -141,7 +141,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = dmalloc.h
-OBJS = arg_check.o compat.o dmalloc_tab.o env.o heap.o protect.o
+OBJS = arg_check.o compat.o dmalloc_tab.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o
@@ -391,7 +391,7 @@ arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h \
  debug_tok.h dmalloc_loc.h error.h arg_check.h
 chunk.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
  dmalloc_loc.h compat.h debug_tok.h dmalloc_tab.h error.h error_val.h \
- heap.h protect.h
+ heap.h
 compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
 dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
  compat.h debug_tok.h dmalloc_loc.h env.h error_val.h version.h
@@ -411,11 +411,9 @@ heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
 malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
  debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
  malloc_funcs.h return.h
-protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
- heap.h protect.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
  dmalloc_loc.h compat.h debug_tok.h dmalloc_tab.h error.h error_val.h \
- heap.h protect.h
+ heap.h
 error_th.o: error.c conf.h settings.h dmalloc.h compat.h debug_tok.h \
  dmalloc_loc.h env.h error.h error_val.h version.h
 malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \

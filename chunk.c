@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.182 2003/05/20 04:05:58 gray Exp $
+ * $Id: chunk.c,v 1.183 2003/05/23 03:05:10 gray Exp $
  */
 
 /*
@@ -62,7 +62,6 @@
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
-#include "protect.h"
 
 /*
  * Library Copyright and URL information for ident and what programs
