@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.54 2000/03/21 18:19:14 gray Exp $
+ * $Id: heap.c,v 1.55 2000/05/15 22:22:28 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: heap.c,v 1.54 2000/03/21 18:19:14 gray Exp $";
+#ident "$Id: heap.c,v 1.55 2000/05/15 22:22:28 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.54 2000/03/21 18:19:14 gray Exp $";
+  "$Id: heap.c,v 1.55 2000/05/15 22:22:28 gray Exp $";
 #endif
 #endif
 
@@ -80,7 +80,7 @@ static	void	*heap_extend(const int incr)
       len = loc_snprintf(str, sizeof(str),
 			 "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
       (void)write(STDERR, str, len);
-      _dmalloc_die(FALSE);
+      _dmalloc_die(0);
     }
     dmalloc_errno = ERROR_ALLOC_FAILED;
     dmalloc_error("heap_extend");
@@ -93,7 +93,21 @@ static	void	*heap_extend(const int incr)
 /**************************** exported functions *****************************/
 
 /*
- * Initialize heap pointers.  returns [NO]ERROR
+ * int _heap_startup
+ *
+ * DESCRIPTION:
+ *
+ * Initialize heap pointers.
+ *
+ * RETURNS:
+ *
+ * Success - 1
+ *
+ * Failure - 0
+ *
+ * ARGUMENTS:
+ *
+ * None.
  */
 int	_heap_startup(void)
 {
@@ -101,7 +115,7 @@ int	_heap_startup(void)
   
   _heap_base = heap_extend(0);
   if (_heap_base == SBRK_ERROR) {
-    return ERROR;
+    return 0;
   }
   
   /* align the heap-base */
@@ -112,14 +126,14 @@ int	_heap_startup(void)
   
   if (diff > 0) {
     if (heap_extend(diff) == SBRK_ERROR) {
-      return ERROR;
+      return 0;
     }
     _heap_base = (char *)HEAP_INCR(_heap_base, diff);
   }
   
   _heap_last = _heap_base;
   
-  return NOERROR;
+  return 1;
 }
 
 /*

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.h,v 1.37 2000/03/21 18:19:15 gray Exp $
+ * $Id: heap.h,v 1.38 2000/05/15 22:22:28 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -105,7 +105,21 @@ extern
 void	*_heap_last;			/* end of our heap */
 
 /*
- * Initialize heap pointers.  returns [NO]ERROR
+ * int _heap_startup
+ *
+ * DESCRIPTION:
+ *
+ * Initialize heap pointers.
+ *
+ * RETURNS:
+ *
+ * Success - 1
+ *
+ * Failure - 0
+ *
+ * ARGUMENTS:
+ *
+ * None.
  */
 extern
 int	_heap_startup(void);
