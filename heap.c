@@ -27,6 +27,12 @@
  * heap as well as reporting the current position of the heap.
  */
 
+#include <stdio.h>				/* for sprintf */
+
+#if HAVE_UNISTD_H
+# include <unistd.h>				/* for write */
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
@@ -42,14 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.45 1997/12/05 21:09:49 gray Exp $";
+  "$Id: heap.c,v 1.46 1998/09/19 00:11:38 gray Exp $";
 #endif
 
-/* external routines */
-#if HAVE_SBRK
-extern	char		*sbrk(const int incr);	/* to extend the heap */
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
-#endif
 
 /* exported variables */
 void	*_heap_base = NULL;			/* base of our heap */
