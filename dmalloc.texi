@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.50 1994/07/21 22:20:05 gray Exp $
+@c $Id: dmalloc.texi,v 1.51 1994/08/03 18:25:01 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -100,6 +100,7 @@ feedback, or general comments.  Gray Watson, Antaire Corporation.
 * Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
+* Detailed Node Listing::       Listing of all the nodes in the manual.
 @end menu
 
 @node Copying, Allocation Basics, Top, Top
@@ -1573,10 +1574,68 @@ environment, complete tcp/ip networking facilities including nfs, full
 software development utilities, X, etc.  <bsdi-info@@bsdi.com>
 @end table
 
-@node Index of Concepts,  , Plugs, Top
+@node Index of Concepts, Detailed Node Listing, Plugs, Top
 @unnumbered Concept Index
 
 @printindex cp
 @contents
 
+@ifinfo
+
+@node Detailed Node Listing,  , Index of Concepts, Top
+@unnumbered Detailed Node Listing
+
+@menu
+Top.
+
+* Copying::                     Library copying conditions.
+* Allocation Basics::           Basic description of terms and functions.
+* Features::                    Description of the benefits of the library.
+* Programming::                 How to program with the library.
+* Running::                     How to run programs with the library.
+* Source Code::                 Information on the source and general concerns.
+* Plugs::                       A couple soapbox comments.
+* Index of Concepts::           Index of concepts in the manual.
+* Detailed Node Listing::       Listing of all the nodes in the manual.
+
+Allocation Basics.
+
+* Basic Definitions::           For defining general terms and concepts.
+* Malloc Functions::            Functionality supported by all malloc libs.
+
+Malloc Functions.
+
+* Overview::                    General debugging concepts.
+* Environment Variables::       The variable names and their features.
+* Debug Tokens::                Description of the debugging token flags.
+* Argument Checking::           Special checking of function arguments.
+
+Programming.
+
+* Allocation Macros::           For providing file and line information.
+* Return Address::              For providing caller information.
+* Extensions::                  Additional non-standard routines.
+* C++ and the Library::         
+* Disabling the Library::       How to compile/link without the library.
+
+Running.
+
+* Malloc_dbg Program::          Env variable setting utility.
+* RC File::                     Format of the run-time configuration file.
+* Debugging with the Library::  How to debug problems with the library.
+
+Debugging with the Library.
+
+* General::                     Diagnosing general problems with a debugger.
+* Memory Leaks::                Tracking down non-freed memory.
+* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
+
+Source Code.
+
+* Definitions::                 Some terms and other information.
+* Compatibility::               General compatibility concerns.
+* Portability::                 Issues important for porting the library.
+@end menu
+
+@end ifinfo
 @bye
