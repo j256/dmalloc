@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.85 1995/09/02 20:41:36 gray Exp $
+# $Id: Makefile.in,v 1.86 1995/09/02 20:48:33 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -222,7 +222,7 @@ shar :: $(FLS) $(CFGFLS)
 	mv Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
 	makekit -n part. -s ${SHARSIZE} \
-		-t "See the README and INSTALL files for instructions on building the library." \
+		-t "See the INSTALL file for instructions on building and installing the library." \
 		$(FLS) Makefile.in $(CFGFLS)
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
