@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.115 2003/06/08 21:26:18 gray Exp $
+ * $Id: version.h,v 1.116 2003/06/10 17:16:19 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -33,14 +33,14 @@
  *	RELEASE.html
  *	configure.ac (in AC_INIT)
  *	dmalloc.spec
- *	dmalloc.texi (2 places)
+ *	dmalloc.texi
  *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
  *      ports/.../Makefile and ports/.../distfile files
  *
  * Make sure to also cvs tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.1.0" ;
+static	char	*dmalloc_version = "5.2.0" ;
 
-/* Version Date: $Date: 2003/06/08 21:26:18 $ */
+/* Version Date: $Date: 2003/06/10 17:16:19 $ */
 
 #endif /* ! __VERSION_H__ */
