@@ -2,6 +2,8 @@
 @c %**start of header
 @setfilename dmalloc.info
 @settitle Dmalloc Tutorial
+@setchapternewpage odd
+@headings double
 @c %**end of header
 
 @c ================================================================
@@ -14,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.113 1995/12/29 01:58:46 gray Exp $
+@c $Id: dmalloc.texi,v 1.114 1997/01/16 15:16:47 gray Exp $
 @c ================================================================
 
 @ifinfo
