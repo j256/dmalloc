@@ -16,7 +16,7 @@
  *
  * The author of dmalloc may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_rand.c,v 1.1 2003/06/04 23:43:44 gray Exp $
+ * $Id: dmalloc_rand.c,v 1.2 2003/07/24 00:25:05 gray Exp $
  */
 
 /*
@@ -77,20 +77,20 @@ static	void	auto_seed(void)
   while (value == 0) {
 #ifdef HAVE_TIME
 #ifdef HAVE_GETPID
-    value = time(0) ^ getpid();
+    value = time(0) ^ getpid() ^ 0xDEADBEEF;
 #else /* ! HAVE_GETPID */
     value = time(0) ^ 0xDEADBEEF;
 #endif /* ! HAVE_GETPID */
 #else /* ! HAVE_TIME */
 #ifdef HAVE_GETPID
-    value = getpid();
+    value = getpid() ^ 0xDEADBEEF;
 #else /* ! HAVE_GETPID */
     /* okay, I give up */
     value = 0xDEADBEEF;
 #endif /* ! HAVE_GETPID */
 #endif /* ! HAVE_TIME */
   }
-}  
+}
 
 /*
  * static void _dmalloc_srand
