@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.68 1994/02/17 22:48:32 gray Exp $";
+  "$Id: chunk.c,v 1.69 1994/02/18 04:09:48 gray Exp $";
 #endif
 
 /*
@@ -2013,7 +2013,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
       (void)memset(pnt, BLANK_CHAR, 1 << bitn);
   }
   else {
-    int		blockn;
+    int		blockn, given;
     
     /*
      * allocate some bblock space
@@ -2030,12 +2030,13 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     /* initialize the bblocks */
     set_bblock_admin(blockn, bblockp, BBLOCK_START_USER, line, byten, file);
     
-    alloc_cur_given += blockn * BLOCK_SIZE;
+    given = blockn * BLOCK_SIZE;
+    alloc_cur_given += given;
     alloc_max_given = MAX(alloc_max_given, alloc_cur_given);
     
     /* overwrite to-be-alloced or non-used portion of memory */
     if (BIT_IS_SET(_malloc_flags, DEBUG_ALLOC_BLANK))
-      (void)memset(pnt, BLANK_CHAR, blockn * BLOCK_SIZE);
+      (void)memset(pnt, BLANK_CHAR, given);
   }
   
   /* write fence post info if needed */
@@ -2059,7 +2060,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 EXPORT	int	_chunk_free(const char * file, const unsigned int line,
 			    void * pnt)
 {
-  int		bitn, blockn;
+  int		bitn, blockn, given;
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   
@@ -2182,15 +2183,16 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   }
   
   blockn = NUM_BLOCKS(bblockp->bb_size);
+  given = blockn * BLOCK_SIZE;
   
   /* monitor current allocation level */
   alloc_current -= bblockp->bb_size;
-  alloc_cur_given -= blockn * BLOCK_SIZE;
+  alloc_cur_given -= given;
   
   /* setup free linked-list */
   bblockp->bb_next = free_bblock[bitn];
   free_bblock[bitn] = bblockp;
-  free_space_count += blockn * BLOCK_SIZE;
+  free_space_count += given;
   
   /*
    * TODO: here we should be checking above and below the free bblock
