@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: error_val.h,v 1.8 1993/09/10 21:11:46 gray Exp $
+ * $Id: error_val.h,v 1.9 1994/01/22 04:46:23 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -73,8 +73,8 @@
 #define ERROR_BAD_DBADMIN_SLOT		33	/* bad dblock slot info */
 
 /* administrative errors */
-#define ERROR_BAD_ADMINP		34	/* out of bounds */
-#define ERROR_BAD_ADMIN_LIST		35	/* out of bounds */
+#define ERROR_BAD_ADMINP		34	/* admin value out of bounds */
+#define ERROR_BAD_ADMIN_LIST		35	/* list pnt out of bounds */
 #define ERROR_BAD_ADMIN_MAGIC		36	/* bad magic numbers */
 #define ERROR_BAD_ADMIN_COUNT		37	/* bad count number */
 #define ERROR_BAD_BLOCK_ADMINP		38	/* bblock adminp bad */

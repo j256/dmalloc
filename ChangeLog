@@ -1,3 +1,7 @@
+Fri Jan 21 23:45:26 1994  Gray Watson  (gray@fridge.antaire.com)
+
+	* added missing checks for ADMIN_FREE in heap_check
+
 Wed Jan 19 20:43:05 1994  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added a new texinfo.tex macro file.
@@ -620,5 +624,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.87 1994/01/20 01:46:29 gray Exp $
+$Id: ChangeLog,v 1.88 1994/01/22 04:46:13 gray Exp $
 -------------------------------------------------------------------------------

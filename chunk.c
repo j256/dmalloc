@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.66 1994/01/20 01:46:41 gray Exp $";
+  "$Id: chunk.c,v 1.67 1994/01/22 04:46:18 gray Exp $";
 #endif
 
 /*
@@ -959,12 +959,12 @@ EXPORT	int	_chunk_heap_check(void)
     
     /* check for no-allocation */
     if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_ALLOCATED)) {
-      undef = 1;
+      undef++;
       continue;
     }
     
     /* we better not have seen a not-allocated block before */
-    if (undef == 1) {
+    if (undef > 0 && bblockp->bb_flags != BBLOCK_ADMIN_FREE) {
       malloc_errno = ERROR_BAD_BLOCK_ORDER;
       _malloc_error("_chunk_heap_check");
       return ERROR;
@@ -1305,6 +1305,23 @@ EXPORT	int	_chunk_heap_check(void)
 	    _malloc_error("_chunk_heap_check");
 	    return ERROR;
 	  }
+	break;
+	
+#if 0
+	/* externally used block */
+      case BBLOCK_EXTERNAL:
+	break;
+#endif
+	
+	/* pointer to first free slot */
+      case BBLOCK_ADMIN_FREE:
+	/* better be the last block and the count should match undef */
+	if (bblockp != this_admp->ba_blocks + (BB_PER_ADMIN - 1)
+	    || bblockp->bb_count != (BB_PER_ADMIN - 1) - undef) {
+	  malloc_errno = ERROR_BAD_ADMIN_COUNT;
+	  _malloc_error("_chunk_heap_check");
+	  return ERROR;
+	}
 	break;
 	
       default:
