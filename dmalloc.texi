@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.118 1997/01/18 00:10:38 gray Exp $
+@c $Id: dmalloc.texi,v 1.119 1997/03/21 14:31:53 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -714,6 +714,16 @@ licensed copy of the software.
 make and install the library (i.e. type: @kbd{make install}).
 @xref{Installation}.
 
+@cindex automatic shutdown
+
+@item You need to make sure that the dmalloc building process
+above was able to locate one of the the @code{on_exit} or @code{atexit}
+functions.  If so, then the dmalloc library should be able to
+automatically call @code{dmalloc_shutdown} when @code{exit} is called.
+This causes the memory statistics and unfreed information to be dumped
+to the log file.  However, if your system has neither, you will need to
+call @code{dmalloc_shutdown} yourself before your program exits.
+
 @item Add an alias for dmalloc to your shell's rc file. csh/tcsh users
 should add the following to their @file{.cshrc} file (notice the -C
 option for c-shell output):
@@ -722,11 +732,14 @@ option for c-shell output):
 alias dmalloc 'eval `\dmalloc -C \!*`'
 @end example
 
-zsh users should add the following to their @file{.zshrc} file (notice
-the -b option for bourne shell output):
+bash
+
+basb and zsh users should add the following to their @file{.bashrc} or
+@file{.zshrc} respectively file (notice the -b option for bourne shell
+output):
 
 @example
-dmalloc() @{ eval `command dmalloc -b $*` @}
+function dmalloc @{ eval `command dmalloc -b $*` @}
 @end example
 
 @item Although not necessary, you may want to include @file{dmalloc.h}
@@ -760,7 +773,8 @@ You may also want to install the @file{dmallocrc} file in your home
 directory as @file{.dmallocrc}.  This allows you to add your own
 combination of debug tokens.  @xref{RC File}.
 
-@item Run your program, examine the logfile, and voila!
+@item Run your program, examine the logfile that should have been created by
+dmalloc_shutdown, and ta-dah!
 
 @end enumerate
 
