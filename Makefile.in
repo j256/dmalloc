@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.159 2003/05/17 15:08:50 gray Exp $
+# $Id: Makefile.in,v 1.160 2003/05/19 18:15:46 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -156,10 +156,16 @@ settings.h : $(srcdir)/settings.dist config.status
 	$(SHELL) config.status
 	touch $@
 
-dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
+dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5
+	rm -f $@ $@.t malloc.h.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</d' $(srcdir)/malloc.h > malloc.h.t
+	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 > $@.t
+	mv $@.t $@
+	rm -f malloc.h.t
+
+dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
-	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > \
-		$@.t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
 	mv $@.t $@
 
 shlib : $(SHLIBRARY)

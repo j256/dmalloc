@@ -1,0 +1,65 @@
+/* NOTE: start of $Id: dmalloc.h.4,v 1.1 2003/05/19 18:15:46 gray Exp $ */
+
+/* dmalloc version defines */
+#define DMALLOC_VERSION_MAJOR	5	/* X.0.0-b0 */
+#define DMALLOC_VERSION_MINOR	0	/* 0.X.0-b0 */
+#define DMALLOC_VERSION_PATCH	0	/* 0.0.X-b0 */
+#define DMALLOC_VERSION_BETA	1	/* 0.0.0-bX */
+
+/* this defines what type the standard void memory-pointer is */
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS)
+#define DMALLOC_PNT		void *
+#define DMALLOC_FREE_RET	void
+#else
+#define DMALLOC_PNT		char *
+#define DMALLOC_FREE_RET	int
+#endif
+
+/*
+ * Malloc function return codes
+ */
+#define CALLOC_ERROR		0L		/* error from calloc */
+#define MALLOC_ERROR		0L		/* error from malloc */
+#define REALLOC_ERROR		0L		/* error from realloc */
+
+/* NOTE: this if for non- __STDC__ systems only */
+#define FREE_ERROR		0		/* error from free */
+#define FREE_NOERROR		1		/* no error from free */
+
+#define DMALLOC_ERROR		0		/* function failed */
+#define DMALLOC_NOERROR		1		/* function succeeded */
+
+#define DMALLOC_VERIFY_ERROR	0		/* function failed */
+#define DMALLOC_VERIFY_NOERROR	1		/* function succeeded */
+#define MALLOC_VERIFY_ERROR	DMALLOC_VERIFY_ERROR
+#define MALLOC_VERIFY_NOERROR	DMALLOC_VERIFY_NOERROR
+
+/*
+ * Dmalloc function IDs for the dmalloc_track_t callback function.
+ */
+#define DMALLOC_FUNC_MALLOC	10	/* malloc function called */
+#define DMALLOC_FUNC_CALLOC	11	/* calloc function called */
+#define DMALLOC_FUNC_REALLOC	12	/* realloc function called */
+#define DMALLOC_FUNC_RECALLOC	13	/* recalloc called */
+#define DMALLOC_FUNC_MEMALIGN	14	/* memalign function called */
+#define DMALLOC_FUNC_VALLOC	15	/* valloc function called */
+#define DMALLOC_FUNC_STRDUP	16	/* strdup function called */
+#define DMALLOC_FUNC_FREE	17	/* free function called */
+#define DMALLOC_FUNC_CFREE	18	/* cfree function called */
+
+#define DMALLOC_FUNC_NEW	20	/* new function called */
+#define DMALLOC_FUNC_NEW_ARRAY	21	/* new[] function called */
+#define DMALLOC_FUNC_DELETE	22	/* delete function called */
+#define DMALLOC_FUNC_DELETE_ARRAY 23	/* delete[] function called */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef void  (*dmalloc_track_t)(const char *file, const unsigned int line,
+				 const int func_id,
+				 const DMALLOC_SIZE byte_size,
+				 const DMALLOC_SIZE alignment,
+				 const DMALLOC_PNT old_addr,
+				 const DMALLOC_PNT new_addr);
+

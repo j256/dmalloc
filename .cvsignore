@@ -19,3 +19,5 @@ PERMISSIONS
 settings.h
 dmalloc_toc.html
 dmalloc.html
+dmalloc.h.3
+ChangeLog.1

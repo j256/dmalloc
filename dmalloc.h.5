@@ -1,0 +1,211 @@
+
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * alloc macros to provide for memory FILE/LINE debugging information.
+ */
+
+#ifndef DMALLOC_DISABLE
+
+#undef malloc
+#define malloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, size, DMALLOC_FUNC_MALLOC, 0, 0)
+#undef calloc
+#define calloc(count, size) \
+  dmalloc_malloc(__FILE__, __LINE__, count * size, DMALLOC_FUNC_CALLOC, 0, 0)
+#undef realloc
+#define realloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, ptr, size, DMALLOC_FUNC_REALLOC, 0)
+#undef recalloc
+#define recalloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, ptr, size, DMALLOC_FUNC_RECALLOC, 0)
+#undef memalign
+#define memalign(alignment, size) \
+  dmalloc_malloc(__FILE__, __LINE__, size, DMALLOC_FUNC_MEMALIGN, \
+		 alignment, 0 /* no xalloc */)
+#undef valloc
+#define valloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, size, DMALLOC_FUNC_VALLOC, \
+		0 /* special case */, 0 /* no xalloc */)
+#ifndef DMALLOC_STRDUP_MACRO
+#undef strdup
+#define strdup(str) \
+  dmalloc_strdup(__FILE__, __LINE__, str, 0)
+#endif
+#undef free
+#define free(ptr) \
+  dmalloc_free(__FILE__, __LINE__, ptr, DMALLOC_FUNC_FREE)
+
+#undef xmalloc
+#define xmalloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, size, DMALLOC_FUNC_MALLOC, 0, 1)
+#undef xcalloc
+#define xcalloc(count, size) \
+  dmalloc_malloc(__FILE__, __LINE__, count * size, DMALLOC_FUNC_CALLOC, 0, 1)
+#undef xrealloc
+#define xrealloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, ptr, size, DMALLOC_FUNC_REALLOC, 1)
+#undef xrecalloc
+#define xrecalloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, ptr, size, DMALLOC_FUNC_RECALLOC, 1)
+#undef xmemalign
+#define xmemalign(alignment, size) \
+  dmalloc_malloc(__FILE__, __LINE__, size, DMALLOC_FUNC_MEMALIGN, alignment, 1)
+#undef xvalloc
+#define xvalloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, size, DMALLOC_FUNC_VALLOC, 0, 1)
+#undef xstrdup
+#define xstrdup(str) \
+  dmalloc_strdup(__FILE__, __LINE__, str, 1)
+#undef xfree
+#define xfree(ptr) \
+  dmalloc_free(__FILE__, __LINE__, ptr, DMALLOC_FUNC_FREE)
+
+#ifdef DMALLOC_FUNC_CHECK
+
+/*
+ * do debugging on the following functions.  this may cause compilation or
+ * other problems depending on your architecture.
+ */
+#undef bcmp
+#define bcmp(b1, b2, len)		_dmalloc_bcmp(b1, b2, len)
+#undef bcopy
+#define bcopy(from, to, len)		_dmalloc_bcopy(from, to, len)
+
+#undef memcmp
+#define memcmp(b1, b2, len)		_dmalloc_memcmp(b1, b2, len)
+#undef memcpy
+#define memcpy(to, from, len)		_dmalloc_memcpy(to, from, len)
+#undef memset
+#define memset(buf, ch, len)		_dmalloc_memset(buf, ch, len)
+
+#undef index
+#define index(str, ch)			_dmalloc_index(str, ch)
+#undef rindex
+#define rindex(str, ch)			_dmalloc_rindex(str, ch)
+
+#undef strcat
+#define strcat(to, from)		_dmalloc_strcat(to, from)
+#undef strcmp
+#define strcmp(s1, s2)			_dmalloc_strcmp(s1, s2)
+#undef strlen
+#define strlen(str)			_dmalloc_strlen(str)
+#undef strtok
+#define strtok(str, sep)		_dmalloc_strtok(str, sep)
+
+#undef bzero
+#define bzero(buf, len)			_dmalloc_bzero(buf, len)
+
+#undef memccpy
+#define memccpy(s1, s2, ch, len)	_dmalloc_memccpy(s1, s2, ch, len)
+#undef memchr
+#define memchr(s1, ch, len)		_dmalloc_memchr(s1, ch, len)
+
+#undef strchr
+#define strchr(str, ch)			_dmalloc_strchr(str, ch)
+#undef strrchr
+#define strrchr(str, ch)		_dmalloc_strrchr(str, ch)
+
+#undef strcpy
+#define strcpy(to, from)		_dmalloc_strcpy(to, from)
+#undef strncpy
+#define strncpy(to, from, len)		_dmalloc_strncpy(to, from, len)
+#undef strcasecmp
+#define strcasecmp(s1, s2)		_dmalloc_strcasecmp(s1, s2)
+#undef strncasecmp
+#define strncasecmp(s1, s2, len)	_dmalloc_strncasecmp(s1, s2, len)
+#undef strspn
+#define strspn(str, list)		_dmalloc_strspn(str, list)
+#undef strcspn
+#define strcspn(str, list)		_dmalloc_strcspn(str, list)
+#undef strncat
+#define strncat(to, from, len)		_dmalloc_strncat(to, from, len)
+#undef strncmp
+#define strncmp(s1, s2, len)		_dmalloc_strncmp(s1, s2, len)
+#undef strpbrk
+#define strpbrk(str, list)		_dmalloc_strpbrk(str, list)
+#undef strstr
+#define strstr(str, pat)		_dmalloc_strstr(str, pat)
+
+#endif /* DMALLOC_FUNC_CHECK */
+#endif /* ! DMALLOC_DISABLE */
+
+/* we start FUNC_CHECK again because we had to stop it above */
+#ifdef DMALLOC_FUNC_CHECK
+
+/*
+ * feel free to add your favorite functions here and to arg_check.[ch]
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * copied in from arg_check.h with all comments removed
+ */
+extern
+int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
+extern
+void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len);
+extern
+int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
+extern
+void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len);
+extern
+void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len);
+extern
+char	*_dmalloc_index(const char *str, const char ch);
+extern
+char	*_dmalloc_rindex(const char *str, const char ch);
+extern
+char	*_dmalloc_strcat(char *to, const char *from);
+extern
+int	_dmalloc_strcmp(const char *s1, const char *s2);
+extern
+DMALLOC_SIZE	_dmalloc_strlen(const char *str);
+extern
+char	*_dmalloc_strtok(char *str, const char *sep);
+extern
+void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
+extern
+void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
+			  const DMALLOC_SIZE len);
+extern
+void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len);
+extern
+char	*_dmalloc_strchr(const char *str, const int ch);
+extern
+char	*_dmalloc_strrchr(const char *str, const int ch);
+extern
+char	*_dmalloc_strcpy(char *to, const char *from);
+extern
+char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len);
+extern
+int	_dmalloc_strcasecmp(const char *s1, const char *s2);
+extern
+int	_dmalloc_strncasecmp(const char *s1, const char *s2,
+			     const DMALLOC_SIZE len);
+extern
+int	_dmalloc_strspn(const char *str, const char *list);
+extern
+int	_dmalloc_strcspn(const char *str, const char *list);
+extern
+char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len);
+extern
+int	_dmalloc_strncmp(const char *s1, const char *s2,
+			 const DMALLOC_SIZE len);
+extern
+char	*_dmalloc_strpbrk(const char *str, const char *list);
+extern
+char	*_dmalloc_strstr(const char *str, const char *pat);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* DMALLOC_FUNC_CHECK */
+
+#endif /* ! __DMALLOC_H__ */
