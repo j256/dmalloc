@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.110 2004/01/14 16:17:58 gray Exp $
+ * $Id: dmalloc_t.c,v 1.111 2004/01/16 14:05:51 gray Exp $
  */
 
 /*
@@ -1120,7 +1120,7 @@ static	int	check_special(void)
       return 0;
     }
     
-    /* overwrite the high fence post */
+    /* save the character but then overwrite the high fence post */
     save_ch = *((char *)pnts[0] + BUF_SIZE);
     *((char *)pnts[0] + BUF_SIZE) = '\0';
     
@@ -1148,7 +1148,7 @@ static	int	check_special(void)
     
     for (iter_c = 0; iter_c < 2; iter_c++) {
       /*
-       * we have to do this hack here because we need to know the
+       * we have to do this loop hack here because we need to know the
        * __FILE__ and __LINE__ of a certain location to set the
        * variable so then we need to run it again.
        */
@@ -1166,10 +1166,9 @@ static	int	check_special(void)
 	return 0;
       }
       
+      /* first time through the loop? */
       if (iter_c == 0) {
-	/* first time through the loop */
-	
-	/* overwrite the high fence post */
+	/* save the character and then overwrite the high fence post */
 	save_ch = *((char *)pnts[0] + BUF_SIZE);
 	*((char *)pnts[0] + BUF_SIZE) = '\0';
 	
@@ -1180,26 +1179,27 @@ static	int	check_special(void)
 	(void)sprintf(setup, "debug=%#x,start=%s:%d",
 		      DEBUG_CHECK_FENCE, loc_file, loc_line);
 	dmalloc_debug_setup(setup);	
+	continue;
       }
-      else {
-	/*
-	 * now the 2nd time through the loop we should have seen an
-	 * error because the 2nd allocation should have checked the
-	 * heap and seen the problem with the 1st allocation
-	 */
-	if (dmalloc_errno != ERROR_OVER_FENCE) {
-	  if (! silent_b) {
-	    (void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
-	  }
-	  return 0;
+      
+      /*
+       * now the 2nd time through the loop we should have seen an
+       * error because heap checking should have been enabled at the
+       * 2nd allocation so the heap should have been checked and the
+       * problem with the 1st allocation detected.
+       */
+      if (dmalloc_errno != ERROR_OVER_FENCE) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
 	}
-	
-	/*
-	 * restore the overwritten character otherwise we can't free
-	 * the pointer
-	 */
-	*((char *)pnts[0] + BUF_SIZE) = save_ch;
+	return 0;
       }
+      
+      /*
+       * restore the overwritten character otherwise we can't free
+       * the pointer
+       */
+      *((char *)pnts[0] + BUF_SIZE) = save_ch;
     }
     
     free(pnts[0]);
@@ -1262,27 +1262,8 @@ static	int	check_special(void)
       return 0;
     }
     
-    /* restore the overwritten character otherwise we can't free the pointer */
-    *((char *)pnt + BUF_SIZE) = save_ch;
-    free(pnt);
+    /* free the 2nd pointer */
     free(pnt2);
-    
-    /*
-     * Make an allocation recording where we did it.
-     *
-     * NOTE: This all needs to be on the same line.
-     */
-    pnt = malloc(BUF_SIZE);
-    if (pnt == NULL) {
-      if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
-      }
-      return 0;
-    }
-    
-    /* overwrite the high fence post */
-    save_ch = *((char *)pnt + BUF_SIZE);
-    *((char *)pnt + BUF_SIZE) = '\0';
     
     /*
      * build and enable an options string turning on checking at the
@@ -1373,27 +1354,7 @@ static	int	check_special(void)
       return 0;
     }
     
-    /* restore the overwritten character otherwise we can't free the pointer */
-    *((char *)pnt + BUF_SIZE) = save_ch;
-    free(pnt);
     free(pnt2);
-    
-    /*
-     * Make an allocation recording where we did it.
-     *
-     * NOTE: This all needs to be on the same line.
-     */
-    pnt = malloc(BUF_SIZE);
-    if (pnt == NULL) {
-      if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
-      }
-      return 0;
-    }
-    
-    /* overwrite the high fence post */
-    save_ch = *((char *)pnt + BUF_SIZE);
-    *((char *)pnt + BUF_SIZE) = '\0';
     
     /*
      * build and enable an options string turning on checking at the
