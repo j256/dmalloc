@@ -1,3 +1,7 @@
+Mon Aug  8 22:43:44 1994  Gray Watson  (gray@mixer.antaire.com)
+
+	* Releasing version 2.2.0.
+
 Mon Aug  8 22:29:11 1994  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added no-special test option to malloc_t.
@@ -753,5 +757,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.108 1994/08/09 02:33:46 gray Exp $
+$Id: ChangeLog,v 1.109 1994/08/09 02:45:50 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.31 1994/08/09 02:33:54 gray Exp $
+$Id: NEWS,v 1.32 1994/08/09 02:45:53 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 2.1.1:
+Version 2.2.0:
 
 	* Fixed xmalloc,xrealloc,etc. override functions.
 	* Added xstrdup to the x override function list.
