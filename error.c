@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.c,v 1.77 1998/11/12 23:05:06 gray Exp $
+ * $Id: error.c,v 1.78 1999/03/02 17:42:21 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.77 1998/11/12 23:05:06 gray Exp $";
+#ident "$Id: error.c,v 1.78 1999/03/02 17:42:21 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.77 1998/11/12 23:05:06 gray Exp $";
+  "$Id: error.c,v 1.78 1999/03/02 17:42:21 gray Exp $";
 #endif
 #endif
 
@@ -101,6 +101,9 @@ unsigned int	_dmalloc_flags = 0;
 
 /* global iteration counter for activities */
 unsigned long	_dmalloc_iter_c = 0;
+
+/* how often to check the heap */
+unsigned long	_dmalloc_check_interval = INTERVAL_INIT;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
@@ -274,6 +277,9 @@ void	_dmalloc_message(const char *format, ...)
       _dmalloc_message("dmalloc_logfile '%s': flags = %#x, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags,
 		       (unsigned long)dmalloc_address);
+      _dmalloc_message("addr = %#lx, interval = %lu",
+		       (unsigned long)dmalloc_address,
+		       _dmalloc_check_interval);
 #if LOCK_THREADS
       _dmalloc_message("threads enabled, lock-init = %d", THREAD_INIT_LOCK);
 #endif

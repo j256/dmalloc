@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.h,v 1.37 1998/11/12 23:05:07 gray Exp $
+ * $Id: error.h,v 1.38 1999/03/02 17:42:21 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -62,6 +62,10 @@ unsigned int	_dmalloc_flags;
 /* global iteration counter for activities */
 extern
 unsigned long	_dmalloc_iter_c;
+
+/* how often to check the heap */
+extern
+unsigned long	_dmalloc_check_interval;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
