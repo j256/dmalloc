@@ -1,3 +1,8 @@
+2001-03-29  Gray Watson  <gray@outside.256.com>
+
+	* Fixed some additional problems with start-file, start-count, and
+	interval.
+
 2001-03-28  Gray Watson  <gray@outside.256.com>
 
 	* Added the 'How It Works' section to the manual.
@@ -1773,5 +1778,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.274 2001/03/29 01:35:16 gray Exp $
+$Id: ChangeLog,v 1.275 2001/03/29 18:11:46 gray Exp $
 -------------------------------------------------------------------------------

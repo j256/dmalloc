@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.153 2001/03/29 00:08:36 gray Exp $
+ * $Id: malloc.c,v 1.154 2001/03/29 18:11:41 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.153 2001/03/29 00:08:36 gray Exp $"
+#ident "$Id: malloc.c,v 1.154 2001/03/29 18:11:41 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.153 2001/03/29 00:08:36 gray Exp $";
+  "$Id: malloc.c,v 1.154 2001/03/29 18:11:41 gray Exp $";
 #endif
 #endif
 
@@ -323,11 +323,13 @@ static	int	dmalloc_startup(void)
     process_environ();
     
     /*
-     * Tune the environment here.  If we have a start-file or
-     * start_count set then clear the check-heap.
+     * Tune the environment here.  If we have a start-file,
+     * start-count, or interval enabled then make sure the check-heap
+     * flag is cleared.
      */ 
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-	&& (start_file != NULL || start_count > 0)) {
+    if (start_file != NULL
+	|| start_count > 0
+	|| _dmalloc_check_interval > 0) {
       BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
     }
     
@@ -560,6 +562,9 @@ static	int	dmalloc_in(const char *file, const int line,
   
   in_alloc_b = 1;
   
+  /* increment our interval */
+  _dmalloc_iter_c++;
+  
   /* check start file/line specifications */
   if ((! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
       && start_file != NULL
@@ -568,16 +573,22 @@ static	int	dmalloc_in(const char *file, const int line,
       && strcmp(start_file, file) == 0
       && (start_line == 0 || start_line == line)) {
     BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    /*
+     * we disable the start file so we won't check this again and the
+     * interval can go on/off
+     */
+    start_file = NULL;
   }
   
   /* start checking heap after X times */
-  if (start_count > 0 && --start_count == 0) {
-    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+  else if (start_count > 0) {
+    if (--start_count == 0) {
+      BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    }
   }
   
   /* checking heap every X times */
-  _dmalloc_iter_c++;
-  if (_dmalloc_check_interval > 0) {
+  else if (_dmalloc_check_interval > 0) {
     if (_dmalloc_iter_c % _dmalloc_check_interval == 0) {
       BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
     }
