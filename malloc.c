@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.118 1998/11/12 23:00:17 gray Exp $
+ * $Id: malloc.c,v 1.119 1998/12/11 05:03:49 gray Exp $
  */
 
 /*
@@ -81,10 +81,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.118 1998/11/12 23:00:17 gray Exp $";
+#ident "$Id: malloc.c,v 1.119 1998/12/11 05:03:49 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.118 1998/11/12 23:00:17 gray Exp $";
+  "$Id: malloc.c,v 1.119 1998/12/11 05:03:49 gray Exp $";
 #endif
 #endif
 
@@ -182,11 +182,6 @@ static	void	lock_thread(void)
 #if HAVE_PTHREAD_MUTEX_LOCK
     pthread_mutex_lock(&dmalloc_mutex);
 #endif
-  }
-  /* was thread-lock-on specified but not configured? */
-  if (thread_lock_on != LOCK_ON_INIT) {
-    dmalloc_errno = ERROR_LOCK_NOT_CONFIG;
-    _dmalloc_die(0);
   }
 }
 

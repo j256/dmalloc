@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.157 1998/11/16 22:21:25 gray Exp $
+@c $Id: dmalloc.texi,v 1.158 1998/12/11 05:03:47 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -105,6 +105,13 @@ texi, info, and ps).  Documentation is available online at URL
 @code{http://www.letters.com/dmalloc/}.
 
 The library is available via ftp from @samp{ftp.letters.com} in the
+@file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached via
+my web page @samp{http://www.letters.com/~gray/} with any questions or
+feedback.  Please include the version number of the library that you are
+using as well as your machine and operating system types.
+
+A new mailing list for the library has been created recently.  See the
+library is available via ftp from @samp{ftp.letters.com} in the
 @file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached via
 my web page @samp{http://www.letters.com/~gray/} with any questions or
 feedback.  Please include the version number of the library that you are
