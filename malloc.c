@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.59 1994/03/30 06:06:47 gray Exp $";
+  "$Id: malloc.c,v 1.60 1994/04/07 20:06:40 gray Exp $";
 #endif
 
 /*
@@ -380,6 +380,12 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return MALLOC_ERROR;
   
+  if (size < 0) {
+    malloc_errno = ERROR_BAD_SIZE;
+    _malloc_error("malloc");
+    return MALLOC_ERROR;
+  }
+  
   newp = _chunk_malloc(_malloc_file, _malloc_line, size);
   check_pnt(_malloc_file, _malloc_line, newp, "malloc");
   
@@ -402,26 +408,16 @@ EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
 #endif
 {
   void		*newp;
-  unsigned int	len = num_elements * size;
+  MALLOC_SIZE	len = num_elements * size;
   
   SET_RET_ADDR(_malloc_file, _malloc_line);
-  
-  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
-    return CALLOC_ERROR;
   
   /* needs to be done here */
   _calloc_count++;
   
-  /* alloc and watch for the die address */
-  newp = _chunk_malloc(_malloc_file, _malloc_line, len);
-  check_pnt(_malloc_file, _malloc_line, newp, "calloc");
-  
-  (void)memset(newp, NULLC, len);
-  
-  in_alloc = FALSE;
-  
-  _malloc_file = MALLOC_DEFAULT_FILE;
-  _malloc_line = MALLOC_DEFAULT_LINE;
+  newp = malloc(len);
+  if (newp != MALLOC_ERROR && len > 0)
+    (void)memset(newp, NULLC, len);
   
   return newp;
 }
@@ -444,6 +440,12 @@ EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
     return REALLOC_ERROR;
   
   check_pnt(_malloc_file, _malloc_line, old_pnt, "realloc-in");
+  
+  if (size < 0) {
+    malloc_errno = ERROR_BAD_SIZE;
+    _malloc_error("malloc");
+    return MALLOC_ERROR;
+  }
   
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL)
@@ -520,6 +522,8 @@ EXPORT	void	cfree(void * pnt)
 EXPORT	int	cfree(void * pnt)
 #endif
 {
+  SET_RET_ADDR(_malloc_file, _malloc_line);
+  
 #if defined(__STDC__) && __STDC__ == 1
   free(pnt);
 #else
