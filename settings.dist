@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.66 2004/07/11 05:45:36 gray Exp $
+ * $Id: settings.dist,v 1.67 2004/07/14 12:33:33 gray Exp $
  */
 
 /*
@@ -120,6 +120,9 @@
  * MIN_FILE_LENGTH 3 => file "[a-zA-Z].c"
  *
  * Set MAX_FILE_LENGTH or MAX_LINE_NUMBER to be 0 to disable checks.
+ *
+ * NOTE: if the max is changed then the dmalloc.texi file reference to
+ * it will need to be changed too.
  */
 #define MIN_FILE_LENGTH		    3
 #define MAX_FILE_LENGTH		  100

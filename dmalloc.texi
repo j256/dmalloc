@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.258 2004/07/11 14:45:47 gray Exp $
+@c $Id: dmalloc.texi,v 1.259 2004/07/14 12:33:32 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1641,7 +1641,7 @@ file.
 @item 25 (ERROR_BAD_LINE)
 A line-number was out-of-bounds in the dmalloc administrative sections.
 This could indicate some corruption of the internal tables.  It also
-could mean that you have a source file containing more than @code{10000}
+could mean that you have a source file containing more than @code{30000}
 lines of code.  See @code{MAX_LINE_NUMBER} in the @file{settings.dist}
 file.
 
