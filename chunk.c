@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.131 1999/02/16 02:33:57 gray Exp $
+ * $Id: chunk.c,v 1.132 1999/02/16 22:45:42 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.131 1999/02/16 02:33:57 gray Exp $";
+#ident "$Id: chunk.c,v 1.132 1999/02/16 22:45:42 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.131 1999/02/16 02:33:57 gray Exp $";
+  "$Id: chunk.c,v 1.132 1999/02/16 22:45:42 gray Exp $";
 #endif
 #endif
 
@@ -87,7 +87,7 @@ static	long		alloc_cur_given = 0;	/* current mem given */
 static	long		alloc_max_given = 0;	/* maximum mem given  */
 static	long		alloc_total = 0;	/* total allocation */
 static	unsigned long	alloc_one_max = 0;	/* maximum at once */
-static	int		free_space_count = 0;	/* count the free bytes */
+static	long		free_space_count = 0;	/* count the free bytes */
 
 /* pointer stats */
 static	long		alloc_cur_pnts = 0;	/* current pointers */
@@ -710,30 +710,27 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
   }
   
   /* is there anything on the user-free list(s)? */
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+  if (find_free_bblocks(many, &bblock_p) != NOERROR) {
+    return NULL;
+  }
+  
+  /* did we find anything? */
+  if (bblock_p != NULL) {
+    free_space_count -= many * BLOCK_SIZE;
     
-    if (find_free_bblocks(many, &bblock_p) != NOERROR) {
+    /* space should be free */
+    if (bblock_p->bb_flags != BBLOCK_FREE) {
+      dmalloc_errno = ERROR_BAD_FREE_MEM;
+      dmalloc_error("get_bblocks");
       return NULL;
     }
     
-    /* did we find anything? */
-    if (bblock_p != NULL) {
-      free_space_count -= many * BLOCK_SIZE;
-      
-      /* space should be free */
-      if (bblock_p->bb_flags != BBLOCK_FREE) {
-	dmalloc_errno = ERROR_BAD_FREE_MEM;
-	dmalloc_error("get_bblocks");
-	return NULL;
-      }
-      
-      adm_p = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblock_p);
-      if (mem_p != NULL) {
-	*mem_p = BLOCK_POINTER(adm_p->ba_pos_n +
-			       (bblock_p - adm_p->ba_blocks));
-      }
-      return bblock_p;
+    adm_p = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblock_p);
+    if (mem_p != NULL) {
+      *mem_p = BLOCK_POINTER(adm_p->ba_pos_n +
+			     (bblock_p - adm_p->ba_blocks));
     }
+    return bblock_p;
   }
   
   /*
@@ -1135,7 +1132,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
   /* is there anything on the dblock free list? */
   dblock_p = find_free_dblock(bit_n);
   
-  if (dblock_p != NULL && (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE))) {
+  if (dblock_p != NULL) {
     free_space_count -= 1 << bit_n;
     
     /* find pointer to memory chunk */
@@ -2651,7 +2648,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
 {
   unsigned int	bit_n, block_n, given;
   int		valloc_b = 0;
-  bblock_t	*bblock_p, *last, *next, *prev_p, *tmp;
+  bblock_t	*bblock_p, *prev_p, *next_p, *list_p, *this_p;
   dblock_t	*dblock_p;
   
   /* counts calls to free */
@@ -2685,7 +2682,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   pnt = USER_TO_CHUNK(pnt);
   
   /* find which block it is in */
-  bblock_p = find_bblock(pnt, &last, &next);
+  bblock_p = find_bblock(pnt, &prev_p, &next_p);
   if (bblock_p == NULL) {
     /* errno set in find_bblock */
     log_error_info(file, line, CHUNK_TO_USER(pnt), 0, NULL, "free", FALSE);
@@ -2747,15 +2744,18 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     /* monitor current allocation level */
     alloc_current -= dblock_p->db_size;
     alloc_cur_given -= 1 << bit_n;
+    free_space_count += 1 << bit_n;
     
-    /* rearrange info */
+    /* adjust the pointer info structure */
     dblock_p->db_bblock = bblock_p;
-    dblock_p->db_next = free_dblock[bit_n];
 #if FREED_POINTER_DELAY
     dblock_p->db_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
 #endif
-    free_dblock[bit_n] = dblock_p;
-    free_space_count += 1 << bit_n;
+    /* put pointer on the dblock free list if we are reusing memory */
+    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+      dblock_p->db_next = free_dblock[bit_n];
+      free_dblock[bit_n] = dblock_p;
+    }
     
     /* should we set free memory with BLANK_CHAR? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
@@ -2864,60 +2864,60 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
    * because we are encorporating in this newly freed block.
    */
   
-  if (last != NULL && BIT_IS_SET(last->bb_flags, BBLOCK_FREE)) {
+  if (prev_p != NULL && BIT_IS_SET(prev_p->bb_flags, BBLOCK_FREE)) {
     
-    /* find last in free list and remove it */
-    for (tmp = free_bblock[last->bb_bit_n], prev_p = NULL;
-	 tmp != NULL;
-	 prev_p = tmp, tmp = tmp->bb_next) {
-      if (tmp == last) {
+    /* find prev in free list and remove it */
+    for (this_p = free_bblock[prev_p->bb_bit_n], list_p = NULL;
+	 this_p != NULL;
+	 list_p = this_p, this_p = this_p->bb_next) {
+      if (this_p == prev_p) {
 	break;
       }
     }
     
     /* we better have found it */
-    if (tmp == NULL) {
+    if (this_p == NULL) {
       dmalloc_errno = ERROR_BAD_FREE_LIST;
       dmalloc_error("_chunk_free");
       return FREE_ERROR;
     }
     
-    if (prev_p == NULL) {
-      free_bblock[last->bb_bit_n] = last->bb_next;
+    if (list_p == NULL) {
+      free_bblock[prev_p->bb_bit_n] = prev_p->bb_next;
     }
     else {
-      prev_p->bb_next = last->bb_next;
+      list_p->bb_next = prev_p->bb_next;
     }
     
-    block_n += last->bb_block_n;
+    block_n += prev_p->bb_block_n;
     NUM_BITS(block_n * BLOCK_SIZE, bit_n);
-    bblock_p = last;
+    bblock_p = prev_p;
   }
-  if (next != NULL && BIT_IS_SET(next->bb_flags, BBLOCK_FREE)) {
-    /* find last in free list and remove it */
-    for (tmp = free_bblock[next->bb_bit_n], prev_p = NULL;
-	 tmp != NULL;
-	 prev_p = tmp, tmp = tmp->bb_next) {
-      if (tmp == next) {
+  if (next_p != NULL && BIT_IS_SET(next_p->bb_flags, BBLOCK_FREE)) {
+    /* find next in free list and remove it */
+    for (this_p = free_bblock[next_p->bb_bit_n], list_p = NULL;
+	 this_p != NULL;
+	 list_p = this_p, this_p = this_p->bb_next) {
+      if (this_p == next_p) {
 	break;
       }
     }
     
     /* we better have found it */
-    if (tmp == NULL) {
+    if (this_p == NULL) {
       dmalloc_errno = ERROR_BAD_FREE_LIST;
       dmalloc_error("_chunk_free");
       return FREE_ERROR;
     }
     
-    if (prev_p == NULL) {
-      free_bblock[next->bb_bit_n] = next->bb_next;
+    if (list_p == NULL) {
+      free_bblock[next_p->bb_bit_n] = next_p->bb_next;
     }
     else {
-      prev_p->bb_next = next->bb_next;
+      list_p->bb_next = next_p->bb_next;
     }
     
-    block_n += next->bb_block_n;
+    block_n += next_p->bb_block_n;
     NUM_BITS(block_n * BLOCK_SIZE, bit_n);
   }
   
