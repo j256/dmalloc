@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.38 1994/03/20 18:47:48 gray Exp $
+# $Id: Makefile.all.in,v 1.39 1994/03/20 19:49:05 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -59,7 +59,7 @@ realclean : clobber
 
 # .PHONY : distclean
 distclean : clobber
-	rm -f config.status Makefile conf.h const.h
+	rm -f config.status Makefile conf.h malloc_dbg.2
 #	rm -f configure
 
 # .PHONY : installincs
@@ -78,9 +78,12 @@ installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 install : installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 
-malloc_dbg.h : malloc_dbg.1 const.h malloc_dbg.2
+malloc_dbg.2 : configure
+	$(SHELL) configure
+
+malloc_dbg.h : malloc_dbg.1 malloc_dbg.2 malloc_dbg.3
 	rm -f $@ $@.t
-	cat malloc_dbg.1 const.h malloc_dbg.2 > $@.t
+	cat malloc_dbg.1 malloc_dbg.2 malloc_dbg.3 > $@.t
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS)
@@ -134,9 +137,6 @@ Makefile : Makefile.in config.status
 	$(SHELL) config.status
 
 conf.h : conf.h.in config.status
-	$(SHELL) config.status
-
-const.h : const.h.in config.status
 	$(SHELL) config.status
 
 config.status : configure

@@ -1,3 +1,7 @@
+Sun Mar 20 14:48:25 1994  Gray Watson  (gray@fridge.antaire.com)
+
+	* Added better mechanisms for const definition.
+
 Sun Mar 20 11:57:34 1994  Gray Watson  (gray at toaster.antaire.com)
 
 	* Renamed token 'log-perror' and 'print-perror' to '...-error'.
@@ -663,5 +667,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.97 1994/03/20 17:13:18 gray Exp $
+$Id: ChangeLog,v 1.98 1994/03/20 19:49:01 gray Exp $
 -------------------------------------------------------------------------------

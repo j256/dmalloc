@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.48 1994/03/20 18:47:51 gray Exp $
+# $Id: Makefile.in,v 1.49 1994/03/20 19:49:07 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -24,12 +24,11 @@ UTIL	= malloc_dbg
 
 MANFILE	= malloc.info
 
-PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
-	config.help \
+PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
 	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.c malloc_dbg.[12] malloc_loc.h malloc_lp.[ch] malloc_t.c \
+	malloc_dbg.c malloc_dbg.[13] malloc_loc.h malloc_lp.[ch] malloc_t.c \
 	return.h version.h \
 	argv.[ch] argv_loc.h \
 	malloc.texi malloc.info malloc.ps texinfo.tex \
@@ -38,12 +37,11 @@ PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
 MAXSIZE	= 85k
 # NOTE: the wc level should be below 90k due to shar overhead
-SHARFLS	= conf.h.in const.h.in Makefile.in configure configure.in \
-	config.help \
+SHARFLS	= conf.h.in Makefile.in configure configure.in config.help \
 	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.c malloc_dbg.[12] malloc_loc.h malloc_lp.[ch] malloc_t.c \
+	malloc_dbg.c malloc_dbg.[13] malloc_loc.h malloc_lp.[ch] malloc_t.c \
 	return.h version.h \
 	argv.[ch] argv_loc.h \
 	malloc.texi malloc.info \
@@ -61,7 +59,7 @@ clobber :
 
 .PHONY : distclean
 distclean : clobber
-	rm -f configure config.status Makefile conf.h const.h
+	rm -f configure config.status Makefile conf.h malloc_dbg.2
 	rm -rf port malloc.ps
 
 .PHONY : installincs
@@ -79,9 +77,12 @@ install : installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
 
 # put situation specific lines here
-malloc_dbg.h : malloc_dbg.1 const.h malloc_dbg.2
+malloc_dbg.2 : configure
+	$(SHELL) configure
+
+malloc_dbg.h : malloc_dbg.1 malloc_dbg.2 malloc_dbg.3
 	rm -f $@ $@.t
-	cat malloc_dbg.1 const.h malloc_dbg.2 > $@.t
+	cat malloc_dbg.1 malloc_dbg.2 malloc_dbg.3 > $@.t
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS)
@@ -174,14 +175,11 @@ Makefile : Makefile.in config.status
 conf.h : conf.h.in config.status
 	$(SHELL) config.status
 
-const.h : const.h.in config.status
-	$(SHELL) config.status
-
 config.status : configure
 	$(SHELL) config.status --recheck
 
 configure : configure.in
-	cd $(srcdir); autoconf
+	autoconf
 
 include /usr/antaire/Default.make
 include Makefile.dep

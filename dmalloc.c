@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.34 1994/01/20 01:47:09 gray Exp $";
+  "$Id: dmalloc.c,v 1.35 1994/03/20 19:49:16 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -474,7 +474,8 @@ EXPORT	int	main(int argc, char ** argv)
   char	buf[20];
   char	debug_set = FALSE;
   
-  argv_help_string = "Sets malloc_dbg library env variables.";
+  argv_help_string =
+    "Sets malloc_dbg library env variables.  Also try --usage.";
   argv_version_string = malloc_version;
   
   argv_process(args, argc, argv);
