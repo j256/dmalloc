@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.72 1994/04/07 21:15:50 gray Exp $";
+  "$Id: chunk.c,v 1.73 1994/04/08 17:52:15 gray Exp $";
 #endif
 
 /*
@@ -622,11 +622,21 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
     freec += BB_PER_ADMIN - 1;
   }
   
-  bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
-  bblockc = bblockp->bb_count;
-  
-  /* this block is the one we got */
+  /* get the block pointer to the one we got */
+  bblockc = (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_count;
   bblockp = freep->ba_blocks + bblockc;
+  
+  /*
+   * alloc the space if needed.
+   * NOTE: we do this here in case of failure
+   */
+  if (extend)
+    bblockp->bb_mem = NULL;
+  else {
+    bblockp->bb_mem = _heap_alloc(many * BLOCK_SIZE);
+    if (bblockp->bb_mem == HEAP_ALLOC_ERROR)
+      return NULL;
+  }
   
   /* adjust for the number of slots we want */
   freec -= many;
@@ -646,15 +656,6 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
    */
   if (freep != NULL && freec > 0)
     (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_count = BB_PER_ADMIN - freec;
-  
-  /* alloc the space if needed */
-  if (extend)
-    bblockp->bb_mem = NULL;
-  else {
-    bblockp->bb_mem = _heap_alloc(many * BLOCK_SIZE);
-    if (bblockp->bb_mem == HEAP_ALLOC_ERROR)
-      return NULL;
-  }
   
   return bblockp;
 }
@@ -701,9 +702,13 @@ LOCAL	bblock_t	*find_bblock(const void * pnt)
 }
 
 /*
- * get MANY of contiguous dblock administrative slots
+ * get MANY of contiguous dblock administrative slots and get the next
+ * basic-block for NEXTP.
+ *
+ * NOTE: the NEXTP is required in case the 2nd get_bblocks fails, we
+ * want it to fail here
  */
-LOCAL	dblock_t	*get_dblock_admin(const int many)
+LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
 {
   static int		free_slots = 0;
   static dblock_adm_t	*dblock_admp = NULL;
@@ -714,9 +719,15 @@ LOCAL	dblock_t	*get_dblock_admin(const int many)
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
     _malloc_message("need %d dblock admin slots", many);
   
-  /* do we have enough right now */
+  /* do we have enough right now? */
   if (free_slots >= many) {
     dblockp = dblock_admp->da_block + (DB_PER_ADMIN - free_slots);
+    
+    /* get a bblock from free list */
+    *nextp = get_bblocks(1, FALSE);
+    if (*nextp == NULL)
+      return NULL;
+    
     free_slots -= many;
     return dblockp;
   }
@@ -730,6 +741,7 @@ LOCAL	dblock_t	*get_dblock_admin(const int many)
   
   dblock_adm_count++;
   dblock_count++;
+  free_slots = DB_PER_ADMIN;
   
   dblock_admp = (dblock_adm_t *)bblockp->bb_mem;
   
@@ -751,7 +763,15 @@ LOCAL	dblock_t	*get_dblock_admin(const int many)
   
   dblock_admp->da_magic2 = CHUNK_MAGIC_TOP;
   
-  free_slots = DB_PER_ADMIN - many;
+  /*
+   * get a bblock from free list
+   * NOTE: this should be here in case it fails
+   */
+  *nextp = get_bblocks(1, FALSE);
+  if (*nextp == NULL)
+    return NULL;
+  
+  free_slots -= many;
   
   return dblock_admp->da_block;
 }
@@ -794,17 +814,12 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
     _malloc_message("need to create a dblock for %dx %d byte blocks",
 		    1 << (BASIC_BLOCK - bitn), 1 << bitn);
   
-  /* get some dblock admin slots */
-  dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn));
+  /* get some dblock admin slots and the bblock space */
+  dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn), &bblockp);
   if (dblockp == NULL)
     return NULL;
   
   dblock_count++;
-  
-  /* get a bblock from free list */
-  bblockp = get_bblocks(1, FALSE);
-  if (bblockp == NULL)
-    return NULL;
   
   pnt = bblockp->bb_mem;
   
