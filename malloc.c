@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.152 2001/02/22 01:15:33 gray Exp $
+ * $Id: malloc.c,v 1.153 2001/03/29 00:08:36 gray Exp $
  */
 
 /*
@@ -31,7 +31,7 @@
 # include <stdlib.h>				/* for atexit */
 #endif
 #if HAVE_STRING_H
-# include <string.h>				/* for strlen/strcpy */
+# include <string.h>				/* for strlen */
 #endif
 
 #include "conf.h"				/* up here for _INCLUDE */
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.152 2001/02/22 01:15:33 gray Exp $"
+#ident "$Id: malloc.c,v 1.153 2001/03/29 00:08:36 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.152 2001/02/22 01:15:33 gray Exp $";
+  "$Id: malloc.c,v 1.153 2001/03/29 00:08:36 gray Exp $";
 #endif
 #endif
 
@@ -321,6 +321,15 @@ static	int	dmalloc_startup(void)
     
     /* process the environmental variable(s) */
     process_environ();
+    
+    /*
+     * Tune the environment here.  If we have a start-file or
+     * start_count set then clear the check-heap.
+     */ 
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
+	&& (start_file != NULL || start_count > 0)) {
+      BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    }
     
     /* startup heap code */
     if (! _heap_startup()) {
@@ -900,7 +909,7 @@ char	*strdup(const char *str)
   buf = (char *)_loc_malloc(file, DMALLOC_DEFAULT_LINE, len,
 			    DMALLOC_FUNC_STRDUP, 0);
   if (buf != NULL) {
-    (void)strcpy(buf, str);
+    (void)memcpy(buf, str, len);
   }
   
   return buf;
