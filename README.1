@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.31 1993/11/23 07:41:03 gray Exp $
+$Id: README.1,v 1.32 1993/11/23 09:37:19 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -24,8 +24,14 @@ INSTALLATION:
 4) Typing 'make' should be enough to build libmalloc.a and
 	malloc_dbg program as well as the argv subdirectory.
 
-5) Typing 'make tests' should build the malloc_t test program
-	(more automated test facilities are needed!!)
+5) Typing 'make tests' should build the malloc_t test program.
+
+6) Typing 'make light' should run the malloc_t test program through
+	a set of light trials.  By default this will execute malloc_t
+	5 times -- each time will execute 10,000 malloc operations in
+	a very random manner.  Very anal folks can 'make heavy' to up
+	the ante.  Use 'malloc_t --usage-long' for the list of all
+	malloc_t options.
 
 See the 'Quick Start' section below or examine the malloc.info file to
 get up and running with the library.

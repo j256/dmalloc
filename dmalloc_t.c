@@ -31,7 +31,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.29 1993/11/23 09:04:05 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.30 1993/11/23 09:37:23 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -52,13 +52,16 @@ typedef struct pnt_info_st pnt_info_t;
 static	pnt_info_t	pointer_grid[MAX_POINTERS];
 
 /* argument variables */
-static	char		interactive = ARGV_FALSE;	/* interactive flag */
 static	int		default_itern = DEFAULT_ITERATIONS; /* # of iters */
+static	char		interactive = ARGV_FALSE;	/* interactive flag */
+static	char		silent = ARGV_FALSE;		/* silent flag */
 static	char		verbose = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
   { INTER_CHAR,	"interactive",		ARGV_BOOL,		&interactive,
       NULL,			"turn on interactive mode" },
+  { 's',	"silent",		ARGV_BOOL,		&silent,
+      NULL,			"do not display messages" },
   { 't',	"times",		ARGV_INT,		&default_itern,
       "number",			"number of iterations to run" },
   { 'v',	"verbose",		ARGV_BOOL,		&verbose,
@@ -135,6 +138,10 @@ static	int	do_random(const int itern)
   for (iterc = 0; iterc < itern;) {
     int		which;
     
+    if (malloc_errno != 0 && ! silent)
+      (void)printf("ERROR: error code %d on iteration #%d: %s\n",
+		   malloc_errno, iterc, malloc_strerror(malloc_errno));
+    
     which = (rand() % 20) / 10;
     
     /*
@@ -179,8 +186,9 @@ static	int	do_random(const int itern)
       }
       
       if (pntp->pi_pnt == NULL) {
-	(void)printf("allocation of %d returned error on iteration #%d\n",
-		     amount, iterc + 1);
+	if (! silent)
+	  (void)printf("allocation of %d returned error on iteration #%d\n",
+		       amount, iterc + 1);
 	iterc++;
 	continue;
       }
@@ -365,21 +373,26 @@ static	void	do_interactive(void)
 
 int	main(int argc, char ** argv)
 {
+  int	ret;
+  
   argv_process(arg_list, argc, argv);
+  
+  if (silent && (verbose || interactive))
+    silent = ARGV_FALSE;
   
   (void)srand(time(0) ^ 0xDEADBEEF);
   
   if (interactive)
     do_interactive();
   else {
-    (void)printf("Running %d tests (use -%c for interactive)...\n",
-		 default_itern, INTER_CHAR);
+    if (! silent)
+      (void)printf("Running %d tests (use -%c for interactive)...\n",
+		   default_itern, INTER_CHAR);
     (void)fflush(stdout);
     
-    if (do_random(default_itern))
-      (void)printf("Succeeded.\n");
-    else
-      (void)printf("Failed.\n");
+    ret = do_random(default_itern);
+    if (! silent)
+      (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   }
   
   /* you will need to uncomment this if you can't auto-shutdown */
@@ -390,9 +403,13 @@ int	main(int argc, char ** argv)
   
   argv_cleanup(arg_list);
   
-  (void)printf("final malloc_verify returned: %s\n",
-	       (malloc_verify(NULL) == MALLOC_VERIFY_NOERROR ? "success" :
-		"failure"));
+  ret = malloc_verify(NULL);
+  if (! silent)
+    (void)printf("Final malloc_verify returned: %s\n",
+		 (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
   
-  exit(0);
+  if (malloc_errno == 0)
+    exit(0);
+  else
+    exit(1);
 }

@@ -1,5 +1,9 @@
 Tue Nov 23 02:39:44 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Added light and heavy makefile targets for automatic testing.
+
+	* added -s flag to malloc_t and cleaned up the output.
+
 	* added realloc test code to malloc_t and immediately had to fix a
 	pretty nasty realloc bug with the new code.
 
@@ -570,5 +574,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.76 1993/11/23 09:03:33 gray Exp $
+$Id: ChangeLog,v 1.77 1993/11/23 09:37:06 gray Exp $
 -------------------------------------------------------------------------------

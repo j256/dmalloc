@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.38 1993/11/23 07:40:56 gray Exp $
+# $Id: Makefile.in,v 1.39 1993/11/23 09:37:14 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -131,6 +131,20 @@ $(TEST) : $(TEST).o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	rm -f $@
 	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
 	mv a.out $@
+
+.PHONY : light
+light : $(TEST)
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+
+.PHONY : heavy
+heavy : $(TEST) light
+	$(TEST) -s -t 100000
+	$(TEST) -s -t 100000
+	$(TEST) -s -t 100000
 
 malloc.ps : malloc.texi
 	@ answer 'Is it okay to remove the work directory? '
