@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.81 1995/06/28 23:51:27 gray Exp $
+# $Id: Makefile.in,v 1.82 1995/07/01 01:09:12 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -174,8 +174,11 @@ PERMISSIONS : dmalloc.info
 	rm -f $(.TARGET) $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
-	sed -e '1,/,  Node: Copying/d' -e '/,  Prev: Copying/,$$d' \
-		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
+	sed -e '1,/,  Node: Copying/d' \
+		-e '/,  Node: Overview/,$$d' \
+		-e '/^\* Menu/,/^File: dmalloc.info/d' \
+		-e '/^File: dmalloc.info/d' < \
+		dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	mv $(.TARGET).t $(.TARGET)

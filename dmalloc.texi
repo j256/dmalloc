@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.98 1995/06/28 23:58:03 gray Exp $
+@c $Id: dmalloc.texi,v 1.99 1995/07/01 01:09:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -36,13 +36,13 @@ notice identical to this one except for the removal of this paragraph
 @end ignore
 Permission is granted to copy and distribute modified versions of this
 manual under the conditions for verbatim copying, provided also that the
-section entitled ``Copying'' are included exactly as in the original,
+chapter entitled ``Copying'' are included exactly as in the original,
 and provided that the entire resulting derived work is distributed under
 the terms of a permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
-except that the section entitled ``Copying'' may be included in a
+except that the chapter entitled ``Copying'' may be included in a
 translation approved by the author instead of in the original English.
 @end ifinfo
 
@@ -63,13 +63,13 @@ preserved on all copies.
 
 Permission is granted to copy and distribute modified versions of this
 manual under the conditions for verbatim copying, provided also that the
-section entitled ``Copying'' are included exactly as in the original,
+chapter entitled ``Copying'' are included exactly as in the original,
 and provided that the entire resulting derived work is distributed under
 the terms of a permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
-except that the section entitled ``Copying'' may be included in a
+except that the chapter entitled ``Copying'' may be included in a
 translation approved by the author instead of in the original English.
 @end titlepage
 
@@ -136,39 +136,77 @@ without express or implied warranty.  The name of Gray Watson cannot be
 used in advertising or publicity pertaining to distribution of the
 document or software without specific, written prior permission.
 
-Permission to use, copy, modify, and distribute this software for any
-@emph{non-commercial} purpose without fee is hereby granted, provided
-that the above copyright notice, any documentation files associated with
-the software, and this permission section appear in all copies.
+Permission to distribute this software for any purpose without fee is
+hereby granted, provided that the above copyright notice, all
+documentation files associated with the software, and this permission
+chapter appear in all copies.
+
+Please see the following sections for usage permissions.
+
+@menu
+* Non-Commercial License::      Permissions for non-commercial entities.
+* Commercial License::          Permissions for commercial entities.
+* Printed Manuals::             Printed/bound manuals and source floppies.
+* Registration Information::    Permissions for commercial entities.
+@end menu
+
+@node Non-Commercial License, Commercial License, Copying, Copying
+@section Non-Commercial License
+
+@cindex non-commercial license
+
+Permission to use, copy, and modify this software for any
+@emph{non-commercial} purpose without fee is hereby granted.
+
+Although only commercial users are required to license the software,
+non-commercial user registration is greatly appreciated.
+@xref{Commercial License}.
+
+@node Commercial License, Printed Manuals, Non-Commercial License, Copying
+@section Commercial License
 
 @cindex commercial license
 
 In order to fund maintenance and continued development of this product,
-I have added the recommendation that commercial entities license the
-software for a nominal fee.  This also allows me to provide better
-support and updates on a more frequent basis.  Non-commercial user
-registration is greatly appreciated.
+I have added the requirement that commercial entities license the
+software for a nominal fee.  There is a thirty (30) day free evaluation
+period but if your organization uses the software after this time period
+expires, please consider purchasing a registered copy.  This allows me
+to provide better support as well as bug fixes and feature updates on a
+more frequent basis.  Non-commercial user registration is greatly
+appreciated.
 
-A licensed copy of the software is available for US$35.  Commercial
-entities should purchase one license per workstation, or one per dmalloc
-user, whichever is the smaller number.  This license cannot be
-distributed with the software.  For ``site'' license discounts or any
-other reasonable agreements, please contact me directly.  Licensees get
-a registered copy of the software as well as more attentive product
-support.
+A licensed copy of the software is available for US$35.  Entities should
+purchase one license per workstation, or one per dmalloc user, whichever
+is the smaller number.  Licensees get a registration file for the
+software, a letter documenting their registered status, as well as more
+attentive product support.  This license file cannot be distributed with
+the software.  For ``site'' license discounts or any other reasonable
+agreements, please contact me directly.
 
 It should be noted that a ``site'' can be defined as anything you'd
 like.  It can be a physical location (a room, building, etc.), an
 organizational grouping (a workgroup, department, etc.) or any other
-logical grouping (``the seventeen tech writers scattered about'', etc.).
+logical grouping (``the folks working on the widget project'', etc.).
 
-A copy of the software on a Unix tar floppy is available for US$10 and a
-printed and bound copy of the manual is available for US$15.
+@node Printed Manuals, Registration Information, Commercial License, Copying
+@section Printed Manuals
+
+@cindex printed manuals
+@cindex manuals, printed
+
+A printed and bound copy of the manual is available for US$15.  A copy
+of the software on a Unix tar floppy is available for US$15.
 International shipping costs outside of the US or Canada, please add
 US$5 for the extra postal charges.
 
+@node Registration Information,  , Printed Manuals, Copying
+@section Registration Information
+
+@cindex registration
+
 Please include the following registration information with your check
-made out to Gray Watson.  Money orders are also accepted.  Purchase
+made out to ``Gray Watson''.  Money orders are also accepted.  Purchase
 orders are as well, although amounts less than US$50 are discouraged.
 
 @itemize
@@ -837,7 +875,7 @@ well with gdb.  You can also use the manual methods below for gdb.
 0x10234d <_findbuf+132>: 0x7fffceb7
 
 (gdb) info line *(0x82cc)
-Line 1092 of "argv.c" starts at pc 0x7540 and ends at 0x7550.
+Line 1092 of argv.c starts at pc 0x7540 and ends at 0x7550.
 @end example
 
 In the above example, gdb was used to find that the two non-freed memory
