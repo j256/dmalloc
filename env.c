@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: env.c,v 1.11 1997/12/05 21:09:45 gray Exp $";
+  "$Id: env.c,v 1.12 1997/12/22 00:24:19 gray Exp $";
 #endif
 
 /* local variables */
@@ -139,15 +139,16 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  * string.
  */
 void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
-			     int *addr_count_p, long *debug_p, int *interval_p,
-			     int *lock_on_p, char **logpath_p, char **sfile_p,
+			     int *addr_count_p, unsigned int *debug_p,
+			     int *interval_p, int *lock_on_p,
+			     char **logpath_p, char **sfile_p,
 			     int *sline_p, int *scount_p)
 {
   const char	*env;
   char		*env_p, *this_p;
   char		buf[1024];
   int		len, done_b = 0;
-  long		flags = 0;
+  unsigned int	flags = 0;
   attr_t	*attr_p;
   
   if (addr_p != NULL) {
@@ -310,7 +311,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
 void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
 			     const int short_tokens_b,
 			     const unsigned long address,
-			     const int addr_count, const long debug,
+			     const int addr_count, const unsigned int debug,
 			     const int interval, const int lock_on,
 			     const char *logpath, const char *sfile,
 			     const int sline, const int scount)
