@@ -49,7 +49,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.112 1997/12/22 00:23:54 gray Exp $";
+  "$Id: chunk.c,v 1.113 1998/09/17 12:36:28 gray Exp $";
 #endif
 
 /*
@@ -392,7 +392,7 @@ static	void	log_error_info(const char *file, const unsigned int line,
   }
   
   /* dump the pointer information */
-  if (file == NULL) {
+  if (pnt == NULL) {
     _dmalloc_message("%s: %s: from '%s'",
 		     where, reason_str, _chunk_display_where(file, line));
   }
