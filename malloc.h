@@ -1,432 +1,205 @@
 /*
- * defines for the malloc-debug library
+ * Function prototypes for the malloc user level routines.
  *
- * Copyright 1992 by Gray Watson and the Antaire Corporation
+ * Copyright 1999 by Gray Watson
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Gray Watson makes no representations about the suitability of the
+ * software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
- * You should have received a copy of the GNU Library General Public
- * License along with this library (see COPYING-LIB); if not, write to the
- * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * The author may be contacted via http://www.dmalloc.com/
  *
- * The author of the program may be contacted at gray.watson@antaire.com
- *
- * $Id: malloc.h,v 1.24 1993/04/14 22:13:59 gray Exp $
+ * $Id: malloc.h,v 1.25 1999/10/13 22:46:42 gray Exp $
  */
 
 #ifndef __MALLOC_H__
 #define __MALLOC_H__
 
-/*
- * NOTE: some archetectures have malloc, realloc, etc. using size_t or
- * an unsigned long instead of the traditional unsigned int.
- */
-
-#if defined(SIZE_T) || defined(_SIZE_T) || defined(_SIZE_T_) \
-  || defined(__SIZE_T__)
-
-#define MALLOC_SIZE	size_t
-
-#else
-
-#define MALLOC_SIZE	unsigned int
-
-#endif
-
-/*
- * malloc function return codes
- */
-#define CALLOC_ERROR		0		/* error from calloc */
-#define MALLOC_ERROR		0		/* error from malloc */
-#define REALLOC_ERROR		0		/* error from realloc */
-
-/* NOTE: this if for non- __STDC__ systems only */
-#define FREE_ERROR		0		/* error from free */
-#define FREE_NOERROR		1		/* no error from free */
-
-#define MALLOC_VERIFY_ERROR	0		/* checks failed, error */
-#define MALLOC_VERIFY_NOERROR	1		/* checks passed, no error */
-
-/*
- * default values if _malloc_file and _malloc_line are not set
- */
-#define MALLOC_DEFAULT_FILE	"unknown"
-#define MALLOC_DEFAULT_LINE	0
-
-/*
- * global variable and procedure scoping for code readability
- */
-#undef	EXPORT
-#define	EXPORT
-
-#undef	IMPORT
-#define	IMPORT		extern
-
-#undef	LOCAL
-#define	LOCAL		static
-
-#if __GNUC__ < 2
-/*
- * prototype for memory copy.  needed for below macros.
- */
-IMPORT	char	*memcpy(char * to, char * from, int length);
-#endif
-
-/*
- * memory copy: copy SIZE bytes from pointer FROM to pointer TO
- */
-#undef MALLOC_MEM_COPY
-#define MALLOC_MEM_COPY(from, to, size)	(void)memcpy((char *)to, \
-						     (char *)from, size)
-
-/*
- * alloc macros to improve memory usage readibility...
- */
-#undef ALLOC
-#define ALLOC(type, count) \
-  (type *)malloc((MALLOC_SIZE)(sizeof(type) * (count)))
-
-#undef MALLOC
-#define MALLOC(size) \
-  (char *)malloc((MALLOC_SIZE)(size))
-
-/* NOTICE: the arguments are REVERSED from normal calloc() */
-#undef CALLOC
-#define CALLOC(type, count) \
-  (type *)calloc((unsigned int)(count), (MALLOC_SIZE)sizeof(type))
-
-#undef REALLOC
-#define REALLOC(ptr, type, count) \
-  (type *)realloc((char *)(ptr), (MALLOC_SIZE)(sizeof(type) * (count)))
-
-#undef REMALLOC
-#define REMALLOC(ptr, size) \
-  (char *)realloc((char *)(ptr), (MALLOC_SIZE)(size))
-
-#undef FREE
-#define FREE(ptr) \
-  free((char *)(ptr))
-
-/*
- * some small allocation macros
- */
-
-#ifdef __GNUC__
-
-/*
- * duplicate BUF of SIZE bytes
- */
-#undef BDUP
-#define BDUP(buf, size)	({ \
-			  char	*_ret; \
-			  int	_size = (size); \
-			   \
-			  _ret = MALLOC(_size); \
-			  if (_ret != NULL) \
-			    MALLOC_MEM_COPY((buf), _ret, _size); \
-			   \
-			  _ret; \
-			})
-
-/*
- * the strdup() function in macro form.  duplicate string STR
- */
-#undef STRDUP
-#define STRDUP(str)	({ \
-			  const char *_strp = (str); \
-			  char	*_ret; \
-			  int	_len; \
-			   \
-			  _len = strlen(_strp); \
-			  _ret = MALLOC(_len + 1); \
-			  if (_ret != NULL) \
-			    MALLOC_MEM_COPY(_strp, _ret, _len + 1); \
-			   \
-			  _ret; \
-			})
-
-#else /* ! __GNUC__ */
-
-/*
- * duplicate BUF of SIZE and return the new address in OUT
- */
-#undef BDUP
-#define BDUP(buf, size, out)	do { \
-				  char	*_ret; \
-				  int	_size = (size); \
-				   \
-				  _ret = MALLOC(_size); \
-				  if (_ret != NULL) \
-				    MALLOC_MEM_COPY((buf), _ret, _size); \
-				   \
-				  (out) = _ret; \
-				} while(0)
-
-/*
- * strdup() in macro form.  duplicate string STR and return a copy in OUT
- */
-#undef STRDUP
-#define STRDUP(str, out)	do { \
-				  const char *_strp = (str); \
-				  char	*_ret; \
-				  int	_len; \
-				   \
-				  _len = strlen(_strp); \
-				  _ret = MALLOC(_len + 1); \
-				  if (_ret != NULL) \
-				    MALLOC_MEM_COPY(_strp, _ret, _len + 1); \
-				   \
-				  (out) = _ret; \
-				} while(0)
-
-#endif /* ! __GNUC__ */
-
 /*<<<<<<<<<<  The below prototypes are auto-generated by fillproto */
-
-/* logfile for dumping malloc info, MALLOC_LOGFILE env. var overrides this */
-IMPORT	char		*malloc_logpath;
-
-/* internal malloc error number for reference purposes only */
-IMPORT	int		malloc_errno;
 
 /*
  * shutdown memory-allocation module, provide statistics if necessary
+ * NOTE: called by way of leap routine in dmalloc_lp.c
  */
-IMPORT	void	malloc_shutdown(void);
+extern
+void	_dmalloc_shutdown(void);
+
+#if FINI_DMALLOC
+/*
+ * Automatic OSF function to close dmalloc.  Pretty cool OS/compiler
+ * hack.  By default it is not necessary because we use atexit() and
+ * on_exit() to register the close functions.  These are more
+ * portable.
+ */
+extern
+void	__fini_dmalloc();
+#endif /* if FINI_DMALLOC */
 
 /*
- * allocate and return a SIZE block of bytes.  returns NULL on error.
+ * Allocate and return a SIZE block of bytes.  FUNC_ID contains the
+ * type of function.  If we are aligning our malloc then ALIGNMENT is
+ * greater than 0.  Returns 0L on error.
  */
-#if __STDC__
-IMPORT	void	*malloc(MALLOC_SIZE size);
-#else
-IMPORT	char	*malloc(MALLOC_SIZE size);
-#endif
+extern
+DMALLOC_PNT	_loc_malloc(const char *file, const int line,
+			    const DMALLOC_SIZE size, const int func_id,
+			    const DMALLOC_SIZE alignment);
 
 /*
- * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
- * of SIZE bytes and zero the block.  returns NULL on error.
+ * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
+ * either copying all of OLD_PNT to the new area or truncating.  If
+ * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
+ * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
+ * equivalent of free(OLD_PNT) and will return 0L.  If the RECALLOC_B
+ * flag is enabled, it will zero any new memory.  Returns 0L on error.
  */
-#if __STDC__
-IMPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size);
-#else
-IMPORT	char	*calloc(unsigned int num_elements, MALLOC_SIZE size);
-#endif
+extern
+DMALLOC_PNT	_loc_realloc(const char *file, const int line,
+			     DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
+			     const int func_id);
 
 /*
- * resizes OLD_PNT to SIZE bytes and return the new space after either copying
- * all of OLD_PNT to the new area or truncating.  returns NULL on error.
+ * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR.
  */
-#if __STDC__
-IMPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size);
-#else
-IMPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size);
-#endif
+extern
+int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt);
 
 /*
- * release PNT in the heap, returning FREE_[NO]ERROR or void
+ * no comments found for this procedure
  */
-#if __STDC__
-IMPORT	void	free(void * pnt);
-#else
-IMPORT	int	free(char * pnt);
-#endif
+extern
+DMALLOC_PNT	malloc(DMALLOC_SIZE size);
 
 /*
- * call through to _heap_map function, returns [NO]ERROR
+ * no comments found for this procedure
  */
-IMPORT	int	malloc_heap_map(void);
+extern
+DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size);
+
+/*
+ * no comments found for this procedure
+ */
+extern
+DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size);
+
+/*
+ * no comments found for this procedure
+ */
+extern
+DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size);
+
+/*
+ * no comments found for this procedure
+ */
+extern
+DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size);
+
+/*
+ * no comments found for this procedure
+ */
+extern
+DMALLOC_PNT	valloc(DMALLOC_SIZE size);
+
+#ifndef DMALLOC_STRDUP_MACRO
+/*
+ * no comments found for this procedure
+ */
+extern
+char	*strdup(const char *str);
+#endif /* ifndef DMALLOC_STRDUP_MACRO */
+
+/*
+ * no comments found for this procedure
+ */
+extern
+DMALLOC_FREE_RET	free(DMALLOC_PNT pnt);
+
+/*
+ * no comments found for this procedure
+ */
+extern
+DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt);
+
+/*
+ * log the heap structure plus information on the blocks if necessary.
+ * NOTE: called by way of leap routine in dmalloc_lp.c
+ */
+extern
+void	_dmalloc_log_heap_map(const char *file, const int line);
+
+/*
+ * dump dmalloc statistics to logfile
+ * NOTE: called by way of leap routine in dmalloc_lp.c
+ */
+extern
+void	_dmalloc_log_stats(const char *file, const int line);
+
+/*
+ * dump unfreed-memory info to logfile
+ * NOTE: called by way of leap routine in dmalloc_lp.c
+ */
+extern
+void	_dmalloc_log_unfreed(const char *file, const int line);
 
 /*
  * verify pointer PNT, if PNT is 0 then check the entire heap.
- * returns MALLOC_VERIFY_[NO]ERROR
+ * NOTE: called by way of leap routine in dmalloc_lp.c
+ * returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
  */
-#if __STDC__
-IMPORT	int	malloc_verify(void * pnt);
-#else
-IMPORT	int	malloc_verify(char * pnt);
-#endif
+extern
+int	_dmalloc_verify(const DMALLOC_PNT pnt);
 
 /*
- * set the global debug functionality flags to DEBUG (0 to disable).
- * returns [NO]ERROR
+ * set the global debug functionality FLAGS (0 to disable all
+ * debugging).  NOTE: after this module has started up, you cannot set
+ * certain flags such as fence-post or free-space checking.
  */
-IMPORT	int	malloc_debug(int debug);
+extern
+void	_dmalloc_debug(const int flags);
 
 /*
- * examine pointer PNT and returns SIZE, and FILE / LINE info on it
- * if any of the pointers are not NULL.
+ * returns the current debug functionality flags.  this allows you to
+ * save a dmalloc library state to be restored later.
+ */
+extern
+int	_dmalloc_debug_current(void);
+
+/*
+ * examine pointer PNT and returns SIZE, and FILE / LINE info on it,
+ * or return-address RET_ADDR if any of the pointers are not 0L.
+ * if FILE returns 0L then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-#if __STDC__
-IMPORT	int	malloc_examine(void * pnt, MALLOC_SIZE * size,
-			       char ** file, unsigned int * line);
-#else
-IMPORT	int	malloc_examine(char * pnt, MALLOC_SIZE * size,
-			       char ** file, unsigned int * line);
-#endif
+extern
+int	_dmalloc_examine(const char *file, const int line,
+			 const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
+			 char **file_p, unsigned int *line_p,
+			 DMALLOC_PNT *ret_attr_p);
 
 /*
- * malloc version of strerror to return the string version of ERRNUM
- * returns the string for MALLOC_BAD_ERRNO if ERRNUM is out-of-range.
+ * Register an allocation tracking function which will be called each
+ * time an allocation occurs.  Pass in NULL to disable.
  */
-IMPORT	char	*malloc_strerror(int errnum);
+extern
+void	_dmalloc_track(const dmalloc_track_t track_func);
+
+/*
+ * Dmalloc version of strerror to return the string version of
+ * ERROR_NUM.  Returns an invaid errno string if ERROR_NUM is
+ * out-of-range.
+ */
+extern
+const char	*_dmalloc_strerror(const int error_num);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
-
-/*
- * alloc macros to provide for memory FILE/LINE debugging information.
- */
-
-#ifndef MALLOC_DEBUG_DISABLE
-
-#undef malloc
-#define malloc(size) \
-  _malloc_leap(__FILE__, __LINE__, size)
-#undef calloc
-#define calloc(count, size) \
-  _calloc_leap(__FILE__, __LINE__, count, size)
-#undef realloc
-#define realloc(ptr, size) \
-  _realloc_leap(__FILE__, __LINE__, ptr, size)
-#undef free
-#define free(ptr) \
-  _free_leap(__FILE__, __LINE__, ptr)
-
-#ifdef MALLOC_FUNC_CHECK
-
-/*
- * do debugging on the following functions.  this may cause compilation or
- * other problems depending on your architecture.
- */
-#undef bcmp
-#define bcmp(b1, b2, len)		_malloc_bcmp(b1, b2, len)
-#undef bcopy
-#define bcopy(from, to, len)		_malloc_bcopy(from, to, len)
-
-#undef memcmp
-#define memcmp(b1, b2, len)		_malloc_memcmp(b1, b2, len)
-#undef memcpy
-#define memcpy(to, from, len)		_malloc_memcpy(to, from, len)
-#undef memset
-#define memset(buf, ch, len)		_malloc_memset(buf, ch, len)
-
-#undef index
-#define index(str, ch)			_malloc_index(str, ch)
-#undef rindex
-#define rindex(str, ch)			_malloc_rindex(str, ch)
-
-#undef strcat
-#define strcat(to, from)		_malloc_strcat(to, from)
-#undef strcmp
-#define strcmp(s1, s2)			_malloc_strcmp(s1, s2)
-#undef strlen
-#define strlen(str)			_malloc_strlen(str)
-#undef strtok
-#define strtok(str, sep)		_malloc_strtok(str, sep)
-
-#undef bzero
-#define bzero(buf, len)			_malloc_bzero(buf, len)
-
-#undef memccpy
-#define memccpy(s1, s2, ch, len)	_malloc_memccpy(s1, s2, ch, len)
-#undef memchr
-#define memchr(s1, ch, len)		_malloc_memchr(s1, ch, len)
-
-#undef strchr
-#define strchr(str, ch)			_malloc_strchr(str, ch)
-#undef strrchr
-#define strrchr(str, ch)		_malloc_strrchr(str, ch)
-
-#undef strcpy
-#define strcpy(to, from)		_malloc_strcpy(to, from)
-#undef strncpy
-#define strncpy(to, from, len)		_malloc_strncpy(to, from, len)
-#undef strcasecmp
-#define strcasecmp(s1, s2)		_malloc_strcasecmp(s1, s2)
-#undef strncasecmp
-#define strncasecmp(s1, s2, len)	_malloc_strncasecmp(s1, s2, len)
-#undef strspn
-#define strspn(str, list)		_malloc_strspn(str, list)
-#undef strcspn
-#define strcspn(str, list)		_malloc_strcspn(str, list)
-#undef strncat
-#define strncat(to, from, len)		_malloc_strncat(to, from, len)
-#undef strncmp
-#define strncmp(s1, s2, len)		_malloc_strncmp(s1, s2, len)
-#undef strpbrk
-#define strpbrk(str, list)		_malloc_strpbrk(str, list)
-#undef strstr
-#define strstr(str, pat)		_malloc_strstr(str, pat)
-
-/*
- * feel free to add your favorite functions here and to malloc_str.[ch]
- */
-
-#endif /* MALLOC_FUNC_CHECK */
-
-/*
- * copied directly from malloc_lp.h
- */
-
-/* to inform the malloc-debug library from which file the call comes from */
-IMPORT	char		*_malloc_file;
-
-/* to inform the library from which line-number the call comes from */
-IMPORT	unsigned int	_malloc_line;
-
-/*
- * leap routine to calloc
- */
-#if __STDC__
-IMPORT	void	*_calloc_leap(const char * file, const int line,
-			      unsigned int elen, MALLOC_SIZE size);
-#else
-IMPORT	char	*_calloc_leap(const char * file, const int line,
-			      unsigned int elen, MALLOC_SIZE size);
-#endif
-
-/*
- * leap routine to free
- */
-#if __STDC__
-IMPORT	void	_free_leap(const char * file, const int line, void * pnt);
-#else
-IMPORT	int	_free_leap(const char * file, const int line, char * pnt);
-#endif
-
-/*
- * leap routine to malloc
- */
-#if __STDC__
-IMPORT	void	*_malloc_leap(const char * file, const int line,
-			      MALLOC_SIZE size);
-#else
-IMPORT	char	*_malloc_leap(const char * file, const int line,
-			      MALLOC_SIZE size);
-#endif
-
-/*
- * leap routine to realloc
- */
-#if __STDC__
-IMPORT	void	*_realloc_leap(const char * file, const int line, void * oldp,
-			       MALLOC_SIZE new_size);
-#else
-IMPORT	char	*_realloc_leap(const char * file, const int line, char * oldp,
-			       MALLOC_SIZE new_size);
-#endif
-
-#endif /* ! MALLOC_DEBUG_DISABLE */
 
 #endif /* ! __MALLOC_H__ */
