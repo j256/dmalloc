@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your $HOME directory to
 # activate.  See malloc.info for more information.
 #
-# $Id: dmallocrc,v 1.23 1994/09/10 23:27:38 gray Exp $
+# $Id: dmallocrc,v 1.24 1994/10/14 01:28:38 gray Exp $
 #
 
 #
@@ -58,39 +58,27 @@
 # no debugging (for disabling memory checking)
 none		none
 
-# basic runtime without fence over-head
-production	log-stats, log-non-free, log-error, log-blocks, \
-		log-bad-space, log-unknown, \
-		catch-null
-
-# basic runtime
+# basic runtime tests
 runtime		log-stats, log-non-free, log-error, log-blocks, \
 		log-bad-space, log-unknown, \
 		check-fence, \
 		catch-null
 
-# basic tests
-1		log-stats, log-non-free, log-error, log-blocks, \
+# minimal checking
+low		log-stats, log-non-free, log-error, log-blocks, \
 		log-bad-space, log-unknown, \
 		check-fence, \
 		free-blank, error-abort, alloc-blank, catch-null
 
-# extensive checking
-2		log-stats, log-non-free, log-error, log-blocks, \
+# significant checking
+medium		log-stats, log-non-free, log-error, log-blocks, \
 		log-bad-space, log-unknown, \
 		check-fence, check-heap, check-lists, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
 		catch-null
 
-# ultra-extensive checking
-3		log-stats, log-non-free, log-error, log-blocks, \
-		log-bad-space, log-unknown, \
-		check-fence, check-heap, check-lists, check-free, \
-		realloc-copy, free-blank, error-abort, alloc-blank, \
-		catch-null
-
-# ultra-extensive checking + funcs
-4		log-stats, log-non-free, log-error, log-blocks, \
+# extensive checking
+high		log-stats, log-non-free, log-error, log-blocks, \
 		log-bad-space, log-unknown, \
 		check-fence, check-heap, check-lists, check-free, \
 		check-funcs, \
@@ -103,12 +91,6 @@ log		log-stats, log-non-free, log-error, log-trans, log-admin, \
 		check-fence, \
 		catch-null
 
-# log detailed map entries
-map		log-stats, log-non-free, log-error, log-blocks, \
-		log-bad-space, log-unknown, \
-		check-fence, check-heap, \
-		catch-null, heap-check-map
-
 # immediate logging of problems in a text-based programs
 text		log-error, log-bad-space, log-unknown, \
 		check-fence, \
@@ -120,12 +102,13 @@ verbose		log-stats, log-non-free, log-error, log-trans, log-admin, \
 		check-fence, \
 		catch-null, print-error
 
-# the kitchen-sink
+# the kitchen-sink - print-error so it doesn't fload your terminal
 all		log-stats, log-non-free, log-error, log-trans, log-stamp, \
 		log-admin, log-blocks, log-unknown, log-bad-space, \
 		check-fence, check-heap, check-lists, check-free, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
-		heap-check-map, print-error, catch-null, never-reuse
+		heap-check-map, catch-null, never-reuse
+# print-error is special
 
 # NOTE: for specific occasions: allow-nonlinear
