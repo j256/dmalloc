@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.189 2003/06/10 00:05:30 gray Exp $
+ * $Id: chunk.c,v 1.190 2003/06/10 18:44:46 gray Exp $
  */
 
 /*
@@ -2831,18 +2831,12 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
  */
 void	_dmalloc_chunk_log_stats(void)
 {
-  unsigned long	overhead, tot_space, wasted, ext_space;
+  unsigned long	overhead, tot_space, ext_space;
   
   dmalloc_message("Dumping Chunk Statistics:");
   
   tot_space = alloc_current + free_space_bytes;
   overhead = admin_block_c * BLOCK_SIZE;
-  if (alloc_max_given >= tot_space) {
-    wasted = 0;
-  }
-  else {
-    wasted = tot_space - alloc_max_given;
-  }
   
   /* version information */
   dmalloc_message("basic-block %d bytes, alignment %d bytes, heap grows %s",
@@ -2863,8 +2857,9 @@ void	_dmalloc_chunk_log_stats(void)
   dmalloc_message("external blocks: %ld blocks, %ld bytes (%ld%%)",
 		  extern_block_c, ext_space,
 		  (HEAP_SIZE == 0 ? 0 : ext_space / (HEAP_SIZE / 100)));
-  dmalloc_message("   total blocks: %ld blocks",
-		  user_block_c + admin_block_c + extern_block_c);
+  tot_space = (user_block_c + admin_block_c + extern_block_c) * BLOCK_SIZE;
+  dmalloc_message("   total blocks: %ld blocks, %ld bytes",
+		  user_block_c + admin_block_c + extern_block_c, tot_space);
   
   dmalloc_message("heap checked %ld", heap_check_c);
   
@@ -2885,14 +2880,11 @@ void	_dmalloc_chunk_log_stats(void)
 		  alloc_maximum, alloc_max_pnts);
   dmalloc_message("max alloced with 1 call: %lu bytes",
 		  alloc_one_max);
-  dmalloc_message("max alloc rounding loss: %lu bytes (%lu%%)",
+  dmalloc_message("max unused memory space: %lu bytes (%lu%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
 		   ((alloc_max_given - alloc_maximum) * 100) /
 		   alloc_max_given));
-  dmalloc_message("max memory space wasted: %lu bytes (%lu%%)",
-		  wasted,
-		  (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   
 #if MEMORY_TABLE_TOP_LOG
   dmalloc_message("top %d allocations:", MEMORY_TABLE_TOP_LOG);
