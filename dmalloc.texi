@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.120 1997/03/21 20:28:59 gray Exp $
+@c $Id: dmalloc.texi,v 1.121 1997/03/21 22:27:27 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -736,7 +736,7 @@ alias dmalloc 'eval `\dmalloc -C \!*`'
 
 bash
 
-basb and zsh users should add the following to their @file{.bashrc} or
+Bash and Zsh users should add the following to their @file{.bashrc} or
 @file{.zshrc} respectively file (notice the -b option for bourne shell
 output):
 
@@ -1799,11 +1799,11 @@ in their @file{.cshrc} file:
 alias dmalloc 'eval `\dmalloc -C \!*`'
 @end example
 
-Zsh users on the other hand should put the following in their
+Bash and Zsh users on the other hand should put the following in their
 @file{.zshrc} file:
 
 @example
-dmalloc() @{ eval `command dmalloc -b $*` @}
+function dmalloc @{ eval `command dmalloc -b $*` @}
 @end example
 
 This allows the user to execute the dmalloc command as @samp{dmalloc
