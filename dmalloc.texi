@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.115 1997/01/16 20:47:16 gray Exp $
+@c $Id: dmalloc.texi,v 1.116 1997/01/17 20:41:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -2094,13 +2094,14 @@ values and priorities.  <cpsr@@csli.stanford.edu>
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
 The author has been a proud and enthusiastic owner and user of the
-BSD/386 operating system for some time now.  For around $1k you get a
+BSD/OS operating system for some time now.  For around $1k you get a
 @emph{complete} BSD-flavor operating system with @emph{full source} for
-386 and 486 systems (binary licenses are available).  Along with the
+Intel class systems (binary licenses are available).  Along with the
 obvious benefits of full source code come excellent customer
 support/service and system features such as a MS-DOG runtime
-environment, complete tcp/ip networking facilities including nfs, full
-software development utilities, X, etc.  <bsdi-info@@bsdi.com>
+environment, SCO binary compatibility, complete tcp/ip networking
+facilities including nfs, full software development utilities, X, etc.
+<bsdi-info@@bsdi.com>
 @end table
 
 @node Index of Concepts, Full Node Listing, Plugs, Top
