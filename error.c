@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.12 1992/11/20 05:07:30 gray Exp $";
+  "$Id: error.c,v 1.13 1992/12/07 18:41:42 gray Exp $";
 #endif
 
 /*
@@ -83,7 +83,7 @@ EXPORT	void	_malloc_message(char * format, ...)
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR) && malloc_logpath != NULL) {
     /*
      * do we need to open the outfile?
-     * it will be closed by exit(0).  yeach.
+     * it will be closed by _exit().  yeach.
      */
     if (outfile < 0) {
       outfile = open(malloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
@@ -114,8 +114,10 @@ EXPORT	void	_malloc_die(void)
   if (BIT_IS_SET(_malloc_debug, DEBUG_ERROR_ABORT))
     (void)kill(getpid(), SIGABRT);
   
-  /* oh well, just die */
-  exit(1);
+  /*
+   * NOTE: this should not be exit() because fclose will free, etc
+   */
+  _exit(1);
 }
 
 /*
