@@ -29,6 +29,7 @@
  */
 
 #include "conf.h"				/* up here for _INCLUDE */
+#include "return.h"				/* up here for asm includes */
 
 /* for timeval type -- see conf.h */
 #if STORE_TIMEVAL
@@ -51,11 +52,10 @@
 #include "heap.h"
 #include "dmalloc_loc.h"
 #include "dmalloc_lp.h"
-#include "return.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.80 1995/06/21 18:20:08 gray Exp $";
+  "$Id: malloc.c,v 1.81 1995/07/04 02:05:41 gray Exp $";
 #endif
 
 /*
