@@ -1,3 +1,8 @@
+2003-11-23  Gray Watson  <gray@outside.256.com>
+
+	* Added dmalloc_count_changed function plus tests.  Thanks to
+	Brian O'Kelley.
+
 2003-11-20  Gray Watson  <gray@outside.256.com>
 
 	* Added some more error code documentation.
@@ -2115,5 +2120,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.313 2003/11/20 17:04:00 gray Exp $
+$Id: ChangeLog,v 1.314 2003/11/23 18:54:15 gray Exp $
 -------------------------------------------------------------------------------

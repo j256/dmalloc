@@ -602,6 +602,32 @@ extern
 unsigned int	dmalloc_page_size(void);
 
 /*
+ * unsigned long dmalloc_count_changed
+ *
+ * DESCRIPTION:
+ *
+ * Count the changed memory bytes since a particular mark.
+ *
+ * RETURNS:
+ *
+ * Number of bytes since mark.
+ *
+ * ARGUMENTS:
+ *
+ * mark -> Sets the point from which to count the changed memory.  You
+ * can use dmalloc_mark to get the current mark value which can later
+ * be passed in here.  Pass in 0 to report on the unfreed memory since
+ * the program started.
+ *
+ * not_freed_b -> Set to 1 to count the new pointers that are non-freed.
+ *
+ * free_b -> Set to 1 to count the new pointers that are freed.
+ */
+extern
+unsigned long	dmalloc_count_changed(const unsigned long mark,
+				      const int not_freed_b, const int free_b);
+
+/*
  * void dmalloc_log_status
  *
  * DESCRIPTION:

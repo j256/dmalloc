@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.247 2003/11/20 18:25:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.248 2003/11/23 18:54:16 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1310,6 +1310,33 @@ This should be the same value as the one returned by the
 
 @c --------------------------------
 
+@cindex count changed
+@cindex count number of bytes changed since mark
+@cindex number bytes changed since mark
+
+@deftypefun
+unsigned unsigned long dmalloc_count_changed ( const unsigned long @var{mark},
+const int @var{not_freed_b}, const int @var{free_b} )
+
+Count the pointers that have changed since the mark which was returned by
+@code{dmalloc_mark}.  If @code{not_freed_b} is set to non-0 then count the
+pointers that have not been freed.  If @code{free_b} is set to non-0
+then count the pointers that have been freed.
+
+This can be used in conjunction with the @code{dmalloc_mark()} function
+to help servers which never exit encure that transactions or events are
+not leaking memory.
+
+@example
+unsigned long mark = dmalloc_mark() ;
+...
+assert(dmalloc_count_changed(mark, 1, 0) == 0) ;
+@end example
+
+@end deftypefun
+
+@c --------------------------------
+
 @cindex dmalloc_log_stats function
 @cindex log statistics
 @cindex statistics logging
@@ -1329,8 +1356,8 @@ This routine outputs the current dmalloc statistics to the log file.
 @deftypefun
 void dmalloc_log_unfreed( void )
 
-This function dumps the unfreed-memory information to the log file.
-This is also useful to dump the currently allocated points to the log
+This function logs the unfreed-memory information to the log file.
+This is also useful to log the currently allocated points to the log
 file to be compared against another dump later on.
 
 @end deftypefun
@@ -1346,12 +1373,12 @@ file to be compared against another dump later on.
 void dmalloc_log_changed ( const unsigned long @var{mark}, const int
 @var{not_freed_b}, const int @var{freed_b}, const int @var{details_b} )
 
-Dump the pointers that have changed since the mark which was returned by
+Log the pointers that have changed since the mark which was returned by
 @code{dmalloc_mark}.  If @code{not_freed_b} is set to non-0 then log the
 pointers that have not been freed.  If @code{free_b} is set to non-0
 then log the pointers that have been freed.  If @code{details_b} set to
-non-0 then dump the individual pointers that have changed otherwise just
-dump the summaries.
+non-0 then log the individual pointers that have changed otherwise just
+log the summaries.
 
 This can be used in conjunction with the @code{dmalloc_mark()} function
 to help servers which never exit find transactions or events which are

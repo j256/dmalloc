@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.68 2003/09/08 19:27:19 gray Exp $
+ * $Id: chunk.h,v 1.69 2003/11/23 18:54:15 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -293,8 +293,7 @@ void	_dmalloc_chunk_log_stats(void);
  *
  * DESCRIPTION:
  *
- * Dump the pointer information that has changed since a pointer in
- * time.
+ * Log the pointers that has changed since a pointer in time.
  *
  * RETURNS:
  *
@@ -317,6 +316,32 @@ extern
 void	_dmalloc_chunk_log_changed(const unsigned long mark,
 				   const int log_not_freed_b,
 				   const int log_freed_b, const int details_b);
+
+/*
+ * unsigned long _dmalloc_chunk_count_changed
+ *
+ * DESCRIPTION:
+ *
+ * Return the pointers that has changed since a pointer in time.
+ *
+ * RETURNS:
+ *
+ * Number of bytes changed since mark.
+ *
+ * ARGUMENTS:
+ *
+ * mark -> Dmalloc counter used to mark a specific time so that
+ * servers can check on the changed pointers.
+ *
+ * count_non_free_b -> If set to 1 then count the new not-freed
+ * (i.e. used) pointers.
+ *
+ * count_free_b -> If set to 1 then count the new freed pointers.
+ */
+extern
+unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
+					     const int count_not_freed_b,
+					     const int count_freed_b);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

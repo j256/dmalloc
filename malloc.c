@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.175 2003/09/29 22:58:27 gray Exp $
+ * $Id: malloc.c,v 1.176 2003/11/23 18:54:16 gray Exp $
  */
 
 /*
@@ -1602,6 +1602,48 @@ unsigned int	dmalloc_page_size(void)
   }
   
   return BLOCK_SIZE;
+}
+
+/*
+ * unsigned long dmalloc_count_changed
+ *
+ * DESCRIPTION:
+ *
+ * Count the changed memory bytes since a particular mark.
+ *
+ * RETURNS:
+ *
+ * Number of bytes since mark.
+ *
+ * ARGUMENTS:
+ *
+ * mark -> Sets the point from which to count the changed memory.  You
+ * can use dmalloc_mark to get the current mark value which can later
+ * be passed in here.  Pass in 0 to report on the unfreed memory since
+ * the program started.
+ *
+ * not_freed_b -> Set to 1 to count the new pointers that are non-freed.
+ *
+ * free_b -> Set to 1 to count the new pointers that are freed.
+ */
+unsigned long	dmalloc_count_changed(const unsigned long mark,
+				      const int not_freed_b, const int free_b)
+{
+  unsigned long	mem_count;
+  
+  if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
+    return 0;
+  }
+  
+  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
+    dmalloc_message("counting the unfreed memory since mark %lu", mark);
+  }
+  
+  mem_count = _dmalloc_chunk_count_changed(mark, not_freed_b, free_b);
+  
+  dmalloc_out();
+  
+  return mem_count;
 }
 
 /*

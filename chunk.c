@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.198 2003/11/20 17:04:00 gray Exp $
+ * $Id: chunk.c,v 1.199 2003/11/23 18:54:15 gray Exp $
  */
 
 /*
@@ -2906,8 +2906,7 @@ void	_dmalloc_chunk_log_stats(void)
  *
  * DESCRIPTION:
  *
- * Dump the pointer information that has changed since a pointer in
- * time.
+ * Log the pointers that has changed since a pointer in time.
  *
  * RETURNS:
  *
@@ -3067,4 +3066,88 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 		      unknown_size_c);
     }
   }
+}
+
+/*
+ * unsigned long _dmalloc_chunk_count_changed
+ *
+ * DESCRIPTION:
+ *
+ * Return the pointers that has changed since a pointer in time.
+ *
+ * RETURNS:
+ *
+ * Number of bytes changed since mark.
+ *
+ * ARGUMENTS:
+ *
+ * mark -> Dmalloc counter used to mark a specific time so that
+ * servers can check on the changed pointers.
+ *
+ * count_non_free_b -> If set to 1 then count the new not-freed
+ * (i.e. used) pointers.
+ *
+ * count_free_b -> If set to 1 then count the new freed pointers.
+ */
+unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
+					     const int count_not_freed_b,
+					     const int count_freed_b)
+{
+  skip_alloc_t	*slot_p;
+  int		freed_b, used_b;
+  int		checking_list_c = 0;
+  unsigned int	mem_count = 0;
+  
+  /* run through the blocks */
+  for (slot_p = skip_address_list->sa_next_p[0];
+       ;
+       slot_p = slot_p->sa_next_p[0]) {
+    
+    /*
+     * switch to the free list in the middle after we've checked the
+     * used pointer slots
+     */
+    if (slot_p == NULL) {
+      checking_list_c++;
+      if (checking_list_c == 1) {
+	slot_p = skip_free_list->sa_next_p[0];
+      }
+#if FREED_POINTER_DELAY
+      else if (checking_list_c == 2) {
+	slot_p = free_wait_list_head;
+      }
+#endif
+      else {
+	/* we are done */
+	break;
+      }
+      if (slot_p == NULL) {
+	break;
+      }
+    }
+    
+    freed_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FREE);
+    used_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_USER);
+    
+    /*
+     * check for different types
+     */
+    if (! (freed_b || used_b)) {
+      continue;
+    }
+    /* is it too long ago? */
+    if (slot_p->sa_use_iter <= mark) {
+      continue;
+    }
+    
+    /* count the memory */
+    if (count_not_freed_b && used_b) {
+      mem_count += slot_p->sa_user_size;
+    }
+    else if (count_freed_b && freed_b) {
+      mem_count += slot_p->sa_user_size;
+    }
+  }
+  
+  return mem_count;
 }

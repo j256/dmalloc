@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.108 2003/11/18 15:20:39 gray Exp $
+ * $Id: dmalloc_t.c,v 1.109 2003/11/23 18:54:16 gray Exp $
  */
 
 /*
@@ -1582,6 +1582,79 @@ static	int	check_special(void)
     /* recover the errno if necessary */
     if (dmalloc_errno == ERROR_NONE) {
       dmalloc_errno = our_errno_hold;
+    }
+  }
+  
+  /********************/
+  
+  /*
+   * Verify the dmalloc_count_changed function.
+   */
+  {
+    unsigned long	size, mem_count, loc_mark;
+    
+    if (! silent_b) {
+      (void)printf("  Checking dmalloc_count_changed function\n");
+    }
+    
+    /* get a mark */
+    loc_mark = dmalloc_mark();
+    
+    /* make sure that nothing has changed */
+    mem_count = dmalloc_count_changed(loc_mark, 1 /* not-freed */,
+				      1 /* freed */);
+    if (mem_count != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: count-changed reported %lu bytes changed.\n",
+		     mem_count);
+      }
+      return 0;
+    }
+    
+    /* allocate a pointer */
+    size = _dmalloc_rand() % MAX_ALLOC + 10;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* make sure that we see the non-freed pointer */
+    mem_count = dmalloc_count_changed(loc_mark, 1 /* not-freed */,
+				      0 /* no freed */);
+    if (mem_count != size) {
+      if (! silent_b) {
+	(void)printf("   ERROR: count-changed reported %lu bytes changed not %lu.\n",
+		     mem_count, size);
+      }
+      return 0;
+    }
+    
+    /* now free it */
+    free(pnt);
+    
+    /* make sure that everything is freed */
+    mem_count = dmalloc_count_changed(loc_mark, 1 /* not-freed */,
+				      0 /* no freed */);
+    if (mem_count != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: count-changed reported %lu bytes changed.\n",
+		     mem_count);
+      }
+      return 0;
+    }
+    
+    /* make sure that we see the freed pointer */
+    mem_count = dmalloc_count_changed(loc_mark, 0 /* no not-freed */,
+				      1 /* no freed */);
+    if (mem_count != size) {
+      if (! silent_b) {
+	(void)printf("   ERROR: count-changed report %lu bytes changed not %lu.\n",
+		     mem_count, size);
+      }
+      return 0;
     }
   }
   
