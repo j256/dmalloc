@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.155 2003/05/13 18:16:47 gray Exp $
+# $Id: Makefile.in,v 1.156 2003/05/15 02:43:27 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -247,7 +247,8 @@ compile_test :: settings.h
 			> settings.h.t ;\
 		mv settings.h.t settings.h ;\
 		rm -f $(TEST) ;\
-		make $(TEST)  ;\
+		echo "Making $(TEST)" ;\
+		make $(TEST) > /dev/null ;\
 		make light ;\
 	done
 	rm -f settings.h.t
