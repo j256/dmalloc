@@ -15,14 +15,16 @@
 
 #define HEAP_MAIN
 
+#if defined(ANTAIRE)
 #include "useful.h"
+#endif
 
 #include "chunk.h"
-#include "debug.h"
+#include "error.h"
 #include "heap.h"
-#include "malloc_err.h"
+#include "malloc_errno.h"
 
-RCS_ID("$Id: heap.c,v 1.6 1992/10/14 09:29:53 gray Exp $");
+RCS_ID("$Id: heap.c,v 1.7 1992/10/21 07:34:13 gray Exp $");
 
 /*
  * system functions

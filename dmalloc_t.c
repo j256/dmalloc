@@ -6,18 +6,14 @@
 
 #define MALLOC_TEST_MAIN
 
-#include "useful.h"
-#include "alloc.h"
-
 #if defined(ANTAIRE)
-#include "assert.h"
-#include "logger.h"
-#include "ourstring.h"
-#include "random.h"
+#include "useful.h"
 #include "terminate.h"
 #endif
 
-RCS_ID("$Id: dmalloc_t.c,v 1.6 1992/10/14 09:30:04 gray Exp $");
+#include "malloc.h"
+
+RCS_ID("$Id: dmalloc_t.c,v 1.7 1992/10/21 07:34:30 gray Exp $");
 
 /*
  * hexadecimal STR to integer translation
@@ -73,10 +69,7 @@ EXPORT	int	main(int argc, char ** argv)
   
   argc--, argv++;
   
-#if defined(ANTAIRE)
-  /* logger needs to be started for map */
-  LOGGER(LOGGER_INFO, "here we go.");
-#endif
+  (void)srand(time(0) ^ 0xdeadbeef);
   
   (void)printf("------------------------------------------------------\n");
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
@@ -96,9 +89,6 @@ EXPORT	int	main(int argc, char ** argv)
       (void)printf("free      - deallocate memory\n");
       (void)printf("realloc   - reallocate memory\n\n");
       
-#if defined(ANTAIRE)
-      (void)printf("assert    - assert fail for diagnostic purposed\n");
-#endif
       (void)printf("map       - map the heap to the logfile\n");
       (void)printf("overwrite - overwrite some memory to test errors\n");
       (void)printf("random    - randomly to a number of malloc/frees\n");
@@ -139,15 +129,6 @@ EXPORT	int	main(int argc, char ** argv)
       continue;
     }
     
-#if defined(ANTAIRE)
-    if (strcmp(line, "assert") == 0) {
-      ASSERT(malloc_verify(NULL) == MALLOC_VERIFY_NOERROR,
-	      "malloc_verify(NULL) failed");
-      ASSERT(FALSE);
-      continue;
-    }
-#endif
-    
     if (strcmp(line, "map") == 0) {
       (void)malloc_heap_map();
       continue;
@@ -157,14 +138,14 @@ EXPORT	int	main(int argc, char ** argv)
       pnt = get_address();
       
       magic = 0x12345678;
-      bcopy(&magic, (char *)pnt, sizeof(magic));
+      MEMORY_COPY(&magic, (char *)pnt, sizeof(magic));
       continue;
     }
     
     /* do random heap hits */
     if (strcmp(line, "random") == 0) {
       for (count = 1; count < 1000; count += 10)
-	(void)FREE(MALLOC(random() % (count * 10) + 1));
+	(void)FREE(MALLOC(rand() % (count * 10) + 1));
       continue;
     }
     
@@ -192,7 +173,6 @@ EXPORT	int	main(int argc, char ** argv)
   
 #if defined(ANTAIRE)
   terminate(0);
-#else
-  (void)exit(0);
 #endif
+  exit(0);
 }

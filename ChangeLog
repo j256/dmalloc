@@ -1,3 +1,25 @@
+Wed Oct 21 03:27:35 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Major changes.  I sort of went overboard tonight.  I integrated
+	the new malloc_debug program which sets all the debug variables
+	for you.  I also added a .mallocrc which you can define with tags
+	exactly the functionality you want to happen.  No more levels!!
+
+	* Did some renaming of files, cleaned up some other things,
+	had to rework a number of items to get new debug flags working.
+
+Tue Oct 20 18:06:36 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Removed useful.h requirements and integrated necessary
+	definitions into malloc.h.
+
+	* Transfered malloc.txt documentation into malloc.texinfo.  Boy
+	is it nifty!!  And damn easy!!!
+
+	* Major changes to improve general machine independance.  Added
+	malloc_mach.h.  Moved alloc.[ch] to malloc.[ch] for sanity
+	reasons.
+
 Tue Oct 13 16:14:17 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Made various cosmetic changes.  Fixed realloc inbound pointer

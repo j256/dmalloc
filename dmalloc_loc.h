@@ -3,7 +3,7 @@
  *
  * Copyright 1991 by the Antaire Corporation.
  *
- * $Id: dmalloc_loc.h,v 1.7 1992/10/14 09:30:02 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.8 1992/10/21 07:34:28 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -22,5 +22,14 @@
 #define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
 #define FENCE_MAGIC_BASE	0xC0C0AB1B
 #define FENCE_MAGIC_TOP		0xFACADE69
+
+/*
+ * env variables
+ */
+#define ADDRESS_ENVIRON		"MALLOC_ADDRESS"
+#define DEBUG_ENVIRON		"MALLOC_DEBUG"
+#define INTERVAL_ENVIRON	"MALLOC_INTERVAL"
+#define LOGFILE_ENVIRON		"MALLOC_LOGFILE"
+#define START_ENVIRON		"MALLOC_START"
 
 #endif /* ! __MALLOC_LOC_H__ */
