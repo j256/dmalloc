@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.145 2000/11/13 16:53:35 gray Exp $
+# $Id: Makefile.in,v 1.146 2000/11/13 17:26:00 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -231,7 +231,8 @@ continuous :: $(TEST)
 		done
 
 port :: $(FLS) $(CONTFLS) Makefile.all.in
-	@ answer 'Is it okay to remove the dmalloc-$(VERSION) directory? '
+	@ test ! -d dmalloc-$(VERSION) || \
+		answer 'Is it okay to remove the dmalloc-$(VERSION) dir? '
 	rm -rf dmalloc-$(VERSION)
 	mkdir dmalloc-$(VERSION) dmalloc-$(VERSION)/contrib
 	cp $(FLS) Makefile.all.in dmalloc-$(VERSION)
