@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.47 2000/05/16 18:36:51 gray Exp $
+ * $Id: error.h,v 1.48 2001/05/23 13:34:17 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -46,7 +46,7 @@
 
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 extern
-char		*_dmalloc_logpath;
+char		*dmalloc_logpath;
 
 /* address to look for.  when discovered call dmalloc_error() */
 extern

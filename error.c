@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.97 2001/02/22 01:15:33 gray Exp $
+ * $Id: error.c,v 1.98 2001/05/23 13:34:16 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: error.c,v 1.97 2001/02/22 01:15:33 gray Exp $"
+#ident "$Id: error.c,v 1.98 2001/05/23 13:34:16 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.97 2001/02/22 01:15:33 gray Exp $";
+  "$Id: error.c,v 1.98 2001/05/23 13:34:16 gray Exp $";
 #endif
 #endif
 
@@ -103,7 +103,7 @@ extern	char		*_dmalloc_strerror(const int errnum);
  * exported variables
  */
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-char		*_dmalloc_logpath = NULL;
+char		*dmalloc_logpath = NULL;
 /* address to look for.  when discovered call dmalloc_error() */
 DMALLOC_PNT	_dmalloc_address = NULL;
 /* when to stop at an address */
@@ -149,19 +149,19 @@ void	_dmalloc_open_log(void)
   
   /* if it's already open or if we don't have a log file configured */
   if (outfile_fd >= 0
-      || _dmalloc_logpath == NULL) {
+      || dmalloc_logpath == NULL) {
     return;
   }
   
   /* open our logfile */
-  outfile_fd = open(_dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  outfile_fd = open(dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if (outfile_fd < 0) {
     (void)loc_snprintf(str, sizeof(str),
 		       "debug-malloc library: could not open '%s'\r\n",
-		       _dmalloc_logpath);
+		       dmalloc_logpath);
     (void)write(STDERR, str, strlen(str));
     /* disable log_path */
-    _dmalloc_logpath = NULL;
+    dmalloc_logpath = NULL;
     return;
   }
   
@@ -173,7 +173,7 @@ void	_dmalloc_open_log(void)
   _dmalloc_message("Dmalloc version '%s' from '%s'",
 		   dmalloc_version, DMALLOC_HOME);
   _dmalloc_message("flags = %#x, logfile '%s'",
-		   _dmalloc_flags, _dmalloc_logpath);
+		   _dmalloc_flags, dmalloc_logpath);
   _dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
 		   _dmalloc_check_interval,
 		   (unsigned long)_dmalloc_address,
@@ -282,13 +282,13 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   bounds_p = str_p + sizeof(str);
   
   /* no logpath and no print then no workie */
-  if (_dmalloc_logpath == NULL
+  if (dmalloc_logpath == NULL
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     return;
   }
   
   /* do we need to open the logfile? */
-  if (_dmalloc_logpath != NULL && outfile_fd < 0) {
+  if (dmalloc_logpath != NULL && outfile_fd < 0) {
     _dmalloc_open_log();
   }
   
@@ -336,7 +336,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   len = str_p - str;
   
   /* do we need to write the message to the logfile */
-  if (_dmalloc_logpath != NULL) {
+  if (dmalloc_logpath != NULL) {
     (void)write(outfile_fd, str, len);
   }
   
@@ -417,7 +417,7 @@ void	_dmalloc_die(const int silent_b)
 void	dmalloc_error(const char *func)
 {
   /* do we need to log or print the error? */
-  if (_dmalloc_logpath != NULL
+  if (dmalloc_logpath != NULL
       || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     
     /* default str value */
