@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.15 1993/04/30 22:34:52 gray Exp $
+@c $Id: dmalloc.texi,v 1.16 1993/05/19 01:31:07 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -434,7 +434,7 @@ To set them by hand, C shell (csh or tcsh) users need to invoke:
         setenv variable value;
 @end example
 
-Bourne shell (sh, bash, or ksh) users should use:
+Bourne shell (sh, bash, ksh, or zsh) users should use:
 
 @example
         variable=value;
@@ -508,10 +508,10 @@ Unfortunately, it cannot make the changes on its own so the output from
 malloc_dbg should be sent through the @code{eval} shell command which
 will do the commands.
 
-With shells that have aliasing or macro capabilities: csh, tcsh, bash,
-ksh, etc., setting up an alias to malloc_dbg to do the eval call is
-recommended.  csh/tcsh users (for example) should put the following in
-their @file{.cshrc} file:
+With shells that have aliasing or macro capabilities: csh, bash, ksh,
+tcsh, zsh, etc., setting up an alias to malloc_dbg to do the eval call
+is recommended.  csh/tcsh users (for example) should put the following
+in their @file{.cshrc} file:
 
 @example
         alias malloc 'eval `malloc_dbg \!*`'
@@ -664,6 +664,9 @@ log detailed block information when malloc_heap_map is called
 
 @item log-unknown
 like log-non-free but logs unknown non-freed memory pointers
+
+@item log-unknown
+log actual bytes in around bad pointers
 
 @item check-fence
 check fence-post memory areas

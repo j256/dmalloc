@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.18 1993/04/19 20:13:55 gray Exp $
+$Id: README.1,v 1.19 1993/05/19 01:30:48 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -39,7 +39,7 @@ the gnu archive sites.
 
 -------------------------------------------------------------------------------
 
-QUICK NOTES:
+GENERAL:
 
 - the system is pretty dependent on a good ansi-c compiler like gcc.
 	non-ansi folks with have to:
@@ -57,9 +57,47 @@ QUICK NOTES:
 
 -------------------------------------------------------------------------------
 
+QUICK START:
+
+If you are not interested in RTFM then shame on you!!  I'll be
+generous and provide a few quick-start tips anyway.  To get the most
+of the library however, I'd recommend at least taking a peak at the
+info file's Features section.
+
+You need to do 6 things to make use of the library:
+
+1)	Configure and make the library and program, and install the
+	malloc_dbg program in your favorite bin directory, the
+	libmalloc_dbg.a library in the correct lib directory, and the
+	malloc_dbg.h include file in the correct inc directory.
+
+2)	Install the mallocrc file in your home directory as .mallocrc.
+	You may want to take a look at the file and add your own
+	combination of tokens.
+
+3)	Setup an alias to malloc and put in your shell's rc file.  For
+	csh/tcsh users:
+
+		alias malloc 'eval `malloc_dbg \!*`'
+
+	For zsh users:
+
+		malloc() { eval `malloc_dbg -b $*` }
+
+4)	Link the library with your program after possibly
+	including malloc_dbg.h in your C files and recompiling.
+
+5)	Typing 'malloc -l logfile 5' (for example) to enable a certain
+	combination of number of debug tokens and set the malloc
+	log path to 'logfile'.  malloc --usage might help.
+
+6)	Run your program.
+
+-------------------------------------------------------------------------------
+
 AUTHOR
 
-If you have any problems with porting issues feel free to send me mail.
+If you have any questions or problems feel free to send me mail.
 gray.watson@antaire.com
 
 -------------------------------------------------------------------------------

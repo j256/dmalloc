@@ -3,18 +3,20 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.9 1993/04/09 06:34:49 gray Exp $
+# $Id: dmallocrc,v 1.10 1993/05/19 01:31:14 gray Exp $
 #
 
 #
+# This file maps tags to certain combinations of tokens.  The tags here
+# are only provided as an example.  You are supposed to roll your own.
 # Lines in this file should have the form:
 #
 #	tag	token1, token2, ...
 #
-# The above 'tag' is then passed to the 'malloc_dbg' program which sets
-# the MALLOC_DEBUG environment variable to token1 and 2's corresponding
-# values.  You must pass the malloc_dbg output through your shell's eval
-# command to change your environment.  See malloc.info for more information.
+# To use the above line you say 'malloc_dbg tag' which enables the debugging
+# facilities token1, token2, ...  You must pass the output from malloc_dbg
+# through your shell's eval command to change your environment.  Se
+# malloc.info for more information.
 #
 # Lines can be finished with a \ meaning it continues onto the next line.
 # Lines begining with '#' or empty lines are ignored
@@ -33,6 +35,7 @@
 # log-admin			log full administrative information
 # log-blocks			log detailed block information in heap_map
 # log-unknown			log unknown non-freed memory pointers too
+# log-bad-space			log some memory from the bad pointers
 #
 # check-fence			check fence-post areas
 # check-heap			do general heap checking
@@ -53,10 +56,10 @@
 # no debugging
 none	none
 
-# basic production
+# basic production combination
 production	log-stats, log-non-free, log-perror, log-bad-pnt
 
-# basic runtime development
+# basic runtime development combination
 runtime		log-stats, log-non-free, log-perror, log-bad-pnt, \
 		check-fence
 
@@ -92,6 +95,6 @@ fence		log-stats, log-non-free, log-perror, log-bad-pnt, \
 
 # full logging of statistics to logfile and screen
 log		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
-		log-admin, log-blocks, \
+		log-admin, log-blocks, log-bad-space, \
 		check-fence, \
 		heap-check-map, print-perror

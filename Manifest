@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.14 1993/04/30 22:38:59 gray Exp $
+$Id: Manifest,v 1.15 1993/05/19 01:30:45 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -62,9 +62,7 @@ malloc.info		User-level gnu info manual file for the malloc
 			routines.  Suitable as a text manual also.
 
 malloc.texi		Texinfo user manual for generating TeX or Info
-			formats.  This is not distributed normally to
-			conserve space.  Let me know if you want a
-			copy.
+			formats.
 
 malloc_dbg.c		Program that assists in the setting of the
 			MALLOC_DEBUG and other debug environmental

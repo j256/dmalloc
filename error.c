@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.24 1993/04/30 20:02:32 gray Exp $";
+  "$Id: error.c,v 1.25 1993/05/19 01:31:03 gray Exp $";
 #endif
 
 /*
@@ -118,7 +118,7 @@ EXPORT	void	_malloc_die(void)
 {
   /* do I need to drop core? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_ERROR_ABORT))
-    (void)kill(getpid(), SIGABRT);
+    (void)kill(0, SIGABRT);
   
   /*
    * NOTE: this should not be exit() because fclose will free, etc

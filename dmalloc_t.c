@@ -33,7 +33,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.20 1993/05/06 15:27:14 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.21 1993/05/19 01:31:12 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -172,12 +172,12 @@ int	main(int argc, char ** argv)
     }
     
     if (strncmp(line, "overwrite", len) == 0) {
-      long	pnt, magic;
+      long	pnt;
+      char	overwrite[] = "WOW!";
       
       pnt = get_address();
       
-      magic = 0x12345678;
-      bcopy(&magic, (char *)pnt, sizeof(magic));
+      bcopy(overwrite, (char *)pnt, sizeof(overwrite) - 1);
       
       (void)printf("Done.\n");
       continue;

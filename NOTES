@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.13 1993/04/06 04:24:29 gray Exp $
+$Id: NOTES,v 1.14 1993/05/19 01:30:47 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -20,6 +20,22 @@ GENERAL:
 	heap was corrupted or some other critical error has occurred then the
 	library would quickly go recursive.
 
+-------------------------------------------------------------------------------
+
+CODING WARNINGS:
+
+- watch for heaps growing up or down (all subtraction or other position
+	dependent code must be changed to macros in heap.h) >,<,-,+,etc
+
+- watch for bounds checking assuming + or - code.
+
+- it is assumed that NONE of the __FILE__ arguments are on the heap because
+	to determine whether a dblock is free or not it looks at the next
+	argument (unioned with the file argument) and sees if it is null or
+	in the heap meaning it is at the end or middle of a free list.
+
+-------------------------------------------------------------------------------
+
 - administration blocks are relocatable:
 	- any administration blocks are relocatable in the heap which means
 		that if we monitor the freeing of a block we have the
@@ -35,24 +51,6 @@ GENERAL:
 	- when you find the free block, find out if it is lower (or higher)
 		than the highest admin block and bcopy the admin block down and
 		redo the pointers
-
--------------------------------------------------------------------------------
-
-CODING WARNINGS:
-
-- watch for heaps growing up or down (all subtraction or other position
-	dependent code must be changed to macros in heap.h) >,<,-,+,etc
-- watch for bounds checking assuming + or - code.
-
--------------------------------------------------------------------------------
-
-CHUNK INFORMATION:
-
-- it is assumed that none of the __FILE__ arguments are on the heap because
-	to determine whether a dblock is free or not it looks at the next
-	argument (unioned with the file argument) and sees if it is null or
-	in the heap meaning it is at the end or middle of a free list.
-
 
 -------------------------------------------------------------------------------
 
@@ -97,8 +95,11 @@ OVERHEAD:
 
 THANKS:
 
-Special thanks to Scott Michel <scottm@intime.intime.COM> for
-listening to my endless chatter and finding/solvings lots of stupid
-problems during the alpha stages of this library.
+Many net folk contributed to the library and my thanks goes out to
+them all.
+
+Special thanks, however, to Scott Michel <scottm@intime.intime.COM>
+for listening to my endless chatter and finding/solvings lots of
+stupid problems during the alpha stages of this library.
 
 -------------------------------------------------------------------------------

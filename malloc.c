@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.28 1993/04/30 21:16:48 gray Exp $";
+  "$Id: malloc.c,v 1.29 1993/05/19 01:31:05 gray Exp $";
 #endif
 
 /*
@@ -105,7 +105,7 @@ LOCAL	int	hex_to_int(char * str)
 
 /*
  * a call to the alloc routines has been made, check the debug variables
- * returns [NO]ERROR.
+ * returns ERROR or NOERROR.
  */
 LOCAL	int	check_debug_vars(const char * file, const int line)
 {
@@ -360,7 +360,8 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
 }
 
 /*
- * release PNT in the heap, returning FREE_[NO]ERROR or void
+ * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
+ * depending on whether STDC is defined by your compiler.
  */
 #if __STDC__
 EXPORT	void	free(void * pnt)
@@ -391,7 +392,7 @@ EXPORT	int	free(void * pnt)
 /******************************* utility calls *******************************/
 
 /*
- * call through to _heap_map function, returns [NO]ERROR
+ * call through to _heap_map function, returns ERROR or NO_ERROR
  */
 EXPORT	int	malloc_heap_map(void)
 {
@@ -408,7 +409,7 @@ EXPORT	int	malloc_heap_map(void)
 
 /*
  * verify pointer PNT, if PNT is 0 then check the entire heap.
- * returns MALLOC_VERIFY_[NO]ERROR
+ * returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
  */
 EXPORT	int	malloc_verify(void * pnt)
 {
@@ -431,7 +432,7 @@ EXPORT	int	malloc_verify(void * pnt)
 
 /*
  * set the global debug functionality flags to DEBUG (0 to disable).
- * returns [NO]ERROR
+ * returns ERROR or NOERROR
  */
 EXPORT	int	malloc_debug(int debug)
 {
