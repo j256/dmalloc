@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.88 1999/05/06 15:11:46 gray Exp $
+ * $Id: dmalloc.c,v 1.89 2000/02/17 14:03:47 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.88 1999/05/06 15:11:46 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.89 2000/02/17 14:03:47 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.88 1999/05/06 15:11:46 gray Exp $";
+  "$Id: dmalloc.c,v 1.89 2000/02/17 14:03:47 gray Exp $";
 #endif
 #endif
 
@@ -735,14 +735,14 @@ static	void    set_variable(const char *var, const char *value)
   char	comm[1024];
   
   if (bourne_b) {
-    (void)loc_snprintf(comm, sizeof(comm), "%s=%s;\nexport %s;\n",
+    (void)loc_snprintf(comm, sizeof(comm), "%s=%s\nexport %s\n",
 		       var, value, var);
   }
   else if (gdb_b) {
-    (void)loc_snprintf(comm, sizeof(comm), "set env %s %s;\n", var, value);
+    (void)loc_snprintf(comm, sizeof(comm), "set env %s %s\n", var, value);
   }
   else {
-    (void)loc_snprintf(comm, sizeof(comm), "setenv %s %s;\n", var, value);
+    (void)loc_snprintf(comm, sizeof(comm), "setenv %s %s\n", var, value);
   }
   
   if (make_changes_b) {
