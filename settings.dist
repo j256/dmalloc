@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: settings.dist,v 1.30 1998/11/12 21:00:35 gray Exp $
+ * $Id: settings.dist,v 1.31 1998/11/12 23:20:54 gray Exp $
  */
 
 /*
@@ -254,7 +254,8 @@
  * At the front of each log message, print the output from the time()
  * call as a number.  This requires that the time function be defined.
  */
-#define LOG_TIME_NUMBER 1
+#define LOG_TIME_NUMBER		1
+#define TIME_INCLUDE		<time.h>
 
 /*
  * At the front of each log message, print the output from the ctime()
@@ -264,8 +265,8 @@
  * be defined.
  */
 #if LOG_TIME_NUMBER == 0
-#define LOG_CTIME_STRING 1
-#define TIME_NUMBER_TYPE unsigned int
+#define LOG_CTIME_STRING	1
+#define TIME_TYPE		unsigned int
 #endif
 
 /*
@@ -282,8 +283,15 @@
  * NOTE: This creates a certain amount of memory overhead.
  */
 #define STORE_TIME		0
+#ifndef TIME_INCLUDE
+#define TIME_INCLUDE		<time.h>
+#endif
+#ifndef TIME_TYPE
+#define TIME_TYPE		unsigned int
+#endif
 #define STORE_TIMEVAL		0
 #define TIMEVAL_INCLUDE		<sys/time.h>
+#define TIMEVAL_TYPE		struct timeval
 #define GET_TIMEVAL(t)		(void)gettimeofday(&(t), NULL)
 
 /*
@@ -305,9 +313,14 @@
  * queue for a certain number of memory transactions.  For instance,
  * if this is set to 10 then after you free a pointer, it cannot be
  * reused until after 10 additional calls to malloc, free, realloc,
- * etc..  Define to 0 to disable.
+ * etc..  Define to 0 to disable.  NOTE: setting to 1 does nothing.
+ *
+ * For more drastic debugging, you can enable the never-reuse flag
+ * which will cause the library to never reuse previously allocated
+ * memory.  This may significantly expand the memory requirements of
+ * your system however.
  */
-#define FREED_POINTER_REUSE_DELAY	100
+#define FREED_POINTER_DELAY 100
 
 /****************************** thread settings ******************************/
 
