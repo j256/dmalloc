@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.52 1995/12/29 01:39:57 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.53 1997/03/18 20:34:04 gray Exp $";
 #endif
 
 /* external routines */
@@ -543,7 +543,7 @@ static	void	do_interactive(void)
       char	*overwrite = "WOW!";
       
       pnt = get_address();
-      bcopy(overwrite, (char *)pnt, strlen(overwrite));
+      memcpy((char *)pnt, overwrite, strlen(overwrite));
       (void)printf("Done.\n");
       continue;
     }

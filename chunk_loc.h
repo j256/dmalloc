@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.41 1997/01/16 22:32:25 gray Exp $
+ * $Id: chunk_loc.h,v 1.42 1997/03/18 20:34:15 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -124,10 +124,10 @@
 #define FENCE_MAGIC_TYPE	int
 
 #define FENCE_WRITE(pnt, size)	do { \
-				  bcopy(fence_bottom, (char *)(pnt), \
+				  memcpy((char *)(pnt), fence_bottom, \
 					FENCE_BOTTOM); \
-				  bcopy(fence_top, (char *)(pnt) + (size) - \
-					FENCE_TOP, FENCE_TOP); \
+				  memcpy((char *)(pnt) + (size) - FENCE_TOP, \
+					 fence_top, FENCE_TOP); \
 				} while (0)
 
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
