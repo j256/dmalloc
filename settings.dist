@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.43 1999/08/25 12:34:43 gray Exp $
+ * $Id: settings.dist,v 1.44 1999/10/11 23:59:16 gray Exp $
  */
 
 /*
@@ -362,9 +362,9 @@
  * the system's or another set of malloc functions without having to
  * recompile.
  *
- * During a recent poll on the dmalloc mailing list, very few people
+ * During a poll on the dmalloc mailing list, very few people
  * showed that they cared at all about this and only 1 (one) said that
- * they used it.
+ * they actually used it.
  */
 #define USE_DMALLOC_LEAP 0
 
