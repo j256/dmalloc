@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.58 1997/12/05 21:09:44 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.59 1997/12/08 04:06:20 gray Exp $";
 #endif
 
 /* external routines */
@@ -171,7 +171,7 @@ static	int	do_random(const int iter_n)
   dmalloc_errno = last = 0;
   flags = dmalloc_debug_current();
   
-  pointer_grid = ALLOC(pnt_info_t, max_pointers);
+  pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
   if (pointer_grid == NULL) {
     (void)printf("%s: problems allocating space for %d pointer slots.\n",
 		 argv_program, max_pointers);
@@ -245,7 +245,7 @@ static	int	do_random(const int iter_n)
 
       case 0: case 1: case 2:
 	pnt_p = free_p;
-	pnt_p->pi_pnt = CALLOC(char, amount);
+	pnt_p->pi_pnt = calloc(amount, sizeof(char));
 	
 	if (verbose_b) {
 	  (void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
@@ -256,7 +256,7 @@ static	int	do_random(const int iter_n)
 
       case 3: case 4: case 5:
 	pnt_p = free_p;
-	pnt_p->pi_pnt = MALLOC(amount);
+	pnt_p->pi_pnt = malloc(amount);
 	
 	if (verbose_b) {
 	  (void)printf("%d: malloc %d of max %d into slot %d.  got %#lx\n",
@@ -275,7 +275,7 @@ static	int	do_random(const int iter_n)
 	  pnt_p = pnt_p->pi_next;
 	}
 	
-	pnt_p->pi_pnt = REMALLOC(pnt_p->pi_pnt, amount);
+	pnt_p->pi_pnt = realloc(pnt_p->pi_pnt, amount);
 	max += pnt_p->pi_size;
 	
 	if (verbose_b) {
@@ -402,7 +402,7 @@ static	int	check_special(void)
   if (! silent_b) {
     (void)printf("  Trying to realloc a 0L pointer.\n");
   }
-  pnt = REMALLOC(NULL, 10);
+  pnt = realloc(NULL, 10);
 #if ALLOW_REALLOC_NULL
   if (pnt == NULL) {
     if (! silent_b) {
@@ -444,7 +444,7 @@ static	int	check_special(void)
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
   }
-  pnt = MALLOC((1 << LARGEST_BLOCK) + 1);
+  pnt = malloc((1 << LARGEST_BLOCK) + 1);
   if (pnt == NULL) {
     dmalloc_errno = 0;
   }
@@ -502,6 +502,9 @@ static	void	do_interactive(void)
       (void)printf("\tmalloc    - allocate memory\n");
       (void)printf("\tcalloc    - allocate/clear memory\n");
       (void)printf("\trealloc   - reallocate memory\n");
+#if HAVE_STRDUP
+      (void)printf("\tstrdup    - allocate a string\n");
+#endif
       (void)printf("\tfree      - deallocate memory\n\n");
       
       (void)printf("\tmap       - map the heap to the logfile\n");
@@ -533,7 +536,7 @@ static	void	do_interactive(void)
 	break;
       }
       size = atoi(line);
-      (void)printf("malloc(%d) returned '%#lx'\n", size, (long)MALLOC(size));
+      (void)printf("malloc(%d) returned '%#lx'\n", size, (long)malloc(size));
       continue;
     }
     
@@ -546,7 +549,7 @@ static	void	do_interactive(void)
       }
       size = atoi(line);
       (void)printf("calloc(%d) returned '%#lx'\n",
-		   size, (long)CALLOC(char, size));
+		   size, (long)calloc(size, sizeof(char)));
       continue;
     }
     
@@ -562,10 +565,23 @@ static	void	do_interactive(void)
       size = atoi(line);
       
       (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
-		   (long)pnt, size, (long)REMALLOC(pnt, size));
+		   (long)pnt, size, (long)realloc(pnt, size));
       
       continue;
     }
+    
+#if HAVE_STRDUP
+    if (strncmp(line, "strdup", len) == 0) {
+      int	size;
+      
+      (void)printf("Enter a string to strdup: ");
+      if (fgets(line, sizeof(line), stdin) == NULL) {
+	break;
+      }
+      (void)printf("strdup returned '%#lx'\n", (long)strdup(line));
+      continue;
+    }
+#endif
     
     if (strncmp(line, "free", len) == 0) {
       pnt = get_address();
