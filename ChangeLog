@@ -1,3 +1,7 @@
+-------------------------------------------------------------------------------
+$Id: ChangeLog,v 1.73 1993/10/17 01:34:27 gray Exp $
+-------------------------------------------------------------------------------
+
 Sat Oct 16 19:18:53 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* removed debug token log-ra, log-unknown should be enough.
