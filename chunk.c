@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.18 1992/11/15 00:17:28 gray Exp $";
+  "$Id: chunk.c,v 1.19 1992/11/15 22:56:52 gray Exp $";
 #endif
 
 /* checking information */
@@ -423,7 +423,7 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
-  char		*mem, *freep;
+  char		*mem, *freep = NULL;
   
   /* is there anything on the dblock free list? */
   dblockp = free_dblock[bitc];
