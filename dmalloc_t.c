@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.59 1997/12/08 04:06:20 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.60 1997/12/08 04:15:20 gray Exp $";
 #endif
 
 /* external routines */
@@ -732,8 +732,8 @@ int	main(int argc, char **argv)
     }
   }
   
-  /* you will need to uncomment this if you can't auto-shutdown */
-#if 0
+  /* you will need this if you can't auto-shutdown */
+#if HAVE_ATEXIT == 0 && HAVE_ON_EXIT == 0 && FINI_DMALLOC == 0
   /* shutdown the alloc routines */
   malloc_shutdown();
 #endif
