@@ -68,7 +68,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.104 1998/09/17 15:22:20 gray Exp $";
+  "$Id: malloc.c,v 1.105 1998/09/17 16:07:23 gray Exp $";
 #endif
 
 /*
@@ -159,7 +159,9 @@ static	void	thread_lock(void)
 #if LOCK_THREADS
   /* we only lock if the lock-on counter has reached 0 */
   if (thread_lock_on == 0) {
+#if HAVE_PTHREAD_MUTEX_LOCK
     pthread_mutex_lock(&dmalloc_mutex);
+#endif
   }
 #endif
 }
@@ -179,12 +181,16 @@ static	void	thread_unlock(void)
      * into the library.  Ugh.
      */
     if (thread_lock_on == THREAD_INIT_LOCK) {
+#if HAVE_PTHREAD_MUTEX_INIT
       /* we init instead of the lock point to avoid recursion */
       pthread_mutex_init(&dmalloc_mutex, THREAD_LOCK_INIT_VAL);
+#endif
     }
   }
   else if (thread_lock_on == 0) {
+#if HAVE_PTHREAD_MUTEX_UNLOCK
     pthread_mutex_unlock(&dmalloc_mutex);
+#endif
   }
 #endif
 }
