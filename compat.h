@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.6 1993/03/31 00:35:40 gray Exp $
+ * $Id: compat.h,v 1.7 1993/04/05 01:28:57 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -53,12 +53,12 @@ IMPORT	char	*memset(char * str, int ch, int len);
 /*
  * find CH in STR by searching backwards through the string
  */
-IMPORT	char	*strchr(const char * str, int ch);
+IMPORT	char	*index(const char * str, int ch);
 
 /*
  * find CH in STR by searching backwards through the string
  */
-IMPORT	char	*strrchr(const char * str, int ch);
+IMPORT	char	*rindex(const char * str, int ch);
 
 /*
  * concatenate STR2 onto the end of STR1

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.9 1993/04/01 04:59:21 gray Exp $
+@c $Id: dmalloc.texi,v 1.10 1993/04/05 01:29:07 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -88,8 +88,7 @@ and excellent run-time debugging information.  We have found these
 capabilities to be superb development tools.
 
 I can be reached at @samp{<gray.watson@@antaire.com>} with any questions
-or general comments.  Also, I decided not to distribute the texinfo
-version of this manual to save space so let me know if you want a copy.
+or general comments.
 
 Gray Watson, Antaire Corporation.
 
@@ -116,9 +115,10 @@ the library than the standard public license distributed with most GNU
 software.  Please read @file{COPYING-LIB} or contact me for more
 information.
 
-The rest of this section contains some propaganda from the Free Software
+The rest of this section contains some messages from the Free Software
 Foundation.  If you find this stuff offensive or annoying, remember that
-you probably did not spend any money to get this code.
+you probably did not spend any money to get this library so feel free to
+heave it into the bit bucket.
 
 The licenses for most software are designed to take away your freedom to
 share and change it.  By contrast, the GNU General Public Licenses are
@@ -315,14 +315,10 @@ that is returned by malloc libraries has already been cleared.
 @node Overview, Environment variables,  , Features
 @section General Debugging Concepts.
 
-The features of this library are controlled through a set of
-environmental variables.  They enable the memory debugging features
-inside a program at runtine to help locate problems, chart memory leaks,
-provide basic bounds checking, log statistics, etc.  @xref{Environment
-variables}.
-
-These variables can be set with the help of the malloc_dbg utility
-@xref{malloc_dbg program}.
+The features of this library are controlled by a number of environmental
+variables.  They enable the memory debugging features at runtine to help
+locate problems, chart memory leaks, provide basic bounds checking, log
+statistics, etc.  @xref{Environment variables}.
 
 The debugging features that are available can be broken down into a
 couple basic classifications:
@@ -332,16 +328,16 @@ couple basic classifications:
 One of the nice things about a good debugger is its ability to provide
 the file and line number of an offending piece of code.  This library
 attempts to give this functionality with the help of @dfn{cpp}, the C
-preprocessor.  If the memory allocation macros in the @file{malloc.h}
-file are used, the library will provide file and line information for
-the library to access @xref{Allocation macros}.
+preprocessor.  If the file @file{malloc.h} was included, the library
+will provide file and line information for the library to access.
 
 @item fence-post (i.e. bounds) checking
 @dfn{Fence-post} memory is the area immediately below or above memory
 allocations.  Often in programming, the code will inadvertently access
 below or above an allocation (especially when dealing with arrays or
-strings).  The library writes special values in the areas around every
-allocation so it will notice when these areas have been overwritten.
+strings).  The library can write special values in the areas around
+every allocation so it will notice when these areas have been
+overwritten.
 
 @emph{NOTE}: The library cannot notice when the program reads from these
 areas, only when it writes values.  Also, fence-post checking will
@@ -382,11 +378,11 @@ Another common problem with programs is that they free a memory pointer
 but then use go on to use it again by mistake.  This can lead to
 mysterious crashes and unexplained problems.
 
-To combat this, the library writes special values into a block of memory
-after it has been freed.  This serves two purposes: it will make sure
-that the program will get garbage data if it trying to access the area
-again, and it will allow the library to verify the area later for signs
-of overwriting.
+To combat this, the library can write special values into a block of
+memory after it has been freed.  This serves two purposes: it will make
+sure that the program will get garbage data if it trying to access the
+area again, and it will allow the library to verify the area later for
+signs of overwriting.
 
 @end table
 
@@ -402,22 +398,24 @@ near the point that the library found the error so reviewing the code
 around this area is recommended.
 
 The library can be configured to quit immediately when an error is
-detected and to dump a core-image file.  This is especially useful when
-using a debugger.  When running our programs in gdb (the
-@emph{excellent} GNU debugger), I always put break-points in
-@code{_malloc_perror()} and @code{_malloc_die()} which is the
-internal error routine for the library.  The program will then hit the
-break-point as soon as a memory problem is detected.
+detected and to dump a core file or memory-image.  This can be examined
+with a debugger to determine the source of the problem.
+
+When running our programs in a debugger such as gdb (the
+@emph{excellent} GNU debugger), I always put a break-point in
+@code{_malloc_perror()} which is the internal error routine for the
+library.  The program will then hit the break-point as soon as a memory
+problem is detected.
 
 Other malloc-debug libraries also support the ability to dump core and
-then continue.  I decided not to support this once it was determined
-that some versions of fork make calls to malloc making the library go
-recursive.
+then continue running.  I decided not to support this once it was
+determined that some versions of fork make calls to malloc which would
+cause the library to go recursive.
 
 @emph{NOTE}: do not be surprised if the library catches problems with
-your system's library routines.  It took me 6 hours once to finally come
-to the conclusion that the localtime call, included in SunOS release
-4.1, was overwriting one of its fence-post markers.
+your system's library routines.  It took me four hours once to finally
+come to the conclusion that the localtime call, included in SunOS
+release 4.1, was overwriting one of its fence-post markers.
 
 @node Environment variables, malloc_dbg program, Overview, Features
 @section The Variable Names and Their Features.
@@ -567,14 +565,14 @@ file:line).
 @end table
 
 If no arguments are specified, malloc_dbg dumps out the current settings
-that you have for the malloc environmental variables.
+that you have for the malloc environmental variables.  For example:
 
 @example
-        MALLOC_DEBUG == '0x6417' (debug1);
-        MALLOC_ADDRESS == '0';
-        MALLOC_INTERVAL not set;
-        MALLOC_LOGFILE == 'malloc';
-        MALLOC_START not set;
+        MALLOC_DEBUG == '0x6417' (debug1)
+        MALLOC_ADDRESS == '0'
+        MALLOC_INTERVAL not set
+        MALLOC_LOGFILE == 'malloc'
+        MALLOC_START not set
 @end example
 
 @node RC file, Debug tokens, malloc_dbg program, Features
@@ -584,7 +582,7 @@ The name of default @dfn{RC file} (or run-time configuration file) is
 @file{$HOME/.mallocrc}.  The @samp{$HOME} environmental variable should
 be set by the system to point to your home-directory.
 
-The file contains lines in the general form of:
+The rc file file should contain lines in the general form of:
 
         @code{tag token1, token2, ...}
 
@@ -680,6 +678,9 @@ check the fence-post areas of small allocations
 @item check-free
 check to see if free space has been overwritten
 
+@item check-funcs
+check the arguments of some functions looking for bad pointers
+
 @item realloc-copy
 always copy data to a new pointer when realloc
 
@@ -704,7 +705,7 @@ log any errors and messages to the screen via standard-error
 @chapter How to Run Programs With the Library.
 
 @menu
-* Allocation macros::           For providing file/line debugging information.
+* Allocation macros::           For providing file and line information.
 * Extensions::                  Additional non-standard routines.
 * Disabling the Library::       How to compile/link without the library.
 @end menu
@@ -712,15 +713,30 @@ log any errors and messages to the screen via standard-error
 @node Allocation macros, Extensions,  , Usage
 @section For Providing File/Line Debugging Information.
 
-The library attempts to provide file and line information so memory
-problems can be debugged faster.  In every .c source file that allocates
-or frees memory and from which file and line information is wanted, the
-@file{malloc.h} file should be included and the uppercase
-memory-allocation macros listed below should be used.
+By including @file{malloc.h} in your C files, your calls to calloc,
+free, malloc, or realloc are replaced with calls to _calloc_leap,
+_free_leap, _malloc_leap, and _realloc_leap.
 
-Aside from providing the file and line information to the library, the
-macros are also nice because they take care of all the type-casting and
-make the code look cleaner (IMHO).
+These leap macros use the c-preprocessor @code{__FILE__} and
+@code{__LINE__} macros which get replaced at compilation time with the
+current file and line-number of the source code in question.  The leap
+routines take this information and pass it on to the library making it
+able to produce verbose reports on memory not freed:
+
+@example
+	not freed: 0x38410 ( 22 bytes) from 'malloc_t.c:92'
+        not freed: 0x38600 ( 10232 bytes) from 'malloc_t.c:104'
+@end example
+	
+These lines from a log file shows that two allocations were not freed.
+One at address 0x38410 of size 22 bytes in source file @file{malloc_t.c}
+at line 92 and another at address 0x38600 of size 10232 bytes at line
+104 of @file{malloc_t.c}.
+
+Along with the above leap macros, @file{malloc.h} also contains the
+following macros which I have been using for all our memory allocation
+needs for some time now.  They take care of all the type-casting and
+make the code look much cleaner (IMHO).
 
 @table @code
 @item ALLOC(type, count)
@@ -767,29 +783,6 @@ copy of item.
 
 @end table
 
-All of the the above macros actually do not call calloc, free, malloc,
-or realloc but _calloc_leap, _free_leap, _malloc_leap, and
-_realloc_leap.  This allows the macros to provide file and line
-information to the library routines.  When you are finished with the
-debugging phase of your development there are many ways to disable the
-macros and library @xref{Disabling the Library}.
-
-The c-preprocessor run by the c-compiler provides @code{__FILE__} and
-@code{__LINE__} macros which are replaced with the current file and
-line-number where the above memory macros are located.  This gives this
-library the ability to produce verbose reports on memory not freed:
-
-@example
-	dblock: 0x38410 ( 22 bytes) from 'malloc_t.c:92' not freed
-	bblock: 0x38600 ( 10232 bytes) from 'malloc_t.c:104' not freed
-@end example
-	
-These lines from a log file shows that two allocations were not freed.
-A @dfn{dblock} or small divided-block allocation was not freed at
-address 0x38410 of size 22 bytes in source file @file{malloc_t.c} at
-line 92 and a @dfn{bblock} or basic-block allocation was not freed at
-address 0x38600 of size 10232 bytes at line 104 of @file{malloc_t.c}.
-
 In the above macro list, I have also included a STRDUP and a BDUP macro.
 STRDUP, for those who are not familiar with the strdup function, takes a
 string, allocates enough information to store the string (along with its
@@ -802,9 +795,8 @@ other elements that are not strings.  A pointer to an element and its
 size are passed in and the macro returns an allocated copy of it.
 
 gcc (GNUs c-compiler) has a neat feature in that it understands
-"return-values" from macros.  I have included a gcc form of these 2
-macros (which makes them a lot more functional) as well as a non-gcc
-version.
+return-values from macros.  I have included a gcc form of these 2 macros
+(which makes them a lot more functional) as well as a non-gcc version.
 
 @emph{NOTE}: I would like to strongly recommend the usage of gcc.  It is
 a superior compiler and future releases of this library may require its
@@ -817,7 +809,7 @@ The library has a number of variables and routines that are not a
 standard part of most malloc libraries:
 
 @table @code
-@item char *malloc_logpath;
+@item char * malloc_logpath;
 This variable can be used to set the malloc log filename.  The env
 variable MALLOC_LOGFILE overrides this variable.
 
@@ -862,26 +854,31 @@ With this routine, the value in the @samp{MALLOC_DEBUG} variable can be
 overridden and the library debugging features set explicitly.  For
 instance, if debugging should never be enabled for a program, a call to
 @code{malloc_debug(0);} as the first call in @code{main()} will disable
-all the memory debugging from that point on.  One problem however is
-that some compilers (gcc for instance) make calls to memory allocation
-functions @emph{before} @code{main()} is reached and
-@code{malloc_debug()} called meaning some debugging information may be
-generated regardless.
+all the memory debugging from that point on.
+
+One problem however is that some compilers (gcc for instance) make calls
+to memory allocation functions @emph{before} @code{main()} is reached
+and @code{malloc_debug()} called meaning some debugging information may
+be generated regardless.
 
 @item int malloc_examine(char * pnt, int * size, char ** file, int * line);
 This routine provides some very interesting functionality.  It returns
 the size of a pnt's allocation as well as the file and line from which
-it was allocated.  This is not provided by most (if not all) of other
-malloc libraries so should only be used for short-term debugging.
+it was allocated.
+
+@emph{NOTE}: This is not provided by most (if not all) of other malloc
+libraries so should only be used for short-term debugging.
 
 @item char * malloc_strerror(int errnum);
 @code{malloc_strerror} returns the string representation of the error
 value in errnum (which probably should be malloc_errno).  This allows
 the logging of more verbose memory error messages.
 
-@end table
+You can also display the string representation of an error value by a
+call to the @file{malloc_dbg} program with a @samp{-e #} option
+@xref{malloc_dbg program}.
 
-For some more information, refer to the @file{malloc.h} header file.
+@end table
 
 @node Disabling the Library,  , Extensions, Usage
 @section How to Compile/Link Without the Library.
@@ -891,30 +888,29 @@ may want to disable the malloc-debug library and put in its place either
 the system's memory-allocation routines, gnu-malloc, or maybe your own.
 I have tried to make this a reasonably painless process.
 
-First off, if you are not using the uppercase allocation macros in
-@file{malloc.h} or any of the special functions provided by the
-malloc-debug library, then all you need to do is relink with a new
+if you are not using the uppercase allocation macros in
+@file{malloc.h} or  then all you need to do is relink with a new
 malloc library.
 
-If you are using any of the special malloc-debug library functions, you
-will need to disable or #ifdef them out if you want to switch to another
-malloc library.  If you are using the uppercase allocation macros then
-you can switch to a new malloc library at link or compilation time.
+First off, if you are using any of the special functions provided by the
+malloc-debug library, you will need to disable or #ifdef them out if you
+want to switch to another malloc library.
 
 To change the malloc-library at link time, just relink with a new malloc
 library and include on the link-line the @file{malloc_lp.o} file.  This
 means that your memory routines will still be calling malloc_leap, etc.
 although the new malloc library will not be using the file and line
-information that the leap routines make available.  This means that the
+information that the leap routines make available.  In this case, your
 program will incur the small overhead of an extra function call.
 
 @example
         gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
 @end example
 
-If you want to totally disable the malloc-debug library while still
-using the allocation macros then you will need to recompile all the C
-files that include @file{malloc.h} while defining MALLOC_DEBUG_DISABLE.
+If you want to totally disable the malloc-debug library then you will
+need to recompile all the C files that include @file{malloc.h} while
+defining MALLOC_DEBUG_DISABLE.  This will cause the malloc leap macros
+to not be applied.
 
 @example
         gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
@@ -973,6 +969,11 @@ Realloc() backwards compatibility with being able to realloc from the
 last freed block is @emph{not} supported.
 
 @item
+Realloc() of a NULL pointer is supported in which case the library will
+just make a call to malloc().  This is a compilation option in the
+@file{conf.h} file.
+
+@item
 The library does @emph{not} provide memalign() nor valloc() support as
 of yet, but may in future releases.  I would be interested to know who
 is using these functions, which architectures they are supported on, and
@@ -981,7 +982,7 @@ for what reason they are being used.
 @item
 Aside from possibly being slower than the system's memory allocation
 functions, the library should be fully compatible with the standard
-memory routines.  If this is not the case please bring this to my
+memory routines.  If this is @emph{not} the case please bring this to my
 attention.
 @end itemize
 
@@ -1021,16 +1022,14 @@ perl, bison, or any of their many programs and libraries then you have
 benefited from the movement.  Please consider supporting it.
 
 @item Berkeley Software Design, Inc. <bsdi-info@@bsdi.com>
-We at the Antaire Corporation are the proud and enthusiastic
-owners/resellers of the BSD/386 operating system.  The system is still
-at pre-production status although we have yet to have a major problem
-with our 486/33 that has been running for a number of months now.  For
-$1k you get a @emph{complete} BSD-flavor operating system with
-@emph{full source} for 386 and 486 systems (binary licenses are
-available).  Along with the obvious benefits of full source code come
-excellent customer support/service and system features such as a MS-DOG
-runtime environment, nfs/tcp-ip, full software development utilities, X,
-etc.
+We at the Antaire Corporation are the proud and enthusiastic owners of
+the BSD/386 operating system.  For $1k you get a @emph{complete}
+BSD-flavor operating system with @emph{full source} for 386 and 486
+systems (binary licenses are available).  Along with the obvious
+benefits of full source code come excellent customer support/service and
+system features such as a MS-DOG runtime environment, complete tcp/ip
+networking facilities including nfs, full software development
+utilities, X, etc.
 
 @contents
 @bye

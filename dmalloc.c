@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.4 1993/03/31 00:35:59 gray Exp $";
+  "$Id: dmalloc.c,v 1.5 1993/04/05 01:29:10 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -133,7 +133,7 @@ LOCAL	void	usage(void)
  */
 LOCAL	void	process_arguments(int argc, char ** argv)
 {
-  program = strrchr(*argv, '/');
+  program = rindex(*argv, '/');
   if (program == NULL)
     program = *argv;
   else
@@ -310,7 +310,7 @@ LOCAL	int	process(int debug_value, char ** strp)
       continue;
     
     /* chop off the ending \n */
-    endp = strrchr(buf, '\n');
+    endp = rindex(buf, '\n');
     if (endp != NULL)
       *endp = NULLC;
     

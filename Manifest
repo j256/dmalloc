@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.12 1993/03/31 00:35:29 gray Exp $
+$Id: Manifest,v 1.13 1993/04/05 01:28:47 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -31,7 +31,8 @@ chunk_loc.h		Local defines specific to the chunk routines
 compat.[ch]		System compatibility routines if missing
 			functionality.
 
-conf.h.in		Used by configure to create the conf.h configurations.
+conf.h.in		Used by configure to create the conf.h
+			configurations.
 
 configure		Configure script.
 
@@ -47,6 +48,8 @@ error.[ch]		Debugging routines and others that provide
 			user output.
 
 error_str.h		Strings that correspond to malloc error codes.
+
+error_val.h		General error codes for the malloc module.
 
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.
@@ -66,8 +69,6 @@ malloc.texi		Texinfo user manual for generating TeX or Info
 malloc_dbg.c		Program that assists in the setting of the
 			MALLOC_DEBUG and other debug environmental
 			variables.
-
-malloc_err.h		General error codes for the malloc module.
 
 malloc_loc.h		Local defines for all of the malloc routines.
 

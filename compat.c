@@ -27,6 +27,8 @@
  * your system does not have them.
  */
 
+#define MALLOC_DEBUG_DISABLE
+
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -35,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.7 1993/03/31 00:35:38 gray Exp $";
+  "$Id: compat.c,v 1.8 1993/04/05 01:28:54 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
@@ -82,11 +84,11 @@ EXPORT	char	*memset(char * str, int ch, int len)
 }
 #endif /* HAVE_MEMSET == 0 */
 
-#if HAVE_STRCHR == 0
+#if HAVE_INDEX == 0
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*strchr(const char * str, int ch)
+EXPORT	char	*index(const char * str, int ch)
 {
   for (; *str != NULLC; str++)
     if (*str == (char)ch)
@@ -94,13 +96,13 @@ EXPORT	char	*strchr(const char * str, int ch)
   
   return NULL;
 }
-#endif /* HAVE_STRCHR == 0 */
+#endif /* HAVE_INDEX == 0 */
 
-#if HAVE_STRRCHR == 0
+#if HAVE_RINDEX == 0
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*strrchr(const char * str, int ch)
+EXPORT	char	*rindex(const char * str, int ch)
 {
   char	*pnt = NULL;
   
@@ -110,7 +112,7 @@ EXPORT	char	*strrchr(const char * str, int ch)
   
   return pnt;
 }
-#endif /* HAVE_STRRCHR == 0 */
+#endif /* HAVE_RINDEX == 0 */
 
 #if HAVE_STRCAT == 0
 /*

@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.20 1993/04/01 04:59:17 gray Exp $";
+  "$Id: malloc.c,v 1.21 1993/04/05 01:29:05 gray Exp $";
 #endif
 
 /*
@@ -199,7 +199,7 @@ LOCAL	void	get_environ(void)
   if (env != NULL) {
     char	*addp;
     
-    addp = strchr(env, ':');
+    addp = index(env, ':');
     if (addp != NULL) {
       *addp = NULLC;
       address_count = atoi(addp + 1);
@@ -225,7 +225,7 @@ LOCAL	void	get_environ(void)
     
     BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
     
-    startp = strchr(env, ':');
+    startp = index(env, ':');
     if (startp != NULL) {
       *startp = NULLC;
       (void)strcpy(start_file, env);

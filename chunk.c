@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.27 1993/03/31 00:35:36 gray Exp $";
+  "$Id: chunk.c,v 1.28 1993/04/05 01:28:51 gray Exp $";
 #endif
 
 /* checking information */
@@ -2060,7 +2060,7 @@ EXPORT	void	_chunk_dump_not_freed(void)
   bblock_adm_t	*this;
   bblock_t	*bblockp;
   dblock_t	*dblockp;
-  char		*mem;
+  char		*mem, unknown;
   int		unknown_sizec = 0, unknown_dblockc = 0, unknown_bblockc = 0;
   int		sizec = 0, dblockc = 0, bblockc = 0;
   
@@ -2102,13 +2102,17 @@ EXPORT	void	_chunk_dump_not_freed(void)
       mem = BLOCK_POINTER(this->ba_count + (bblockp - this->ba_block));
       
       /* unknown pointer? */
-      if (strcmp(MALLOC_DEFAULT_FILE, bblockp->bb_file) == 0
-	  && bblockp->bb_line == MALLOC_DEFAULT_LINE) {
+      if (bblockp->bb_line == MALLOC_DEFAULT_LINE
+	  && strcmp(MALLOC_DEFAULT_FILE, bblockp->bb_file) == 0) {
 	unknown_bblockc++;
 	unknown_sizec += bblockp->bb_size - pnt_total_adm;
+	unknown = 1;
       }
       else
-	_malloc_message("bblock: %#9lx (%8d bytes) from '%s:%u' not freed",
+	unknown = 0;
+      
+      if (! unknown || BIT_IS_SET(_malloc_debug, DEBUG_LOG_UNKNOWN))
+	_malloc_message("not freed: %#9lx (%8d bytes) from '%s:%u'",
 			mem  + pnt_below_adm, bblockp->bb_size - pnt_total_adm,
 			bblockp->bb_file, bblockp->bb_line);
       
@@ -2168,13 +2172,17 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	}
 	
 	/* unknown pointer? */
-	if (strcmp(MALLOC_DEFAULT_FILE, dblockp->db_file) == 0
-	    && dblockp->db_line == MALLOC_DEFAULT_LINE) {
+	if (dblockp->db_line == MALLOC_DEFAULT_LINE
+	    && strcmp(MALLOC_DEFAULT_FILE, dblockp->db_file) == 0) {
 	  unknown_dblockc++;
 	  unknown_sizec += dblockp->db_size - pnt_total_adm;
+	  unknown = 1;
 	}
 	else
-	  _malloc_message("dblock: %#9lx (%8d bytes) from '%s:%u' not freed",
+	  unknown = 0;
+	
+	if (! unknown || BIT_IS_SET(_malloc_debug, DEBUG_LOG_UNKNOWN))
+	  _malloc_message("not freed: %#9lx (%8d bytes) from '%s:%u'",
 			  mem  + pnt_below_adm,
 			  dblockp->db_size - pnt_total_adm,
 			  dblockp->db_file, dblockp->db_line);

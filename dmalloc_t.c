@@ -30,14 +30,10 @@
 #include <stdio.h>				/* for stdin */
 
 #include "malloc.h"
-#include "malloc_loc.h"
-
-#include "conf.h"
-#include "compat.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.12 1993/03/31 00:36:04 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.13 1993/04/05 01:29:12 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -68,6 +64,18 @@ LOCAL	int	hex_to_int(char * str)
   }
   
   return ret;
+}
+
+/*
+ * little index function
+ */
+LOCAL	char	*find(char * str, char ch)
+{
+  for (; *str != '\0'; str++)
+    if (*str == (char)ch)
+      return str;
+  
+  return NULL;
 }
 
 /*
@@ -104,7 +112,7 @@ EXPORT	int	main(int argc, char ** argv)
     (void)printf("------------------------------------------------------\n");
     (void)printf("prompt> ");
     (void)fgets(line, sizeof(line), stdin);
-    linep = strrchr(line, '\n');
+    linep = find(line, '\n');
     if (linep != NULL)
       *linep = '\0';
     

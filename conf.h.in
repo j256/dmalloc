@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.6 1992/12/22 04:55:25 gray Exp $
+ * $Id: conf.h.in,v 1.7 1993/04/05 01:28:59 gray Exp $
  */
 
 /*
@@ -93,11 +93,10 @@
 
 #define HAVE_MEMCMP 0
 #define HAVE_MEMCPY 0
-
 #define HAVE_MEMSET 0
 
-#define HAVE_STRCHR 0
-#define HAVE_STRRCHR 0
+#define HAVE_INDEX 0
+#define HAVE_RINDEX 0
 
 #define HAVE_STRCAT 0
 #define HAVE_STRCMP 0

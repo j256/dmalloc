@@ -1,3 +1,14 @@
+Sun Apr  4 21:24:45 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added token "log-unknown" to dump non-free unknown pointers as
+	well as known ones.  Also cleaned up the displaying of the
+	pointers.
+
+	* comp.sources.unix is almost ready to post so lots of last minute
+	cleanups in the manual, etc.
+
+	* Started integration of function argument checking.
+
 Tue Mar 30 19:36:27 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Changed malloc.h defines so malloc routines are handled as well

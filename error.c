@@ -31,6 +31,8 @@
 #include <signal.h>				/* for kill signals */
 #include <stdarg.h>				/* for message vsprintf */
 
+#define MALLOC_DEBUG_DISABLE
+
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -42,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.17 1993/03/31 00:35:45 gray Exp $";
+  "$Id: error.c,v 1.18 1993/04/05 01:29:02 gray Exp $";
 #endif
 
 /*

@@ -27,6 +27,8 @@
  * heap as well as reporting the current position of the heap.
  */
 
+#define MALLOC_DEBUG_DISABLE
+
 #include "malloc.h"
 #include "malloc_loc.h"
 
@@ -39,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.17 1993/03/31 00:35:49 gray Exp $";
+  "$Id: heap.c,v 1.18 1993/04/05 01:29:03 gray Exp $";
 #endif
 
 /* external routines */
