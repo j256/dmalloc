@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: conf.h.in,v 1.75 1999/03/09 19:28:39 gray Exp $
+ * $Id: conf.h.in,v 1.76 1999/03/09 20:53:02 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -207,6 +207,7 @@
 #define HAVE_STRNCAT 0
 #define HAVE_STRPBRK 0
 #define HAVE_STRSTR 0
+#define HAVE_STRTOK 0
 
 /* manual settings */
 #include "settings.h"
