@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.87 2000/05/16 15:48:20 gray Exp $
+ * $Id: dmalloc_t.c,v 1.88 2000/05/17 16:24:52 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.87 2000/05/16 15:48:20 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.88 2000/05/17 16:24:52 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.87 2000/05/16 15:48:20 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.88 2000/05/17 16:24:52 gray Exp $";
 #endif
 #endif
 
@@ -379,7 +379,11 @@ static	int	do_random(const int iter_n)
 	
       case 15:
 #if HAVE_SBRK
-	{
+	/*
+	 * random-debug and sbrk kills the library because the
+	 * DEBUG_ALLOW_NONLINEAR flag can be turned off.
+	 */
+	if (! random_debug_b) {
 	  void	*mem;
 	  
 	  mem = sbrk(amount);
