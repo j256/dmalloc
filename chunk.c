@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.106 1997/03/21 17:23:57 gray Exp $";
+  "$Id: chunk.c,v 1.107 1997/03/21 21:22:49 gray Exp $";
 #endif
 
 /*
@@ -1358,7 +1358,7 @@ EXPORT	int	_chunk_check(void)
 	 * check out size, better be less than BLOCK_SIZE / 2
 	 * I have to check this twice :-(
 	 */
-	if (dblockp->db_size > BLOCK_SIZE / 2) {
+	if ((int)dblockp->db_size > BLOCK_SIZE / 2) {
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
 	  log_error_info(dblockp->db_file, dblockp->db_line, FALSE, NULL,
 			 NULL, "heap-check", FALSE);
@@ -1432,7 +1432,7 @@ EXPORT	int	_chunk_check(void)
 	}
 	
 	/* check out size, better be less than BLOCK_SIZE / 2 */
-	if (dblockp->db_size > BLOCK_SIZE / 2) {
+	if ((int)dblockp->db_size > BLOCK_SIZE / 2) {
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
 	  log_error_info(dblockp->db_file, dblockp->db_line, FALSE, NULL,
 			 NULL, "heap-check", FALSE);
@@ -1677,7 +1677,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
     }
     
     /* check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take over */
-    if (dblockp->db_size > BLOCK_SIZE / 2) {
+    if ((int)dblockp->db_size > BLOCK_SIZE / 2) {
       dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
       log_error_info(dblockp->db_file, dblockp->db_line, TRUE,
 		     CHUNK_TO_USER(pnt), NULL, "pointer-check", FALSE);
