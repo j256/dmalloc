@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.36 1993/08/12 22:11:55 gray Exp $";
+  "$Id: malloc.c,v 1.37 1993/08/12 22:18:35 gray Exp $";
 #endif
 
 /*
@@ -168,7 +168,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
  * may not return.
  */
 LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
-			  const char allocing)
+			  const char * label)
 {
   static int	addc = 0;
   
@@ -180,12 +180,8 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
   if (malloc_trace != NULL && pnt == malloc_trace) {
     trace_count++;
     
-    if (allocing)
-      _malloc_message("trace address '%#lx' allocing at pass %d from '%s:%u'",
-		      pnt, trace_count, file, line);
-    else
-      _malloc_message("trace address '%#lx' freeing at pass %d from '%s:%u'",
-		      pnt, trace_count, file, line);
+    _malloc_message("trace address '%#lx' from '%s' at pass %d from '%s:%u'",
+		    pnt, label, trace_count, file, line);
     
     /* we may need to continue to handle address */
     if (malloc_address == NULL || pnt != malloc_address)
@@ -333,7 +329,7 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
     return MALLOC_ERROR;
   
   newp = _chunk_malloc(_malloc_file, _malloc_line, size);
-  check_pnt(_malloc_file, _malloc_line, newp, TRUE);
+  check_pnt(_malloc_file, _malloc_line, newp, "malloc");
   
   in_alloc = FALSE;
   
@@ -357,7 +353,7 @@ EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
   
   /* alloc and watch for the die address */
   newp = _chunk_malloc(_malloc_file, _malloc_line, len);
-  check_pnt(_malloc_file, _malloc_line, newp, TRUE);
+  check_pnt(_malloc_file, _malloc_line, newp, "calloc");
   
   (void)memset(newp, NULLC, len);
   
@@ -382,9 +378,9 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
-  check_pnt(_malloc_file, _malloc_line, old_pnt, FALSE);
+  check_pnt(_malloc_file, _malloc_line, old_pnt, "realloc-in");
   newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
-  check_pnt(_malloc_file, _malloc_line, newp, TRUE);
+  check_pnt(_malloc_file, _malloc_line, newp, "realloc-out");
   
   in_alloc = FALSE;
   
@@ -411,7 +407,7 @@ EXPORT	int	free(void * pnt)
 #endif
   }
   
-  check_pnt(_malloc_file, _malloc_line, pnt, FALSE);
+  check_pnt(_malloc_file, _malloc_line, pnt, "free");
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
