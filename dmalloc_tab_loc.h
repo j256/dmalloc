@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab_loc.h,v 1.3 1999/03/11 00:57:28 gray Exp $
+ * $Id: dmalloc_tab_loc.h,v 1.4 1999/03/11 01:01:34 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_LOC_H__
@@ -36,7 +36,7 @@ typedef struct mem_table_st {
   unsigned long		mt_total_c;		/* total pointers allocated */
   unsigned long		mt_in_use_size;		/* size currently alloced */
   unsigned long		mt_in_use_c;		/* pointers currently in use */
-#if HAVE_QSORT
+#if QSORT_OKAY
   /* we use this so we can easily un-sort the list */
   struct mem_table_st	*mt_entry_pos_p;	/* pos of entry in table */
 #endif
