@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: conf.h.in,v 1.65 1998/10/26 14:24:29 gray Exp $
+ * $Id: conf.h.in,v 1.66 1998/11/09 16:50:09 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -162,6 +162,7 @@
 #define HAVE_TIME 0
 
 #define HAVE_RECALLOC 0
+#define HAVE_MEMALIGN 0
 #define HAVE_VALLOC 0
 
 #define HAVE_BCMP 0
