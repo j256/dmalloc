@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.159 2003/05/13 18:16:49 gray Exp $
+ * $Id: malloc.c,v 1.160 2003/05/15 02:39:29 gray Exp $
  */
 
 /*
@@ -71,7 +71,7 @@
 
 #include "chunk.h"
 #include "compat.h"
-#include "debug_val.h"
+#include "debug_tok.h"
 #include "env.h"
 #include "error.h"
 #include "error_val.h"
@@ -79,15 +79,6 @@
 #include "dmalloc_loc.h"
 #include "malloc_funcs.h"
 #include "return.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.159 2003/05/13 18:16:49 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: malloc.c,v 1.159 2003/05/13 18:16:49 gray Exp $";
-#endif
-#endif
 
 #if LOCK_THREADS
 #if IDENT_WORKS

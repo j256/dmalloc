@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.63 2003/05/13 18:15:32 gray Exp $
+ * $Id: heap.c,v 1.64 2003/05/15 02:39:29 gray Exp $
  */
 
 /*
@@ -37,20 +37,11 @@
 
 #include "chunk.h"
 #include "compat.h"
-#include "debug_val.h"
+#include "debug_tok.h"
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
 #include "dmalloc_loc.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: heap.c,v 1.63 2003/05/13 18:15:32 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: heap.c,v 1.63 2003/05/13 18:15:32 gray Exp $";
-#endif
-#endif
 
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.31 2003/05/13 18:16:48 gray Exp $
+ * $Id: env.c,v 1.32 2003/05/15 02:39:29 gray Exp $
  */
 
 /*
@@ -46,15 +46,6 @@
 #include "debug_tok.h"
 #include "env.h"
 #include "error.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: env.c,v 1.31 2003/05/13 18:16:48 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: env.c,v 1.31 2003/05/13 18:16:48 gray Exp $";
-#endif
-#endif
 
 /*
  * Environmental labels.

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.105 2003/05/13 18:16:48 gray Exp $
+ * $Id: dmalloc.c,v 1.106 2003/05/15 02:39:28 gray Exp $
  */
 
 /*
@@ -50,20 +50,11 @@
 
 #include "compat.h"
 #include "debug_tok.h"
-#include "debug_val.h"
+#include "debug_tok.h"
 #include "env.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
 #include "version.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.105 2003/05/13 18:16:48 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.105 2003/05/13 18:16:48 gray Exp $";
-#endif
-#endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
 #define SHELL_ENVIRON	"SHELL"			/* for the type of shell */

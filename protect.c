@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: protect.c,v 1.6 2002/07/24 19:04:24 gray Exp $
+ * $Id: protect.c,v 1.7 2003/05/15 02:39:29 gray Exp $
  */
 
 /*
@@ -44,15 +44,6 @@
 #include "error.h"
 #include "heap.h"
 #include "protect.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: protect.c,v 1.6 2002/07/24 19:04:24 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: protect.c,v 1.6 2002/07/24 19:04:24 gray Exp $";
-#endif
-#endif
 
 /*
  * void protect_set_read_only

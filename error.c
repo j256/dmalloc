@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.101 2002/07/24 19:05:16 gray Exp $
+ * $Id: error.c,v 1.102 2003/05/15 02:39:29 gray Exp $
  */
 
 /*
@@ -68,21 +68,12 @@
 #include "dmalloc.h"
 
 #include "compat.h"
-#include "debug_val.h"
+#include "debug_tok.h"
 #include "env.h"				/* for LOGPATH_INIT */
 #include "error.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
 #include "version.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: error.c,v 1.101 2002/07/24 19:05:16 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: error.c,v 1.101 2002/07/24 19:05:16 gray Exp $";
-#endif
-#endif
 
 #if LOCK_THREADS
 #if IDENT_WORKS

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.17 2003/05/13 16:36:16 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.18 2003/05/15 02:39:28 gray Exp $
  */
 
 /*
@@ -45,15 +45,6 @@
 
 #include "dmalloc_tab.h"
 #include "dmalloc_tab_loc.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: dmalloc_tab.c,v 1.17 2003/05/13 16:36:16 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.17 2003/05/13 16:36:16 gray Exp $";
-#endif
-#endif
 
 /*
  * local variables
