@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.166 1999/04/15 12:54:46 gray Exp $
+@c $Id: dmalloc.texi,v 1.167 1999/04/20 16:48:25 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -630,10 +630,7 @@ Bash, ksh, and zsh users should add the following to their
 (notice the -b option for bourne shell output):
 
 @example
-function dmalloc
-@{
-        eval `command dmalloc -b $*`
-@}
+function dmalloc @{ eval `command dmalloc -b $*`; @}
 @end example
 
 By the way, if you are looking for a shell, I heartily recommend trying
