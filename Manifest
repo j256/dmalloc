@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.24 1994/03/03 03:50:09 gray Exp $
+$Id: Manifest,v 1.25 1994/04/08 21:10:49 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -22,8 +22,7 @@ NOTES			General Notes of the malloc routines and
 
 README			Quick startup notes.
 
-TODO			Things to do list.  It only gets longer and
-			longer.
+TODO			Things to do list.  It gets longer and longer.
 
 arg_check.[ch]		Malloc routines used for testing of arguments.
 
@@ -51,10 +50,6 @@ config.help		Help file about the GNU configure scripts.
 configure		Configure shell script.
 
 configure.in		Used by autoconf to create configure script.
-
-const.h			Small header file to be included in malloc_dbg.h.
-
-const.h.in		Used by configure to create const.h.
 
 contrib/		directory of contributions from other sources
 
@@ -89,7 +84,7 @@ malloc_dbg.c		Program that assists in the setting of the
 			MALLOC_DEBUG and other debug environmental
 			variables.
 
-malloc_dbg.[12]		Used to create malloc_dbg.h.
+malloc_dbg.[123]	Used to create malloc_dbg.h.
 
 malloc_dbg.h		Installed malloc .h file to be included in
 			those .c files where file and line debugging
