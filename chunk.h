@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk.h,v 1.47 1998/09/18 19:07:55 gray Exp $
+ * $Id: chunk.h,v 1.48 1998/09/18 19:10:57 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -88,21 +88,23 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 		       const int realloc_b, const int valloc_b);
 
 /*
+ * Frees PNT from the heap.  REALLOC_B set if realloc is freeing a
+ * pointer so doing count it as a free.  Returns FREE_ERROR or
+ * FREE_NOERROR.
+ *
+ * NOTE: should be above _chunk_realloc which calls it.
+ */
+extern
+int	_chunk_free(const char *file, const unsigned int line, void *pnt,
+		    const int realloc_b);
+
+/*
  * Reallocate a section of memory
  */
 extern
 void	*_chunk_realloc(const char *file, const unsigned int line,
 			void *old_p, unsigned int new_size,
 			const int recalloc_b);
-
-/*
- * Frees PNT from the heap.  REALLOC_B set if realloc is freeing a
- * pointer so doing count it as a free.  Returns FREE_ERROR or
- * FREE_NOERROR.
- */
-extern
-int	_chunk_free(const char *file, const unsigned int line, void *pnt,
-		    const int realloc_b);
 
 /*
  * Log present free and used lists
