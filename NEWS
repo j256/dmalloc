@@ -1,14 +1,17 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.41 1994/10/12 17:22:26 gray Exp $
+$Id: NEWS,v 1.42 1994/10/14 02:04:26 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Added default tags: default,low,medium,high,all to dmalloc.
+	* Renamed 'check-free' token to 'check-blank'.
+	* Made many changes to make it easier to get running with dmalloc.
+	* Added long(-L)/short(-S) options to output debug-tokens in env.
 	* Changed some dmalloc options:
 		* -T (list-tokens) -> -D (debug-tokens)
-		* -L (list-tags) -> -t (list-tags).
-	* Added long(-L)/short(-S) options to output debug-tokens in env.
-	* Added much better error logging in chunk.
+		* -L (list-tags) -> -t (list-tags)
+	* Added better error logging in chunk.
 	* Added DG/UX code to return.h and atexit.c to contrib.  Thanks Joerg.
 
 Version 3.0.2:

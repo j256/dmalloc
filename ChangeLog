@@ -1,10 +1,19 @@
+Thu Oct 13 21:25:52 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Added default tags: default,low,medium,high,all to dmalloc.
+
+	* Renamed check-free to check-blank but left free for compat.
+
+	* Made a number of changes from Dave MacKenzie.  Thanks Dave!
+	Reworking the manual fixed the Makefile, RC file, argv, etc...
+
 Wed Oct 12 13:00:48 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Added long/short options to dmalloc and env routines.
 
 	* Changed some dmalloc options.  -T -> -D, -L -> -t.  Yeach!
 
-	* Added long/short options to dmalloc and env.
-
-	* Added much better error logging in chunk.
+	* Added better error logging in chunk.
 
 Tue Oct  4 13:39:40 1994  Gray Watson  (gray at toaster.antaire.com)
 
@@ -847,5 +856,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.122 1994/10/12 17:22:23 gray Exp $
+$Id: ChangeLog,v 1.123 1994/10/14 02:04:23 gray Exp $
 -------------------------------------------------------------------------------

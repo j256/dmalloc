@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.62 1994/10/12 17:07:31 gray Exp $
+@c $Id: dmalloc.texi,v 1.63 1994/10/14 02:04:01 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -232,7 +232,7 @@ include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
 more information about their capabilities, do a @code{man 3 malloc} to
 read the system's manual pages.
 
-@table @samp
+@table @code
 @item malloc
 @cindex malloc
 Usage: @code{pnt = (type *)malloc(unsigned int size);}
@@ -308,7 +308,7 @@ statistics, etc.. @xref{Environment Variable}.
 The debugging features that are available can be divided into a couple
 basic classifications:
 
-@table @samp
+@table @asis
 @item file and line number information
 @cindex file/line numbers
 @cindex cpp
@@ -446,7 +446,7 @@ The @samp{DMALLOC_OPTIONS} variable should be set to a comma separated
 list of tokens with a corresponding value.  Each of the tokens is
 described below:
 
-@table @samp
+@table @code
 @item debug
 @cindex debug setting
 This should be set to a value in hexadecimal which corresponds to the
@@ -562,7 +562,7 @@ To get this information on the fly, use @samp{dmalloc -TV}.  This
 will print out the Tokens in Very-verbose mode @xref{Dmalloc
 Program}.
 
-@table @samp
+@table @code
 @item none
 no debugging functionality
 
@@ -608,9 +608,9 @@ verify heap administrative structure
 @item check-lists
 examine internal heap linked-lists
 
-@item check-free
-check to see if free space has been overwritten.  @emph{NOTE}: this
-enabled free-blank also.
+@item check-blank
+check to see if space that was blanked by free-blank or alloc-blank has
+been overwritten.
 
 @item check-funcs
 check the arguments of some functions (mostly string operations) looking
@@ -679,6 +679,11 @@ gcc -DDMALLOC_FUNC_CHECK file.c
 enabled, you will have to recompile with it off to disconnect the
 library @xref{Disabling the Library}.
 
+@emph{WARNING}: You should be sure to have @file{dmalloc.h} included at
+the end of your include file list because dmalloc uses macros and may
+try to change declarations of the checked functions if they come after
+it.
+
 When this is defined dmalloc will override a number of functions and will
 insert a routine which knows how to check its own arguments and then
 call the real function.  Dmalloc can check such functions as bcopy,
@@ -718,7 +723,14 @@ may still be lurking.
 
 By including @file{dmalloc.h} in your C files, your calls to calloc,
 free, malloc, or realloc are replaced with calls to _calloc_leap,
-_free_leap, _malloc_leap, and _realloc_leap.
+_free_leap, _malloc_leap, and _realloc_leap.  Additionally the library
+replaces calls to xcalloc, xfree, xmalloc, xrealloc, and xstrdup with
+_leap calls.
+
+@emph{WARNING}: You should be sure to have @file{dmalloc.h} included at
+the end of your include file list because dmalloc uses macros and may
+try to change declarations of the malloc functions if they come after
+it.
 
 @cindex leap macros
 
@@ -1135,7 +1147,7 @@ included with this package.  It is available from ftp.antaire.com in the
 
 Here is a detailed list of the flags that can passed to dmalloc:
 
-@table @samp
+@table @code
 @item -a address
 Set the @samp{addr} part of the @samp{DMALLOC_OPTIONS} variable to
 address (or alternatively address:number).
@@ -1285,13 +1297,32 @@ dmalloc -tv
 @cindex debug tags
 
 By using a @dfn{RC File} (or run-time configuration file) you can alias
-tags to combinations of debug tokens.  @xref{Debug Tokens}.  A sample
-@file{dmallocrc} file has been provided but you are encouraged to roll
-your own combinations.
+tags to combinations of debug tokens.  @xref{Debug Tokens}.  
 
-The name of default rc-file is @file{$HOME/.dmallocrc}.  The @samp{$HOME}
-environmental variable should be set by the system to point to your
-home-directory.
+@emph{NOTE}: For beginning users, the dmalloc program has a couple of
+tags built into it so it is not necessary for you to setup a RC file:
+
+@table @code
+@item runtime
+enables basic run-time tests
+
+@item low
+turns on minumal checking of heap structures
+
+@item medium
+significant checking of heap areas
+
+@item high
+extensive checking of heap areas
+
+@item all
+turns on all the checking possible
+@end table
+
+For expert users, a sample @file{dmallocrc} file has been provided but
+you are encouraged to roll your own combinations.  The name of default
+rc-file is @file{$HOME/.dmallocrc}.  The @samp{$HOME} environmental
+variable should be set by the system to point to your home-directory.
 
 The rc-file file should contain lines in the general form of:
 
@@ -1400,6 +1431,10 @@ should be enabled and the @samp{inter} part of the
 library can find the problem as close as possible to its source.  The
 code before the call to the library which stopped can then be examined
 closely for irregularities.
+
+You may also want to put calls to @code{dmalloc_verify(0)} in your code
+before the section which generated the error.  This should locate the
+problem faster by checking the library's structures more frequently.
 
 @node Memory Leaks, Fence-Post Overruns, General, Debugging with the Library
 @subsection Tracking down non-freed memory.
@@ -1596,7 +1631,7 @@ couple of things that I feel strongly about.  If you would like any more
 information about the below, please mail to the supplied addresses or
 drop me a line with any questions.
 
-@table @samp
+@table @asis
 @item The Electronic Frontier Foundation (EFF)
 @cindex EFF
 @cindex Electronic Frontier Foundation
