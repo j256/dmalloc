@@ -1,10 +1,12 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.17 1994/02/18 23:19:28 gray Exp $
+$Id: NEWS,v 1.18 1994/02/20 05:40:34 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.1:
 
+	* Cleaned up a number of configure/compat functions.
 	* Fixed tons of __STDC__ defines.  Finally I hope.
+	* Added more commands to malloc_t to log information, etc.
 
 Version 2.0.0:
 

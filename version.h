@@ -18,8 +18,11 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.30 1994/02/18 03:57:01 gray Exp $
+ * $Id: version.h,v 1.31 1994/02/20 05:40:43 gray Exp $
  */
+
+#ifndef __VERSION_H__
+#define __VERSION_H__
 
 #include "malloc_loc.h"				/* for LOCAL */
 
@@ -30,4 +33,6 @@
  */
 LOCAL	char	*malloc_version = "2.0.0";
 
-/* Version Date: $Date: 1994/02/18 03:57:01 $ */
+/* Version Date: $Date: 1994/02/20 05:40:43 $ */
+
+#endif /* ! __VERSION_H__ */

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.34 1994/02/18 07:34:06 gray Exp $
+# $Id: Makefile.all.in,v 1.35 1994/02/20 05:40:33 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -94,7 +94,7 @@ $(UTIL) : $(UTIL).o argv.o compat.o
 	mv a.out $@
 
 # .PHONY : noansi
-noansi : Deansify.pl
+noansi : malloc_dbg.h Deansify.pl
 	perl ./Deansify.pl *.[ch]
 
 # .PHONY : tests

@@ -18,8 +18,11 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.30 1994/02/18 07:34:13 gray Exp $
+ * $Id: conf.h.in,v 1.31 1994/02/20 05:40:38 gray Exp $
  */
+
+#ifndef __CONF_H__
+#define __CONF_H__
 
 /*
  ************************************************************************
@@ -196,36 +199,40 @@
 
 #define HAVE_STRCAT 0
 #define HAVE_STRCMP 0
+#define HAVE_STRCPY 0
 #define HAVE_STRLEN 0
 #define HAVE_STRTOK 0
 
+/* place fillers */
 #define HAVE_GETPID 0
 #define HAVE_TIME 0
 
 /* for argv files */
 #define HAVE_STRDUP 0
+#define HAVE_STRNCMP 0
+#define HAVE_STRNCPY 0
+#define HAVE_STRSTR 0
+
 
 /*
  * the below functions are here to provide function argument checking
  * only.  the library only has stubs for these and does not use them
  * internally.
  */
-#define HAVE_MEMCMP 0
-#define HAVE_MEMCPY 0
 #define HAVE_BZERO 0
 
+#define HAVE_MEMCPY 0
 #define HAVE_MEMCCPY 0
 #define HAVE_MEMCHR 0
+#define HAVE_MEMCMP 0
 
 #define HAVE_STRCHR 0
 #define HAVE_STRRCHR 0
-#define HAVE_STRCPY 0
-#define HAVE_STRNCPY 0
 #define HAVE_STRCASECMP 0
 #define HAVE_STRNCASECMP 0
 #define HAVE_STRSPN 0
 #define HAVE_STRCSPN 0
 #define HAVE_STRNCAT 0
-#define HAVE_STRNCMP 0
 #define HAVE_STRPBRK 0
-#define HAVE_STRSTR 0
+
+#endif /* ! __CONF_H__ */
