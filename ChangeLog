@@ -1,5 +1,9 @@
 Fri Mar 31 16:51:52 1995  Gray Watson  (gray@burger.letters.com)
 
+	* New version of argv files.
+
+	* Fixed problem with dmalloc -c and start-count.
+
 	* Added some messages about upcoming errors in dmalloc_t.
 
 Thu Mar 23 10:34:33 1995  Gray Watson  (gray@burger.letters.com)
@@ -936,5 +940,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.141 1995/03/31 21:52:25 gray Exp $
+$Id: ChangeLog,v 1.142 1995/03/31 23:01:54 gray Exp $
 -------------------------------------------------------------------------------

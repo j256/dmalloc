@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.53 1995/03/31 21:52:26 gray Exp $
+$Id: NEWS,v 1.54 1995/03/31 23:01:55 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.6:
 
+	* New version of argv files.
+	* Fixed problem with dmalloc -c and start-count.
 	* Added some messages about upcoming errors in dmalloc_t.
 	* Added allow-zero token for not minding malloc(0) and free(0L).
 	* Made all chunk.c global counters longs.
