@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.77 1999/03/05 14:54:49 gray Exp $
+ * $Id: dmalloc_t.c,v 1.78 1999/03/08 04:59:01 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.77 1999/03/05 14:54:49 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.78 1999/03/08 04:59:01 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.77 1999/03/05 14:54:49 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.78 1999/03/08 04:59:01 gray Exp $";
 #endif
 #endif
 
@@ -854,7 +854,7 @@ int	main(int argc, char **argv)
     (void)printf("Random seed is %u\n", seed_random);
   }
   
-  dmalloc_message("Random seed is %u\n", seed_random);
+  dmalloc_message("random seed is %u\n", seed_random);
   
   if (interactive_b) {
     do_interactive();
