@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.106 2003/09/08 15:21:41 gray Exp $
+ * $Id: dmalloc_t.c,v 1.107 2003/11/10 23:59:55 gray Exp $
  */
 
 /*
@@ -1467,6 +1467,54 @@ static	int	check_special(void)
     }
     
     dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that the calloc macro is valid.
+   */
+  {
+    DMALLOC_SIZE	user_size;
+  
+    if (! silent_b) {
+      (void)printf("  Checking calloc macro arguments\n");
+    }
+    
+    /* notice that we do not have a () around this operation */
+#define SIZE_ARG	10 + 1
+#define COUNT_ARG	2
+    
+    /*
+     * Initially I was not putting parens around macro arguments in
+     * dmalloc.h.  Rookie mistake.  This should allocate (10 + 1) * 2
+     * bytes (22) not 10 + 1 * 2 bytes (12).
+     */
+    pnt = calloc(SIZE_ARG, COUNT_ARG);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not calloc %d bytes.\n",
+		     (SIZE_ARG) * (COUNT_ARG));
+      }
+      final = 0;
+    }
+    
+    else if (dmalloc_examine(pnt, &user_size, NULL, NULL, NULL, NULL, NULL,
+			     NULL) != DMALLOC_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: examining pointer %lx failed.\n",
+		     (unsigned long)pnt);
+      }
+      final = 0;
+    }
+    
+    else if (user_size != (SIZE_ARG) * (COUNT_ARG)) {
+      if (! silent_b) {
+	(void)printf("   ERROR: calloc size should be %d but was %d.\n",
+		     (SIZE_ARG) * (COUNT_ARG), user_size);
+      }
+      final = 0;
+    }
   }
   
   /********************/
