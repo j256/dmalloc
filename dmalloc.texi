@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.60 1994/09/26 17:54:46 gray Exp $
+@c $Id: dmalloc.texi,v 1.61 1994/10/04 17:42:17 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -86,9 +86,9 @@ memory allocation or @dfn{dmalloc} library it accompanies (see
 The library has been designed as a drop in replacement for the system's
 malloc, realloc, calloc, free and other memory management routines while
 providing powerful debugging facilities.  It is also reasonably portable
-having been successfully run on the following operating systems: BSDI,
-SunOS, Solaris, AIX, Ultrix, OSF, Irix, HPUX, and probably a couple
-others.
+having been successfully run on the following operating systems: AIX,
+BSDI, DG/UX, HPUX, Irix, MS-DOG, OSF, Solaris, SunOS, Ultrix, and
+probably a couple others.
 
 The library is available from ftp.antaire.com in the
 @file{antaire/src/dmalloc} directory (URL
