@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.24 1993/08/30 20:14:36 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.25 1993/09/10 21:13:56 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -113,16 +113,5 @@
 #define BIT_CLEAR(v,f)		(v) &= ~(f)
 #undef BIT_IS_SET
 #define BIT_IS_SET(v,f)		((v) & (f))
-
-/*
- * some defines to standardize memory functions
- */
-#if HAVE_BCMP == 0
-#define bcmp(s1, s2, len)	memcmp((char *)(s1), (char *)(s2), (len))
-#endif
-
-#if HAVE_BCOPY == 0
-#define bcopy(from, to, len)	(void)memcpy((char *)(to), (char *)(from), len)
-#endif
 
 #endif /* ! __MALLOC_LOC_H__ */
