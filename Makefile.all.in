@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.105 2000/11/15 01:34:00 gray Exp $
+# $Id: Makefile.all.in,v 1.106 2001/02/26 19:52:45 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -80,8 +80,8 @@ LIB_SL = lib$(MODULE).so
 @TH_ON@INSTALL_SL_7 = installthsl
 @CXX_ON@BUILD_SL_8 = $(LIB_CXX_SL)
 @CXX_ON@INSTALL_SL_8 = installcxxsl
-@TH_ON@CXX_ON@BUILD_SL_9 = $(LIB_TH_CXX_SL)
-@TH_ON@CXX_ON@INSTALL_SL_9 = installthcxxsl
+@TH_ON@@CXX_ON@BUILD_SL_9 = $(LIB_TH_CXX_SL)
+@TH_ON@@CXX_ON@INSTALL_SL_9 = installthcxxsl
 
 # now construct our build and install targets
 BUILD_ALL = dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) \
