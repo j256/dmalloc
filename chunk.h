@@ -2,10 +2,12 @@
  * defines for low level memory management routines
  *
  * Copyright 1991 by the Antaire Corporation
- * Please see the LICENSE file in this directory for license information
  *
- * @(#)chunk.h	3.1 GRAY@ANTAIRE.COM 11/27/91
+ * @(#)chunk.h	3.6 GRAY@ANTAIRE.COM 12/23/91
  */
+
+#define CHUNK_CHECK_LEVEL	0	/* check depending on level only */
+#define CHUNK_CHECK_ALL		1	/* check absolutely everything */
 
 /*<<<<<<<<<<*/
 /* Do NOT erase this or the above <<<<<<<<<< line. make fillproto used them. */
@@ -16,57 +18,58 @@
 /* global debug level number */
 IMPORT	int		_malloc_debug_level;
 
-IMPORT	int		_malloc_errno;	/* error number */
+IMPORT	int		_malloc_errno;  /* error number */
 
-IMPORT	int		_calloc_count;	/* # callocs, done in alloc */
+IMPORT	int		_calloc_count;  /* # callocs, done in alloc */
 
 /*
  * Internal message writter
  * NOTE: this is here so the users will not see it in alloc.h
  */
 IMPORT	void	_malloc_message(/* format, va_alist */);
-/*   charp_t	format; */
-/*   va_dcl */
+/* char		*format; */
+/* va_dcl */
 
-/* malloc version of perror */
+/* malloc version of perror of an error in STR */
 IMPORT	void	_malloc_perror(/* str */);
-/*   charp_t	str; */
+/* char		*str; */
 
 /* startup the low level malloc routines */
 IMPORT	int	_chunk_startup(/* VOID */);
 
-/* run extensive tests on the entire heap */
-IMPORT	int	_chunk_heap_check(/* VOID */);
+/* run extensive tests on the entire heap depending on TYPE */
+IMPORT	int	_chunk_heap_check(/* type */);
+/* int		type; */		/* check all or use only level */
 
 /* run extensive tests on PNT */
 IMPORT	int	_chunk_pnt_check(/* pnt */);
-/*   void		*pnt; */
+/* char		*pnt; */
 
-/* return some information associated with PNT, FALSE on error */
-IMPORT	int	_chunk_read_info(/* pnt, size, file, line */);
-/*   void		*pnt; */
-/*   unsigned int	*size; */
-/*   charp_t	*file; */
-/*   unsigned int	*line; */
+/* return some information associated with PNT, ERROR on error */
+IMPORT	int	chunk_read_info(/* pnt, size, file, line */);
+/* char		*pnt; */
+/* unsigned int	*size; */
+/* char		**file; */
+/* unsigned int	*line; */
 
 /* get a SIZE chunk of memory for FILE at LINE */
-IMPORT	void	*_chunk_malloc(/* file, line, size */);
-/*   charp_t	file; */
-/*   unsigned int	line; */
-/*   unsigned int	size; */
+IMPORT	char	*_chunk_malloc(/* file, line, size */);
+/* char		*file; */
+/* unsigned int	line; */
+/* unsigned int	size; */
 
 /* frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR */
 IMPORT	int	_chunk_free(/* file, line, pnt */);
-/*   charp_t	file; */
-/*   unsigned int	line; */
-/*   void		*pnt; */
+/* char		*file; */
+/* unsigned int	line; */
+/* char		*pnt; */
 
 /* reallocate a section of memory */
-IMPORT	void	*_chunk_realloc(/* file, line, old_pnt, new_size */);
-/*   charp_t	file; */
-/*   unsigned int	line; */
-/*   void		*old_pnt; */
-/*   unsigned int	new_size; */
+IMPORT	char	*_chunk_realloc(/* file, line, oldp, new_size */);
+/* char		*file; */
+/* unsigned int	line; */
+/* char		*oldp; */
+/* unsigned int	new_size; */
 
 /* log present free and used lists */
 IMPORT	void	_chunk_count(/* VOID */);

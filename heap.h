@@ -2,26 +2,35 @@
  * defines for the system specific memory routines
  *
  * Copyright 1991 by the Antaire Corporation
- * Please see the LICENSE file in this directory for license information
  *
- * @(#)heap.h	1.8 GRAY@ANTAIRE.COM 11/26/91
+ * @(#)heap.h	1.11 GRAY@ANTAIRE.COM 12/23/91
  */
 
 /*
  * error code returned by heap allocation routine
  */
-#if defined(sparc) || defined(i386)
-#  define HEAP_ALLOC_ERROR	((void *)-1)
+#if defined(sparc) || defined(i386) || defined(mips)
+#  define HEAP_ALLOC_ERROR	((char *)-1)
+#endif
+
+/*
+ * word boundaries for different machine types
+ */
+#if defined(i386)
+#define WORD_BOUNDARY		4
+#endif
+#if defined(sparc) || defined(mips)
+#define WORD_BOUNDARY		8
 #endif
 
 /*
  * probably machine specific defines used for certain calculations
  */
-#if defined(sparc) || defined(i386)
+#if defined(sparc) || defined(i386) || defined(mips)
 
 /* test whether pointer P is in the heap space */
 #define IS_IN_HEAP(p)		\
-  ((void *)(p) >= _heap_base && (void *)(p) < _heap_last)
+  ((char *)(p) >= _heap_base && (char *)(p) < _heap_last)
 
 /* turn pointer P into a block index */
 #define WHICH_BLOCK(p)		(((p) - _heap_base) / BLOCK_SIZE)
@@ -35,7 +44,7 @@
 /* calculate the size of heap */
 #define HEAP_SIZE()		(_heap_last - _heap_base)
 
-#endif /* sparc || i386 */
+#endif
 
 /*<<<<<<<<<<*/
 /* Do NOT erase this or the above <<<<<<<<<< line. make fillproto used them. */
@@ -43,22 +52,22 @@
 
 #if !defined(HEAP_MAIN)
 
-IMPORT	void		*_heap_base;	/* base of our heap */
+IMPORT	char		*_heap_base;	/* base of our heap */
 
-IMPORT	void		*_heap_last;	/* end of our heap */
+IMPORT	char		*_heap_last;	/* end of our heap */
 
 /* function to get SIZE memory bytes from the end of the heap */
-IMPORT	void	*_heap_alloc(/* size */);
+IMPORT	char	*_heap_alloc(/* size */);
 /*   unsigned int	size; */
 
 /* return a pointer to the current end of the heap */
-IMPORT	void	*_heap_end(/* VOID */);
+IMPORT	char	*_heap_end(/* VOID */);
 
 /* initialize heap pointers */
 IMPORT	void	_heap_startup(/* VOID */);
 
 /* align (by extending) _heap_base to BASE byte boundary */
-IMPORT	void	*_heap_align_base(/* base */);
+IMPORT	char	*_heap_align_base(/* base */);
 /*   int	base; */
 
 #endif

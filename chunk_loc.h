@@ -2,9 +2,8 @@
  * local malloc defines
  *
  * Copyright 1991 by the Antaire Corporation
- * Please see the LICENSE file in this directory for license information
  *
- * @(#)chunk_loc.h	1.10 GRAY@ANTAIRE.COM 11/27/91
+ * @(#)chunk_loc.h	1.12 GRAY@ANTAIRE.COM 12/7/91
  */
 
 /* defines for the malloc subsystem */
@@ -17,7 +16,7 @@
 
 /* number of blocks in the administrative structures */
 #define BB_PER_ADMIN	((BLOCK_SIZE - \
-			  (sizeof(long) + sizeof(int) + sizeof(void *) + \
+			  (sizeof(long) + sizeof(int) + sizeof(char *) + \
 			   sizeof(long))) / sizeof(bblock_t))
 #define DB_PER_ADMIN	((BLOCK_SIZE - (sizeof(long) + sizeof(long))) \
 			 / sizeof(dblock_t))
@@ -56,7 +55,7 @@ struct dblock_st {
   
   union {
     struct dblock_st	*pn_next;		/* next in the free list */
-    charp_t		pn_file;		/* .c filename where alloced */
+    char		*pn_file;		/* .c filename where alloced */
   } db_pnt;
 
   /* to reference union elements as db elements */
@@ -97,8 +96,8 @@ struct bblock_st {
   union {
     struct dblock_adm_st	*pn_slotp;	/* pointer to db_admin block */
     struct bblock_adm_st	*pn_adminp;	/* pointer to bb_admin block */
-    void			*pn_mem;	/* memory associated to it */
-    charp_t			pn_file;	/* .c filename where alloced */
+    char			*pn_mem;	/* memory associated to it */
+    char			*pn_file;	/* .c filename where alloced */
   } bb_pnt;
   
   /* to reference union elements as bb elements */
