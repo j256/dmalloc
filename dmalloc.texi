@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.102 1995/07/04 01:54:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.103 1995/07/14 20:59:19 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -156,11 +156,12 @@ Please see the following sections for usage permissions.
 @cindex non-commercial license
 
 Permission to use, copy, and modify this software for any
-@emph{non-commercial} purpose without fee is hereby granted.
+@emph{academic} or @emph{non-commercial} purpose without fee is hereby
+granted.
 
 Although only commercial users are required to license the software,
-non-commercial user registration is greatly appreciated.  Licensees get
-a registration file for the software (which cannot be distributed), a
+@emph{all} user registrations are greatly appreciated.  Licensees get a
+registration file for the software (which cannot be distributed), a
 letter documenting their registered status, as well as product support
 and notification of free-upgrades.  @xref{Commercial License}.
 
@@ -175,8 +176,8 @@ software for a nominal fee.  There is a thirty (30) day free evaluation
 period but if your organization uses the software after this time period
 expires, please consider purchasing a registered copy.  This allows me
 to provide better support as well as bug fixes and feature updates on a
-more frequent basis.  Although not required, non-commercial user
-registration is greatly appreciated.
+more frequent basis.  Although not required, academic or non-commercial
+user registration is greatly appreciated.
 
 A licensed copy of the software is available for US$35.  Commercial
 entities should purchase one license per workstation, or one per dmalloc
