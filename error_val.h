@@ -18,14 +18,17 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.29 2003/05/15 02:43:10 gray Exp $
+ * $Id: error_val.h,v 1.30 2003/05/16 00:09:42 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
 #define __ERROR_VAL_H__
 
 /*
- * malloc error codes
+ * Dmalloc error codes.
+ *
+ * NOTE: these are here instead of error.h because the dmalloc utility
+ * needs them as well as the dmalloc library.
  */
 #define ERROR_NONE			1	/* no error */
 
@@ -40,15 +43,15 @@
 #define ERROR_NOT_IN_HEAP		21	/* pointer is not in heap */
 #define ERROR_NOT_FOUND			22	/* pointer not-found */
 #define ERROR_IS_FOUND			23	/* found special pointer */
-#define ERROR_BAD_FILEP			24	/* bad bblock file-name */
-#define ERROR_BAD_LINE			25	/* bad bblock line-number */
+#define ERROR_BAD_FILE			24	/* bad file-name */
+#define ERROR_BAD_LINE			25	/* bad line-number */
 #define ERROR_UNDER_FENCE		26	/* failed picket fence lower */
 #define ERROR_OVER_FENCE		27	/* failed picket fence upper */
 #define ERROR_WOULD_OVERWRITE		28	/* would overwrite fence */
 #define ERROR_IS_FREE			29	/* pointer is already free */
 
 /* allocation errors */
-#define ERROR_BAD_SIZE			40	/* bad bblock size value */
+#define ERROR_BAD_SIZE			40	/* bad size value */
 #define ERROR_TOO_BIG			41	/* allocation too large */
 #define ERROR_USER_NON_CONTIG		42	/* user space not contiguous */
 #define ERROR_ALLOC_FAILED		43	/* could not get more space */
@@ -68,6 +71,7 @@
 #define ERROR_ADMIN_LIST		70	/* list pnt out of bounds */
 #define ERROR_TABLE_CORRUPT		71	/* memory table corruption */
 #define ERROR_ADDRESS_LIST		72	/* invalid address list */
+#define ERROR_SLOT_CORRUPT		73	/* memory slot corruption */
 
 #define INVALID_ERROR		"errno value is not valid"
 
@@ -95,7 +99,7 @@ __attribute__ ((unused))
   { ERROR_NOT_IN_HEAP,		"pointer is not pointing to heap data space" },
   { ERROR_NOT_FOUND,		"cannot locate pointer in heap" },
   { ERROR_IS_FOUND,		"found pointer the user was looking for" },
-  { ERROR_BAD_FILEP,		"possibly bad .c filename pointer" },
+  { ERROR_BAD_FILE,		"possibly bad .c filename pointer" },
   { ERROR_BAD_LINE,		"possibly bad .c file line-number" },
   { ERROR_UNDER_FENCE,	       "failed UNDER picket-fence magic-number check"},
   { ERROR_OVER_FENCE,		"failed OVER picket-fence magic-number check"},
@@ -122,7 +126,10 @@ __attribute__ ((unused))
   /* administrative errors */
   { ERROR_ADMIN_LIST,		"bad admin structure list" },
   { ERROR_TABLE_CORRUPT,	"internal memory table corruption" },
-  { ERROR_ADDRESS_LIST,		"internal address list corruption" }
+  { ERROR_ADDRESS_LIST,		"internal address list corruption" },
+  { ERROR_SLOT_CORRUPT,		"internal memory slot corruption" },
+  
+  { 0 }
 };
 
 #endif /* ! __ERROR_VAL_H__ */
