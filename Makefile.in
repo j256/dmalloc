@@ -1,12 +1,12 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.39 1993/11/23 09:37:14 gray Exp $
+# $Id: Makefile.in,v 1.40 1993/12/20 06:30:17 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
 OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
-OBJS_IN	= malloc_lp.o 
+OBJS_IN	= malloc_lp.o
 FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
 
 ARGV	= argv
@@ -35,22 +35,39 @@ PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
 	malloc.info malloc.texi malloc.ps texinfo.tex
 PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
-PARTS	= 1 2 3 4 5
-MAXPART	= 5
-SHAR1	= ChangeLog Makefile.in Manifest NEWS NOTES README TODO malloc.c
-SHAR2	= chunk.c
-SHAR3	= configure error.[ch] error_str.h error_val.h malloc.info
-SHAR4	= chunk.h chunk_loc.h compat.[ch] conf.h.in const.h.in malloc.texi \
-	malloc_t.c mallocrc
-SHAR5	= configure.in dbg_tokens.h dbg_values.h heap.[ch] malloc_dbg.c \
-	malloc_dbg.[12] malloc_loc.h malloc_lp.[ch] arg_check.[ch] version.h
+PARTS	= 1 2 3 4 5 6 7
+MAXPART	= 7
+# NOTE: the wc level should be below 90k due to shar overhead
+SHAR1	= conf.h.in const.h.in Makefile.in configure configure.in \
+	configure.help \
+	ChangeLog Manifest
+SHAR2	= chunk.[ch] chunk_loc.h
+SHAR3	= NEWS NOTES README TODO mallocrc \
+	arg_check.[ch] compat.[ch] dbg_tokens.h \
+	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] \
+	malloc_lp.c
+SHAR4	= malloc_lp.h malloc_loc.h return.h \
+	version.h malloc_t.c malloc.info
+SHAR5	= malloc_dbg.c malloc_dbg.[12] \
+	malloc.texi
+SHAR6	= contrib contrib/README contrib/dec_notes contrib/ra_info.pl \
+	malloc.c \
+	argv \
+	argv/ChangeLog argv/Makefile.in argv/Manifest argv/NOTES \
+	argv/README argv/TODO \
+	argv/argv.c argv/argv.h.[12] 
+SHAR7	= argv/argv_loc.h argv/argv_test.c argv/argv_type.h \
+	argv/argv_util.[ch] argv/queue.h argv/version.h \
+	argv/compat.[ch] argv/configure.in argv/configure argv/conf.h.in \
+	argv/const.h.in \
+	argv/argv.info argv/argv.texi
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
 
 .PHONY : clobber
 clobber :
-	rm -f $(LIBRARY) $(TEST) $(UTIL) 
+	rm -f $(LIBRARY) $(TEST) $(UTIL)
 	rm -f part.? malloc.head malloc.info malloc_dbg.h
 
 .PHONY : distclean
@@ -155,24 +172,23 @@ malloc.ps : malloc.texi
 
 malloc.head : malloc.info
 	rm -f $@ $@.t
-	sed -e '/^Malloc Debug Library/,/^   Gray Watson/p' -e 'd' < \
+	sed -e '/^Malloc Debug Library/,/Gray Watson/p' -e 'd' < \
 		malloc.info > $@.t
+	echo '' >> $@.t
+	echo ---------------------------------------------------------------- \
+		>> $@.t
 	mv $@.t $@
 
 .PHONY : shar
-shar : malloc.info malloc.head
-	rm -f part.? part.tmp
+shar : malloc.head
+	rm -f part.? part.t
 	cd port ; $(foreach part, $(PARTS), \
-		shar -b -n${part} -e${MAXPART} -o../part.${part} -t \
+		shar -n${part} -e${MAXPART} -o../part.${part} -t \
 			"Do a 'sh ./configure' to configure the library" \
 			${SHAR${part}} ; \
 		)
-	cat malloc.head > part.tmp
-	echo '' >> part.tmp
-	echo ---------------------------------------------------------------- \
-		>> part.tmp
-	cat part.1 >> part.tmp
-	mv part.tmp part.1
+	cat malloc.head part.1 > part.t
+	mv part.t part.1
 
 include /usr/antaire/Default.make
 include Makefile.dep
