@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.55 1994/09/12 17:14:59 gray Exp $
+@c $Id: dmalloc.texi,v 1.56 1994/09/16 18:52:17 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -53,7 +53,7 @@ translation approved by the author instead of in the original English.
 @page
 Copyright @copyright{} 1992 and 1993 by the Antaire Corporation.
 
-Published by Gray Watson @samp{<gray.watson@@antaire.com>}
+Published by Gray Watson @samp{<gray@@antaire.com>}
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -91,7 +91,7 @@ others.
 The library is available from ftp.antaire.com in the
 @file{antaire/src/dmalloc} directory (URL
 @samp{ftp://ftp.antaire.com/antaire/src/dmalloc/dmalloc.tar.gz}).  I can
-be reached at @samp{gray.watson@@antaire.com} with any questions,
+be reached at @samp{gray@@antaire.com} with any questions,
 feedback, or general comments.  Gray Watson, Antaire Corporation.
 
 @menu
@@ -299,8 +299,8 @@ variables.  They enable the memory debugging features at runtime to help
 locate problems, chart memory leaks, provide basic bounds checking, log
 statistics, etc.. @xref{Environment Variables}.
 
-The debugging features that are available can be broken down into a
-couple basic classifications:
+The debugging features that are available can be divided into a couple
+basic classifications:
 
 @table @samp
 @item file and line number information
@@ -447,9 +447,9 @@ logging of memory transactions (value @samp{0x008}) and wanted to check
 fence-post memory (value @samp{0x400}) then @samp{DMALLOC_DEBUG} should
 be set to @samp{0x408} (@samp{0x008} + @samp{0x400}).
 
-However, you don't have to worry about remembering all the hex values of
-the tokens, the dmalloc program automates the setting of this
-variable especially.
+@emph{NOTE}: You don't have to worry about remembering all the hex
+values of the tokens because the dmalloc program automates the setting
+of this variable especially.
 
 @item DMALLOC_LOGFILE
 @cindex DMALLOC_LOGFILE variable
@@ -1101,7 +1101,10 @@ settings of the environmental variables.
 
 To find out the usage for the debug malloc program try @code{dmalloc
 --usage-all}.  This is one of the many features of the argv library
-included with this package.  See @file{argv.info} for more information.
+included with this package.  It is available from ftp.antaire.com in the
+@file{antaire/src/argv} directory (URL
+@samp{ftp://ftp.antaire.com/antaire/src/argv/argv.tar.gz}).  See
+@file{argv.info} for more information.
 
 Here is a detailed list of the flags that can passed to dmalloc:
 
@@ -1149,6 +1152,10 @@ List all of the tags in the rc-file.  Useful with -v.
 Remove (minus) the debug capabilities of token(s) from the current debug
 setting or from the selected tag (or -d value).  Multiple -m's can be
 specified.
+
+@item -n
+Without changing the environment, output the commands resulting from the
+supplied options.
 
 @item -p token(s)
 Add (plus) the debug capabilities of token(s) to the current debug
