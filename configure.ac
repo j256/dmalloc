@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.20 2003/09/29 23:29:38 gray Exp $
+# $Id: configure.ac,v 1.21 2003/10/01 16:00:10 gray Exp $
 #
-AC_REVISION($Revision: 1.20 $)
+AC_REVISION($Revision: 1.21 $)
 AC_INIT(dmalloc, 5.2.3, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -483,23 +483,33 @@ fi
 ############
 
 #
-# check for constructor support
+# check for constructor attribute support
 #
 AC_MSG_CHECKING([constructor attribute])
 AC_RUN_IFELSE([[
-/*
- * if the before flag is enabled by the time we get to main() then
- * loc_init must have been called already meaning that the constructor
- * attribute works
- */
-static int before_b = 0;
-static void loc_init() __attribute__((constructor));
-static void loc_init() { before_b = 1; }
-int main() { if (before_b) return 0; else return 1; }
+/* if we call the loc_con constructor then exit with error code 0 */
+static void loc_con() __attribute__((constructor));
+static void loc_con() { exit(0); }
+int main() { exit(1); }
 ]],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 0) AC_MSG_RESULT([no]) ],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ]
+)
+
+#
+# check for destructor attribute support
+#
+AC_MSG_CHECKING([destructor attribute])
+AC_RUN_IFELSE([[
+/* if we call the loc_decon destructor then exit with error code 0 */
+static void loc_decon() __attribute__((destructor));
+static void loc_decon() { exit(0); }
+int main() { return 1; }
+]],
+[ AC_DEFINE(DESTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ],
+[ AC_DEFINE(DESTRUCTOR_WORKS, 0) AC_MSG_RESULT([no]) ],
+[ AC_DEFINE(DESTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ]
 )
 
 ##############################################################################
@@ -540,7 +550,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.20 2003/09/29 23:29:38 gray Exp $"
+#ident "$Id: configure.ac,v 1.21 2003/10/01 16:00:10 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

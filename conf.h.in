@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.93 2003/09/12 05:55:57 gray Exp $
+ * $Id: conf.h.in,v 1.94 2003/10/01 16:00:10 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -163,6 +163,14 @@
  * compilers do as well.
  */
 #define CONSTRUCTOR_WORKS 0
+
+/*
+ * See whether support exists for the destructor attribute which
+ * allows the library to run code after main() is exited.  I know
+ * that later versions of gcc have support for this and maybe other
+ * compilers do as well.
+ */
+#define DESTRUCTOR_WORKS 0
 
 /*
  * See if we have the GetEnvironmentVariableA Cygwin function.  This
