@@ -1,3 +1,9 @@
+Fri Jul 14 16:58:09 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing version 3.1.0.  First commercial release.
+
+	* Added academic references to permissions sections.
+
 Wed Jul  5 19:11:03 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Released version 3.1.0-beta.
@@ -28,6 +34,10 @@ Mon Jun 19 22:06:12 1995  Gray Watson  <gray@burger.letters.com>
 Tue Jun 13 17:34:02 1995  Gray Watson  <gray@burger.letters.com>
 
 	* pulled manual settings out of conf.h to settings.h.
+
+Tue May 31 10:30:59 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Finished version 3.0.7.  Released later.
 
 Tue May 30 10:30:59 1995  Gray Watson  (gray@burger.letters.com)
 
@@ -1013,5 +1023,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.155 1995/07/05 23:14:29 gray Exp $
+$Id: ChangeLog,v 1.156 1995/07/14 20:59:48 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,11 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.60 1995/07/05 23:14:31 gray Exp $
+$Id: NEWS,v 1.61 1995/07/14 20:59:49 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.1.0:
 
 	* pulled manual settings out of conf.h to settings.h.
 	* Added error-dump token for dumping-core and continuing on errors.
+
+Version 3.0.7:
+
+	* New release to fix some version problems.
 
 Version 3.0.6:
 
