@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.144 2000/11/10 00:59:26 gray Exp $
+# $Id: Makefile.in,v 1.145 2000/11/13 16:53:35 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -145,6 +145,17 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 	rm -f $@ $@.t
 	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > \
 		$@.t
+	mv $@.t $@
+
+shlib : $(SHLIBRARY)
+
+$(SHLIBRARY) : $(LIBRARY)
+	rm -f $@ $@.t
+	if (ld --version | grep '^GNU' >/dev/null 2>&1); then \
+	  ld -shared -soname $@ --whole-archive $(LIBRARY) -o $@.t ; \
+	else \
+	  ld -shared -soname $@ -all -none -lc $(LIBRARY) -o $@.t ; \
+	fi
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
@@ -303,7 +314,7 @@ $(srcdir)/configure : $(srcdir)/configure.in
 #
 depend ::
 	@ echo ""
-	@ echo "WARNING: you should be running ${MAKE} depend2"
+	@ echo "WARNING: you should be running $(MAKE) depend2"
 	@ false
 
 depend2 ::

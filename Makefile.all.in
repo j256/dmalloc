@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.99 2000/11/10 16:50:08 gray Exp $
+# $Id: Makefile.all.in,v 1.100 2000/11/13 16:53:34 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -180,12 +180,16 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > $@.t
 	mv $@.t $@
 
-shlib : ${SHLIBRARY}
+shlib : $(SHLIBRARY)
 
 # NOTE: you may have to edit the following to have it work on your system
-${SHLIBRARY} : $(LIBRARY)
+$(SHLIBRARY) : $(LIBRARY)
 	rm -f $@ $@.t
-	ld -shared -o $@.t -all $(LIBRARY) -all -soname $@ -none -lc
+	if (ld --version | grep '^GNU' >/dev/null 2>&1); then \
+	  ld -shared -soname $@ --whole-archive $(LIBRARY) -o $@.t ; \
+	else \
+	  ld -shared -soname $@ -all -none -lc $(LIBRARY) -o $@.t ; \
+	fi
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
