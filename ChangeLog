@@ -1,5 +1,7 @@
 Wed Aug 25 08:33:39 1999  Gray Watson  <gray@burger.256.com>
 
+	* Added copyright and url info for ident and what.
+
 	* Added support for PTHREAD_MUTEX_INITIALIZER.
 
 Tue Jul 20 12:47:14 1999  Gray Watson  <gray@burger.256.com>
@@ -1469,5 +1471,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.221 1999/08/25 12:34:22 gray Exp $
+$Id: ChangeLog,v 1.222 1999/08/25 12:37:48 gray Exp $
 -------------------------------------------------------------------------------

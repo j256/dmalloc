@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.151 1999/04/15 12:55:37 gray Exp $
+ * $Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $
  */
 
 /*
@@ -62,11 +62,27 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.151 1999/04/15 12:55:37 gray Exp $";
+#ident "$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.151 1999/04/15 12:55:37 gray Exp $";
+  "$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $";
 #endif
+#endif
+
+#ifdef __GNUC__
+#ident "$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $";
+#ident "@(#) Dmalloc package Copyright 1999 by Gray Watson";
+#ident "$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $";
+#ident "@(#) Source for dmalloc available from http://www.dmalloc.com/";
+#else
+static	char	*copyright =
+  "$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $";
+static	char	*copyright_w =
+  "@(#) Dmalloc package Copyright 1999 by Gray Watson";
+static	char	*source_url =
+  "$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $";
+static	char	*source_url_w =
+  "@(#) Source for dmalloc available from http://www.dmalloc.com/";
 #endif
 
 /* local routines */
