@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.4 1999/03/10 23:26:47 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.5 1999/03/11 00:57:28 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.4 1999/03/10 23:26:47 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.5 1999/03/11 00:57:28 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.4 1999/03/10 23:26:47 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.5 1999/03/11 00:57:28 gray Exp $";
 #endif
 #endif
 
@@ -115,17 +115,17 @@ static	unsigned int	hash(const unsigned char *key,
   /* handle most of the key */
   for (len = length; len >= 12; len -= 12) {
     a += (key_p[0]
-	  + ((unsigned long)key_p[1] << 8)
-	  + ((unsigned long)key_p[2] << 16)
-	  + ((unsigned long)key_p[3] << 24));
+	  + ((unsigned int)key_p[1] << 8)
+	  + ((unsigned int)key_p[2] << 16)
+	  + ((unsigned int)key_p[3] << 24));
     b += (key_p[4]
-	  + ((unsigned long)key_p[5] << 8)
-	  + ((unsigned long)key_p[6] << 16)
-	  + ((unsigned long)key_p[7] << 24));
+	  + ((unsigned int)key_p[5] << 8)
+	  + ((unsigned int)key_p[6] << 16)
+	  + ((unsigned int)key_p[7] << 24));
     c += (key_p[8]
-	  + ((unsigned long)key_p[9] << 8)
-	  + ((unsigned long)key_p[10] << 16)
-	  + ((unsigned long)key_p[11] << 24));
+	  + ((unsigned int)key_p[9] << 8)
+	  + ((unsigned int)key_p[10] << 16)
+	  + ((unsigned int)key_p[11] << 24));
     HASH_MIX(a,b,c);
     key_p += 12;
   }
@@ -135,26 +135,26 @@ static	unsigned int	hash(const unsigned char *key,
   /* all the case statements fall through to the next */
   switch(len) {
   case 11:
-    c += ((unsigned long)key_p[10] << 24);
+    c += ((unsigned int)key_p[10] << 24);
   case 10:
-    c += ((unsigned long)key_p[9] << 16);
+    c += ((unsigned int)key_p[9] << 16);
   case 9:
-    c += ((unsigned long)key_p[8] << 8);
+    c += ((unsigned int)key_p[8] << 8);
     /* the first byte of c is reserved for the length */
   case 8:
-    b += ((unsigned long)key_p[7] << 24);
+    b += ((unsigned int)key_p[7] << 24);
   case 7:
-    b += ((unsigned long)key_p[6] << 16);
+    b += ((unsigned int)key_p[6] << 16);
   case 6:
-    b += ((unsigned long)key_p[5] << 8);
+    b += ((unsigned int)key_p[5] << 8);
   case 5:
     b += key_p[4];
   case 4:
-    a += ((unsigned long)key_p[3] << 24);
+    a += ((unsigned int)key_p[3] << 24);
   case 3:
-    a += ((unsigned long)key_p[2] << 16);
+    a += ((unsigned int)key_p[2] << 16);
   case 2:
-    a += ((unsigned long)key_p[1] << 8);
+    a += ((unsigned int)key_p[1] << 8);
   case 1:
     a += key_p[0];
     /* case 0: nothing left to add */
@@ -164,7 +164,7 @@ static	unsigned int	hash(const unsigned char *key,
   return c;
 }
 
-#if HAVE_QSORT && QSORT_OKAY
+#if HAVE_QSORT
 /*
  * static int entry_cmp
  *
@@ -230,12 +230,12 @@ static	void	log_entry(const mem_table_t *tab_p, const int in_use_b,
 			  const char *source)
 {
   if (in_use_b) {
-    _dmalloc_message("%11ld %6ld %11ld %6ld  %s\n",
+    _dmalloc_message("%11lu %6lu %11lu %6lu  %s\n",
 		     tab_p->mt_total_size, tab_p->mt_total_c,
 		     tab_p->mt_in_use_size, tab_p->mt_in_use_c, source);
   }
   else {
-    _dmalloc_message("%11ld %6ld  %s\n",
+    _dmalloc_message("%11lu %6lu  %s\n",
 		     tab_p->mt_total_size, tab_p->mt_total_c, source);
   }
 }
@@ -312,16 +312,19 @@ void	_table_clear(void)
 void	_table_alloc(const char *file, const unsigned int line,
 		     const unsigned long size)
 {
-  mem_key_t	key;
   unsigned int	bucket;
   mem_table_t	*tab_p, *tab_end_p, *tab_bounds_p;
   
-  key.mk_file = file;
-  key.mk_line = line;
-  
-  /* get our start bucket */
-  bucket = hash((unsigned char *)&key, sizeof(key), 0) % MEM_ENTRIES_N;
+  /*
+   * Get our start bucket.  We calculate the hash value by referencing
+   * the file/line information directly because of problems with
+   * putting them in a structure.
+   */
+  bucket = hash((unsigned char *)file, strlen(file), 0);
+  bucket = hash((unsigned char *)&line, sizeof(line), bucket);
+  bucket %= MEM_ENTRIES_N;
   tab_p = memory_table + bucket;
+  
   /* the end is if we come around to the start again */
   tab_end_p = tab_p;
   tab_bounds_p = memory_table + MEM_ENTRIES_N;
@@ -358,7 +361,7 @@ void	_table_alloc(const char *file, const unsigned int line,
       /* we found an open slot */
       tab_p->mt_file = file;
       tab_p->mt_line = line;
-#if HAVE_QSORT && QSORT_OKAY
+#if HAVE_QSORT
       /* remember its position in the table so we can unsort it later */
       tab_p->mt_entry_pos_p = tab_p;
 #endif
@@ -396,17 +399,20 @@ void	_table_alloc(const char *file, const unsigned int line,
 void	_table_free(const char *old_file, const unsigned int old_line,
 		    const DMALLOC_SIZE size)
 {
-  mem_key_t	key;
   unsigned int	bucket;
   int		found_b = 0;
   mem_table_t	*tab_p, *tab_end_p, *tab_bounds_p;
   
-  key.mk_file = old_file;
-  key.mk_line = old_line;
-  
-  /* get our start bucket */
-  bucket = hash((unsigned char *)&key, sizeof(key), 0) % MEM_ENTRIES_N;
+  /*
+   * Get our start bucket.  We calculate the hash value by referencing
+   * the file/line information directly because of problems with
+   * putting them in a structure.
+   */
+  bucket = hash((unsigned char *)old_file, strlen(old_file), 0);
+  bucket = hash((unsigned char *)&old_line, sizeof(old_line), bucket);
+  bucket %= MEM_ENTRIES_N;
   tab_p = memory_table + bucket;
+  
   /* the end is if we come around to the start again */
   tab_end_p = tab_p;
   tab_bounds_p = memory_table + MEM_ENTRIES_N;
@@ -440,9 +446,11 @@ void	_table_free(const char *old_file, const unsigned int old_line,
     tab_p = &other_pointers;
   }
   
-  /* update our pointer info */
-  tab_p->mt_in_use_size -= size;
-  tab_p->mt_in_use_c--;
+  /* update our pointer info if we can */
+  if (tab_p->mt_in_use_size >= size && tab_p->mt_in_use_c > 0) {
+    tab_p->mt_in_use_size -= size;
+    tab_p->mt_in_use_c--;
+  }
 }
 
 /*
@@ -476,7 +484,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   }
   
   /* sort the entry by the total size if we have qsort */
-#if HAVE_QSORT && QSORT_OKAY
+#if HAVE_QSORT
   qsort(memory_table, MEM_ENTRIES_N, sizeof(mem_table_t), entry_cmp);
 #else
   _dmalloc_message("qsort not available, displaying first entries");
@@ -517,7 +525,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   (void)loc_snprintf(source, sizeof(source), "Total of %d", entry_c);
   log_entry(&total, in_use_b, source);
   
-#if HAVE_QSORT && QSORT_OKAY
+#if HAVE_QSORT
   /*
    * If we sorted the array, we have to put it back the way it was if
    * we want to continue and handle memory transactions.  We should be

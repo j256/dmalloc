@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab_loc.h,v 1.2 1999/03/10 23:26:47 gray Exp $
+ * $Id: dmalloc_tab_loc.h,v 1.3 1999/03/11 00:57:28 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_LOC_H__
@@ -36,17 +36,11 @@ typedef struct mem_table_st {
   unsigned long		mt_total_c;		/* total pointers allocated */
   unsigned long		mt_in_use_size;		/* size currently alloced */
   unsigned long		mt_in_use_c;		/* pointers currently in use */
-#if HAVE_QSORT && QSORT_OKAY
+#if HAVE_QSORT
   /* we use this so we can easily un-sort the list */
   struct mem_table_st	*mt_entry_pos_p;	/* pos of entry in table */
 #endif
 } mem_table_t;
-
-/* little structure to for our hash-table key */
-typedef struct {
-  const char		*mk_file;		/* filename of allocation */
-  unsigned int		mk_line;		/* line number of allocation */
-} mem_key_t;
 
 /*
  * void HASH_MIX
