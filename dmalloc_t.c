@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.94 2002/01/28 18:21:09 gray Exp $
+ * $Id: dmalloc_t.c,v 1.95 2003/05/13 16:40:05 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_t.c,v 1.94 2002/01/28 18:21:09 gray Exp $"
+#ident "$Id: dmalloc_t.c,v 1.95 2003/05/13 16:40:05 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.94 2002/01/28 18:21:09 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.95 2003/05/13 16:40:05 gray Exp $";
 #endif
 #endif
 
@@ -71,14 +71,12 @@ static	char	*rcs_id =
 #define MIN_AVAIL		10
 
 /* pointer tracking structure */
-struct pnt_info_st {
+typedef struct pnt_info_st {
   long			pi_crc;			/* crc of storage */
   int			pi_size;		/* size of storage */
   void			*pi_pnt;		/* pnt to storage */
   struct pnt_info_st	*pi_next;		/* pnt to next */
-};
-
-typedef struct pnt_info_st pnt_info_t;
+} pnt_info_t;
 
 static	pnt_info_t	*pointer_grid;
 
@@ -551,7 +549,7 @@ static	int	check_special(void)
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
   }
-  pnt = malloc((1 << LARGEST_BLOCK) + 1);
+  pnt = malloc(LARGEST_BLOCK + 1);
   if (pnt == NULL) {
     dmalloc_errno = ERROR_NONE;
   }
@@ -740,12 +738,6 @@ static	void	do_interactive(void)
     if (strncmp(line, "free", len) == 0) {
       pnt = get_address();
       free(pnt);
-      continue;
-    }
-    
-    if (strncmp(line, "map", len) == 0) {
-      dmalloc_log_heap_map();
-      (void)printf("Done.\n");
       continue;
     }
     
