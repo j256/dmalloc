@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.63 1994/10/14 02:04:01 gray Exp $
+@c $Id: dmalloc.texi,v 1.64 1994/10/15 18:49:35 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -232,19 +232,22 @@ include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
 more information about their capabilities, do a @code{man 3 malloc} to
 read the system's manual pages.
 
-@table @code
-@item malloc
+@deftypefun void * malloc ( unsigned int @var{size} )
 @cindex malloc
-Usage: @code{pnt = (type *)malloc(unsigned int size);}
+
+Usage: @code{pnt = (type *)malloc(size);}
 
 The malloc routine is the basic memory allocation routine.  It allocates
 an area of size bytes.  It will return a pointer to the space requested.
 
+@end deftypefun
+@deftypefun void * calloc ( unsigned int @var{number}, unsigned int
+@var{size} )
 @item calloc
 @cindex calloc
 @cindex Allocation of zeros
-Usage: @code{pnt = (type *)calloc(unsigned int number, unsigned int
-size);}
+
+Usage: @code{pnt = (type *)calloc(number, size);}
 
 The calloc routine allocates a certain number of items, each of size
 bytes, and returns a pointer to the space.  It is appropriate to pass in
@@ -253,19 +256,23 @@ a @code{sizeof(type)} value as the size argument.
 Also, calloc nulls the space that it returns, assuring that the memory
 is all zeros.
 
+@end deftypefun
+@deftypefun void * realloc ( void * @var{old_pnt}, unsigned int
+@var{new_size} )
 @item realloc
 @cindex realloc
-Usage: @code{new_pnt = (type *)realloc(void * old_pnt, unsigned
-int new_size);}
+
+Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size);}
 
 The realloc function expands or shrinks the memory allocation in old_pnt
 to new_size number of bytes.  Realloc copies the information in old_pnt
 into the new_pnt space up to new_size bytes or until it copies all of
 the information from old_pnt.
 
-@item free
-@cindex free
-Usage: @code{(void)free(void * pnt);}
+@end deftypefun
+@deftypefun void free ( void * @var{pnt} )
+
+Usage: @code{free(pnt);}
 
 The free routine releases an allocation returned by malloc, calloc, or
 realloc back to the heap.  This allows other parts of the program to
@@ -273,7 +280,7 @@ re-use memory that is not needed anymore.  It also guarantees that the
 process does not grow too big and swallow a large portion of the system
 resources.
 
-@end table
+@end deftypefun
 
 @emph{NOTE}: the returned address from the memory
 allocation/reallocation functions should @emph{always} be cast to the
