@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.181 2003/05/16 00:10:47 gray Exp $
+ * $Id: chunk.c,v 1.182 2003/05/20 04:05:58 gray Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ unsigned long		_dmalloc_memory_limit = 0;
 static	skip_alloc_t	skip_free_alloc[MAX_SKIP_LEVEL /* read note ^^ */];
 static	skip_alloc_t	*skip_free_list = skip_free_alloc;
 
-/* skip list of all of our allocated or free blocks by address */
+/* skip list of all of our allocated blocks sorted by address */
 static	skip_alloc_t	skip_address_alloc[MAX_SKIP_LEVEL /* read note ^^ */];
 static	skip_alloc_t	*skip_address_list = skip_address_alloc;
 
@@ -1512,9 +1512,9 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
 }
 
 /*
- * static int check_slot
+ * static int check_used_slot
  *
- * Check out the pointer in a slot to make sure it is good.
+ * Check out the pointer in a allocated slot to make sure it is good.
  *
  * RETURNS:
  *
@@ -1528,7 +1528,8 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
  *
  * user_pnt -> User pointer which was used to get the slot or NULL.
  */
-static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
+static	int	check_used_slot(const skip_alloc_t *slot_p,
+				const void *user_pnt)
 {
   const char	*file, *name_p, *bounds_p;
   unsigned int	line;
@@ -1585,15 +1586,18 @@ static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
   line = slot_p->sa_line;
   
   /* check line number */
+#if MAX_LINE_NUMBER
   if (line > MAX_LINE_NUMBER) {
     dmalloc_errno = ERROR_BAD_LINE;
     return 0;
   }
+#endif
   
   /*
    * Check file pointer only if file is not NULL and line is not 0
    * which implies that file is a return-addr.
    */
+#if MAX_FILE_LENGTH
   if (file != DMALLOC_DEFAULT_FILE && line != DMALLOC_DEFAULT_LINE) {
     /* NOTE: we don't use strlen here because we might check too far */
     bounds_p = file + MAX_FILE_LENGTH;
@@ -1605,6 +1609,54 @@ static	int	check_slot(const skip_alloc_t *slot_p, const void *user_pnt)
       return 0;
     }
   }
+#endif
+  
+#if STORE_SEEN_COUNT
+  if (slot_p->sa_seen_c > _dmalloc_iter_c) {
+    dmalloc_errno = ERROR_SLOT_CORRUPT;
+    return 0;
+  }
+#endif
+  
+  return 1;
+}
+
+/*
+ * static int check_free_slot
+ *
+ * Check out the pointer in a slot to make sure it is good.
+ *
+ * RETURNS:
+ *
+ * Success - 1
+ *
+ * Failure - 0
+ *
+ * ARGUMENTS:
+ *
+ * slot_p -> Slot that we are checking.
+ */
+static	int	check_free_slot(const skip_alloc_t *slot_p)
+{
+  char	*check_p;
+  
+  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
+    for (check_p = (char *)slot_p->sa_mem;
+	 check_p < (char *)slot_p->sa_mem + slot_p->sa_total_size;
+	 check_p++) {
+      if (*check_p != FREE_BLANK_CHAR) {
+	dmalloc_errno = ERROR_FREE_NON_BLANK;
+	return 0;
+      }
+    }
+  }
+  
+#if STORE_SEEN_COUNT
+  if (slot_p->sa_seen_c > _dmalloc_iter_c) {
+    dmalloc_errno = ERROR_SLOT_CORRUPT;
+    return 0;
+  }
+#endif
   
   return 1;
 }
@@ -1653,7 +1705,7 @@ static	skip_alloc_t	*find_slot(const void *user_pnt,
     return NULL;
   }
   
-  if (! check_slot(slot_p, user_pnt)) {
+  if (! check_used_slot(slot_p, user_pnt)) {
     /* error set in check slot */
     return NULL;
   }
@@ -1685,17 +1737,17 @@ static	skip_alloc_t	*find_slot(const void *user_pnt,
  */
 int	_dmalloc_chunk_startup(void)
 {
-  unsigned FENCE_MAGIC_TYPE	value;
-  char				*pos_p, *max_p;
-  int				bit_c, *bits_p;
+  unsigned int	value;
+  char		*pos_p, *max_p;
+  int		bit_c, *bits_p;
   
   value = FENCE_MAGIC_BOTTOM;
   max_p = fence_bottom + FENCE_BOTTOM_SIZE;
   for (pos_p = fence_bottom;
        pos_p < max_p;
-       pos_p += sizeof(FENCE_MAGIC_TYPE)) {
-    if (pos_p + sizeof(FENCE_MAGIC_TYPE) <= max_p) {
-      memcpy(pos_p, (char *)&value, sizeof(FENCE_MAGIC_TYPE));
+       pos_p += sizeof(value)) {
+    if (pos_p + sizeof(value) <= max_p) {
+      memcpy(pos_p, (char *)&value, sizeof(value));
     }
     else {
       memcpy(pos_p, (char *)&value, max_p - pos_p);
@@ -1704,9 +1756,9 @@ int	_dmalloc_chunk_startup(void)
   
   value = FENCE_MAGIC_TOP;
   max_p = fence_top + FENCE_TOP_SIZE;
-  for (pos_p = fence_top; pos_p < max_p; pos_p += sizeof(FENCE_MAGIC_TYPE)) {
-    if (pos_p + sizeof(FENCE_MAGIC_TYPE) <= max_p) {
-      memcpy(pos_p, (char *)&value, sizeof(FENCE_MAGIC_TYPE));
+  for (pos_p = fence_top; pos_p < max_p; pos_p += sizeof(value)) {
+    if (pos_p + sizeof(value) <= max_p) {
+      memcpy(pos_p, (char *)&value, sizeof(value));
     }
     else {
       memcpy(pos_p, (char *)&value, max_p - pos_p);
@@ -1835,7 +1887,7 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   }
   
   /* might as well check the pointer now */
-  if (! check_slot(slot_p, user_pnt)) {
+  if (! check_used_slot(slot_p, user_pnt)) {
     /* errno set in check_slot */
     log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
     dmalloc_error("_dmalloc_chunk_read_info");
@@ -1891,15 +1943,7 @@ int	_dmalloc_chunk_heap_check(void)
 {
   skip_alloc_t	*slot_p;
   entry_block_t	*block_p;
-  int		level_c;
-  
-#if 0
-  unsigned int	undef = 0, start = 0;
-  char		*byte_p;
-  void		*pnt;
-  int		bit_c, dblock_c = 0, bblock_c = 0, free_c = 0, fence_b;
-  unsigned int	bb_c = 0, len, block_type;
-#endif
+  int		ret, level_c, checking_free_b = 0;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     dmalloc_message("checking heap");
@@ -1971,12 +2015,27 @@ int	_dmalloc_chunk_heap_check(void)
   }
   
   /*
-   * Now run through the pointers and check each one.
+   * Now run through the used pointers and check each one.
    */
   for (slot_p = skip_address_list->sa_next_p[0];
-       slot_p != NULL;
+       ;
        slot_p = slot_p->sa_next_p[0]) {
     skip_alloc_t	*block_slot_p;
+    
+    /*
+     * switch to the free list in the middle after we've checked the
+     * used pointer slots
+     */
+    if (slot_p == NULL) {
+      if (checking_free_b) {
+	break;
+      }
+      slot_p = skip_free_list->sa_next_p[0];
+      if (slot_p == NULL) {
+	break;
+      }
+      checking_free_b = 1;
+    }
     
     /* better be in the heap */
     if (! IS_IN_HEAP(slot_p)) {
@@ -2014,7 +2073,13 @@ int	_dmalloc_chunk_heap_check(void)
     }
     
     /* now check the allocation */
-    if (! check_slot(slot_p, NULL /* no user pnt */)) {
+    if (checking_free_b) {
+      ret = check_free_slot(slot_p);
+    }
+    else {
+      ret = check_used_slot(slot_p, NULL /* no user pnt */);
+    }
+    if (! ret) {
       /* error set in check_slot */
       dmalloc_error("_dmalloc_chunk_heap_check");
       return 0;
@@ -2062,6 +2127,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   /* find our slot which does a lot of other checking */
   slot_p = find_slot(user_pnt, skip_update, NULL /* prev */, NULL /* next */);
   if (slot_p == NULL) {
+    /* dmalloc_errno set in find_slot */
     if (exact_b || dmalloc_errno == ERROR_NOT_FOUND) {
       log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, "pointer-check");
       dmalloc_error(func);
@@ -2369,7 +2435,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   slot_p = find_slot(user_pnt, update_p, NULL /* no prev_p */,
 		     NULL /* no next_p */);
   if (slot_p == NULL) {
-    /* errno set in find_block */
+    /* errno set in find_slot */
     log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
     dmalloc_error("_dmalloc_chunk_free");
     return FREE_ERROR;
@@ -2378,6 +2444,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
     /* error set and dumped in remove_slot */
     return FREE_ERROR;
   }
+  slot_p->sa_flags = ALLOC_FLAG_FREE;
   
   alloc_cur_pnts--;
   
@@ -2413,6 +2480,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
     memset(slot_p->sa_mem, FREE_BLANK_CHAR, slot_p->sa_total_size);
+    /* set our slot blank flag */
+    BIT_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
   }
   
   /*
@@ -2428,9 +2497,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
    * because we are encorporating in this newly freed block.
    */
   
-  /* update the slot flags, and put on free list */
-  slot_p->sa_flags = ALLOC_FLAG_FREE;
-  if (! insert_slot(slot_p, 0 /* used list */)) {
+  /* put slot on free list */
+  if (! insert_slot(slot_p, 1 /* free list */)) {
     /* error dumped in insert_slot */
     return FREE_ERROR;
   }
@@ -2787,7 +2855,7 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
     }
     
     if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE)) {
-      user_pnt = CHUNK_TO_USER(slot_p->sa_mem, 1 /* fence */);
+      user_pnt = (char *)slot_p->sa_mem + FENCE_BOTTOM_SIZE;
     }
     else {
       user_pnt = slot_p->sa_mem;

@@ -1,3 +1,22 @@
+2003-05-19  Gray Watson  <gray@outside.256.com>
+
+	* Added dmalloc_page_size() function.
+
+	* Improved the auto-testing in dmalloc_t.
+
+	* Found a [bad] problem with putting pointers back on the free
+	list.
+
+	* Added some checking of pointers on the free list.
+
+	* Removed DEBUG_NOT_REMOVABLE and DEBUG_NOT_ADDABLE flags.
+
+	* Added the per-pointer checking for cleared free memory.
+
+	* Compressed the admin per-pointer structure by 8 bytes.
+
+	* Cleaned up the production of dmalloc.h.3 from fillproto file.
+
 2003-05-16  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.0.0.
@@ -1867,5 +1886,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.285 2003/05/16 17:00:52 gray Exp $
+$Id: ChangeLog,v 1.286 2003/05/20 04:05:58 gray Exp $
 -------------------------------------------------------------------------------
