@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.33 2003/06/10 17:16:29 gray Exp $
+ * $Id: return.h,v 1.34 2004/07/08 04:53:48 gray Exp $
  */
 
 /*
@@ -266,6 +266,16 @@ do { \
 } while(0)
 
 #endif /* __powerpc__ && __GNUC__ && !__OPTIMIZE__ */
+
+/*************************************/
+
+/*
+ * RH AS2.1 gcc 2.96, tested on a piece of code compiled with icc (Intel
+ * compiler V8 from Didier Remy.
+ */
+#ifdef __ia64__
+#define GET_RET_ADDR(file)  asm("mov %0=b0" : "=g" (file) : /* no inputs */ )
+#endif
 
 /*************************************/
 
