@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.64 1997/01/17 19:26:20 gray Exp $";
+  "$Id: error.c,v 1.65 1997/03/21 17:23:17 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -73,73 +73,90 @@ IMPORT	char		*_dmalloc_strerror(const int errnum);
 /*
  * exported variables
  */
+/* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
+EXPORT	char		*dmalloc_logpath = LOGPATH_INIT;
+/* internal dmalloc error number for reference purposes only */
+EXPORT	int		dmalloc_errno = ERROR_NONE;
+/* address to look for.  when discovered call dmalloc_error() */
+EXPORT	DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
+
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
 EXPORT	long		_dmalloc_flags = 0;
 
 /* global iteration counter for activities */
 EXPORT	unsigned long	_dmalloc_iterc = 0;
 
-/* overhead information storing when the library started up for elapsed time */
 #if STORE_TIMEVAL
+/* overhead information storing when the library started up for elapsed time */
 EXPORT	struct timeval	_dmalloc_start;
-#else
+#endif
+#if STORE_TIMEVAL == 0
 EXPORT	long		_dmalloc_start = 0;
 #endif
 
 /* global flag which indicates when we are aborting */
 EXPORT	char		_dmalloc_aborting = FALSE;
 
+#if STORE_TIMEVAL
 /*
  * print the time into local buffer which is returned
  */
-#if STORE_TIMEVAL
-EXPORT	char	*_dmalloc_ptime(const struct timeval * timevalp,
-				const char elapsed)
-#else
-EXPORT	char	*_dmalloc_ptime(const long * timep,
-				const char elapsed)
-#endif
+EXPORT	char	*_dmalloc_ptimeval(const struct timeval * timevalp,
+				   const char elapsed)
 {
   static char	buf[64];
   long		hrs, mins, secs;
-#if STORE_TIMEVAL
   long		usecs;
-#endif
   
   buf[0] = NULLC;
   
-#if STORE_TIMEVAL
   secs = timevalp->tv_sec;
   usecs = timevalp->tv_usec;
-#else
-  secs = *timep;
-#endif
   
   if (elapsed || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
-#if STORE_TIMEVAL
     usecs -= _dmalloc_start.tv_usec;
     if (usecs < 0) {
       secs--;
       usecs = - usecs;
     }
     secs -= _dmalloc_start.tv_sec;
-#else
-    secs -= _dmalloc_start;
-#endif
   }
   
   hrs = secs / SECS_IN_HOUR;
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-#if STORE_TIMEVAL
   (void)sprintf(buf, "%ld:%ld:%ld.%ld", hrs, mins, secs, usecs);
-#else
-  (void)sprintf(buf, "%ld:%ld:%ld", hrs, mins, secs);
-#endif
   
   return buf;
 }
+#endif
+
+#if STORE_TIMEVAL == 0
+/*
+ * print the time into local buffer which is returned
+ */
+EXPORT	char	*_dmalloc_ptime(const long * timep, const char elapsed)
+{
+  static char	buf[64];
+  long		hrs, mins, secs;
+  
+  buf[0] = NULLC;
+  secs = *timep;
+  
+  if (elapsed || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+    secs -= _dmalloc_start;
+  }
+  
+  hrs = secs / SECS_IN_HOUR;
+  mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
+  secs %= SECS_IN_MIN;
+  
+  (void)sprintf(buf, "%ld:%ld:%ld", hrs, mins, secs);
+  
+  return buf;
+}
+#endif
 
 /*
  * message writer with printf like arguments

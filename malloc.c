@@ -65,18 +65,12 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.92 1997/01/21 21:01:31 gray Exp $";
+  "$Id: malloc.c,v 1.93 1997/03/21 17:23:16 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
-/* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-EXPORT	char		*dmalloc_logpath = LOGPATH_INIT;
-/* internal dmalloc error number for reference purposes only */
-EXPORT	int		dmalloc_errno = ERROR_NONE;
-/* address to look for.  when discovered call dmalloc_error() */
-EXPORT	DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
 /*
  * argument to dmalloc_address, if 0 then never call dmalloc_error()
  * else call it after seeing dmalloc_address for this many times.
@@ -105,7 +99,7 @@ LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
 LOCAL	char		do_shutdown	= FALSE; /* execute shutdown soon */
 
 #ifdef THREAD_LOCK_GLOBAL
-/* define the global thread-lock variable if needed */
+/* define the global thread-lock variable(s) if needed */
 THREAD_LOCK_GLOBAL
 #endif
 
@@ -329,6 +323,11 @@ LOCAL	int	dmalloc_startup(void)
   }
 #endif /* SIGNAL_OKAY */
   
+#ifdef THREAD_LOCK_INIT
+  /* initialize any thread mutex locking variables */
+  THREAD_LOCK_INIT;
+#endif
+  
   return NOERROR;
 }
 
@@ -371,7 +370,7 @@ EXPORT	void	_dmalloc_shutdown(void)
     struct timeval	now;
     GET_TIMEVAL(now);
     _dmalloc_message("ending time = %ld.%ld, elapsed since start = %s",
-		     now.tv_sec, now.tv_usec, _dmalloc_ptime(&now, TRUE));
+		     now.tv_sec, now.tv_usec, _dmalloc_ptimeval(&now, TRUE));
   }
 #else
 #if HAVE_TIME
