@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.125 1998/11/09 16:54:25 gray Exp $
+ * $Id: chunk.c,v 1.126 1998/11/12 21:50:26 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.125 1998/11/09 16:54:25 gray Exp $";
+#ident "$Id: chunk.c,v 1.126 1998/11/12 21:50:26 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.125 1998/11/09 16:54:25 gray Exp $";
+  "$Id: chunk.c,v 1.126 1998/11/12 21:50:26 gray Exp $";
 #endif
 #endif
 
@@ -123,7 +123,8 @@ int	_chunk_startup(void)
   /* calculate the smallest possible block */
   for (smallest_block = DEFAULT_SMALLEST_BLOCK;
        DB_PER_ADMIN < BLOCK_SIZE / (1 << smallest_block);
-       smallest_block++);
+       smallest_block++) {
+  }
   
   /* verify that some conditions are not true */
   if (BB_PER_ADMIN <= 2
@@ -721,7 +722,8 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
       
       adm_p = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblock_p);
       if (mem_p != NULL) {
-	*mem_p = BLOCK_POINTER(adm_p->ba_pos_n + (bblock_p - adm_p->ba_blocks));
+	*mem_p = BLOCK_POINTER(adm_p->ba_pos_n +
+			       (bblock_p - adm_p->ba_blocks));
       }
       return bblock_p;
     }
@@ -1051,7 +1053,7 @@ static	dblock_t	*get_dblock_admin(const int many)
   free_slots = DB_PER_ADMIN;
   
   bblock_p->bb_flags = BBLOCK_DBLOCK_ADMIN;
-  bblock_p->bb_slotp = dblock_adm_p;
+  bblock_p->bb_slot_p = dblock_adm_p;
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
@@ -1148,8 +1150,11 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     dblock_p->db_bblock = bblock_p;
     free_space_count += 1 << bit_n;
     
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
-	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+    /*
+     * We return the 1st dblock chunk in the block.  Overwrite the
+     * rest of the block.
+     */ 
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)) {
       (void)memset((char *)pnt + (1 << bit_n), BLANK_CHAR,
 		   BLOCK_SIZE - (1 << bit_n));
     }
@@ -1550,23 +1555,23 @@ int	_chunk_check(void)
     case BBLOCK_DBLOCK_ADMIN:
       
       /* check out dblock pointer */
-      if (! IS_IN_HEAP(bblock_p->bb_slotp)) {
+      if (! IS_IN_HEAP(bblock_p->bb_slot_p)) {
 	dmalloc_errno = ERROR_BAD_DBADMIN_POINTER;
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
       /* verify magic numbers */
-      if (bblock_p->bb_slotp->da_magic1 != CHUNK_MAGIC_BOTTOM
-	  || bblock_p->bb_slotp->da_magic2 != CHUNK_MAGIC_TOP) {
+      if (bblock_p->bb_slot_p->da_magic1 != CHUNK_MAGIC_BOTTOM
+	  || bblock_p->bb_slot_p->da_magic2 != CHUNK_MAGIC_TOP) {
 	dmalloc_errno = ERROR_BAD_DBADMIN_MAGIC;
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
       /* check out each dblock_admin struct? */
-      for (dblock_p = bblock_p->bb_slotp->da_block;
-	   dblock_p < bblock_p->bb_slotp->da_block + DB_PER_ADMIN;
+      for (dblock_p = bblock_p->bb_slot_p->da_block;
+	   dblock_p < bblock_p->bb_slot_p->da_block + DB_PER_ADMIN;
 	   dblock_p++) {
 	
 	/* see if we've used this slot before */
@@ -2420,11 +2425,9 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (byte_n == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO)) {
-      log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
-		     "malloc", FALSE);
-      dmalloc_error("_chunk_malloc");
-    }
+    log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
+		   "malloc", FALSE);
+    dmalloc_error("_chunk_malloc");
     return MALLOC_ERROR;
   }
 #endif
@@ -2602,11 +2605,16 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     _dmalloc_message("WARNING: tried to free(0) from '%s'",
 		     _chunk_display_where(file, line));
 #endif
+    /*
+     * NOTE: we have here both a default in the settings.h file and a
+     * runtime token in case people want to turn it on or off at
+     * runtime.
+     */
 #if ALLOW_FREE_NULL
     return FREE_NOERROR;
 #else
     dmalloc_errno = ERROR_IS_NULL;
-    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO)) {
+    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_FREE_NULL)) {
       log_error_info(file, line, pnt, 0, "invalid pointer", "free", FALSE);
       dmalloc_error("_chunk_free");
     }
@@ -2882,11 +2890,9 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (new_size == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO)) {
-      log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
-		     "realloc", FALSE);
-      dmalloc_error("_chunk_realloc");
-    }
+    log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
+		   "realloc", FALSE);
+    dmalloc_error("_chunk_realloc");
     return REALLOC_ERROR;
   }
 #endif
@@ -3220,8 +3226,8 @@ void	_chunk_dump_unfreed(void)
       
     case BBLOCK_DBLOCK_ADMIN:
       
-      for (dblock_p = bblock_p->bb_slotp->da_block;
-	   dblock_p < bblock_p->bb_slotp->da_block + DB_PER_ADMIN;
+      for (dblock_p = bblock_p->bb_slot_p->da_block;
+	   dblock_p < bblock_p->bb_slot_p->da_block + DB_PER_ADMIN;
 	   dblock_p++) {
 	
 	/* see if this admin slot has ever been used */
