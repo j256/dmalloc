@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.100 2000/11/13 16:53:34 gray Exp $
+# $Id: Makefile.all.in,v 1.101 2000/11/14 20:10:46 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -10,9 +10,9 @@ exec_prefix = @exec_prefix@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-bindir = $(exec_prefix)/bin
-libdir = $(exec_prefix)/lib
-shlibdir = $(exec_prefix)/shlib
+bindir = @bindir@
+libdir = @libdir@
+shlibdir = @shlibdir@
 incdir = $(prefix)/include
 infodir = $(prefix)/info
 docdir = $(prefix)/share/doc/$(MODULE)
@@ -121,7 +121,6 @@ distclean : clean
 
 installdirs :
 	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(bindir)
-# may want to add $(shlibdir) to this list
 
 installincs : $(HFLS)
 	$(srcdir)/mkinstalldirs $(incdir)

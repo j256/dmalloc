@@ -1,11 +1,16 @@
 #
-# $Id: Makefile.in,v 1.146 2000/11/13 17:26:00 gray Exp $
+# $Id: Makefile.in,v 1.147 2000/11/14 20:10:47 gray Exp $
 #
 
 SHELL	= /bin/sh
 
+# default root installation directory
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
 srcdir = @srcdir@
 VPATH = @srcdir@
+shlibdir = @shlibdir@
 
 HFLS	= dmalloc.h
 OBJS	= arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o \
@@ -121,16 +126,19 @@ installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-install :: installlibs $(UTIL) $(INFOFILE)
-	install -cev $(UTIL) $(DESTDIR)/bin
-	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
-
 installdocs :: $(DOCS)
 	install -cev -m 444 $(DOCS) $(WWWDIR)/docs
 	cd $(WWWDIR)/docs ; for file in $(DOCS) ; \
 		do gzip -9fc $$file > $$file.gz.t ; \
 		install -cev -m 444 $$file.gz.t $$file.gz ; \
 		rm -f $$file.gz.t ; done
+
+installshlib : $(SHLIBRARY)
+	install -cevr -m 644 $(srcdir)/$(SHLIBRARY) $(shlibdir)
+
+install :: installlibs $(UTIL) $(INFOFILE)
+	install -cev $(UTIL) $(DESTDIR)/bin
+	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
 
 # put situation specific lines here
 dmalloc.h.2 : config.status
