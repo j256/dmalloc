@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.12 1994/01/20 01:46:36 gray Exp $
+$Id: TODO,v 1.13 1994/02/27 22:55:12 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -55,6 +55,12 @@ CHECKING:
 
 GENERAL:
 
+- maybe have some sort of memory-stack support:
+	- malloc_push_location("foo");
+	- malloc_pop_location("foo");
+	- have a maximum ~100 entry stack
+	- count how deep we are and if we go over don't store but track	so
+		when we drop below 100 it will be correct info
 - maybe some sort of cheap crc on memory in non-freed memory sections so
 	you can see what portions of memory changed (check tripwire)
 - maybe provide support for reference counts on allocations:

@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.43 1994/02/18 07:34:09 gray Exp $
+# $Id: Makefile.in,v 1.44 1994/02/27 22:55:10 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -25,7 +25,7 @@ UTIL	= malloc_dbg
 MANFILE	= malloc.info
 
 PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
-	configure.help \
+	config.help \
 	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
@@ -40,7 +40,7 @@ PARTS	= 1 2 3 4 5 6
 MAXPART	= 6
 # NOTE: the wc level should be below 90k due to shar overhead
 SHAR1	= conf.h.in const.h.in Makefile.in configure configure.in \
-	configure.help \
+	config.help \
 	ChangeLog Manifest
 SHAR2	= chunk.[ch] chunk_loc.h
 SHAR3	= INSTALL NEWS NOTES README TODO mallocrc \
@@ -75,7 +75,7 @@ installincs : $(HFLS)
 .PHONY : installlibs
 installlibs : installincs $(LIBRARY) $(OBJS_INST) $(MANFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
-	install -cev -m 444 $(OBJS_IN) $(DESTDIR)/lib
+	install -cev -m 444 $(OBJS_INST) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
 
 .PHONY : install

@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.31 1994/02/20 05:40:43 gray Exp $
+ * $Id: version.h,v 1.32 1994/02/27 22:55:19 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -31,8 +31,8 @@
  * entry *must* be entered and a NEWS entry probably needs to be
  * added.
  */
-LOCAL	char	*malloc_version = "2.0.0";
+LOCAL	char	*malloc_version = "2.0.1";
 
-/* Version Date: $Date: 1994/02/20 05:40:43 $ */
+/* Version Date: $Date: 1994/02/27 22:55:19 $ */
 
 #endif /* ! __VERSION_H__ */
