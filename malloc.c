@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.71 1994/11/12 23:09:39 gray Exp $";
+  "$Id: malloc.c,v 1.72 1994/11/13 00:14:36 gray Exp $";
 #endif
 
 /*
@@ -171,8 +171,7 @@ LOCAL	void	process_environ(void)
   _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&dmalloc_address,
 		       &dmalloc_address_count, &_dmalloc_flags,
 		       &check_interval, &dmalloc_logpath,
-		       &start_file, &start_line, &start_count,
-		       (void (*)())_dmalloc_message);
+		       &start_file, &start_line, &start_count);
   
   /* if it was not set then no flags set */
   if (_dmalloc_flags == DEBUG_INIT)

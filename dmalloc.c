@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.50 1994/10/27 01:24:08 gray Exp $";
+  "$Id: dmalloc.c,v 1.51 1994/11/13 00:14:30 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -421,7 +421,7 @@ LOCAL	void	dump_current(void)
   
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
 		       &inter, &lpath,
-		       &start_file, &start_line, &start_count, NULL);
+		       &start_file, &start_line, &start_count);
   
   if (flags == DEBUG_INIT)
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
@@ -519,7 +519,7 @@ EXPORT	int	main(int argc, char ** argv)
   
   /* get the current debug information from the env variable */
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags, &inter,
-		       &lpath, &sfile, &sline, &scount, NULL);
+		       &lpath, &sfile, &sline, &scount);
   
   /* get a new debug value from tag */
   if (tag != NULL) {

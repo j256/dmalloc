@@ -35,7 +35,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.3 1994/10/12 17:07:12 gray Exp $";
+  "$Id: env.c,v 1.4 1994/11/13 00:14:32 gray Exp $";
 #endif
 
 /* local variables */
@@ -125,8 +125,7 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
 				     long * debugp, int * intervalp,
 				     char ** logpathp,
 				     char ** sfilep, int * slinep,
-				     int * scountp,
-				     void (*message)())
+				     int * scountp)
 {
   const char	*env;
   char		*envp, *thisp;
@@ -247,10 +246,6 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
     }
     if (attrp->at_string != NULL)
       continue;
-    
-    /* no error exit, just ignore */
-    if (message != NULL)
-      message("WARNING: unknown environmental setting '%s'", thisp);
   }
   
   /* append the token settings to the debug setting */
