@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv_loc.h,v 1.7 1999/03/08 15:52:32 gray Exp $
+ * $Id: dmalloc_argv_loc.h,v 1.8 1999/03/08 19:27:42 gray Exp $
  */
 
 #ifndef __ARGV_LOC_H__
 #define __ARGV_LOC_H__
 
-#include "argv.h"			/* to get the types */
+#include "dmalloc_argv.h"			/* to get the types */
 
 /*
  * some compilation options
