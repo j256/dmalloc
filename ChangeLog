@@ -1,5 +1,10 @@
 2003-06-10  Gray Watson  <gray@outside.256.com>
 
+	* Renamed the "max memory space wasted" to "max unused memory
+	space" to indicate that it is not the users fault.
+
+	* Improved the admin and extern block accounting.
+
 	* Added PDF doc files to the installation.
 
 	* Fixed a problem with the global Makefile and dmalloc_t.  Thanks
@@ -1992,5 +1997,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.297 2003/06/10 17:47:13 gray Exp $
+$Id: ChangeLog,v 1.298 2003/06/10 18:46:59 gray Exp $
 -------------------------------------------------------------------------------
