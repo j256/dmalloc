@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.c,v 1.75 1998/11/09 18:09:31 gray Exp $
+ * $Id: error.c,v 1.76 1998/11/12 20:59:42 gray Exp $
  */
 
 /*
@@ -67,10 +67,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.75 1998/11/09 18:09:31 gray Exp $";
+#ident "$Id: error.c,v 1.76 1998/11/12 20:59:42 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.75 1998/11/09 18:09:31 gray Exp $";
+  "$Id: error.c,v 1.76 1998/11/12 20:59:42 gray Exp $";
 #endif
 #endif
 
@@ -185,18 +185,29 @@ void	_dmalloc_message(const char *format, ...)
   }
   
 #if HAVE_TIME
-  /* maybe dump a time stamp */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STAMP)) {
-    (void)sprintf(str_p, "%ld: ", (long)time(NULL));
+#if LOG_TIME_NUMBER
+  (void)sprintf(str_p, "%ld: ", (long)time(NULL));
+  for (; *str_p != '\0'; str_p++) {
+  }
+#endif /* LOG_TIME_NUMBER */
+#if HAVE_CTIME
+#if LOG_CTIME_STRING
+  {
+    TIME_NUMBER_TYPE	now;
+    now = time(NULL);
+    (void)sprintf(str_p, "%.24s: ", ctime(&now));
     for (; *str_p != '\0'; str_p++) {
     }
   }
-#endif
+#endif /* LOG_CTIME_STRING */
+#endif /* HAVE_CTIME */
+#endif /* HAVE_TIME */
   
 #if LOG_ITERATION_COUNT
   /* add the iteration number */
   (void)sprintf(str_p, "%lu: ", _dmalloc_iter_c);
-  for (; *str_p != '\0'; str_p++);
+  for (; *str_p != '\0'; str_p++) {
+  }
 #endif
   
   /*
