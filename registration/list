@@ -1,7 +1,7 @@
 #
 # Registration information
 #
-# $Id: list,v 1.3 1997/01/16 15:21:06 gray Exp $
+# $Id: list,v 1.4 1997/11/05 16:25:48 gray Exp $
 #
 
 Number:		1011
@@ -90,3 +90,25 @@ Letter Sent:	1/25/96
 Email Sent:	1/25/96
 Other Sent:	none
 Status:		done
+
+Number:		1015
+Name:		Walter Haas
+Organization:	
+Amount:		$35
+What:		1 License
+Type:		check (Personal # 190)
+From:		mail
+Position:	Contract Software Development
+Street Address:	?
+City:		?
+State:		?
+Zip:		?
+Country:	?
+Email:		haas@xmission.com
+Phone:		
+Fax:		
+Arrival Date:	6/6/96
+Letter Sent:	
+Email Sent:	3/22/97
+Other Sent:	none
+Status:		Waiting for email response.
