@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: return.h,v 1.4 1993/09/07 04:55:11 gray Exp $
+ * $Id: return.h,v 1.5 1993/09/10 21:17:39 gray Exp $
  */
 
 /*
@@ -82,8 +82,8 @@
 
 #endif /* __sparc */
 
-/* for i[34]86 machines */
-#if __i386
+/* for i[34]86 machines with GCC */
+#if __i386 && __GNUC__ > 1
 
 #define SET_RET_ADDR(file, line)	\
   do { \
