@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: compat.h,v 1.28 1997/03/21 17:21:30 gray Exp $
+ * $Id: compat.h,v 1.29 1997/12/05 21:09:39 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -33,88 +33,101 @@
 
 #if HAVE_MEMCPY == 0
 /*
- * copy LEN characters from SRC to DEST
+ * Copy LEN characters from SRC to DEST
  */
-extern	void	memcpy(char * dest, const char * src, DMALLOC_SIZE len);
+extern
+void	memcpy(char *dest, const char *src, DMALLOC_SIZE len);
 #endif
 
 #if HAVE_MEMCMP == 0
 /*
- * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
+ * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-extern	int	memcmp(const char * str1, const char * str2, DMALLOC_SIZE len);
+extern
+int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len);
 #endif
 
 #if HAVE_MEMSET == 0
 /*
- * set LEN characters in STR to character CH
+ * Set LEN characters in STR to character CH
  */
-extern	char	*memset(char * str, int ch, DMALLOC_SIZE len);
+extern
+char	*memset(char *str, int ch, DMALLOC_SIZE len);
 #endif
 
 #if HAVE_STRCHR == 0
 /*
- * find CH in STR by searching backwards through the string
+ * Find CH in STR by searching backwards through the string
  */
-extern	char	*strchr(const char * str, int ch);
+extern
+char	*strchr(const char *str, int ch);
 #endif
 
 #if HAVE_STRRCHR == 0
 /*
- * find CH in STR by searching backwards through the string
+ * Find CH in STR by searching backwards through the string
  */
-extern	char	*strrchr(const char * str, int ch);
+extern
+char	*strrchr(const char *str, int ch);
 #endif
 
 #if HAVE_STRCAT == 0
 /*
- * concatenate STR2 onto the end of STR1
+ * Concatenate STR2 onto the end of STR1
  */
-extern	char	*strcat(char * str1, const char * str2);
+extern
+char	*strcat(char *str1, const char *str2);
 #endif
 
 #if HAVE_STRLEN == 0
 /*
- * return the length in characters of STR
+ * Return the length in characters of STR
  */
-extern	int	strlen(const char * str);
+extern
+int	strlen(const char *str);
 #endif
 
 #if HAVE_STRCMP == 0
 /*
- * returns -1,0,1 on whether STR1 is <,==,> STR2
+ * Returns -1,0,1 on whether STR1 is <,==,> STR2
  */
-extern	int	strcmp(const char * str1, const char * str2);
+extern
+int	strcmp(const char *str1, const char *str2);
 #endif
 
 #if HAVE_STRNCMP == 0
 /*
- * compare at most LEN chars in STR1 and STR2 and return -1,0,1 or STR1 - STR2
+ * Compare at most LEN chars in STR1 and STR2 and return -1,0,1 or
+ * STR1 - STR2
  */
-extern	int	strncmp(const char * str1, const char * str2, const int len);
+extern
+int	strncmp(const char *str1, const char *str2, const int len);
 #endif
 
 #if HAVE_STRCPY == 0
 /*
- * copies STR2 to STR1.  returns STR1
+ * Copies STR2 to STR1.  Returns STR1.
  */
-extern	char	*strcpy(char * str1, const char * str2);
+extern
+char	*strcpy(char *str1, const char *str2);
 #endif
 
 #if HAVE_STRNCPY == 0
 /*
- * copy STR2 to STR1 until LEN or null
+ * Copy STR2 to STR1 until LEN or null
  */
-extern	char	*strncpy(char * str1, const char * str2, const int len);
+extern
+char	*strncpy(char *str1, const char *str2, const int len);
 #endif
 
 #if HAVE_STRTOK == 0
 /*
- * get the next token from STR (pass in NULL on the 2nd, 3rd, etc. calls),
- * tokens are a list of characters deliminated by a character from DELIM.
- * writes null into STR to end token.
+ * Get the next token from STR (pass in NULL on the 2nd, 3rd,
+ * etc. calls), tokens are a list of characters deliminated by a
+ * character from DELIM.  writes null into STR to end token.
  */
-extern	char	*strtok(char * str, char * delim);
+extern
+char	*strtok(char *str, char *delim);
 #endif
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */

@@ -59,8 +59,8 @@
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
-LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.69 1997/11/05 16:29:22 gray Exp $";
+static	char	*rcs_id =
+  "$Id: dmalloc.c,v 1.70 1997/12/05 21:09:40 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -98,7 +98,7 @@ typedef struct {
 			 DEBUG_HEAP_CHECK_MAP | DEBUG_NEVER_REUSE)
 /* NOTE: print-error is not in this list because it is special */
 
-LOCAL	default_t	defaults[] = {
+static	default_t	defaults[] = {
   { "runtime",		RUNTIME_FLAGS },
   { "run",		RUNTIME_FLAGS },
   { "low",		LOW_FLAGS },
@@ -110,48 +110,48 @@ LOCAL	default_t	defaults[] = {
 };
 
 /* argument variables */
-LOCAL	char	*address	= NULL;		/* for ADDRESS */
-LOCAL	char	bourne		= FALSE;	/* set bourne shell output */
-LOCAL	char	cshell		= FALSE;	/* set c-shell output */
-LOCAL	char	clear		= FALSE;	/* clear variables */
-LOCAL	int	debug		= NO_VALUE;	/* for DEBUG */
-LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
-LOCAL	char	*inpath		= NULL;		/* for config-file path */
-LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
-LOCAL	int	thread_lock_on	= NO_VALUE;	/* for setting LOCK_ON */
-LOCAL	char	keep		= FALSE;	/* keep settings override -r */
-LOCAL	char	list_tags	= FALSE;	/* list rc tags */
-LOCAL	char	debug_tokens	= FALSE;	/* list debug tokens */
-LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
-LOCAL	char	long_tokens	= FALSE;	/* long-tok output */
-LOCAL	argv_array_t	minus;			/* tokens to remove */
-LOCAL	char	no_changes	= FALSE;	/* make no changes to env */
-LOCAL	argv_array_t	plus;			/* tokens to add */
-LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
-LOCAL	char	short_tokens	= FALSE;	/* short-tok output */
-LOCAL	char	*start		= NULL;		/* for START settings */
-LOCAL	char	verbose		= FALSE;	/* verbose flag */
-LOCAL	char	very_verbose	= FALSE;	/* very-verbose flag */
-LOCAL	char	*tag		= NULL;		/* maybe a tag argument */
+static	char	*address	= NULL;		/* for ADDRESS */
+static	char	bourne_b	= FALSE;	/* set bourne shell output */
+static	char	cshell_b	= FALSE;	/* set c-shell output */
+static	char	clear_b		= FALSE;	/* clear variables */
+static	int	debug		= NO_VALUE;	/* for DEBUG */
+static	int	errno_to_print	= NO_VALUE;	/* to print the error string */
+static	char	*inpath		= NULL;		/* for config-file path */
+static	int	interval	= NO_VALUE;	/* for setting INTERVAL */
+static	int	thread_lock_on	= NO_VALUE;	/* for setting LOCK_ON */
+static	char	keep_b		= FALSE;	/* keep settings override -r */
+static	char	list_tags_b	= FALSE;	/* list rc tags */
+static	char	debug_tokens_b	= FALSE;	/* list debug tokens */
+static	char	*logpath	= NULL;		/* for LOGFILE setting */
+static	char	long_tokens_b	= FALSE;	/* long-tok output */
+static	argv_array_t	minus;			/* tokens to remove */
+static	char	no_changes_b	= FALSE;	/* make no changes to env */
+static	argv_array_t	plus;			/* tokens to add */
+static	char	remove_auto_b	= FALSE;	/* auto-remove settings */
+static	char	short_tokens_b	= FALSE;	/* short-tok output */
+static	char	*start		= NULL;		/* for START settings */
+static	char	verbose_b	= FALSE;	/* verbose flag */
+static	char	very_verbose_b	= FALSE;	/* very-verbose flag */
+static	char	*tag		= NULL;		/* maybe a tag argument */
 
-LOCAL	argv_t	args[] = {
-  { 'b',	"bourne",	ARGV_BOOL,	&bourne,
+static	argv_t	args[] = {
+  { 'b',	"bourne",	ARGV_BOOL,	&bourne_b,
       NULL,			"set output for bourne shells" },
   { ARGV_OR },
-  { 'C',	"c-shell",	ARGV_BOOL,	&cshell,
+  { 'C',	"c-shell",	ARGV_BOOL,	&cshell_b,
       NULL,			"set output for C-type shells" },
-  { 'L',	"long-tokens",	ARGV_BOOL,	&long_tokens,
+  { 'L',	"long-tokens",	ARGV_BOOL,	&long_tokens_b,
       NULL,			"output long-tokens not 0x..." },
   { ARGV_OR },
-  { 'S',	"short-tokens",	ARGV_BOOL,	&short_tokens,
+  { 'S',	"short-tokens",	ARGV_BOOL,	&short_tokens_b,
       NULL,			"output short-tokens not 0x..." },
   { 'a',	"address",	ARGV_CHAR_P,	&address,
       "address:#",		"stop when malloc sees address" },
-  { 'c',	"clear",	ARGV_BOOL,	&clear,
+  { 'c',	"clear",	ARGV_BOOL,	&clear_b,
       NULL,			"clear all variables not set" },
   { 'd',	"debug-mask",	ARGV_HEX,	&debug,
       "value",			"hex flag to set debug mask" },
-  { 'D',	"debug-tokens",	ARGV_BOOL,	&debug_tokens,
+  { 'D',	"debug-tokens",	ARGV_BOOL,	&debug_tokens_b,
       NULL,			"list debug tokens" },
   { 'e',	"errno",	ARGV_INT,	&errno_to_print,
       "errno",			"print error string for errno" },
@@ -159,27 +159,27 @@ LOCAL	argv_t	args[] = {
       "path",			"config if not ~/.mallocrc" },
   { 'i',	"interval",	ARGV_INT,	&interval,
       "value",			"check heap every number times" },
-  { 'k',	"keep",		ARGV_BOOL,	&keep,
+  { 'k',	"keep",		ARGV_BOOL,	&keep_b,
       NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHAR_P,	&logpath,
       "path",			"file to log messages to" },
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_ARRAY,	&minus,
       "token(s)",		"del tokens from current debug" },
-  { 'n',	"no-changes",	ARGV_BOOL,	&no_changes,
+  { 'n',	"no-changes",	ARGV_BOOL,	&no_changes_b,
       NULL,			"make no changes to the env" },
   { 'o',	"lock-on",	ARGV_INT,	&thread_lock_on,
       "number",			"number of times to not lock" },
   { 'p',	"plus",		ARGV_CHAR_P | ARGV_ARRAY,	&plus,
       "token(s)",		"add tokens to current debug" },
-  { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
+  { 'r',	"remove",	ARGV_BOOL,	&remove_auto_b,
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHAR_P,	&start,
       "file:line",		"start check heap after this" },
-  { 't',	"list-tags",	ARGV_BOOL,	&list_tags,
+  { 't',	"list-tags",	ARGV_BOOL,	&list_tags_b,
       NULL,			"list tags in rc file" },
-  { 'v',	"verbose",	ARGV_BOOL,	&verbose,
+  { 'v',	"verbose",	ARGV_BOOL,	&verbose_b,
       NULL,			"turn on verbose output" },
-  { 'V',	"very-verbose",	ARGV_BOOL,	&very_verbose,
+  { 'V',	"very-verbose",	ARGV_BOOL,	&very_verbose_b,
       NULL,			"turn on very-verbose output" },
   { ARGV_MAYBE,	NULL,		ARGV_CHAR_P,	&tag,
       "tag",			"debug token to find in rc" },
@@ -189,45 +189,48 @@ LOCAL	argv_t	args[] = {
 /*
  * list of bourne shells
  */
-LOCAL	char	*sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
+static	char	*sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
 
 /*
  * try a check out the shell env variable to see what form of shell
  * commands we should output
  */
-LOCAL	void	choose_shell(void)
+static	void	choose_shell(void)
 {
   const char	*shell, *shellp;
-  int		shellc;
+  int		shell_c;
   
   shell = getenv(SHELL_ENVIRON);
   if (shell == NULL) {
-    cshell = TRUE;
+    cshell_b = TRUE;
     return;
   }
   
   shellp = strrchr(shell, '/');
-  if (shellp == NULL)
+  if (shellp == NULL) {
     shellp = shell;
-  else
+  }
+  else {
     shellp++;
+  }
   
-  for (shellc = 0; sh_shells[shellc] != NULL; shellc++)
-    if (strcmp(sh_shells[shellc], shellp) == 0) {
-      bourne = TRUE;
+  for (shell_c = 0; sh_shells[shell_c] != NULL; shell_c++) {
+    if (strcmp(sh_shells[shell_c], shellp) == 0) {
+      bourne_b = TRUE;
       return;
     }
+  }
   
-  cshell = TRUE;
+  cshell_b = TRUE;
 }
 
 /*
  * dump the current flags set in the debug variable VAL
  */
-LOCAL	void	dump_debug(const int val)
+static	void	dump_debug(const int val)
 {
   attr_t	*attrp;
-  int		tokc = 0, work = val;
+  int		tok_c = 0, work = val;
   
   for (attrp = attributes; attrp->at_string != NULL; attrp++) {
     /* the below is necessary to handle the 'none' HACK */
@@ -236,54 +239,62 @@ LOCAL	void	dump_debug(const int val)
 	    && (work & attrp->at_value) == attrp->at_value)) {
       work &= ~attrp->at_value;
       
-      if (tokc == 0)
+      if (tok_c == 0) {
 	(void)fprintf(stderr, "   ");
-      
-      if (very_verbose)
-	(void)fprintf(stderr, "%s -- %s",
-		      attrp->at_string, attrp->at_desc);
-      else {
-	(void)fprintf(stderr, "%s", attrp->at_string);
-	if (work != 0)
-	  (void)fprintf(stderr, ", ");
-	tokc = (tokc + 1) % TOKENS_PER_LINE;
       }
       
-      if (tokc == 0)
-	(void)fprintf(stderr, "\n");
+      if (very_verbose_b) {
+	(void)fprintf(stderr, "%s -- %s", attrp->at_string, attrp->at_desc);
+      }
+      else {
+	(void)fprintf(stderr, "%s", attrp->at_string);
+	if (work != 0) {
+	  (void)fprintf(stderr, ", ");
+	}
+	tok_c = (tok_c + 1) % TOKENS_PER_LINE;
+      }
       
-      if (work == 0)
+      if (tok_c == 0) {
+	(void)fprintf(stderr, "\n");
+      }
+      
+      if (work == 0) {
 	break;
+      }
     }
   }
   
-  if (tokc != 0)
+  if (tok_c != 0) {
     (void)fprintf(stderr, "\n");
+  }
   
-  if (work != 0)
+  if (work != 0) {
     (void)fprintf(stderr, "%s: warning, unknown debug flags: %#x\n",
 		  argv_program, work);
+  }
 }
 
 /*
  * translate TOK into its proper value which is returned
  */
-LOCAL	long	token_to_value(const char * tok)
+static	long	token_to_value(const char *tok)
 {
-  int	attrc;
+  int	attr_c;
   long	ret = 0;
   
-  for (attrc = 0; attributes[attrc].at_string != NULL; attrc++) {
-    if (strcmp(tok, attributes[attrc].at_string) == 0)
+  for (attr_c = 0; attributes[attr_c].at_string != NULL; attr_c++) {
+    if (strcmp(tok, attributes[attr_c].at_string) == 0) {
       break;
+    }
   }
   
-  if (attributes[attrc].at_string == NULL) {
+  if (attributes[attr_c].at_string == NULL) {
     (void)fprintf(stderr, "%s: unknown token '%s'\n",
 		  argv_program, tok);
   }
-  else
-    ret = attributes[attrc].at_value;
+  else {
+    ret = attributes[attr_c].at_value;
+  }
   
   return ret;
 }
@@ -293,112 +304,123 @@ LOCAL	long	token_to_value(const char * tok)
  * null then look for DEBUG_VALUE in the file and return the token for
  * it in STRP.  routine returns the new debug value matching tag.
  */
-LOCAL	long	process(const long debug_value, const char * tag_find,
-			char ** strp)
+static	long	process(const long debug_value, const char *tag_find,
+			char **strp)
 {
   static char	token[128];
   FILE		*infile = NULL;
   char		path[1024], buf[1024];
-  const char	*homep;
-  char		found, cont;
+  const char	*home_p;
+  int		found_b, cont_b;
   long		new_debug = 0;
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
-    homep = getenv(HOME_ENVIRON);
-    if (homep == NULL) {
+    home_p = getenv(HOME_ENVIRON);
+    if (home_p == NULL) {
       (void)fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
       exit(1);
     }
     
-    (void)sprintf(path, DEFAULT_CONFIG, homep);
+    (void)sprintf(path, DEFAULT_CONFIG, home_p);
     inpath = path;
   }
   
   infile = fopen(inpath, "r");
   /* do not test for error here */
   
-  if (list_tags && infile != NULL)
+  if (list_tags_b && infile != NULL) {
     (void)fprintf(stderr, "Tags available from '%s':\n", inpath);
+  }
   
   /* read each of the lines looking for the tag */
-  found = FALSE;
-  cont = FALSE;
+  found_b = FALSE;
+  cont_b = FALSE;
   
   while (infile != NULL && fgets(buf, sizeof(buf), infile) != NULL) {
-    char	*tokp, *endp;
+    char	*tok_p, *endp;
     
     /* ignore comments and empty lines */
-    if (buf[0] == '#' || buf[0] == '\n')
+    if (buf[0] == '#' || buf[0] == '\n') {
       continue;
+    }
     
     /* chop off the ending \n */
     endp = strrchr(buf, '\n');
-    if (endp != NULL)
-      *endp = NULLC;
-    
-    /* get the first token on the line */
-    tokp = strtok(buf, TOKENIZE_CHARS);
-    if (tokp == NULL)
-      continue;
-    
-    /* if we're not continuing then we need to process a tag */
-    if (! cont) {
-      (void)strcpy(token, tokp);
-      new_debug = 0;
-      
-      if (tag_find != NULL && strcmp(tag_find, tokp) == 0)
-	found = TRUE;
-      
-      tokp = strtok(NULL, TOKENIZE_CHARS);
-      if (tokp == NULL)
-	continue;
+    if (endp != NULL) {
+      *endp = '\0';
     }
     
-    cont = FALSE;
+    /* get the first token on the line */
+    tok_p = strtok(buf, TOKENIZE_CHARS);
+    if (tok_p == NULL) {
+      continue;
+    }
+    
+    /* if we're not continuing then we need to process a tag */
+    if (! cont_b) {
+      (void)strcpy(token, tok_p);
+      new_debug = 0;
+      
+      if (tag_find != NULL && strcmp(tag_find, tok_p) == 0) {
+	found_b = TRUE;
+      }
+      
+      tok_p = strtok(NULL, TOKENIZE_CHARS);
+      if (tok_p == NULL) {
+	continue;
+      }
+    }
+    
+    cont_b = FALSE;
     
     do {
       /* do we have a continuation character */
-      if (strcmp(tokp, "\\") == 0) {
-	cont = TRUE;
+      if (strcmp(tok_p, "\\") == 0) {
+	cont_b = TRUE;
 	break;
       }
       
       /* are we processing the tag of choice? */
-      if (found || tag_find == NULL)
-	new_debug |= token_to_value(tokp);
+      if (found_b || tag_find == NULL) {
+	new_debug |= token_to_value(tok_p);
+      }
       
-      tokp = strtok(NULL, TOKENIZE_CHARS);
-    } while (tokp != NULL);
+      tok_p = strtok(NULL, TOKENIZE_CHARS);
+    } while (tok_p != NULL);
     
-    if (list_tags && ! cont) {
-      if (verbose) {
+    if (list_tags_b && (! cont_b)) {
+      if (verbose_b) {
 	(void)fprintf(stderr, "%s (%#lx):\n", token, new_debug);
 	dump_debug(new_debug);
       }
       else
 	(void)fprintf(stderr, "%s\n", token);
     }
-    else if (tag_find == NULL && ! cont && new_debug == debug_value) {
-      found = TRUE;
-      if (strp != NULL)
+    else if (tag_find == NULL && (! cont_b) && new_debug == debug_value) {
+      found_b = TRUE;
+      if (strp != NULL) {
 	*strp = token;
+      }
     }
     
     /* are we done? */
-    if (found && ! cont)
+    if (found_b && (! cont_b)) {
       break;
+    }
   }
   
-  if (infile != NULL)
+  if (infile != NULL) {
     (void)fclose(infile);
+  }
   
   /* did we find the correct value in the file? */
-  if (found)
+  if (found_b) {
     return new_debug;
+  }
   
-  if (! list_tags && tag_find == NULL) {
+  if (! list_tags_b && tag_find == NULL) {
     default_t	*def_p;
     
     /* check the default list to see if we have a match there */
@@ -409,21 +431,22 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
 	  break;
 	}
       }
-      if (def_p->de_string == NULL)
+      if (def_p->de_string == NULL) {
 	*strp = "unknown";
+      }
     }
   }
   else {
     default_t	*defp;
     
-    if (list_tags) {
+    if (list_tags_b) {
       (void)fprintf(stderr, "\n");
       (void)fprintf(stderr, "Tags available by default:\n");
     }
     
     for (defp = defaults; defp->de_string != NULL; defp++) {
-      if (list_tags) {
-	if (verbose) {
+      if (list_tags_b) {
+	if (verbose_b) {
 	  (void)fprintf(stderr, "%s (%#lx):\n",
 			defp->de_string, defp->de_flags);
 	  dump_debug(defp->de_flags);
@@ -431,10 +454,11 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
 	else
 	  (void)fprintf(stderr, "%s\n", defp->de_string);
       }
-      if (tag_find != NULL && strcmp(tag_find, defp->de_string) == 0)
+      if (tag_find != NULL && strcmp(tag_find, defp->de_string) == 0) {
 	break;
+      }
     }
-    if (! list_tags) {
+    if (! list_tags_b) {
       if (defp->de_string == NULL) {
 	if (infile == NULL) {
 	  (void)fprintf(stderr, "%s: could not read '%s': ",
@@ -457,9 +481,9 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
 /*
  * dump the current settings of the malloc variables
  */
-LOCAL	void	dump_current(void)
+static	void	dump_current(void)
 {
-  char		*tokp;
+  char		*tok_p;
   char		*lpath, *start_file;
   unsigned long	addr;
   int		addr_count, inter, lock_on, start_line, start_count;
@@ -469,64 +493,88 @@ LOCAL	void	dump_current(void)
 		       &inter, &lock_on, &lpath,
 		       &start_file, &start_line, &start_count);
   
-  if (flags == DEBUG_INIT)
+  if (flags == DEBUG_INIT) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
+  }
   else {
-    (void)process(flags, NULL, &tokp);
-    (void)fprintf(stderr, "Debug-Flags %#lx (%ld) (%s)\n", flags, flags, tokp);
-    if (verbose)
+    (void)process(flags, NULL, &tok_p);
+    (void)fprintf(stderr, "Debug-Flags %#lx (%ld) (%s)\n", flags, flags,
+		  tok_p);
+    if (verbose_b) {
       dump_debug(flags);
+    }
   }
   
-  if (addr == ADDRESS_INIT)
+  if (addr == ADDRESS_INIT) {
     (void)fprintf(stderr, "Address      not-set\n");
+  }
   else {
-    if (addr_count == ADDRESS_COUNT_INIT)
+    if (addr_count == ADDRESS_COUNT_INIT) {
       (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
-    else
+    }
+    else {
       (void)fprintf(stderr, "Address      %#lx, count = %d\n",
 		    (long)addr, addr_count);
+    }
   }
   
-  if (inter == INTERVAL_INIT)
+  if (inter == INTERVAL_INIT) {
     (void)fprintf(stderr, "Interval     not-set\n");
-  else
+  }
+  else {
     (void)fprintf(stderr, "Interval     %d\n", inter);
+  }
   
-  if (lock_on == LOCK_ON_INIT)
+#if LOCK_THREADS
+  if (lock_on == LOCK_ON_INIT) {
     (void)fprintf(stderr, "Lock-On      not-set\n");
-  else
+  }
+  else {
     (void)fprintf(stderr, "Lock-On      %d\n", lock_on);
+  }
+#else
+  if (very_verbose_b) {
+    (void)fprintf(stderr, "Lock-On      not-configured\n");
+  }
+#endif
   
-  if (lpath == LOGPATH_INIT)
+  if (lpath == LOGPATH_INIT) {
     (void)fprintf(stderr, "Logpath      not-set\n");
-  else
+  }
+  else {
     (void)fprintf(stderr, "Logpath      '%s'\n", lpath);
+  }
   
-  if (start_file == START_FILE_INIT && start_count == START_COUNT_INIT)
+  if (start_file == START_FILE_INIT && start_count == START_COUNT_INIT) {
     (void)fprintf(stderr, "Start-File   not-set\n");
-  else if (start_count != START_COUNT_INIT)
+  }
+  else if (start_count != START_COUNT_INIT) {
     (void)fprintf(stderr, "Start-Count  %d\n", start_count);
-  else
+  }
+  else {
     (void)fprintf(stderr, "Start-File   '%s', line = %d\n",
 		  start_file, start_line);
+  }
 }
 
 /*
  * output the code to set env VAR to VALUE
  */
-LOCAL void    set_variable(const char * var, const char * value)
+static	void    set_variable(const char *var, const char *value)
 {
   char	comm[1024];
   
-  if (bourne)
+  if (bourne_b) {
     (void)sprintf(comm, "%s=%s;\nexport %s;\n", var, value, var);
-  else
+  }
+  else {
     (void)sprintf(comm, "setenv %s %s;\n", var, value);
+  }
   
-  if (! no_changes)
+  if (! no_changes_b) {
     (void)printf("%s", comm);
-  if (no_changes || verbose) {
+  }
+  if (no_changes_b || verbose_b) {
     (void)fprintf(stderr, "Outputed:\n");
     (void)fprintf(stderr, "%s", comm);
   }
@@ -535,18 +583,20 @@ LOCAL void    set_variable(const char * var, const char * value)
 /*
  * returns the string for ERRNUM
  */
-LOCAL	char	*local_strerror(const int errnum)
+static	char	*local_strerror(const int errnum)
 {
-  if (! IS_MALLOC_ERRNO(errnum))
+  if (! IS_MALLOC_ERRNO(errnum)) {
     return errlist[ERROR_BAD_ERRNO];
-  else
+  }
+  else {
     return errlist[errnum];
+  }
 }
 
-EXPORT	int	main(int argc, char ** argv)
+int	main(int argc, char **argv)
 {
   char		buf[1024];
-  char		debug_set = FALSE, set = FALSE;
+  int		debug_set_b = FALSE, set_b = FALSE;
   char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
   unsigned long	addr = ADDRESS_INIT;
   int		addr_count = ADDRESS_COUNT_INIT, inter = INTERVAL_INIT;
@@ -559,12 +609,14 @@ EXPORT	int	main(int argc, char ** argv)
   
   argv_process(args, argc, argv);
   
-  if (very_verbose)
-    verbose = TRUE;
+  if (very_verbose_b) {
+    verbose_b = TRUE;
+  }
   
   /* try to figure out the shell we are using */
-  if (! bourne && ! cshell)
+  if (! bourne_b && ! cshell_b) {
     choose_shell();
+  }
   
   /* get the current debug information from the env variable */
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags, &inter,
@@ -572,97 +624,123 @@ EXPORT	int	main(int argc, char ** argv)
   
   /* get a new debug value from tag */
   if (tag != NULL) {
-    if (debug != NO_VALUE)
+    if (debug != NO_VALUE) {
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
+    }
     debug = process(0L, tag, NULL);
-    debug_set = TRUE;
+    debug_set_b = TRUE;
   }
   
   if (plus.aa_entry_n > 0) {
     int		plusc;
     
     /* get current debug value and add tokens if possible */
-    if (debug == NO_VALUE)
-      if (flags == DEBUG_INIT)
+    if (debug == NO_VALUE) {
+      if (flags == DEBUG_INIT) {
 	debug = 0;
-      else
+      }
+      else {
 	debug = flags;
+      }
+    }
     
-    for (plusc = 0; plusc < plus.aa_entry_n; plusc++)
+    for (plusc = 0; plusc < plus.aa_entry_n; plusc++) {
       debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
+    }
   }
   
   if (minus.aa_entry_n > 0) {
     int		minusc;
     
     /* get current debug value and add tokens if possible */
-    if (debug == NO_VALUE)
-      if (flags == DEBUG_INIT)
+    if (debug == NO_VALUE) {
+      if (flags == DEBUG_INIT) {
 	debug = 0;
-      else
+      }
+      else {
 	debug = flags;
+      }
+    }
     
-    for (minusc = 0; minusc < minus.aa_entry_n; minusc++)
+    for (minusc = 0; minusc < minus.aa_entry_n; minusc++) {
       debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minusc));
+    }
   }
   
   if (debug != NO_VALUE) {
     /* special case, undefine if 0 */
-    if (debug == 0)
+    if (debug == 0) {
       flags = DEBUG_INIT;
-    else
+    }
+    else {
       flags = debug;
-    set = TRUE;
+    }
+    set_b = TRUE;
     /* should we clear the rest? */
-    if (debug_set && remove_auto && ! keep)
-      clear = TRUE;
+    if (debug_set_b && remove_auto_b && ! keep_b) {
+      clear_b = TRUE;
+    }
   }
   
-  if (clear)
-    set = TRUE;
+  if (clear_b) {
+    set_b = TRUE;
+  }
   
   if (address != NULL) {
     _dmalloc_address_break(address, &addr, &addr_count);
-    set = TRUE;
+    set_b = TRUE;
   }
-  else if (clear)
+  else if (clear_b) {
     addr = ADDRESS_INIT;
+  }
   
   if (interval != NO_VALUE) {
     /* NOTE: special case, == 0 causes it to be undef'ed */
-    if (interval == 0)
+    if (interval == 0) {
       inter = INTERVAL_INIT;
-    else
+    }
+    else {
       inter = interval;
-    set = TRUE;
+    }
+    set_b = TRUE;
   }
-  else if (clear)
+  else if (clear_b) {
     inter = INTERVAL_INIT;
+  }
   
   if (thread_lock_on != NO_VALUE) {
+#if LOCK_THREADS
     /* NOTE: special case, == 0 causes it to be undef'ed */
-    if (thread_lock_on == 0)
+    if (thread_lock_on == 0) {
       lock_on = LOCK_ON_INIT;
-    else
+    }
+    else {
       lock_on = thread_lock_on;
+    }
     set = TRUE;
-  }
-  else if (clear)
+#else
+    (void)fprintf(stderr, "WARNING: LOCK_THREADS not-configured\n");
     lock_on = LOCK_ON_INIT;
+#endif
+  }
+  else if (clear_b) {
+    lock_on = LOCK_ON_INIT;
+  }
   
   if (logpath != NULL) {
     lpath = logpath;
-    set = TRUE;
+    set_b = TRUE;
   }
-  else if (clear)
+  else if (clear_b) {
     lpath = LOGPATH_INIT;
+  }
   
   if (start != NULL) {
     _dmalloc_start_break(start, &sfile, &sline, &scount);
-    set = TRUE;
+    set_b = TRUE;
   }
-  else if (clear) {
+  else if (clear_b) {
     sfile = START_FILE_INIT;
     scount = START_COUNT_INIT;
   }
@@ -673,31 +751,39 @@ EXPORT	int	main(int argc, char ** argv)
     (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
   }
   
-  if (list_tags)
+  if (list_tags_b) {
     process(0L, NULL, NULL);
+  }
   
-  if (debug_tokens) {
+  if (debug_tokens_b) {
     attr_t	*attrp;
     (void)fprintf(stderr, "Debug Tokens:\n");
-    for (attrp = attributes; attrp->at_string != NULL; attrp++)
-      if (very_verbose)
+    for (attrp = attributes; attrp->at_string != NULL; attrp++) {
+      if (very_verbose_b) {
 	(void)fprintf(stderr, "%s (%s) -- %s (%#lx)\n",
 		      attrp->at_string, attrp->at_short, attrp->at_desc,
 		      attrp->at_value);
-      else if (verbose)
+      }
+      else if (verbose_b) {
 	(void)fprintf(stderr, "%s -- %s\n",
 		      attrp->at_string, attrp->at_desc);
-      else
+      }
+      else {
 	(void)fprintf(stderr, "%s\n", attrp->at_string);
+      }
+    }
   }
   
-  if (set) {
-    _dmalloc_environ_set(buf, long_tokens, short_tokens, addr, addr_count,
+  if (set_b) {
+    _dmalloc_environ_set(buf, long_tokens_b, short_tokens_b, addr, addr_count,
 			 flags, inter, lock_on, lpath, sfile, sline, scount);
     set_variable(OPTIONS_ENVIRON, buf);
   }
-  else if (errno_to_print == NO_VALUE && ! list_tags && ! debug_tokens)
+  else if (errno_to_print == NO_VALUE
+	   && (! list_tags_b)
+	   && (! debug_tokens_b)) {
     dump_current();
+  }
   
   argv_cleanup(args);
   

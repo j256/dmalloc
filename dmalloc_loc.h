@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_loc.h,v 1.36 1997/03/21 14:30:23 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.37 1997/12/05 21:09:42 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -35,18 +35,6 @@
 #define OPTIONS_ENVIRON		"DMALLOC_OPTIONS"
 
 /******************************* useful defines ******************************/
-
-/*
- * global variable and procedure scoping for code readability
- */
-#undef	EXPORT
-#define	EXPORT
-
-#undef	IMPORT
-#define	IMPORT		extern
-
-#undef	LOCAL
-#define	LOCAL		static
 
 /*
  * standard int return codes
@@ -64,9 +52,6 @@
 #ifndef NULL
 #define NULL		0L
 #endif
-
-#undef	NULLC
-#define NULLC		'\0'
 
 #undef	FALSE
 #define FALSE		0

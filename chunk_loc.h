@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.43 1997/03/21 14:33:08 gray Exp $
+ * $Id: chunk_loc.h,v 1.44 1997/12/05 21:09:38 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -226,7 +226,7 @@ typedef struct dblock_st	dblock_t;
  *
  * Like the above divided-block structure, I use unions here to to
  * simplify the code and the comments at the end show when the field
- * is used.  For instance, bb_bitn (really bb_nums.nu_bitn) is in use
+ * is used.  For instance, bb_bit_n (really bb_nums.nu_bit_n) is in use
  * when the pointer is tracking user divided-block allocations or when
  * the pointer is free.  The bb_freen field is used when the block is
  * full of admin structures such as this.  Yes, the library uses this
@@ -236,18 +236,18 @@ struct bblock_st {
   unsigned short	bb_flags;		/* what it is */
   
   union {
-    unsigned short	nu_bitn;		/* chunk bit size */
+    unsigned short	nu_bit_n;		/* chunk bit size */
     unsigned short	nu_line;		/* line where it was alloced */
   } bb_nums;
   
   /* to reference union elements as bb elements */
-#define bb_bitn		bb_nums.nu_bitn		/* User-dblock, Free */
+#define bb_bit_n		bb_nums.nu_bit_n		/* User-dblock, Free */
 #define bb_line		bb_nums.nu_line		/* User-bblock */
   
   union {
     unsigned long	in_freen;		/* admin free number */
     unsigned long	in_posn;		/* admin block position */
-    unsigned long	in_blockn;		/* number of blocks */
+    unsigned long	in_block_n;		/* number of blocks */
     unsigned long	in_size;		/* size of allocation */
     /* NOTE: this pointer and the longs may be of a different type */
     dblock_t		*in_dblock;		/* pointer to dblock info */
@@ -256,13 +256,13 @@ struct bblock_st {
   /* to reference union elements as bb elements */
 #define bb_freen	bb_info.in_freen	/* BBlock-admin-free */
 #define	bb_posn		bb_info.in_posn		/* BBlock-admin */
-#define	bb_blockn	bb_info.in_blockn	/* Free */
+#define	bb_block_n	bb_info.in_block_n	/* Free */
 #define	bb_size		bb_info.in_size		/* User-bblock */
 #define	bb_dblock	bb_info.in_dblock	/* User-dblock */
   
   union {
     struct dblock_adm_st	*pn_slotp;	/* pointer to db_admin block */
-    struct bblock_adm_st	*pn_adminp;	/* pointer to bb_admin block */
+    struct bblock_adm_st	*pn_admin_p;	/* pointer to bb_admin block */
     void			*pn_mem;	/* memory associated to it */
     struct bblock_st		*pn_next;	/* next in free list */
     const char			*pn_file;	/* .c filename where alloced */
@@ -270,7 +270,7 @@ struct bblock_st {
   
   /* to reference union elements as bb elements */
 #define	bb_slotp	bb_pnt.pn_slotp		/* DBlock-admin */
-#define	bb_adminp	bb_pnt.pn_adminp	/* BBlock-admin */
+#define	bb_admin_p	bb_pnt.pn_admin_p	/* BBlock-admin */
 #define	bb_mem		bb_pnt.pn_mem		/* User-dblock, External */
 #define	bb_next		bb_pnt.pn_next		/* Free */
 #define	bb_file		bb_pnt.pn_file		/* User-bblock */

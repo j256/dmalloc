@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error_val.h,v 1.15 1995/09/06 17:47:36 gray Exp $
+ * $Id: error_val.h,v 1.16 1997/12/05 21:09:49 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -77,12 +77,12 @@
 #define ERROR_BAD_DBADMIN_SLOT		85	/* bad dblock slot info */
 
 /* administrative errors */
-#define ERROR_BAD_ADMINP		90	/* admin value out of bounds */
+#define ERROR_BAD_ADMIN_P		90	/* admin value out of bounds */
 #define ERROR_BAD_ADMIN_LIST		91	/* list pnt out of bounds */
 #define ERROR_BAD_ADMIN_MAGIC		92	/* bad magic numbers */
 #define ERROR_BAD_ADMIN_COUNT		93	/* bad count number */
-#define ERROR_BAD_BLOCK_ADMINP		94	/* bblock adminp bad */
-#define ERROR_BAD_BLOCK_ADMINC		95	/* bblock adminp->count bad */
+#define ERROR_BAD_BLOCK_ADMIN_P		94	/* bblock adminp bad */
+#define ERROR_BAD_BLOCK_ADMIN_C		95	/* bblock adminp->count bad */
 
 /* heap check verification errors */
 #define ERROR_BAD_BLOCK_ORDER		100	/* block allocation bad */

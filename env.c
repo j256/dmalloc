@@ -45,20 +45,20 @@
 #include "error.h"
 
 #if INCLUDE_RCS_IDS
-LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.10 1997/07/07 06:26:56 gray Exp $";
+static	char	*rcs_id =
+  "$Id: env.c,v 1.11 1997/12/05 21:09:45 gray Exp $";
 #endif
 
 /* local variables */
-LOCAL	char		log_path[512]	= { NULLC }; /* storage for env path */
-LOCAL	char		start_file[512] = { NULLC }; /* file to start at */
+static	char		log_path[512]	= { '\0' }; /* storage for env path */
+static	char		start_file[512] = { '\0' }; /* file to start at */
 
 /****************************** local utilities ******************************/
 
 /*
- * hexadecimal STR to int translation
+ * Hexadecimal STR to int translation
  */
-LOCAL	long	hex_to_long(const char * str)
+static	long	hex_to_long(const char *str)
 {
   long		ret;
   
@@ -66,18 +66,23 @@ LOCAL	long	hex_to_long(const char * str)
   for (; *str == ' ' || *str == '\t'; str++);
   
   /* skip a leading 0[xX] */
-  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X'))
+  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) {
     str += 2;
+  }
   
   for (ret = 0;; str++) {
-    if (*str >= '0' && *str <= '9')
+    if (*str >= '0' && *str <= '9') {
       ret = ret * 16 + (*str - '0');
-    else if (*str >= 'a' && *str <= 'f')
+    }
+    else if (*str >= 'a' && *str <= 'f') {
       ret = ret * 16 + (*str - 'a' + 10);
-    else if (*str >= 'A' && *str <= 'F')
+    }
+    else if (*str >= 'A' && *str <= 'F') {
       ret = ret * 16 + (*str - 'A' + 10);
-    else
+    }
+    else {
       break;
+    }
   }
   
   return ret;
@@ -86,164 +91,179 @@ LOCAL	long	hex_to_long(const char * str)
 /***************************** exported routines *****************************/
 
 /*
- * break up ADDR_ALL into ADDRP and ADDR_COUNTP
+ * Break up ADDR_ALL into ADDR_P and ADDR_COUNT_P
  */
-EXPORT	void	_dmalloc_address_break(const char * addr_all,
-				       unsigned long * addrp,
-				       int * addr_countp)
+void	_dmalloc_address_break(const char *addr_all, unsigned long *addr_p,
+			       int *addr_count_p)
 {
-  char	*colonp;
+  char	*colon_p;
   
-  if (addrp != NULL)
-    *addrp = hex_to_long(addr_all);
-  if (addr_countp != NULL) {
-    colonp = strchr(addr_all, ':');
-    if (colonp != NULL)
-      *addr_countp = atoi(colonp + 1);
+  if (addr_p != NULL) {
+    *addr_p = hex_to_long(addr_all);
+  }
+  if (addr_count_p != NULL) {
+    colon_p = strchr(addr_all, ':');
+    if (colon_p != NULL) {
+      *addr_count_p = atoi(colon_p + 1);
+    }
   }
 }
 
 /*
- * break up START_ALL into SFILEP, SLINEP, and SCOUNTP
+ * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
  */
-EXPORT	void	_dmalloc_start_break(const char * start_all,
-				     char ** sfilep, int * slinep,
-				     int * scountp)
+void	_dmalloc_start_break(const char *start_all, char **sfile_p,
+			     int *sline_p, int *scount_p)
 {
-  char	*startp;
+  char	*start_p;
   
-  startp = strchr(start_all, ':');
-  if (startp != NULL) {
+  start_p = strchr(start_all, ':');
+  if (start_p != NULL) {
     (void)strcpy(start_file, start_all);
-    if (sfilep != NULL)
-      *sfilep = start_file;
-    startp = start_file + (startp - start_all);
-    *startp = NULLC;
-    if (slinep != NULL)
-      *slinep = atoi(startp + 1);
+    if (sfile_p != NULL) {
+      *sfile_p = start_file;
+    }
+    start_p = start_file + (start_p - start_all);
+    *start_p = '\0';
+    if (sline_p != NULL) {
+      *sline_p = atoi(start_p + 1);
+    }
   }
-  else if (scountp != NULL)
-    *scountp = atoi(start_all);
+  else if (scount_p != NULL) {
+    *scount_p = atoi(start_all);
+  }
 }
 
 /*
- * process the values of dmalloc environ variable(s) from ENVIRON
+ * Process the values of dmalloc environ variable(s) from ENVIRON
  * string.
  */
-EXPORT	void	_dmalloc_environ_get(const char * environ,
-				     unsigned long * addrp,
-				     int * addr_countp,
-				     long * debugp, int * intervalp,
-				     int * lock_onp,
-				     char ** logpathp,
-				     char ** sfilep, int * slinep,
-				     int * scountp)
+void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
+			     int *addr_count_p, long *debug_p, int *interval_p,
+			     int *lock_on_p, char **logpath_p, char **sfile_p,
+			     int *sline_p, int *scount_p)
 {
   const char	*env;
-  char		*envp, *thisp;
-  char		buf[1024], done = FALSE;
-  int		len;
+  char		*env_p, *this_p;
+  char		buf[1024];
+  int		len, done_b = 0;
   long		flags = 0;
-  attr_t	*attrp;
+  attr_t	*attr_p;
   
-  if (addrp != NULL)
-    *addrp = ADDRESS_INIT;
-  if (addr_countp != NULL)
-    *addr_countp = ADDRESS_COUNT_INIT;
-  if (debugp != NULL)
-    *debugp = DEBUG_INIT;
-  if (intervalp != NULL)
-    *intervalp = INTERVAL_INIT;
-  if (lock_onp != NULL)
-    *lock_onp = LOCK_ON_INIT;
-  if (logpathp != NULL)
-    *logpathp = LOGPATH_INIT;
-  if (sfilep != NULL)
-    *sfilep = START_FILE_INIT;
-  if (slinep != NULL)
-    *slinep = START_LINE_INIT;
-  if (scountp != NULL)
-    *scountp = START_COUNT_INIT;
+  if (addr_p != NULL) {
+    *addr_p = ADDRESS_INIT;
+  }
+  if (addr_count_p != NULL) {
+    *addr_count_p = ADDRESS_COUNT_INIT;
+  }
+  if (debug_p != NULL) {
+    *debug_p = DEBUG_INIT;
+  }
+  if (interval_p != NULL) {
+    *interval_p = INTERVAL_INIT;
+  }
+  if (lock_on_p != NULL) {
+    *lock_on_p = LOCK_ON_INIT;
+  }
+  if (logpath_p != NULL) {
+    *logpath_p = LOGPATH_INIT;
+  }
+  if (sfile_p != NULL) {
+    *sfile_p = START_FILE_INIT;
+  }
+  if (sline_p != NULL) {
+    *sline_p = START_LINE_INIT;
+  }
+  if (scount_p != NULL) {
+    *scount_p = START_COUNT_INIT;
+  }
   
   /* get the options flag */
   env = getenv(environ);
-  if (env == NULL)
+  if (env == NULL) {
     return;
+  }
   
   /* make a copy */
   (void)strcpy(buf, env);
   
   /* handle each of tokens, in turn */
-  for (envp = buf, thisp = buf; ! done; envp++, thisp = envp) {
+  for (env_p = buf, this_p = buf; ! done_b; env_p++, this_p = env_p) {
     
     /* find the comma of end */
-    for (;; envp++) {
-      if (*envp == NULLC) {
-	done = TRUE;
+    for (;; env_p++) {
+      if (*env_p == '\0') {
+	done_b = 1;
 	break;
       }
-      if (*envp == ',' && (envp == buf || *(envp - 1) != '\\'))
+      if (*env_p == ',' && (env_p == buf || *(env_p - 1) != '\\')) {
 	break;
+      }
     }
     
     /* should we strip ' ' or '\t' here? */
     
-    if (thisp == envp)
+    if (this_p == env_p) {
       continue;
+    }
     
-    *envp = NULLC;
+    *env_p = '\0';
     
     len = strlen(ADDRESS_LABEL);
-    if (strncmp(thisp, ADDRESS_LABEL, len) == 0
-	&& *(thisp + len) == ASSIGNMENT_CHAR) {
-      thisp += len + 1;
-      _dmalloc_address_break(thisp, addrp, addr_countp);
+    if (strncmp(this_p, ADDRESS_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
+      _dmalloc_address_break(this_p, addr_p, addr_count_p);
       continue;
     }
     
     len = strlen(DEBUG_LABEL);
-    if (strncmp(thisp, DEBUG_LABEL, len) == 0
-	&& *(thisp + len) == ASSIGNMENT_CHAR) {
-      thisp += len + 1;
-      if (debugp != NULL)
-	*debugp = hex_to_long(thisp);
+    if (strncmp(this_p, DEBUG_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
+      if (debug_p != NULL) {
+	*debug_p = hex_to_long(this_p);
+      }
       continue;
     }
     
     len = strlen(INTERVAL_LABEL);
-    if (strncmp(thisp, INTERVAL_LABEL, len) == 0
-	&& *(thisp + len) == ASSIGNMENT_CHAR) {
-      thisp += len + 1;
-      if (intervalp != NULL)
-	*intervalp = atoi(thisp);
+    if (strncmp(this_p, INTERVAL_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
+      if (interval_p != NULL) {
+	*interval_p = atoi(this_p);
+      }
       continue;
     }
     
     len = strlen(LOCK_ON_LABEL);
-    if (strncmp(thisp, LOCK_ON_LABEL, len) == 0
-	&& *(thisp + len) == ASSIGNMENT_CHAR) {
-      thisp += len + 1;
-      if (lock_onp != NULL)
-	*lock_onp = atoi(thisp);
+    if (strncmp(this_p, LOCK_ON_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
+      if (lock_on_p != NULL) {
+	*lock_on_p = atoi(this_p);
+      }
       continue;
     }
     
     /* get the dmalloc logfile name into a holding variable */
     len = strlen(LOGFILE_LABEL);
-    if (strncmp(thisp, LOGFILE_LABEL, len) == 0
-	&& *(thisp + len) == ASSIGNMENT_CHAR) {
-      thisp += len + 1;
+    if (strncmp(this_p, LOGFILE_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
 #if HAVE_GETPID
       /*
-       * NOTE: this may cause core dumps if thisp contains a bad
+       * NOTE: this may cause core dumps if this_p contains a bad
        * format string
        */
-      (void)sprintf(log_path, thisp, getpid());
+      (void)sprintf(log_path, this_p, getpid());
 #else
-      (void)strcpy(log_path, thisp);
+      (void)strcpy(log_path, this_p);
 #endif
-      if (logpathp != NULL)
-	*logpathp = log_path;
+      if (logpath_p != NULL) {
+	*logpath_p = log_path;
+      }
       continue;
     }
     
@@ -252,106 +272,122 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
      * start at a file:line combination
      */
     len = strlen(START_LABEL);
-    if (strncmp(thisp, START_LABEL, len) == 0
-	&& *(thisp + len) == ASSIGNMENT_CHAR) {
-      thisp += len + 1;
-      _dmalloc_start_break(thisp, sfilep, slinep, scountp);
+    if (strncmp(this_p, START_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
+      _dmalloc_start_break(this_p, sfile_p, sline_p, scount_p);
       continue;
     }
     
     /* need to check the short/long debug options */
-    for (attrp = attributes; attrp->at_string != NULL; attrp++) {
-      if (strcmp(thisp, attrp->at_string) == 0
-	  || strcmp(thisp, attrp->at_short) == 0) {
-	flags |= attrp->at_value;
+    for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
+      if (strcmp(this_p, attr_p->at_string) == 0
+	  || strcmp(this_p, attr_p->at_short) == 0) {
+	flags |= attr_p->at_value;
 	break;
       }
     }
-    if (attrp->at_string != NULL)
+    if (attr_p->at_string != NULL) {
       continue;
+    }
   }
   
   /* append the token settings to the debug setting */
-  if (debugp != NULL) {
-    if (*debugp == DEBUG_INIT)
-      *debugp = flags;
-    else
-      *debugp |= flags;
+  if (debug_p != NULL) {
+    if (*debug_p == DEBUG_INIT) {
+      *debug_p = flags;
+    }
+    else {
+      *debug_p |= flags;
+    }
   }
 }
 
 /*
- * set dmalloc environ variable(s) with the values (maybe SHORT debug
- * info) into BUF
+ * Set dmalloc environ variable(s) with the values (maybe SHORT debug
+ * info) into BUF.
  */
-EXPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
-				     const char short_tokens,
-				     const unsigned long address,
-				     const int addr_count, const long debug,
-				     const int interval,
-				     const int lock_on,
-				     const char * logpath,
-				     const char * sfile,
-				     const int sline,
-				     const int scount)
+void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
+			     const int short_tokens_b,
+			     const unsigned long address,
+			     const int addr_count, const long debug,
+			     const int interval, const int lock_on,
+			     const char *logpath, const char *sfile,
+			     const int sline, const int scount)
 {
-  char	*bufp = buf;
+  char	*buf_p = buf;
   
   if (debug != DEBUG_INIT) {
-    if (short_tokens || long_tokens) {
-      attr_t	*attrp;
+    if (short_tokens_b || long_tokens_b) {
+      attr_t	*attr_p;
       
-      for (attrp = attributes; attrp->at_string != NULL; attrp++)
-	if (debug & attrp->at_value) {
-	  if (short_tokens)
-	    (void)sprintf(bufp, "%s,", attrp->at_short);
-	  else
-	    (void)sprintf(bufp, "%s,", attrp->at_string);
-	  for (; *bufp != NULLC; bufp++);
+      for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
+	if (debug & attr_p->at_value) {
+	  if (short_tokens_b) {
+	    (void)sprintf(buf_p, "%s,", attr_p->at_short);
+	  }
+	  else {
+	    (void)sprintf(buf_p, "%s,", attr_p->at_string);
+	  }
+	  for (; *buf_p != '\0'; buf_p++) {
+	  }
 	}
+      }
     }
     else {
-      (void)sprintf(bufp, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
-      for (; *bufp != NULLC; bufp++);
+      (void)sprintf(buf_p, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
+      for (; *buf_p != '\0'; buf_p++) {
+      }
     }
   }
   if (address != ADDRESS_INIT) {
-    if (addr_count != ADDRESS_COUNT_INIT)
-      (void)sprintf(bufp, "%s%c%#lx:%d,",
+    if (addr_count != ADDRESS_COUNT_INIT) {
+      (void)sprintf(buf_p, "%s%c%#lx:%d,",
 		    ADDRESS_LABEL, ASSIGNMENT_CHAR, address, addr_count);
-    else
-      (void)sprintf(bufp, "%s%c%#lx,",
+    }
+    else {
+      (void)sprintf(buf_p, "%s%c%#lx,",
 		    ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
-    for (; *bufp != NULLC; bufp++);
+    }
+    for (; *buf_p != '\0'; buf_p++) {
+    }
   }
   if (interval != INTERVAL_INIT) {
-    (void)sprintf(bufp, "%s%c%d,", INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
-    for (; *bufp != NULLC; bufp++);
+    (void)sprintf(buf_p, "%s%c%d,", INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
+    for (; *buf_p != '\0'; buf_p++) {
+    }
   }
   if (lock_on != LOCK_ON_INIT) {
-    (void)sprintf(bufp, "%s%c%d,", LOCK_ON_LABEL, ASSIGNMENT_CHAR, lock_on);
-    for (; *bufp != NULLC; bufp++);
+    (void)sprintf(buf_p, "%s%c%d,", LOCK_ON_LABEL, ASSIGNMENT_CHAR, lock_on);
+    for (; *buf_p != '\0'; buf_p++) {
+    }
   }
   if (logpath != LOGPATH_INIT) {
-    (void)sprintf(bufp, "%s%c%s,", LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
-    for (; *bufp != NULLC; bufp++);
+    (void)sprintf(buf_p, "%s%c%s,", LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
+    for (; *buf_p != '\0'; buf_p++) {
+    }
   }
   if (sfile != START_FILE_INIT) {
-    if (sline != START_LINE_INIT)
-      (void)sprintf(bufp, "%s%c%s:%d,",
+    if (sline != START_LINE_INIT) {
+      (void)sprintf(buf_p, "%s%c%s:%d,",
 		    START_LABEL, ASSIGNMENT_CHAR, sfile, sline);
-    else
-      (void)sprintf(bufp, "%s%c%s,", START_LABEL, ASSIGNMENT_CHAR, sfile);
-    for (; *bufp != NULLC; bufp++);
+    }
+    else {
+      (void)sprintf(buf_p, "%s%c%s,", START_LABEL, ASSIGNMENT_CHAR, sfile);
+    }
+    for (; *buf_p != '\0'; buf_p++) {
+    }
   }
   else if (scount != START_COUNT_INIT) {
-    (void)sprintf(bufp, "%s%c%d,", START_LABEL, ASSIGNMENT_CHAR, scount);
-    for (; *bufp != NULLC; bufp++);
+    (void)sprintf(buf_p, "%s%c%d,", START_LABEL, ASSIGNMENT_CHAR, scount);
+    for (; *buf_p != '\0'; buf_p++) {
+    }
   }
   
   /* cut off the last comma */
-  if (bufp > buf)
-    bufp--;
+  if (buf_p > buf) {
+    buf_p--;
+  }
   
-  *bufp = NULLC;
+  *buf_p = '\0';
 }

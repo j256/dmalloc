@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.21 1997/03/21 21:22:37 gray Exp $
+ * $Id: debug_tok.h,v 1.22 1997/12/05 21:09:39 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -41,7 +41,7 @@ typedef struct {
   char		*at_desc;		/* description string */
 } attr_t;
 
-LOCAL	attr_t		attributes[] = {
+static	attr_t		attributes[] = {
   { "none",		"nil",	0,
       "no functionality" },
   

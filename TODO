@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.29 1995/05/13 00:34:55 gray Exp $
+$Id: TODO,v 1.30 1997/12/05 21:09:33 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -176,5 +176,6 @@ GENERAL:
 	- or could use .mallocrc entry
 	- could have program:tag entries for default behavior in program
 	- requires knowing the argv[0] argument
+- add a recalloc function.  I guess it is available under SGI.
 
 -------------------------------------------------------------------------------

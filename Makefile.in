@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.98 1997/12/05 15:49:06 gray Exp $
+# $Id: Makefile.in,v 1.99 1997/12/05 21:09:32 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -137,6 +137,7 @@ $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) $(LIBRARY)
 	mv a.out $(.TARGET)
 
+# NOTE: we sleep here to make sure we get a different random seed from time()
 check light :: $(TEST)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
@@ -144,6 +145,7 @@ check light :: $(TEST)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 
+# NOTE: we sleep here to make sure we get a different random seed from time()
 heavy :: $(TEST) light
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000

@@ -41,26 +41,26 @@
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
-LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.44 1995/09/06 17:37:00 gray Exp $";
+static	char	*rcs_id =
+  "$Id: heap.c,v 1.45 1997/12/05 21:09:49 gray Exp $";
 #endif
 
 /* external routines */
 #if HAVE_SBRK
-IMPORT	char		*sbrk(const int incr);	/* to extend the heap */
+extern	char		*sbrk(const int incr);	/* to extend the heap */
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
 #endif
 
 /* exported variables */
-EXPORT	void		*_heap_base = NULL;	/* base of our heap */
-EXPORT	void		*_heap_last = NULL;	/* end of our heap */
+void	*_heap_base = NULL;			/* base of our heap */
+void	*_heap_last = NULL;			/* end of our heap */
 
 /****************************** local functions ******************************/
 
 /*
- * increment the heap INCR bytes with sbrk
+ * Increment the heap INCR bytes with sbrk
  */
-LOCAL	void	*heap_extend(const int incr)
+static	void	*heap_extend(const int incr)
 {
   void	*ret = SBRK_ERROR;
   
@@ -84,9 +84,9 @@ LOCAL	void	*heap_extend(const int incr)
 /**************************** exported functions *****************************/
 
 /*
- * initialize heap pointers.  returns [NO]ERROR
+ * Initialize heap pointers.  returns [NO]ERROR
  */
-EXPORT	int	_heap_startup(void)
+int	_heap_startup(void)
 {
   long		diff;
   
@@ -111,12 +111,12 @@ EXPORT	int	_heap_startup(void)
 }
 
 /*
- * function to get SIZE memory bytes from the end of the heap.  it
- * returns a pointer to any external blocks in EXTERNP and the number
- * of blocks in EXTERNCP.
+ * Function to get SIZE memory bytes from the end of the heap.  it
+ * returns a pointer to any external blocks in EXTERN_P and the number
+ * of blocks in EXTERN_CP.
  */
-EXPORT	void	*_heap_alloc(const unsigned int size, void ** externp,
-			     int * externcp)
+void	*_heap_alloc(const unsigned int size, void **extern_p,
+		     int *extern_cp)
 {
   void		*ret;
   long		diff;
@@ -129,10 +129,10 @@ EXPORT	void	*_heap_alloc(const unsigned int size, void ** externp,
   /* is the heap linear? */
   if (ret == _heap_last) {
     _heap_last = HEAP_INCR(ret, size);
-    if (externp != NULL)
-      *externp = NULL;
-    if (externcp != NULL)
-      *externcp = 0;
+    if (extern_p != NULL)
+      *extern_p = NULL;
+    if (extern_cp != NULL)
+      *extern_cp = 0;
     return ret;
   }
   
@@ -157,17 +157,20 @@ EXPORT	void	*_heap_alloc(const unsigned int size, void ** externp,
   
   /* do we need to correct non-linear space with sbrk */
   if (diff > 0) {
-    if (heap_extend(diff) == SBRK_ERROR)
+    if (heap_extend(diff) == SBRK_ERROR) {
       return HEAP_ALLOC_ERROR;
+    }
     
     ret = HEAP_INCR(ret, diff);
     blockn++;
   }
   
-  if (externp != NULL)
-    *externp = _heap_last;
-  if (externcp != NULL)
-    *externcp = blockn;
+  if (extern_p != NULL) {
+    *extern_p = _heap_last;
+  }
+  if (extern_cp != NULL) {
+    *extern_cp = blockn;
+  }
   
   _heap_last = HEAP_INCR(ret, size);
   

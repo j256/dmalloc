@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk.h,v 1.44 1997/01/16 22:24:35 gray Exp $
+ * $Id: chunk.h,v 1.45 1997/12/05 21:09:37 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -38,79 +38,91 @@
  * the unknown file pointer.  did not use DMALLOC_UNKNOWN_FILE everywhere else
  * the pointers would be different.
  */
-extern	char		*_dmalloc_unknown_file;
+extern
+char		*_dmalloc_unknown_file;
 
-extern	long		_calloc_count;	/* # callocs, done in alloc */
-
-/*
- * startup the low level malloc routines
- */
-extern	int	_chunk_startup(void);
+extern
+long			_calloc_count;	/* # callocs, done in alloc */
 
 /*
- * display a bad pointer with FILE and LINE information
+ * Startup the low level malloc routines
  */
-extern	char	*_chunk_display_where(const char * file,
-				      const unsigned int line);
+extern
+int	_chunk_startup(void);
 
 /*
- * run extensive tests on the entire heap
+ * Display a bad pointer with FILE and LINE information
  */
-extern	int	_chunk_check(void);
+extern
+char	*_chunk_display_where(const char *file, const unsigned int line);
 
 /*
- * run extensive tests on PNT from FUNC. test PNT HOW_MUCH of MIN_SIZE
- * (or 0 if unknown).  CHECK is flags for types of checking (see chunk.h).
- * returns [NO]ERROR
+ * Run extensive tests on the entire heap
  */
-extern	int	_chunk_pnt_check(const char * func, const void * pnt,
-				 const int check, const int min_size);
+extern
+int	_chunk_check(void);
+
+/*
+ * Run extensive tests on PNT from FUNC. test PNT HOW_MUCH of MIN_SIZE
+ * (or 0 if unknown).  CHECK is flags for types of checking (see
+ * chunk.h).  returns [NO]ERROR
+ */
+extern
+int	_chunk_pnt_check(const char *func, const void *pnt,
+			 const int check, const int min_size);
 
 /*
  * return some information associated with PNT, returns [NO]ERROR
  */
-extern	int	_chunk_read_info(const void * pnt, unsigned int * size,
-				 unsigned int * alloc_size, char ** file,
-				 unsigned int * line, void ** ret_attr,
-				 const char * where, int ** seencp);
+extern
+int	_chunk_read_info(const void *pnt, unsigned int *size_p,
+			 unsigned int *alloc_size_p, char **file_p,
+			 unsigned int *line_p, void **ret_attr_p,
+			 const char *where, int **seen_cp);
 
 /*
- * log the heap structure plus information on the blocks if necessary
+ * Log the heap structure plus information on the blocks if necessary
  */
-extern	void	_chunk_log_heap_map(void);
+extern
+void	_chunk_log_heap_map(void);
 
 /*
- * get a SIZE chunk of memory for FILE at LINE
+ * Get a SIZE chunk of memory for FILE at LINE
  */
-extern	void	*_chunk_malloc(const char * file, const unsigned int line,
-			       const unsigned int size);
+extern
+void	*_chunk_malloc(const char *file, const unsigned int line,
+		       const unsigned int size);
 
 /*
- * frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR
+ * Frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR
  */
-extern	int	_chunk_free(const char * file, const unsigned int line,
-			    void * pnt);
+extern
+int	_chunk_free(const char *file, const unsigned int line, void *pnt);
 
 /*
- * reallocate a section of memory
+ * Reallocate a section of memory
  */
-extern	void	*_chunk_realloc(const char * file, const unsigned int line,
-				void * oldp, unsigned int new_size);
+extern
+void	*_chunk_realloc(const char *file, const unsigned int line,
+			void *old_p, unsigned int new_size);
 
 /*
- * log present free and used lists
+ * Log present free and used lists
  */
-extern	void	_chunk_list_count(void);
+extern
+void	_chunk_list_count(void);
 
 /*
- * log statistics on the heap
+ * Log statistics on the heap
  */
-extern	void	_chunk_stats(void);
+extern
+void	_chunk_stats(void);
 
 /*
- * dump the unfreed memory, logs the unfreed information to logger
+ * Dump the unfreed memory, logs the unfreed information to logger
  */
-extern	void	_chunk_dump_unfreed(void);
+extern
+void	_chunk_dump_unfreed(void);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

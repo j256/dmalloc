@@ -1,5 +1,5 @@
 /*
- * error and message routines
+ * Error and message routines
  *
  * Copyright 1995 by Gray Watson
  *
@@ -59,8 +59,8 @@
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
-LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.65 1997/03/21 17:23:17 gray Exp $";
+static	char	*rcs_id =
+  "$Id: error.c,v 1.66 1997/12/05 21:09:46 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -68,52 +68,52 @@ LOCAL	char	*rcs_id =
 #define SECS_IN_MIN	60
 
 /* external routines */
-IMPORT	char		*_dmalloc_strerror(const int errnum);
+extern	char		*_dmalloc_strerror(const int errnum);
 
 /*
  * exported variables
  */
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-EXPORT	char		*dmalloc_logpath = LOGPATH_INIT;
+char		*dmalloc_logpath = LOGPATH_INIT;
 /* internal dmalloc error number for reference purposes only */
-EXPORT	int		dmalloc_errno = ERROR_NONE;
+int		dmalloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call dmalloc_error() */
-EXPORT	DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
+DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
-EXPORT	long		_dmalloc_flags = 0;
+long		_dmalloc_flags = 0;
 
 /* global iteration counter for activities */
-EXPORT	unsigned long	_dmalloc_iterc = 0;
+unsigned long	_dmalloc_iterc = 0;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
-EXPORT	struct timeval	_dmalloc_start;
+struct timeval	_dmalloc_start;
 #endif
 #if STORE_TIMEVAL == 0
-EXPORT	long		_dmalloc_start = 0;
+long		_dmalloc_start = 0;
 #endif
 
 /* global flag which indicates when we are aborting */
-EXPORT	char		_dmalloc_aborting = FALSE;
+int		_dmalloc_aborting_b = FALSE;
 
 #if STORE_TIMEVAL
 /*
  * print the time into local buffer which is returned
  */
-EXPORT	char	*_dmalloc_ptimeval(const struct timeval * timevalp,
-				   const char elapsed)
+char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
+			   const int elapsed_b)
 {
   static char	buf[64];
   long		hrs, mins, secs;
   long		usecs;
   
-  buf[0] = NULLC;
+  buf[0] = '\0';
   
-  secs = timevalp->tv_sec;
-  usecs = timevalp->tv_usec;
+  secs = timeval_p->tv_sec;
+  usecs = timeval_p->tv_usec;
   
-  if (elapsed || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+  if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
     usecs -= _dmalloc_start.tv_usec;
     if (usecs < 0) {
       secs--;
@@ -136,15 +136,15 @@ EXPORT	char	*_dmalloc_ptimeval(const struct timeval * timevalp,
 /*
  * print the time into local buffer which is returned
  */
-EXPORT	char	*_dmalloc_ptime(const long * timep, const char elapsed)
+char	*_dmalloc_ptime(const long *time_p, const int elapsed_b)
 {
   static char	buf[64];
   long		hrs, mins, secs;
   
-  buf[0] = NULLC;
-  secs = *timep;
+  buf[0] = '\0';
+  secs = *time_p;
   
-  if (elapsed || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+  if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
     secs -= _dmalloc_start;
   }
   
@@ -161,30 +161,32 @@ EXPORT	char	*_dmalloc_ptime(const long * timep, const char elapsed)
 /*
  * message writer with printf like arguments
  */
-EXPORT	void	_dmalloc_message(const char * format, ...)
+void	_dmalloc_message(const char *format, ...)
 {
   static int	outfile = -1;
-  char		str[1024], *strp = str;
+  char		str[1024], *str_p = str;
   int		len;
   va_list	args;
   
   /* no logpath and no print then no workie */
   if (dmalloc_logpath == LOGPATH_INIT
-      && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR))
+      && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
     return;
+  }
   
 #if HAVE_TIME
   /* maybe dump a time stamp */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STAMP)) {
-    (void)sprintf(strp, "%ld: ", (long)time(NULL));
-    for (; *strp != NULLC; strp++);
+    (void)sprintf(str_p, "%ld: ", (long)time(NULL));
+    for (; *str_p != '\0'; str_p++) {
+    }
   }
 #endif
   
 #if LOG_ITERATION_COUNT
   /* add the iteration number */
-  (void)sprintf(strp, "%lu: ", _dmalloc_iterc);
-  for (; *strp != NULLC; strp++);
+  (void)sprintf(str_p, "%lu: ", _dmalloc_iterc);
+  for (; *str_p != '\0'; str_p++);
 #endif
   
   /*
@@ -195,22 +197,24 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
   
   /* write the format + info into str */
   va_start(args, format);
-  (void)vsprintf(strp, format, args);
+  (void)vsprintf(str_p, format, args);
   va_end(args);
   
   /* was it an empty format? */
-  if (*strp == NULLC)
+  if (*str_p == '\0') {
     return;
+  }
   
   /* find the length of str */
-  for (; *strp != NULLC; strp++);
+  for (; *str_p != '\0'; str_p++) {
+  }
   
   /* tack on a '\n' if necessary */
-  if (*(strp - 1) != '\n') {
-    *strp++ = '\n';
-    *strp = NULLC;
+  if (*(str_p - 1) != '\n') {
+    *str_p++ = '\n';
+    *str_p = '\0';
   }
-  len = strp - str;
+  len = str_p - str;
   
   /* do we need to log the message? */
   if (dmalloc_logpath != LOGPATH_INIT) {
@@ -258,22 +262,25 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
   }
   
   /* do we need to print the message? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR))
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
     (void)write(STDERR, str, len);
+  }
 }
 
 /*
  * kill the program because of an internal malloc error
  */
-EXPORT	void	_dmalloc_die(const char silent)
+void	_dmalloc_die(const int silent_b)
 {
   char	str[1024], *stop_str;
   
-  if (! silent) {
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
+  if (! silent_b) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)) {
       stop_str = "dumping";
-    else
+    }
+    else {
       stop_str = "halting";
+    }
     
     /* print a message that we are going down */
     (void)sprintf(str, "debug-malloc library: %s program, fatal error\n",
@@ -290,7 +297,7 @@ EXPORT	void	_dmalloc_die(const char silent)
    * set this in case the following generates a recursive call for
    * some dumb reason
    */
-  _dmalloc_aborting = TRUE;
+  _dmalloc_aborting_b = TRUE;
   
   /* do I need to drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)
@@ -314,15 +321,16 @@ EXPORT	void	_dmalloc_die(const char silent)
  * handler of error codes from procedure FUNC.  the procedure should
  * have set the errno already.
  */
-EXPORT	void	dmalloc_error(const char * func)
+void	dmalloc_error(const char *func)
 {
   /* do we need to log or print the error? */
   if (dmalloc_logpath != NULL
       || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
     
     /* default str value */
-    if (func == NULL)
+    if (func == NULL) {
       func = "_malloc_error";
+    }
     
     /* print the malloc error message */
     _dmalloc_message("ERROR: %s: %s (err %d)",
@@ -330,15 +338,16 @@ EXPORT	void	dmalloc_error(const char * func)
   }
   
   /* do I need to abort? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)) {
     _dmalloc_die(FALSE);
+  }
   
 #if HAVE_FORK
   /* how about just drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
-    int		pid = fork();
-    if (pid == 0)
+    if (fork() == 0) {
       _dmalloc_die(TRUE);
+    }
   }
 #endif
 }
