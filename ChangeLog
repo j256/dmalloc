@@ -1,3 +1,7 @@
+Tue Feb 10 21:12:40 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing version 3.3.1 to get rid of the -beta.
+
 Sun Dec 21 19:32:02 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Shifted some flags to ints instead of longs.
@@ -1233,5 +1237,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.183 1997/12/22 00:32:29 gray Exp $
+$Id: ChangeLog,v 1.184 1998/02/11 02:14:21 gray Exp $
 -------------------------------------------------------------------------------
