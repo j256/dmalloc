@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.199 2000/11/15 15:40:33 gray Exp $
+@c $Id: dmalloc.texi,v 1.200 2000/11/20 17:44:26 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -768,6 +768,22 @@ enable the @code{log-unknown} token (@kbd{dmalloc -p log-unknown}).
 This will be necessary if you are @emph{not} including @file{dmalloc.h}
 in all of your C files or if you are interested in tracking leaks in
 system functions.
+
+@item Dmalloc is returning the error "malloc library has gone recursive"
+
+This most likely indicates that you are using the Dmalloc library within
+a threaded application and two threads are trying to use the dmalloc
+library at once.  Please see the section of the manual about threads for
+more information about properly configuring the library.  @xref{Using
+With Threads}.
+
+If you are not using threads, then your program could have caught a
+signal while within Dmalloc, which then in turn called a memory
+allocation routine.  It is unwise to allocate memory on the heap in most
+signal handlers.  Lastly, some functions called by the library may call
+memory routines that it does not anticipate.  If you think this the
+case, please report the problem and include a stack trace, operating
+system version/type, and the version of Dmalloc you are using.
 
 @end table
 
