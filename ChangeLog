@@ -1,6 +1,10 @@
--------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.73 1993/10/17 01:34:27 gray Exp $
--------------------------------------------------------------------------------
+Mon Nov 22 22:21:56 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added more automatic and comprehensive malloc_t testing
+	facilities with argv options.
+
+	* Integrated tons of new heap code with per/block allocations (not
+	base 2) and better free list management with block splitting.
 
 Sat Oct 16 19:18:53 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -511,3 +515,7 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	* Fixed a large problem with chunk.c not reporting the correct
 	memory address when listing unfreed memory.  This was discovered
 	when MALLOC_ADDRESS was not working correctly.
+
+-------------------------------------------------------------------------------
+$Id: ChangeLog,v 1.74 1993/11/23 03:25:38 gray Exp $
+-------------------------------------------------------------------------------

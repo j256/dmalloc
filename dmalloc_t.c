@@ -26,14 +26,45 @@
 
 #include <stdio.h>				/* for stdin */
 
+#include "argv.h"
 #include "malloc_dbg.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.26 1993/09/25 18:10:49 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.27 1993/11/23 03:26:06 gray Exp $";
 #endif
 
-#define DEFAULT_ITERATIONS	1000
+#define INTER_CHAR		'i'
+#define DEFAULT_ITERATIONS	10000
+#define MAX_POINTERS		1000
+#define MAX_AMOUNT		(1000 * 1000)
+
+/* pointer tracking structure */
+struct pnt_info_st {
+  long			pi_crc;			/* crc of storage */
+  int			pi_size;		/* size of storage */
+  void			*pi_pnt;		/* pnt to storage */
+  struct pnt_info_st	*pi_next;		/* pnt to next */
+};
+
+typedef struct pnt_info_st pnt_info_t;
+
+static	pnt_info_t	pointer_grid[MAX_POINTERS];
+
+/* argument variables */
+static	char		interactive = ARGV_FALSE;	/* interactive flag */
+static	int		default_itern = DEFAULT_ITERATIONS; /* # of iters */
+static	char		verbose = ARGV_FALSE;		/* verbose flag */
+
+static	argv_t		arg_list[] = {
+  { INTER_CHAR,	"interactive",		ARGV_BOOL,		&interactive,
+      NULL,			"turn on interactive mode" },
+  { 't',	"times",		ARGV_INT,		&default_itern,
+      "number",			"number of iterations to run" },
+  { 'v',	"verbose",		ARGV_BOOL,		&verbose,
+      NULL,			"enables verbose messages" },
+  { ARGV_LAST }
+};
 
 /*
  * hexadecimal STR to integer translation
@@ -66,35 +97,140 @@ static	long	hex_to_long(char * str)
 /*
  * read an address from the user
  */
-static	long	get_address(void)
+static	void	*get_address(void)
 {
   char	line[80];
-  long	pnt;
+  void	*pnt;
   
   do {
     (void)printf("Enter a hex address: ");
     (void)fgets(line, sizeof(line), stdin);
   } while (line[0] == '\0');
   
-  pnt = hex_to_long(line);
+  pnt = (void *)hex_to_long(line);
   
   return pnt;
 }
 
-int	main(int argc, char ** argv)
+/* 
+ * try ITERN random program iterations, returns 1 on success else 0
+ */
+static	int	do_random(const int itern)
 {
-  argc--, argv++;
+  int		iterc, amount, max = MAX_AMOUNT;
+  pnt_info_t	*freep = pointer_grid, *usedp = NULL;
+  pnt_info_t	*pntp;
   
-  (void)srand(time(0) ^ 0xDEADBEEF);
+  malloc_errno = 0;
   
-  (void)printf("------------------------------------------------------\n");
+  /* initialize free list */
+  for (pntp = pointer_grid; pntp < pointer_grid + MAX_POINTERS; pntp++) {
+    pntp->pi_size = 0;
+    pntp->pi_pnt = NULL;
+    pntp->pi_next = pntp + 1;
+  }
+  /* redo the last next pointer */
+  (pntp - 1)->pi_next = NULL;
+  
+  for (iterc = 0; iterc < itern; iterc++) {
+    int		which;
+    
+    which = rand() % 2;
+    
+    /*
+     * < 10 means alloc as long as we have enough memory and there are
+     * free slots else we free
+     */
+    if (which == 0 && max > 10 && freep != NULL) {
+      pntp = freep;
+      
+      do {
+	amount = rand() % (max / 2);
+      } while (amount == 0);
+      
+      if (rand() % 2 == 0)
+	pntp->pi_pnt = CALLOC(char, amount);
+      else
+	pntp->pi_pnt = MALLOC(amount);
+      
+      if (pntp->pi_pnt == NULL) {
+	(void)printf("allocation of %d returned error on iteration #%d\n",
+		     amount, iterc + 1);
+	continue;
+      }
+      
+      if (verbose)
+	(void)printf("%d: alloced %d of max %d into slot %d.  got %#lx\n",
+		     iterc + 1, amount, max, pntp - pointer_grid,
+		     (long)pntp->pi_pnt);
+      
+      /* set the size and take it off the free-list and put on used list */
+      pntp->pi_size = amount;
+      
+      freep = pntp->pi_next;
+      pntp->pi_next = usedp;
+      usedp = pntp;
+      
+      max -= amount;
+      continue;
+    }
+    
+    /*
+     * choose a rand slot to free and make sure it is not a free-slot
+     */
+    pntp = pointer_grid + (rand() % MAX_POINTERS);
+    if (pntp->pi_pnt != NULL) {
+      pnt_info_t	*lastp, *thisp;
+      
+      FREE(pntp->pi_pnt);
+      
+      if (verbose)
+	(void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
+		     iterc + 1, pntp->pi_size, pntp - pointer_grid,
+		     (long)pntp->pi_pnt);
+      
+      pntp->pi_pnt = NULL;
+      
+      /* find pnt in the used list */
+      for (thisp = usedp, lastp = NULL; lastp != NULL;
+	   lastp = thisp, thisp = thisp->pi_next)
+	if (thisp == pntp)
+	  break;
+      if (lastp == NULL)
+	usedp = pntp->pi_next;
+      else
+	lastp->pi_next = pntp->pi_next;
+      
+      pntp->pi_next = freep;
+      freep = pntp;
+      
+      max += pntp->pi_size;
+    }
+  }
+  
+  /* free used pointers */
+  for (pntp = pointer_grid; pntp < pointer_grid + MAX_POINTERS; pntp++)
+    if (pntp->pi_pnt != NULL)
+      FREE(pntp->pi_pnt);
+  
+  if (malloc_errno == 0)
+    return 1;
+  else
+    return 0;
+}
+
+/*
+ * run the interactive section of the program
+ */
+static	void	do_interactive(void)
+{
+  int		len;
+  char		line[128], *linep;
+  void		*pnt;
+  
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
   
   for (;;) {
-    int		len;
-    char	line[128], *linep;
-    
-    (void)printf("------------------------------------------------------\n");
     (void)printf("prompt> ");
     (void)fgets(line, sizeof(line), stdin);
     linep = (char *)index(line, '\n');
@@ -107,20 +243,15 @@ int	main(int argc, char ** argv)
     
     if (strncmp(line, "?", len) == 0
 	|| strncmp(line, "help", len) == 0) {
-      (void)printf("------------------------------------------------------\n");
-      (void)printf("HELP:\n\n");
-      
-      (void)printf("help      - print this message\n\n");
-      
+      (void)printf("\n");
+      (void)printf("help      - print this message\n");
       (void)printf("malloc    - allocate memory\n");
       (void)printf("free      - deallocate memory\n");
-      (void)printf("realloc   - reallocate memory\n\n");
-      
+      (void)printf("realloc   - reallocate memory\n");
       (void)printf("map       - map the heap to the logfile\n");
       (void)printf("overwrite - overwrite some memory to test errors\n");
       (void)printf("random    - randomly execute a number of malloc/frees\n");
-      (void)printf("verify    - check out a memory address\n\n");
-      
+      (void)printf("verify    - check out a memory address\n");
       (void)printf("quit      - quit this test program\n");
       continue;
     }
@@ -139,8 +270,6 @@ int	main(int argc, char ** argv)
     }
     
     if (strncmp(line, "free", len) == 0) {
-      long	pnt;
-      
       pnt = get_address();
       FREE(pnt);
       continue;
@@ -148,7 +277,6 @@ int	main(int argc, char ** argv)
     
     if (strncmp(line, "realloc", len) == 0) {
       int	size;
-      long	pnt;
       
       pnt = get_address();
       
@@ -157,78 +285,85 @@ int	main(int argc, char ** argv)
       size = atoi(line);
       
       (void)printf("realloc(%#lx, %d) returned: %#lx\n",
-		   pnt, size, (long)REMALLOC(pnt, size));
+		   (long)pnt, size, (long)REMALLOC(pnt, size));
       
       continue;
     }
     
     if (strncmp(line, "map", len) == 0) {
-      (void)malloc_heap_map();
+      (void)malloc_log_heap_map();
       (void)printf("Done.\n");
       continue;
     }
     
     if (strncmp(line, "overwrite", len) == 0) {
-      long	pnt;
       char	overwrite[] = "WOW!";
       
       pnt = get_address();
-      
       bcopy(overwrite, (char *)pnt, sizeof(overwrite) - 1);
-      
       (void)printf("Done.\n");
       continue;
     }
     
     /* do random heap hits */
     if (strncmp(line, "random", len) == 0) {
-      int	count, max;
+      int	itern;
       
-      (void)printf("How many iterations[%d]: ", DEFAULT_ITERATIONS);
+      (void)printf("How many iterations[%d]: ", default_itern);
       (void)fgets(line, sizeof(line), stdin);
       if (line[0] == '\0' || line[0] == '\n')
-	max = DEFAULT_ITERATIONS;
+	itern = default_itern;
       else
-	max = atoi(line);
+	itern = atoi(line);
       
-      for (count = 1; count < max + 1; count++) {
-	int	amount;
-	char	*data;
-	
-	amount = rand() % (count * 10) + 1;
-	data = MALLOC(amount);
-	FREE(data);
-      }
+      if (do_random(itern))
+	(void)printf("It succeeded.\n");
+      else
+	(void)printf("It failed.\n");
       
-      (void)printf("Done.\n");
       continue;
     }
     
     if (strncmp(line, "verify", len) == 0) {
-      long	pnt;
       int	ret;
       
       pnt = get_address();
-      
       ret = malloc_verify((char *)pnt);
       (void)printf("malloc_verify(%#lx) returned: %s\n",
-		   pnt,
+		   (long)pnt,
 		   (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
       continue;
     }
     
-    (void)printf("Unknown command '%s'.\n", line);
-    (void)printf("Type 'help' for assistance.\n");
+    (void)printf("Unknown command '%s'.  Type 'help' for assistance.\n", line);
+  }
+}
+
+int	main(int argc, char ** argv)
+{
+  argv_process(arg_list, argc, argv);
+  
+  (void)srand(time(0));
+  
+  if (interactive)
+    do_interactive();
+  else {
+    (void)printf("Running %d tests (use -%c for interactive)...\n",
+		 default_itern, INTER_CHAR);
+    (void)fflush(stdout);
+    
+    if (do_random(default_itern))
+      (void)printf("Succeeded.\n");
+    else
+      (void)printf("Failed.\n");
   }
   
   /* shutdown the alloc routines */
   malloc_shutdown();
   
-  (void)printf("------------------------------------------------------\n");
   (void)printf("final malloc_verify returned: %s\n",
 	       (malloc_verify(NULL) == MALLOC_VERIFY_NOERROR ? "success" :
 		"failure"));
-  (void)printf("------------------------------------------------------\n");
   
   exit(0);
 }

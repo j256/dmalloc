@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.18 1993/10/17 00:50:24 gray Exp $
+ * $Id: chunk_loc.h,v 1.19 1993/11/23 03:25:55 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -43,7 +43,7 @@
 #define USER_TO_CHUNK(pnt)	((char *)(pnt) - pnt_below_adm)
 
 /* get the number of blocks to hold SIZE */
-#define NUM_BLOCKS(size)	(size + (BLOCK_SIZE - 1) / BLOCK_SIZE)
+#define NUM_BLOCKS(size)	((size + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
 
 /*
  * number of ba_block entries is a bblock_adm_t which must fit in a
@@ -142,7 +142,7 @@ struct bblock_st {
   /* to reference union elements as bb elements */
 #define	bb_slotp	bb_pnt.pn_slotp		/* a */
 #define	bb_adminp	bb_pnt.pn_adminp	/* A */
-#define	bb_mem		bb_pnt.pn_mem		/* D */
+#define	bb_mem		bb_pnt.pn_mem		/* D (and tmp) */
 #define	bb_next		bb_pnt.pn_next		/* F */
 #define	bb_file		bb_pnt.pn_file		/* U */
   
@@ -155,7 +155,7 @@ typedef struct bblock_st	bblock_t;
 struct bblock_adm_st {
   long			ba_magic1;		/* bottom magic number */
   int			ba_count;		/* position in bblock array */
-  bblock_t		ba_block[BB_PER_ADMIN];	/* bblock admin info */
+  bblock_t		ba_blocks[BB_PER_ADMIN]; /* bblock admin info */
   struct bblock_adm_st	*ba_next;		/* next bblock adm struct */
   long			ba_magic2;		/* top magic number */
 };

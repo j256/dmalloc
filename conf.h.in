@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.24 1993/10/17 00:39:14 gray Exp $
+ * $Id: conf.h.in,v 1.25 1993/11/23 03:26:01 gray Exp $
  */
 
 /*
@@ -76,6 +76,17 @@
  * that an allocation of more than 16mb (2^24) will generate an error.
  */
 #define LARGEST_BLOCK 24
+
+/*
+ * although I don't know why you would want to tune this since this is
+ * pretty dependant on my general heap mechanisms, here are some
+ * options to use general first, best, and worst fit algorithms.  if
+ * you don't know what these are then don't touch.  NOTE: they may go
+ * away in the future and/or be replaced by debug-tokens.
+ */
+#define FIRST_FIT 1
+#define BEST_FIT 0
+#define WORST_FIT 0
 
 /*
  ************************************************************************
