@@ -1,4 +1,10 @@
+Mon Nov 16 11:51:39 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing dmalloc version 4.1.0.
+
 Thu Nov 12 10:08:58 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added HTML versions of the manuals to the releases.
 
 	* Added FREED_POINTER_DELAY in settings.h which will hold a
 	pointer from being reused for a certain amount of time.
@@ -8,7 +14,7 @@ Thu Nov 12 10:08:58 1998  Gray Watson  <gray@burger.letters.com>
 	* Added LOG_TIME_NUMBER and LOG_CTIME_STRING to the settings.dist
 	file for logging times in the logfile.
 
-	* Disabled the log-thread-id macro.  Use the THREAD_STORE_ID
+	* Disabled the log-thread-id macro.  Use the LOG_THREAD_ID
 	define in settings.h to control.
 
 	* Disabled the log-stamp macro.  Use the STORE_TIME define in
@@ -16,7 +22,8 @@ Thu Nov 12 10:08:58 1998  Gray Watson  <gray@burger.letters.com>
 
 Tue Nov 10 12:43:00 1998  Gray Watson  <gray@burger.letters.com>
 
-	* Added Jens' cool gdb script and -g flag to dmalloc.
+	* Added Jens' cool gdb script and -g (--gdb) flag to dmalloc
+        utility.
 
 	* Added missing delete[] function to the C++ code.  Thanks Jens.
 
@@ -1371,5 +1378,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.202 1998/11/12 23:59:03 gray Exp $
+$Id: ChangeLog,v 1.203 1998/11/16 16:56:02 gray Exp $
 -------------------------------------------------------------------------------

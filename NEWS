@@ -1,15 +1,16 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.81 1998/11/12 23:59:04 gray Exp $
+$Id: NEWS,v 1.82 1998/11/16 16:56:02 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 4.1.0:
 
+	* Added HTML versions of the manuals to the releases.
 	* Added FREED_POINTER_DELAY in settings.h.  Delays pointer reuse.
 	* Renamed allow-zero token to be allow-free-null.
 	* Added LOG_TIME_NUMBER and LOG_CTIME_STRING to the settings.h.
-	* Disabled the log-thread-id macro.  Use THREAD_STORE_ID in setting.h.
-	* Disabled the log-stamp macro.  Use STORE_TIME define in setting.h.
-	* Added -g (-gdb) flag to dmalloc along with gdb script.
+	* Disabled the log-thread-id macro.  Use LOG_THREAD_ID in settings.h.
+	* Disabled the log-stamp macro.  Use LOG_TIME_NUMBER in settings.h.
+	* Added -g (--gdb) flag to dmalloc utility along with gdb script.
 	* Added missing delete[] function to the C++ code.
 	* Moved some settings from chunk_loc.h into settings.dist.
 	* Improved the handling of free(NULL) and malloc(0) settings.
