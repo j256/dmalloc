@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.48 1998/09/28 21:36:38 gray Exp $
+ * $Id: chunk_loc.h,v 1.49 1998/09/29 13:30:57 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -76,8 +76,8 @@
 #define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
 
 /* adjust internal PNT to user-space */
-#define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_fence_bottom)
-#define USER_TO_CHUNK(pnt)	((char *)(pnt) - pnt_fence_bottom)
+#define CHUNK_TO_USER(pnt)	((char *)(pnt) + fence_bottom_size)
+#define USER_TO_CHUNK(pnt)	((char *)(pnt) - fence_bottom_size)
 
 /* get the number of blocks to hold SIZE */
 #define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
@@ -114,8 +114,8 @@
 				  (ans) = _b; \
 				} while (0)
   
-/* NOTE: FENCE_TOP defined in conf.h */
-#define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
+/* NOTE: FENCE_BOTTOM_SIZE and TOP_SIZE defined in settings.h */
+#define FENCE_OVERHEAD_SIZE	(FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE)
 #define FENCE_MAGIC_BOTTOM	0xC0C0AB1B
 #define FENCE_MAGIC_TOP		0xFACADE69
 /* type of the fence magic values */
@@ -123,9 +123,10 @@
 
 #define FENCE_WRITE(pnt, size)	do { \
 				  memcpy((char *)(pnt), fence_bottom, \
-					FENCE_BOTTOM); \
-				  memcpy((char *)(pnt) + (size) - FENCE_TOP, \
-					 fence_top, FENCE_TOP); \
+					FENCE_BOTTOM_SIZE); \
+				  memcpy((char *)(pnt) + (size) \
+					 - FENCE_TOP_SIZE, \
+					 fence_top, FENCE_TOP_SIZE); \
 				} while (0)
 
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
