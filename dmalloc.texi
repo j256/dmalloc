@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.95 1995/06/20 22:37:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.96 1995/06/21 17:12:35 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -48,7 +48,7 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 3.0.7
+@subtitle Version 3.1.0
 @subtitle June 1995
 @author Gray Watson <gray@@letters.com>
 
@@ -77,7 +77,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 3.0.7 -- June 1995
+Version 3.1.0 -- June 1995
 @end ifinfo
 
 @cindex introduction
@@ -124,6 +124,9 @@ Gray Watson.
 @chapter Library Copying Conditions
 
 @cindex copying
+@cindex license
+@cindex library permissions
+@cindex permissions of the library
 
 Gray Watson makes no representations about the suitability of the
 software described herein for any purpose.  It is provided ``as is''
@@ -131,7 +134,7 @@ without express or implied warranty.
 
 Permission to use, copy, modify, and distribute this software for any
 @emph{non-commercial} purpose without fee is hereby granted, provided
-that the above copyright notice and this permission notice appear in all
+that the copyright notice and this permission notice appear in all
 copies, and that the name of Gray Watson not be used in advertising or
 publicity pertaining to distribution of the document or software without
 specific, written prior permission.
@@ -143,35 +146,43 @@ commercial entities license the software for a nominal fee.  This also
 allows me to provide better support and updates on a more frequent
 basis.
 
+@cindex commercial license
+
 A @emph{commercially} licensed copy of the software which allows the
-licensee to use, copy, or modify the software for any @emph{commercial}
-purpose is available for US$35.  The license is good for a single
-installed copy of the library.  For site licenses or any other
-reasonable agreements, please contact me directly.  Licensees get a
-registered copy of the software as well as more attentive product
-support.
+licensee to use, copy, or modify the software for any commercial purpose
+is available for US$35.  The license is good for a single installed copy
+of the library.  For site licenses or any other reasonable agreements,
+please contact me directly.  Licensees get a registered copy of the
+software as well as more attentive product support.
 
 A copy of the software on a Unix tar floppy is available for US$10 and a
 printed and bound copy of the manual is available for US$15.
-Internation shipping costs not included.
+International shipping costs are not included.
 
-Please include the following registration information with your check.
+Please include the following registration information with your check
+made out to Gray Watson.
 
-@table @asis
+@itemize
 @item Name
 @item Position
 @item Company/Organization
-@item Postal Mail Address
+@item Street Address
+@item City
+@item State/Prov/Pref
+@item Zip/Postal Code
+@item Country
 @item Email-Address
-@item Telephone Number
-@end table
+@item Telephone and Fax Number
+@end itemize
 
-Send it along with any other correspondence to:
+Send it along with any other correspondence that cannot be sent via
+email to:
 
 @example
 Gray Watson
 330 Harmar St.
 Pittsburgh, PA  15219-3748
+USA
 @end example
 
 @node Overview, Details, Copying, Top
@@ -185,10 +196,9 @@ Pittsburgh, PA  15219-3748
 * How To Get::			How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
-* Using a Debugger::            Using a debugger with the library.
 @end menu
 
-@node Allocation Basics, Features,  , Overview
+@node Allocation Basics, Features, Overview, Overview
 @section Allocation Terms and Functions
 
 @cindex allocation basics
@@ -198,7 +208,7 @@ Pittsburgh, PA  15219-3748
 * Malloc Functions::            Functionality supported by all malloc libs.
 @end menu
 
-@node Basic Definitions, Malloc Functions,  , Allocation Basics
+@node Basic Definitions, Malloc Functions, Allocation Basics, Allocation Basics
 @subsection Basic Concept Definitions
 
 @cindex basic defintions
@@ -234,7 +244,7 @@ stack space.
 @example
 void foo()
 @{
-        /* this local variable is allocated on the stack */
+        /* this local variable is stored on the stack */
         float total;
         @dots{}
 @}
@@ -248,14 +258,18 @@ dynamic memory capabilities.
 @example
 main()
 @{
+        /* the address is stored on the stack */
         char * string;
         @dots{}
 
-        /* allocate a string of 10 bytes */
+        /*
+         * allocate a string of 10 bytes on the heap, store the
+         * address in string which is on the stack
+         */
         string = (char *)malloc(10);
         @dots{}
 
-        /* de-allocate the string now that I'm done with it */
+        /* de-allocate the heap memory now that I'm done with it */
         (void)free(string);
         @dots{}
 @}
@@ -289,8 +303,8 @@ handle any sized file.
 
 All malloc libraries support 4 basic memory allocation commands.  These
 include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
-more information about their capabilities, do a @code{man 3 malloc} to
-read the system's manual pages.
+more information about their capabilities, check your system's manual
+pages -- in unix, do a @code{man 3 malloc}.
 
 @deftypefun void * malloc ( unsigned int @var{size} )
 @cindex malloc
@@ -323,9 +337,8 @@ is all zeros.
 Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
 
 The realloc function expands or shrinks the memory allocation in old_pnt
-to new_size number of bytes.  Realloc copies the information in old_pnt
-into the new_pnt space up to new_size bytes or until it copies all of
-the information from old_pnt.
+to new_size number of bytes.  Realloc copies as much of the information
+in old_pnt as it can into the new_pnt space up to new_size bytes.
 
 @end deftypefun
 @deftypefun void free ( void * @var{pnt} )
@@ -335,7 +348,7 @@ Usage: @code{free(pnt)}
 
 The free routine releases an allocation returned by malloc, calloc, or
 realloc back to the heap.  This allows other parts of the program to
-re-use memory that is not needed anymore.  It also guarantees that the
+re-use memory that is not needed anymore.  It guarantees that the
 process does not grow too big and swallow a large portion of the system
 resources.
 
@@ -354,8 +367,8 @@ the calloc routine will zero the memory space it returns.
 
 @cindex features
 
-The debugging features that are available can be divided into a couple
-basic classifications:
+The debugging features that are available in this debug malloc library
+can be divided into a couple basic classifications:
 
 @table @asis
 @item file and line number information
@@ -369,9 +382,9 @@ preprocessor.  @xref{Allocation Macros}.
 @item return-address information
 @cindex return-address
 To debug calls to the library from external sources (i.e. those files
-that did not include @file{dmalloc.h}), some facilities have been
-provided to supply the callers address.  This address, with the help of
-a debugger, can provide a lot of debugging information.  @xref{Return
+that could not use the allocation macros), some facilities have been
+provided to supply the caller's address.  This address, with the help of
+a debugger, can help you locate the source of a problem.  @xref{Return
 Address}.
 
 @item fence-post (i.e. bounds) checking
@@ -379,14 +392,14 @@ Address}.
 @cindex bounds checking
 @dfn{Fence-post} memory is the area immediately above or below memory
 allocations.  It is all too easy to write code that accesses above or
-below an allocation (especially when dealing with arrays or strings).
+below an allocation -- especially when dealing with arrays or strings.
 The library can write special values in the areas around every
 allocation so it will notice when these areas have been overwritten.
 @xref{Fence-Post Overruns}.
 
-@emph{NOTE}: The library cannot notice when the program reads from these
-areas, only when it writes values.  Also, fence-post checking will
-increase the amount of memory the program allocates.
+@emph{NOTE}: The library cannot notice when the program @emph{reads}
+from these areas, only when it writes values.  Also, fence-post checking
+will increase the amount of memory the program allocates.
 
 @item heap-constancy verification
 @cindex constancy verification
@@ -405,8 +418,8 @@ development and debugging sessions.
 @emph{NOTE}: the heap checking routines cannot guarantee that the tests
 will not cause a segmentation-fault if the heap administration
 structures are properly (or improperly if you will) overwritten.  In
-other words, they will verify that everything is okay but may not inform
-the user of problems in a graceful manner.
+other words, the tests will verify that everything is okay but may not
+inform the user of problems in a graceful manner.
 
 @item logging statistics
 @cindex logging statistics
@@ -444,13 +457,11 @@ most information for developers.  If the error message is not
 understood, then it is most likely just trying to indicate that a part
 of the heap has been corrupted.
 
+@cindex dump core
 The library can be configured to quit immediately when an error is
 detected and to dump a core file or memory-image.  This can be examined
-with a debugger to determine the source of the problem.
-
-Other debug malloc libraries also support the ability to dump core and
-then continue running.  I decided not to support this once it was
-determined that this might cause a recursive call back into the library.
+with a debugger to determine the source of the problem.  The library can
+either stop after dumping core or continue running.
 
 @cindex system memory problems
 @emph{NOTE}: do not be surprised if the library catches problems with
@@ -461,12 +472,18 @@ overwrites one of its fence-post markers.
 @node How To Get, Installation, Features, Overview
 @section How to get the library.
 
+@cindex downloading the library
+@cindex getting the source
+
 @table @asis
 @item Standard Repository:
 
 The newest version(s) of the dmalloc library are available via anonymous
 ftp from @samp{ftp.letters.com} in the @file{/src/dmalloc}
 directory.
+
+@cindex anonymous ftp
+@cindex ftp
 
 To use anonymous ftp, you ftp to the site and when the system prompts
 you for a login-id or username you enter @kbd{anonymous}.  When it
@@ -480,6 +497,8 @@ version of the manual and other large files which may not have been
 included in the distribution you received.
 
 @item Other Repositories:
+
+@cindex gatekeeper version
 
 You can also get a recent version from anonymous ftp via
 @samp{gatekeeper.dec.com} in the @file{/pub/misc/dmalloc} directory.
@@ -505,9 +524,14 @@ carefully.
 
 @enumerate
 
-@item First, please examine the LICENSE file.  If you are using
+@cindex LICENSE file
+
+@item First, please examine the @file{LICENSE} file.  If you are using
 the library in a commercial setting, please consider paying for a
 licensed copy of the software.
+
+@cindex configure script
+@cindex conf.h file
 
 @item Type @kbd{sh ./configure} to configure the library.  You may want
 to first examine the @file{config.help} file for some information about
@@ -522,8 +546,12 @@ or generate the @file{Makefile} and @file{conf.h} files by hand.
 @item You may want to examine the @file{Makefile} and @file{conf.h} files
 created by configure to make sure it did its job correctly.
 
+@cindex settings.h file
+
 @item You may also want ot Examine the manual settings in
 @file{settings.h} to tune specific features of the library.
+
+@cindex DMALLOC_SIZE variable
 
 @item I was unable to auto-configure to my satisfaction the
 @code{DMALLOC_SIZE} variable in @file{dmalloc.h.3}.  You may have to
@@ -537,6 +565,9 @@ system-type.  If not and you figure your problem out, please send me
 some notes so future users can profit from your experiences.  In general
 64 bit systems usally have lots of warnings about int to pointer
 promotion.
+
+@cindex ANSI-C compiler
+@cindex Deansify.pl script
 
 @emph{NOTE}: The dmalloc code is pretty dependent on a good ANSI-C
 compiler like gcc.  If the configure script gives the @samp{WARNING}
@@ -555,6 +586,9 @@ Otherwise, you will have to try @kbd{make noansi}.  This will run the
 @end itemize
 
 If it doesn't work you may have to do Deansify.pl's job by hand.
+
+@cindex testing the library
+@cindex dmalloc_t test program
 
 @item Typing @kbd{make tests} should build the @file{dmalloc_t} test
 program.
@@ -576,7 +610,7 @@ optimized for space nor speed.  in fact, some of its features make it
 unable to use some of the organizational methods of other more efficient
 heap libraries.
 
-@node Getting Started, Using a Debugger, Installation, Overview
+@node Getting Started,  , Installation, Overview
 @section Getting Started with the Library
 
 @cindex quick start
@@ -586,9 +620,14 @@ heap libraries.
 @cindex where to begin
 
 This section should give you a quick idea on how to get going.
-Basically, you need to do 6 things to make use of the library:
+Basically, you need to do the following things to make use of the
+library:
 
 @enumerate
+
+@item First, please examine the @file{LICENSE} file.  If you are using
+the library in a commercial setting, please consider paying for a
+licensed copy of the software.
 
 @item Follow the installation instructions on how to configure and
 make and install the library (i.e. type: @kbd{make install}).
@@ -610,9 +649,9 @@ dmalloc() @{ eval `command dmalloc -b $*` @}
 @end example
 
 @item Although not necessary, you may want to include @file{dmalloc.h}
-in your C files and recompile.  Including @file{dmalloc.h} will allow
-the library to report the file/line numbers of calls that generate
-problems.  @xref{Allocation Macros}.
+in your C files and recompile.  This will allow the library to report
+the file/line numbers of calls that generate problems.  @xref{Allocation
+Macros}.
 
 @item Link the dmalloc library into your program.
 
@@ -644,166 +683,6 @@ combination of debug tokens.  @xref{RC File}.
 
 @end enumerate
 
-@node Using a Debugger,  , Getting Started, Overview
-@section Using a Debugger with the Library
-
-@cindex debugger usage
-
-Here are a number of possible scenarios for using the dmalloc library
-to track down problems with your program.
-
-You should first enable a logfile filename (I use @file{dmalloc}) and
-turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
-low} to accomplish this.  If you are interested in have the error
-messages printed to your terminal as well, enable the @samp{print-error}
-token by typing @kbd{dmalloc -p print-error} afterwards.
-
-@cindex gdb
-Now you can enter your debugger (I use the @emph{excellent} GNU debugger
-gdb), and put a break-point in @code{dmalloc_error()} which is the
-internal error routine for the library.  When your program is run, it
-will stop there as soon as a memory problem is detected.
-
-@menu
-* General Errors::              Diagnosing general problems with a debugger.
-* Memory Leaks::                Tracking down non-freed memory.
-* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
-@end menu
-
-@node General Errors, Memory Leaks,  , Using a Debugger
-@subsection Diagnosing General Errors with a Debugger
-
-@cindex diagnosing errors
-@cindex general errors
-
-If your program stops at @code{dmalloc_error()} then there could one of
-a number of problems happening.  Incorrect arguments could have been
-passed to a malloc call (asking for negative number of bytes, trying to
-realloc a non-heap pointer, etc.).  There also could be a problem with
-the system's allocations (you've run out of memory, some other function
-in your program is using @code{sbrk}, etc).  However, it is more likely
-that some code that has been executed was naughty.
-
-To get more information about the problem, first print dmalloc_errno to
-get the heap's error code.  You can suspend your debugger and run
-@samp{dmalloc -e value-returned-from-print} to get an english
-translation of the error.  A number of the error messages are designed
-to indicate specific problems with the heap and may not be
-user-friendly.
-
-If the problem was due to the arguments or system allocations then the
-source of the problem has been found.  However, if some code did
-something wrong, you have more work to do.  The @code{check-heap} token
-should be enabled and the interval setting disabled or set to a low
-value so that the library can find the problem as close as possible to
-its source.  The code that was execute right before the library halted,
-can then be examined closely for irregularities.  @xref{Debug Tokens}
-and @xref{Dmalloc Program}.
-
-You may also want to put calls to @code{dmalloc_verify(0)} in your code
-before the section which generated the error.  This should locate the
-problem faster by checking the library's structures more frequently.
-@xref{Extensions}.
-
-@node Memory Leaks, Fence-Post Overruns, General Errors, Using a Debugger
-@subsection Tracking down Non-Freed Memory
-
-@cindex memory leaks
-
-So you've run your program, examined the log-file and discovered (to
-your horror) some un-freed memory.  We tend to be anal about memory
-leaks since even the smallest and most insignificant leak can starve the
-program given the right circumstances.
-
-@example
-not freed: 0x45008 (      12 bytes) from 'ra=0x1f8f4'
-not freed: 0x45028 (      12 bytes) from 'unknown'
-not freed: 0x45048 (      10 bytes) from 'argv.c:1077'
-  known memory not freed: 1 pointer, 10 bytes
-unknown memory not freed: 2 pointers, 24 bytes
-@end example
-
-Above you will see a sample of some non-freed memory messages from the
-logfile.  In the first line the @samp{0x45008} is the pointer that was
-not freed, the @samp{12 bytes} is the size of the unfreed block, and the
-@samp{ra=0x1f8f4} or return-address shows where the allocation
-originated from.  @xref{Return Address}.
-
-The systems which cannot provide return-address information show
-@samp{unknown} instead as in the 2nd line from the sample above.
-
-The @samp{argv.c:1077} information from the 3rd line shows the file and
-line number which allocated the memory which was not freed.  This
-information comes from the calls from C files which included
-@file{dmalloc.h}.  @xref{Allocation Macros}.
-
-At the bottom of the sample it totals the memory for you and breaks it
-down to known memory (those calls which supplied the file/line
-information) and unknown (the rest).
-
-Often, you may allocate memory in via @code{strdup()} or another
-routine, so the logfile listing where in the strdup routine the memory
-was allocated does not help locate the true source of the memory leak --
-the routined that called strdup.  Without a mechanism to trace the
-calling stack, there is no way for the library to see who the caller of
-the caller (so to speak) was.
-
-However, there is a way to track down unfreed memory in this
-circumstance.  You need to compile the library with
-@code{STORE_SEEN_COUNT} defined in @file{conf.h}.  The library will then
-record how many times a pointer has been allocated or freed.  It
-will diskplay the unfreed memory as:
-
-@example
-not freed: 0x45008|s3 (      12 bytes) from 'ra=0x1f8f4'
-@end example
-
-In the above example, @samp{0x45008} was seen @samp{3} times.  The last
-time it was allocated, it was not freed.  How can a pointer be ``seen''
-3 times?  Let say you ask for @samp{12 bytes} and get @samp{0x45008} --
-this is (seen 1).  You then free this pointer (seen 2) but later ask for
-another 12 bytes and it gets the block from the free list (seen 3).
-
-So you want to find out who is allocating this particular 12 bytes the
-3rd time.  Try @samp{dmalloc -a 0x45008:3}.  The library will stop the
-program the third time it sees @samp{0x45008}.  You then enter a
-debugger and put a break point at @code{dmalloc_error}.  Run the program
-and when the breakpoint is reached you can examine the stack frame to
-determine who allocated the pointer.
-
-@node Fence-Post Overruns,  , Memory Leaks, Using a Debugger
-@subsection Diagnosing Fence-Post Overwritten Memory
-
-@cindex fence-post errors
-
-For a definition of fence-posts please see the Features section.
-@xref{Features}.
-
-If you have encountered a fence-post memory error, the logfile should be
-able to tell you the offending address.
-
-@example
-free: failed UNDER picket-fence magic-number checking: 
-pointer '0x1d008' from 'dmalloc_t.c:427'
-Dump of proper fence-bottom bytes: '\e\253\300\300\e\253\300\300'
-Dump of '0x1d008'-8: '\e\253\300\300WOW!\003\001pforger\023\001\123'
-@end example
-
-The above sample shows that the pointer @samp{0x1d008} has had its lower
-fence-post area overwritten.  This means that the code wrote below the
-bottom of the address or above the address right below this one.  In the
-sample, the string that did it was @samp{WOW!}.
-
-The library first shows you what the proper fence-post information
-should look like, and then shows what the pointer's bad information was.
-If it cannot print the character, it will display the value as
-@samp{\ddd} where ddd are three octal digits.
-
-By enabling the @code{check-heap} debugging token and assigning the
-interval setting to a low number, you should be able to locate
-approximately when this problem happened.  @xref{Debug Tokens} and
-@xref{Dmalloc Program}.
-
 @node Details, Source Code, Overview, Top
 @chapter Details about the Library's Operations
 
@@ -812,13 +691,14 @@ approximately when this problem happened.  @xref{Debug Tokens} and
 
 @menu
 * Programming::                 How to program with the library.
+* Using a Debugger::            Using a debugger with the library.
 * Environment Variable::        The variable name and its features.
 * Debug Tokens::                Description of the debugging tokens.
 * RC File::                     Format of the run-time configuration file.
 * Dmalloc Program::             Env variable setting utility.
 @end menu
 
-@node Programming, Environment Variable,  , Details
+@node Programming, Using a Debugger, Details, Details
 @section How to Program with the Library
 
 @cindex programming
@@ -832,7 +712,7 @@ approximately when this problem happened.  @xref{Debug Tokens} and
 * Disabling the Library::       How to compile/link without the library.
 @end menu
 
-@node Allocation Macros, Return Address,  , Programming
+@node Allocation Macros, Return Address, Programming, Programming
 @subsection Allocation Macros
 
 @cindex allocation macros
@@ -858,11 +738,11 @@ routines take this information and pass it on to the library making it
 able to produce verbose reports on memory problems.
 
 @example
-not freed: 0x38410 ( 22 bytes) from 'dmalloc_t.c:92'
+not freed: '0x38410' (22 bytes) from 'dmalloc_t.c:92'
 @end example
 
 This line from a log file shows that memory was not freed from file
-@file{dmalloc_t.c} line 92.
+@file{dmalloc_t.c} line 92.  @xref{Memory Leaks}.
 
 Along with the above leap functionality, @file{dmalloc.h} also adds the
 following macros which I have been using for all our memory allocation
@@ -911,7 +791,9 @@ Usage: @code{FREE(pnt)}.  This frees memory pointers.
 @node Return Address, Argument Checking, Allocation Macros, Programming
 @subsection Using the Return Address Information
 
+@cindex caller's address
 @cindex return-address
+@cindex return.h file
 @cindex ra
 
 Even though the allocation macros can provide file/line information for
@@ -922,15 +804,17 @@ dmalloc function from the return-address information.  To accomplish
 this, you must be using this library on one of the supported
 architecture/compilers.  @xref{Portability}.
 
+@cindex assembly hacks
+
 The library attempts to use some assembly hacks to get the the
 return-address or the address of the line that called the dmalloc
 function.  If you have the @samp{log-unknown} token enabled and you run
 your program, you might see the following non-freed memory messages.
 
 @example
-not freed: 0x38410 ( 22 bytes) from 'ra=0xdd2c'
-not freed: 0x38600 ( 10232 bytes) from 'ra=0x10234d'
-not freed: 0x38220 ( 137 bytes) from 'ra=0x82cc'
+not freed: '0x38410' (22 bytes) from 'ra=0xdd2c'
+not freed: '0x38600' (10232 bytes) from 'ra=0x10234d'
+not freed: '0x38220' (137 bytes) from 'ra=0x82cc'
 @end example
 
 @cindex gdb
@@ -948,10 +832,11 @@ Line 1092 of "argv.c" starts at pc 0x7540 and ends at 0x7550.
 @end example
 
 In the above example, gdb was used to find that the two non-freed memory
-pointers were alloc'ed in _findbuf() and in file argv.c line 1092
-respectively.  The @samp{x address} (for examine) can always be used on
-the return-addresses but the @samp{info line *(address)} will only work
-if that file was compiled using the -g option and has not been stripped.
+pointers were allocated in @code{_findbuf()} and in file argv.c line
+1092 respectively.  The @samp{x address} (for examine) can always be
+used on the return-addresses but the @samp{info line *(address)} will
+only work if that file was compiled using the -g option and has not been
+stripped.  This limitation may not be true in later versions of gdb.
 
 @node Argument Checking, Extensions, Return Address, Programming
 @subsection Argument Checking of Function Arguments
@@ -978,23 +863,20 @@ the end of your include file list because dmalloc uses macros and may
 try to change declarations of the checked functions if they come after
 it.
 
-When this is defined dmalloc will override a number of functions and will
-insert a routine which knows how to check its own arguments and then
-call the real function.  Dmalloc can check such functions as bcopy,
-index, strcat, and strcasecmp (for the full list see the end of
-@file{dmalloc.h}).
+When this is defined dmalloc will override a number of functions and
+will insert a routine which knows how to check its own arguments and
+then call the real function.  Dmalloc can check such functions as
+@code{bcopy}, @code{index}, @code{strcat}, and @code{strcasecmp}.  For
+the full list see the end of @file{dmalloc.h}.
 
-When you call strlen, for instance, dmalloc will make sure the string
-argument's fence-post areas have not been overwritten, its file and line
-number locations are good, etc.  With bcopy, dmalloc will make sure that
-the destination string has enough space to store the number of bytes
-specified.
+When you call @code{strlen}, for instance, dmalloc will make sure the
+string argument's fence-post areas have not been overwritten, its file
+and line number locations are good, etc.  With @code{bcopy}, dmalloc
+will make sure that the destination string has enough space to store the
+number of bytes specified.
 
 For all of the arguments checked, if the pointer is not in the heap then
 it is ignored since dmalloc does not know anything about it.
-
-@emph{NOTE}: this is one of the newest parts of the library so problems
-may still be lurking.
 
 @node Extensions, C++ and the Library, Argument Checking, Programming
 @subsection Library Extension Routines
@@ -1007,15 +889,14 @@ most malloc libraries:
 @table @code
 @item char * dmalloc_logpath
 @cindex dmalloc_logpath variable
+@cindex logfile name
 This variable can be used to set the dmalloc log filename.  The env
-variable
-@iftex
-@*
-@end iftex
-DMALLOC_LOGFILE overrides this variable.
+variable DMALLOC_LOGFILE overrides this variable.
 
 @item int dmalloc_errno
-@cindex dmalloc_errno variable
+@cindex dmalloc_errno number
+@cindex internal error number
+@cindex error number
 This variable stores the internal dmalloc library error number like errno
 does for the system calls.  It can be passed to @code{dmalloc_strerror()}
 (see below) to get a string version of the error.  It will have a value
@@ -1023,6 +904,8 @@ of zero if the library has not detected any problems.
 
 @item int dmalloc_address
 @cindex dmalloc_address variable
+@cindex address to look for
+@cindex looking for an address
 This variable holds the address to be specifically looked for when
 allocating or freeing by the library.
 
@@ -1033,20 +916,25 @@ is set to a greater than 0 value then after the library has seen the
 @samp{addr} address this many times, it will call
 @code{dmalloc_error()}.
 
+This works well in conjunction with the @code{STORE_SEEN_COUNT} option.
+@xref{Memory Leaks}.
+
 @end table
 
 Additionally the library provides a number of non-standard malloc
 routines:
 
 @deftypefun void dmalloc_shutdown ( void )
+
 @cindex dmalloc_shutdown function
+@cindex shutdown the library
 
 This function shuts the library down and logs the final statistics and
 information especially the non-freed memory pointers.  The library has
 code to support auto-shutdown if your system has @code{on_exit()} or
-@code{atexit()} calls.  If you do not have these routines, then
-@code{dmalloc_shutdown} should be called right before @code{exit()} or
-as the last function in @code{main()}.
+@code{atexit()} calls (see @file{conf.h}).  If you do not have these
+routines, then @code{dmalloc_shutdown} should be called right before
+@code{exit()} or as the last function in @code{main()}.
 
 @example
 main()
@@ -1059,7 +947,10 @@ main()
 @end deftypefun
 
 @deftypefun void dmalloc_log_heap_map ( void )
+
 @cindex dmalloc_log_heap_map function
+@cindex log a heap map
+@cindex heap map
 
 This routine logs to the logfile (if it is enabled) a graphical
 representation of the current heap space.
@@ -1067,12 +958,17 @@ representation of the current heap space.
 
 @deftypefun void dmalloc_log_stats ( void )
 @cindex dmalloc_log_stats function
+@cindex log statistics
+@cindex statistics logging
 
 This routine outputs the current dmalloc statistics to the log file.
 @end deftypefun
 
 @deftypefun void dmalloc_log_unfreed( void )
+
 @cindex dmalloc_log_unfreed function
+@cindex log unfreed memory
+@cindex unfreed memory log
 
 This function dumps the unfreed-memory information to the log file.
 This is also useful to dump the currently allocated points to the log
@@ -1080,7 +976,10 @@ file to be diff'ed against another dump later on.
 @end deftypefun
 
 @deftypefun int dmalloc_verify ( char * @var{pnt} )
+
 @cindex dmalloc_verify function
+@cindex verify pointers
+@cindex verify the heap
 
 This function verifies individual memory pointers that are suspect of
 memory problems.  To check the entire heap pass in a NULL or 0 pointer.
@@ -1093,7 +992,9 @@ areas in the heap.
 @end deftypefun
 
 @deftypefun void dmalloc_debug ( long @var{debug} )
+
 @cindex dmalloc_debug function
+@cindex override debug settings
 
 This routine overrides the debug setting from the environment variable
 and sets the library debugging features explicitly.  For instance, if
@@ -1108,7 +1009,9 @@ may be generated regardless.
 @end deftypefun
 
 @deftypefun long dmalloc_debug_current ( void )
+
 @cindex dmalloc_debug_current function
+@cindex current debug value
 
 This routine returns the current debug value from the environment
 variable.  This allows you to save a copy of the debug dmalloc settings
@@ -1117,7 +1020,10 @@ to be changed and then restored later.
 
 @deftypefun int dmalloc_examine ( char * @var{pnt}, int * @var{size},
 char ** @var{file}, int * @var{line}, void ** @var{ret_address} )
+
 @cindex dmalloc_examine function
+@cindex examine a pointer
+@cindex pointer information
 
 This function returns the size of a pnt's allocation as well as the file
 and line or the return-address from where it was allocated.  It will
@@ -1128,7 +1034,10 @@ not all other malloc libraries.
 @end deftypefun
 
 @deftypefun char * dmalloc_strerror ( int @var{errnum} )
+
 @cindex dmalloc_strerror function
+@cindex string error message
+@cindex error message
 
 This function returns the string representation of the error value in
 errnum (which probably should be dmalloc_errno).  This allows the
@@ -1143,6 +1052,7 @@ call to the @file{dmalloc} program with a @samp{-e #} option.
 @subsection Using the Library with C++
 
 @cindex c++ usage
+@cindex dmalloc.cc file
 
 For those people using the C++ language, some special things need to be
 done to get the library to work.  The problem exists with the fact that
@@ -1188,6 +1098,9 @@ If you compiled any of your source modules with @code{DMALLOC_FUNC_CHECK}
 defined then you must first recompile all those modules without the flag
 enabled.
 
+@cindex leap library
+@cindex libdmalloclp.a library
+
 @item
 If you have not compiled all your source with @code{DMALLOC_DISABLED}
 defined then you need to link your program with the
@@ -1198,12 +1111,8 @@ cc main.o -L/usr/local/lib -ldmalloclp -lgmalloc
 @end example
 
 If you have disabled dmalloc with the @code{DMALLOC_DISABLED} flag or
-never included
-@iftex
-@*
-@end iftex
-@file{dmalloc.h} in any of your C files,
-then you will not need the @file{libdmalloclp.a} library.
+never included @file{dmalloc.h} in any of your C files, then you will
+not need the @file{libdmalloclp.a} library.
 
 @example
 cc -g main.o -L/usr/local/lib -lgmalloc
@@ -1214,14 +1123,185 @@ If you get unresolved references like @code{_malloc_leap} or
 been.
 @end itemize
 
-@node Environment Variable, Debug Tokens, Programming, Details
+@node Using a Debugger, Environment Variable, Programming, Details
+@section Using a Debugger with the Library
+
+@cindex debugger usage
+@cindex using a debugger
+
+Here are a number of possible scenarios for using the dmalloc library to
+track down problems with your program.
+
+You should first enable a logfile filename (I use @file{dmalloc}) and
+turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
+low} to accomplish this.  If you are interested in having the error
+messages printed to your terminal as well, enable the @samp{print-error}
+token by typing @kbd{dmalloc -p print-error} afterwards.  @xref{Dmalloc
+Program}.
+
+@cindex gdb
+@cindex dmalloc_error() routine
+Now you can enter your debugger (I use the @emph{excellent} GNU debugger
+gdb), and put a break-point in @code{dmalloc_error()} which is the
+internal error routine for the library.  When your program is run, it
+will stop there if a memory problem is detected.
+
+@menu
+* General Errors::              Diagnosing general problems with a debugger.
+* Memory Leaks::                Tracking down non-freed memory.
+* Fence-Post Overruns::         Diagnosing fence-post overwritten memory.
+@end menu
+
+@node General Errors, Memory Leaks, Using a Debugger, Using a Debugger
+@subsection Diagnosing General Errors with a Debugger
+
+@cindex diagnosing errors
+@cindex general errors
+
+If your program stops at the @code{dmalloc_error()} routine then one of
+a number of problems could be happening.  Incorrect arguments could have
+been passed to a malloc call: asking for negative number of bytes,
+trying to realloc a non-heap pointer, etc..  There also could be a
+problem with the system's allocations: you've run out of memory, some
+other function in your program is using @code{sbrk}, etc.  However, it
+is most likely that some code that has been executed was naughty.
+
+To get more information about the problem, first print via the debugger
+the dmalloc_errno variable to get the library's internal error code.
+You can suspend your debugger and run @samp{dmalloc -e
+value-returned-from-print} to get an english translation of the error.
+A number of the error messages are designed to indicate specific
+problems with the library administrative structures and may not be
+user-friendly.
+
+If the problem was due to the arguments or system allocations then the
+source of the problem has been found.  However, if some code did
+something wrong, you may have some more work to do to locate the actual
+problem.  The @code{check-heap} token should be enabled and the interval
+setting disabled or set to a low value so that the library can find the
+problem as close as possible to its source.  The code that was execute
+right before the library halted, can then be examined closely for
+irregularities.  @xref{Debug Tokens} and @xref{Dmalloc Program}.
+
+@cindex dmalloc_verify() routine
+
+You may also want to put calls to @code{dmalloc_verify(0)} in your code
+before the section which generated the error.  This should locate the
+problem faster by checking the library's structures at that point.
+@xref{Extensions}.
+
+@node Memory Leaks, Fence-Post Overruns, General Errors, Using a Debugger
+@subsection Tracking down Non-Freed Memory
+
+@cindex memory leaks
+
+So you've run your program, examined the log-file and discovered (to
+your horror) some un-freed memory.  I tend to be anal about memory leaks
+since even the smallest and most insignificant leak can starve the
+program given the right circumstances.
+
+@example
+not freed: '0x45008' (12 bytes) from 'ra=0x1f8f4'
+not freed: '0x45028' (12 bytes) from 'unknown'
+not freed: '0x45048' (10 bytes) from 'argv.c:1077'
+  known memory not freed: 1 pointer, 10 bytes
+unknown memory not freed: 2 pointers, 24 bytes
+@end example
+
+Above you will see a sample of some non-freed memory messages from the
+logfile.  In the first line the @samp{0x45008} is the pointer that was
+not freed, the @samp{12 bytes} is the size of the unfreed block, and the
+@samp{ra=0x1f8f4} or return-address shows where the allocation
+originated from.  @xref{Return Address}.
+
+The systems which cannot provide return-address information show
+@samp{unknown} instead, as in the 2nd line in the sample above.
+
+The @samp{argv.c:1077} information from the 3rd line shows the file and
+line number which allocated the memory which was not freed.  This
+information comes from the calls from C files which included
+@file{dmalloc.h}.  @xref{Allocation Macros}.
+
+At the bottom of the sample it totals the memory for you and breaks it
+down to known memory (those calls which supplied the file/line
+information) and unknown (the rest).
+
+Often, you may allocate memory in via @code{strdup()} or another
+routine, so the logfile listing where in the @code{strdup} routine the
+memory was allocated does not help locate the true source of the memory
+leak -- the routined that called @code{strdup}.  Without a mechanism to
+trace the calling stack, there is no way for the library to see who the
+caller of the caller (so to speak) was.
+
+@cindex STORE_SEEN_COUNT option
+@cindex pointer seen count
+
+However, there is a way to track down unfreed memory in this
+circumstance.  You need to compile the library with
+@code{STORE_SEEN_COUNT} defined in @file{conf.h}.  The library will then
+record how many times a pointer has been allocated or freed.  It will
+diskplay the unfreed memory as:
+
+@example
+not freed: '0x45008|s3' (12 bytes) from 'ra=0x1f8f4'
+@end example
+
+In the above example, @samp{0x45008} was seen @samp{3} times.  The last
+time it was allocated, it was not freed.  How can a pointer be ``seen''
+3 times?  Let say you @code{strdup} a string of 12 characters and get
+address @samp{0x45008} -- this is #1 time the pointer is seen.  You then
+free the pointer (seen #2) but later @code{strdup} another 12 character
+string and it gets the @samp{0x45008} address from the free list (seen
+#3).
+
+So to find out who is allocating this particular 12 bytes the 3rd time,
+try @samp{dmalloc -a 0x45008:3}.  The library will stop the program the
+third time it sees the @samp{0x45008} address.  You then enter a
+debugger and put a break point at @code{dmalloc_error}.  Run the program
+and when the breakpoint is reached you can examine the stack frame to
+determine who called @code{strdup} to allocate the pointer.
+
+@node Fence-Post Overruns,  , Memory Leaks, Using a Debugger
+@subsection Diagnosing Fence-Post Overwritten Memory
+
+@cindex fence-post errors
+
+For a definition of fence-posts please see the Features section.
+@xref{Features}.
+
+If you have encountered a fence-post memory error, the logfile should be
+able to tell you the offending address.
+
+@example
+free: failed UNDER picket-fence magic-number checking: 
+pointer '0x1d008' from 'dmalloc_t.c:427'
+Dump of proper fence-bottom bytes: '\e\253\300\300\e\253\300\300'
+Dump of '0x1d008'-8: '\e\253\300\300WOW!\003\001pforger\023\001\123'
+@end example
+
+The above sample shows that the pointer @samp{0x1d008} has had its lower
+fence-post area overwritten.  This means that the code wrote below the
+bottom of the address or above the address right below this one.  In the
+sample, the string that did it was @samp{WOW!}.
+
+The library first shows you what the proper fence-post information
+should look like, and then shows what the pointer's bad information was.
+If it cannot print the character, it will display the value as
+@samp{\ddd} where ddd are three octal digits.
+
+By enabling the @code{check-heap} debugging token and assigning the
+interval setting to a low number, you should be able to locate
+approximately when this problem happened.  @xref{Debug Tokens} and
+@xref{Dmalloc Program}.
+
+@node Environment Variable, Debug Tokens, Using a Debugger, Details
 @section Environment Variable Features
 
 @cindex environment variable
 @cindex DMALLOC_OPTIONS
 
 An @dfn{environment variable} is a variable that is part of the user's
-working environment and it is shared by all the programs.  The
+working environment and is shared by all the programs.  The
 @samp{DMALLOC_OPTIONS} variable is used by the dmalloc library to enable
 or disable the memory debugging features, at runtime.  It can be set
 either by hand or with the help of the dmalloc program.  @xref{Dmalloc
@@ -1233,7 +1313,7 @@ Program}.
 To set it by hand, C shell (csh or tcsh) users need to invoke:
 
 @example
-setenv DMALLOC_OPTIONS value;
+setenv DMALLOC_OPTIONS value
 @end example
 
 @cindex Bourne shell usage
@@ -1244,8 +1324,8 @@ setenv DMALLOC_OPTIONS value;
 Bourne shell (sh, bash, ksh, or zsh) users should use:
 
 @example
-DMALLOC_OPTIONS=value;
-export DMALLOC_OPTIONS;
+DMALLOC_OPTIONS=value
+export DMALLOC_OPTIONS
 @end example
 
 The @samp{DMALLOC_OPTIONS} variable should be set to a comma separated
@@ -1297,9 +1377,11 @@ The address can also have an @samp{:number} argument.  For instance, if
 it was set it to @samp{0x3e45:10}, the library will kill itself the 10th
 time it sees address @samp{0x3e45}.  By setting the number argument to
 0, the program will never stop when it sees the address.  This is useful
-for logging all activity on the address.
+for logging all activity on the address and makes it easier to track
+down specific addresses not being freed.
 
-This makes it easier to track down specific addresses not being freed.
+This works well in conjunction with the @code{STORE_SEEN_COUNT} option.
+@xref{Memory Leaks}.
 
 @emph{NOTE}: dmalloc will also log all activity on this address along
 with a count.
@@ -1322,15 +1404,10 @@ times.  This means the intensive debugging can be started after a
 certain point in a program.
 
 @samp{start} also has the format file:line.  For instance, if it is set
-to
-@iftex
-@*
-@end iftex
-@samp{dmalloc_t.c:126} dmalloc will start checking
-the heap after it sees a dmalloc call from the @file{dmalloc_t.c} file,
-line number 126.  If line number is 0 then dmalloc will start checking
-the heap after it sees a call from anywhere in the @file{dmalloc_t.c}
-file.
+to @samp{dmalloc_t.c:126} dmalloc will start checking the heap after it
+sees a dmalloc call from the @file{dmalloc_t.c} file, line number 126.
+If line number is 0 then dmalloc will start checking the heap after it
+sees a call from anywhere in the @file{dmalloc_t.c} file.
 
 This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.
@@ -1344,7 +1421,7 @@ setenv DMALLOC_OPTIONS log-trans,log-stats,log=malloc
 
 # enable debug flags 0x1f as well as heap-checking and set the interval
 # to be 100
-setenv DMALLOC_OPTIONS debug=0x1f,check-heap,log=malloc
+setenv DMALLOC_OPTIONS debug=0x1f,check-heap,inter=100
 
 # enable 'malloc' as the log-file, watch for address '0x1234', and start
 # checking when we see file.c line 123
@@ -1365,8 +1442,9 @@ Each token, when specified, enables a specific debugging feature.  For
 instance, if you have the log-stats token enabled, the library will log
 general statistics to the logfile.
 
-To get this information on the fly, use @samp{dmalloc -TV}.  This will
-print out the Tokens in Very-verbose mode.  @xref{Dmalloc Program}.
+To get this information on the fly, use @samp{dmalloc -DV}.  This will
+print out the Debug tokens in Very-verbose mode.  @xref{Dmalloc
+Program}.
 
 @table @code
 @item none
@@ -1442,7 +1520,7 @@ it is freed
 @cindex dump core
 @cindex core dump
 @item error-abort
-abort the program (and dump core) on errors
+abort the program (and dump core) on errors.  See @code{error-dump} below.
 
 @cindex blank space
 @cindex octal 305
@@ -1488,14 +1566,11 @@ options which can be adjusted in @file{conf.h}.
 @cindex core dump
 @item error-dump
 dump core on error and then continue.  Later core dumps overwrite
-earlier ones if the program encounters more than one error.
+earlier ones if the program encounters more than one error.  See
+@code{error-abort} above.
 
 @emph{NOTE}: This will only work if your system supports the @code{fork}
 system call.
-
-@emph{WARNING}: I believe I have encountered some problems in the past
-with fork calling memory routines and thus causing the library to go
-recursive.  For this reason, this token should be used with caution.
 
 @end table
 
@@ -1527,7 +1602,8 @@ significant checking of heap areas
 extensive checking of heap areas
 
 @item all
-turns on all the checking possible
+turns on all the checking possible.  This generates a multitude of log
+messages without many more tests than high.
 @end table
 
 For expert users, a sample @file{dmallocrc} file has been provided but
@@ -1574,12 +1650,13 @@ debug3	log-stats, log-non-free, log-trans, \
 @dots{}
 @end example
 
-With the above file, when you type @code{eval `dmalloc debug1`}, for
-example, this enables the logging of statistics, the logging of
-non-freed memory, and the checking of fence-post memory areas.
+For example, with the above file installed, you can type @code{dmalloc
+debug1} after setting up your shell alias.  @xref{Dmalloc Program}.
+This enables the logging of statistics, the logging of non-freed memory,
+and the checking of fence-post memory areas.
 
-When I say @code{eval `dmalloc none`}, all memory debugging features
-are disabled.
+When I say @code{dmalloc none}, all memory debugging features are
+disabled.
 
 @node Dmalloc Program,  , RC File, Details
 @section Dmalloc Utility Program
@@ -1610,23 +1687,27 @@ Zsh users on the other hand should put the following in their
 dmalloc() @{ eval `command dmalloc -b $*` @}
 @end example
 
-This allows the user to execute @samp{dmalloc args}.
+This allows the user to execute the dmalloc command as @samp{dmalloc
+arguments}.
 
 The most basic usage for the program is @samp{dmalloc [-bC] tag}.  The
--b or -C flags are for generating Bourne or C shell type commands
-respectively.  dmalloc will try and use the @code{SHELL} environment
-variable to determine whether bourne or c shell commands should be
-generated but you may want to explicitly specify -b or -C.
+@samp{-b} or @samp{-C} (either but not both flags used at a time) are
+for generating Bourne or C shell type commands respectively.  dmalloc
+will try and use the @code{SHELL} environment variable to determine
+whether bourne or C shell commands should be generated but you may want
+to explicitly specify the correct flag.
 
-The tag argument to dmalloc should match a line from the user's run-time
-configuration file or should be one of the built-in tags.  @xref{RC
-File}.  If no tag is specified and no other option-commands used,
-dmalloc will display the current settings of the environment variable.
+The @samp{tag} argument to dmalloc should match a line from the user's
+run-time configuration file or should be one of the built-in tags.
+@xref{RC File}.  If no tag is specified and no other option-commands
+used, dmalloc will display the current settings of the environment
+variable.  It is useful to specify one of the verbose options when doing
+this.
 
 To find out the usage for the debug malloc program try @samp{dmalloc
---usage}.  The standardized usage message that will be displayed is one
-of the many features of the argv library included with this package.  It
-is available via ftp from @samp{ftp.letters.com} in the
+--usage-long}.  The standardized usage message that will be displayed is
+one of the many features of the argv library included with this package.
+It is available via ftp from @samp{ftp.letters.com} in the
 @file{/src/argv} directory.  See @file{argv.info} there for more
 information.
 
@@ -1656,7 +1737,7 @@ unnecessary) if a tag is specified.
 
 @item -D
 List all of the debug-tokens.  Useful for finding a token to be used
-with the -p or -m options.
+with the -p or -m options.  Use with -v or -V verbose options.
 
 @item -e errno
 Print the dmalloc error string that corresponds to the error number
@@ -1667,6 +1748,7 @@ Use this configuration file instead of the RC file
 @file{$HOME/.dmallocrc}.
 
 @item -i number
+@cindex interval setting
 Set the checking interval to number.
 
 @item -k
@@ -1708,7 +1790,7 @@ Output the debug-value not in hex but by individual debug-tokens in short
 form.
 
 @item -t
-List all of the tags in the rc-file.  Useful with -v.
+List all of the tags in the rc-file.  Use with -v or -V verbose options.
 
 @item -v
 Give verbose output.  Especially useful when dumping current settings or
@@ -1720,7 +1802,7 @@ that you have for the environment variable.  For example:
 
 @example
 Debug-Flags  '0x40005c7' (runtime)
-Address      0x1f008
+Address      0x1f008, count = 3
 Interval     100
 Logpath      'malloc'
 Start-File   not-set
@@ -1742,15 +1824,15 @@ Start-File   not-set
 Here are some examples of dmalloc usage:
 
 @example
-# start tough debugging, check the heap every 1000 times,
+# start tough debugging, check the heap every 100 times,
 # send the log information to file 'dmalloc'
-dmalloc high -i 1000 -l dmalloc
+dmalloc high -i 100 -l dmalloc
 
 # find out what error code 20 is (from the logfile)
 dmalloc -e 20
 
-# after finding a corrupted address, cause the program to signal
-# itself when it sees the address 0x34238 for the 6th time.
+# cause the library to halt itself when it sees the address 0x34238
+# for the 6th time.
 dmalloc -a 0x34238:6
 
 # return to the normal 'runtime' settings and clear out all
@@ -1782,7 +1864,7 @@ dmalloc -tv
 * Portability::                 Issues important for porting the library.
 @end menu
 
-@node Definitions, Compatibility,  , Source Code
+@node Definitions, Compatibility, Source Code, Source Code
 @section Definitions of Terms
 
 @cindex source definitions
@@ -1809,6 +1891,9 @@ administration for a set of divided blocks
 @item chunk
 some anonymous amount of memory
 @end table
+
+For more information about administration structures, see the code and
+comments from @file{chunk_loc.h}.
 
 @node Compatibility, Portability, Definitions, Source Code
 @section General Compatibility Concerns
@@ -1930,12 +2015,13 @@ values and priorities.  <cpsr@@csli.stanford.edu>
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
 I am a proud and enthusiastic owner and user of the BSD/386 operating
-system.  For $1+k you get a @emph{complete} BSD-flavor operating system
-with @emph{full source} for 386 and 486 systems (binary licenses are
-available).  Along with the obvious benefits of full source code come
-excellent customer support/service and system features such as a MS-DOG
-runtime environment, complete tcp/ip networking facilities including
-nfs, full software development utilities, X, etc.  <bsdi-info@@bsdi.com>
+system.  For around $1k you get a @emph{complete} BSD-flavor operating
+system with @emph{full source} for 386 and 486 systems (binary licenses
+are available).  Along with the obvious benefits of full source code
+come excellent customer support/service and system features such as a
+MS-DOG runtime environment, complete tcp/ip networking facilities
+including nfs, full software development utilities, X, etc.
+<bsdi-info@@bsdi.com>
 @end table
 
 @node Index of Concepts, Full Node Listings, Plugs, Top
