@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.35 1994/03/20 19:49:16 gray Exp $";
+  "$Id: dmalloc.c,v 1.36 1994/05/02 23:06:25 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -423,7 +423,7 @@ LOCAL	void	dump_current(void)
 /*
  * output the code to set env VAR to VALUE
  */
-LOCAL	void	set_variable(char * var, char * value)
+LOCAL	void	set_variable(const char * var, const char * value)
 {
   if (bourne) {
     (void)printf("%s=%s; export %s;\n", var, value, var);
@@ -442,7 +442,7 @@ LOCAL	void	set_variable(char * var, char * value)
 /*
  * output the code to un-set env VAR
  */
-LOCAL	void	unset_variable(char * var)
+LOCAL	void	unset_variable(const char * var)
 {
   if (bourne) {
     (void)printf("unset %s;\n", var);
