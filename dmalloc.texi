@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.42 1993/12/20 04:58:14 gray Exp $
+@c $Id: dmalloc.texi,v 1.43 1993/12/20 07:44:09 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1252,17 +1252,16 @@ are disabled.
 Here are a number of possible scenarios for using the malloc_dbg library
 to track down problems with your program.
 
-In all cases, you should first off have @samp{MALLOC_LOGFILE} defined to
-a log-file name (I use the filename @file{malloc}) and probably have at
-least the tokens @samp{log-stats}, @samp{log-non-free},
-@samp{log-perror}, and @samp{log-bad-space} enabled.  This way, the
-library can log some helpful diagnostic information to the log-file.
+In all cases, you should first have @samp{MALLOC_LOGFILE} defined to a
+filename (I use @file{malloc}).  Also, you should at least enable the
+following tokens: @samp{log-stats}, @samp{log-non-free},
+@samp{log-perror}, and @samp{log-bad-space}.  This way, the library can
+log some helpful diagnostic information to the log-file.
 
-Also, when running your programs in a debugger such as gdb (the
-@emph{excellent} GNU debugger), I always put a break-point in
-@code{_malloc_error()} which is the internal error routine for the
-library.  The program will then hit the break-point as soon as a memory
-problem is detected.
+When running your program in a debugger (I use the @emph{excellent} GNU
+debugger gdb), put a break-point in @code{_malloc_error()} which is the
+internal error routine for the library.  The program will then stop
+there as soon as a memory problem is detected.
 
 @menu
 * General::                     Diagnosing general problems with a debugger.
@@ -1275,18 +1274,17 @@ problem is detected.
 
 @cindex diagnosing errors
 
-First off, load your program (which should have the malloc library in
-it) with a debugger and set a break-point at _malloc_error.  Run the
-program.  If the program stops in the _malloc_error() function, this
-indicates that there was a problem.
+Load your program (which should have the malloc library in it) with a
+debugger and set a break-point at _malloc_error.  Run the program.  If
+the program stops in the _malloc_error() function, this indicates that
+there was a problem.
 
 There could be a problem with the arguments of the malloc call (asking
 for negative number of bytes, trying to realloc a non-heap pointer,
 etc.).  There also could be a problem with the system's allocations
 (you've run out of memory, some other function in your program is using
-@code{sbrk}, etc).  Most likely, however, some code executed before this
-malloc call, was naughty.  @emph{NOTE}: this does not necessarily have
-to be @emph{right} before.
+@code{sbrk}, etc).  However, it is more likely that some code that has
+been executed was naughty.
 
 To get more information about the problem, first print malloc_errno to
 get the heap's error code.  You can suspend your debugger and run
@@ -1296,15 +1294,12 @@ to diagnose specific problems with the heap and may not be
 user-friendly.
 
 If the problem was due to the arguments or system allocations then the
-source of the problem has been found.  If some code did something wrong,
-you have more work to do.  If the @code{check-heap} token was enabled
-and the @samp{MALLOC_INTERVAL} was not set then the problem should be in
-the code between the last good call and the current call which noticed
-the problem.
-
-If not, you may want to turn on heap checking which will check all
-pointers every call to malloc and may locate the problem closer to
-its source.
+source of the problem has been found.  However, if some code did
+something wrong, you have more work to do.  The @code{check-heap} token
+should be enabled and the @samp{MALLOC_INTERVAL} un-set or set to a low
+value so that the library can find the problem as close as possible to
+its source.  The code before the call to the library which stopped can
+then be examined closely for irregularities.
 
 @node Memory Leaks, Fence-Post Overruns, General, Debugging with the Library
 @subsection Tracking down non-freed memory.
