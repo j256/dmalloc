@@ -21,13 +21,14 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.40 1995/09/06 17:40:45 gray Exp $
+ * $Id: chunk_loc.h,v 1.41 1997/01/16 22:32:25 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
 #define __CHUNK_LOC_H__
 
 #include "conf.h"				/* up here for _INCLUDE */
+#include "dmalloc_loc.h"			/* for DMALLOC_SIZE */
 
 /* for thread-id types -- see conf.h */
 #if STORE_THREAD_ID
