@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.9 1997/01/17 19:24:40 gray Exp $
+ * $Id: settings.dist,v 1.10 1997/01/21 21:01:45 gray Exp $
  */
 
 /*
@@ -222,32 +222,67 @@
  */
 #define LOCK_THREADS 0
 #if LOCK_THREADS
+
+#define THREAD_INCLUDE			<pthread.h>
+
+/*
+ * The problem is that the pthreads library uses malloc itself.  If we
+ * attempt to call the global lock while inside of the pthreads
+ * initialization code, core dumps result.  So we have the dmalloc
+ * library not do the lock the first X times.  This is a HACK however
+ * necessary.
+ *
+ * NOTE: you may have to play with the IGNORE value.  Too many will cause
+ * two threads to march through the dmalloc code which is NOT thread
+ * safe.  Too few and you will get a core dump in the pthreads init
+ * code.  Weeee!
+ */
+#define THREAD_LOCK_IGNORE		10
+
+/* if set, we add code to not lock the first X calls */
+#if THREAD_LOCK_IGNORE
+
+#define THREAD_LOCK_GLOBAL  static int thread_lock_ignore = THREAD_LOCK_IGNORE;
+
+#define THREAD_LOCK		do { if (thread_lock_ignore <= 0) \
+					pthread_lock_global_np(); \
+				} while (0)
+#define THREAD_UNLOCK		do { if (thread_lock_ignore > 0) \
+					thread_lock_ignore--; \
+				     else \
+					pthread_unlock_global_np(); \
+				} while (0)
+#else /* THREAD_LOCK_IGNORE */
+
 #define THREAD_LOCK			pthread_lock_global_np()
 #define THREAD_UNLOCK			pthread_unlock_global_np()
-#define THREAD_INCLUDE			<pthread.h>
-#else
-#define THREAD_LOCK
-#define THREAD_UNLOCK
-#endif
+#undef THREAD_LOCK_GLOBAL
+
+#endif /* ! THREAD_LOCK_IGNORE */
 
 /*
  * For those threaded programs, this logs the thread ID that allocated
  * the pointer -- it shows up as a t... (for thread-id) in the
  * logfile.  The ... is determined by the THREAD_ID_TO_STRING macro
  * below.  THREAD_TYPE defines the type of id storage field.
- * GET_THREAD_ID returns the current thread id.  It is assumed that
- * the THREAD_TYPE and GET_THREAD_ID macros are defined in the above
+ * THREAD_GET_ID returns the current thread id.  It is assumed that
+ * the THREAD_TYPE and THREAD_GET_ID macros are defined in the above
  * THREAD_INCLUDE file.
  *
- * NOTE: You may have to change the GET_THREAD_ID macro which is supposed
+ * NOTE: You may have to change the THREAD_GET_ID macro which is supposed
  * to return the thread-id integer to be stored in the pointer
  * structures.
  */
-#if LOCK_THREADS
 #define STORE_THREAD_ID 0
-#define THREAD_TYPE			int
-#define GET_THREAD_ID			gettid()
-#define THREAD_ID_TO_STRING(b, t)	(void)sprintf((b), "%d", (int)(t))
-#endif
+#define THREAD_TYPE			pthread_t
+#define THREAD_GET_ID			pthread_self()
+#define THREAD_ID_TO_STRING(b, t)	(void)sprintf((b), "%#lx", (long)(t))
+
+#else /* LOCK_THREADS */
+
+#define THREAD_LOCK
+#define THREAD_UNLOCK
+
+#endif /* ! LOCK_THREADS */
 
 #endif /* ! __SETTINGS_H__ */
