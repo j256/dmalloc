@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.113 2004/01/31 16:26:22 gray Exp $
+ * $Id: dmalloc_t.c,v 1.114 2004/07/01 15:35:57 gray Exp $
  */
 
 /*
@@ -39,6 +39,7 @@
 #endif
 
 #include "conf.h"
+#include "compat.h"				/* for loc_snprintf */
 
 #if HAVE_TIME
 # ifdef TIME_INCLUDE
