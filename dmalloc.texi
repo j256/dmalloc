@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.184 2000/05/08 12:27:52 gray Exp $
+@c $Id: dmalloc.texi,v 1.185 2000/05/08 12:30:04 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -569,8 +569,8 @@ heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 and @file{libdmalloc_lp.a} library files in @file{/usr/local/lib}, the
 @file{dmalloc.h} include file in @file{/usr/local/include}, and the
 @file{dmalloc} utility in @file{/usr/local/bin}.  You may also want to
-type @kbd{make installth} to install the thread library into place or
-@kbd{make installcc} to install the C++ library into place.
+type @kbd{make installth} to install the thread library into place
+and/or @kbd{make installcc} to install the C++ library into place.
 
 You may have specified a @samp{--prefix=PATH} option to configure in
 which case @samp{/usr/local} will have been replaced with @samp{PATH}.
