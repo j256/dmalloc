@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.28 1994/09/13 15:36:47 gray Exp $
+$Id: NOTES,v 1.29 1995/05/16 00:24:36 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -38,13 +38,6 @@ WARNINGS:
 -------------------------------------------------------------------------------
 
 GENERAL:
-
--	Dumping core on errors and then continuing did not look to be
-	a problem to implement.  However it became "not recommended"
-	as soon as it was discovered that fork (which is needed) calls
-	malloc itself.  If the heap was corrupted or some other
-	critical error has occurred then the library would quickly go
-	recursive.
 
 -	I've considered adding the mprotect features which would
 	signal if code READ into certain areas (writing is easy with
