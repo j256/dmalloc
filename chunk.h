@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.32 1994/05/11 19:32:03 gray Exp $
+ * $Id: chunk.h,v 1.33 1994/08/29 15:10:23 gray Exp $
  */
 
 #ifndef __CHUNK_H__
 #define __CHUNK_H__
 
-#include "malloc_loc.h"				/* for IMPORT ... */
+#include "dmalloc_loc.h"			/* for IMPORT ... */
 
 /* some argument defines */
 #define CHUNK_PNT_EXACT		BIT_FLAG(0)	/* pointer must be on block */
@@ -37,7 +37,7 @@
  * the unknown file pointer.  did not use MALLOC_UNKNOWN_FILE everywhere else
  * the pointers would be different.
  */
-IMPORT	char		*_malloc_unknown_file;
+IMPORT	char		*_dmalloc_unknown_file;
 
 IMPORT	int		_calloc_count;  /* # callocs, done in alloc */
 
@@ -59,7 +59,7 @@ IMPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line);
 IMPORT	int	_chunk_note_external(const int blockn, const void * mem);
 
 /*
- * run extensive tests on the entire heap depending on TYPE
+ * run extensive tests on the entire heap
  */
 IMPORT	int	_chunk_heap_check(void);
 

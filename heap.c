@@ -24,9 +24,9 @@
  * heap as well as reporting the current position of the heap.
  */
 
-#define MALLOC_DEBUG_DISABLE
+#define DMALLOC_DEBUG_DISABLE
 
-#include "malloc_dbg.h"
+#include "dmalloc.h"
 #include "conf.h"
 
 #include "chunk.h"
@@ -35,11 +35,11 @@
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
-#include "malloc_loc.h"
+#include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.34 1994/01/25 21:33:05 gray Exp $";
+  "$Id: heap.c,v 1.35 1994/08/29 15:11:20 gray Exp $";
 #endif
 
 /* external routines */
@@ -66,9 +66,9 @@ EXPORT	int	_heap_check(void)
   if (ret != _heap_last) {
     /* if we went down then real error! */
     if (ret < _heap_last
-	|| ! BIT_IS_SET(_malloc_flags, DEBUG_ALLOW_NONLINEAR)) {
-      malloc_errno = ERROR_ALLOC_NONLINEAR;
-      _malloc_error("_heap_alloc");
+	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
+      dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+      _dmalloc_error("_heap_alloc");
       return ERROR;
     }
     
@@ -100,28 +100,28 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
 #if HAVE_SBRK
   ret = sbrk(size);
   if (ret == SBRK_ERROR) {
-    malloc_errno = ERROR_ALLOC_FAILED;
-    _malloc_error("_heap_alloc");
+    dmalloc_errno = ERROR_ALLOC_FAILED;
+    _dmalloc_error("_heap_alloc");
     ret = HEAP_ALLOC_ERROR;
   }
 #endif
   
   /* did we not allocate any heap space? */
   if (ret == HEAP_ALLOC_ERROR) {
-    if (BIT_IS_SET(_malloc_flags, DEBUG_CATCH_NULL)) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
       (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not allocate %u more bytes from heap\r\n",
 		    size);
       (void)write(STDERR, str, strlen(str));
-      _malloc_die();
+      _dmalloc_die();
     }
     return HEAP_ALLOC_ERROR;
   }
   
 #if HAVE_SBRK
   if (ret != _heap_last) {
-    malloc_errno = ERROR_ALLOC_NONLINEAR;
-    _malloc_error("_heap_alloc");
+    dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+    _dmalloc_error("_heap_alloc");
     return HEAP_ALLOC_ERROR;
   }
   
@@ -142,13 +142,13 @@ EXPORT	void	*_heap_end(void)
 #if HAVE_SBRK
   ret = sbrk(0);
   if (ret == SBRK_ERROR) {
-    malloc_errno = ERROR_ALLOC_FAILED;
-    _malloc_error("_heap_end");
-    if (BIT_IS_SET(_malloc_flags, DEBUG_CATCH_NULL)) {
+    dmalloc_errno = ERROR_ALLOC_FAILED;
+    _dmalloc_error("_heap_end");
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
       (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not find the end of the heap\r\n");
       (void)write(STDERR, str, strlen(str));
-      _malloc_die();
+      _dmalloc_die();
     }
     ret = HEAP_ALLOC_ERROR;
   }

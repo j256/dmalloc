@@ -27,7 +27,7 @@
 #include <stdio.h>				/* for stdin */
 
 #include "argv.h"
-#include "malloc_dbg.h"
+#include "dmalloc.h"
 
 /*
  * NOTE: this is only needed to test certain features of the library.
@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.38 1994/08/09 02:30:54 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.39 1994/08/29 15:11:09 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -143,8 +143,8 @@ static	int	do_random(const int itern)
   pnt_info_t	*freep, *usedp = NULL;
   pnt_info_t	*pntp, *lastp, *thisp;
   
-  malloc_errno = last = 0;
-  flags = malloc_debug_current();
+  dmalloc_errno = last = 0;
+  flags = dmalloc_debug_current();
   
   pointer_grid = ALLOC(pnt_info_t, max_pointers);
   if (pointer_grid == NULL) {
@@ -166,10 +166,10 @@ static	int	do_random(const int itern)
   for (iterc = 0; iterc < itern;) {
     int		which;
     
-    if (malloc_errno != last && ! silent) {
+    if (dmalloc_errno != last && ! silent) {
       (void)printf("ERROR: iter %d: %s (err %d)\n",
-		   iterc, malloc_strerror(malloc_errno), malloc_errno);
-      last = malloc_errno;
+		   iterc, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      last = dmalloc_errno;
     }
     
     if (random_debug) {
@@ -177,7 +177,7 @@ static	int	do_random(const int itern)
       flags ^= 1 << which;
       if (verbose)
 	(void)printf("%d: debug flags = %#x\n", iterc + 1, flags);
-      malloc_debug(flags);
+      dmalloc_debug(flags);
     }
     
     which = RANDOM_VALUE(2);
@@ -292,7 +292,7 @@ static	int	do_random(const int itern)
   
   FREE(pointer_grid);
   
-  if (malloc_errno == 0)
+  if (dmalloc_errno == 0)
     return 1;
   else
     return 0;
@@ -324,32 +324,32 @@ static	int	check_special(void)
   
 #if ALLOW_FREE_NULL
   {
-    int		hold = malloc_errno;
+    int		hold = dmalloc_errno;
     
-    malloc_errno = 0;
+    dmalloc_errno = 0;
     
     FREE(NULL);
-    if (malloc_errno != 0 && ! silent)
+    if (dmalloc_errno != 0 && ! silent)
       (void)printf("   ERROR: free of 0L returned error.\n");
     
-    malloc_errno = hold;
+    dmalloc_errno = hold;
   }
 #else
   {
-    int		hold = malloc_errno;
-    malloc_errno = 0;
+    int		hold = dmalloc_errno;
+    dmalloc_errno = 0;
     
     FREE(NULL);
-    if (malloc_errno == 0 && ! silent)
+    if (dmalloc_errno == 0 && ! silent)
       (void)printf("   ERROR: free of 0L did not return error.\n");
     
-    malloc_errno = hold;
+    dmalloc_errno = hold;
   }
 #endif
   
   {
-    int		hold = malloc_errno;
-    malloc_errno = 0;
+    int		hold = dmalloc_errno;
+    dmalloc_errno = 0;
     
     pnt = MALLOC((1 << LARGEST_BLOCK) + 1);
     if (pnt != NULL) {
@@ -358,10 +358,10 @@ static	int	check_special(void)
       FREE(pnt);
     }
     
-    malloc_errno = hold;
+    dmalloc_errno = hold;
   }
   
-  if (malloc_errno == 0)
+  if (dmalloc_errno == 0)
     return 1;
   else
     return 0;
@@ -461,19 +461,19 @@ static	void	do_interactive(void)
     }
     
     if (strncmp(line, "map", len) == 0) {
-      malloc_log_heap_map();
+      dmalloc_log_heap_map();
       (void)printf("Done.\n");
       continue;
     }
     
     if (strncmp(line, "stats", len) == 0) {
-      malloc_log_stats();
+      dmalloc_log_stats();
       (void)printf("Done.\n");
       continue;
     }
     
     if (strncmp(line, "unfreed", len) == 0) {
-      malloc_log_unfreed();
+      dmalloc_log_unfreed();
       (void)printf("Done.\n");
       continue;
     }
@@ -590,7 +590,7 @@ int	main(int argc, char ** argv)
     (void)printf("Final malloc_verify returned: %s\n",
 		 (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
   
-  if (malloc_errno == 0)
+  if (dmalloc_errno == 0)
     exit(0);
   else
     exit(1);

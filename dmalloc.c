@@ -30,28 +30,28 @@
 
 #include <stdio.h>				/* for stderr */
 
-#define MALLOC_DEBUG_DISABLE
+#define DMALLOC_DEBUG_DISABLE
 
 #include "argv.h"				/* for argument processing */
 
-#include "malloc_dbg.h"
+#include "dmalloc.h"
 #include "conf.h"
 
 #include "compat.h"
 #include "debug_tok.h"
 #include "error_str.h"
 #include "error_val.h"
-#include "malloc_loc.h"
+#include "dmalloc_loc.h"
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.37 1994/07/22 14:31:18 gray Exp $";
+  "$Id: dmalloc.c,v 1.38 1994/08/29 15:10:35 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
 #define SHELL_ENVIRON	"SHELL"			/* for the type of shell */
-#define DEFAULT_CONFIG	"%s/.mallocrc"		/* default config file */
+#define DEFAULT_CONFIG	"%s/.dmallocrc"		/* default config file */
 #define TOKENIZE_CHARS	" \t,="			/* for tag lines */
 
 #define NO_VALUE		(-1)		/* no value ... value */
@@ -464,9 +464,9 @@ LOCAL	void	unset_variable(const char * var)
 LOCAL	char	*local_strerror(const int errnum)
 {
   if (! IS_MALLOC_ERRNO(errnum))
-    return malloc_errlist[ERROR_BAD_ERRNO];
+    return errlist[ERROR_BAD_ERRNO];
   else
-    return malloc_errlist[errnum];
+    return errlist[errnum];
 }
 
 EXPORT	int	main(int argc, char ** argv)
@@ -563,7 +563,7 @@ EXPORT	int	main(int argc, char ** argv)
     unset_variable(START_ENVIRON);
   
   if (errno_to_print != NO_VALUE) {
-    (void)fprintf(stderr, "%s: malloc_errno value '%d' = \n",
+    (void)fprintf(stderr, "%s: dmalloc_errno value '%d' = \n",
 		  argv_program, errno_to_print);
     (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
     printed = TRUE;

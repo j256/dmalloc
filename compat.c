@@ -24,17 +24,17 @@
  * function just in case your system does not have them.
  */
 
-#define MALLOC_DEBUG_DISABLE
+#define DMALLOC_DEBUG_DISABLE
 
-#include "malloc_dbg.h"
+#include "dmalloc.h"
 #include "conf.h"
 
 #include "compat.h"
-#include "malloc_loc.h"
+#include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.26 1994/02/20 05:40:36 gray Exp $";
+  "$Id: compat.c,v 1.27 1994/08/29 15:10:25 gray Exp $";
 #endif
 
 #if HAVE_BCOPY == 0

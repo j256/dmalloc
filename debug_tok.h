@@ -1,5 +1,5 @@
 /*
- * token attributes for the malloc_dbg program and _malloc_flags
+ * token attributes for the malloc_dbg program and _dmalloc_flags
  *
  * Copyright 1993 by the Antaire Corporation
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.5 1994/04/08 21:13:54 gray Exp $
+ * $Id: debug_tok.h,v 1.6 1994/08/29 15:10:32 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -28,7 +28,7 @@
  * NOTE: see debug_val.h for instructions about changes here
  */
 
-#include "malloc_loc.h"			/* for LOCAL */
+#include "dmalloc_loc.h"		/* for LOCAL */
 #include "debug_val.h"			/* for debug codes */
 
 typedef struct {

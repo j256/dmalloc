@@ -3,10 +3,10 @@ Makefile.all
 conf.h
 config.status
 configure
-malloc.info
-malloc.ps
-malloc_t
-malloc_dbg
-malloc_dbg.h
-malloc.head
-malloc_dbg.2
+dmalloc.info
+dmalloc.ps
+dmalloc_t
+dmalloc
+dmalloc.h
+dmalloc.head
+dmalloc.h.2

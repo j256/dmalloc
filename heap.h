@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.21 1994/04/07 21:16:19 gray Exp $
+ * $Id: heap.h,v 1.22 1994/08/29 15:11:21 gray Exp $
  */
 
 #ifndef __HEAP_H__
 #define __HEAP_H__
 
-#include "malloc_loc.h"				/* for LOCAL and BLOCK_SIZE */
+#include "dmalloc_loc.h"			/* for LOCAL and BLOCK_SIZE */
 
 /*
  * error code returned by heap allocation routine

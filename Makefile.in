@@ -1,14 +1,14 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.52 1994/08/09 02:33:52 gray Exp $
+# $Id: Makefile.in,v 1.53 1994/08/29 15:09:41 gray Exp $
 #
 
-HFLS	= malloc_dbg.h
-OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
-OBJS_INST= malloc_lp.o
-FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_t.c
-DOCS	= malloc.texi malloc.info malloc.ps
+HFLS	= dmalloc.h
+OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o error.o heap.o malloc.o
+OBJS_INST= dmalloc_lp.o
+FILLFLS	= arg_check.c chunk.c error.c heap.c dmalloc_t.c
+DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
@@ -19,33 +19,33 @@ CFLAGS	= -g $(CCFLS) -pipe -W -Wreturn-type -Wunused -Wpointer-arith \
 	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= $(ROOT)
-TEST	= malloc_t
-LIBRARY	= libmalloc_dbg.a
-UTIL	= malloc_dbg
+TEST	= dmalloc_t
+LIBRARY	= libdmalloc.a
+UTIL	= dmalloc
 
-MANFILE	= malloc.info
+MANFILE	= dmalloc.info
 
 PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
-	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
+	ChangeLog Manifest INSTALL NEWS NOTES README TODO dmallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.c malloc_dbg.[13] malloc_loc.h malloc_lp.[ch] malloc_t.c \
+	dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] dmalloc_t.c \
 	return.h version.h \
 	argv.[ch] argv_loc.h \
-	malloc.texi malloc.info malloc.ps texinfo.tex \
+	dmalloc.texi dmalloc.info dmalloc.ps texinfo.tex \
 	Deansify.pl
 PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
 MAXSIZE	= 85k
 # NOTE: the wc level should be below 90k due to shar overhead
 SHARFLS	= conf.h.in Makefile.in configure configure.in config.help \
-	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
+	ChangeLog Manifest INSTALL NEWS NOTES README TODO dmallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.c malloc_dbg.[13] malloc_loc.h malloc_lp.[ch] malloc_t.c \
+	dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] dmalloc_t.c \
 	return.h version.h \
 	argv.[ch] argv_loc.h \
-	malloc.texi malloc.info \
+	dmalloc.texi dmalloc.info \
 	Deansify.pl \
 	contrib contrib/README contrib/dec_notes \
 	contrib/ra_info.pl
@@ -56,12 +56,12 @@ all : $(LIBRARY) $(UTIL)
 .PHONY : clobber
 clobber :
 	rm -f $(LIBRARY) $(TEST) $(UTIL)
-	rm -f part.? malloc.head malloc.info malloc_dbg.h
+	rm -f part.? dmalloc.head dmalloc.info dmalloc.h
 
 .PHONY : distclean
 distclean : clobber
-	rm -f configure config.status Makefile conf.h malloc_dbg.2
-	rm -rf port malloc.ps
+	rm -f configure config.status Makefile conf.h dmalloc.h.2
+	rm -rf port dmalloc.ps
 
 .PHONY : installincs
 installincs : $(HFLS)
@@ -83,12 +83,12 @@ installftp : README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 
 # put situation specific lines here
-malloc_dbg.2 : configure
+dmalloc.h.2 : configure
 	$(SHELL) configure
 
-malloc_dbg.h : malloc_dbg.1 malloc_dbg.2 malloc_dbg.3
+dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
-	cat malloc_dbg.1 malloc_dbg.2 malloc_dbg.3 > $@.t
+	cat dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS)
@@ -96,7 +96,7 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o argv.o compat.o 
+$(UTIL) : dmalloc.o argv.o compat.o 
 	rm -f $@
 	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o $(LIBS)
 	mv a.out $@
@@ -110,7 +110,7 @@ port : $(PORTFLS)
 	cp $(PORTCFG) $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
-	@ echo 'Please rename $@ to malloc-version and tar up file'
+	@ echo 'Please rename $@ to dmalloc-version and tar up file'
 
 .PHONY : patch
 patch :
@@ -149,25 +149,25 @@ continuous : $(TEST)
 			sleep 1 ;\
 		); done
 
-malloc.ps : malloc.texi
+dmalloc.ps : dmalloc.texi
 	@ answer 'Is it okay to remove the work directory? '
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi ../malloc.texi ; texi2dvi ../malloc.texi ; \
-	  dvips -o ../$@ malloc.dvi )
+	( cd work ; texi2dvi ../dmalloc.texi ; texi2dvi ../dmalloc.texi ; \
+	  dvips -o ../$@ dmalloc.dvi )
 	rm -rf work
 
-malloc.head : malloc.info
+dmalloc.head : dmalloc.info
 	rm -f $@ $@.t
 	sed -e '/^Malloc Debug Library/,/Gray Watson/p' -e 'd' < \
-		malloc.info > $@.t
+		dmalloc.info > $@.t
 	echo '' >> $@.t
 	echo ---------------------------------------------------------------- \
 		>> $@.t
 	mv $@.t $@
 
 .PHONY : shar
-shar : malloc.head
+shar : dmalloc.head
 	rm -f part.?? part.t Makefile.in.bak
 	mv Makefile.in Makefile.in.bak
 	cp Makefile.all.in Makefile.in
@@ -176,7 +176,7 @@ shar : malloc.head
 		${SHARFLS}
 	rm -f Makefile.in
 	mv Makefile.in.bak Makefile.in
-	cat malloc.head part.01 > part.t
+	cat dmalloc.head part.01 > part.t
 	rm -f part.01
 	mv part.t part.01
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.27 1994/01/22 06:35:29 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.28 1994/08/29 15:10:52 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -29,11 +29,11 @@
 /*
  * env variables
  */
-#define ADDRESS_ENVIRON		"MALLOC_ADDRESS"
-#define DEBUG_ENVIRON		"MALLOC_DEBUG"
-#define INTERVAL_ENVIRON	"MALLOC_INTERVAL"
-#define LOGFILE_ENVIRON		"MALLOC_LOGFILE"
-#define START_ENVIRON		"MALLOC_START"
+#define ADDRESS_ENVIRON		"DMALLOC_ADDRESS"
+#define DEBUG_ENVIRON		"DMALLOC_DEBUG"
+#define INTERVAL_ENVIRON	"DMALLOC_INTERVAL"
+#define LOGFILE_ENVIRON		"DMALLOC_LOGFILE"
+#define START_ENVIRON		"DMALLOC_START"
 
 /******************************* useful defines ******************************/
 

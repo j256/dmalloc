@@ -1,6 +1,6 @@
 ###############################################################################
-# Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.43 1994/05/22 22:38:59 gray Exp $
+# Makefile for the DMalloc library.
+# $Id: Makefile.all.in,v 1.44 1994/08/29 15:09:39 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -19,11 +19,9 @@ DEFS =
 INCS = -I$(srcdir)
 LIBS = @LIBS@
 
-# NOTE: you may have to rename this to libmallocdbg.a or libmalloc_db.a to
-# avoid the 14 character filename restrictions on non-BSD file-systems.
-LIBRARY	= libmalloc_dbg.a
-UTIL = malloc_dbg
-INFOFILE = malloc.info
+LIBRARY	= libdmalloc.a
+UTIL = dmalloc
+INFOFILE = dmalloc.info
 
 CCFLAGS = -g
 LDFLAGS = -g
@@ -38,12 +36,12 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
-HFLS = malloc_dbg.h
-OBJS = arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
-OBJS_IN = malloc_lp.o
+HFLS = dmalloc.h
+OBJS = arg_check.o chunk.o compat.o error.o heap.o malloc.o dmalloc_lp.o
+OBJS_IN = dmalloc_lp.o
 
 CFLAGS = $(CCFLAGS)
-TEST = malloc_t
+TEST = dmalloc_t
 
 # .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -54,14 +52,14 @@ clean :
 
 # .PHONY : clobber
 clobber : clean
-	rm -f $(LIBRARY) $(TEST) $(UTIL) malloc_dbg.h
+	rm -f $(LIBRARY) $(TEST) $(UTIL) dmalloc.h
 
 # .PHONY : realclean
 realclean : clobber
 
 # .PHONY : distclean
 distclean : clobber
-	rm -f config.status Makefile conf.h malloc_dbg.2
+	rm -f config.status Makefile conf.h dmalloc.h.2
 #	rm -f configure
 
 # .PHONY : installincs
@@ -80,12 +78,12 @@ installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 install : installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 
-malloc_dbg.2 : configure
+dmalloc.h.2 : configure
 	$(SHELL) configure
 
-malloc_dbg.h : malloc_dbg.1 malloc_dbg.2 malloc_dbg.3
+dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
-	cat malloc_dbg.1 malloc_dbg.2 malloc_dbg.3 > $@.t
+	cat dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS)
@@ -99,7 +97,7 @@ $(UTIL) : $(UTIL).o argv.o compat.o
 	mv a.out $@
 
 # .PHONY : noansi
-noansi : malloc_dbg.h Deansify.pl
+noansi : dmalloc.h Deansify.pl
 	perl ./Deansify.pl *.[ch]
 
 # .PHONY : tests
@@ -152,18 +150,18 @@ configure : configure.in
 # These dependencies are automatically generated.  Do not edit by hand.
 #
 
-arg_check.o : arg_check.c malloc_dbg.h conf.h chunk.h malloc_loc.h debug_val.h \
+arg_check.o : arg_check.c dmalloc.h conf.h chunk.h dmalloc_loc.h debug_val.h \
   error.h arg_check.h 
-argv.o : argv.c conf.h argv.h argv_loc.h 
-chunk.o : chunk.c malloc_dbg.h conf.h chunk.h malloc_loc.h chunk_loc.h compat.h \
+argv.o : argv.c argv.h argv_loc.h 
+chunk.o : chunk.c dmalloc.h conf.h chunk.h dmalloc_loc.h chunk_loc.h compat.h \
   debug_val.h error.h error_val.h heap.h version.h 
-compat.o : compat.c malloc_dbg.h conf.h compat.h malloc_loc.h 
-error.o : error.c malloc_dbg.h conf.h compat.h malloc_loc.h debug_val.h error.h 
-heap.o : heap.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h debug_val.h \
+compat.o : compat.c dmalloc.h conf.h compat.h dmalloc_loc.h 
+dmalloc.o : dmalloc.c argv.h dmalloc.h conf.h compat.h dmalloc_loc.h debug_tok.h \
+  debug_val.h error_str.h error_val.h version.h 
+dmalloc_lp.o : dmalloc_lp.c dmalloc.h conf.h dmalloc_loc.h dmalloc_lp.h 
+dmalloc_t.o : dmalloc_t.c argv.h dmalloc.h conf.h 
+error.o : error.c dmalloc.h conf.h compat.h dmalloc_loc.h debug_val.h error.h 
+heap.o : heap.c dmalloc.h conf.h chunk.h dmalloc_loc.h compat.h debug_val.h \
   error.h error_val.h heap.h 
-malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h debug_val.h \
-  error.h error_str.h error_val.h heap.h malloc_lp.h return.h 
-malloc_dbg.o : malloc_dbg.c argv.h malloc_dbg.h conf.h compat.h malloc_loc.h \
-  debug_tok.h debug_val.h error_str.h error_val.h version.h 
-malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h malloc_lp.h 
-malloc_t.o : malloc_t.c argv.h malloc_dbg.h conf.h 
+malloc.o : malloc.c dmalloc.h conf.h chunk.h dmalloc_loc.h compat.h debug_val.h \
+  error.h error_str.h error_val.h heap.h dmalloc_lp.h return.h 
