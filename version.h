@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: version.h,v 1.82 1999/03/08 17:53:00 gray Exp $
+ * $Id: version.h,v 1.83 1999/03/11 22:40:48 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -34,6 +34,6 @@
  */
 static	char	*dmalloc_version = "4.2.0";
 
-/* Version Date: $Date: 1999/03/08 17:53:00 $ */
+/* Version Date: $Date: 1999/03/11 22:40:48 $ */
 
 #endif /* ! __VERSION_H__ */
