@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.135 1998/09/19 00:33:05 gray Exp $
+@c $Id: dmalloc.texi,v 1.136 1998/09/28 15:03:30 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -824,11 +824,11 @@ book.  My apologies.
 Threads are special operating system facilities which allow your
 programs to have multiple threads of execution (hence the name).  In
 effect your program can be doing a number of things ``at the same
-time''.  This gives you the opportunity to take advantage of modern
-operating system scheduling and multi-processor hardware efficiently.  If
-I've already lost you or if any of the terminology below does not make
-sense, see manuals about POSIX threads (pthreads) before going any
-further.  O'Reilly publishes a pretty good pthreads manual for example.
+time''.  This allows you to take full advantage of modern operating
+system scheduling and multi-processor hardware.  If I've already lost
+you or if any of the terminology below does not make sense, see manuals
+about POSIX threads (pthreads) before going any further.  O'Reilly
+publishes a pretty good pthreads manual for example.
 
 The support for threads in dmalloc is minimal although probably adequate
 for most if not all testing scenarios.  It provides support for mutex
