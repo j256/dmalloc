@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.166 2003/05/20 04:03:56 gray Exp $
+ * $Id: malloc.c,v 1.167 2003/06/06 19:03:33 gray Exp $
  */
 
 /*
@@ -1432,24 +1432,43 @@ void	dmalloc_debug_setup(const char *options_str)
  *
  * pnt -> Pointer we are checking.
  *
- * size_p <- Pointer to an unsigned int which, if not NULL, will be
- * set to the size of bytes from the pointer.
+ * user_size_p <- Pointer to a DMALLOC_SIZE type variable which, if
+ * not NULL, will be set to the size of bytes from the pointer.
+ *
+ * total_size_p <- Poiner to a DMALLOC_SIZE type variable which, if
+ * not NULL, will be set to the total size given for this allocation
+ * including administrative overhead.
  *
  * file_p <- Pointer to a character pointer which, if not NULL, will
  * be set to the file where the pointer was allocated.
  *
- * line_p <- Pointer to a character pointer which, if not NULL, will
+ * line_p <- Pointer to an unsigned integer which, if not NULL, will
  * be set to the line-number where the pointer was allocated.
  *
  * ret_attr_p <- Pointer to a void pointer, if not NULL, will be set
  * to the return-address where the pointer was allocated.
+ *
+ * used_mark_p <- Poiner to an unsigned integer which, if not NULL,
+ * will be set to the mark of when the pointer was last "used".  This
+ * could be when it was allocated, reallocated, or freed.
+ *
+ * seen_p <- Poiner to an unsigned long which, if not NULL, will be
+ * set to the number of times that this pointer has been allocated,
+ * realloced, or freed.
  */
-int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
-			char **file_p, unsigned int *line_p,
-			DMALLOC_PNT *ret_attr_p)
+int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
+			DMALLOC_SIZE *total_size_p, char **file_p,
+			unsigned int *line_p, DMALLOC_PNT *ret_attr_p,
+			unsigned long *used_mark_p, unsigned long *seen_p)
 {
   int		ret;
-  unsigned int	size_map;
+  unsigned int	user_size_map, tot_size_map;
+  unsigned long	*loc_seen_p;
+  
+  /*
+   * NOTE: we use the size maps because we use a unsigned int size
+   * type internally but may use some size_t externally.
+   */
   
   /* need to check the heap here since we are geting info from it below */
   if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
@@ -1457,14 +1476,21 @@ int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
   }
   
   /* NOTE: we do not need the alloc-size info */
-  ret = _dmalloc_chunk_read_info(pnt, "dmalloc_examine", &size_map, NULL,
-				 file_p, line_p, ret_attr_p, NULL, NULL, NULL);
+  ret = _dmalloc_chunk_read_info(pnt, "dmalloc_examine", &user_size_map,
+				 &tot_size_map, file_p, line_p, ret_attr_p,
+				 &loc_seen_p, used_mark_p, NULL, NULL);
   
   dmalloc_out();
   
   if (ret) {
-    if (size_p != NULL) {
-      *size_p = size_map;
+    if (user_size_p != NULL) {
+      *user_size_p = user_size_map;
+    }
+    if (total_size_p != NULL) {
+      *total_size_p = tot_size_map;
+    }
+    if (seen_p != NULL) {
+      *seen_p = *loc_seen_p;
     }
     return DMALLOC_NOERROR;
   }

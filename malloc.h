@@ -513,22 +513,35 @@ void	dmalloc_debug_setup(const char *options_str);
  *
  * pnt -> Pointer we are checking.
  *
- * size_p <- Pointer to an unsigned int which, if not NULL, will be
- * set to the size of bytes from the pointer.
+ * user_size_p <- Pointer to a DMALLOC_SIZE type variable which, if
+ * not NULL, will be set to the size of bytes from the pointer.
+ *
+ * total_size_p <- Poiner to a DMALLOC_SIZE type variable which, if
+ * not NULL, will be set to the total size given for this allocation
+ * including administrative overhead.
  *
  * file_p <- Pointer to a character pointer which, if not NULL, will
  * be set to the file where the pointer was allocated.
  *
- * line_p <- Pointer to a character pointer which, if not NULL, will
+ * line_p <- Pointer to an unsigned integer which, if not NULL, will
  * be set to the line-number where the pointer was allocated.
  *
  * ret_attr_p <- Pointer to a void pointer, if not NULL, will be set
  * to the return-address where the pointer was allocated.
+ *
+ * used_mark_p <- Poiner to an unsigned integer which, if not NULL,
+ * will be set to the mark of when the pointer was last "used".  This
+ * could be when it was allocated, reallocated, or freed.
+ *
+ * seen_p <- Poiner to an unsigned long which, if not NULL, will be
+ * set to the number of times that this pointer has been allocated,
+ * realloced, or freed.
  */
 extern
-int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
-			char **file_p, unsigned int *line_p,
-			DMALLOC_PNT *ret_attr_p);
+int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
+			DMALLOC_SIZE *total_size_p, char **file_p,
+			unsigned int *line_p, DMALLOC_PNT *ret_attr_p,
+			unsigned long *used_mark_p, unsigned long *seen_p);
 
 /*
  * void dmalloc_track
