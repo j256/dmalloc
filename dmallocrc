@@ -1,31 +1,31 @@
 #
 # Sample Malloc rc file for the debug malloc library
-# Rename this to .mallocrc and place in your home directory to activate.
-# See malloc.info for more information
+# Rename this to .mallocrc and place in your $HOME directory to
+# activate.  See malloc.info for more information.
 #
-# $Id: dmallocrc,v 1.19 1994/01/20 01:47:13 gray Exp $
+# $Id: dmallocrc,v 1.20 1994/03/03 04:11:57 gray Exp $
 #
 
 #
-# This file maps tags to certain combinations of tokens.  The tags here
-# are only provided as an example.  You are supposed to roll your own.
-# Lines in this file should have the form:
+# This file maps tags to certain combinations of tokens.  The tags
+# here are only provided as an example.  You are supposed to roll your
+# own.  Lines in this file should have the form:
 #
 #	tag	token1, token2, ...
 #
-# To use the above line you say 'malloc_dbg tag' which enables the debugging
-# facilities token1, token2, ...  You must pass the output from malloc_dbg
-# through your shell's eval command to change your environment.  Se
-# malloc.info for more information.
+# To use the above line you say 'malloc_dbg tag' which enables the
+# debugging facilities token1, token2, ...  You must pass the output
+# from malloc_dbg through your shell's eval command to change your
+# environment.  See malloc.info for more information.
 #
-# Lines can be finished with a \ meaning it continues onto the next line.
-# Lines begining with '#' or empty lines are ignored
+# Lines can end with a \ meaning it continues onto the next line.
+# Lines beginning with '#' or empty lines are ignored
 #
 
 #
 # Token:			Description:
 ###########################################################################
-# none				no debuging functionality
+# none				no debugging functionality
 #
 # log-stats			log general statistics
 # log-non-free			log non-freed memory pointers on shutdown
@@ -98,7 +98,7 @@ runtime		log-stats, log-non-free, log-perror, log-blocks, \
 
 # full logging of statistics
 log		log-stats, log-non-free, log-perror, log-trans, log-admin, \
-		log-blocks, log-unknown, log-bad-space, log-unknown, \
+		log-blocks, log-unknown, log-bad-space, \
 		check-fence, \
 		catch-null
 
@@ -115,14 +115,13 @@ text		log-perror, log-bad-space, log-unknown, \
 
 # full logging of statistics in text programs
 verbose		log-stats, log-non-free, log-perror, log-trans, log-admin, \
-		log-blocks, log-unknown, log-bad-space, log-unknown, \
+		log-blocks, log-unknown, log-bad-space, \
 		check-fence, \
 		catch-null, print-perror
 
 # the kitchen-sink
 all		log-stats, log-non-free, log-perror, log-trans, log-stamp, \
 		log-admin, log-blocks, log-unknown, log-bad-space, \
-		log-unknown, \
 		check-fence, check-heap, check-lists, check-free, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
