@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.32 2003/05/15 02:39:29 gray Exp $
+ * $Id: env.c,v 1.33 2003/06/08 05:54:06 gray Exp $
  */
 
 /*
@@ -245,9 +245,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
       (void)strncpy(log_path, this_p, sizeof(log_path));
       log_path[sizeof(log_path) - 1] = '\0';
 #endif
-      if (logpath_p != NULL) {
-	*logpath_p = log_path;
-      }
+      SET_POINTER(logpath_p, log_path);
       continue;
     }
     

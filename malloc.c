@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.168 2003/06/06 21:02:15 gray Exp $
+ * $Id: malloc.c,v 1.169 2003/06/08 05:54:12 gray Exp $
  */
 
 /*
@@ -1483,15 +1483,9 @@ int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
   dmalloc_out();
   
   if (ret) {
-    if (user_size_p != NULL) {
-      *user_size_p = user_size_map;
-    }
-    if (total_size_p != NULL) {
-      *total_size_p = tot_size_map;
-    }
-    if (seen_p != NULL) {
-      *seen_p = *loc_seen_p;
-    }
+    SET_POINTER(user_size_p, user_size_map);
+    SET_POINTER(total_size_p, tot_size_map);
+    SET_POINTER(seen_p, *loc_seen_p);
     return DMALLOC_NOERROR;
   }
   else {
