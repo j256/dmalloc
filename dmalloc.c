@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.100 2001/07/11 18:48:27 gray Exp $
+ * $Id: dmalloc.c,v 1.101 2001/07/12 23:10:31 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.100 2001/07/11 18:48:27 gray Exp $"
+#ident "$Id: dmalloc.c,v 1.101 2001/07/12 23:10:31 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.100 2001/07/11 18:48:27 gray Exp $";
+  "$Id: dmalloc.c,v 1.101 2001/07/12 23:10:31 gray Exp $";
 #endif
 #endif
 
@@ -174,7 +174,7 @@ static	argv_t	args[] = {
   { 'e',	"errno",	ARGV_INT,	&errno_to_print,
     "errno",			"print error string for errno" },
   { 'f',	"file",		ARGV_CHAR_P,	&inpath,
-    "path",			"config if not ~/.mallocrc" },
+    "path",			"config if not $HOME/.dmallocrc" },
   { 'h',	"help",		ARGV_BOOL_INT,	&help_b,
     NULL,			"print help message" },
   { INTERVAL_ARG, "interval",	ARGV_U_LONG,	&interval,
@@ -688,20 +688,20 @@ static	void	list_tags(void)
 static	void	dump_current(void)
 {
   char		*lpath, *start_file, token[64];
+  const char	*env_str;
   DMALLOC_PNT	addr;
   unsigned long	inter;
   long		addr_count;
   int		lock_on, start_line, start_count;
   unsigned int	flags;
   
-  (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
-  (void)fprintf(stderr,
-		"  For a list of the command-line options enter: %s --usage\n",
-		argv_argv[0]);
-  
-  _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
-		       &inter, &lock_on, &lpath,
-		       &start_file, &start_line, &start_count);
+  /* get the options flag */
+  env_str = getenv(OPTIONS_ENVIRON);
+  if (env_str != NULL) {
+    _dmalloc_environ_process(env_str, &addr, &addr_count, &flags,
+			     &inter, &lock_on, &lpath,
+			     &start_file, &start_line, &start_count);
+  }
   
   if (flags == 0) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
@@ -759,6 +759,11 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Start-File   '%s', line = %d\n",
 		  start_file, start_line);
   }
+  
+  (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
+  (void)fprintf(stderr,
+		"  For a list of the command-line options enter: %s --usage\n",
+		argv_argv[0]);
 }
 
 /*
@@ -809,6 +814,7 @@ int	main(int argc, char **argv)
   char		buf[1024];
   int		set_b = 0;
   char		*lpath, *sfile;
+  const char	*env_str;
   DMALLOC_PNT	addr;
   unsigned long	inter;
   long		addr_count;
@@ -841,8 +847,11 @@ int	main(int argc, char **argv)
   }
   
   /* get the current debug information from the env variable */
-  _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags, &inter,
-		       &lock_on, &lpath, &sfile, &sline, &scount);
+  env_str = getenv(OPTIONS_ENVIRON);
+  if (env_str != NULL) {
+    _dmalloc_environ_process(env_str, &addr, &addr_count, &flags, &inter,
+			     &lock_on, &lpath, &sfile, &sline, &scount);
+  }
   
   /*
    * So, if a tag was specified on the command line then we set the
@@ -878,7 +887,7 @@ int	main(int argc, char **argv)
   if (plus.aa_entry_n > 0) {
     int		plus_c;
     for (plus_c = 0; plus_c < plus.aa_entry_n; plus_c++) {
-      debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plus_c));
+      BIT_SET(debug, token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plus_c)));
       set_b = 1;
     }
   }
@@ -886,7 +895,8 @@ int	main(int argc, char **argv)
   if (minus.aa_entry_n > 0) {
     int		minus_c;
     for (minus_c = 0; minus_c < minus.aa_entry_n; minus_c++) {
-      debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minus_c));
+      BIT_CLEAR(debug,
+		token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minus_c)));
       set_b = 1;
     }
   }
