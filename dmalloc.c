@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: dmalloc.c,v 1.81 1998/11/12 16:29:44 gray Exp $
+ * $Id: dmalloc.c,v 1.82 1998/11/12 21:29:32 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.81 1998/11/12 16:29:44 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.82 1998/11/12 21:29:32 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.81 1998/11/12 16:29:44 gray Exp $";
+  "$Id: dmalloc.c,v 1.82 1998/11/12 21:29:32 gray Exp $";
 #endif
 #endif
 
@@ -249,8 +249,8 @@ static	void	dump_debug(const int val)
     /* the below is necessary to handle the 'none' HACK */
     if ((work == 0 && attr_p->at_value == 0)
 	|| (attr_p->at_value != 0
-	    && (work & attr_p->at_value) == attr_p->at_value)) {
-      work &= ~attr_p->at_value;
+	    && BIT_IS_SET(work, attr_p->at_value))) {
+      BIT_CLEAR(work, attr_p->at_value);
       
       if (tok_c == 0) {
 	(void)fprintf(stderr, "   ");
@@ -740,7 +740,7 @@ int	main(int argc, char **argv)
       lock_on = thread_lock_on;
     }
     set_b = TRUE;
-    if (! (flags & DEBUG_ALLOW_NONLINEAR)) {
+    if (! BIT_IS_SET(flags, DEBUG_ALLOW_NONLINEAR)) {
       (void)fprintf(stderr,
 		    "WARNING: the allow-nonlinear flag is not enabled\n");
     }
@@ -777,11 +777,17 @@ int	main(int argc, char **argv)
   }
   
   if (debug_tokens_b) {
-    attr_t	*attr_p;
+    attr_t		*attr_p;
+    unsigned int	left = 0x7fffffff;
+    
     (void)fprintf(stderr, "Debug Tokens:\n");
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
       /* skip any disabled tokens */
       if (attr_p->at_value == 0 && strcmp(attr_p->at_string, "none") != 0) {
+	continue;
+      }
+      if (attr_p->at_value != 0 && (! BIT_IS_SET(left, attr_p->at_value))) {
+	/* skip any tokens we've seen before */
 	continue;
       }
       if (very_verbose_b) {
@@ -796,6 +802,7 @@ int	main(int argc, char **argv)
       else {
 	(void)fprintf(stderr, "%s\n", attr_p->at_string);
       }
+      BIT_CLEAR(left, attr_p->at_value);
     }
   }
   
