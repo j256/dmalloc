@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.186 2003/06/08 19:39:24 gray Exp $
+ * $Id: chunk.c,v 1.187 2003/06/08 21:26:08 gray Exp $
  */
 
 /*
@@ -116,6 +116,9 @@ static	skip_alloc_t	skip_update[MAX_SKIP_LEVEL /* read note ^^ */];
 static	skip_alloc_t	*entry_free_list[MAX_SKIP_LEVEL];
 /* linked list of blocks of the sizes */
 static	entry_block_t	*entry_blocks[MAX_SKIP_LEVEL];
+/* linked list of freed blocks on hold waiting for the FREED_POINTER_DELAY */
+static	skip_alloc_t	*free_wait_list_head = NULL;
+static	skip_alloc_t	*free_wait_list_tail = NULL;
 
 /* administrative structures */
 static	char		fence_bottom[FENCE_BOTTOM_SIZE];
@@ -1376,6 +1379,35 @@ static	skip_alloc_t	*use_free_memory(const unsigned int size,
 {
   skip_alloc_t	*slot_p;
   
+#if FREED_POINTER_DELAY
+  /*
+   * check the free wait list to see if any of the waiting pointers
+   * need to be moved off and inserted into the free list
+   */
+  for (slot_p = free_wait_list_head; slot_p != NULL; ) {
+    skip_alloc_t	*next_p;
+    
+    /* we are done if we find a pointer delay in the future */
+    if (slot_p->sa_use_iter + FREED_POINTER_DELAY > _dmalloc_iter_c) {
+      break;
+    }
+    
+    /* put slot on free list */
+    next_p = slot_p->sa_next_p[0];
+    if (! insert_slot(slot_p, 1 /* free list */)) {
+      /* error dumped in insert_slot */
+      return NULL;
+    }
+    
+    /* adjust our linked list */
+    slot_p = next_p;
+    free_wait_list_head = slot_p;
+    if (slot_p == NULL) {
+      free_wait_list_tail = NULL;
+    }
+  }
+#endif
+  
   /* find a free block which matches the size */ 
   slot_p = find_free_size(size, update_p);
   if (slot_p == NULL) {
@@ -2015,7 +2047,7 @@ int	_dmalloc_chunk_heap_check(void)
 {
   skip_alloc_t	*slot_p;
   entry_block_t	*block_p;
-  int		ret, level_c, checking_free_b = 0;
+  int		ret, level_c, checking_list_c = 0;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     dmalloc_message("checking heap");
@@ -2099,14 +2131,22 @@ int	_dmalloc_chunk_heap_check(void)
      * used pointer slots
      */
     if (slot_p == NULL) {
-      if (checking_free_b) {
+      checking_list_c++;
+      if (checking_list_c == 1) {
+	slot_p = skip_free_list->sa_next_p[0];
+      }
+#if FREED_POINTER_DELAY
+      else if (checking_list_c == 2) {
+	slot_p = free_wait_list_head;
+      }
+#endif
+      else {
+	/* we are done */
 	break;
       }
-      slot_p = skip_free_list->sa_next_p[0];
       if (slot_p == NULL) {
 	break;
       }
-      checking_free_b = 1;
     }
     
     /* better be in the heap */
@@ -2145,11 +2185,11 @@ int	_dmalloc_chunk_heap_check(void)
     }
     
     /* now check the allocation */
-    if (checking_free_b) {
-      ret = check_free_slot(slot_p);
+    if (checking_list_c == 0) {
+      ret = check_used_slot(slot_p, NULL /* no user pnt */);
     }
     else {
-      ret = check_used_slot(slot_p, NULL /* no user pnt */);
+      ret = check_free_slot(slot_p);
     }
     if (! ret) {
       /* error set in check_slot */
@@ -2572,11 +2612,22 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
    */
   
   if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+#if FREED_POINTER_DELAY
+    slot_p->sa_next_p[0] = NULL;
+    if (free_wait_list_head == NULL) {
+      free_wait_list_head = slot_p;
+    }
+    else {
+      free_wait_list_tail->sa_next_p[0] = slot_p;
+    }
+    free_wait_list_tail = slot_p;
+#else
     /* put slot on free list */
     if (! insert_slot(slot_p, 1 /* free list */)) {
       /* error dumped in insert_slot */
       return FREE_ERROR;
     }
+#endif
   }
   
   return FREE_NOERROR;
@@ -2884,11 +2935,11 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 {
   skip_alloc_t	*slot_p;
   pnt_info_t	pnt_info;
-  int		known_b, freed_b, used_b, checking_free_b = 0;
+  int		known_b, freed_b, used_b;
   char		out[DUMP_SPACE * 4], *which_str;
   char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   int		unknown_size_c = 0, unknown_block_c = 0, out_len;
-  int		size_c = 0, block_c = 0;
+  int		size_c = 0, block_c = 0, checking_list_c = 0;
   
   if (log_not_freed_b && log_freed_b) {
     which_str = "not-freed and freed";
@@ -2926,14 +2977,22 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
      * used pointer slots
      */
     if (slot_p == NULL) {
-      if (checking_free_b) {
+      checking_list_c++;
+      if (checking_list_c == 1) {
+	slot_p = skip_free_list->sa_next_p[0];
+      }
+#if FREED_POINTER_DELAY
+      else if (checking_list_c == 2) {
+	slot_p = free_wait_list_head;
+      }
+#endif
+      else {
+	/* we are done */
 	break;
       }
-      slot_p = skip_free_list->sa_next_p[0];
       if (slot_p == NULL) {
 	break;
       }
-      checking_free_b = 1;
     }
     
     freed_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FREE);
