@@ -72,20 +72,11 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.109 1998/09/28 21:36:20 gray Exp $";
+  "$Id: malloc.c,v 1.110 1998/10/08 15:02:43 gray Exp $";
 #endif
 
-/*
- * exported variables
- */
-/*
- * argument to dmalloc_address, if 0 then never call dmalloc_error()
- * else call it after seeing dmalloc_address for this many times.
- */
-int		dmalloc_address_count = ADDRESS_COUNT_INIT;
-
 /* local routines */
-static	int		dmalloc_startup(void);
+static	int	dmalloc_startup(void);
 void		_dmalloc_shutdown(void);
 DMALLOC_PNT	_loc_malloc(const char *file, const int line,
 			    DMALLOC_SIZE size, const int calloc_b,
@@ -106,18 +97,19 @@ int	_dmalloc_examine(const char *file, const int line,
 			 DMALLOC_PNT *ret_attr_p);
 const char	*_dmalloc_strerror(const int error_num);
 
-
 /* local variables */
 static	int		enabled_b	= FALSE; /* have we started yet? */
 static	int		in_alloc_b	= FALSE; /* can't be here twice */
 static	int		do_shutdown_b	= FALSE; /* execute shutdown soon */
 
 /* debug variables */
-static	char		*start_file = START_FILE_INIT; /* file to start at */
-static	int		start_line = START_LINE_INIT; /* line to start */
+static	int		address_seen_n = ADDRESS_COUNT_INIT; /* # stop addr */
+static	char		*start_file = START_FILE_INIT;	/* file to start at */
+static	int		start_line = START_LINE_INIT;	/* line to start */
 static	int		start_count = START_COUNT_INIT; /* start after X */
 static	int		check_interval = INTERVAL_INIT; /* check every X */
-static	int		thread_lock_on = LOCK_ON_INIT;	/* turn locking on */
+static	int		thread_lock_on = LOCK_ON_INIT;	/* start locking when*/
+static	int		thread_lock_c = 0;		/* lock counter */
 
 /****************************** thread locking *******************************/
 
@@ -156,12 +148,14 @@ static THREAD_MUTEX_T dmalloc_mutex;
  * in OSF.  Sigh.
  */
 
-/* mutex lock the malloc library */
+/*
+ * mutex lock the malloc library
+ */
 static	void	thread_lock(void)
 {
 #if LOCK_THREADS
   /* we only lock if the lock-on counter has reached 0 */
-  if (thread_lock_on == 0) {
+  if (thread_lock_c == 0) {
 #if HAVE_PTHREAD_MUTEX_LOCK
     pthread_mutex_lock(&dmalloc_mutex);
 #endif
@@ -175,13 +169,15 @@ static	void	thread_lock(void)
 #endif /* ! LOCK_THREADS */
 }
 
-/* mutex unlock the malloc library */
+/*
+ * mutex unlock the malloc library
+ */
 static	void	thread_unlock(void)
 {
 #if LOCK_THREADS
   /* if the lock-on counter has not reached 0 then count it down */
-  if (thread_lock_on > 0) {
-    thread_lock_on--;
+  if (thread_lock_c > 0) {
+    thread_lock_c--;
     /*
      * As we approach the time when we start mutex locking the
      * library, we need to init the mutex variable.  This sets how
@@ -189,14 +185,14 @@ static	void	thread_unlock(void)
      * taking in account that the init itself might generate a call
      * into the library.  Ugh.
      */
-    if (thread_lock_on == THREAD_INIT_LOCK) {
+    if (thread_lock_c == THREAD_INIT_LOCK) {
 #if HAVE_PTHREAD_MUTEX_INIT
       /* we init instead of the lock point to avoid recursion */
       pthread_mutex_init(&dmalloc_mutex, THREAD_LOCK_INIT_VAL);
 #endif
     }
   }
-  else if (thread_lock_on == 0) {
+  else if (thread_lock_c == 0) {
 #if HAVE_PTHREAD_MUTEX_UNLOCK
     pthread_mutex_unlock(&dmalloc_mutex);
 #endif
@@ -280,20 +276,20 @@ static	int	check_debug_vars(const char *file, const int line)
 static	void	check_pnt(const char *file, const int line, const void *pnt,
 			  const char *label)
 {
-  static int	addc = 0;
+  static int	addr_c = 0;
   
   if (dmalloc_address == ADDRESS_INIT || pnt != dmalloc_address) {
     return;
   }
   
-  addc++;
+  addr_c++;
   _dmalloc_message("address '%#lx' found in '%s' at pass %d from '%s'",
-		   (unsigned long)pnt, label, addc,
+		   (unsigned long)pnt, label, addr_c,
 		   _chunk_display_where(file, line));
   
-  /* NOTE: if dmalloc_address_count == 0 then never quit */
-  if (dmalloc_address_count == ADDRESS_COUNT_INIT
-      || (dmalloc_address_count > 0 && addc >= dmalloc_address_count)) {
+  /* NOTE: if address_seen_n == 0 then never quit */
+  if (address_seen_n == ADDRESS_COUNT_INIT
+      || (address_seen_n > 0 && addr_c >= address_seen_n)) {
     dmalloc_errno = ERROR_IS_FOUND;
     dmalloc_error("check_pnt");
   }
@@ -305,9 +301,10 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
 static	void	process_environ(void)
 {
   _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&dmalloc_address,
-		       &dmalloc_address_count, &_dmalloc_flags,
+		       &address_seen_n, &_dmalloc_flags,
 		       &check_interval, &thread_lock_on, &dmalloc_logpath,
 		       &start_file, &start_line, &start_count);
+  thread_lock_c = thread_lock_on;
   
   /* if it was not set then no flags set */
   if (_dmalloc_flags == (unsigned int)DEBUG_INIT) {
