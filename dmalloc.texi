@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.132 1998/09/19 00:13:23 gray Exp $
+@c $Id: dmalloc.texi,v 1.133 1998/09/19 00:21:31 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -799,7 +799,14 @@ directory as @file{.dmallocrc}.  This allows you to add your own
 combination of debug tokens.  @xref{RC File}.
 
 @item Run your program, examine the logfile that should have been created by
-dmalloc_shutdown, and ta-dah!
+dmalloc_shutdown, and use its information to help debug your program.
+
+@cindex ident
+
+@emph{NOTE}: If a log file has not been created then go back and repeat
+these items carefully.  You may want to use @kbd{ident} or @kbd{strings}
+on your program and @kbd{grep} for @samp{chunk.c,v} to make sure that
+the library is actually getting linked into your program.
 
 @end enumerate
 
