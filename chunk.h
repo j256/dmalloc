@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.61 2001/02/28 05:13:46 gray Exp $
+ * $Id: chunk.h,v 1.62 2001/07/12 22:28:25 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -93,7 +93,7 @@ int	_chunk_check(void);
  *
  * func -> Function string which is checking the pointer.
  *
- * pnt -> Pointer we are checking.
+ * user_pnt -> Pointer we are checking.
  *
  * check -> Type of checking (see chunk.h).
  *
@@ -101,7 +101,7 @@ int	_chunk_check(void);
  * If -1 then do a strlen + 1 for the \0.
  */
 extern
-int	_chunk_pnt_check(const char *func, const void *pnt,
+int	_chunk_pnt_check(const char *func, const void *user_pnt,
 			 const int check, const int min_size);
 
 /*
@@ -119,7 +119,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
  *
  * ARGUMENTS:
  *
- * pnt -> Pointer we are checking.
+ * user_pnt -> Pointer we are checking.
  *
  * where <- Where the check is being made from.
  *
@@ -148,7 +148,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
  * to 1 if the pointer has the fence bit set otherwise 0.
  */
 extern
-int	_chunk_read_info(const void *pnt, const char *where,
+int	_chunk_read_info(const void *user_pnt, const char *where,
 			 unsigned int *size_p,
 			 unsigned int *alloc_size_p, char **file_p,
 			 unsigned int *line_p, void **ret_attr_p,
@@ -172,14 +172,14 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 		       const unsigned int alignment);
 
 /*
- * Frees PNT from the heap.  REALLOC_B set if realloc is freeing a
- * pointer so doing count it as a free.  Returns FREE_ERROR or
+ * Frees USER_PNT from the heap.  REALLOC_B set if realloc is freeing
+ * a pointer so doing count it as a free.  Returns FREE_ERROR or
  * FREE_NOERROR.
  *
  * NOTE: should be above _chunk_realloc which calls it.
  */
 extern
-int	_chunk_free(const char *file, const unsigned int line, void *pnt,
+int	_chunk_free(const char *file, const unsigned int line, void *user_pnt,
 		    const int realloc_b);
 
 /*
@@ -187,7 +187,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
  */
 extern
 void	*_chunk_realloc(const char *file, const unsigned int line,
-			void *old_p, unsigned long new_size,
+			void *old_user_p, unsigned long new_size,
 			const int func_id);
 
 /*

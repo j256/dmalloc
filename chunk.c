@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.172 2001/02/28 05:13:45 gray Exp $
+ * $Id: chunk.c,v 1.173 2001/07/12 22:28:25 gray Exp $
  */
 
 /*
@@ -63,10 +63,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "@(#) $Id: chunk.c,v 1.172 2001/02/28 05:13:45 gray Exp $"
+#ident "@(#) $Id: chunk.c,v 1.173 2001/07/12 22:28:25 gray Exp $"
 #else
 static	char	*rcs_id =
-  "@(#) $Id: chunk.c,v 1.172 2001/02/28 05:13:45 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.173 2001/07/12 22:28:25 gray Exp $";
 #endif
 #endif
 
@@ -1137,65 +1137,6 @@ static	bblock_t	*find_blocks(const void *user_pnt, const int start_b,
   
   bblock_p = bblock_adm_p->ba_blocks + bblock_c;
   
-  if (prev_pp != NULL) {
-    if (bblock_c > 0) {
-      prev_bb_p = bblock_adm_p->ba_blocks + (bblock_c - 1);
-    }
-    
-    /* adjust the last pointer back to start of free block */
-    if (prev_bb_p != NULL
-	&& BIT_IS_SET(prev_bb_p->bb_flags, BBLOCK_START_FREE)) {
-      if (prev_bb_p->bb_block_n <= bblock_c) {
-	prev_bb_p = bblock_adm_p->ba_blocks +
-	  (bblock_c - prev_bb_p->bb_block_n);
-      }
-      else {
-	/* need to go recursive to go bblock_n back, check if at 1st block */
-	tmp = (char *)user_pnt - prev_bb_p->bb_block_n * BLOCK_SIZE;
-	if (IS_IN_HEAP(tmp)) {
-	  /* the prev block before may not be a user block */
-	  prev_bb_p = find_blocks(tmp, 0, NULL, NULL, NULL, NULL, NULL);
-	  if (prev_bb_p == NULL) {
-	    dmalloc_error("find_blocks");
-	    return NULL;
-	  }
-	}
-	else {
-	  prev_bb_p = NULL;
-	}
-      }
-    }
-    
-    *prev_pp = prev_bb_p;
-  }
-  if (next_pp != NULL) {
-    /* next pointer should move past current allocation */
-    if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
-      bblock_n = NUM_BLOCKS(bblock_p->bb_size);
-    }
-    else {
-      bblock_n = 1;
-    }
-    if (bblock_c + bblock_n < BB_PER_ADMIN) {
-      *next_pp = bblock_p + bblock_n;
-    }
-    else {
-      /* need to go recursive to go bblock_n ahead, check if at prev block */
-      tmp = (char *)user_pnt + bblock_n * BLOCK_SIZE;
-      if (! IS_IN_HEAP(tmp)) {
-	*next_pp = NULL;
-      }
-      else {
-	/* the next block may not be a user block */
-	*next_pp = find_blocks(tmp, 0, NULL, NULL, NULL, NULL, NULL);
-	if (*next_pp == NULL) {
-	  dmalloc_error("find_blocks");
-	  return NULL;
-	}
-      }
-    }
-  }
-  
   /* verify that the pointer is either dblock or user allocated */
   if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_DBLOCK)) {
     
@@ -1261,8 +1202,27 @@ static	bblock_t	*find_blocks(const void *user_pnt, const int start_b,
 	  dmalloc_errno = ERROR_NOT_START_USER;
 	  return NULL;
 	}
+	
+	/*
+	 * Find right bblock admin now based on the chunk-pnt.  We
+	 * can't just do a bblock_p-- in case it was at the start of a
+	 * bblock_adm section.
+	 */
+	for (bblock_c = WHICH_BLOCK(chunk_pnt), bblock_adm_p = bblock_adm_head;
+	     bblock_c >= BB_PER_ADMIN && bblock_adm_p != NULL;
+	     bblock_c -= BB_PER_ADMIN, bblock_adm_p = bblock_adm_p->ba_next) {
+	  prev_bb_p = bblock_adm_p->ba_blocks + (BB_PER_ADMIN - 1);
+	}
+	
+	if (bblock_adm_p == NULL) {
+	  dmalloc_errno = ERROR_NOT_FOUND;
+	  return NULL;
+	}
+	
+	bblock_p = bblock_adm_p->ba_blocks + bblock_c;
+	/* this should now point at the start-user block */
       }
-      else if (! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
+      if (! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
 	/* verify that we are at the start of an allocation */
 	dmalloc_errno = ERROR_NOT_START_USER;
 	return NULL;
@@ -1302,6 +1262,65 @@ static	bblock_t	*find_blocks(const void *user_pnt, const int start_b,
     }
   }
   
+  if (prev_pp != NULL) {
+    if (bblock_c > 0) {
+      prev_bb_p = bblock_adm_p->ba_blocks + (bblock_c - 1);
+    }
+    
+    /* adjust the last pointer back to start of free block */
+    if (prev_bb_p != NULL
+	&& BIT_IS_SET(prev_bb_p->bb_flags, BBLOCK_START_FREE)) {
+      if (prev_bb_p->bb_block_n <= bblock_c) {
+	prev_bb_p = bblock_adm_p->ba_blocks +
+	  (bblock_c - prev_bb_p->bb_block_n);
+      }
+      else {
+	/* need to go recursive to go bblock_n back, check if at 1st block */
+	tmp = (char *)user_pnt - prev_bb_p->bb_block_n * BLOCK_SIZE;
+	if (IS_IN_HEAP(tmp)) {
+	  /* the prev block before may not be a user block */
+	  prev_bb_p = find_blocks(tmp, 0, NULL, NULL, NULL, NULL, NULL);
+	  if (prev_bb_p == NULL) {
+	    dmalloc_error("find_blocks");
+	    return NULL;
+	  }
+	}
+	else {
+	  prev_bb_p = NULL;
+	}
+      }
+    }
+    
+    *prev_pp = prev_bb_p;
+  }
+  if (next_pp != NULL) {
+    /* next pointer should move past current allocation */
+    if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
+      bblock_n = NUM_BLOCKS(bblock_p->bb_size);
+    }
+    else {
+      bblock_n = 1;
+    }
+    if (bblock_c + bblock_n < BB_PER_ADMIN) {
+      *next_pp = bblock_p + bblock_n;
+    }
+    else {
+      /* need to go recursive to go bblock_n ahead, check if at prev block */
+      tmp = (char *)user_pnt + bblock_n * BLOCK_SIZE;
+      if (! IS_IN_HEAP(tmp)) {
+	*next_pp = NULL;
+      }
+      else {
+	/* the next block may not be a user block */
+	*next_pp = find_blocks(tmp, 0, NULL, NULL, NULL, NULL, NULL);
+	if (*next_pp == NULL) {
+	  dmalloc_error("find_blocks");
+	  return NULL;
+	}
+      }
+    }
+  }
+  
   if (file_line_b) {
     /* check line number */
     if (line > MAX_LINE_NUMBER) {
@@ -1327,7 +1346,7 @@ static	bblock_t	*find_blocks(const void *user_pnt, const int start_b,
   }
   
   SET_POINTER(fence_bp, fence_b);
-  SET_POINTER(valloc_bp, fence_b);
+  SET_POINTER(valloc_bp, valloc_b);
   return bblock_p;
 }
 
@@ -2346,7 +2365,7 @@ int	_chunk_read_info(const void *user_pnt, const char *where,
   /* find which block it is in */
   bblock_p = find_blocks(user_pnt, 1, NULL, NULL, &dblock_p, &fence_b, NULL);
   if (bblock_p == NULL) {
-    /* errno set in find_bblock */
+    /* errno set in find_block */
     log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
     dmalloc_error("_chunk_read_info");
     return 0;
@@ -2430,19 +2449,22 @@ int	_chunk_read_info(const void *user_pnt, const char *where,
  * Write new FILE, LINE, SIZE info into PNT -- which is in chunk-space
  */
 static	int	chunk_write_info(const char *file, const unsigned int line,
-				 void *user_pnt, const unsigned int size,
+				 void *chunk_pnt, const unsigned int size,
 				 const char *where, const int fence_b)
 {
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
   int		block_n;
+  void		*user_pnt;
   
-  /* NOTE: pnt is already in chunk-space */
+  /* NOTE: pnt is in chunk-space */
+  
+  user_pnt = CHUNK_TO_USER(chunk_pnt, fence_b);
   
   /* find which block it is in */
   bblock_p = find_blocks(user_pnt, 1, NULL, NULL, &dblock_p, NULL, NULL);
   if (bblock_p == NULL) {
-    /* errno set in find_bblock */
+    /* errno set in find_blocks */
     log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, where);
     dmalloc_error("chunk_write_info");
     return 0;
@@ -2934,7 +2956,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *user_pnt,
   bblock_p = find_blocks(user_pnt, 1, &prev_p, &next_p, &dblock_p, &fence_b,
 			 &valloc_b);
   if (bblock_p == NULL) {
-    /* errno set in find_bblock */
+    /* errno set in find_block */
     log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
     dmalloc_error("_chunk_free");
     return FREE_ERROR;
