@@ -1,6 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.35 1994/09/08 14:43:32 gray Exp $
+$Id: NEWS,v 1.36 1994/09/12 17:20:03 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.0.1:
+
+	* Fixed zsh and [t]csh alias messages in documentation.
+	* Renamed _dmalloc_error to dmalloc_error.
+	* Removed time() and getpid() from compat functions.
+	* Changed DMALLOC_DEBUG_DISABLE flag to DMALLOC_DISABLE.
+	* Fixed some include file auto-include messages.
 
 Version 3.0.0:
 

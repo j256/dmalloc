@@ -1,3 +1,22 @@
+Mon Sep 12 13:12:38 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed zsh and [t]csh alias messages in documentation.
+
+	* Added install.sh to distribution per feedback from Francois.
+
+Mon Sep 12 10:07:29 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Renamed _dmalloc_error to dmalloc_error since it is used
+	externally so often.  Sorry folks.
+
+	* Removed time() and getpid() from compat functions.  Moved
+	HAVE_... tests into the code that used them.  Duhhhh.
+
+	* Changed DMALLOC_DEBUG_DISABLE flag to DMALLOC_DISABLE.
+
+	* Fixed some include file auto-include messages from feedback from
+	Francois.
+
 Thu Sep  8 10:07:56 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Releasing version 3.0.0.
@@ -778,5 +797,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.114 1994/09/10 23:26:33 gray Exp $
+$Id: ChangeLog,v 1.115 1994/09/12 17:19:59 gray Exp $
 -------------------------------------------------------------------------------
