@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.6 1993/09/25 18:12:09 gray Exp $
+$Id: NEWS,v 1.7 1993/10/07 04:53:44 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 1.3.4:
 
+	* Fixed compat function problems, added checks for -std1 cc flags.
 	* Fixed debug messages to reflect reality.
 	* Added malloc_debug_current and changed #if __STDC__ -> #ifdef
 	* Removed log-bad-pnt.  What an unnecessary token!
