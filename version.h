@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: version.h,v 1.74 1998/10/22 14:24:09 gray Exp $
+ * $Id: version.h,v 1.75 1998/10/26 14:24:41 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -37,6 +37,6 @@
  */
 static	char	*dmalloc_version = "4.0.3";
 
-/* Version Date: $Date: 1998/10/22 14:24:09 $ */
+/* Version Date: $Date: 1998/10/26 14:24:41 $ */
 
 #endif /* ! __VERSION_H__ */

@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: env.h,v 1.11 1997/12/22 00:32:01 gray Exp $
+ * $Id: env.h,v 1.12 1998/10/26 14:24:36 gray Exp $
  */
 
 #ifndef __ENV_H__

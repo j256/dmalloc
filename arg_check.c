@@ -19,7 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
+ *
+ * $Id: arg_check.c,v 1.18 1998/10/26 14:24:24 gray Exp $
  */
 
 /*
@@ -45,10 +47,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.17 1998/10/15 20:26:03 gray Exp $";
+#ident "$Id: arg_check.c,v 1.18 1998/10/26 14:24:24 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.17 1998/10/15 20:26:03 gray Exp $";
+  "$Id: arg_check.c,v 1.18 1998/10/26 14:24:24 gray Exp $";
 #endif
 #endif
 

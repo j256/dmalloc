@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: heap.h,v 1.32 1998/10/07 18:52:27 gray Exp $
+ * $Id: heap.h,v 1.33 1998/10/26 14:24:39 gray Exp $
  */
 
 #ifndef __HEAP_H__

@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk_loc.h,v 1.50 1998/10/15 20:17:21 gray Exp $
+ * $Id: chunk_loc.h,v 1.51 1998/10/26 14:24:27 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__

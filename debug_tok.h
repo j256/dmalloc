@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: debug_tok.h,v 1.23 1997/12/07 23:17:30 gray Exp $
+ * $Id: debug_tok.h,v 1.24 1998/10/26 14:24:30 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__

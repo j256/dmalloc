@@ -19,7 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
+ *
+ * $Id: heap.c,v 1.49 1998/10/26 14:24:38 gray Exp $
  */
 
 /*
@@ -48,10 +50,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: heap.c,v 1.48 1998/10/15 20:26:13 gray Exp $";
+#ident "$Id: heap.c,v 1.49 1998/10/26 14:24:38 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.48 1998/10/15 20:26:13 gray Exp $";
+  "$Id: heap.c,v 1.49 1998/10/26 14:24:38 gray Exp $";
 #endif
 #endif
 

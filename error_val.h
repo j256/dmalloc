@@ -19,9 +19,9 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error_val.h,v 1.18 1998/09/17 19:26:02 gray Exp $
+ * $Id: error_val.h,v 1.19 1998/10/26 14:24:38 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
