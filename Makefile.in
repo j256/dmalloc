@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.7 1993/01/02 00:17:00 gray Exp $
+# $Id: Makefile.in,v 1.8 1993/01/04 18:32:57 gray Exp $
 #
 
 HFLS	= malloc.h malloc_lp.h
@@ -32,7 +32,7 @@ all : $(LIBRARY) $(UTIL)
 
 .PHONY : clobber
 clobber :
-	rm -f $(LIBRARY) $(TESTS) $(UTIL) part.?
+	rm -f $(LIBRARY) $(TESTS) $(UTIL) part.? malloc.head
 
 .PHONY : distclean
 distclean : clobber
@@ -74,14 +74,27 @@ tests : $(TESTS)
 
 malloc_t : malloc_t.o $(LIBRARY)
 
+malloc.head : malloc.info
+	rm -f $@ $@.t
+	sed -e '/^Malloc Debug Library/,/^   Gray Watson/p' -e 'd' < \
+		malloc.info > $@.t
+	mv $@.t $@
+
 .PHONY : shar
-shar : malloc.info
-	rm -f part*
+shar : malloc.info malloc.head
+	rm -f part.? part.tmp
 	$(foreach part, $(PARTS), \
 		shar -b -n${part} -e${MAXPART} -opart.${part} -t \
 			"Do a 'sh ./configure' to configure the library" \
 			`cat shar.${part}` ; \
 		)
+
+	cat malloc.head > part.tmp
+	echo '' >> part.tmp
+	echo ---------------------------------------------------------------- \
+		>> part.tmp
+	cat part.1 >> part.tmp
+	mv part.tmp part.1
 
 include /usr/antaire/Default.make
 include Makefile.dep
