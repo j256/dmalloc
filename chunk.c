@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.73 1994/04/08 17:52:15 gray Exp $";
+  "$Id: chunk.c,v 1.74 1994/05/11 19:31:57 gray Exp $";
 #endif
 
 /*
@@ -783,7 +783,7 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
 			    const char * file, const unsigned short line)
 {
   bblock_t	*bblockp;
-  dblock_t	*dblockp, *firstp;
+  dblock_t	*dblockp, *firstp, *freep;
   void		*pnt;
   
   /* is there anything on the dblock free list? */
@@ -831,6 +831,7 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
   /* add the rest to the free list (has to be at least 1 other dblock) */
   firstp = dblockp;
   dblockp++;
+  freep = free_dblock[bitn];
   free_dblock[bitn] = dblockp;
   
   for (; dblockp < firstp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
@@ -839,8 +840,8 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
     free_space_count	+= 1 << bitn;
   }
   
-  /* last one points to NULL */
-  dblockp->db_next	= NULL;
+  /* last one points to the free list (probably NULL) */
+  dblockp->db_next	= freep;
   dblockp->db_bblock	= bblockp;
   free_space_count += 1 << bitn;
   
@@ -1635,8 +1636,8 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
  * return some information associated with PNT, returns [NO]ERROR
  */
 EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
-				 char ** file, unsigned int * line,
-				 void ** ret_attr)
+				 unsigned int * alloc_size, char ** file,
+				 unsigned int * line, void ** ret_attr)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
@@ -1685,6 +1686,8 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     /* write info back to user space */
     if (size != NULL)
       *size = dblockp->db_size;
+    if (alloc_size != NULL)
+      *alloc_size = 1 << bblockp->bb_bitn;
     if (file != NULL) {
       if (dblockp->db_line == MALLOC_DEFAULT_LINE)
 	*file = NULL;
@@ -1714,6 +1717,8 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     /* write info back to user space */
     if (size != NULL)
       *size = bblockp->bb_size;
+    if (alloc_size != NULL)
+      *alloc_size = NUM_BLOCKS(bblockp->bb_size) * BLOCK_SIZE;
     if (file != NULL) {
       if (bblockp->bb_line == MALLOC_DEFAULT_LINE)
 	*file = NULL;
@@ -2241,7 +2246,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
 {
   void		*newp, *ret_addr;
   char		*old_file;
-  unsigned int	old_size, size, old_line;
+  unsigned int	old_size, size, old_line, alloc_size;
   unsigned int	old_bitn, new_bitn;
   
   /* counts calls to realloc */
@@ -2271,8 +2276,8 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
    */
   
   /* get info about old pointer */
-  if (_chunk_read_info(oldp, &old_size, &old_file, &old_line, &ret_addr) !=
-      NOERROR)
+  if (_chunk_read_info(oldp, &old_size, &alloc_size, &old_file, &old_line,
+		       &ret_addr) != NOERROR)
     return REALLOC_ERROR;
   
   if (ret_addr != NULL)
@@ -2346,10 +2351,12 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
       return REALLOC_ERROR;
     
     /* overwrite to-be-alloced or non-used portion of memory */
+    size = MIN(new_size, old_size);
+    
+    /* NOTE: using same number of blocks so NUM_BLOCKS works with either */
     if (BIT_IS_SET(_malloc_flags, DEBUG_ALLOC_BLANK)
-	&& (1 << new_bitn) - old_size > 0)
-      (void)memset((char *)newp + old_size, BLANK_CHAR,
-		   (1 << new_bitn) - old_size);
+	&& alloc_size - size > 0)
+      (void)memset((char *)newp + size, BLANK_CHAR, alloc_size - size);
     
     /* write in fence-post info and adjust new pointer over fence info */
     if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FENCE))
