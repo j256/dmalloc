@@ -1,6 +1,20 @@
+2004-07-09  Gray Watson  <gray@outside.256.com>
+
+	* Removed force-linear token because made invalid with mmap
+	addition.
+
+	* Removed the growing up testing and other restrictions for the
+	heap because mmap made it invalid.  Drastically reduced the
+	various up and down macros and associated testing.
+
+	* Added mmap usage inside of the library.  Should it be the
+	default?
+
 2004-07-08  Gray Watson  <gray@outside.256.com>
 
 	* Removed auto-seeding of internal random with variable seed.
+	This was creating random addresses for programs making it hard to
+	debug.
 
 2004-07-01  Gray Watson  <gray@outside.256.com>
 
@@ -2189,5 +2203,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.319 2004/07/08 05:14:34 gray Exp $
+$Id: ChangeLog,v 1.320 2004/07/10 03:49:51 gray Exp $
 -------------------------------------------------------------------------------

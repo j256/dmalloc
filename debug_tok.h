@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.39 2004/01/14 16:17:57 gray Exp $
+ * $Id: debug_tok.h,v 1.40 2004/07/10 03:49:52 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -56,7 +56,7 @@
 #define DEBUG_CHECK_SHUTDOWN	BIT_FLAG(15)	/* check pointers on shutdown*/
 
 /* misc */
-#define DEBUG_FORCE_LINEAR	BIT_FLAG(16)	/* force linear heap */
+/* 16 available - 20040709 */
 #define DEBUG_CATCH_SIGNALS	BIT_FLAG(17)	/* catch HUP, INT, and TERM */
 /* 18,19 used above */
 #define DEBUG_REALLOC_COPY	BIT_FLAG(20)	/* copy all reallocations */
@@ -110,8 +110,6 @@ __attribute__ ((unused))
   { "check-funcs",	DEBUG_CHECK_FUNCS,	"check functions" },
   { "check-shutdown",	DEBUG_CHECK_SHUTDOWN,	"check heap on shutdown" },
   
-  { "force-linear",	DEBUG_FORCE_LINEAR,
-    "force heap space to be linear" },
   { "catch-signals",	DEBUG_CATCH_SIGNALS,
     "shutdown program on SIGHUP, SIGINT, SIGTERM" },
   { "realloc-copy",	DEBUG_REALLOC_COPY,	"copy all re-allocations" },
@@ -147,6 +145,8 @@ __attribute__ ((unused))
     "Disbaled because of new heap organization" },
   { "check-lists",	0,
     "Disabled -- removed with new heap organization" },
+  { "force-linear",	0,
+    "Disabled -- removed with new mmap usage" },
   
   { NULL }
 };

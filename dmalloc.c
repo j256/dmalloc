@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.113 2004/01/16 14:04:53 gray Exp $
+ * $Id: dmalloc.c,v 1.114 2004/07/10 03:49:52 gray Exp $
  */
 
 /*
@@ -979,10 +979,6 @@ int	main(int argc, char **argv)
   if (argv_was_used(args, THREAD_LOCK_ON_ARG)) {
     lock_on = thread_lock_on;
     set_b = 1;
-    if (BIT_IS_SET(debug, DEBUG_FORCE_LINEAR)) {
-      (void)fprintf(stderr,
-		    "WARNING: the force-linear flag is enabled\n");
-    }
   }
   else if (clear_b) {
     lock_on = 0;

@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.255 2004/07/08 04:57:01 gray Exp $
+@c $Id: dmalloc.texi,v 1.256 2004/07/10 03:49:52 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1585,12 +1585,14 @@ pointer from a different source than @code{malloc}.
 @cindex error code 22
 @cindex cannot locate pointer in heap
 @cindex ERROR_NOT_FOUND
+@cindex mmap
+@cindex sbrk
 
 @item 22 (ERROR_NOT_FOUND)
 Cannot locate pointer in heap.  The user passed in a pointer which the
 heap did not know about.  Either this pointer was allocated by some
-other mechanism (like @code{sbrk} directly) or it is a random invalid
-pointer.
+other mechanism (like @code{mmap} or @code{sbrk} directly) or it is a
+random invalid pointer.
 
 In some rare circumstances, sometimes seen with shared libraries, there
 can be two separate copies of the dmalloc library in a program.  Each
@@ -2011,15 +2013,17 @@ commands initially to load in dmalloc and other library symbols:
 
 @cindex diagnosing errors
 @cindex general errors
+@cindex mmap
 @cindex sbrk
 
-If your program stops at the @code{dmalloc_error()} routine then one of
-a number of problems could be happening.  Incorrect arguments could have
-been passed to a malloc call: asking for negative number of bytes,
-trying to realloc a non-heap pointer, etc..  There also could be a
-problem with the system's allocations: you've run out of memory, some
-other function in your program is using @code{sbrk}, etc.  However, it
-is most likely that some code that has been executed was naughty.
+If your program stops at the @code{dmalloc_error()} routine then one
+of a number of problems could be happening.  Incorrect arguments could
+have been passed to a malloc call: asking for negative number of
+bytes, trying to realloc a non-heap pointer, etc..  There also could
+be a problem with the system's allocations: you've run out of memory,
+some other function in your program is using the heap allocation
+functions @code{mmap} or @code{sbrk}, etc..  However, it is most
+likely that some code that has been executed was naughty.
 
 To get more information about the problem, first print via the debugger
 the dmalloc_errno variable to get the library's internal error code.
@@ -3144,18 +3148,6 @@ for bad pointers.
 @item check-shutdown
 Check all of the pointers in the heap when the program exits.
 
-@cindex force-linear
-@cindex sbrk
-@cindex ERROR_ALLOC_NONLINEAR
-@item force-linear
-Have the heap complain when additional program functionality seems to
-have made use of the system's heap-allocation routine @code{sbrk}
-directly behind the dmalloc library's back.  This is disabled by default
-since an increasing number of operating system functions seem to be
-doing this -- especially pthread libraries.  If this is enabled, and
-non-linear memory is returned, the @code{ERROR_ALLOC_NONLINEAR} error
-will be triggered.
-
 @cindex catch-signals
 @cindex signal shutdown
 @cindex shutdown on signal
@@ -3183,18 +3175,18 @@ Always copy data to a new pointer when realloc.
 @cindex octal 337 character
 @cindex 337 character
 @cindex 0337 character
-@cindex hex 0xdf character
+@cindex hexadecimal 0xdf character
 @cindex 0xdf character
 @cindex df character
 @cindex free-blank
 @cindex ERROR_FREE_OVERWRITTEN
 @item free-blank
-Write special ``dmalloc-free'' byte (hex 0xdf, octal 0337, decimal 223)
-into space when it is freed.  You can set this to be something else in
-the @file{settings.dist} file.  You can then check to see if areas have
-been improperly overwritten with the @code{check-blank} token.  If the
-free space has been overwritten, then ERROR_FREE_OVERWRITTEN is
-triggered.
+Write special ``dmalloc-free'' byte (hexadecimal @code{0xdf}, octal
+@code{0337}, decimal @code{223}) into space when it is freed.  You can
+set this to be something else in the @file{settings.dist} file.  You
+can then check to see if areas have been improperly overwritten with
+the @code{check-blank} token.  If the free space has been overwritten,
+then ERROR_FREE_OVERWRITTEN is triggered.
 
 @cindex dump core
 @cindex core dump
@@ -3211,25 +3203,27 @@ Abort the program (and dump core) on errors.  See @code{error-dump} below.
 @cindex octal 332 character
 @cindex 332 character
 @cindex 0332 character
-@cindex hex 0xda character
+@cindex hexadecimal 0xda character
 @cindex 0xda character
 @cindex da character
 @cindex alloc-blank
 @item alloc-blank
-Write special ``dmalloc-alloc'' byte (octal 0xda, octal 0332, decimal
-218) into space when it is allocated.  You can set this to be something
-else in the @file{settings.dist} file.  You can then check to see if
-areas have been improperly overwritten with the check-blank token.
+Write special ``dmalloc-alloc'' byte (hexadecimal @code{0xda}, octal
+@code{0332}, decimal @code{218}) into space when it is allocated.  You
+can set this to be something else in the @file{settings.dist} file.
+You can then check to see if areas have been improperly overwritten
+with the check-blank token.
 
 @cindex print-messages
 @item print-messages
 Log any errors and messages to the screen via standard-error.
 
+@cindex mmap
 @cindex sbrk
 @cindex catch-null
 @item catch-null
 Abort the program immediately if the library fails to get more heap
-space from sbrk.
+space from the heap allocation routine @code{mmap} or @code{sbrk}.
 
 @cindex never-reuse
 @item never-reuse
@@ -3430,10 +3424,11 @@ General portability issues center around:
 
 @itemize @bullet
 @item
+@cindex mmap, usage without
 @cindex sbrk, usage without
 @cindex preallocated memory heap
 @cindex INTERNAL_MEMORY_SPACE
-sbrk or compatible function usages.  The library does support a
+mmap, sbrk, or compatible function usages.  The library does support a
 preallocated memory chunk heap.  See the @code{INTERNAL_MEMORY_SPACE}
 define in the @file{settings.dist} file.
 

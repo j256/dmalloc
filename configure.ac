@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.25 2004/01/31 16:21:27 gray Exp $
+# $Id: configure.ac,v 1.26 2004/07/10 03:49:52 gray Exp $
 #
-AC_REVISION($Revision: 1.25 $)
+AC_REVISION($Revision: 1.26 $)
 AC_INIT(dmalloc, 5.3.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -68,23 +68,23 @@ AC_C_CONST
 # we need this for various settings
 AC_HEADER_STDC
 AC_CHECK_HEADER([stdarg.h],
-		[AC_SUBST([HAVE_STDARG_H],1)],
-		[AC_SUBST([HAVE_STDARG_H],0)])
+		[AC_DEFINE(HAVE_STDARG_H,1) AC_SUBST([HAVE_STDARG_H],1)],
+		[AC_DEFINE(HAVE_STDARG_H,0) AC_SUBST([HAVE_STDARG_H],0)])
 AC_CHECK_HEADER([stdlib.h],
-		[AC_SUBST([HAVE_STDLIB_H],1)],
-		[AC_SUBST([HAVE_STDLIB_H],0)])
+		[AC_DEFINE(HAVE_STDLIB_H,1) AC_SUBST([HAVE_STDLIB_H],1)],
+		[AC_DEFINE(HAVE_STDLIB_H,0) AC_SUBST([HAVE_STDLIB_H],0)])
 AC_CHECK_HEADER([string.h],
-		[AC_SUBST([HAVE_STRING_H],1)],
-		[AC_SUBST([HAVE_STRING_H],0)])
+		[AC_DEFINE(HAVE_STRING_H,1) AC_SUBST([HAVE_STRING_H],1)],
+		[AC_DEFINE(HAVE_STRING_H,0) AC_SUBST([HAVE_STRING_H],0)])
 AC_CHECK_HEADER([unistd.h],
-		[AC_SUBST([HAVE_UNISTD_H],1)],
-		[AC_SUBST([HAVE_UNISTD_H],0)])
+		[AC_DEFINE(HAVE_UNISTD_H,1) AC_SUBST([HAVE_UNISTD_H],1)],
+		[AC_DEFINE(HAVE_UNISTD_H,0) AC_SUBST([HAVE_UNISTD_H],0)])
 AC_CHECK_HEADER([sys/types.h],
-		[AC_SUBST([HAVE_SYS_TYPES_H],1)],
-		[AC_SUBST([HAVE_SYS_TYPES_H],0)])
+		[AC_DEFINE(HAVE_SYS_TYPES_H,1) AC_SUBST([HAVE_SYS_TYPES_H],1)],
+		[AC_DEFINE(HAVE_SYS_TYPES_H,0) AC_SUBST([HAVE_SYS_TYPES_H],0)])
 AC_CHECK_HEADER([sys/mman.h],
-		[AC_SUBST([HAVE_SYS_MMAN_H],1)],
-		[AC_SUBST([HAVE_SYS_MMAN_H],0)])
+		[AC_DEFINE(HAVE_SYS_MMAN_H,1) AC_SUBST([HAVE_SYS_MMAN_H],1)],
+		[AC_DEFINE(HAVE_SYS_MMAN_H,0) AC_SUBST([HAVE_SYS_MMAN_H],0)])
 
 ###############################################################################
 # shared library handling
@@ -199,9 +199,11 @@ fi
 #
 AC_MSG_CHECKING([dmalloc size unsigned])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <sys/types.h>
+#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
 #if HAVE_STDLIB_H
-#include <stdlib.h>
+#  include <stdlib.h>
 #endif
 main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
 ]])],
@@ -216,7 +218,7 @@ main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
 AC_MSG_CHECKING([strdup macro])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_STDLIB_H
-#include <string.h>
+#  include <string.h>
 #endif
 
 #ifdef strdup
@@ -237,8 +239,12 @@ AC_MSG_RESULT([$ac_cv_strdup_macro])
 AC_CHECK_FUNCS(mprotect)
 AC_MSG_CHECKING([mprotect works])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-#include <sys/types.h>
-#include <sys/mman.h>
+#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#if HAVE_SYS_MMAN_H
+#  include <sys/mman.h>
+#endif
 ]],[[
   int prot = PROT_NONE | PROT_READ | PROT_WRITE;
   (void)mprotect(0, 0, prot);
@@ -250,34 +256,35 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 ##############################################################################
 AC_MSG_NOTICE([important functionality])
 
+AC_CHECK_FUNCS(mmap)
 AC_CHECK_FUNCS(sbrk)
-if test $ac_cv_func_sbrk = no; then
+
+if test x$ac_cv_func_mmap != xyes && x$ac_cv_func_sbrk != xyes; then
 	AC_MSG_WARN()
-	AC_MSG_WARN(WARNING: no sbrk function.  See INTERNAL_MEMORY_SPACE in settings.dist.)
+	AC_MSG_WARN(WARNING: no mmap nor sbrk function.  See INTERNAL_MEMORY_SPACE in settings.dist.)
 	AC_MSG_WARN()
-	AC_DEFINE(HEAP_GROWS_UP, 1)
-else
-	#
-	# heap growing up
-	#
-	AC_MSG_CHECKING([heap grows])
-	AC_RUN_IFELSE([
-		#define SBRK_AMOUNT	(32 * 1024)
-		main() {
-		  char *first, *next;
-		  first = (char *)sbrk(SBRK_AMOUNT);
-		  next = (char *)sbrk(SBRK_AMOUNT);
-		  if (next > first)
-		    _exit(0);
-		  else
-		    _exit(1);
-		}
-	],
-	[ AC_DEFINE(HEAP_GROWS_UP, 1) AC_MSG_RESULT([up]) ],
-	[ AC_DEFINE(HEAP_GROWS_UP, 0) AC_MSG_RESULT([down]) ],
-	[ AC_DEFINE(HEAP_GROWS_UP, 1) AC_MSG_RESULT([up]) ]
-	)
 fi
+
+AC_MSG_CHECKING([mmap usage])
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#if HAVE_SYS_MMAN_H
+#  include <sys/mman.h>
+#endif
+main() {
+  void *ret = mmap(0L, 10, PROT_READ | PROT_WRITE | PROT_EXEC,
+	           MAP_PRIVATE | MAP_ANON, -1 /* no fd */, 0 /* no offset */);
+  if (ret == MAP_FAILED) { exit(1); }
+  else { exit(0); }
+}
+]])],
+[ AC_DEFINE(USE_MMAP, 1) ac_cv_use_mmap=yes],
+[ AC_DEFINE(USE_MMAP, 0) ac_cv_use_mmap=no],
+[ AC_DEFINE(USE_MMAP, 0) ac_cv_use_mmap=no]
+)
+AC_MSG_RESULT([$ac_cv_use_mmap])
 
 #
 # check for basic block size
@@ -368,8 +375,13 @@ main() { main_b = 1; abort(); _exit(1); }
 
 AC_TYPE_SIGNAL
 AC_MSG_CHECKING([signal works])
+AC_CHECK_HEADER([signal.h],
+		[AC_DEFINE(HAVE_SIGNAL_H,1) AC_SUBST([HAVE_SIGNAL_H],1)],
+		[AC_DEFINE(HAVE_SIGNAL_H,0) AC_SUBST([HAVE_SIGNAL_H],0)])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-	#include <signal.h>
+#if HAVE_SIGNAL_H
+  #include <signal.h>
+#endif
 ]], [[
 	(void)signal(SIGHUP, SIG_IGN);
 	(void)signal(SIGINT, SIG_IGN);
@@ -430,15 +442,16 @@ main() { malloc(10); _exit(0); }
 
 # now check to see if we can replace getenv with GetEnvironmentVariableA
 AC_CHECK_HEADER([sys/cygwin.h],
-		[AC_SUBST([HAVE_SYS_CYGWIN_H],1)],
-		[AC_SUBST([HAVE_SYS_CYGWIN_H],0)])
+		[AC_DEFINE(HAVE_SYS_CYGWIN_H,1) AC_SUBST([HAVE_SYS_CYGWIN_H],1)],
+		[AC_DEFINE(HAVE_SYS_CYGWIN_H,0) AC_SUBST([HAVE_SYS_CYGWIN_H],0)])
 AC_CHECK_HEADER([w32api/windef.h],
-		[AC_SUBST([HAVE_W32API_WINDEF_H],1)],
-		[AC_SUBST([HAVE_W32API_WINDEF_H],0)])
+		[AC_DEFINE(HAVE_W32API_WINDEF_H,1) AC_SUBST([HAVE_W32API_WINDEF_H],1)],
+		[AC_DEFINE(HAVE_W32API_WINDEF_H,0) AC_SUBST([HAVE_W32API_WINDEF_H],0)])
 AC_CHECK_HEADER([w32api/winbase.h],
-		[AC_SUBST([HAVE_W32API_WINBASE_H],1)],
-		[AC_SUBST([HAVE_W32API_WINBASE_H],0)],
-		[[#if HAVE_W32API_WINDEF_H
+		[AC_DEFINE(HAVE_W32API_WINBASE_H,1) AC_SUBST([HAVE_W32API_WINBASE_H],1)],
+		[AC_DEFINE(HAVE_W32API_WINBASE_H,0) AC_SUBST([HAVE_W32API_WINBASE_H],0)],
+		[[
+#if HAVE_W32API_WINDEF_H
 # include <w32api/windef.h>
 #endif]])
 AC_MSG_CHECKING([for GetEnvironmentVariableA])
@@ -556,7 +569,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.25 2004/01/31 16:21:27 gray Exp $"
+#ident "$Id: configure.ac,v 1.26 2004/07/10 03:49:52 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -569,17 +582,22 @@ AC_MSG_NOTICE([pthread particulars])
 XX_OLD_LIBS=$LIBS
 
 AC_SEARCH_LIBS(pthread_mutex_init, pthread pthreads c_r)
-AC_CHECK_HEADERS(pthread.h pthreads.h)
+AC_CHECK_HEADER([pthread.h],
+		[AC_DEFINE(HAVE_PTHREAD_H,1) AC_SUBST([HAVE_PTHREAD_H],1)],
+		[AC_DEFINE(HAVE_PTHREAD_H,0) AC_SUBST([HAVE_PTHREAD_H],0)])
+AC_CHECK_HEADER([pthreads.h],
+		[AC_DEFINE(HAVE_PTHREADS_H,1) AC_SUBST([HAVE_PTHREADS_H],1)],
+		[AC_DEFINE(HAVE_PTHREADS_H,0) AC_SUBST([HAVE_PTHREADS_H],0)])
 
 AC_CHECK_FUNCS(pthread_mutex_init pthread_mutex_lock pthread_mutex_unlock)
 
 AC_MSG_CHECKING([pthread mutex type])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_PTHREAD_H
-#include <pthread.h>
+#  include <pthread.h>
 #endif
 #if HAVE_PTHREADS_H
-#include <pthreads.h>
+#  include <pthreads.h>
 #endif
 ]],[[
    pthread_mutex_t dmalloc_mutex;
@@ -591,10 +609,10 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 AC_MSG_CHECKING([pthread attribute initialization])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_PTHREAD_H
-#include <pthread.h>
+#  include <pthread.h>
 #endif
 #if HAVE_PTHREADS_H
-#include <pthreads.h>
+#  include <pthreads.h>
 #endif
 ]], [[
 	THREAD_MUTEX_T dmalloc_mutex;

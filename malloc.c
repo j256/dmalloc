@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.180 2004/07/01 15:34:18 gray Exp $
+ * $Id: malloc.c,v 1.181 2004/07/10 03:49:52 gray Exp $
  */
 
 /*
@@ -77,7 +77,7 @@
 #endif
 #endif
 
-#if SIGNAL_OKAY
+#if SIGNAL_OKAY && HAVE_SIGNAL_H
 #include <signal.h>
 #endif
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.95 2004/01/31 16:20:40 gray Exp $
+ * $Id: conf.h.in,v 1.96 2004/07/10 03:49:52 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -42,16 +42,24 @@
  * routine that most systems employ.  This extends the program's data
  * space by INCR number of bytes.
  *
- * NOTE: If configure generates a 0 for this on your system, you
- * should see the INTERNAL_MEMORY_SPACE setting in the settings.h file
- * which is created from the settings.dist file.
+ * NOTE: If configure generates a 0 for this and HAVE_MMAP on your
+ * system, you should see the INTERNAL_MEMORY_SPACE setting in the
+ * settings.h file which is created from the settings.dist file.
  */
 #define HAVE_SBRK 0
 
 /*
- * Does your heap grow up or down?
+ * (void *)mmap(...) is another heap-memory allocation routine that
+ * systems employ.  On newer systems it is often preferable over sbrk.
+ * It allocates a block of memory in the virtual-memory system.  The
+ * USE_MMAP define is set if the standard mmap call works.
+ *
+ * NOTE: If configure generates a 0 for this and HAVE_SBRK on your
+ * system, you should see the INTERNAL_MEMORY_SPACE setting in the
+ * settings.h file which is created from the settings.dist file.
  */
-#define HEAP_GROWS_UP 1
+#define HAVE_MMAP 0
+#define USE_MMAP 0
 
 /*
  * This is the basic block size in bits.  If possible, the configure
@@ -59,11 +67,9 @@
  * function.  If not then some sort of best guess will be necessary.
  * 14 (meaning basic block size of 16k) will probably be good.
  *
- * NOTE: some sbrk functions round to the correct page-size.  If this
- * value is too low, the dmalloc library may think someone is using
- * sbrk behind its back and return a ERROR_ALLOC_NONLINEAR error
- * (#18).  No problems aside from a possible small increase in the
- * administration overhead should happen if this value is too high.
+ * NOTE: some sbrk functions round to the correct page-size.  No
+ * problems aside from a possible small increase in the administration
+ * overhead should happen if this value is too high.
  */
 #define BASIC_BLOCK 12
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.114 2004/07/01 15:35:57 gray Exp $
+ * $Id: dmalloc_t.c,v 1.115 2004/07/10 03:49:52 gray Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
  */
 #include "debug_tok.h"
 #include "error_val.h"
+#include "heap.h"				/* for external testing */
 
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
@@ -253,10 +254,8 @@ static	int	do_random(const int iter_n)
     
     if (random_debug_b) {
       unsigned int	new_flag;
-      do {
-	which = _dmalloc_rand() % (sizeof(int) * 8);
-	new_flag = 1 << which;
-      } while (new_flag == DEBUG_FORCE_LINEAR);
+      which = _dmalloc_rand() % (sizeof(int) * 8);
+      new_flag = 1 << which;
       flags ^= new_flag;
       if (verbose_b) {
 	(void)printf("%d: debug flags = %#x\n", iter_c + 1, flags);
@@ -445,20 +444,18 @@ static	int	do_random(const int iter_n)
       
       /* sbrk */
     case 5:
-#if HAVE_SBRK
       /* do it less often then the other functions */
       which = _dmalloc_rand() % 5;
       if (which == 3) {
 	void	*mem;
 	
-	mem = sbrk(amount);
+	mem = _dmalloc_heap_alloc(amount);
 	if (verbose_b) {
-	  (void)printf("%d: sbrk'd %d of max %d bytes.  got %#lx\n",
+	  (void)printf("%d: heap alloc %d of max %d bytes.  got %#lx\n",
 		       iter_c + 1, amount, max_avail, (long)mem);
 	}
 	/* don't store the memory */
       }
-#endif
       continue;
       break;
       
@@ -1988,6 +1985,75 @@ static	int	check_special(void)
  
   /********************/
   
+  /*
+   * Check block rounding by sbrk.
+   */
+  {
+    unsigned long	size;
+    unsigned int	old_flags = dmalloc_debug_current();
+    
+    if (! silent_b) {
+      (void)printf("  Checking block-size alignment rounding\n");
+    }
+    
+    /* enable never-reuse and disable fence checking */
+    dmalloc_debug((old_flags | DEBUG_NEVER_REUSE) & (~DEBUG_CHECK_FENCE));
+    
+    size = BLOCK_SIZE / 2 + 1;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    if ((unsigned long)pnt % BLOCK_SIZE != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
+		     size);
+      }
+      return 0;
+    }
+    free(pnt);
+    
+    /*
+     * Now we'll allocate some pitifully small chunk from the heap
+     * allocator and it should return a good pointer.  In the future
+     * it should re-align the heap.
+     */
+
+    size = 10;
+    pnt = _dmalloc_heap_alloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not heap-alloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    size = BLOCK_SIZE / 2 + 1;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    if ((unsigned long)pnt % BLOCK_SIZE != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
+		     size);
+      }
+      return 0;
+    }
+    free(pnt);
+    
+    /* restore flags */
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+
   /*
    * NOTE: add tests which should result in errors before the -------
    * message above

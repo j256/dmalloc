@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.203 2004/06/30 12:59:24 gray Exp $
+ * $Id: chunk.c,v 1.204 2004/07/10 03:49:51 gray Exp $
  */
 
 /*
@@ -454,16 +454,8 @@ static	int	insert_slot(skip_alloc_t *slot_p, const int free_b)
  *
  * level_n -> Number of the level we are looking for.  Set to 0 to
  * have it be chosen at random.
- *
- * extern_mem_pp <- Pointer to a void * which will be set to a chunk
- * of memory that was allocated externally and needs to be accounted
- * for.
- *
- * extern_np <- Pointer to an integer which will be set to the number
- * of blocks in the external memory chunk.
  */
-static	void	*alloc_slots(const int level_n, void **extern_mem_pp,
-			     int *extern_np)
+static	void	*alloc_slots(const int level_n)
 {
   skip_alloc_t	*new_p;
   entry_block_t	*block_p;
@@ -475,7 +467,7 @@ static	void	*alloc_slots(const int level_n, void **extern_mem_pp,
   }
   
   /* we need to allocate a new block of the slots of this level */
-  block_p = _dmalloc_heap_alloc(BLOCK_SIZE, extern_mem_pp, extern_np);
+  block_p = _dmalloc_heap_alloc(BLOCK_SIZE);
   if (block_p == NULL) {
     /* error code set in _dmalloc_heap_alloc */
     return NULL;
@@ -604,8 +596,8 @@ static	int	remove_slot(skip_alloc_t *delete_p, skip_alloc_t *update_p)
 static	skip_alloc_t	*get_slot(void)
 {
   skip_alloc_t	*new_p;
-  int		level_n, extern_n, slot_size;
-  void		*admin_mem, *extern_mem;
+  int		level_n, slot_size;
+  void		*admin_mem;
   
   /* generate the level for our new slot */
   level_n = random_level(MAX_SKIP_LEVEL);
@@ -628,19 +620,16 @@ static	skip_alloc_t	*get_slot(void)
    * So we are trying to get a slot of a certain size to store
    * something in a skip list.  We didn't have any on the free-list so
    * now we will allocate a block.  We allocate a block of memory to
-   * hold the slots and we might note that there was an external use
-   * of sbrk.  This means that we may need 2 of the new slots to
-   * account for the admin and external memory in addition to the 1
-   * requested.
+   * hold the slots meaning that we may need 1 new slot to account for
+   * the admin and external memory in addition to the 1 requested.
    *
    * To do it right, would take a recursive call to get_slot which I
-   * am not willing to do so we will have 2 blocks in a row (sometimes
-   * 3) which have the same height.  This is less than efficient but
-   * oh well.
+   * am not willing to do so we will have 2 blocks in a row which have
+   * the same height.  This is less than efficient but oh well.
    */
   
   /* add in all of the unused slots to the linked list */
-  admin_mem = alloc_slots(level_n, &extern_mem, &extern_n);
+  admin_mem = alloc_slots(level_n);
   if (admin_mem == NULL) {
     /* error code set in alloc_slots */
     return NULL;
@@ -668,37 +657,6 @@ static	skip_alloc_t	*get_slot(void)
   if (! insert_slot(new_p, 0 /* used list */)) {
     /* error reported above */
     return NULL;
-  }
-  
-  /*
-   * if we got any external blocks when we did our allocation then
-   * account for them
-   */
-  if (extern_n > 0) {
-    /* get one for the admin memory */
-    new_p = entry_free_list[level_n];
-    if (new_p == NULL) {
-      /*
-       * HUH?  This isn't right.  We should have created a whole bunch
-       * of addresses
-       */
-      dmalloc_errno = ERROR_ADDRESS_LIST;
-      dmalloc_error("get_slot");
-      return NULL;
-    }
-    entry_free_list[level_n] = new_p->sa_next_p[0];
-    memset(new_p, 0, slot_size);
-    new_p->sa_flags = ALLOC_FLAG_EXTERN;
-    new_p->sa_mem = extern_mem;
-    new_p->sa_total_size = extern_n * BLOCK_SIZE;
-    new_p->sa_level_n = level_n;
-    extern_block_c++;
-    
-    /* now put it in the used list */
-    if (! insert_slot(new_p, 0 /* used list */)) {
-      /* error reported above */
-      return NULL;
-    }
   }
   
   /* now get one for the user */
@@ -770,49 +728,6 @@ static	skip_alloc_t	*insert_address(void *address, const int free_b,
   }
   
   return new_p;
-}
-
-/*
- * static void *allocate_memory
- *
- * DESCRIPTION:
- *
- * Allocate memory on the heap and account for external blocks.
- *
- * RETURNS:
- *
- * Success - Valid slot pointer.
- *
- * Failure - NULL
- *
- * ARGUMENTS:
- *
- * size -> Size of the memory that we want to allocate.
- */
-static	void	*allocate_memory(const unsigned int size)
-{
-  skip_alloc_t	*slot_p;
-  void		*mem, *extern_mem;
-  int		extern_n;
-  
-  /* allocate the memory and record if there were any external blocks */
-  mem = _dmalloc_heap_alloc(size, &extern_mem, &extern_n);
-  if (mem == HEAP_ALLOC_ERROR) {
-    /* error code set in _dmalloc_heap_alloc */
-    return NULL;
-  }
-  
-  if (extern_n > 0) {
-    slot_p = insert_address(extern_mem, 0 /* used */, extern_n * BLOCK_SIZE);
-    if (slot_p == NULL) {
-      /* error code set in insert_address */
-      return NULL;
-    }
-    /* set the flags to be external memory */ 
-    slot_p->sa_flags = ALLOC_FLAG_EXTERN;
-  }
-  
-  return mem;
 }
 
 /******************************* misc routines *******************************/
@@ -1208,9 +1123,8 @@ static	void	log_error_info(const char *now_file,
   
   /* find the previous pointer in case it ran over */
   if (dmalloc_errno == ERROR_UNDER_FENCE && start_user != NULL) {
-    (void)find_address((char *)start_user - FENCE_BOTTOM_SIZE - 1,
-		       1 /* not exact pointer */, skip_update);
-    other_p = skip_update->sa_next_p[0];
+    other_p = find_address((char *)start_user - FENCE_BOTTOM_SIZE - 1,
+			   1 /* not exact pointer */, skip_update);
     if (other_p != NULL) {
       dmalloc_message("  prev pointer '%#lx' (size %u) may have run over from '%s'",
 		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
@@ -1223,9 +1137,9 @@ static	void	log_error_info(const char *now_file,
   else if (dmalloc_errno == ERROR_OVER_FENCE
 	   && start_user != NULL
 	   && slot_p != NULL) {
-    other_p = slot_p->sa_next_p[0];
-    /* a user_size of 0 could be admin information */
-    if (other_p != NULL && other_p->sa_user_size > 0) {
+    other_p = find_address((char *)slot_p->sa_mem + slot_p->sa_total_size,
+			   1 /* not exact pointer */, skip_update);
+    if (other_p != NULL) {
       dmalloc_message("  next pointer '%#lx' (size %u) may have run under from '%s'",
 		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
 		      _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
@@ -1385,8 +1299,9 @@ static	int	create_divided_chunks(const unsigned int div_size)
   void		*mem, *bounds_p;
   
   /* allocate a 1 block chunk that we will cut up into pieces */
-  mem = allocate_memory(BLOCK_SIZE);
+  mem = _dmalloc_heap_alloc(BLOCK_SIZE);
   if (mem == HEAP_ALLOC_ERROR) {
+    /* error code set in _dmalloc_heap_alloc */
     return 0;
   }
   user_block_c++;
@@ -1624,8 +1539,9 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
   }
   
   /* allocate the memory necessary for the new blocks */
-  mem = allocate_memory(need_size);
+  mem = _dmalloc_heap_alloc(need_size);
   if (mem == HEAP_ALLOC_ERROR) {
+    /* error code set in _dmalloc_heap_alloc */
     return NULL;
   }
   user_block_c += block_n;
@@ -1703,7 +1619,8 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
    * block aligned otherwise the chunk_pnt should be.
    */
   if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC)) {
-    if (! ON_BLOCK(pnt_info.pi_user_start)) {
+    
+    if ((long)pnt_info.pi_user_start % BLOCK_SIZE != 0) {
       dmalloc_errno = ERROR_NOT_ON_BLOCK;
       return 0;
     }
@@ -2898,24 +2815,22 @@ void	_dmalloc_chunk_log_stats(void)
   overhead = admin_block_c * BLOCK_SIZE;
   
   /* version information */
-  dmalloc_message("basic-block %d bytes, alignment %d bytes, heap grows %s",
-		  BLOCK_SIZE, ALLOCATION_ALIGNMENT,
-		  (HEAP_GROWS_UP ? "up" : "down"));
+  dmalloc_message("basic-block %d bytes, alignment %d bytes",
+		  BLOCK_SIZE, ALLOCATION_ALIGNMENT);
   
   /* general heap information with blocks */
   dmalloc_message("heap address range: %#lx to %#lx, %ld bytes",
-		  (unsigned long)_dmalloc_heap_base,
-		  (unsigned long)_dmalloc_heap_last, (long)HEAP_SIZE);
+		  (unsigned long)_dmalloc_heap_low,
+		  (unsigned long)_dmalloc_heap_high,
+		  (unsigned long)_dmalloc_heap_high -
+		  (unsigned long)_dmalloc_heap_low);
   dmalloc_message("    user blocks: %ld blocks, %ld bytes (%ld%%)",
-		  user_block_c, tot_space,
-		  (HEAP_SIZE == 0 ? 0 : tot_space / (HEAP_SIZE / 100)));
+		  user_block_c, tot_space, /* XXX */ 0L);
   dmalloc_message("   admin blocks: %ld blocks, %ld bytes (%ld%%)",
-		  admin_block_c, overhead,
-		  (HEAP_SIZE == 0 ? 0 : overhead / (HEAP_SIZE / 100)));
+		  admin_block_c, overhead, /* XXX */ 0L);
   ext_space = extern_block_c * BLOCK_SIZE;
   dmalloc_message("external blocks: %ld blocks, %ld bytes (%ld%%)",
-		  extern_block_c, ext_space,
-		  (HEAP_SIZE == 0 ? 0 : ext_space / (HEAP_SIZE / 100)));
+		  extern_block_c, ext_space, /* XXX */ 0L);
   tot_space = (user_block_c + admin_block_c + extern_block_c) * BLOCK_SIZE;
   dmalloc_message("   total blocks: %ld blocks, %ld bytes",
 		  user_block_c + admin_block_c + extern_block_c, tot_space);
