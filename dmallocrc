@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.12 1993/07/19 16:32:03 gray Exp $
+# $Id: dmallocrc,v 1.13 1993/07/19 18:56:45 gray Exp $
 #
 
 #
@@ -43,13 +43,13 @@
 # check-free			check to see if free space has been overwritten
 # check-funcs			check the arguments of some routines
 #
-# alloc-blank			overwrite space that is to be alloced
-# error-abort			abort the program (and dump core) on errors
-# catch-null			abort program if library can't get sbrk space
+# realloc-copy			always copy data to a new pointer when realloc
 # free-blank			overwrite space that is freed
+# error-abort			abort the program (and dump core) on errors
+# alloc-blank			overwrite space that is to be alloced
 # heap-check-map		log a heap-map every time the heap is checked
 # print-perror			dump errors and messages to STDERR
-# realloc-copy			always copy data to a new pointer when realloc
+# catch-null			abort program if library can't get sbrk space
 #
 
 # no debugging
@@ -103,6 +103,7 @@ log		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 # the kitchen-sink
 all		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, log-unknown, log-bad-space, \
-		check-fence, check-heap, check-lists, check-free, check-funcs \
-		alloc-blank, catch-null, error-abort, free-blank, \
-		heap-check-map, print-perror, realloc-copy
+		check-fence, check-heap, check-lists, check-free, \
+		check-funcs, \
+		realloc-copy, free-blank, error-abort, alloc-blank, \
+		heap-check-map, print-perror, catch-null

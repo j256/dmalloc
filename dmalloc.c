@@ -47,10 +47,11 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.18 1993/07/19 16:31:57 gray Exp $";
+  "$Id: dmalloc.c,v 1.19 1993/07/19 18:56:43 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
+#define SHELL_ENVIRON	"SHELL"			/* for the type of shell */
 #define DEFAULT_CONFIG	"%s/.mallocrc"		/* default config file */
 #define TOKENIZE_CHARS	" \t,="			/* for tag lines */
 
@@ -63,6 +64,7 @@ LOCAL	char	printed		= FALSE;	/* did we outputed anything? */
 /* argument variables */
 LOCAL	char	*address	= NULL;		/* for ADDRESS */
 LOCAL	char	bourne		= FALSE;	/* set bourne shell output */
+LOCAL	char	cshell		= FALSE;	/* set c-shell output */
 LOCAL	char	clear		= FALSE;	/* clear variables */
 LOCAL	int	debug		= NO_VALUE;	/* for DEBUG */
 LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
@@ -80,6 +82,9 @@ LOCAL	argv_t	args[] = {
       "address:#",		"stop when malloc sees address" },
   { 'b',	"bourne",	ARGV_BOOL,	&bourne,
       NULL,			"set output for bourne shells" },
+  { ARGV_OR },
+  { 'C',	"c-shell",	ARGV_BOOL,	&cshell,
+      NULL,			"set output for C-type shells)" },
   { 'c',	"clear",	ARGV_BOOL,	&clear,
       NULL,			"clear all variables not set" },
   { 'd',	"debug-mask",	ARGV_HEX,	&debug,
@@ -104,6 +109,41 @@ LOCAL	argv_t	args[] = {
       "tag",			"debug token to find in rc" },
   { ARGV_LAST }
 };
+
+/*
+ * list of bourne shells
+ */
+LOCAL	char	*sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
+
+/*
+ * try a check out the shell env variable to see what form of shell
+ * commands we should output
+ */
+LOCAL	void	choose_shell(void)
+{
+  char	*shell, *shellp;
+  int	shellc;
+  
+  shell = (char *)getenv(SHELL_ENVIRON);
+  if (shell == NULL) {
+    cshell = TRUE;
+    return;
+  }
+  
+  shellp = (char *)rindex(shell, '/');
+  if (shellp == NULL)
+    shellp = shell;
+  else
+    shellp++;
+  
+  for (shellc = 0; sh_shells[shellc] != NULL; shellc++)
+    if (strcmp(sh_shells[shellc], shellp) == 0) {
+      bourne = TRUE;
+      return;
+    }
+  
+  cshell = TRUE;
+}
 
 /*
  * hexadecimal STR to long translation
@@ -383,6 +423,10 @@ EXPORT	int	main(int argc, char ** argv)
   argv_version_string = malloc_version;
   
   argv_process(args, argc, argv);
+  
+  /* try to figure out the shell we are using */
+  if (! bourne && ! cshell)
+    choose_shell();
   
   /* get a new debug value from tag */
   if (tag != NULL) {

@@ -1,5 +1,8 @@
 Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Added Dave Hill's idea of auto-sensing of shell by malloc_dbg.
+	Also added -C option to malloc_dbg to force cshell output.
+
 	* Removed the dblock checking tokens CHECK_DBLOCK and
 	CHECK_DB_FENCE for a couple different reasons.  I never liked them
 	anyway!  I also renumbered CHECK_FREE and CHECK_FUNCS in the
