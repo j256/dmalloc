@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.16 1993/06/19 18:50:25 gray Exp $
+$Id: Manifest,v 1.17 1993/06/26 21:16:09 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -17,7 +17,7 @@ NOTES			General Notes of the malloc routines and
 
 README			Quick startup notes.
 
-TTD			Things To Do list.  It only gets longer and
+TODO			Things to do list.  It only gets longer and
 			longer.
 
 chunk.[ch]		Lower level allocation routines.  This is the

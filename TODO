@@ -1,0 +1,121 @@
+-------------------------------------------------------------------------------
+$Id: TODO,v 1.1 1993/06/26 21:16:11 gray Exp $
+-------------------------------------------------------------------------------
+
+IMPORTANT:
+
+- completely rework the bblock allocation:
+	- need to remove the bit restriction and maintain the free lists
+		as some sort of gradient list:
+		blocks 1-10 have their own bucket
+		blocks 11-100 have buckets for each 10
+		blocks 101+ have 1 bucket for all
+	- maybe but the administration information at the front of the block
+		well buffered with magic numbers and such.
+	- this would reduce if not remove the need for the block-based
+		administrative information
+	- be able to break up bigger blocks of memory into small ones
+- fix the dblock-admin structures to pack them into the same block as their
+	allocations.  So for 8 byte allocationes in a 4k blocksize there
+	would be 256 user-allocation slots and 256 admin slots.  Yeach but
+	a LOT cleaner than current code.
+	- there is then the possibility of reducing the db-overhead to 6 bytes
+		with some sort of file hash-table.  File-names would hash
+		into some 1 byte value and then will be maintained in a list
+		somewhere.  Maybe??
+
+-------------------------------------------------------------------------------
+
+CHECKING:
+
+- check in heap_check the cleared space above each allocation instead of
+	only the fence posts
+- maybe write the address % 256 into bytes instead of a constant
+	- maybe it would slow it down.
+	- a token/option?
+	- \305 is recognizable however
+- another token to have the library never reclaim memory, always extend the
+	heap (i.e. don't use free lists at all)
+	- this would grow into an enormous heap however.
+- maybe add another debug level which stores crc information about internal
+	heap structures and verifies it during run time.  slow, slow!!
+- think of ways we can reorganize the heap and move allocations around
+	since problems sometimes pop-up with different heap organizations:
+
+	- pick a random slot from the free-list not just the first entry
+	- add new list of dblocks in reverse order to the free-lists or
+		randomly disperse
+	- maybe when allocating for a block of X bits, get 2 blocks or
+		some allocation factor
+	- maybe some sort of compact heap orientation like ndt organization.
+	- maybe generate some magical value which corresponds to the
+		orientation becasue you want to be able to reproduce the error
+
+-------------------------------------------------------------------------------
+
+GENERAL:
+
+- provide support for reference counts on allocations:
+	- have a call which increments the reference count of the node
+	- free will decrement the reference count and free if 0
+	- have a call which reports on the reference count of the node
+	- may need additional admin space
+	- debug token?
+- maybe have bit in allocation struct somewhere that it is a string and
+	maybe have a checking level/value that runs though the strings
+	and makes sure they have a NULL in them.
+- have a function that summaries the memory usage per file.  runs through
+	the unfreed pointers and keeps a table per file.c in terms of number
+	of pointers and bytes per file.  Could be a perl script.
+- for fence underflow, print out the allocation below and for fence overflow
+	the allocation above if possible
+- add __builtin_return_value support for higher gcc versions (2.2.0+)
+- have either a bunch of free or used bblocks be:
+	- start block and then a set of continuation blocks
+	- this would mean we do not have to hit each bblock entry to redo
+		the type flag
+- handle memalign, valloc, maybe some form of mallopt
+- maybe use getpagesize (mach_dep.c) to determine BASIC block size
+- handle 0 length allocations correctly if the #define is set
+	- i.e. maybe give back a small section with bounds-checking touching
+- manage dblock_admin entries better
+	- map out usage and get some stats
+	- add to normal db_free lists, zero out each of the entries.  if they
+		are both zero or some magic X then we need to get more bblock
+		space for the dblocks.
+- maybe make malloc_dbg use no stdio so no unwanted memory allocations.
+- turn realloc into an intelligent beasty that looks on either side
+	of existing chunk (if expanding) for free space and manages free-lists
+	appropriately
+
+-------------------------------------------------------------------------------
+
+TESTING / STATISTICS:
+
+- need to write a set of fully automated test programs
+	- maybe start with a test shell like malloc_t but stripped and then
+		run a script through it and analyse the output
+	- should be a killer that does a million hits
+- test define for allowing 0 length defines
+- test define for realloc(NULL)
+- check out situation where sbrk calls return ERROR (from the beginning and
+	in the middle).  the library should return NULL's straight off and
+	log appropriate errors.
+- add free-list statistics whenever it gets more memory to see the viability of
+	dividing larger free entries in two
+- add statistics whenever it frees memory to see the viability of combining
+	adjacent blocks
+- maybe a program that would try a standard set of tests on a number of
+	different combinations of debug-values to look for dependancies.
+
+-------------------------------------------------------------------------------
+
+RMS comments:
+
+- integrate into gnu-malloc
+- change the bit-flags into the functionality strings themselves
+- get rid of the malloc_dbg program and the mallocrc file (too "hairy")
+- integrate __builtin_return_address functionality from gcc gdb command
+	'info line *ADDRESS' to get file/line
+
+-------------------------------------------------------------------------------
