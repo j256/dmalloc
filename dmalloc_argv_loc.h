@@ -16,15 +16,15 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv_loc.h,v 1.6 1999/03/04 16:31:22 gray Exp $
+ * $Id: dmalloc_argv_loc.h,v 1.7 1999/03/08 15:52:32 gray Exp $
  */
 
-#ifndef __DMALLOC_ARGV_LOC_H__
-#define __DMALLOC_ARGV_LOC_H__
+#ifndef __ARGV_LOC_H__
+#define __ARGV_LOC_H__
 
-#include "dmalloc_argv.h"		/* to get the types */
+#include "argv.h"			/* to get the types */
 
 /*
  * some compilation options
@@ -93,32 +93,6 @@
 #define GLOBAL_USAGE		"usage="	/* usage setting */
 #define GLOBAL_LASTTOG		"lasttog="	/* last-arg toggle */
 
-#define GLOBAL_CLOSE_DISABLE	1		/* disable close args */
-#define GLOBAL_CLOSE_ENABLE	2		/* enable close args */
-
-#define GLOBAL_ENV_NONE		3		/* no env processing */
-#define GLOBAL_ENV_BEFORE	4		/* process env before args */
-#define GLOBAL_ENV_AFTER	5		/* process env after args */
-
-#define GLOBAL_USAGE_SEE	6		/* see messages (special) */
-#define GLOBAL_USAGE_SHORT	7		/* print short */
-#define GLOBAL_USAGE_SHORTREM	8		/* short + remind */
-#define GLOBAL_USAGE_LONG	9		/* long */
-#define GLOBAL_USAGE_ALL	10		/* all */
-
-#define GLOBAL_MULTI_REJECT	11		/* reject multiple arg use */
-#define GLOBAL_MULTI_ACCEPT	12		/* accept multiple arg use */
-
-#define GLOBAL_LASTTOG_DISABLE	13		/* toggling of last-arg off */
-#define GLOBAL_LASTTOG_ENABLE	14		/* toggling of last-arg on */
-
-#define GLOBAL_ERROR_NONE	15		/* print only error */
-#define GLOBAL_ERROR_SEE	GLOBAL_USAGE_SEE /* error + see messages */
-#define GLOBAL_ERROR_SHORT	GLOBAL_USAGE_SHORT /* error + short */
-#define GLOBAL_ERROR_SHORTREM	GLOBAL_USAGE_SHORTREM /* err + short + remind*/
-#define GLOBAL_ERROR_LONG	GLOBAL_USAGE_LONG /* err + long */
-#define GLOBAL_ERROR_ALL	GLOBAL_USAGE_ALL /* err + all */
-
 /* special argument definitions */
 #define LAST_ARG		"--"		/* arg to mark end of args */
 #define LONG_PREFIX		"--"		/* prefix for long args */
@@ -168,58 +142,66 @@
 
 #define HAS_ARG(type)	(! (ARGV_TYPE(type) == ARGV_BOOL \
 			    || ARGV_TYPE(type) == ARGV_BOOL_NEG \
-			    || ARGV_TYPE(type) == ARGV_INCR))
+			    || ARGV_TYPE(type) == ARGV_INCR \
+			    || ARGV_TYPE(type) == ARGV_BOOL_INT \
+			    || ARGV_TYPE(type) == ARGV_BOOL_INT_NEG))
 
 /******************************** argv types *********************************/
 
 /* strcture defining argv types */
 typedef struct {
   unsigned int	at_value;		/* value of the type */
-  char		*at_name;		/* name of the type */
+  const char	*at_name;		/* name of the type */
   unsigned int	at_size;		/* size of type */
-  char		*at_desc;		/* description of the type */
+  const char	*at_desc;		/* description of the type */
 } argv_type_t;
 
 static	argv_type_t	argv_types[] = {
   { ARGV_BOOL,		"flag",			sizeof(char),
-      "if option used, set variable to true" },
+    "if option used, set variable to 1" },
   { ARGV_BOOL_NEG,	"negative flag",	sizeof(int),
-      "if option used, set variable to false" },
+    "if option used, set variable to 0" },
   { ARGV_BOOL_ARG,	"flag with arg",	sizeof(char),
-      "like flag but you specify with yes/no argument" },
+    "like boolean but with an argument, true/yes/1 sets var to 1" },
   { ARGV_CHAR,		"character",		sizeof(char),
-      "single character" },
+    "single character" },
   { ARGV_CHAR_P,	"string",		sizeof(char *),
-      "multiple characters terminated with a '\\0'" },
+    "multiple characters terminated with a '\\0'" },
   { ARGV_SHORT,		"short integer",	sizeof(short),
-      "decimal short-sized integer value" },
+    "decimal short-sized integer value" },
   { ARGV_U_SHORT,	"unsigned short integer", sizeof(unsigned short),
-      "decimal unsigned short-sized integer value" },
+    "decimal unsigned short-sized integer value" },
   { ARGV_INT,		"integer",		sizeof(int),
-      "decimal integer value" },
+    "decimal integer value" },
   { ARGV_U_INT,		"unsigned integer",	sizeof(unsigned int),
-      "decimal unsigned integer value" },
+    "decimal unsigned integer value" },
   { ARGV_LONG,		"long integer",		sizeof(long),
-      "decimal long-sized integer value" },
+    "decimal long-sized integer value" },
   { ARGV_U_LONG,	"unsigned long",	sizeof(unsigned long),
-      "decimal unsigned long-sized integer value" },
+    "decimal unsigned long-sized integer value" },
   { ARGV_FLOAT,		"floating point",	sizeof(float),
-      "real number with decimal point" },
+    "real number with decimal point" },
   { ARGV_DOUBLE,	"double floating point", sizeof(double),
-      "double precision real number with decimal point" },
+    "double precision real number with decimal point" },
   { ARGV_BIN,		"binary",		sizeof(int),
-      "base 2 value with digits of 0 or 1" },
+    "base 2 value with digits of 0 or 1" },
   { ARGV_OCT,		"octal",		sizeof(int),
-      "base 8 value with digits from 0-7" },
+    "base 8 value with digits from 0-7" },
   { ARGV_HEX,		"hexadecimal",		sizeof(int),
-      "base 16 value with digits from 0-9, A-F" },
+    "base 16 value with digits from 0-9, A-F" },
   { ARGV_INCR,		"increment",		sizeof(int),
-      "increment variable each time option used" },
+    "increment variable each time option used" },
   { ARGV_SIZE,		"long size",		sizeof(long),
-      "size as long int + [bkmg] b=byte,k=kilo,m=meg,g=gig" },
+    "size as long int + [bkmg] b=byte,k=kilo,m=meg,g=gig" },
   { ARGV_U_SIZE,	"unsigned long size",	sizeof(unsigned long),
-      "size as unsigned long int + [bkmg] b=byte,k=kilo,m=meg,g=gig" },
+    "size as unsigned long int + [bkmg] b=byte,k=kilo,m=meg,g=gig" },
+  { ARGV_BOOL_INT,	"integer boolean",	sizeof(int),
+    "if option used, set integer variable to 1" },
+  { ARGV_BOOL_INT_NEG,	"integer boolean",	sizeof(int),
+    "if option used, set integer variable to 0" },
+  { ARGV_BOOL_INT_ARG,	"integer boolean",	sizeof(int),
+    "like boolean but with an argument, true/yes/1 sets integer var to 1" },
   { 0 }
 };
 
-#endif /* ! __DMALLOC_ARGV_LOC_H__ */
+#endif /* ! __ARGV_LOC_H__ */

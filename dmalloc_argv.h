@@ -16,13 +16,13 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://www.dmalloc.com/
+ * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv.h,v 1.6 1999/03/04 16:31:20 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.7 1999/03/08 15:52:31 gray Exp $
  */
 
-#ifndef __DMALLOC_ARGV_H__
-#define __DMALLOC_ARGV_H__
+#ifndef __ARGV_H__
+#define __ARGV_H__
 
 /*
  * Version string for the library
@@ -31,14 +31,14 @@
  * NEWS entries *must* be entered and 2 entries in argv.texi must be
  * updated.
  *
- * ARGV LIBRARY VERSION -- 2.3.1
+ * ARGV LIBRARY VERSION -- 2.4.0
  */
 
 /* produced by configure, inserted into argv.h */
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.6 1999/03/04 16:31:20 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.7 1999/03/08 15:52:31 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments
@@ -66,11 +66,11 @@
  * { 'c',  "config",  ARGV_CHAR_P,  &config,  "file",  "configuration file" }
  */
 typedef struct {
-  char		ar_short_arg;		/* the char of the arg, 'd' if '-d' */
-  char		*ar_long_arg;		/* long version of arg, 'delete' */
+  char		ar_short_arg;		/* short argument, 'd' if '-d' */
+  char		*ar_long_arg;		/* long version of arg, '--delete' */
   unsigned int	ar_type;		/* type of option, see values below */
-  ARGV_PNT	ar_variable;		/* address of variable that is arg */
-  char		*ar_var_label;		/* label for variable descriptions */
+  ARGV_PNT	ar_variable;		/* address of associated variable */
+  char		*ar_var_label;		/* label for variable description */
   char		*ar_comment;		/* comment for usage message */
 } argv_t;
 
@@ -156,6 +156,9 @@ typedef struct {
 #define ARGV_INCR	17		/* int arg which gets ++ each time */
 #define ARGV_SIZE	18		/* long arg which knows mMbBkKgG */
 #define ARGV_U_SIZE	19		/* u_long arg which knows mMbBkKgG */
+#define ARGV_BOOL_INT	20		/* like bool but takes an integer var*/
+#define ARGV_BOOL_INT_NEG 21		/* like bool-neg but with an integer */
+#define ARGV_BOOL_INT_ARG 22		/* like bool-arg but with an integer */
 
 #define ARGV_TYPE(t)	((t) & 0x3F)	/* strip off all but the var type */
 #define ARGV_FLAG_ARRAY	(1 << 14)	/* OR with type to indicate array */
@@ -163,9 +166,13 @@ typedef struct {
 /* NOTE: other internal flags defined in argv_loc.h */
 
 /* argv_usage which argument values */
+#define ARGV_USAGE_NONE		0	/* no usage messages -- special */
 #define ARGV_USAGE_SHORT	1	/* print short usage messages */
 #define ARGV_USAGE_LONG		2	/* print long-format usage messages */
 #define ARGV_USAGE_DEFAULT	3	/* default usage messages */
+#define ARGV_USAGE_SEE		4	/* say see --usage for more info */
+#define ARGV_USAGE_SHORT_REM	5	/* short + reminder how to get long */
+#define ARGV_USAGE_ALL		6	/* all usage information */
 
 /* boolean type settings */
 #define ARGV_FALSE		0
@@ -198,7 +205,7 @@ char	*argv_version_string;
  * false to return error codes instead.
  */
 extern
-char 	argv_interactive;
+int 	argv_interactive;
 
 /*
  * The FILE stream that argv out_puts all its errors.  Set to NULL to
@@ -208,74 +215,324 @@ extern
 FILE 	*argv_error_stream;
 
 /*
- * Processes ARGC number of arguments from ARGV depending on argument
- * info array ARGS (if null then an empty array is used).  This
- * routine will not modify the argv array in any way.
+ * Set to 1 (the default) to enable the handling of -l=foo or
+ * --logfile=foo type of arguments.  Set to 0 to disable.  This allows
+ * you to specifically assign a value to an argument.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_close_enable_b;
+
+/*
+ * If the library sees a "--" argument, it will turn off further
+ * argument process.  Set to 1 to enable the ability of specifying
+ * additional "--" arguments to reenable (basically toggle on then
+ * off) argument processing.  Set to 0 (the default) to disable this
+ * behavior.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_last_toggle_b;
+
+/*
+ * Set to 1 (the default) to have the library accept multiple usage of
+ * the same argument.  Set to 0 to have the library generate an error
+ * if you use an argument twice.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_multi_accept_b;
+
+/*
+ * Set to one of the ARGV_USAGE_ defines in the argv.h file.  This
+ * tell the library what usage information to display when --usage is
+ * specified by the user.  Default is ARGV_USAGE_LONG.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_usage_type;
+
+/*
+ * Set to one of the ARGV_USAGE_ defines in the argv.h file.  This
+ * tell the library what usage information to display when an error is
+ * encountered.  The usage information accompanies the error message.
+ * Default is ARGV_USAGE_SEE.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_error_type;
+
+/*
+ * Set to 1 (the default) if you want the library look for associated
+ * arguments from the associated program's environmental variable.  If
+ * set the 0 then no environmental variable will be used.  If you are
+ * running program foo then the library will look for the
+ * environmental variable ARGV_foo and will add those to the argument
+ * list specified on the command line.  By default they will be
+ * inserted in front of those on the command line unless the
+ * argv_env_after_b is set to 1.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_process_env_b;
+
+/*
+ * Set to 1 if you want the library to append the arguments from the
+ * program's environmental variable after those specified on the
+ * command line.  If set the 0 (the default) then they will be
+ * inserted before those specified on the command line.  See
+ * argv_process_env_b for more information.
+ *
+ * NOTE: this is set by argv_process automatically.  If you do not
+ * want this behavior, you should use argv_process_no_env.
+ */
+extern
+int	argv_env_after_b;
+
+/*
+ * int argv_process_no_env
+ *
+ * DESCRIPTION:
+ *
+ * Process the user arguments with an argv_t structure array.  Like
+ * argv_process_args but without the processing of the argv
+ * environmental variables.
+ *
+ * RETURNS:
+ *
+ * Success - 0
+ *
+ * Failure - -1
+ *
+ * ARGUMENTS:
+ *
+ * args - Array of argv_t structures.
+ *
+ * arg_c - Number of arguments in the argv array.
+ *
+ * argv - Array of character pointers terminated by 0L.
+ */
+extern
+int	argv_process_no_env(argv_t *args, const int arg_c, char **argv);
+
+/*
+ * int argv_process
+ *
+ * DESCRIPTION:
+ *
+ * Processes a number of arguments depending on the argument array.
+ * This routine will not modify the argv array in any way.
  *
  * NOTE: it will modify the args array by setting various flags in the
  * type field.  returns 0 if no error else -1.
+ *
+ * ARGUMENTS:
+ *
+ * args - Array of argv_t structures that we are using to process the
+ * user argument array.  If null then an empty array is used.
+ *
+ * argc - Number of arguments in the argv argument array.
+ *
+ * argv - Array of character pointer arguments terminated by a 0L.
  */
 extern
 int	argv_process(argv_t *args, const int argc, char **argv);
 
 /*
- * Processes arguments sent in via the STRING that a web-server might
- * send to program in ARG0.  Use DELIM to set up the delimiters of the
- * arguments in the string.  query_string processing should have "&"
- * and path_info should have "/".  You may want to add "=" if you use
- * arg=value.  The '=' delimiter is treated as special so //x=// will
- * strip the extra /'s in a row but will create a null argument for x.
+ * int argv_usage
  *
- * WARNING: you cannot use argv_copy_args after this is called because a
- * temporary grid is created.  returns 0 on noerror else -1.
- */
-extern
-int	argv_web_process_string(argv_t *args, const char *arg0,
-				const char *string, const char *delim);
-
-/*
- * Processes arguments sent in via the QUERY_STRING environmental
- * variable that a web-server might send to program in ARG0.  Returns
- * 0 on noerror else -1.
- */
-extern
-int	argv_web_process(argv_t *args, const char *arg0);
-
-/*
- * Print the standard usage messages for argument array ARGS (if null
- * then an empty array is used).  WHICH chooses between long or short
- * messages (see argv.h).
+ * DESCRIPTION:
  *
- * NOTE: if this is called before argv_process then the program name may
- * be messed up.
+ * Print the standard usage messages for our argument array.  You can
+ * specify whether you want to see a short or long usage messages.
+ *
+ * NOTE: if this is called before argv_process then the program name
+ * may be invalid.
+ *
+ * RETURNS:
+ *
+ * Success - 0
+ *
+ * Failure - -1
+ *
+ * ARGUMENTS:
+ *
+ * args - Our argument array to print the usage messages about.  If
+ * null then an empty array is used.
+ *
+ * which - Either ARGV_USAGE_SHORT (for short usage messages),
+ * ARGV_USAGE_LONG (for long usage messages), or ARGV_USAGE_DEFAULT
+ * (the user's default either long or short).
  */
 extern
 int	argv_usage(const argv_t *args, const int which);
 
 /*
- * See if ARG argument was used in a previous call to argv_process on
- * ARGS.  Returns 1 if yes else 0.
+ * int argv_was_used
+ *
+ * DESCRIPTION:
+ *
+ * See if an argument was used in a previous call to argv_process.
+ *
+ * RETURNS:
+ *
+ * 1 if yes it was used, else 0 if not.
+ *
+ * ARGUMENTS:
+ *
+ * args - Argument list to search.
+ *
+ * short_arg - Short argument to see if it was used.
  */
 extern
-int	argv_was_used(const argv_t *args, const char arg);
+int	argv_was_used(const argv_t *args, const char short_arg);
 
 /*
- * Frees up any allocations in ARGS that may have been done by
+ * int argv_long_was_used
+ *
+ * DESCRIPTION:
+ *
+ * See if a long argument was used in a previous call to argv_process.
+ *
+ * RETURNS:
+ *
+ * 1 if yes it was used, else 0 if not.
+ *
+ * ARGUMENTS:
+ *
+ * args - Argument list to search.
+ *
+ * long_arg - Long argument to see if it was used.
+ */
+extern
+int	argv_long_was_used(const argv_t *args, const char *long_arg);
+
+/*
+ * int argv_entry_was_used
+ *
+ * DESCRIPTION:
+ *
+ * See if an entry in the argument array was used in a previous call
+ * to argv_process.
+ *
+ * RETURNS:
+ *
+ * 1 if yes it was used, else 0 if not.
+ *
+ * ARGUMENTS:
+ *
+ * argv_entry_p - Pointer to an entry in a argv_t list.
+ */
+extern
+int	argv_entry_was_used(const argv_t *argv_entry_p);
+
+/*
+ * void argv_cleanup
+ *
+ * DESCRIPTION:
+ *
+ * Frees up any allocations associated with the argument array during
  * argv_process.  This should be done at the end of the program or
  * after all the arguments have been referenced.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * args - Argument array we are cleaning up.
  */
 extern
 void	argv_cleanup(const argv_t *args);
 
 /*
- * Copy all the args (after the 0th), one after the other, into BUF of
- * MAX_SIZE.  Returns 0 on no error else -1.
+ * int argv_copy_args
  *
- * NOTE: you can get the 0th argument from argv_argv[0].
+ * DESCRIPTION:
+ *
+ * Copy all the arguements (not including the 0th) one after the other
+ * into the user specified buffer.
+ *
+ * NOTE: you can get the 0th argument from argv_argv[0] or
+ * argv_program.
+ *
+ * RETURNS:
+ *
+ * Success - 0
+ *
+ * Failure - -1
+ *
+ * ARGUMENTS:
+ *
+ * buf - Buffer to copy all of the user arguments into.
+ *
+ * buf_size - Size of the buffer.
  */
 extern
-int	argv_copy_args(char *buf, const int max_size);
+int	argv_copy_args(char *buf, const int buf_size);
+
+/*
+ * int argv_value_string
+ *
+ * DESCRIPTION:
+ *
+ * Convert the value of a RC entry to its string equivalent in the
+ * buffer provided.
+ *
+ * RETURNS:
+ *
+ * Length of bytes copied into the buffer.
+ *
+ * ARGUMENTS:
+ *
+ * argv_entry_p - Pointer to an entry in a argv_t list.
+ *
+ * buf - Buffer to convert the value into.
+ *
+ * buf_size - Size of the buffer.
+ */
+extern
+int	argv_value_string(const argv_t *argv_entry_p, char *buf,
+			  const int buf_size);
+
+/*
+ * int argv_type_info
+ *
+ * DESCRIPTION:
+ *
+ * Get internal information about the type of the argument.
+ *
+ * RETURNS:
+ *
+ * The name of the type.
+ *
+ * ARGUMENTS:
+ *
+ * type - Number of argument type.
+ *
+ * size_p - Pointer to an unsigned integer which, if not NULL, will be
+ * set with the size of the type.
+ *
+ * desc_p - Pointer to a constant character pointer which, if not
+ * NULL, will be pointed to a description of the type.
+ */
+extern
+const char	*argv_type_info(const unsigned int type, unsigned int *size_p,
+				const char **desc_p);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
-#endif /* ! __DMALLOC_ARGV_H__ */
+#endif /* ! __ARGV_H__ */
