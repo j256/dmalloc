@@ -50,7 +50,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.120 1998/10/15 20:16:21 gray Exp $";
+  "$Id: chunk.c,v 1.121 1998/10/15 20:16:58 gray Exp $";
 #endif
 
 /* local routines */
@@ -332,7 +332,7 @@ static	char	*display_pnt(const void *pnt, const overhead_t *over_p)
   (void)sprintf(buf, "%#lx", (unsigned long)pnt);
   
 #if STORE_SEEN_COUNT
-  (void)sprintf(buf2, "|s%d", over_p->ov_seenc);
+  (void)sprintf(buf2, "|s%d", over_p->ov_seen_c);
   (void)strcat(buf, buf2);
 #endif
   
@@ -805,7 +805,7 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
 	 bblock_p++) {
       bblock_p->bb_flags = 0;
 #if STORE_SEEN_COUNT
-      bblock_p->bb_overhead.ov_seenc = 0;
+      bblock_p->bb_overhead.ov_seen_c = 0;
 #endif
     }
     
@@ -1131,7 +1131,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
       dblock_p->db_next = dblock_p + 1;
       dblock_p->db_bblock = bblock_p;
 #if STORE_SEEN_COUNT
-      dblock_p->db_overhead.ov_seenc = 0;
+      dblock_p->db_overhead.ov_seen_c = 0;
 #endif
       free_space_count += 1 << bit_n;
     }
@@ -1149,7 +1149,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     
 #if STORE_SEEN_COUNT
     /* the first pointer in the block inherits the counter of the bblock */
-    first_p->db_overhead.ov_seenc = bblock_p->bb_overhead.ov_seenc;
+    first_p->db_overhead.ov_seen_c = bblock_p->bb_overhead.ov_seen_c;
 #endif
     
     dblock_p = first_p;
@@ -1160,7 +1160,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
   dblock_p->db_file = file;
   
 #if STORE_SEEN_COUNT
-  dblock_p->db_overhead.ov_seenc++;
+  dblock_p->db_overhead.ov_seen_c++;
 #endif
 #if STORE_ITERATION_COUNT
   dblock_p->db_overhead.ov_iteration = _dmalloc_iter_c;
@@ -2063,7 +2063,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       }
 #if STORE_SEEN_COUNT
       if (seen_cp != NULL) {
-	*seen_cp = &dblock_p->db_overhead.ov_seenc;
+	*seen_cp = &dblock_p->db_overhead.ov_seen_c;
       }
 #endif
     }
@@ -2117,7 +2117,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
     }
 #if STORE_SEEN_COUNT
     if (seen_cp != NULL) {
-      *seen_cp = &bblock_p->bb_overhead.ov_seenc;
+      *seen_cp = &bblock_p->bb_overhead.ov_seen_c;
     }
 #endif
   }
@@ -2502,7 +2502,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     }
     
 #if STORE_SEEN_COUNT
-    bblock_p->bb_overhead.ov_seenc++;
+    bblock_p->bb_overhead.ov_seen_c++;
 #endif
 #if STORE_ITERATION_COUNT
     bblock_p->bb_overhead.ov_iteration = _dmalloc_iter_c;
@@ -2629,7 +2629,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     }
     
 #if STORE_SEEN_COUNT
-    dblock_p->db_overhead.ov_seenc++;
+    dblock_p->db_overhead.ov_seen_c++;
 #endif
     
     /* print transaction info? */
@@ -2699,7 +2699,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   }
   
 #if STORE_SEEN_COUNT
-  bblock_p->bb_overhead.ov_seenc++;
+  bblock_p->bb_overhead.ov_seen_c++;
 #endif
   
   /* do we need to print transaction info? */

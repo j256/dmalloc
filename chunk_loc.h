@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.49 1998/09/29 13:30:57 gray Exp $
+ * $Id: chunk_loc.h,v 1.50 1998/10/15 20:17:21 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -155,7 +155,7 @@
  */
 typedef struct {
 #if STORE_SEEN_COUNT
-  int		ov_seenc;		/* times pointer was seen */
+  int		ov_seen_c;		/* times pointer was seen */
 #endif
 #if STORE_ITERATION_COUNT
   long		ov_iteration;		/* interation when pointer alloced */
