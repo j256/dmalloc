@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.8 1993/03/31 00:35:57 gray Exp $
+@c $Id: dmalloc.texi,v 1.9 1993/04/01 04:59:21 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -627,7 +627,7 @@ logging of errors, logging of bad pointer information, and the checking
 of fence-post memory areas.
 
 When I say @code{eval `malloc_dbg none`}, all memory debugging features
-will be disabled.
+are disabled.
 
 @node Debug tokens,  , RC file, Features
 @section Description of the Debugging Token Flags.

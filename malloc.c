@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.19 1993/03/31 00:35:51 gray Exp $";
+  "$Id: malloc.c,v 1.20 1993/04/01 04:59:17 gray Exp $";
 #endif
 
 /*
@@ -76,11 +76,11 @@ LOCAL	int		check_interval	= -1;	/* check every X */
 /****************************** local utilities ******************************/
 
 /*
- * hexadecimal STR to long translation
+ * hexadecimal STR to int translation
  */
-LOCAL	long	hex_to_int(char * str)
+LOCAL	int	hex_to_int(char * str)
 {
-  long		ret;
+  int		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++);
@@ -158,16 +158,19 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
  * check out a pointer to see if we were looking for it.
  * may not return.
  */
-LOCAL	void	check_var(char * pnt)
+LOCAL	void	check_var(const char * file, const int line, char * pnt)
 {
+  static int	addc = 0;
+  
   if (malloc_address == NULL || pnt != malloc_address)
     return;
   
-  if (address_count - 1 > 0) {
-    address_count--;
+  if (++addc < address_count)
     return;
-  }
   
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
+    _malloc_message("found address '%#lx' after %d pass%s from '%s:%u'",
+		    pnt, addc, (addc == 1 ? "" : "es"), file, line);
   malloc_errno = MALLOC_POINTER_FOUND;
   _malloc_perror("check_var");
 }
@@ -298,7 +301,7 @@ EXPORT	char	*malloc(unsigned int size)
     return MALLOC_ERROR;
   
   newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, size);
-  check_var(newp);
+  check_var(_malloc_file, _malloc_line, newp);
   
   in_alloc = FALSE;
   
@@ -322,7 +325,7 @@ EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
   
   /* alloc and watch for the die address */
   newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, len);
-  check_var(newp);
+  check_var(_malloc_file, _malloc_line, newp);
   
   (void)memset(newp, NULLC, len);
   
@@ -347,9 +350,9 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
-  check_var(old_pnt);
+  check_var(_malloc_file, _malloc_line, old_pnt);
   newp = (char *)_chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
-  check_var(newp);
+  check_var(_malloc_file, _malloc_line, newp);
   
   in_alloc = FALSE;
   
@@ -366,7 +369,7 @@ EXPORT	int	free(char * pnt)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return FREE_ERROR;
   
-  check_var(pnt);
+  check_var(_malloc_file, _malloc_line, pnt);
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
@@ -392,7 +395,7 @@ EXPORT	int	malloc_heap_map(void)
 }
 
 /*
- * verify pointer PNT or if it equals 0, the entire heap.
+ * verify pointer PNT, if PNT is 0 then check the entire heap.
  * returns MALLOC_VERIFY_[NO]ERROR
  */
 EXPORT	int	malloc_verify(char * pnt)
@@ -416,10 +419,10 @@ EXPORT	int	malloc_verify(char * pnt)
 }
 
 /*
- * set the global debug functionality flags to DEBUG.
+ * set the global debug functionality flags to DEBUG (0 to disable).
  * returns [NO]ERROR
  */
-EXPORT	int	malloc_debug(long debug)
+EXPORT	int	malloc_debug(int debug)
 {
   int	hold;
   
@@ -467,7 +470,6 @@ EXPORT	char	*malloc_strerror(int errnum)
 {
   /*
    * NOTE: should not check_debug_vars here because _malloc_perror calls this.
-   * thanks scott!
    */
   
   if (! IS_MALLOC_ERRNO(errnum))

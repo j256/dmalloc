@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.17 1993/03/31 00:35:54 gray Exp $
+ * $Id: malloc.h,v 1.18 1993/04/01 04:59:19 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -213,16 +213,16 @@ IMPORT	int	free(char * pnt);
 IMPORT	int	malloc_heap_map(void);
 
 /*
- * verify pointer PNT or if it equals 0, the entire heap.
+ * verify pointer PNT, if PNT is 0 then check the entire heap.
  * returns MALLOC_VERIFY_[NO]ERROR
  */
 IMPORT	int	malloc_verify(char * pnt);
 
 /*
- * set the global debug functionality flags to DEBUG.
+ * set the global debug functionality flags to DEBUG (0 to disable).
  * returns [NO]ERROR
  */
-IMPORT	int	malloc_debug(long debug);
+IMPORT	int	malloc_debug(int debug);
 
 /*
  * examine pointer PNT and returns SIZE, and FILE / LINE info on it
