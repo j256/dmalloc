@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.240 2003/10/04 19:44:23 gray Exp $
+@c $Id: dmalloc.texi,v 1.241 2003/10/17 14:17:02 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -128,7 +128,7 @@ Gray Watson.
 * Copying::                     Library copying and licensing conditions.
 * Overview::                    Description of features and how to get started.
 * Programming::                 How to program with the library.
-* Dmalloc Program::             Dmalloc Utility Program.
+* Dmalloc Program::             How to use the library's utility.
 * Source Code::                 Information on the source code.
 * Index of Concepts::           Index of concepts in the manual.
 @end menu
@@ -1411,11 +1411,11 @@ call to the @file{dmalloc} program with a @samp{-e #} option.
 The following error codes are defined in @file{error_val.h}.  They are
 used by the library to indicate a detected problem.  They can be caused
 by the user (@samp{ERROR_TOO_BIG}) or can indicate an internal library
-problem (@samp{ERROR_OVER_LIMIT}).  The @file{dmalloc} utility can give
-you the string version of the error with the @code{-e} argument:
+problem (@samp{ERROR_SLOT_CORRUPT}).  The @file{dmalloc} utility can
+give you the string version of the error with the @code{-e} argument:
 
 @example
-> dmalloc -e 60
+$ dmalloc -e 60
 dmalloc: dmalloc_errno value '60' = 
    'pointer is not on block boundary'
 @end example
@@ -1429,13 +1429,28 @@ sections for various error-code types.
 @cindex 1, error code
 @cindex error code, 1
 @cindex no error
+@cindex ERROR_NONE
 
 @item 1 (ERROR_NONE)
 No error.  It is good coding practice to set the no-error code to be
 non-0 value because it forces you to set it explicitly.
 
+@cindex 2, error code
+@cindex error code, 2
+@cindex invalid errno value
+@cindex errno value is not valid
+@cindex INVALID_ERROR
+
+@item 2 (INVALID_ERROR)
+Invalid error number.  If the library outputs this error however the
+dmalloc utility says that it is invalid then your dmalloc utility may be
+out of date with the library you linked against.  This will be returned
+with all error codes not listed here.
+
 @cindex 10, error code
 @cindex error code 10
+@cindex initialization and setup failed
+@cindex ERROR_BAD_SETUP
 
 @item 10 (ERROR_BAD_SETUP)
 Bad setup value.  This is currently unused but it is intended to report
@@ -1446,22 +1461,19 @@ on invalid setup configuration information.
 @cindex in twice
 @cindex 11, error code
 @cindex error code 11
+@cindex malloc library has gone recursive
+@cindex ERROR_IN_TWICE
 
 @item 11 (ERROR_IN_TWICE)
 Library went recursive.  This usually indicates that you are not using
 the threaded version of the library.  Or if you are then you are not
 using the @samp{-o} "lock-on" option.  @xref{Using With Threads}.
 
-@cindex 12, error code
-@cindex error code 12
-
-@item 12 (ERROR_BAD_ERRNO)
-Errno value from user is out-of-bounds.  This is currently unused but is
-intended to report a bad errno argument to a function.
-
 @cindex lock-on not configured
 @cindex 13, error code
 @cindex error code 13
+@cindex thread locking has not been configured
+@cindex ERROR_LOCK_NOT_CONFIG
 
 @item 13 (ERROR_LOCK_NOT_CONFIG)
 Thread locking has not been configured.  This indicates that you
@@ -1470,18 +1482,21 @@ thread version of the library.
 
 @cindex error-free-null token
 @cindex free null token
-@cindex pointer is null error
 @cindex 20, error code
 @cindex error code 20
+@cindex pointer is null
+@cindex ERROR_IS_NULL
 
 @item 20 (ERROR_IS_NULL)
-Pointer is null.  The program passed a NULL pointer to @code{free} and
-you have the @samp{error-free-null} token enabled.
+Pointer is null.  The program passed a NULL (0L) pointer to @code{free}
+and you have the @samp{error-free-null} token enabled.
 
 @cindex pointer not in heap error
 @cindex not in heap error
 @cindex 21, error code
 @cindex error code 21
+@cindex pointer is not pointing to heap data space
+@cindex ERROR_NOT_IN_HEAP
 
 @item 21 (ERROR_NOT_IN_HEAP)
 Pointer is not pointing to heap data space.  This means that the program
@@ -1493,159 +1508,223 @@ pointer from a different source than @code{malloc}.
 @cindex pointer not found error
 @cindex 22, error code
 @cindex error code 22
+@cindex cannot locate pointer in heap
+@cindex ERROR_NOT_FOUND
 
 @item 22 (ERROR_NOT_FOUND)
-Cannot locate pointer in heap.
+Cannot locate pointer in heap.  The user passed in a pointer which the
+heap did not know about.  Either this pointer was allocated by some
+other mechanism (like @code{sbrk} directly) or it is a random invalid
+pointer.
+
+In some rare circumstances, sometimes seen with shared libraries, there
+can be two separate copies of the dmalloc library in a program.  Each
+one does not know about the pointers allocated by the other.
 
 @cindex 23, error code
 @cindex error code 23
+@cindex found pointer the user was looking for
+@cindex ERROR_IS_FOUND
 
 @item 23 (ERROR_IS_FOUND)
-Found pointer the user was looking for.
+This indicates that the pointer specified in the address part of the
+environmental variable was discovered by the library.  @xref{Environment
+Variable}.  This error is useful so you can put a breakpoint in a
+debugger to find where a particular address was allocated.  @xref{Using
+With a Debugger}.
 
 @cindex 24, error code
 @cindex error code 24
+@cindex possibly bad .c filename pointer
+@cindex ERROR_BAD_FILE
 
 @item 24 (ERROR_BAD_FILE)
-Possibly bad .c filename pointer.
+A possibly invalid filename was discovered in the dmalloc administrative
+sections.  This could indicate some corruption of the internal tables.
+It also could mean that you have some super long filename which was
+returned by @code{__FILE__}.  See @code{MAX_FILE_LENGTH} in the
+@file{settings.dist} file.
 
 @cindex 25, error code
 @cindex error code 25
+@cindex possibly bad .c file line-number
+@cindex ERROR_BAD_LINE
 
 @item 25 (ERROR_BAD_LINE)
-Possibly bad .c file line-number.
+A line-number was out-of-bounds in the dmalloc administrative sections.
+This could indicate some corruption of the internal tables.  It also
+could mean that you have some super long file with more than
+@code{10000} lines.  See @code{MAX_LINE_NUMBER} in the
+@file{settings.dist} file.
 
 @cindex 26, error code
 @cindex error code 26
+@cindex failed under picket-fence magic-number check
+@cindex ERROR_UNDER_FENCE
 
 @item 26 (ERROR_UNDER_FENCE)
-Failed UNDER picket-fence magic-number check.
+This indicates that a pointer had it's lower bound picket-fence magic
+number overwritten.  If the @samp{check-fence} token is enabled, the
+library writes magic values above and below allocations to protect
+against overflow.  Most likely this is because a pointer below it went
+past it's allocate and wrote into the next pointer's space.
 
 @cindex 27, error code
 @cindex error code 27
+@cindex failed over picket-fence magic-number check
+@cindex ERROR_OVER_FENCE
 
 @item 27 (ERROR_OVER_FENCE)
-Failed OVER picket-fence magic-number check.
+This indicates that a pointer had it's upper bound picket-fence magic
+space overwritten.  If the @samp{check-fence} token is enabled, the
+library writes magic values above and below allocations to protect
+against overflow.  Most likely this is because an array or string
+allocation wrote past the end of the allocation.
+
+Check for improper usage of @code{strcat}, @code{sprintf},
+@code{strcpy}, and any other functions which work with strings and do
+not protect themselves by tracking the size of the string.  These
+functions should @emph{always} be replaced with: @code{strncat},
+@code{snprintf}, @code{strncpy}, and others.
 
 @cindex 28, error code
 @cindex error code 28
+@cindex use of pointer would exceed allocation
+@cindex ERROR_WOULD_OVERWRITE
 
 @item 28 (ERROR_WOULD_OVERWRITE)
-Use of pointer would exceed allocation.
-
-@cindex 29, error code
-@cindex error code 29
-
-@item 29 (ERROR_IS_FREE)
-Pointer is on free list.
+This error is generated by the function pointer checking code usually
+enabled wit the @code{check-funcs} token.  Dmalloc overloads a number of
+string and memory copying functions and verifies that the buffers (if
+allocated in the heap) would not be overwritten by the function.
 
 @cindex 30, error code
 @cindex error code 30
+@cindex pointer is not to start of memory block
+@cindex ERROR_NOT_START_BLOCK
 
 @item 30 (ERROR_NOT_START_BLOCK)
-Pointer is not to start of memory block.
+This indicates that the user passed in a pointer to be freed or
+reallocated that was not at the start of the allocation.  You would get
+this error, for example, if you allocate and get pointer @code{X} but
+then try to free @code{X+1}.
 
 @cindex 40, error code
 @cindex error code 40
+@cindex invalid allocation size
+@cindex ERROR_BAD_SIZE
 
 @item 40 (ERROR_BAD_SIZE)
-Invalid allocation size.
+This error indicates that a size value in the internal structures of the
+library were corrupted.  This could be a random pointer problem, pointer
+overflow, or some other corruption.
 
 @cindex 41, error code
 @cindex error code 41
+@cindex largest maximum allocation size exceeded
+@cindex ERROR_TOO_BIG
 
 @item 41 (ERROR_TOO_BIG)
-Largest maximum allocation size exceeded.
-
-@cindex 42, error code
-@cindex error code 42
-
-@item 42 (ERROR_USER_NON_CONTIG)
-User allocated space contiguous block error.
+An allocation asked for memory larger than the configured maximum.  See
+@code{LARGEST_ALLOCATION} in the @file{settings.dist} file.
 
 @cindex 43, error code
 @cindex error code 43
+@cindex could not grow heap by allocating memory
+@cindex ERROR_ALLOC_FAILED
 
 @item 43 (ERROR_ALLOC_FAILED)
-Could not grow heap by allocating memory.
+The library could not allocate more heap space and the program has run
+out of memory.  This could indicate that you've overflowed some system
+imposed limit.  On many operation systems, the @code{ulimit} call can
+tune system defaults.
 
 @cindex 44, error code
 @cindex error code 44
+@cindex heap failed to produce linear address space
+@cindex ERROR_ALLOC_NONLINEAR
 
 @item 44 (ERROR_ALLOC_NONLINEAR)
-Heap failed to produce linear address space.
+If the @code{force-linear} token is enabled, the library will ensure
+that the heap memory returned, is linear and contiguous.  This should
+only be used in special circumstances.
 
 @cindex 45, error code
 @cindex error code 45
+@cindex memory limit
+@cindex over user specified allocation limit
+@cindex ERROR_OVER_LIMIT
 
 @item 45 (ERROR_OVER_LIMIT)
-Over user specified allocation limit.
+The library has allocated more memory than was specified in the
+memory-limit environmental variable.  @xref{Environment Variable}.
 
 @cindex 60, error code
 @cindex error code 60
+@cindex pointer is not on block boundary
+@cindex ERROR_NOT_ON_BLOCK
 
 @item 60 (ERROR_NOT_ON_BLOCK)
-Pointer is not on block boundary.
+The user tried to free or realloc a pointer that was not pointing to a
+block boundary.  You would get this error, for example, if you allocate
+and get pointer @code{X} but then try to free @code{X+1}.
 
 @cindex 61, error code
 @cindex error code 61
+@cindex tried to free previously freed pointer
+@cindex ERROR_ALREADY_FREE
 
 @item 61 (ERROR_ALREADY_FREE)
-Tried to free previously freed pointer.
-
-@cindex 63, error code
-@cindex error code 63
-
-@item 63 (ERROR_NOT_USER)
-Pointer does not point to user-alloc space.
-
-@cindex 64, error code
-@cindex error code 64
-
-@item 64 (ERROR_FREE_LIST)
-Inconsistency with free linked-list.
-
-@cindex 65, error code
-@cindex error code 65
-
-@item 65 (ERROR_FREE_NON_CONTIG)
-Free space contiguous block error.
-
-@cindex 66, error code
-@cindex error code 66
-
-@item 66 (ERROR_FREE_MEM)
-Bad basic-block mem pointer in free-list.
+The user tried to free a pointer than has already been freed.  This is a
+very common mistake and can lead to serious problems.  It can be because
+a destructor is being called twice for some reason.  Although tracking
+down the specific source is highly recommended, it is good to set
+pointers to NULL (0L) after you free them as a rule.
 
 @cindex 67, error code
 @cindex error code 67
+@cindex free space has been overwritten
+@cindex ERROR_FREE_OVERWRITTEN
+@cindex free-blank
+@cindex check-blank
 
 @item 67 (ERROR_FREE_OVERWRITTEN)
-Free space has been overwritten.
+If either the @code{free-blank} or @code{check-blank} tokens are enabled
+then the library will overwrite memory when it is freed with the
+``dmalloc-free'' byte (hex 0xdf, octal 0337, decimal 223).  If the
+program writes into this space, then the library will detect the write
+and trigger this error.  This could indicate that the program is using a
+pointer after it has been freed.
 
 @cindex 70, error code
 @cindex error code 70
+@cindex bad admin structure list
+@cindex ERROR_ADMIN_LIST
 
 @item 70 (ERROR_ADMIN_LIST)
-Bad admin structure list.
-
-@cindex 71, error code
-@cindex error code 71
-
-@item 71 (ERROR_TABLE_CORRUPT)
-Internal memory table corruption.
+An internal corruption in the library's administrative structures has
+been detected.  This could be a random pointer problem, pointer
+overflow, or some other corruption.
 
 @cindex 72, error code
 @cindex error code 72
+@cindex internal address list corruption
+@cindex ERROR_ADDRESS_LIST
 
 @item 72 (ERROR_ADDRESS_LIST)
-Internal address list corruption.
+An internal corruption in the library's administrative structures has
+been detected.  This could be a random pointer problem, pointer
+overflow, or some other corruption.
 
 @cindex 73, error code
 @cindex error code 73
+@cindex internal memory slot corruption
+@cindex ERROR_SLOT_CORRUPT
 
 @item 73 (ERROR_SLOT_CORRUPT)
-Internal memory slot corruption.
+An internal corruption in the library's administrative structures has
+been detected.  This could be a random pointer problem, pointer
+overflow, or some other corruption.
 
 @end table
 
@@ -1699,10 +1778,10 @@ main()
 
 @example
 // to get dmalloc information
-> cc -Ddmalloc main.c
+$ cc -Ddmalloc main.c
 
 // without dmalloc information
-> cc main.c
+$ cc main.c
 @end example
 
 
@@ -2416,11 +2495,13 @@ Without changing the environment, output the commands resulting from the
 supplied options.
 
 @cindex memory limit
+@cindex ERROR_OVER_LIMIT
 @item -M limit
 Set the memory allocation limit which will abort the program if the
 total memory allocations exceed this number of bytes.  The limit can be
 a number with a k, m, or g at the end to indicate kilobyte, megabyte,
-and gigabyte respectively.  Ex: 100k, 200m, 1g.
+and gigabyte respectively.  Ex: 100k, 200m, 1g.  If the limit is
+exceeded, this will generate an @code{ERROR_OVER_LIMIT} error.
 
 @cindex lock on
 @item -o times
@@ -2750,12 +2831,15 @@ for bad pointers.
 
 @cindex force-linear
 @cindex sbrk
+@cindex ERROR_ALLOC_NONLINEAR
 @item force-linear
 Have the heap complain when additional program functionality seems to
 have made use of the system's heap-allocation routine @code{sbrk}
 directly behind the dmalloc library's back.  This is disabled by default
 since an increasing number of operating system functions seem to be
-doing this -- especially pthread libraries.
+doing this -- especially pthread libraries.  If this is enabled, and
+non-linear memory is returned, the @code{ERROR_ALLOC_NONLINEAR} error
+will be triggered.
 
 @cindex catch-signals
 @item catch-signals
@@ -2780,11 +2864,14 @@ Always copy data to a new pointer when realloc.
 @cindex 0xdf character
 @cindex df character
 @cindex free-blank
+@cindex ERROR_FREE_OVERWRITTEN
 @item free-blank
 Write special ``dmalloc-free'' byte (hex 0xdf, octal 0337, decimal 223)
 into space when it is freed.  You can set this to be something else in
 the @file{settings.dist} file.  You can then check to see if areas have
-been improperly overwritten with the check-blank token.
+been improperly overwritten with the @code{check-blank} token.  If the
+free space has been overwritten, then ERROR_FREE_OVERWRITTEN is
+triggered.
 
 @cindex dump core
 @cindex core dump
