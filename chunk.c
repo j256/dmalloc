@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.148 1999/03/10 22:05:28 gray Exp $
+ * $Id: chunk.c,v 1.149 1999/03/10 22:22:17 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.148 1999/03/10 22:05:28 gray Exp $";
+#ident "$Id: chunk.c,v 1.149 1999/03/10 22:22:17 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.148 1999/03/10 22:05:28 gray Exp $";
+  "$Id: chunk.c,v 1.149 1999/03/10 22:22:17 gray Exp $";
 #endif
 #endif
 
@@ -3500,6 +3500,11 @@ void	_chunk_dump_unfreed(void)
     }
   }
   
+  /* dump the summary and clear the table */
+  _dmalloc_message("Unfreed allocations:");
+  _table_log_info(0, 0);
+  _table_clear();
+  
   /* copy out size of pointers */
   if (block_c > 0) {
     if (block_c - unknown_block_c > 0) {
@@ -3514,9 +3519,4 @@ void	_chunk_dump_unfreed(void)
 		       unknown_size_c);
     }
   }
-  
-  /* dump the summary and clear the table */
-  _dmalloc_message("Unfreed allocations:");
-  _table_log_info(0, 0);
-  _table_clear();
 }
