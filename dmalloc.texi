@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.126 1997/12/05 15:48:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.127 1997/12/07 23:15:03 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1632,7 +1632,9 @@ for bad pointers
 always copy data to a new pointer when realloc
 
 @cindex blank space
+@cindex decimal 197
 @cindex octal 305
+@cindex hex 0xc5
 @item free-blank
 write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
 it is freed
@@ -1643,7 +1645,9 @@ it is freed
 abort the program (and dump core) on errors.  See @code{error-dump} below.
 
 @cindex blank space
+@cindex decimal 197
 @cindex octal 305
+@cindex hex 0xc5
 @item alloc-blank
 write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
 it is alloced
@@ -1689,7 +1693,8 @@ earlier ones if the program encounters more than one error.  See
 @code{error-abort} above.
 
 @emph{NOTE}: This will only work if your system supports the @code{fork}
-system call.
+system call and the configuration utility was able to fork without going
+recursive.
 
 @end table
 
