@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.103 1997/01/18 05:23:24 gray Exp $";
+  "$Id: chunk.c,v 1.104 1997/01/18 05:24:04 gray Exp $";
 #endif
 
 /*
@@ -2254,7 +2254,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     
 #if STORE_THREAD_ID
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
-      bblockp->bb_overhead.ov_thread_id = GET_THREAD_ID;
+      bblockp->bb_overhead.ov_thread_id = THREAD_GET_ID;
     }
 #endif
     
