@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.80 1999/03/08 17:25:38 gray Exp $
+ * $Id: dmalloc_t.c,v 1.81 1999/03/10 22:06:05 gray Exp $
  */
 
 /*
@@ -28,8 +28,14 @@
 
 #include <stdio.h>				/* for stdin */
 
+#if HAVE_STDLIB_H
+# include <stdlib.h>				/* for atoi + */
+#endif
 #if HAVE_STRING_H
 # include <string.h>
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
 #endif
 
 #include "dmalloc_argv.h"
@@ -44,16 +50,11 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.80 1999/03/08 17:25:38 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.81 1999/03/10 22:06:05 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.80 1999/03/08 17:25:38 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.81 1999/03/10 22:06:05 gray Exp $";
 #endif
-#endif
-
-/* external routines */
-#if HAVE_SBRK
-extern	char		*sbrk(const int incr);	/* to extend the heap */
 #endif
 
 #define INTER_CHAR		'i'
