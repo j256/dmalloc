@@ -1,5 +1,15 @@
 2003-09-08  Gray Watson  <gray@outside.256.com>
 
+	* Changed the configure script to define the HAVE_... include
+	defines to 0 or 1.  Thanks to Brian Schreder.
+
+	* Removed usage of environ (duh) from dmalloc_argv.c.  Thanks to
+	Brian Schreder.
+
+	* Added better dmalloc.h processing.
+
+2003-09-08  Gray Watson  <gray@outside.256.com>
+
 	* Releasing dmalloc version 5.2.2.
 
 	* Added a Cygwin section to the manual.
@@ -2049,5 +2059,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.305 2003/09/08 15:23:55 gray Exp $
+$Id: ChangeLog,v 1.306 2003/09/08 21:37:08 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.14 2003/09/08 14:43:22 gray Exp $
+# $Id: configure.ac,v 1.15 2003/09/08 21:37:08 gray Exp $
 #
-AC_REVISION($Revision: 1.14 $)
+AC_REVISION($Revision: 1.15 $)
 AC_INIT(dmalloc, 5.2.2, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -68,17 +68,23 @@ AC_C_CONST
 # we need this for various settings
 AC_HEADER_STDC
 AC_CHECK_HEADER([stdarg.h],
-		[AC_SUBST([HAVE_STDARG_H],1)])
+		[AC_SUBST([HAVE_STDARG_H],1)],
+		[AC_SUBST([HAVE_STDARG_H],0)])
 AC_CHECK_HEADER([stdlib.h],
-		[AC_SUBST([HAVE_STDLIB_H],1)])
+		[AC_SUBST([HAVE_STDLIB_H],1)],
+		[AC_SUBST([HAVE_STDLIB_H],0)])
 AC_CHECK_HEADER([string.h],
-		[AC_SUBST([HAVE_STRING_H],1)])
+		[AC_SUBST([HAVE_STRING_H],1)],
+		[AC_SUBST([HAVE_STRING_H],0)])
 AC_CHECK_HEADER([unistd.h],
-		[AC_SUBST([HAVE_UNISTD_H],1)])
+		[AC_SUBST([HAVE_UNISTD_H],1)],
+		[AC_SUBST([HAVE_UNISTD_H],0)])
 AC_CHECK_HEADER([sys/types.h],
-		[AC_SUBST([HAVE_SYS_TYPES_H],1)])
+		[AC_SUBST([HAVE_SYS_TYPES_H],1)],
+		[AC_SUBST([HAVE_SYS_TYPES_H],0)])
 AC_CHECK_HEADER([sys/mman.h],
-		[AC_SUBST([HAVE_SYS_MMAN_H],1)])
+		[AC_SUBST([HAVE_SYS_MMAN_H],1)],
+		[AC_SUBST([HAVE_SYS_MMAN_H],0)])
 
 ###############################################################################
 # shared library handling
@@ -470,7 +476,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.14 2003/09/08 14:43:22 gray Exp $"
+#ident "$Id: configure.ac,v 1.15 2003/09/08 21:37:08 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
