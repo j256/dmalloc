@@ -55,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.82 1995/08/13 20:02:58 gray Exp $";
+  "$Id: malloc.c,v 1.83 1995/08/18 15:49:06 gray Exp $";
 #endif
 
 /*
@@ -612,19 +612,22 @@ EXPORT	int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
 				 DMALLOC_PNT * ret_attr)
 {
   int		ret;
+  unsigned int	size_map;
   
   /* need to check the heap here since we are geting info from it below */
   if (check_debug_vars(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE) != NOERROR)
     return ERROR;
   
   /* NOTE: we do not need the alloc-size info */
-  ret = _chunk_read_info(pnt, size, NULL, file, line, ret_attr,
+  ret = _chunk_read_info(pnt, &size_map, NULL, file, line, ret_attr,
 			 "dmalloc_examine", NULL);
-  
   in_alloc = FALSE;
   
-  if (ret == NOERROR)
+  if (ret == NOERROR) {
+    if (size != NULL)
+      *size = size_map;
     return NOERROR;
+  }
   else
     return ERROR;
 }
