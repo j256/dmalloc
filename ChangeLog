@@ -1,3 +1,21 @@
+2004-10-19  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.4.2.
+
+	* Refined the definition of the 'alloc-blank' and 'free-blank'
+	tags.  The 'alloc-blank' token clear various parts of the
+	allocation block when it is allocated.  The 'free-blank' token
+	clears a pointer when it is freed.
+
+	* Also, the library was clearing the user spaces of an allocated
+	chunk with the alloc-blank character and the non-user spaces with
+	the free-blank character.  This seemed confusing and wrong so now
+	all sections of an allocated chunk are cleared with the
+	alloc-blank character.
+
+	* Fixed a couple of longer standing stupid bugs via feedback from
+	Philippe.  Thanks dude.
+
 2004-10-12  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.4.1.
@@ -2232,5 +2250,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.326 2004/10/12 19:42:24 gray Exp $
+$Id: ChangeLog,v 1.327 2004/10/19 14:50:51 gray Exp $
 -------------------------------------------------------------------------------
