@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.48 2000/07/21 22:41:22 gray Exp $
+ * $Id: settings.dist,v 1.49 2000/12/01 00:06:43 gray Exp $
  */
 
 /*
@@ -80,8 +80,7 @@
  *
  * Even with ALLOW_FREE_NULL set to 0, you can enable the
  * 'allow-free-null' token at runtime for specific programs.  It will
- * not cause an error when the user asks for 0 bytes and will not
- * generate an exception when it sees a free(0L).
+ * not generate an exception when it sees a free(0L).
  */
 #define ALLOW_FREE_NULL 0
 #define ALLOW_FREE_NULL_MESSAGE 1
@@ -89,19 +88,27 @@
 /*
  * Should we use the ra-address macros in return.h.  These are system
  * specific macros designed to return the return-address for logging
- * callers (i.e. possible offenders) of malloc routines.  Please mail
- * me if you have any questions with this functionality.
+ * callers (i.e. possible offenders) of malloc routines.
+ *
+ * Please mail me if you have any questions with this functionality.
  */
 #define USE_RETURN_MACROS 1
 
 /*
  * Write this character into memory when it is allocated and not
- * calloc-ed if the alloc-blank token is enabled and when it has been
- * freed if the free-blank token is enabled.  You can verify that
- * these sections have not been overwritten with the check-blank
- * token.
+ * calloc-ed if the alloc-blank token is enabled.  It will also write
+ * this into realloc'd memory which you extend or reduce.  You can
+ * verify that these sections have not been overwritten with the
+ * check-blank token.
  */
-#define BLANK_CHAR		'\305'
+#define ALLOC_BLANK_CHAR	'\332'		/* 0xda, 0332, decimal 218 */
+
+/*
+ * Write this character into memory when it is freed if the free-blank
+ * token is enabled.  You can verify that these sections have not been
+ * overwritten with the check-blank token.
+ */
+#define FREE_BLANK_CHAR		'\337'		/* 0xdf, 0337, decimal 223 */
 
 /*
  * The following information sets limits on the size of the source

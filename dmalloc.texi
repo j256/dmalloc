@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.201 2000/11/20 17:56:24 gray Exp $
+@c $Id: dmalloc.texi,v 1.202 2000/12/01 00:06:42 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -112,8 +112,8 @@ Details on the library's mailing list are available there as well.
 
 My contact information is available on the web page.  I can be reached
 with any questions or feedback.  Please include the version number of
-the library that you are using as well as your machine and operating
-system types.
+the library that you are using, your machine and operating system types,
+and the value of the DMALLOC_OPTIONS environment variable.
 
 Gray Watson.
 
@@ -2067,19 +2067,20 @@ Always copy data to a new pointer when realloc.
 @cindex blanking memory
 @cindex overwriting memory
 @cindex clearing memory
-@cindex decimal 197
-@cindex 197
-@cindex octal 305
-@cindex 305
-@cindex 0305
-@cindex hex 0xc5
-@cindex 0xc5
-@cindex c5
+@cindex decimal 223 character
+@cindex 223 character
+@cindex octal 337 character
+@cindex 337 character
+@cindex 0337 character
+@cindex hex 0xdf character
+@cindex 0xdf character
+@cindex df character
 @cindex free-blank
 @item free-blank
-Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is freed.  The same bytes are written when memory is allocated if
-alloc-blank is enabled.
+Write special ``dmalloc-free'' byte (hex 0xdf, octal 0337, decimal 223)
+into space when it is freed.  You can set this to be something else in
+the @file{settings.dist} file.  You can then check to see if areas have
+been improperly overwritten with the check-blank token.
 
 @cindex dump core
 @cindex core dump
@@ -2091,19 +2092,20 @@ Abort the program (and dump core) on errors.  See @code{error-dump} below.
 @cindex blanking memory
 @cindex overwriting memory
 @cindex clearing memory
-@cindex decimal 197
-@cindex 197
-@cindex octal 305
-@cindex 305
-@cindex 0305
-@cindex hex 0xc5
-@cindex 0xc5
-@cindex c5
+@cindex decimal 218 character
+@cindex 218 character
+@cindex octal 332 character
+@cindex 332 character
+@cindex 0332 character
+@cindex hex 0xda character
+@cindex 0xda character
+@cindex da character
 @cindex alloc-blank
 @item alloc-blank
-Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is allocated.  The same bytes are written when memory is freed if
-free-blank is enabled.
+Write special ``dmalloc-alloc'' byte (octal 0xda, octal 0332, decimal
+218) into space when it is allocated.  You can set this to be something
+else in the @file{settings.dist} file.  You can then check to see if
+areas have been improperly overwritten with the check-blank token.
 
 @cindex heap-check-map
 @item heap-check-map

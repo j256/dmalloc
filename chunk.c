@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.168 2000/11/13 15:47:18 gray Exp $
+ * $Id: chunk.c,v 1.169 2000/12/01 00:07:23 gray Exp $
  */
 
 /*
@@ -63,10 +63,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "@(#) $Id: chunk.c,v 1.168 2000/11/13 15:47:18 gray Exp $"
+#ident "@(#) $Id: chunk.c,v 1.169 2000/12/01 00:07:23 gray Exp $"
 #else
 static	char	*rcs_id =
-  "@(#) $Id: chunk.c,v 1.168 2000/11/13 15:47:18 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.169 2000/12/01 00:07:23 gray Exp $";
 #endif
 #endif
 
@@ -1323,7 +1323,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
      */ 
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-      (void)memset((char *)pnt + (1 << bit_n), BLANK_CHAR,
+      (void)memset((char *)pnt + (1 << bit_n), FREE_BLANK_CHAR,
 		   BLOCK_SIZE - (1 << bit_n));
     }
     
@@ -1770,7 +1770,7 @@ int	_chunk_check(void)
 	/* check out dblock pointer and next pointer (if free) */
 	if (dblock_p->db_flags == DBLOCK_FREE) {
 	  
-	  /* should we verify that we have a block of BLANK_CHAR? */
+	  /* should we verify that we have a block of free'd chars */
 	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
 	    
 	    /* find pointer to memory chunk */
@@ -1781,7 +1781,7 @@ int	_chunk_check(void)
 	    for (byte_p = (char *)pnt;
 		 byte_p < (char *)pnt + (1 << dblock_p->db_bblock->bb_bit_n);
 		 byte_p++) {
-	      if (*byte_p != BLANK_CHAR) {
+	      if (*byte_p != FREE_BLANK_CHAR) {
 		dmalloc_errno = ERROR_FREE_NON_BLANK;
 		log_error_info(NULL, 0, byte_p, 0, NULL, "heap-check", 1);
 		dmalloc_error("_chunk_check");
@@ -1872,14 +1872,14 @@ int	_chunk_check(void)
       }
       free_c--;
       
-      /* should we verify that we have a block of BLANK_CHAR? */
+      /* should we verify that we have a block of freed chars? */
       if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
 	pnt = BLOCK_POINTER(this_adm_p->ba_pos_n +
 			    (bblock_p - this_adm_p->ba_blocks));
 	for (byte_p = (char *)pnt;
 	     byte_p < (char *)pnt + BLOCK_SIZE;
 	     byte_p++) {
-	  if (*byte_p != BLANK_CHAR) {
+	  if (*byte_p != FREE_BLANK_CHAR) {
 	    dmalloc_errno = ERROR_FREE_NON_BLANK;
 	    log_error_info(NULL, 0, byte_p, 0, NULL, "heap-check", 1);
 	    dmalloc_error("_chunk_check");
@@ -2213,10 +2213,10 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
  * where <- Where the check is being made from.
  *
  * size_p <- Pointer to an unsigned int which, if not NULL, will be
- * set to the size of bytes from the pointer.
+ * set to the size of bytes that the user requested.
  *
  * alloc_size_p <- Pointer to an unsigned int which, if not NULL, will
- * be set to the total allocated size of bytes from the pointer.
+ * be set to the total given size of bytes including block overhead.
  *
  * file_p <- Pointer to a character pointer which, if not NULL, will
  * be set to the file where the pointer was allocated.
@@ -2719,7 +2719,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     /* overwrite to-be-alloced or non-used portion of memory */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-      (void)memset(pnt, BLANK_CHAR, 1 << bit_n);
+      (void)memset(pnt, ALLOC_BLANK_CHAR, 1 << bit_n);
     }
   }
   else {
@@ -2761,7 +2761,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     /* overwrite to-be-alloced or non-used portion of memory */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-      (void)memset(pnt, BLANK_CHAR, given);
+      (void)memset(pnt, ALLOC_BLANK_CHAR, given);
     }
     
 #if STORE_SEEN_COUNT
@@ -2967,10 +2967,10 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     dblock_p->db_next = free_dblock[bit_n];
     free_dblock[bit_n] = dblock_p;
     
-    /* should we set free memory with BLANK_CHAR? */
+    /* should we set free memory with freed chars? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-      (void)memset(pnt, BLANK_CHAR, 1 << bit_n);
+      (void)memset(pnt, FREE_BLANK_CHAR, 1 << bit_n);
     }
     
     return FREE_NOERROR;
@@ -3059,8 +3059,9 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   free_space_count += given;
   
   /*
-   * should we set free memory with BLANK_CHAR?
-   * NOTE: we do this hear because block_n might change below
+   * should we set free memory with freed chars?
+   *
+   * NOTE: we do this here because block_n might change below
    */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
@@ -3071,7 +3072,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     if (valloc_b && fence_bottom_size > 0) {
       pnt = (char *)pnt - (BLOCK_SIZE - fence_bottom_size);
     }
-    (void)memset(pnt, BLANK_CHAR, block_n * BLOCK_SIZE);
+    (void)memset(pnt, FREE_BLANK_CHAR, block_n * BLOCK_SIZE);
   }
   
   /*
@@ -3290,11 +3291,11 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     /* overwrite to-be-alloced or non-used portion of memory */
     size = MIN(new_size, old_size);
     
-    /* NOTE: using same number of blocks so NUM_BLOCKS works with either */
+    /* if we are extending memory, write in our alloc chars */
     if ((BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
 	 || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))
 	&& alloc_size > size) {
-      (void)memset((char *)new_p + size, BLANK_CHAR, alloc_size - size);
+      (void)memset((char *)new_p + size, ALLOC_BLANK_CHAR, alloc_size - size);
     }
     
     /* write in fence-post info and adjust new pointer over fence info */
