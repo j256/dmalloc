@@ -1,6 +1,13 @@
+Tue Mar  9 14:26:11 1999  Gray Watson  <gray@burger.letters.com>
+
+	* Fixed some problems with threading and the LOG_THREAD_ID ifdef.
+
+	* Improved the memory table output.  Renamed the table files to be
+	dmalloc_tab.[ch] to removed clash with libtable.a.
+
 Mon Mar  8 10:50:12 1999  Gray Watson  <gray@burger.letters.com>
 
-	* Releasing dmalloc version 4.2.0.
+	* Releasing dmalloc version 4.2.0-beta.
 
 	* Fixed long standing problem with the NEVER-REUSE token.
 
@@ -1422,5 +1429,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.212 1999/03/08 17:52:56 gray Exp $
+$Id: ChangeLog,v 1.213 1999/03/09 19:29:17 gray Exp $
 -------------------------------------------------------------------------------
