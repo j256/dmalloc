@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.105 1998/09/18 23:33:20 gray Exp $
+# $Id: Makefile.in,v 1.106 1998/09/19 00:12:12 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -21,6 +21,7 @@ DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
+	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ \
 	$(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
