@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.55 2003/05/15 02:42:56 gray Exp $
+ * $Id: settings.dist,v 1.56 2003/05/15 15:38:40 gray Exp $
  */
 
 /*
@@ -95,15 +95,19 @@
  * this into realloc'd memory which you extend or reduce.  You can
  * verify that these sections have not been overwritten with the
  * check-blank token.
+ *
+ * \332 == 0xda, 0332, decimal 218 (i.e. dmalloc-alloc)
  */
-#define ALLOC_BLANK_CHAR	'\332'		/* 0xda, 0332, decimal 218 */
+#define ALLOC_BLANK_CHAR	'\332'
 
 /*
  * Write this character into memory when it is freed if the free-blank
  * token is enabled.  You can verify that these sections have not been
  * overwritten with the check-blank token.
+ *
+ * \337 == 0xdf, 0337, decimal 223 (i.e. dmalloc-free)
  */
-#define FREE_BLANK_CHAR		'\337'		/* 0xdf, 0337, decimal 223 */
+#define FREE_BLANK_CHAR		'\337'
 
 /*
  * The following information sets limits on the size of the source
@@ -112,17 +116,21 @@
  * although I would argue that if you have filenames longer than 40
  * characters or files longer than 10,000 lines, you are doing
  * something wrong.
+ *
+ * MIN_FILE_LENGTH 3 => file "[a-zA-Z].c"
  */
-#define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
-#define MAX_FILE_LENGTH		  100		/* max __FILE__ length */
-#define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
+#define MIN_FILE_LENGTH		    3
+#define MAX_FILE_LENGTH		  100
+#define MAX_LINE_NUMBER		10000
 
 /*
  * The largest allowable allocation size.  This is only for
  * verification purposes.  Any allocation larger than this
  * will generate a ERROR_TOO_BIG error.
+ *
+ * 268435456UL == 256mb
  */
-#define LARGEST_ALLOCATION	268435456UL	/* 256mb */
+#define LARGEST_ALLOCATION	268435456UL
 
 /*
  * Automatically call dmalloc_shutdown if on_exit or atexit is
