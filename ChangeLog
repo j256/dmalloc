@@ -1,5 +1,7 @@
 Fri Sep 18 13:37:23 1998  Gray Watson  <gray@burger.letters.com>
 
+	* Releasing dmalloc version 4.0.0 beta.
+
 	* Added recalloc support into the library.  Thanks to Nick
         Albright for suggesting it.
 
@@ -1268,5 +1270,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.186 1998/09/18 23:33:19 gray Exp $
+$Id: ChangeLog,v 1.187 1998/09/19 00:27:02 gray Exp $
 -------------------------------------------------------------------------------

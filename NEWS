@@ -1,6 +1,16 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.73 1998/02/11 02:14:23 gray Exp $
+$Id: NEWS,v 1.74 1998/09/19 00:27:03 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.0.0:
+
+	* Added recalloc support into the library.
+	* Cleaned up the calloc special handling and accounting.
+	* Added valloc support to the library for OSF thread libraries.
+	* Improved the pthread autoconfiguration and the code.
+	* Got rid of the _dmalloc_file and _dmalloc_line crap.
+	* Added FTX return.h information.
+	* Added direct strdup support to the library.
 
 Version 3.3.1:
 
