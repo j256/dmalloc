@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.92 1995/06/13 21:34:41 gray Exp $
+@c $Id: dmalloc.texi,v 1.93 1995/06/20 17:54:21 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -133,7 +133,7 @@ pertaining to distribution of the document or software without specific,
 written prior permission.
 
 Gray Watson makes no representations about the suitability of the
-software described herein for any purpose.  It is provided "as is"
+software described herein for any purpose.  It is provided ``as is''
 without express or implied warranty.
 
 @node Overview, Details, Copying, Top
@@ -444,10 +444,9 @@ included in the distribution you received.
 @item Other Repositories:
 
 You can also get a recent version from anonymous ftp via
-@samp{gatekeeper.dec.com} in the @file{/pub/misc/malloc_dbg} directory
-or maybe @file{/pub/misc/dmalloc} if they've changed it.  This
-repository has been made available through the generosity of the Digital
-Equipment Corporation with special help from Dave Hill and the
+@samp{gatekeeper.dec.com} in the @file{/pub/misc/dmalloc} directory.
+This repository has been made available through the generosity of the
+Digital Equipment Corporation with special help from Dave Hill and the
 gatekeepers.
 
 Thanks much to them all.
@@ -1747,7 +1746,7 @@ dmalloc -tv
 @cindex source definitions
 
 Here are a couple definitions and other information for those interested
-in "picking the brain" of the library.  The code is a little ugly here
+in ``picking the brain'' of the library.  The code is a little ugly here
 and there and it conforms to the Gray-Watson handbook of coding
 standards only.
 
