@@ -1,3 +1,7 @@
+Tue Oct 18 19:54:21 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed problem with new args clearing all old ones.
+
 Sat Oct 15 13:55:16 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Added dmalloc.h.2 creation to config.status file.  Thanks Dave.
@@ -866,5 +870,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.126 1994/10/15 18:52:27 gray Exp $
+$Id: ChangeLog,v 1.127 1994/10/18 23:55:04 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.59 1994/10/04 17:48:04 gray Exp $
+# $Id: Makefile.in,v 1.60 1994/10/18 23:55:09 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -166,6 +166,10 @@ dmalloc.head : dmalloc.info
 	echo ---------------------------------------------------------------- \
 		>> $@.t
 	mv $@.t $@
+
+dmalloc.info : dmalloc.texi
+	rm -f $@
+	makeinfo --no-split $^
 
 .PHONY : shar
 shar : dmalloc.head

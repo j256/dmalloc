@@ -1,10 +1,12 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.44 1994/10/15 18:52:29 gray Exp $
+$Id: NEWS,v 1.45 1994/10/18 23:55:11 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Fixed problem with new args clearing all old ones.
 	* Added dmalloc.h.2 creation to config.status file.
+	* Added a startup message with the debug flags used to logfile.
 	* Fixed errors with FUNC_CHECK code.
 	* Added default tags: default,low,medium,high,all to dmalloc.
 	* Renamed 'check-free' token to 'check-blank'.
