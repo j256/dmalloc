@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.2.1 </title>
+<title> Dmalloc Release Notes - 5.2.2 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.2.1 <br />
+Version: Release 5.2.2 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.1.0.html">5.1.0</a> <br />
-Date: July 8, 2003
+Last-Version: <a href="dmalloc-5.2.1.html">5.2.1</a> <br />
+Date: September 8, 2003
 </h4>
 
 <p>
@@ -28,9 +28,8 @@ Date: July 8, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Bug fix release which resolves some issues with the strdup
-function that have been around a while.  Also fixed a problem where
-the macro arguments in dmalloc.h were not enclosed in (). </p>
+<p> Bug fix release to fix a couple of problems.  See the Bugs section
+for details. </p>
 
 <!--========================================================================-->
 
@@ -60,17 +59,29 @@ None.
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> Added a section to the configure script to test for segfaults
+when getenv is called during the initialization process inside of
+malloc. </li>
+
+</ul>
 
 <!--========================================================================-->
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> Added a section to the manual to discuss usage of the library
+with the Cygwin environment. </li>
+
+<li> Added a new ERROR_NOT_START_BLOCK (30) errno to report on
+addresses which are within an allocation but not pointing to the start
+of the block.  In the past, the library would have returned
+ERROR_NOT_FOUND. </li>
+
+</ul>
 
 <!--========================================================================-->
 
@@ -86,14 +97,19 @@ None.
 
 <ul>
 
-<li> Fixed problems with arguments to the various allocation macros in
-dmalloc.h were not surrounded by parens ().  This meant that the
-calloc macro could produce bad arithmetic because of operator
-ordering.  Rookie mistake. </li>
+<li> Fixed a bug in the function argument pointer checking code.
+Dmalloc was improperly using the not-found error. Added to regression
+tests.  </li>
 
-<li> Fixed problem with the strdup function being defined as void *
-instead of char *.  Also, there was a char ** and void ** bug in the
-function which caused some crashes on some architectures. </li>
+<li> Improved the pointer checking code to properly check free space
+above an allocation.  Added to regression tests.  </li>
+
+<li> Fixed a possible pthread lock leak in the dmalloc shutdown code
+under certain circumstances. </li>
+
+<li> Added GETENV_SAFE configuration testing for problems when getenv
+is called during initialization of the library.  This hopefully will
+better handle Cygwin environments.  </li>
 
 </ul>
 
