@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.211 2002/02/14 23:42:02 gray Exp $
+@c $Id: dmalloc.texi,v 1.212 2002/07/24 19:03:57 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -381,14 +381,6 @@ program.  @xref{Dmalloc Program}.
 You may also want to install the @file{dmallocrc} file in your home
 directory as @file{.dmallocrc}.  This allows you to add your own
 combination of debug tokens.  @xref{RC File}.
-
-@cindex log-unknown
-@item You may also want to enable the @code{log-unknown} token
-(@kbd{dmalloc -p log-unknown}) which will log non-freed information
-about ``unknown'' memory to the log file.  Unknown means memory that
-does not have associated file and line information.  This is necessary
-if you are @emph{not} including @file{dmalloc.h} in your C files or if
-you want to track possible memory leaks in system functions.
 
 @item Run your program, examine the logfile that should have been created by
 dmalloc_shutdown, and use its information to help debug your program.
@@ -844,11 +836,11 @@ memory may be reported.
 
 The library will not (by default) report on ``unknown'' non-freed
 memory.  Unknown means memory that does not have associated file and
-line information.  To log information about unknown pointers you should
-enable the @code{log-unknown} token (@kbd{dmalloc -p log-unknown}).
-This will be necessary if you are @emph{not} including @file{dmalloc.h}
-in all of your C files or if you are interested in tracking leaks in
-system functions.
+line information.
+
+This will be necessary if you are @emph{not}
+including @file{dmalloc.h} in all of your C files or if you are
+interested in tracking leaks in system functions.
 
 @item Dmalloc is returning the error "malloc library has gone recursive"
 
@@ -966,11 +958,11 @@ architecture/compilers.  @xref{Portability}.
 
 @cindex assembly hacks
 
-@cindex log-unknown
 The library attempts to use some assembly hacks to get the the
 return-address or the address of the line that called the dmalloc
-function.  If you have the @code{log-unknown} token enabled and you run
-your program, you might see the following non-freed memory messages.
+function.  If you have unfreed memory that does not have associated file
+and line information, you might see the following non-freed memory
+messages.
 
 @example
 not freed: '0x38410' (22 bytes) from 'ra=0xdd2c'
@@ -1524,13 +1516,19 @@ cause the library to never reuse memory that has been freed.  Unique
 addresses are always generated.  This should be used with caution since
 it may cause your program to run out of memory.
 
-@node Fence-Post Overruns,  , Memory Leaks, Using With a Debugger
+@node Fence-Post Overruns,, Memory Leaks, Using With a Debugger
 @subsection Diagnosing Fence-Post Overwritten Memory
 
 @cindex fence-post errors
 
 For a definition of fence-posts please see the ``Features'' section.
 @xref{Features}.
+
+To detect fence-post overruns, you need to enable the @samp{check-fence}
+token.  @xref{Debug Tokens}.  This pads your allocations with some extra
+bytes at the front and the end and watches the space to make sure that
+they don't get overwritten.  @emph{NOTE:} The library cannot detect if
+this space gets read, only written.
 
 If you have encountered a fence-post memory error, the logfile should be
 able to tell you the offending address.
@@ -1572,14 +1570,16 @@ you or if any of the terminology below does not make sense, see manuals
 about POSIX threads (pthreads) before going any further.  O'Reilly
 publishes a pretty good pthreads manual for example.
 
-The support for threads in dmalloc should be adequate for most if not
-all testing scenarios.  It provides support for mutex locking itself to
-protect against race conditions that result in multiple simultaneous
-execution.  One of the major problems is that most thread libraries uses
-malloc themselves.  Since all of dmalloc's initialization happens when a
-call to malloc is made, we may be attempting to initialize or lock the
-mutex while the thread library is booting up.  A baaaad thing since
-thread libraries aren't reentrant.
+To use dmalloc with your threaded program, you will first need to make
+sure that you are linking with @file{libdmallocth.a} which is the
+threaded version of the library.  The support for threads in dmalloc
+should be adequate for most if not all testing scenarios.  It provides
+support for mutex locking itself to protect against race conditions that
+result in multiple simultaneous execution.  One of the major problems is
+that most thread libraries uses malloc themselves.  Since all of
+dmalloc's initialization happens when a call to malloc is made, we may
+be attempting to initialize or lock the mutex while the thread library
+is booting up.  A baaaad thing since thread libraries aren't reentrant.
 
 @cindex lock on
 
@@ -1589,12 +1589,12 @@ have been completed.  If the library does not wait before initializing
 the locks, the thread library will probably core dump.  If it waits too
 long then it can't protect itself from multiple execution and it will
 abort or other bad things might happen.  You adjust the number of times
-to wait at runtime with the ``lock-on'' option to the dmalloc program
+to wait at runtime with the @samp{lock-on} option to the dmalloc program
 (for example @kbd{dmalloc -o 20}).  @xref{Dmalloc Program}.  Times
-values between 2 and 30 are probably good although operating systems
+values between 5 and 30 are probably good although operating systems
 will vary significantly.  You know its too low if your program
 immediately core dumps and too high if the dmalloc library says its gone
-recursive.
+recursive although with low values, you might get either problem.
 
 An additional complexity is when we are initializing the lock before
 mutex locking around the library.  As mentioned, the initialization
@@ -1629,7 +1629,11 @@ list.
 
 @item Enable the ``lock-on'' option (for example @kbd{dmalloc -o 20}).
 As explained above, you may have to try different values before getting
-it right.
+it right.  Values between 5 and 30 are probably good.
+
+@item If you get a dmalloc error #13 @samp{thread locking has not
+been configured} then you have not compiled you program with the
+threaded version of dmalloc or there was a problem building it.
 
 @item If everything works, you should be able to run your program, have
 it not immediately crash, and the dmalloc library should not complain
@@ -1914,7 +1918,7 @@ settings in a verbose manner.  For example:
 
 @example
 Debug-Flags  '0x40005c7' (runtime)
-   log-stats, log-non-free, log-blocks, log-unknown, 
+   log-stats, log-non-free, log-blocks,
    log-bad-space, check-fence, catch-null
 Address      0x1f008, count = 10
 Interval     100
@@ -2157,8 +2161,7 @@ Log detailed block information when dmalloc_log_heap_map is called.
 
 @cindex log-unknown
 @item log-unknown
-Like log-non-free but logs non-freed memory pointers that did not have
-file/line information associated with them.
+This token is now the default.
 
 @cindex log-bad-space
 @item log-bad-space
@@ -2282,15 +2285,6 @@ Have the heap never use space that has been used before and freed.
 @xref{Memory Leaks}.  @emph{WARNING}: This should be used with caution
 since you may run out of heap space.
 
-@cindex allow-free-null
-@item allow-free-null
-The library will not generate an error when a program tries to free a
-NULL pointer.  See ALLOW_FREE_NULL and ALLOW_FREE_NULL_MESSAGE settings
-in the @file{settings.h} file which change the default behavior.
-
-@emph{NOTE}: This does not impact the ALLOW_REALLOC_NULL compilation
-options which can be adjusted in @file{conf.h}.
-
 @cindex dump core
 @cindex core dump
 @cindex error-dump
@@ -2302,6 +2296,20 @@ earlier ones if the program encounters more than one error.  See
 @emph{NOTE}: This will only work if your system supports the @code{fork}
 system call and the configuration utility was able to fork without going
 recursive.
+
+@cindex allow-free-null
+@item allow-free-null
+This is the default now.  By default the library will allow the free of
+0L pointers.  If you do not want this behavior then enable the
+error-free-null token.
+
+@cindex error-free-null
+@item error-free-null
+By default the library will not generate an error when a program tries
+to free a NULL pointer.  By enabling this token, you can change this
+behavior so an error is reported.  See also the ALLOW_FREE_NULL and
+ALLOW_FREE_NULL_MESSAGE settings in the @file{settings.h} file to change
+the default behavior.
 
 @end table
 
