@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.31 2000/04/18 19:39:00 gray Exp $
+ * $Id: return.h,v 1.32 2000/07/21 22:41:22 gray Exp $
  */
 
 /*
@@ -42,9 +42,15 @@
 #ifndef __RETURN_H__
 #define __RETURN_H__
 
-#include "conf.h"			/* for USE_RET_ADDRESS */
+/*
+ * we check this here because configure needs to be able to use
+ * return.h without conf.h existance
+ */
+#ifndef __CONF_H__
+#include "conf.h"	/* for USE_RETURN_MACROS and RETURN_MACROS_WORK */
+#endif
 
-#if USE_RET_ADDRESS
+#if USE_RETURN_MACROS && RETURN_MACROS_WORK
 
 /*************************************/
 
@@ -265,13 +271,17 @@ do { \
 
 /*************************************/
 
-#endif /* USE_RET_ADDRESS */
+#endif /* USE_RETURN_MACROS */
 
 /********************************** default **********************************/
 
 /* for all others, do nothing */
 #ifndef GET_RET_ADDR
+#ifdef DMALLOC_DEFAULT_FILE
 #define GET_RET_ADDR(file)	file = DMALLOC_DEFAULT_FILE
+#else
+#define GET_RET_ADDR(file)	file = 0L
+#endif
 #endif
 
 #endif /* ! __RETURN_H__ */

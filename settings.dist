@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.47 2000/05/15 15:46:41 gray Exp $
+ * $Id: settings.dist,v 1.48 2000/07/21 22:41:22 gray Exp $
  */
 
 /*
@@ -89,13 +89,10 @@
 /*
  * Should we use the ra-address macros in return.h.  These are system
  * specific macros designed to return the return-address for logging
- * callers (i.e. possible offenders) of malloc routines.  You should
- * only want to disable them if you are storing code which makes calls
- * to the dmalloc functions *from* the heap.  This is unlikely but
- * will confuse the library.  Please mail me if you have any questions
- * or if you indeed have this problem.
+ * callers (i.e. possible offenders) of malloc routines.  Please mail
+ * me if you have any questions with this functionality.
  */
-#define USE_RET_ADDRESS 1
+#define USE_RETURN_MACROS 1
 
 /*
  * Write this character into memory when it is allocated and not

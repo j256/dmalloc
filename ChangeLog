@@ -1,5 +1,10 @@
 Fri Jul 21 17:00:25 2000  Gray Watson  <gray@256.com>
 
+	* Added autoconfiguration code to see if the return macros work
+ 	for an architecture.
+
+	* Renamed USE_RET_ADDRESS to USE_RETURN_MACROS.
+
 	* Added threaded C++ library to Makefile.
 
 Tue Jun 20 18:30:55 2000  Gray Watson  <gray@256.com>
@@ -1646,5 +1651,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.255 2000/07/21 21:00:38 gray Exp $
+$Id: ChangeLog,v 1.256 2000/07/21 22:41:21 gray Exp $
 -------------------------------------------------------------------------------

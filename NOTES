@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.30 1999/03/09 05:17:36 gray Exp $
+$Id: NOTES,v 1.31 2000/07/21 22:41:21 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -14,12 +14,5 @@ WARNINGS:
 	to the conclusion that the localtime call, included in SunOS
 	release 4.1 (and maybe before/after), was overwriting one of
 	its fence-post markers.
-
--	currently, it is assumed that none of the return-addresses
-	that are returned by the assembly hacks in return.h (or
-	__FILE__ arguments for that matter), are on the heap -- in
-	other words that you do not make calls to malloc libraries
-	from code stored on the heap.  Set USE_RET_ADDRESS define to 0
-	in conf.h to disable if you are having problems.
 
 -------------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.188 2000/07/21 21:00:39 gray Exp $
+@c $Id: dmalloc.texi,v 1.189 2000/07/21 22:41:22 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -524,7 +524,7 @@ some notes so future users can profit from your experiences.
 return.h assembly macros which attempt to determine the callers address
 for logging purposes.  You may want to first try disabling any compiler
 optimization flags.  If this doesn't work then you may need to disable
-the @samp{USE_RET_ADDRESS} variable in the @file{settings.h} file.
+the @samp{USE_RETURN_MACROS} variable in the @file{settings.h} file.
 
 @cindex ANSI-C compiler
 
