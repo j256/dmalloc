@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.151 2001/07/12 23:11:46 gray Exp $
+# $Id: Makefile.in,v 1.152 2002/01/28 19:08:21 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -274,7 +274,7 @@ port :: $(FLS) $(CONTFLS) Makefile.all.in
 	tar -czf dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION)
 	mv dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION).tgz
 
-dmalloc.ps : dmalloc.texi
+dmalloc.ps : $(srcdir)/dmalloc.texi
 	rm -rf work
 	mkdir work
 	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ;\
@@ -283,15 +283,15 @@ dmalloc.ps : dmalloc.texi
 
 dmalloc.html : $(srcdir)/dmalloc.texi
 	rm -f $@
-	texi2html -number -monolithic ../dmalloc.texi
+	texi2html -number -monolithic $(srcdir)/dmalloc.texi
 
-dmalloc.dvi : dmalloc.texi
+dmalloc.dvi : $(srcdir)/dmalloc.texi
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi .././$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
+	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
-INSTALL : $(INFOFILE)
+INSTALL : $(srcdir)/$(INFOFILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
 		> $@.t
