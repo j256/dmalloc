@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: env.c,v 1.16 1998/10/26 14:24:35 gray Exp $
+ * $Id: env.c,v 1.17 1998/11/12 16:28:12 gray Exp $
  */
 
 /*
@@ -53,10 +53,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.16 1998/10/26 14:24:35 gray Exp $";
+#ident "$Id: env.c,v 1.17 1998/11/12 16:28:12 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.16 1998/10/26 14:24:35 gray Exp $";
+  "$Id: env.c,v 1.17 1998/11/12 16:28:12 gray Exp $";
 #endif
 #endif
 
@@ -74,7 +74,8 @@ static	long	hex_to_long(const char *str)
   long		ret;
   
   /* strip off spaces */
-  for (; *str == ' ' || *str == '\t'; str++);
+  for (; *str == ' ' || *str == '\t'; str++) {
+  }
   
   /* skip a leading 0[xX] */
   if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) {

@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: compat.c,v 1.39 1998/10/26 14:24:28 gray Exp $
+ * $Id: compat.c,v 1.40 1998/11/12 16:28:11 gray Exp $
  */
 
 /*
@@ -39,10 +39,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.39 1998/10/26 14:24:28 gray Exp $";
+#ident "$Id: compat.c,v 1.40 1998/11/12 16:28:11 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.39 1998/10/26 14:24:28 gray Exp $";
+  "$Id: compat.c,v 1.40 1998/11/12 16:28:11 gray Exp $";
 #endif
 #endif
 
@@ -162,7 +162,8 @@ char	*strcat(char *str1, const char *str2)
 {
   char	*hold = str1;
   
-  for (; *str1 != '\0'; str1++);
+  for (; *str1 != '\0'; str1++) {
+  }
   
   while (*str2 != '\0') {
     *str1++ = *str2++;
@@ -181,7 +182,8 @@ int	strlen(const char *str)
 {
   int	len;
   
-  for (len = 0; *str != '\0'; str++, len++);
+  for (len = 0; *str != '\0'; str++, len++) {
+  }
   
   return len;
 }
@@ -193,7 +195,8 @@ int	strlen(const char *str)
  */
 int	strcmp(const char *str1, const char *str2)
 {
-  for (; *str1 != '\0' && *str1 == *str2; str1++, str2++);
+  for (; *str1 != '\0' && *str1 == *str2; str1++, str2++) {
+  }
   return *str1 - *str2;
 }
 #endif /* HAVE_STRCMP == 0 */
