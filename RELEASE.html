@@ -29,7 +29,7 @@ Date: July 10, 2004
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> A feature release with a number of new features. </p>
+<p> A release with a couple of new features. </p>
 
 <!--========================================================================-->
 
@@ -44,8 +44,9 @@ choice.  Please report any problems with this ASAP. </li>
 
 <li> Added return.h support for ia64 processors. </li>
 
-<li> Added compat and arg_checking of atoi, atol, and memmove.  Thanks
-to Guy (guyresh) for pointing out the omissions. /li>
+<li> Added compat and arg_checking of atoi, atol, and memmove. </li>
+
+<li> Added backwards compatibility for %d usage in logfile name. </li>
 
 </ul>
 
@@ -115,6 +116,10 @@ None.
 <li> Removed auto-seeding of internal random with variable seed.  This
 was creating random addresses for programs making it hard to
 debug. </li>
+
+<li> Fixed some missing semicolons and a int/unsigned-int bug. </li>
+
+<li> Fixed info file install target bug. </li>
 
 </ul>
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.113 2004/08/13 16:52:14 gray Exp $
+ * $Id: error.c,v 1.114 2004/08/13 21:26:27 gray Exp $
  */
 
 /*
@@ -77,7 +77,7 @@
 #if IDENT_WORKS
 #ident "@(#) $Information: lock-threads is enabled $"
 #else
-static char *information = "@(#) $Information: lock-threads is enabled $"
+static char *information = "@(#) $Information: lock-threads is enabled $";
 #endif
 #endif
 

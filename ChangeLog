@@ -1,5 +1,10 @@
 2004-08-13  Gray Watson  <gray@outside.256.com>
 
+	* Fixed some missing ; and a int/unsigned-int bug from feedback
+	from Joe Buehler.
+
+	* Added return.h support for AIX 4.3 RS/6000 from Joe Buehler.
+
 	* Added backwards compatibility (ugh) to %d for logfile name.
 
 2004-07-10  Gray Watson  <gray@outside.256.com>
@@ -2211,5 +2216,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.322 2004/08/13 16:52:14 gray Exp $
+$Id: ChangeLog,v 1.323 2004/08/13 21:26:51 gray Exp $
 -------------------------------------------------------------------------------

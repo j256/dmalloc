@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.205 2004/07/11 05:45:36 gray Exp $
+ * $Id: chunk.c,v 1.206 2004/08/13 21:26:27 gray Exp $
  */
 
 /*
@@ -1433,7 +1433,8 @@ static	skip_alloc_t	*use_free_memory(const unsigned int size,
 static	skip_alloc_t	*get_divided_memory(const unsigned int size)
 {
   skip_alloc_t	*slot_p;
-  unsigned int	need_size, *bits_p;
+  unsigned int	need_size;
+  int		*bits_p;
   
   for (bits_p = bit_sizes;; bits_p++) {
     if (*bits_p >= size) {

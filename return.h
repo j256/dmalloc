@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.34 2004/07/08 04:53:48 gray Exp $
+ * $Id: return.h,v 1.35 2004/08/13 21:26:27 gray Exp $
  */
 
 /*
@@ -271,11 +271,29 @@ do { \
 
 /*
  * RH AS2.1 gcc 2.96, tested on a piece of code compiled with icc (Intel
- * compiler V8 from Didier Remy.
+ * compiler V8) from Didier Remy.
  */
 #ifdef __ia64__
 #define GET_RET_ADDR(file)  asm("mov %0=b0" : "=g" (file) : /* no inputs */ )
 #endif
+
+/*************************************/
+
+/*
+ * AIX 4.3 RS/6000 from Joe Buehler.
+ */
+#if defined(_AIX)
+static	void	aix_c_get_ret_addr(int i, int *file)
+{
+  int start = *((int *)&start + 4);
+  while (--i >= 0) {
+    start = *((int *)start);
+  }
+  *file = *((int *)start + 2);
+}
+
+#define GET_RET_ADDR(file)	aix_c_get_ret_addr(0, (int *)&file)
+#endif /* _AIX */
 
 /*************************************/
 
