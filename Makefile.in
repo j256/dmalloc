@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.143 2000/11/07 17:33:28 gray Exp $
+# $Id: Makefile.in,v 1.144 2000/11/10 00:59:26 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -35,6 +35,7 @@ LIB_TH	= lib$(MODULE)th.a
 SHLIB_TH = lib$(MODULE)th.so
 @TH_ON@BUILD_TH = $(LIB_TH)
 @TH_ON@INSTALL_TH = installth
+@CXX_ON@@TH_ON@INSTALL_TH_CXX = installthcxx
 
 # C++ version of the library
 LIB_CXX	= lib$(MODULE)xx.a
@@ -70,11 +71,11 @@ FLS	=  conf.h.in configure.in config.help \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
-	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc.h protect.[ch] \
-	return.h version.h \
+	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc_funcs.h \
+	protect.[ch] return.h version.h \
 	settings.dist dmalloc_argv.[ch] dmalloc_argv_loc.h dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
-	configure
+	configure Makefile.bsd.ports
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
@@ -107,6 +108,13 @@ installincs :: $(HFLS)
 installcxx :: $(LIB_CXX)
 	install -cevr -m 644 $(LIB_CXX) $(DESTDIR)/lib
 
+installthcxx :: $(LIB_THCXX)
+	install -cevr -m 644 $(LIB_THCXX) $(DESTDIR)/lib
+
+installth :: $(LIB_TH) $(INSTALL_TH_CXX)
+	install -cevr -m 644 $(LIB_TH) $(DESTDIR)/lib
+@CXX_OFF@	@echo "Enter 'make installthcxx' to install the C++ library"
+
 installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
@@ -116,9 +124,6 @@ installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 install :: installlibs $(UTIL) $(INFOFILE)
 	install -cev $(UTIL) $(DESTDIR)/bin
 	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
-
-installth :: $(LIB_TH)
-	install -cevr -m 644 $(LIB_TH) $(DESTDIR)/lib
 
 installdocs :: $(DOCS)
 	install -cev -m 444 $(DOCS) $(WWWDIR)/docs
@@ -200,11 +205,13 @@ check light :: $(TEST)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
+	@echo tests have passed
 
 heavy :: $(TEST) light
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
+	@echo tests have passed
 
 continuous :: $(TEST)
 	while $(TEST) -n -t 100000 ;\
@@ -213,13 +220,12 @@ continuous :: $(TEST)
 		done
 
 port :: $(FLS) $(CONTFLS) Makefile.all.in
-	@ answer 'Is it okay to remove the $@ directory? '
-	rm -rf $@
-	mkdir $@ $@/contrib
-	cp $(FLS) Makefile.all.in $@
-	cp $(CONTFLS) $@/contrib
-	mv $@/Makefile.all.in $@/Makefile.in
-	mv $@ dmalloc-$(VERSION)
+	@ answer 'Is it okay to remove the dmalloc-$(VERSION) directory? '
+	rm -rf dmalloc-$(VERSION)
+	mkdir dmalloc-$(VERSION) dmalloc-$(VERSION)/contrib
+	cp $(FLS) Makefile.all.in dmalloc-$(VERSION)
+	cp $(CONTFLS) dmalloc-$(VERSION)/contrib
+	mv dmalloc-$(VERSION)/Makefile.all.in dmalloc-$(VERSION)/Makefile.in
 	rm -f dmalloc-$(VERSION).tgz dmalloc-$(VERSION).tgz.t
 	tar -czf dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION)
 	mv dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION).tgz

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.96 2000/11/07 17:33:28 gray Exp $
+# $Id: Makefile.all.in,v 1.97 2000/11/10 00:59:26 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -15,6 +15,7 @@ libdir = $(exec_prefix)/lib
 shlibdir = $(exec_prefix)/shlib
 incdir = $(prefix)/include
 infodir = $(prefix)/info
+docdir = $(prefix)/share/doc/$(MODULE)
 
 # default c-compiler
 CC = @CC@
@@ -40,6 +41,7 @@ LIB_TH	= lib$(MODULE)th.a
 SHLIB_TH = lib$(MODULE)th.so
 @TH_ON@BUILD_TH = $(LIB_TH)
 @TH_ON@INSTALL_TH = installth
+@CXX_ON@@TH_ON@INSTALL_TH_CXX = installthcxx
 
 # C++ version of the library
 LIB_CXX	= lib$(MODULE)xx.a
@@ -57,6 +59,9 @@ SHLIB_DIS = lib$(MODULE)lp.so
 
 UTIL = $(MODULE)
 INFOFILE = $(MODULE).info
+HTMLFILE = $(MODULE).html
+TEXIFILE = $(MODULE).texi
+DOCFILES = $(HTMLFILE) $(TEXIFILE)
 
 CCFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -108,6 +113,15 @@ installcxx : $(LIB_CXX)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIB_CXX) $(libdir)
 
+installthcxx : $(LIB_TH_CXX)
+	$(srcdir)/mkinstalldirs $(libdir)
+	$(INSTALL_DATA) $(LIB_TH_CXX) $(libdir)
+
+installth : $(LIB_TH) $(INSTALL_TH_CXX)
+	$(srcdir)/mkinstalldirs $(libdir)
+	$(INSTALL_DATA) $(LIB_TH) $(libdir)
+@CXX_OFF@	@echo "Enter 'make installthcxx' to install the C++ library"
+
 installlib : installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
@@ -115,25 +129,26 @@ installlib : installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 	$(INSTALL_DATA) $(LIB_DIS) $(libdir)
 	@RANLIB@ $(libdir)/$(LIB_DIS)
 
-install : installdirs installlib $(UTIL)
-	$(srcdir)/mkinstalldirs $(bindir)
-	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
-	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
-	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
-@CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
-@TH_OFF@	@echo "Enter 'make installth' to install thread library"
-
-installth : $(LIB_TH)
-	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_TH) $(libdir)
-
-installinfo : $(INFOFILE)
+installinfo : $(srcdir)/$(INFOFILE)
 	$(srcdir)/mkinstalldirs $(infodir)
 	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
+
+installdocs : $(srcdir)/$(HTMLFILE) $(srcdir)/$(TEXIFILE)
+	$(srcdir)/mkinstalldirs $(docdir)
+	$(INSTALL_DATA) $(srcdir)/$(HTMLFILE) $(srcdir)/$(TEXIFILE) $(docdir)
 
 installshlib : $(SHLIBRARY)
 	$(srcdir)/mkinstalldirs $(shlibdir)
 	$(INSTALL_DATA) $(srcdir)/$(SHLIBRARY) $(shlibdir)
+
+install : installdirs installlib $(UTIL)
+	$(srcdir)/mkinstalldirs $(bindir)
+	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
+	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
+	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(docdir)"
+	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
+@CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
+@TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
 dmalloc.h.2 : $(srcdir)/configure
 	$(SHELL) $(srcdir)/configure
@@ -214,11 +229,13 @@ check light : $(TEST)
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
+	@echo tests have passed
 
 heavy : $(TEST) light
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
+	@echo tests have passed
 
 .c.o :
 	rm -f $@
@@ -253,40 +270,44 @@ heavy : $(TEST) light
 # These dependencies are automatically generated.  Do not edit by hand.
 #
 
-arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h \
- debug_val.h dmalloc_loc.h error.h arg_check.h
-chunk.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
- dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h error.h error_val.h \
- heap.h
-compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
-dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
- compat.h debug_tok.h dmalloc_loc.h debug_val.h env.h error_str.h \
- error_val.h version.h
+arg_check.o: arg_check.c /usr/local/include/dmalloc.h conf.h \
+ settings.h chunk.h debug_val.h dmalloc_loc.h error.h arg_check.h
+chunk.o: chunk.c conf.h settings.h /usr/local/include/dmalloc.h \
+ chunk.h chunk_loc.h dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h \
+ error.h error_val.h heap.h protect.h
+compat.o: compat.c /usr/local/include/dmalloc.h conf.h settings.h \
+ compat.h dmalloc_loc.h
+dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h \
+ /usr/local/include/dmalloc.h compat.h debug_tok.h dmalloc_loc.h \
+ debug_val.h env.h error_str.h error_val.h version.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
  dmalloc_argv_loc.h compat.h
-dmalloc_lp.o: dmalloc_lp.c dmalloc.h conf.h settings.h error_val.h \
- dmalloc_loc.h dmalloc_lp.h malloc.h error.h return.h
-dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h dmalloc.h \
- debug_val.h dmalloc_loc.h error_val.h
+dmalloc_lp.o: dmalloc_lp.c /usr/local/include/dmalloc.h conf.h \
+ settings.h error_val.h dmalloc_loc.h dmalloc_lp.h malloc_funcs.h \
+ error.h return.h
+dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h \
+ /usr/local/include/dmalloc.h debug_val.h dmalloc_loc.h error_val.h
 dmalloc_tab.o: dmalloc_tab.c conf.h settings.h chunk.h compat.h \
- dmalloc.h dmalloc_loc.h error.h error_val.h dmalloc_tab.h \
- dmalloc_tab_loc.h
-env.o: env.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h \
- debug_tok.h debug_val.h env.h error.h
-error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
- dmalloc_loc.h env.h error.h error_val.h version.h
-heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
- debug_val.h dmalloc_loc.h error.h error_val.h heap.h
-malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
- debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
- heap.h dmalloc_lp.h malloc.h return.h
-protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
- protect.h
-chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
- dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h error.h error_val.h \
- heap.h
-error_th.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
- dmalloc_loc.h env.h error.h error_val.h version.h
-malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
- debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
- heap.h dmalloc_lp.h malloc.h return.h
+ /usr/local/include/dmalloc.h dmalloc_loc.h error.h error_val.h \
+ dmalloc_tab.h dmalloc_tab_loc.h
+env.o: env.c conf.h settings.h /usr/local/include/dmalloc.h compat.h \
+ dmalloc_loc.h debug_tok.h debug_val.h env.h error.h
+error.o: error.c conf.h settings.h /usr/local/include/dmalloc.h \
+ compat.h debug_val.h dmalloc_loc.h env.h error.h error_val.h \
+ version.h
+heap.o: heap.c /usr/local/include/dmalloc.h conf.h settings.h chunk.h \
+ compat.h debug_val.h dmalloc_loc.h error.h error_val.h heap.h
+malloc.o: malloc.c conf.h settings.h /usr/local/include/dmalloc.h \
+ chunk.h compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
+ error_val.h heap.h dmalloc_lp.h malloc_funcs.h return.h
+protect.o: protect.c conf.h settings.h /usr/local/include/dmalloc.h \
+ dmalloc_loc.h error.h heap.h protect.h
+chunk_th.o: chunk.c conf.h settings.h /usr/local/include/dmalloc.h \
+ chunk.h chunk_loc.h dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h \
+ error.h error_val.h heap.h protect.h
+error_th.o: error.c conf.h settings.h /usr/local/include/dmalloc.h \
+ compat.h debug_val.h dmalloc_loc.h env.h error.h error_val.h \
+ version.h
+malloc_th.o: malloc.c conf.h settings.h /usr/local/include/dmalloc.h \
+ chunk.h compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
+ error_val.h heap.h dmalloc_lp.h malloc_funcs.h return.h

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.102 2000/11/07 16:57:31 gray Exp $
+ * $Id: version.h,v 1.103 2000/11/10 00:59:27 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -31,6 +31,7 @@
  *	Changlog
  *	RELEASE.html
  *	NEWS
+ *	Makefile.bsd.ports
  *	dmalloc.spec
  *	dmalloc.texi (2 places)
  *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
@@ -39,6 +40,6 @@
  */
 static	char	*dmalloc_version = "4.7.2";
 
-/* Version Date: $Date: 2000/11/07 16:57:31 $ */
+/* Version Date: $Date: 2000/11/10 00:59:27 $ */
 
 #endif /* ! __VERSION_H__ */

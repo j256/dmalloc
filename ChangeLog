@@ -1,3 +1,8 @@
+Thu Nov  9 19:58:56 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added OpenBSD port information.  Hopefully this will be close to
+ 	Free/Net/... BSD as well.
+
 Tue Nov  7 11:39:26 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Removed malloc.h to malloc_funcs.h to avoid system conflicts.
@@ -1700,5 +1705,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.264 2000/11/07 17:33:03 gray Exp $
+$Id: ChangeLog,v 1.265 2000/11/10 00:59:25 gray Exp $
 -------------------------------------------------------------------------------
