@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -34,14 +34,14 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.27 1994/08/29 15:10:25 gray Exp $";
+  "$Id: compat.c,v 1.28 1994/09/10 23:27:14 gray Exp $";
 #endif
 
 #if HAVE_BCOPY == 0
 /*
  * copy LEN characters from DEST to SRC
  */
-EXPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len)
+EXPORT	void	bcopy(const char * src, char * dest, DMALLOC_SIZE len)
 {
   char		*destp;
   const	char	*srcp;
@@ -69,7 +69,7 @@ EXPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len)
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-EXPORT	int	bcmp(const char * str1, const char * str2, MALLOC_SIZE len)
+EXPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
 {
   for (; len > 0; len--, str1++, str2++)
     if (*str1 != *str2)
@@ -123,7 +123,7 @@ EXPORT	char	*index(const char * str, int ch)
  * set LEN characters in STR to character CH
  * NOTE: remember Gray, there is no bset().
  */
-EXPORT	char	*memset(char * str, int ch, MALLOC_SIZE len)
+EXPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len)
 {
   char	*hold = str;
   
@@ -220,7 +220,7 @@ EXPORT	char	*strdup(const char * ptr)
 /*
  * return the length in characters of STR
  */
-EXPORT	MALLOC_SIZE	strlen(const char * str)
+EXPORT	DMALLOC_SIZE	strlen(const char * str)
 {
   int	len;
   
@@ -236,7 +236,7 @@ EXPORT	MALLOC_SIZE	strlen(const char * str)
  */
 EXPORT	int	strncmp(const char * str1, const char * str2, const int len)
 {
-  int	len;
+  int	lenc;
   
   for (lenc = 0; lenc < len; lenc++, str1++, str2++)
     if (*str1 != *str2 || *str1 == NULLC)

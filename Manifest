@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.25 1994/04/08 21:10:49 gray Exp $
+$Id: Manifest,v 1.26 1994/09/10 23:26:43 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -58,6 +58,35 @@ debug_tok.h		Tokens that correspond to debugging
 
 debug_val.h		Values corresponding to the debug tokens.
 
+dmalloc.c		Program that assists in the setting of the
+			DMALLOC_DEBUG and other debug environmental
+			variables.
+
+dmalloc.h		Installed malloc .h file to be included in
+			those .c files where file and line debugging
+			information is required.
+
+dmalloc.h.[123]		Used to create dmalloc.h.
+
+dmalloc.info		User-level gnu info manual file for the malloc
+			routines.  Suitable as a text manual also.
+
+dmalloc.ps		Possible postscript file for TeX-less folks.
+
+dmalloc.texi		Texinfo user manual for generating TeX or Info
+			formats.
+
+dmalloc_loc.h		Local defines for all of the malloc routines.
+
+dmalloc_lp.[ch]		Leap-frog routines to provide file/line info
+			to lib.
+
+dmalloc_t.c		Meager test program for testing the malloc
+			routines.
+
+dmallocrc		Sample RC file that is used to set the debug
+			flags.
+
 error.[ch]		Debugging routines and others that provide
 			user output.
 
@@ -71,35 +100,6 @@ heap.[ch]		Possibly machine specific routines for
 malloc.c		Higher level alloc routines including malloc,
 			free, realloc, etc.  These are the routines to
 			be called from user space.
-
-malloc.info		User-level gnu info manual file for the malloc
-			routines.  Suitable as a text manual also.
-
-malloc.ps		Possible postscript file for TeX-less folks.
-
-malloc.texi		Texinfo user manual for generating TeX or Info
-			formats.
-
-malloc_dbg.c		Program that assists in the setting of the
-			MALLOC_DEBUG and other debug environmental
-			variables.
-
-malloc_dbg.[123]	Used to create malloc_dbg.h.
-
-malloc_dbg.h		Installed malloc .h file to be included in
-			those .c files where file and line debugging
-			information is required.
-
-malloc_loc.h		Local defines for all of the malloc routines.
-
-malloc_lp.[ch]		Leap-frog routines to provide file/line info
-			to lib.
-
-malloc_t.c		Meager test program for testing the malloc
-			routines.
-
-mallocrc		Sample RC file that is used to set the debug
-			flags.
 
 return.h		Defines to get the return-address for non-malloc calls.
 

@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.39 1994/08/29 15:11:09 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.40 1994/09/10 23:27:35 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -537,7 +537,7 @@ static	void	do_interactive(void)
       ret = malloc_verify((char *)pnt);
       (void)printf("malloc_verify(%#lx) returned: %s\n",
 		   (long)pnt,
-		   (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
+		   (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
       continue;
     }
     
@@ -588,7 +588,7 @@ int	main(int argc, char ** argv)
   ret = malloc_verify(NULL);
   if (! silent)
     (void)printf("Final malloc_verify returned: %s\n",
-		 (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
+		 (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
   
   if (dmalloc_errno == 0)
     exit(0);

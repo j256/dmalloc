@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: error_val.h,v 1.10 1994/05/22 22:40:12 gray Exp $
+ * $Id: error_val.h,v 1.11 1994/09/10 23:27:49 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__

@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.36 1994/08/02 03:11:24 gray Exp $
+ * $Id: conf.h.in,v 1.37 1994/09/10 23:27:18 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -160,7 +160,7 @@
  * 14 (meaning basic block size of 16k) will probably be good.
  *
  * NOTE: some sbrk functions round to the correct page-size.  If this
- * value is too low, the malloc-dbg library may think someone is using
+ * value is too low, the dmalloc library may think someone is using
  * sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR error.  No
  * problems aside from a possible small increase in the administration
  * overhead should happen if this value is too high.
@@ -202,7 +202,7 @@
 #define HAVE_ON_EXIT 0
 
 /*
- * the malloc_dbg library provides its own versions of the following
+ * the dmalloc library provides its own versions of the following
  * functions, or knows how to work around their absence.
  */
 #define HAVE_BCMP 0

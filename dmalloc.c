@@ -1,9 +1,9 @@
 /*
- * program that handles the malloc debug variables.
+ * program that handles the dmalloc variables.
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -20,8 +20,8 @@
  */
 
 /*
- * This is the malloc_dbg program which is designed to enable the user
- * to easily set the environmental variables that control the malloc-debug
+ * This is the dmalloc program which is designed to enable the user
+ * to easily set the environmental variables that control the dmalloc
  * library capabilities.
  *
  * NOTE: all stdout output from this program is designed to be run through
@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.38 1994/08/29 15:10:35 gray Exp $";
+  "$Id: dmalloc.c,v 1.39 1994/09/10 23:27:24 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -474,8 +474,7 @@ EXPORT	int	main(int argc, char ** argv)
   char	buf[20];
   char	debug_set = FALSE;
   
-  argv_help_string =
-    "Sets malloc_dbg library env variables.  Also try --usage.";
+  argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
   argv_version_string = malloc_version;
   
   argv_process(args, argc, argv);

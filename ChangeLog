@@ -72,7 +72,7 @@ Wed May 11 12:02:31 1994  Gray Watson  (gray@blender.antaire.com)
 	* Fixed problem with never-reuse going on/off and check-lists.
 
 	* Added -r (random-debug) option to malloc_t which causes it to
-	constantly change the malloc-debug flags while testing.
+	constantly change the dmalloc flags while testing.
 
 	* Fixed VERY nasty bug in realloc with alloc-blank and no
 	realloc-copy token.
@@ -778,5 +778,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.113 1994/09/08 14:43:23 gray Exp $
+$Id: ChangeLog,v 1.114 1994/09/10 23:26:33 gray Exp $
 -------------------------------------------------------------------------------

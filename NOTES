@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.26 1994/03/20 18:47:53 gray Exp $
+$Id: NOTES,v 1.27 1994/09/10 23:26:46 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -16,11 +16,11 @@ WARNINGS:
 	its fence-post markers.
 
 -	some systems' sbrk calls seem to round to the page size or to
-	some other anonymous value.  Malloc-dbg will complain if it
-	does not get contiguous memory and gets confused by this.  If
-	the configuration script does not set it up correctly, then
-	you may have to play with the basic block size to make it
-	match the page size.
+	some other anonymous value.  Dmalloc will complain if it does
+	not get contiguous memory and gets confused by this.  If the
+	configuration script does not set it up correctly, then you
+	may have to play with the basic block size to make it match
+	the page size.
 
 -	currently, it is assumed that none of the return-addresses
 	that are returned by the assembly hacks in return.h (or

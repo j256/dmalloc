@@ -1,9 +1,9 @@
 /*
- * defines to get the return-address for non-malloc_lp malloc calls.
+ * defines to get the return-address for non-dmalloc_lp malloc calls.
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: return.h,v 1.7 1994/07/21 19:04:50 gray Exp $
+ * $Id: return.h,v 1.8 1994/09/10 23:27:59 gray Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #define SET_RET_ADDR(file, line)	\
   do { \
-    if (file == MALLOC_DEFAULT_FILE) \
+    if (file == DMALLOC_DEFAULT_FILE) \
       file = (char *)asm("bis %ra,%ra,%v0"); \
   } while(0)
 
@@ -70,7 +70,7 @@
  */
 #define SET_RET_ADDR(file, line)	\
   do { \
-    if (file == MALLOC_DEFAULT_FILE) \
+    if (file == DMALLOC_DEFAULT_FILE) \
       asm("st %%i7,%0" : \
 	  "=g" (file) : \
 	  /* no inputs */ ); \
@@ -90,7 +90,7 @@
 
 #define SET_RET_ADDR(file, line)	\
   do { \
-    if (file == MALLOC_DEFAULT_FILE) \
+    if (file == DMALLOC_DEFAULT_FILE) \
       asm("movl 4(%%ebp),%%eax ; movl %%eax,%0" : \
 	  "=g" (file) : \
 	  /* no inputs */ : \

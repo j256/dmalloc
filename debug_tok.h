@@ -1,9 +1,9 @@
 /*
- * token attributes for the malloc_dbg program and _dmalloc_flags
+ * token attributes for the dmalloc program and _dmalloc_flags
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.6 1994/08/29 15:10:32 gray Exp $
+ * $Id: debug_tok.h,v 1.7 1994/09/10 23:27:20 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__

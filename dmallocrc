@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your $HOME directory to
 # activate.  See malloc.info for more information.
 #
-# $Id: dmallocrc,v 1.22 1994/04/07 03:03:51 gray Exp $
+# $Id: dmallocrc,v 1.23 1994/09/10 23:27:38 gray Exp $
 #
 
 #
@@ -13,9 +13,9 @@
 #
 #	tag	token1, token2, ...
 #
-# To use the above line you say 'malloc_dbg tag' which enables the
+# To use the above line you say 'dmalloc tag' which enables the
 # debugging facilities token1, token2, ...  You must pass the output
-# from malloc_dbg through your shell's eval command to change your
+# from dmalloc through your shell's eval command to change your
 # environment.  See malloc.info for more information.
 #
 # Lines can end with a \ meaning it continues onto the next line.

@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -43,15 +43,15 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.65 1994/09/02 21:34:45 gray Exp $";
+  "$Id: malloc.c,v 1.66 1994/09/10 23:27:57 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
-/* logfile for dumping malloc info, MALLOC_LOGFILE env var overrides this */
+/* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 EXPORT	char		*dmalloc_logpath = NULL;
-/* internal malloc error number for reference purposes only */
+/* internal dmalloc error number for reference purposes only */
 EXPORT	int		dmalloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call _dmalloc_error() */
 #if defined(__STDC__) && __STDC__ == 1
@@ -60,8 +60,8 @@ EXPORT	void		*dmalloc_address = NULL;
 EXPORT	char		*dmalloc_address = NULL;
 #endif
 /*
- * argument to malloc_address, if 0 then never call _dmalloc_error()
- * else call it after seeing malloc_address for this many times.
+ * argument to dmalloc_address, if 0 then never call _dmalloc_error()
+ * else call it after seeing dmalloc_address for this many times.
  */
 EXPORT	int		dmalloc_address_count = 0;
 
@@ -84,11 +84,11 @@ EXPORT	int		_malloc_verify(const char * pnt);
 EXPORT	void		_dmalloc_debug(const int debug);
 EXPORT	int		_dmalloc_debug_current(void);
 #if defined(__STDC__) && __STDC__ == 1
-EXPORT	int		_dmalloc_examine(const void * pnt, MALLOC_SIZE * size,
+EXPORT	int		_dmalloc_examine(const void * pnt, DMALLOC_SIZE * size,
 					 char ** file, unsigned int * line,
 					 void ** ret_attr);
 #else
-EXPORT	int		_dmalloc_examine(const char * pnt, MALLOC_SIZE * size,
+EXPORT	int		_dmalloc_examine(const char * pnt, DMALLOC_SIZE * size,
 					 char ** file, unsigned int * line,
 					 char ** ret_attr);
 #endif
@@ -145,7 +145,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
     _dmalloc_error("check_debug_vars");
-    /* NOTE: malloc_error may die already */
+    /* NOTE: dmalloc_error may die already */
     _dmalloc_die();
     /*NOTREACHED*/
   }
@@ -160,7 +160,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
       && start_file[0] != NULLC
       && file != NULL
-      && line != MALLOC_DEFAULT_LINE
+      && line != DMALLOC_DEFAULT_LINE
       && strcmp(start_file, file) == 0
       && (start_line == 0 || start_line == line))
     BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
@@ -209,13 +209,13 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
 }
 
 /*
- * get the values of malloc environ variables
+ * get the values of dmalloc environ variables
  */
 LOCAL	void	get_environ(void)
 {
   const char	*env;
   
-  /* get the malloc_debug value -- if we haven't called malloc_debug yet */
+  /* get the dmalloc_debug value -- if we haven't called dmalloc yet */
   if (_dmalloc_debug_preset != DEBUG_PRE_NONE)
     _dmalloc_flags = _dmalloc_debug_preset;
   else {
@@ -224,7 +224,7 @@ LOCAL	void	get_environ(void)
       _dmalloc_flags = (int)hex_to_long(env);
   }
   
-  /* get the malloc debug logfile name into a holding variable */
+  /* get the dmalloc logfile name into a holding variable */
   env = (const char *)getenv(LOGFILE_ENVIRON);
   if (env != NULL) {
     /* NOTE: this may cause core dumps if env contains a bad format string */
@@ -317,7 +317,7 @@ LOCAL	int	dmalloc_startup(void)
     
     /*
      * HACK: we have to disable the in_alloc because we might be about
-     * to go recursize.  this should not get back here since malloc
+     * to go recursize.  this should not get back here since dmalloc
      * has been enabled.
      */
     in_alloc = FALSE;
@@ -349,7 +349,7 @@ EXPORT	void	_dmalloc_shutdown(void)
 {
   /* NOTE: do not generate errors for IN_TWICE here */
   
-  /* if we've died in malloc somewhere then leave fast and quietly */
+  /* if we've died in dmalloc somewhere then leave fast and quietly */
   if (in_alloc)
     return;
   
@@ -376,9 +376,9 @@ EXPORT	void	_dmalloc_shutdown(void)
  * allocate and return a SIZE block of bytes.  returns 0L on error.
  */
 #if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	*malloc(MALLOC_SIZE size)
+EXPORT	void	*malloc(DMALLOC_SIZE size)
 #else
-EXPORT	char	*malloc(MALLOC_SIZE size)
+EXPORT	char	*malloc(DMALLOC_SIZE size)
 #endif
 {
   void		*newp;
@@ -400,8 +400,8 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
   
   in_alloc = FALSE;
   
-  _dmalloc_file = MALLOC_DEFAULT_FILE;
-  _dmalloc_line = MALLOC_DEFAULT_LINE;
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   return newp;
 }
@@ -411,13 +411,13 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
  * of SIZE bytes and zero the block.  returns 0L on error.
  */
 #if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
+EXPORT	void	*calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 #else
-EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
+EXPORT	char	*calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 #endif
 {
   void		*newp;
-  MALLOC_SIZE	len = num_elements * size;
+  DMALLOC_SIZE	len = num_elements * size;
   
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
@@ -436,9 +436,9 @@ EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
  * all of OLD_PNT to the new area or truncating.  returns 0L on error.
  */
 #if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
+EXPORT	void	*realloc(void * old_pnt, DMALLOC_SIZE new_size)
 #else
-EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
+EXPORT	char	*realloc(char * old_pnt, DMALLOC_SIZE new_size)
 #endif
 {
   void		*newp;
@@ -468,8 +468,8 @@ EXPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size)
   
   in_alloc = FALSE;
   
-  _dmalloc_file = MALLOC_DEFAULT_FILE;
-  _dmalloc_line = MALLOC_DEFAULT_LINE;
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   return newp;
 }
@@ -514,8 +514,8 @@ EXPORT	int	free(void * pnt)
   
   in_alloc = FALSE;
   
-  _dmalloc_file = MALLOC_DEFAULT_FILE;
-  _dmalloc_line = MALLOC_DEFAULT_LINE;
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
 #if defined(__STDC__) && __STDC__ == 1
 #else
@@ -550,7 +550,7 @@ EXPORT	int	cfree(void * pnt)
 EXPORT	void	_dmalloc_log_heap_map(void)
 {
   /* check the heap since we are dumping info from it */
-  if (check_debug_vars(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE) != NOERROR)
+  if (check_debug_vars(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE) != NOERROR)
     return;
   
   _chunk_log_heap_map();
@@ -559,7 +559,7 @@ EXPORT	void	_dmalloc_log_heap_map(void)
 }
 
 /*
- * dump malloc statistics to logfile
+ * dump dmalloc statistics to logfile
  * NOTE: called by way of leap routine in dmalloc_lp.c
  */
 EXPORT	void	_dmalloc_log_stats(void)
@@ -574,8 +574,8 @@ EXPORT	void	_dmalloc_log_stats(void)
   
   in_alloc = FALSE;
   
-  _dmalloc_file = MALLOC_DEFAULT_FILE;
-  _dmalloc_line = MALLOC_DEFAULT_LINE;
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
 }
 
 /*
@@ -596,8 +596,8 @@ EXPORT	void	_dmalloc_log_unfreed(void)
   
   in_alloc = FALSE;
   
-  _dmalloc_file = MALLOC_DEFAULT_FILE;
-  _dmalloc_line = MALLOC_DEFAULT_LINE;
+  _dmalloc_file = DMALLOC_DEFAULT_FILE;
+  _dmalloc_line = DMALLOC_DEFAULT_LINE;
 }
 
 /*
@@ -618,7 +618,7 @@ EXPORT	int	_dmalloc_verify(const char * pnt)
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
     _dmalloc_error("check_debug_vars");
-    /* NOTE: malloc_error may die already */
+    /* NOTE: dmalloc_error may die already */
     _dmalloc_die();
     /*NOTREACHED*/
   }
@@ -628,14 +628,14 @@ EXPORT	int	_dmalloc_verify(const char * pnt)
   if (pnt == NULL)
     ret = _chunk_heap_check();
   else
-    ret = _chunk_pnt_check("malloc_verify", pnt, CHUNK_PNT_EXACT, 0);
+    ret = _chunk_pnt_check("dmalloc_verify", pnt, CHUNK_PNT_EXACT, 0);
   
   in_alloc = FALSE;
   
   if (ret == NOERROR)
-    return MALLOC_VERIFY_NOERROR;
+    return DMALLOC_VERIFY_NOERROR;
   else
-    return MALLOC_VERIFY_ERROR;
+    return DMALLOC_VERIFY_ERROR;
 }
 
 /*
@@ -673,7 +673,7 @@ EXPORT	void	_dmalloc_debug(const int debug)
 
 /*
  * returns the current debug functionality flags.  this allows you to
- * save a malloc library state to be restored later.
+ * save a dmalloc library state to be restored later.
  */
 EXPORT	int	_dmalloc_debug_current(void)
 {
@@ -688,11 +688,11 @@ EXPORT	int	_dmalloc_debug_current(void)
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
 #if defined(__STDC__) && __STDC__ == 1
-EXPORT	int	_dmalloc_examine(const void * pnt, MALLOC_SIZE * size,
+EXPORT	int	_dmalloc_examine(const void * pnt, DMALLOC_SIZE * size,
 				char ** file, unsigned int * line,
 				void ** ret_attr)
 #else
-EXPORT	int	_dmalloc_examine(const char * pnt, MALLOC_SIZE * size,
+EXPORT	int	_dmalloc_examine(const char * pnt, DMALLOC_SIZE * size,
 				char ** file, unsigned int * line,
 				char ** ret_attr)
 #endif
@@ -700,7 +700,7 @@ EXPORT	int	_dmalloc_examine(const char * pnt, MALLOC_SIZE * size,
   int		ret;
   
   /* need to check the heap here since we are geting info from it below */
-  if (check_debug_vars(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE) != NOERROR)
+  if (check_debug_vars(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE) != NOERROR)
     return ERROR;
   
   /* NOTE: we do not need the alloc-size info */
@@ -715,7 +715,7 @@ EXPORT	int	_dmalloc_examine(const char * pnt, MALLOC_SIZE * size,
 }
 
 /*
- * malloc version of strerror to return the string version of ERRNUM
+ * dmalloc version of strerror to return the string version of ERRNUM
  * returns the string for MALLOC_BAD_ERRNO if ERRNUM is out-of-range.
  */
 EXPORT	char	*_dmalloc_strerror(const int errnum)

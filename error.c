@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -40,13 +40,13 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.41 1994/08/29 15:11:11 gray Exp $";
+  "$Id: error.c,v 1.42 1994/09/10 23:27:42 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
-/* global debug flags that are set my MALLOC_DEBUG environ variable */
+/* global debug flags that are set my DMALLOC_DEBUG environ variable */
 EXPORT	long		_dmalloc_flags = 0;
 
 /* global iteration counter for activities */

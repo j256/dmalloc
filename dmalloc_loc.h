@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.28 1994/08/29 15:10:52 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.29 1994/09/10 23:27:29 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__

@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -43,14 +43,14 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.82 1994/09/08 14:08:52 gray Exp $";
+  "$Id: chunk.c,v 1.83 1994/09/10 23:26:59 gray Exp $";
 #endif
 
 /*
- * the unknown file pointer.  did not use MALLOC_UNKNOWN_FILE everywhere else
+ * the unknown file pointer.  did not use DMALLOC_UNKNOWN_FILE everywhere else
  * the pointers would be different.
  */
-EXPORT	char		*_dmalloc_unknown_file = MALLOC_UNKNOWN_FILE;
+EXPORT	char		*_dmalloc_unknown_file = DMALLOC_UNKNOWN_FILE;
 
 /* local routines */
 EXPORT	void		_chunk_log_heap_map(void);
@@ -234,12 +234,12 @@ LOCAL	char	*expand_buf(const void * buf, const int size)
 LOCAL	void	desc_pnt(char * buf, const char * file,
 			 const unsigned int line)
 {
-  if ((file == MALLOC_DEFAULT_FILE || file == _dmalloc_unknown_file)
-      && line == MALLOC_DEFAULT_LINE)
+  if ((file == DMALLOC_DEFAULT_FILE || file == _dmalloc_unknown_file)
+      && line == DMALLOC_DEFAULT_LINE)
     (void)sprintf(buf, "%s", _dmalloc_unknown_file);
-  else if (line == MALLOC_DEFAULT_LINE)
+  else if (line == DMALLOC_DEFAULT_LINE)
     (void)sprintf(buf, "ra=%#lx", (long)file);
-  else if (file == MALLOC_DEFAULT_FILE)
+  else if (file == DMALLOC_DEFAULT_FILE)
     (void)sprintf(buf, "ra=ERROR(line=%u)", line);
   else
     (void)sprintf(buf, "%s:%u", file, line);
@@ -1126,7 +1126,7 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check file pointer */
       if (bblockp->bb_file != NULL
-	  && bblockp->bb_line != MALLOC_DEFAULT_LINE) {
+	  && bblockp->bb_line != DMALLOC_DEFAULT_LINE) {
 	len = strlen(bblockp->bb_file);
 	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	  dmalloc_errno = ERROR_BAD_FILEP;
@@ -1305,7 +1305,7 @@ EXPORT	int	_chunk_heap_check(void)
 		 bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitn);
 		 bytep++)
 	      if (*bytep != BLANK_CHAR) {
-		log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+		log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 			       bytep, "overwrote free space", TRUE);
 		dmalloc_errno = ERROR_FREE_NON_BLANK;
 		_dmalloc_error("_chunk_heap_check");
@@ -1335,7 +1335,7 @@ EXPORT	int	_chunk_heap_check(void)
 	}
 	
 	if (dblockp->db_file != NULL
-	    && dblockp->db_line != MALLOC_DEFAULT_LINE) {
+	    && dblockp->db_line != DMALLOC_DEFAULT_LINE) {
 	  len = strlen(dblockp->db_file);
 	  if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	    dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
@@ -1399,7 +1399,7 @@ EXPORT	int	_chunk_heap_check(void)
 			    (bblockp - this_admp->ba_blocks));
 	for (bytep = (char *)pnt; bytep < (char *)pnt + BLOCK_SIZE; bytep++)
 	  if (*bytep != BLANK_CHAR) {
-	    log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+	    log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 			   bytep, "overwrote free space", TRUE);
 	    dmalloc_errno = ERROR_FREE_NON_BLANK;
 	    _dmalloc_error("_chunk_heap_check");
@@ -1501,7 +1501,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
       return NOERROR;
     }
     else {
-      log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+      log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "not in heap", FALSE);
       /* errno set in find_bblock */
       _dmalloc_error(func);
@@ -1528,7 +1528,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 	pnt = (char *)pnt - diff;
       }
       else {
-	log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+	log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		       CHUNK_TO_USER(pnt), "not on block boundary", FALSE);
 	dmalloc_errno = ERROR_NOT_ON_BLOCK;
 	_dmalloc_error(func);
@@ -1542,7 +1542,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
     
     if (dblockp->db_bblock == bblockp) {
       /* NOTE: we should run through free list here */
-      log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+      log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "bad administration info", FALSE);
       dmalloc_errno = ERROR_IS_FREE;
       _dmalloc_error(func);
@@ -1577,7 +1577,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
     
     /* check file pointer */
     if (dblockp->db_file != NULL
-	&& dblockp->db_line != MALLOC_DEFAULT_LINE) {
+	&& dblockp->db_line != DMALLOC_DEFAULT_LINE) {
       len = strlen(dblockp->db_file);
       if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	log_error_info(dblockp->db_file, dblockp->db_line, TRUE,
@@ -1612,7 +1612,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 	min += diff;
     }
     else {
-      log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+      log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "not on block boundary", FALSE);
       dmalloc_errno = ERROR_NOT_ON_BLOCK;
       _dmalloc_error(func);
@@ -1624,7 +1624,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
   if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)
       && ! (BIT_IS_SET(check, CHUNK_PNT_LOOSE)
 	    && BIT_IS_SET(bblockp->bb_flags, BBLOCK_USER))) {
-    log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+    log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		   CHUNK_TO_USER(pnt), "not at start of user space", FALSE);
     dmalloc_errno = ERROR_NOT_START_USER;
     _dmalloc_error(func);
@@ -1660,7 +1660,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
   
   /* check file pointer */
   if (bblockp->bb_file != NULL
-      && bblockp->bb_line != MALLOC_DEFAULT_LINE) {
+      && bblockp->bb_line != DMALLOC_DEFAULT_LINE) {
     len = strlen(bblockp->bb_file);
     if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
       log_error_info(bblockp->bb_file, bblockp->bb_line, TRUE,
@@ -1702,7 +1702,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, NULL);
   if (bblockp == NULL) {
-    log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+    log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		   CHUNK_TO_USER(pnt), "not in heap", FALSE);
     /* errno set in find_bblock */
     _dmalloc_error("_chunk_read_info");
@@ -1714,7 +1714,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     /* on a mini-block boundary? */
     if (((char *)pnt - (char *)bblockp->bb_mem) %
 	(1 << bblockp->bb_bitn) != 0) {
-      log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+      log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "not on block boundary", FALSE);
       dmalloc_errno = ERROR_NOT_ON_BLOCK;
       _dmalloc_error("_chunk_read_info");
@@ -1727,7 +1727,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     
     if (dblockp->db_bblock == bblockp) {
       /* NOTE: we should run through free list here */
-      log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+      log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "bad administration info", FALSE);
       dmalloc_errno = ERROR_IS_FREE;
       _dmalloc_error("_chunk_read_info");
@@ -1740,7 +1740,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     if (alloc_size != NULL)
       *alloc_size = 1 << bblockp->bb_bitn;
     if (file != NULL) {
-      if (dblockp->db_line == MALLOC_DEFAULT_LINE)
+      if (dblockp->db_line == DMALLOC_DEFAULT_LINE)
 	*file = NULL;
       else
 	*file = (char *)dblockp->db_file;
@@ -1748,7 +1748,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     if (line != NULL)
       *line = dblockp->db_line;
     if (ret_attr != NULL) {
-      if (dblockp->db_line == MALLOC_DEFAULT_LINE)
+      if (dblockp->db_line == DMALLOC_DEFAULT_LINE)
 	*ret_attr = (char *)dblockp->db_file;
       else
 	*ret_attr = NULL;
@@ -1758,7 +1758,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     
     /* verify that the pointer is either dblock or user allocated */
     if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
-      log_error_info(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, TRUE,
+      log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 		     CHUNK_TO_USER(pnt), "not at start of user space", FALSE);
       dmalloc_errno = ERROR_NOT_USER;
       _dmalloc_error("_chunk_read_info");
@@ -1771,7 +1771,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     if (alloc_size != NULL)
       *alloc_size = NUM_BLOCKS(bblockp->bb_size) * BLOCK_SIZE;
     if (file != NULL) {
-      if (bblockp->bb_line == MALLOC_DEFAULT_LINE)
+      if (bblockp->bb_line == DMALLOC_DEFAULT_LINE)
 	*file = NULL;
       else
 	*file = (char *)bblockp->bb_file;
@@ -1779,7 +1779,7 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
     if (line != NULL)
       *line = bblockp->bb_line;
     if (ret_attr != NULL) {
-      if (bblockp->bb_line == MALLOC_DEFAULT_LINE)
+      if (bblockp->bb_line == DMALLOC_DEFAULT_LINE)
 	*ret_attr = (char *)bblockp->bb_file;
       else
 	*ret_attr = NULL;
@@ -2624,7 +2624,7 @@ EXPORT	void	_chunk_dump_unfreed(void)
       /* unknown pointer? */
       if (bblockp->bb_file == _dmalloc_unknown_file
 	  || bblockp->bb_file == NULL
-	  || bblockp->bb_line == MALLOC_DEFAULT_LINE) {
+	  || bblockp->bb_line == DMALLOC_DEFAULT_LINE) {
 	unknown_blockc++;
 	unknown_sizec += bblockp->bb_size - pnt_total_adm;
 	unknown = 1;
@@ -2707,7 +2707,7 @@ EXPORT	void	_chunk_dump_unfreed(void)
 	/* unknown pointer? */
 	if (dblockp->db_file == _dmalloc_unknown_file
 	    || dblockp->db_file == NULL
-	    || dblockp->db_line == MALLOC_DEFAULT_LINE) {
+	    || dblockp->db_line == DMALLOC_DEFAULT_LINE) {
 	  unknown_blockc++;
 	  unknown_sizec += dblockp->db_size - pnt_total_adm;
 	  unknown = 1;

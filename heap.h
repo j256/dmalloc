@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.22 1994/08/29 15:11:21 gray Exp $
+ * $Id: heap.h,v 1.23 1994/09/10 23:27:54 gray Exp $
  */
 
 #ifndef __HEAP_H__

@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.54 1994/09/08 14:43:30 gray Exp $
+# $Id: Makefile.in,v 1.55 1994/09/10 23:26:41 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -159,7 +159,7 @@ dmalloc.ps : dmalloc.texi
 
 dmalloc.head : dmalloc.info
 	rm -f $@ $@.t
-	sed -e '/^Malloc Debug Library/,/Gray Watson/p' -e 'd' < \
+	sed -e '/^Debug Malloc Library/,/Gray Watson/p' -e 'd' < \
 		dmalloc.info > $@.t
 	echo '' >> $@.t
 	echo ---------------------------------------------------------------- \

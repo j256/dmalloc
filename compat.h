@@ -3,7 +3,7 @@
  *
  * Copyright 1993 by the Antaire Corporation
  *
- * This file is part of the malloc-debug package.
+ * This file is part of the dmalloc package.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose and without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.18 1994/08/29 15:10:28 gray Exp $
+ * $Id: compat.h,v 1.19 1994/09/10 23:27:16 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -47,21 +47,21 @@ IMPORT	long	time(long * timep);
  * copy LEN characters from SRC to DEST
  */
 #if HAVE_BCOPY == 0
-IMPORT	void	bcopy(const char * src, char * dest, MALLOC_SIZE len);
+IMPORT	void	bcopy(const char * src, char * dest, DMALLOC_SIZE len);
 #endif
 
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
 #if HAVE_BCMP == 0
-IMPORT	int	bcmp(const char * str1, const char * str2, MALLOC_SIZE len);
+IMPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len);
 #endif
 
 /*
  * set LEN characters in STR to character CH
  */
 #if HAVE_MEMSET == 0
-IMPORT	char	*memset(char * str, int ch, MALLOC_SIZE len);
+IMPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len);
 #endif
 
 /*
@@ -96,7 +96,7 @@ IMPORT	int	strcmp(const char * str1, const char * str2);
  * return the length in characters of STR
  */
 #if HAVE_STRLEN == 0
-IMPORT	MALLOC_SIZE	strlen(const char * str);
+IMPORT	DMALLOC_SIZE	strlen(const char * str);
 #endif
 
 /*
