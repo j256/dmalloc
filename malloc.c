@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.142 2000/03/21 18:19:15 gray Exp $
+ * $Id: malloc.c,v 1.143 2000/03/21 22:13:50 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.142 2000/03/21 18:19:15 gray Exp $";
+#ident "$Id: malloc.c,v 1.143 2000/03/21 22:13:50 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.142 2000/03/21 18:19:15 gray Exp $";
+  "$Id: malloc.c,v 1.143 2000/03/21 22:13:50 gray Exp $";
 #endif
 #endif
 
@@ -299,16 +299,16 @@ static	RETSIGTYPE	signal_handler(const int sig)
  */
 static	int	dmalloc_startup(void)
 {
-  static int	all_up_b = 0;
+  static int	some_up_b = 0;
   
   /* have we started already? */
-  if (all_up_b) {
+  if (enabled_b) {
     return ERROR;
   }
   
-  if (! enabled_b) {
+  if (! some_up_b) {
     /* set this up here so if an error occurs below, it will not try again */
-    enabled_b = TRUE;
+    some_up_b = 1;
     
 #if STORE_TIMEVAL
     GET_TIMEVAL(_dmalloc_start);
@@ -362,7 +362,7 @@ static	int	dmalloc_startup(void)
    * NOTE: set this up here so if an error occurs below, it will not
    * try again
    */
-  all_up_b = 1;
+  enabled_b = 1;
   
   /*
    * NOTE: we may go recursive below here becasue atexit or on_exit
