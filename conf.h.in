@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.33 1994/03/30 06:06:41 gray Exp $
+ * $Id: conf.h.in,v 1.34 1994/07/21 18:45:07 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -122,6 +122,17 @@
  * begin the tough debugging at a certain point.
  */
 #define LOG_ITERATION_COUNT 1
+
+/*
+ * this macro is used to kill the current process and produce a
+ * core-dump image.  Most Unix-like systems should use the kill
+ * line although other may want to substiture in the abort.
+ *
+ * NOTE: On some OS's, abort calls fclose() which may want to free
+ * memory making the library go recursive.
+ */
+#define KILL_PROCESS()		(void)kill(0, ERROR_SIGNAL)
+/* #define KILL_PROCESS()		abort() */
 
 /*
  ************************************************************************
