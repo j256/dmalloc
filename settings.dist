@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.36 1999/03/07 23:04:19 gray Exp $
+ * $Id: settings.dist,v 1.37 1999/03/07 23:55:19 gray Exp $
  */
 
 /*
@@ -335,8 +335,19 @@
 /*
  * This indicates how many of the top entries from the memory table
  * you want to log by default to the log file.
+ *
+ * NOTE: to display the top entries correctly, your OS must support
+ * the qsort function.
  */
 #define MEMORY_TABLE_LOG 10
+
+/*
+ * Define this to 1 to only display the memory table summary of the
+ * dumped table pointers.  The default is to display the summary as
+ * well as the individual pointers so the individual leaks can be
+ * tracked down.
+ */
+#define DUMP_UNFREED_SUMMARY_ONLY 0
 
 /****************************** thread settings ******************************/
 
