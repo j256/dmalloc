@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.29 1995/05/16 00:24:36 gray Exp $
+$Id: NOTES,v 1.30 1999/03/09 05:17:36 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -15,75 +15,11 @@ WARNINGS:
 	release 4.1 (and maybe before/after), was overwriting one of
 	its fence-post markers.
 
--	some systems' sbrk calls seem to round to the page size or to
-	some other anonymous value.  Dmalloc will complain if it does
-	not get contiguous memory and gets confused by this.  If the
-	configuration script does not set it up correctly, then you
-	may have to play with the basic block size to make it match
-	the page size.
-
 -	currently, it is assumed that none of the return-addresses
 	that are returned by the assembly hacks in return.h (or
 	__FILE__ arguments for that matter), are on the heap -- in
 	other words that you do not make calls to malloc libraries
-	from code stored on the heap.  See the 2 XXX sections for
-	specifics.  Set USE_RET_ADDRESS define to 0 in conf.h to
-	disable if you are having problems.
-
--	incorrect formats passed in from environment variable
-	MALLOC_LOGFILE will cause core dumps because it is passed
-	through sprintf.  This may or may not be a security hole.
-	Recommendations on better ways of achieving this?
-
--------------------------------------------------------------------------------
-
-GENERAL:
-
--	I've considered adding the mprotect features which would
-	signal if code READ into certain areas (writing is easy with
-	magic values).  This causes problems since most (all?)
-	mprotect implementations work with page-size resolutions which
-	means that every allocation (8 byte string) would require
-	8+pagesize (often > 4096 bytes).  Anyone have a easier way of
-	accomplishing this?
-
--	For coders, the library should have all the code that depends
-	on heaps growing up or down in heap.[ch].  Any dependences on
-	>,<,-,+,etc are potential problems and should be brought to my
-	attention.
-
--	Should the free and alloc-blank tokens write the address % 256
-	into bytes instead of a constant '\305'
-
-	- it would slow it down a bit
-	- maybe some token/option?
-	- \305 is recognizable however
-
--	zsh users may want to try either of the following as dmalloc
-	function overloading is NO_EQUALS is not set:
-
-		dmalloc() { eval `=dmalloc -b $*` }
-		alias dmalloc='eval `=dmalloc -b $*` }
-
--------------------------------------------------------------------------------
-
-EXIT REGISTRATION FUNCTIONS BY SYSTEM/OS TYPES:
-
-	System/OS   |   atexit()   |  on_exit()  |   others    |
-	------------+--------------+-------------+-------------+
-	AIX 3.2.4   |     yes      |      no     |      no     |
-	------------+--------------+-------------+-------------+
-	Ultrix 4.3  |      no      |      no     |      no     |
-	------------+--------------+-------------+-------------+
-	BSD/386 1.0 |     yes      |      no     |      no     |
-	------------+--------------+-------------+-------------+
-	OSF/1 1.3   |     yes      |      no     |      no     |
-	------------+--------------+-------------+-------------+
-	SunOS 4.1   |      no      |     yes     |      no     |
-	------------+--------------+-------------+-------------+
-	Solaris 1.1 |      no      |     yes     |      no     |
-	------------+--------------+-------------+-------------+
-	Pyramid     |      no      |      no     |      no     |
-	------------+--------------+-------------+-------------+
+	from code stored on the heap.  Set USE_RET_ADDRESS define to 0
+	in conf.h to disable if you are having problems.
 
 -------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.30 1997/12/05 21:09:33 gray Exp $
+$Id: TODO,v 1.31 1999/03/09 05:17:37 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -177,5 +177,21 @@ GENERAL:
 	- could have program:tag entries for default behavior in program
 	- requires knowing the argv[0] argument
 - add a recalloc function.  I guess it is available under SGI.
+
+-------------------------------------------------------------------------------
+
+- should the free and alloc-blank tokens write the address % 256 into
+bytes instead of a constant '\305'
+
+	- it would slow it down a bit
+	- maybe some token/option?
+	- \305 is recognizable however
+
+- I've considered adding the mprotect features which would signal if
+code READ into certain areas (writing is easy with magic values).
+This causes problems since most (all?)  mprotect implementations work
+with page-size resolutions which means that every allocation (8 byte
+string) would require 8+pagesize (often > 4096 bytes).  Anyone have a
+easier way of accomplishing this?
 
 -------------------------------------------------------------------------------
