@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.71 1994/04/07 03:03:33 gray Exp $";
+  "$Id: chunk.c,v 1.72 1994/04/07 21:15:50 gray Exp $";
 #endif
 
 /*
@@ -394,7 +394,7 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
 {
   bblock_t	*bblockp, *prevp;
   bblock_t	*bestp = NULL, *best_prevp = NULL;
-  int		bitc, pos, bitn, best = 0;
+  int		bitc, bitn, pos, best = 0;
   bblock_adm_t	*admp;
   
   /*
@@ -862,7 +862,7 @@ EXPORT	int	_chunk_note_external(const int blockn, const void * mem)
 /******************************* heap checking *******************************/
 
 /*
- * run extensive tests on the entire heap depending on TYPE
+ * run extensive tests on the entire heap
  */
 EXPORT	int	_chunk_heap_check(void)
 {
@@ -1949,7 +1949,7 @@ EXPORT	void	_chunk_log_heap_map(void)
 EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 			       const unsigned int size)
 {
-  int		bitn, byten = size;
+  unsigned int	bitn, byten = size;
   bblock_t	*bblockp;
   void		*pnt;
   
@@ -2060,14 +2060,19 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 EXPORT	int	_chunk_free(const char * file, const unsigned int line,
 			    void * pnt)
 {
-  int		bitn, blockn, given;
+  unsigned int	bitn, blockn, given;
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   
   /* counts calls to free */
   free_count++;
   
-  alloc_cur_pnts--;
+  if (pnt == NULL) {
+    log_error_info(file, line, TRUE, pnt, "zero pointer", FALSE);
+    _malloc_error("_chunk_free");
+    malloc_errno = ERROR_IS_NULL;
+    return FREE_ERROR;
+  }
   
   /* adjust the pointer down if fence-posting */
   pnt = USER_TO_CHUNK(pnt);
@@ -2079,6 +2084,8 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     _malloc_error("_chunk_free");
     return FREE_ERROR;
   }
+  
+  alloc_cur_pnts--;
   
   /* are we free'ing a dblock entry? */
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
@@ -2220,7 +2227,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   void		*newp, *ret_addr;
   char		*old_file;
   unsigned int	old_size, size, old_line;
-  int		old_bitn, new_bitn;
+  unsigned int	old_bitn, new_bitn;
   
   /* counts calls to realloc */
   realloc_count++;
@@ -2234,6 +2241,14 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     return REALLOC_ERROR;
   }
 #endif
+  
+  /* by now malloc.c should have taken care of the realloc(NULL) case */
+  if (oldp == NULL) {
+    log_error_info(file, line, TRUE, oldp, "zero pointer", FALSE);
+    _malloc_error("_chunk_realloc");
+    malloc_errno = ERROR_IS_NULL;
+    return REALLOC_ERROR;
+  }
   
   /*
    * TODO: for bblocks it would be nice to examine the above memory
@@ -2389,7 +2404,7 @@ EXPORT	void	_chunk_stats(void)
   
   tot_space = alloc_current + free_space_count;
   overhead = HEAP_SIZE - tot_space;
-  wasted = tot_space - alloc_maximum;
+  wasted = tot_space - alloc_max_given;
   
   /* version information */
   _malloc_message("version '%s', basic-block %d bytes, alignment %d bytes, heap grows %s",
