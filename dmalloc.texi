@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.57 1994/09/20 18:57:58 gray Exp $
+@c $Id: dmalloc.texi,v 1.58 1994/09/20 19:05:21 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -436,8 +436,9 @@ DMALLOC_OPTIONS=value;
 export DMALLOC_OPTIONS;
 @end example
 
-The @samp{DMALLOC_OPTIONS} variable is a comma separated list of tokens
-with a value.  Each of the tokens is described below:
+The @samp{DMALLOC_OPTIONS} variable should be set to a comma separated
+list of tokens with a corresponding value.  Each of the tokens is
+described below:
 
 @table @samp
 @item debug
@@ -453,9 +454,9 @@ transactions (value @samp{0x008}) and wanted to check fence-post memory
 values of the tokens because the dmalloc program automates the setting
 of this variable especially.
 
-@emph{NOTE}: You can also specify the debug tokens directly separate by
-commas.  @xref{Debug Tokens}.  If @samp{debug} and the tokens are both
-used, the token values will be added to the debug value.
+@emph{NOTE}: You can also specify the debug tokens directly, separated
+by commas.  @xref{Debug Tokens}.  If @samp{debug} and the tokens are
+both used, the token values will be added to the debug value.
 
 @item log
 @cindex logfile setting
@@ -528,8 +529,9 @@ Some examples are:
 # turn on transaction and stats logging and set 'malloc' as the log-file
 setenv DMALLOC_OPTIONS log-trans,log-stats,log=malloc
 
-# enable heap-checking and set the interval to be 100
-setenv DMALLOC_OPTIONS check-heap,log=malloc
+# enable debug flags 0x1f as well as heap-checking and set the interval
+# to be 100
+setenv DMALLOC_OPTIONS debug=0x1f,check-heap,log=malloc
 
 # enable 'malloc' as the log-file, watch for address '0x1234', and start
 # checking when we see file.c line 123
