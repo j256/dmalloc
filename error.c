@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.103 2003/05/16 04:09:13 gray Exp $
+ * $Id: error.c,v 1.104 2003/05/19 18:14:15 gray Exp $
  */
 
 /*
@@ -93,11 +93,7 @@ extern	const char	*dmalloc_strerror(const int errnum);
 /*
  * exported variables
  */
-/* internal dmalloc error number for reference purposes only */
-int		dmalloc_errno = ERROR_NONE;
 
-/* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-char		*dmalloc_logpath = NULL;
 /* address to look for.  when discovered call dmalloc_error() */
 DMALLOC_PNT	_dmalloc_address = NULL;
 /* when to stop at an address */
@@ -349,7 +345,7 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 #endif
 
 /*
- * void dmalloc_vmessage
+ * void _dmalloc_vmessage
  *
  * DESCRIPTION:
  *
@@ -366,7 +362,7 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  *
  * args -> Already converted pointer to a stdarg list.
  */
-void	dmalloc_vmessage(const char *format, va_list args)
+void	_dmalloc_vmessage(const char *format, va_list args)
 {
   char		str[1024], *str_p, *bounds_p;
   int		len;
@@ -437,34 +433,6 @@ void	dmalloc_vmessage(const char *format, va_list args)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     (void)write(STDERR, str, len);
   }
-}
-
-/*
- * void dmalloc_message
- *
- * DESCRIPTION:
- *
- * Message writer with printf like arguments which adds a line to the
- * dmalloc logfile.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * format -> Printf-style format statement.
- *
- * ... -> Variable argument list.
- */
-void	dmalloc_message(const char *format, ...)
-  /* __attribute__ ((format (printf, 1, 2))) */
-{
-  va_list	args;
-  
-  va_start(args, format);
-  dmalloc_vmessage(format, args);
-  va_end(args);
 }
 
 /*

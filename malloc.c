@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.163 2003/05/16 04:09:12 gray Exp $
+ * $Id: malloc.c,v 1.164 2003/05/19 18:14:16 gray Exp $
  */
 
 /*
@@ -87,6 +87,14 @@
 static char *information = "@(#) $Information: lock-threads is enabled $"
 #endif
 #endif
+
+/* exported variables */
+
+/* internal dmalloc error number for reference purposes only */
+int		dmalloc_errno = ERROR_NONE;
+
+/* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
+char		*dmalloc_logpath = NULL;
 
 /* local variables */
 static	int		enabled_b = 0;		/* have we started yet? */
@@ -1314,10 +1322,8 @@ int	malloc_verify(const DMALLOC_PNT pnt)
  * Set the global debug functionality flags.  You can also use
  * dmalloc_debug_setup.
  *
- * Note: you cannot remove certain flags such as signal handlers since
- * they are setup at initialization time only.  Also you cannot add
- * certain flags such as free-space checking since they must be on
- * from the start.
+ * Note: you cannot add or remove certain flags such as signal
+ * handlers since they are setup at initialization time only.
  *
  * RETURNS:
  *
@@ -1614,6 +1620,57 @@ void	dmalloc_log_changed(const unsigned long mark, const int not_freed_b,
   _dmalloc_chunk_log_changed(mark, not_freed_b, free_b, details_b);
   
   dmalloc_out();
+}
+
+/*
+ * void dmalloc_vmessage
+ *
+ * DESCRIPTION:
+ *
+ * Message writer with vprintf like arguments which adds a line to the
+ * dmalloc logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * format -> Printf-style format statement.
+ *
+ * args -> Already converted pointer to a stdarg list.
+ */
+void	dmalloc_vmessage(const char *format, va_list args)
+{
+  _dmalloc_vmessage(format, args);
+}
+
+/*
+ * void dmalloc_message
+ *
+ * DESCRIPTION:
+ *
+ * Message writer with printf like arguments which adds a line to the
+ * dmalloc logfile.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * format -> Printf-style format statement.
+ *
+ * ... -> Variable argument list.
+ */
+void	dmalloc_message(const char *format, ...)
+  /* __attribute__ ((format (printf, 1, 2))) */
+{
+  va_list	args;
+  
+  va_start(args, format);
+  _dmalloc_vmessage(format, args);
+  va_end(args);
 }
 
 /*
