@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.166 2003/05/23 03:05:10 gray Exp $
+# $Id: Makefile.in,v 1.167 2003/06/04 23:44:34 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -18,7 +18,7 @@ CC = @CC@
 CXX = @CXX@
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o compat.o dmalloc_tab.o env.o heap.o
+OBJS	= arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o

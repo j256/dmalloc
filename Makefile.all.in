@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.117 2003/05/23 03:05:10 gray Exp $
+# $Id: Makefile.all.in,v 1.118 2003/06/04 23:44:34 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -141,7 +141,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = dmalloc.h
-OBJS = arg_check.o compat.o dmalloc_tab.o env.o heap.o
+OBJS = arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o

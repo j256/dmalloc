@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.183 2003/05/23 03:05:10 gray Exp $
+ * $Id: chunk.c,v 1.184 2003/06/04 23:43:45 gray Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 #include "compat.h"
 #include "debug_tok.h"
 #include "dmalloc_loc.h"
+#include "dmalloc_rand.h"
 #include "dmalloc_tab.h"
 #include "error.h"
 #include "error_val.h"
@@ -183,10 +184,10 @@ static	int	random_level(const int max_level)
      *
      * Since many machines return random numbers which aren't that
      * random, there may be better ways of doing this.  In the past I
-     * had (random() % 10000 >= 5000) or something but I'd rather not
-     * have the % overhead here.
+     * had (_dmalloc_rand() % 10000 >= 5000) or something but I'd
+     * rather not have the % overhead here.
      */
-    if (random() & 1) {
+    if (_dmalloc_rand() & 1) {
       break;
     }
   }
