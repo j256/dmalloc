@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.34 2002/01/28 19:10:11 gray Exp $
+ * $Id: debug_tok.h,v 1.35 2003/05/13 16:37:44 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -46,7 +46,8 @@ static	attr_t		attributes[] = {
   { "log-known",	DEBUG_LOG_KNOWN,	"log only known non-freed" },
   { "log-trans",	DEBUG_LOG_TRANS,	"log memory transactions" },
   { "log-admin",	DEBUG_LOG_ADMIN,	"log administrative info" },
-  { "log-blocks",	DEBUG_LOG_BLOCKS,	"log blocks when heap-map" },
+  { "log-blocks",	0,
+    "Disabled because of new heap organization" },
   { "log-bad-space",	DEBUG_LOG_BAD_SPACE,	"dump space from bad pnt" },
   { "log-nonfree-space",DEBUG_LOG_NONFREE_SPACE,
     "dump space from non-freed pointers" },
@@ -73,7 +74,8 @@ static	attr_t		attributes[] = {
   { "error-abort",	DEBUG_ERROR_ABORT,	"abort immediately on error" },
   { "alloc-blank",	DEBUG_ALLOC_BLANK,
     "overwrite newly alloced memory with BLANK_CHAR" },
-  { "heap-check-map",	DEBUG_HEAP_CHECK_MAP,	"log heap-map on heap-check" },
+  { "heap-check-map",	0,
+    "Disbaled because of new heap organization" },
   { "print-messages",	DEBUG_PRINT_MESSAGES,	"write messages to stderr" },
   { "catch-null",	DEBUG_CATCH_NULL,      "abort if no memory available"},
   { "never-reuse",	DEBUG_NEVER_REUSE,	"never re-use freed memory" },
