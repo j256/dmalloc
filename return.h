@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.35 2004/08/13 21:26:27 gray Exp $
+ * $Id: return.h,v 1.36 2004/10/12 13:53:15 gray Exp $
  */
 
 /*
@@ -294,6 +294,15 @@ static	void	aix_c_get_ret_addr(int i, int *file)
 
 #define GET_RET_ADDR(file)	aix_c_get_ret_addr(0, (int *)&file)
 #endif /* _AIX */
+
+/*************************************/
+
+/*
+ * For ARM based machines with gcc/gas 3.3.3 -- Silvester Erdeg.
+ */
+#ifdef __arm__
+#define GET_RET_ADDR(file)  asm("str lr, %0" : "=g" (file) : /* no inputs */ )
+#endif
 
 /*************************************/
 
