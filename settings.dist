@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.46 2000/03/21 18:19:16 gray Exp $
+ * $Id: settings.dist,v 1.47 2000/05/15 15:46:41 gray Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 /*
  * Should we allow realloc to a 0 size to cause the pointer to be
  * freed?  If set to one, this will call free when a pointer is
- * realloc-ed to a size of 0.  Thanks to Stefan.Froehlich@tuwien.ac.at
+ * realloc-ed to a size of 0.  Thanks to Stefan Froehlich
  * for patiently pointing that the realloc in just about every Unix
  * has this functionality.
  */
@@ -367,6 +367,15 @@
  * they actually used it.
  */
 #define USE_DMALLOC_LEAP 0
+
+/*
+ * Set to 0 if you don't want dmalloc to be using mprotect to restrict
+ * accesses to memory blocks.  This is a newer part of the library and
+ * still may have bugs.  Protection will only be on if the
+ * auto-configuration scripts find the mprotect function and the
+ * PROT_NONE, PROT_READ, and PROT_WRITE defines.
+ */
+#define PROTECT_BLOCKS 1
 
 /****************************** thread settings ******************************/
 

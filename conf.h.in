@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.81 2000/03/21 18:19:08 gray Exp $
+ * $Id: conf.h.in,v 1.82 2000/05/15 15:46:40 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -29,6 +29,13 @@
 /*
  * NOTE: The following settings should not need to be tuned by hand.
  */
+
+/*
+ * Set to 1 if the mprotect function was found and the PROT_NONE,
+ * PROT_READ, and PROT_WRITE defines were found in sys/mman.h.  This
+ * is so that we can restrict access to certain blocks of memory.
+ */
+#define PROTECT_ALLOWED 0
 
 /*
  * (char *)sbrk(const int incr) is the main heap-memory allocation
