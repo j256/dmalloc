@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.63 1998/09/18 19:11:55 gray Exp $
+ * $Id: conf.h.in,v 1.64 1998/09/28 21:58:28 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -160,7 +160,9 @@
 #define HAVE_FORK 0
 #define HAVE_GETPID 0
 #define HAVE_TIME 0
+
 #define HAVE_RECALLOC 0
+#define HAVE_VALLOC 0
 
 #define HAVE_BCMP 0
 #define HAVE_BCOPY 0

@@ -1,3 +1,12 @@
+Mon Sep 28 17:55:24 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added better auto-configuration of valloc.
+
+	* Improved the log-trans output messages.
+
+	* Added the printf attribute to error.c's dmalloc_message.  Fixed
+        a number of casting problems.
+
 Fri Sep 18 13:37:23 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.0.0 beta.
@@ -1270,5 +1279,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.187 1998/09/19 00:27:02 gray Exp $
+$Id: ChangeLog,v 1.188 1998/09/28 21:58:29 gray Exp $
 -------------------------------------------------------------------------------
