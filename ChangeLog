@@ -1,3 +1,13 @@
+Mon Feb 26 12:17:25 2001  Gray Watson  <gray@whopper.be.256.com>
+
+	* Releasing dmalloc version 4.8.2.
+
+	* Installed new configure script to remove C++ requirement.
+
+Sun Feb 25 18:58:37 2001  Gray Watson  <gray@whopper.be.256.com>
+
+	* Making major changes to a number of routines.
+
 Thu Feb 22 19:24:38 2001  Gray Watson  <gray@whopper.be.256.com>
 
 	* Added more information to heap-check error messages on freed
@@ -1752,5 +1762,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.272 2001/02/23 22:09:01 gray Exp $
+$Id: ChangeLog,v 1.273 2001/02/28 05:14:26 gray Exp $
 -------------------------------------------------------------------------------
