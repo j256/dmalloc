@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.121 1999/03/09 05:00:04 gray Exp $
+# $Id: Makefile.in,v 1.122 1999/03/09 05:14:01 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -130,17 +130,17 @@ threads : $(LIB_TH)
 chunk_th.o : chunk.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c chunk.c -o ./$@
+		-c $(srcdir)/chunk.c -o ./$@
 
 error_th.o : error.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
-		-c error.c -o $@
+		-c $(srcdir)/error.c -o $@
 
 malloc_th.o : malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
-		-c malloc.c -o $@
+		-c $(srcdir)/malloc.c -o $@
 
 tests :: $(TEST)
 

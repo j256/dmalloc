@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.78 1999/03/08 19:24:31 gray Exp $
+# $Id: Makefile.all.in,v 1.79 1999/03/09 05:14:02 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -156,20 +156,20 @@ $(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o
 threads : $(LIB_TH)
 
 # special _th versions of objects with the LOCK_THREADS variable defined to 1
-chunk_th.o : chunk.c
+chunk_th.o : $(srcdir)/chunk.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c chunk.c -o ./$@
+		-c $(srcdir)/chunk.c -o ./$@
 
-error_th.o : error.c
+error_th.o : $(srcdir)/error.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c error.c -o ./$@
+		-c $(srcdir)/error.c -o ./$@
 
-malloc_th.o : malloc.c
+malloc_th.o : $(srcdir)/malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c malloc.c -o ./$@
+		-c $(srcdir)/malloc.c -o ./$@
 
 tests : $(TEST)
 
