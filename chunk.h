@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.h,v 1.53 1999/03/04 19:08:15 gray Exp $
+ * $Id: chunk.h,v 1.54 1999/03/05 00:30:32 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -41,7 +41,8 @@ int	_chunk_startup(void);
  * Display a bad pointer with FILE and LINE information
  */
 extern
-char	*_chunk_display_where(const char *file, const unsigned int line);
+char	*_chunk_display_where(const char *file, const unsigned int line,
+			      char *buf, const int buf_size);
 
 /*
  * Run extensive tests on the entire heap

@@ -18,15 +18,13 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: env.c,v 1.20 1999/03/04 19:11:18 gray Exp $
+ * $Id: env.c,v 1.21 1999/03/05 00:28:37 gray Exp $
  */
 
 /*
  * This file contains short routine(s) to process the environment
  * variable(s) used by the library to get the runtime option(s).
  */
-
-#include <stdio.h>				/* for sprintf */
 
 #define DMALLOC_DISABLE
 
@@ -50,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.20 1999/03/04 19:11:18 gray Exp $";
+#ident "$Id: env.c,v 1.21 1999/03/05 00:28:37 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.20 1999/03/04 19:11:18 gray Exp $";
+  "$Id: env.c,v 1.21 1999/03/05 00:28:37 gray Exp $";
 #endif
 #endif
 
@@ -103,7 +101,7 @@ static	long	hex_to_long(const char *str)
  * Break up ADDR_ALL into ADDR_P and ADDR_COUNT_P
  */
 void	_dmalloc_address_break(const char *addr_all, unsigned long *addr_p,
-			       int *addr_count_p)
+			       long *addr_count_p)
 {
   char	*colon_p;
   
@@ -148,7 +146,7 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  * string.
  */
 void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
-			     int *addr_count_p, unsigned int *debug_p,
+			     long *addr_count_p, unsigned int *debug_p,
 			     unsigned long *interval_p, int *lock_on_p,
 			     char **logpath_p, char **sfile_p,
 			     int *sline_p, int *scount_p)
@@ -267,7 +265,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
        * NOTE: this may cause core dumps if this_p contains a bad
        * format string
        */
-      (void)sprintf(log_path, this_p, getpid());
+      (void)loc_snprintf(log_path, sizeof(log_path), this_p, getpid());
 #else
       (void)strcpy(log_path, this_p);
 #endif
@@ -317,15 +315,16 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
  * Set dmalloc environ variable(s) with the values (maybe SHORT debug
  * info) into BUF.
  */
-void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
+void	_dmalloc_environ_set(char *buf, const int buf_size,
+			     const int long_tokens_b,
 			     const int short_tokens_b,
 			     const unsigned long address,
-			     const int addr_count, const unsigned int debug,
+			     const long addr_count, const unsigned int debug,
 			     const int interval, const int lock_on,
 			     const char *logpath, const char *sfile,
 			     const int sline, const int scount)
 {
-  char	*buf_p = buf;
+  char	*buf_p = buf, *bounds_p = buf + buf_size;
   
   if (debug != (unsigned int)DEBUG_INIT) {
     if (short_tokens_b || long_tokens_b) {
@@ -334,64 +333,57 @@ void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
       for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
 	if (debug & attr_p->at_value) {
 	  if (short_tokens_b) {
-	    (void)sprintf(buf_p, "%s,", attr_p->at_short);
+	    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s,",
+				  attr_p->at_short);
 	  }
 	  else {
-	    (void)sprintf(buf_p, "%s,", attr_p->at_string);
-	  }
-	  for (; *buf_p != '\0'; buf_p++) {
+	    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s,",
+				  attr_p->at_string);
 	  }
 	}
       }
     }
     else {
-      (void)sprintf(buf_p, "%s%c%#x,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
-      for (; *buf_p != '\0'; buf_p++) {
-      }
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#x,",
+			    DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
     }
   }
   if (address != ADDRESS_INIT) {
     if (addr_count != ADDRESS_COUNT_INIT) {
-      (void)sprintf(buf_p, "%s%c%#lx:%d,",
-		    ADDRESS_LABEL, ASSIGNMENT_CHAR, address, addr_count);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx:%ld,",
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address,
+			    addr_count);
     }
     else {
-      (void)sprintf(buf_p, "%s%c%#lx,",
-		    ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
-    }
-    for (; *buf_p != '\0'; buf_p++) {
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx,",
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
     }
   }
   if (interval != INTERVAL_INIT) {
-    (void)sprintf(buf_p, "%s%c%d,", INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
-    for (; *buf_p != '\0'; buf_p++) {
-    }
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
+			  INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
   }
   if (lock_on != LOCK_ON_INIT) {
-    (void)sprintf(buf_p, "%s%c%d,", LOCK_ON_LABEL, ASSIGNMENT_CHAR, lock_on);
-    for (; *buf_p != '\0'; buf_p++) {
-    }
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
+			  LOCK_ON_LABEL, ASSIGNMENT_CHAR, lock_on);
   }
   if (logpath != LOGPATH_INIT) {
-    (void)sprintf(buf_p, "%s%c%s,", LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
-    for (; *buf_p != '\0'; buf_p++) {
-    }
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%s,",
+			  LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
   }
   if (sfile != START_FILE_INIT) {
     if (sline != START_LINE_INIT) {
-      (void)sprintf(buf_p, "%s%c%s:%d,",
-		    START_LABEL, ASSIGNMENT_CHAR, sfile, sline);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%s:%d,",
+			    START_LABEL, ASSIGNMENT_CHAR, sfile, sline);
     }
     else {
-      (void)sprintf(buf_p, "%s%c%s,", START_LABEL, ASSIGNMENT_CHAR, sfile);
-    }
-    for (; *buf_p != '\0'; buf_p++) {
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%s,",
+			    START_LABEL, ASSIGNMENT_CHAR, sfile);
     }
   }
   else if (scount != START_COUNT_INIT) {
-    (void)sprintf(buf_p, "%s%c%d,", START_LABEL, ASSIGNMENT_CHAR, scount);
-    for (; *buf_p != '\0'; buf_p++) {
-    }
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
+			  START_LABEL, ASSIGNMENT_CHAR, scount);
   }
   
   /* cut off the last comma */

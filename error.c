@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.82 1999/03/04 19:11:20 gray Exp $
+ * $Id: error.c,v 1.83 1999/03/05 00:30:47 gray Exp $
  */
 
 /*
@@ -73,10 +73,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.82 1999/03/04 19:11:20 gray Exp $";
+#ident "$Id: error.c,v 1.83 1999/03/05 00:30:47 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.82 1999/03/04 19:11:20 gray Exp $";
+  "$Id: error.c,v 1.83 1999/03/05 00:30:47 gray Exp $";
 #endif
 #endif
 
@@ -91,9 +91,11 @@ extern	char		*_dmalloc_strerror(const int errnum);
  * exported variables
  */
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
-char		*dmalloc_logpath = LOGPATH_INIT;
+char		*_dmalloc_logpath = LOGPATH_INIT;
 /* address to look for.  when discovered call dmalloc_error() */
-DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
+DMALLOC_PNT	_dmalloc_address = ADDRESS_INIT;
+/* when to stop at an address */
+long		_dmalloc_address_seen_n = ADDRESS_COUNT_INIT;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
 unsigned int	_dmalloc_flags = 0;
@@ -119,13 +121,11 @@ int		_dmalloc_aborting_b = FALSE;
 /*
  * print the time into local buffer which is returned
  */
-char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b)
+char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
+			   const int buf_size, const int elapsed_b)
 {
-  static char	buf[64];
   unsigned long	hrs, mins, secs;
   unsigned long	usecs;
-  
-  buf[0] = '\0';
   
   secs = timeval_p->tv_sec;
   usecs = timeval_p->tv_usec;
@@ -143,7 +143,7 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b)
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-  (void)sprintf(buf, "%lu:%lu:%lu.%lu", hrs, mins, secs, usecs);
+  (void)loc_snprintf(buf, buf_size, "%lu:%lu:%lu.%lu", hrs, mins, secs, usecs);
   
   return buf;
 }
@@ -153,12 +153,11 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b)
 /*
  * print the time into local buffer which is returned
  */
-char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b)
+char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
+			const int elapsed_b)
 {
-  static char	buf[64];
   unsigned long	hrs, mins, secs;
   
-  buf[0] = '\0';
   secs = *time_p;
   
   if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
@@ -169,7 +168,7 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b)
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-  (void)sprintf(buf, "%lu:%lu:%lu", hrs, mins, secs);
+  (void)loc_snprintf(buf, buf_size, "%lu:%lu:%lu", hrs, mins, secs);
   
   return buf;
 }
@@ -181,29 +180,29 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b)
 void	_dmalloc_vmessage(const char *format, va_list args)
 {
   static int	outfile = -1;
-  char		str[1024], *str_p = str;
+  char		str[1024], *str_p, *bounds_p;
   int		len;
   
+  str_p = str;
+  bounds_p = str_p + sizeof(str);
+  
   /* no logpath and no print then no workie */
-  if (dmalloc_logpath == LOGPATH_INIT
+  if (_dmalloc_logpath == LOGPATH_INIT
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     return;
   }
   
 #if HAVE_TIME
 #if LOG_TIME_NUMBER
-  (void)sprintf(str_p, "%lu: ", (unsigned long)time(NULL));
-  for (; *str_p != '\0'; str_p++) {
-  }
+  str_p += loc_snprintf(str_p, bounds_p - str_p, "%lu: ",
+			(unsigned long)time(NULL));
 #endif /* LOG_TIME_NUMBER */
 #if HAVE_CTIME
 #if LOG_CTIME_STRING
   {
     TIME_TYPE	now;
     now = time(NULL);
-    (void)sprintf(str_p, "%.24s: ", ctime(&now));
-    for (; *str_p != '\0'; str_p++) {
-    }
+    str_p += loc_snprintf(str_p, bounds_p - str_p, "%.24s: ", ctime(&now));
   }
 #endif /* LOG_CTIME_STRING */
 #endif /* HAVE_CTIME */
@@ -211,9 +210,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   
 #if LOG_ITERATION_COUNT
   /* add the iteration number */
-  (void)sprintf(str_p, "%lu: ", _dmalloc_iter_c);
-  for (; *str_p != '\0'; str_p++) {
-  }
+  str_p += loc_snprintf(str_p, bounds_p - str_p, "%lu: ", _dmalloc_iter_c);
 #endif
   
   /*
@@ -223,23 +220,13 @@ void	_dmalloc_vmessage(const char *format, va_list args)
    */
   
   /* write the format + info into str */
-  va_start(args, format);
-#if HAVE_VPRINTF
-  (void)vsprintf(str_p, format, args);
-#else
-  /* Oh well, just copy the format in.  Yuck. */
-  (void)strcpy(str_p, format);
-#endif
-  va_end(args);
+  len = loc_vsnprintf(str_p, bounds_p - str_p, format, args);
   
   /* was it an empty format? */
-  if (*str_p == '\0') {
+  if (len == 0) {
     return;
   }
-  
-  /* find the length of str */
-  for (; *str_p != '\0'; str_p++) {
-  }
+  str_p += len;
   
   /* tack on a '\n' if necessary */
   if (*(str_p - 1) != '\n') {
@@ -249,19 +236,20 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   len = str_p - str;
   
   /* do we need to log the message? */
-  if (dmalloc_logpath != LOGPATH_INIT) {
+  if (_dmalloc_logpath != LOGPATH_INIT) {
     /*
      * do we need to open the outfile?
      * it will be closed by _exit().  yeach.
      */
     if (outfile < 0) {
-      outfile = open(dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+      outfile = open(_dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
       if (outfile < 0) {
-	(void)sprintf(str, "debug-malloc library: could not open '%s'\n",
-		      dmalloc_logpath);
+	(void)loc_snprintf(str, sizeof(str),
+			   "debug-malloc library: could not open '%s'\n",
+			   _dmalloc_logpath);
 	(void)write(STDERR, str, strlen(str));
 	/* disable log_path */
-	dmalloc_logpath = LOGPATH_INIT;
+	_dmalloc_logpath = LOGPATH_INIT;
 	return;
       }
       
@@ -269,14 +257,18 @@ void	_dmalloc_vmessage(const char *format, va_list args)
        * NOTE: this makes it go recursive here but it will never enter
        * this section of code.
        */
-      _dmalloc_message("Dmalloc version '%s'.  Public domain copy.",
-		       dmalloc_version);
-      _dmalloc_message("dmalloc_logfile '%s': flags = %#x, addr = %#lx",
-		       dmalloc_logpath, _dmalloc_flags,
-		       (unsigned long)dmalloc_address);
-      _dmalloc_message("addr = %#lx, interval = %lu",
-		       (unsigned long)dmalloc_address,
-		       _dmalloc_check_interval);
+      _dmalloc_message("Dmalloc version '%s', logfile '%s'",
+		       dmalloc_version, _dmalloc_logpath);
+      _dmalloc_message("flags = %#x, interval = %lu",
+		       _dmalloc_flags, _dmalloc_check_interval);
+      if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT) {
+	_dmalloc_message("addr = %#lx", (unsigned long)_dmalloc_address);
+      }
+      else {
+	_dmalloc_message("addr = %#lx, seen # = %ld",
+			 (unsigned long)_dmalloc_address,
+			 _dmalloc_address_seen_n);
+      }
 #if LOCK_THREADS
       _dmalloc_message("threads enabled, lock-init = %d", THREAD_INIT_LOCK);
 #endif
@@ -331,12 +323,13 @@ void	_dmalloc_die(const int silent_b)
     }
     
     /* print a message that we are going down */
-    (void)sprintf(str, "debug-malloc library: %s program, fatal error\n",
-		  stop_str);
+    (void)loc_snprintf(str, sizeof(str),
+		       "debug-malloc library: %s program, fatal error\n",
+		       stop_str);
     (void)write(STDERR, str, strlen(str));
     if (dmalloc_errno != ERROR_NONE) {
-      (void)sprintf(str, "   Error: %s (err %d)\n",
-		    _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      (void)loc_snprintf(str, sizeof(str), "   Error: %s (err %d)\n",
+			 _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       (void)write(STDERR, str, strlen(str));
     }
   }
@@ -372,7 +365,7 @@ void	_dmalloc_die(const int silent_b)
 void	dmalloc_error(const char *func)
 {
   /* do we need to log or print the error? */
-  if (dmalloc_logpath != NULL
+  if (_dmalloc_logpath != NULL
       || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     
     /* default str value */

@@ -18,15 +18,13 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: heap.c,v 1.51 1999/03/04 19:11:23 gray Exp $
+ * $Id: heap.c,v 1.52 1999/03/05 00:30:52 gray Exp $
  */
 
 /*
  * These are the system/machine specific routines for allocating space on the
  * heap as well as reporting the current position of the heap.
  */
-
-#include <stdio.h>				/* for sprintf */
 
 #if HAVE_UNISTD_H
 # include <unistd.h>				/* for write */
@@ -47,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: heap.c,v 1.51 1999/03/04 19:11:23 gray Exp $";
+#ident "$Id: heap.c,v 1.52 1999/03/05 00:30:52 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.51 1999/03/04 19:11:23 gray Exp $";
+  "$Id: heap.c,v 1.52 1999/03/05 00:30:52 gray Exp $";
 #endif
 #endif
 
@@ -78,8 +76,10 @@ static	void	*heap_extend(const int incr)
   if (ret == SBRK_ERROR) {
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
-      (void)sprintf(str, "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
-      (void)write(STDERR, str, strlen(str));
+      int	len;
+      len = loc_snprintf(str, sizeof(str),
+			 "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
+      (void)write(STDERR, str, len);
       _dmalloc_die(FALSE);
     }
     dmalloc_errno = ERROR_ALLOC_FAILED;

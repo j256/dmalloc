@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.135 1999/03/04 19:09:45 gray Exp $
+ * $Id: chunk.c,v 1.136 1999/03/05 00:30:28 gray Exp $
  */
 
 /*
@@ -27,7 +27,6 @@
  */
 
 #include <ctype.h>
-#include <stdio.h>			/* for sprintf */
 
 #if HAVE_STRING_H
 # include <string.h>
@@ -49,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.135 1999/03/04 19:09:45 gray Exp $";
+#ident "$Id: chunk.c,v 1.136 1999/03/05 00:30:28 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.135 1999/03/04 19:09:45 gray Exp $";
+  "$Id: chunk.c,v 1.136 1999/03/05 00:30:28 gray Exp $";
 #endif
 #endif
 
@@ -222,10 +221,10 @@ static	int	expand_chars(const void *buf, const int buf_size,
 {
   int			buf_c;
   const unsigned char	*buf_p, *spec_p;
-  char	 		*max_p, *out_p = out;
+  char	 		*out_p = out, *bounds_p;
   
   /* setup our max pointer */
-  max_p = out + out_size;
+  bounds_p = out + out_size;
   
   /* run through the input buffer, counting the characters as we go */
   for (buf_c = 0, buf_p = (const unsigned char *)buf;; buf_c++, buf_p++) {
@@ -253,32 +252,30 @@ static	int	expand_chars(const void *buf, const int buf_size,
     
     /* did we find one? */
     if (*(spec_p - 1) != '\0') {
-      if (out_p + 2 >= max_p) {
+      if (out_p + 2 >= bounds_p) {
 	break;
       }
-      (void)sprintf(out_p, "\\%c", *(spec_p - 1));
-      out_p += 2;
+      out_p += loc_snprintf(out_p, bounds_p - out_p, "\\%c", *(spec_p - 1));
       continue;
     }
     
     /* print out any 7-bit printable characters */
     if (*buf_p < 128 && isprint(*buf_p)) {
-      if (out_p + 1 >= max_p) {
+      if (out_p + 1 >= bounds_p) {
 	break;
       }
       *out_p = *(char *)buf_p;
       out_p += 1;
     }
     else {
-      if (out_p + 4 >= max_p) {
+      if (out_p + 4 >= bounds_p) {
 	break;
       }
-      (void)sprintf(out_p, "\\%03o", *buf_p);
-      out_p += 4;
+      out_p += loc_snprintf(out_p, bounds_p - out_p, "\\%03o", *buf_p);
     }
   }
   /* try to punch the null if we have space in case the %.*s doesn't work */
-  if (out_p < max_p) {
+  if (out_p < bounds_p) {
     *out_p = '\0';
   }
   
@@ -288,83 +285,75 @@ static	int	expand_chars(const void *buf, const int buf_size,
 /*
  * Describe pnt from its FILE, LINE into BUF
  */
-static	void	desc_pnt(char *buf, const char *file,
+static	void	desc_pnt(char *buf, const int buf_size, const char *file,
 			 const unsigned int line)
 {
   if (file == DMALLOC_DEFAULT_FILE && line == DMALLOC_DEFAULT_LINE) {
-    (void)sprintf(buf, "unknown");
+    (void)loc_snprintf(buf, buf_size, "unknown");
   }
   else if (line == DMALLOC_DEFAULT_LINE) {
-    (void)sprintf(buf, "ra=%#lx", (unsigned long)file);
+    (void)loc_snprintf(buf, buf_size, "ra=%#lx", (unsigned long)file);
   }
   else if (file == DMALLOC_DEFAULT_FILE) {
-    (void)sprintf(buf, "ra=ERROR(line=%u)", line);
+    (void)loc_snprintf(buf, buf_size, "ra=ERROR(line=%u)", line);
   }
   else {
-    (void)sprintf(buf, "%s:%u", file, line);
+    (void)loc_snprintf(buf, buf_size, "%s:%u", file, line);
   }
 }
 
 /*
  * Display a bad pointer with FILE and LINE information
  */
-char	*_chunk_display_where(const char *file, const unsigned int line)
+char	*_chunk_display_where(const char *file, const unsigned int line,
+			      char *buf, const int buf_size)
 {
-  static char	buf[256];
-  desc_pnt(buf, file, line);
-  return buf;
-}
-
-/*
- * Small hack here.  Same as above but different buffer space so we
- * can use 2 calls in 1 printf.
- */
-static	char	*chunk_display_where2(const char *file,
-				      const unsigned int line)
-{
-  static char	buf[256];
-  desc_pnt(buf, file, line);
+  desc_pnt(buf, buf_size, file, line);
   return buf;
 }
 
 /*
  * Display a pointer PNT and information about it.
  */
-static	char	*display_pnt(const void *pnt, const overhead_t *over_p)
+static	char	*display_pnt(const void *pnt, const overhead_t *over_p,
+			     char *buf, const int buf_size)
 {
-  static char	buf[256];
-  char		buf2[64];
+  char	*buf_p, *bounds_p;
   
-  (void)sprintf(buf, "%#lx", (unsigned long)pnt);
+  buf_p = buf;
+  bounds_p = buf_p + buf_size;
+  
+  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%#lx", (unsigned long)pnt);
   
 #if STORE_SEEN_COUNT
-  (void)sprintf(buf2, "|s%lu", over_p->ov_seen_c);
-  (void)strcat(buf, buf2);
+  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|s%lu", over_p->ov_seen_c);
 #endif
   
 #if STORE_ITERATION_COUNT
-  (void)sprintf(buf2, "|i%lu", over_p->ov_iteration);
-  (void)strcat(buf, buf2);
+  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|i%lu",
+			over_p->ov_iteration);
 #endif
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
 #if STORE_TIMEVAL
-    (void)sprintf(buf2, "|w%s", _dmalloc_ptimeval(&over_p->ov_timeval, FALSE));
-    (void)strcat(buf, buf2);
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
+			  _dmalloc_ptimeval(&over_p->ov_timeval, FALSE));
 #else
 #if STORE_TIME
-    (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&over_p->ov_time, FALSE));
-    (void)strcat(buf, buf2);
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
+			  _dmalloc_ptime(&over_p->ov_time, FALSE));
 #endif
 #endif
   }
   
 #if STORE_THREAD_ID
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
-    (void)strcat(buf, "|t");
-    THREAD_ID_TO_STRING(buf2, over_p->ov_thread_id);
-    (void)strcat(buf, buf2);
+    char	thread_id[256];
+    
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|t");
+    THREAD_ID_TO_STRING(thread_id, sizeof(thread_id), over_p->ov_thread_id);
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", thread_id);
   }
 #endif
   
@@ -382,6 +371,7 @@ static	void	log_error_info(const char *file, const unsigned int line,
 {
   static int	dump_bottom_b = 0, dump_top_b = 0;
   char		out[(DUMP_SPACE + FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE) * 4];
+  char		where_buf[64];
   const char	*reason_str;
   const void	*dump_pnt = pnt;
   int		out_len, dump_size = DUMP_SPACE, offset = 0;
@@ -397,12 +387,15 @@ static	void	log_error_info(const char *file, const unsigned int line,
   /* dump the pointer information */
   if (pnt == NULL) {
     _dmalloc_message("%s: %s: from '%s'",
-		     where, reason_str, _chunk_display_where(file, line));
+		     where, reason_str,
+		     _chunk_display_where(file, line, where_buf,
+					  sizeof(where_buf)));
   }
   else {
     _dmalloc_message("%s: %s: pointer '%#lx' from '%s'",
 		     where, reason_str, (unsigned long)pnt,
-		     _chunk_display_where(file, line));
+		     _chunk_display_where(file, line, where_buf,
+					  sizeof(where_buf)));
   }
   
   /* if we are not displaying memory then quit */
@@ -2277,7 +2270,7 @@ void	_chunk_log_heap_map(void)
 {
   bblock_adm_t	*bblock_adm_p;
   bblock_t	*bblock_p;
-  char		line[BB_PER_ADMIN + 10];
+  char		line[BB_PER_ADMIN + 10], where_buf[64];
   int		char_c, bblock_c, tblock_c, bb_admin_c;
   int		undef_b = 0;
   
@@ -2385,7 +2378,8 @@ void	_chunk_log_heap_map(void)
 			 tblock_c, (unsigned long)BLOCK_POINTER(tblock_c),
 			 bblock_p->bb_size,
 			 _chunk_display_where(bblock_p->bb_file,
-					      bblock_p->bb_line));
+					      bblock_p->bb_line, where_buf,
+					      sizeof(where_buf)));
 	continue;
       }
       
@@ -2454,6 +2448,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 {
   unsigned int	bit_n, byte_n = size;
   int		valloc_b = 0, memalign_b = 0;
+  char		where_buf[64], disp_buf[64];
   bblock_t	*bblock_p;
   overhead_t	*over_p;
   const char	*trans_log;
@@ -2626,8 +2621,10 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
       trans_log = "alloc";
     }
     _dmalloc_message("*** %s: at '%s' for %d bytes, got '%s'",
-		     trans_log, _chunk_display_where(file, line), size,
-		     display_pnt(pnt, over_p));
+		     trans_log, _chunk_display_where(file, line, where_buf,
+						     sizeof(where_buf)),
+		     size, display_pnt(pnt, over_p, disp_buf,
+				       sizeof(disp_buf)));
   }
   
   return pnt;
@@ -2644,6 +2641,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
 		    const int realloc_b)
 {
   unsigned int	bit_n, block_n, given;
+  char		where_buf[64], where_buf2[64], disp_buf[64];
   int		valloc_b = 0;
   bblock_t	*bblock_p, *prev_p, *next_p, *list_p, *this_p;
   dblock_t	*dblock_p;
@@ -2656,7 +2654,8 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   if (pnt == NULL) {
 #if ALLOW_FREE_NULL_MESSAGE
     _dmalloc_message("WARNING: tried to free(0) from '%s'",
-		     _chunk_display_where(file, line));
+		     _chunk_display_where(file, line, where_buf,
+					  sizeof(where_buf)));
 #endif
     /*
      * NOTE: we have here both a default in the settings.h file and a
@@ -2720,11 +2719,14 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     /* print transaction info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
       _dmalloc_message("*** free: at '%s' pnt '%s': size %d, alloced at '%s'",
-		       _chunk_display_where(file, line),
-		       display_pnt(CHUNK_TO_USER(pnt), &dblock_p->db_overhead),
+		       _chunk_display_where(file, line, where_buf,
+					    sizeof(where_buf)),
+		       display_pnt(CHUNK_TO_USER(pnt), &dblock_p->db_overhead,
+				   disp_buf, sizeof(disp_buf)),
 		       dblock_p->db_size - fence_overhead_size,
-		       chunk_display_where2(dblock_p->db_file,
-					    dblock_p->db_line));
+		       _chunk_display_where(dblock_p->db_file,
+					    dblock_p->db_line, where_buf2,
+					    sizeof(where_buf2)));
     }
     
     /* check fence-post, probably again */
@@ -2796,11 +2798,14 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     _dmalloc_message("*** free: at '%s' pnt '%s': size %ld, alloced at '%s'",
-		     _chunk_display_where(file, line),
-		     display_pnt(CHUNK_TO_USER(pnt), &bblock_p->bb_overhead),
+		     _chunk_display_where(file, line, where_buf,
+					  sizeof(where_buf)),
+		     display_pnt(CHUNK_TO_USER(pnt), &bblock_p->bb_overhead,
+				 disp_buf, sizeof(disp_buf)),
 		     bblock_p->bb_size - fence_overhead_size,
-		     chunk_display_where2(bblock_p->bb_file,
-					  bblock_p->bb_line));
+		     _chunk_display_where(bblock_p->bb_file,
+					  bblock_p->bb_line, where_buf2,
+					  sizeof(where_buf2)));
   }
   
   /* check fence-post, probably again */
@@ -2946,6 +2951,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
 {
   void		*new_p, *ret_addr;
   char		*old_file;
+  char		where_buf[64], where_buf2[64];
   const char	*trans_log;
   unsigned long	*seen_cp;
   unsigned int	old_size, size, old_line, alloc_size;
@@ -3107,9 +3113,11 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
       trans_log = "realloc";
     }
     _dmalloc_message("*** %s: at '%s' from '%#lx' (%u bytes) file '%s' to '%#lx' (%u bytes)",
-		     trans_log, _chunk_display_where(file, line),
+		     trans_log, _chunk_display_where(file, line, where_buf,
+						     sizeof(where_buf)),
 		     (unsigned long)old_p, old_size,
-		     chunk_display_where2(old_file, old_line),
+		     _chunk_display_where(old_file, old_line, where_buf2,
+					  sizeof(where_buf2)),
 		     (unsigned long)new_p, new_size);
   }
   
@@ -3124,12 +3132,17 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
 void	_chunk_list_count(void)
 {
   int		bit_c, block_c;
-  char		info[256], tmp[80];
+  char		buf[256], *buf_p, *bounds_p;
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
   
+  buf_p = buf;
+  bounds_p = buf + sizeof(buf);
+  
+  /* we have to punch the 1st \0 in case be add nothing to the buffer below */
+  *buf_p = '\0';
+  
   /* dump the free (and later used) list counts */
-  info[0] = '\0';
   for (bit_c = smallest_block; bit_c < MAX_SLOTS; bit_c++) {
     if (bit_c < BASIC_BLOCK) {
       for (block_c = 0, dblock_p = free_dblock[bit_c];
@@ -3145,12 +3158,11 @@ void	_chunk_list_count(void)
     }
     
     if (block_c > 0) {
-      (void)sprintf(tmp, " %d/%d", block_c, bit_c);
-      (void)strcat(info, tmp);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, " %d/%d", block_c, bit_c);
     }
   }
   
-  _dmalloc_message("free bucket count/bits: %s", info);
+  _dmalloc_message("free bucket count/bits: %s", buf);
 }
 
 /*
@@ -3228,7 +3240,7 @@ void	_chunk_dump_unfreed(void)
   dblock_t	*dblock_p;
   void		*pnt;
   int		unknown_b;
-  char		out[DUMP_SPACE * 4];
+  char		out[DUMP_SPACE * 4], where_buf[64], disp_buf[64];
   int		unknown_size_c = 0, unknown_block_c = 0, out_len;
   int		size_c = 0, block_c = 0;
   
@@ -3280,10 +3292,12 @@ void	_chunk_dump_unfreed(void)
       if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	_dmalloc_message("not freed: '%s' (%ld bytes) from '%s'",
 			 display_pnt(CHUNK_TO_USER(pnt),
-				     &bblock_p->bb_overhead),
+				     &bblock_p->bb_overhead, disp_buf,
+				     sizeof(disp_buf)),
 			 bblock_p->bb_size - fence_overhead_size,
 			 _chunk_display_where(bblock_p->bb_file,
-					      bblock_p->bb_line));
+					      bblock_p->bb_line, where_buf,
+					      sizeof(where_buf)));
 	
 	if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
 	  out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,
@@ -3372,10 +3386,12 @@ void	_chunk_dump_unfreed(void)
 	if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			   display_pnt(CHUNK_TO_USER(pnt),
-				       &dblock_p->db_overhead),
+				       &dblock_p->db_overhead, disp_buf,
+				       sizeof(disp_buf)),
 			   dblock_p->db_size - fence_overhead_size,
 			   _chunk_display_where(dblock_p->db_file,
-						dblock_p->db_line));
+						dblock_p->db_line, where_buf,
+						sizeof(where_buf)));
 	  
 	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE_SPACE)) {
 	    out_len = expand_chars((char *)CHUNK_TO_USER(pnt), DUMP_SPACE,

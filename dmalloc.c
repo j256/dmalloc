@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.85 1999/03/04 19:13:09 gray Exp $
+ * $Id: dmalloc.c,v 1.86 1999/03/05 00:30:40 gray Exp $
  */
 
 /*
@@ -59,16 +59,16 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.85 1999/03/04 19:13:09 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.86 1999/03/05 00:30:40 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.85 1999/03/04 19:13:09 gray Exp $";
+  "$Id: dmalloc.c,v 1.86 1999/03/05 00:30:40 gray Exp $";
 #endif
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
 #define SHELL_ENVIRON	"SHELL"			/* for the type of shell */
-#define DEFAULT_CONFIG	"%s/.dmallocrc"		/* default config file */
+#define DEFAULT_CONFIG	".dmallocrc"		/* default config file */
 #define TOKENIZE_CHARS	" \t,="			/* for tag lines */
 
 #define NO_VALUE		(-1)		/* no value ... value */
@@ -340,7 +340,7 @@ static	long	process(const long debug_value, const char *tag_find,
       exit(1);
     }
     
-    (void)sprintf(path, DEFAULT_CONFIG, home_p);
+    (void)loc_snprintf(path, sizeof(path), "%s/%s", home_p, DEFAULT_CONFIG);
     inpath = path;
   }
   
@@ -501,7 +501,8 @@ static	void	dump_current(void)
   char		*tok_p;
   char		*lpath, *start_file;
   unsigned long	addr, inter;
-  int		addr_count, lock_on, start_line, start_count;
+  long		addr_count;
+  int		lock_on, start_line, start_count;
   unsigned int	flags;
   
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
@@ -527,7 +528,7 @@ static	void	dump_current(void)
       (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
     }
     else {
-      (void)fprintf(stderr, "Address      %#lx, count = %d\n",
+      (void)fprintf(stderr, "Address      %#lx, count = %ld\n",
 		    (long)addr, addr_count);
     }
   }
@@ -573,13 +574,14 @@ static	void    set_variable(const char *var, const char *value)
   char	comm[1024];
   
   if (bourne_b) {
-    (void)sprintf(comm, "%s=%s;\nexport %s;\n", var, value, var);
+    (void)loc_snprintf(comm, sizeof(comm), "%s=%s;\nexport %s;\n",
+		       var, value, var);
   }
   else if (gdb_b) {
-    (void)sprintf(comm, "set env %s %s;\n", var, value);
+    (void)loc_snprintf(comm, sizeof(comm), "set env %s %s;\n", var, value);
   }
   else {
-    (void)sprintf(comm, "setenv %s %s;\n", var, value);
+    (void)loc_snprintf(comm, sizeof(comm), "setenv %s %s;\n", var, value);
   }
   
   if (make_changes_b) {
@@ -613,7 +615,7 @@ int	main(int argc, char **argv)
   int		debug_set_b = FALSE, set_b = FALSE;
   char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
   unsigned long	addr = ADDRESS_INIT, inter = INTERVAL_INIT;
-  int		addr_count = ADDRESS_COUNT_INIT;
+  long		addr_count = ADDRESS_COUNT_INIT;
   int		lock_on = LOCK_ON_INIT;
   int		sline = START_LINE_INIT, scount = START_COUNT_INIT;
   unsigned int	flags = DEBUG_INIT;
@@ -805,8 +807,9 @@ int	main(int argc, char **argv)
   }
   
   if (set_b) {
-    _dmalloc_environ_set(buf, long_tokens_b, short_tokens_b, addr, addr_count,
-			 flags, inter, lock_on, lpath, sfile, sline, scount);
+    _dmalloc_environ_set(buf, sizeof(buf), long_tokens_b, short_tokens_b,
+			 addr, addr_count, flags, inter, lock_on, lpath,
+			 sfile, sline, scount);
     set_variable(OPTIONS_ENVIRON, buf);
   }
   else if (errno_to_print == NO_VALUE

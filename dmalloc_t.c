@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.75 1999/03/04 19:12:15 gray Exp $
+ * $Id: dmalloc_t.c,v 1.76 1999/03/05 00:30:45 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.75 1999/03/04 19:12:15 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.76 1999/03/05 00:30:45 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.75 1999/03/04 19:12:15 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.76 1999/03/05 00:30:45 gray Exp $";
 #endif
 #endif
 
@@ -169,9 +169,9 @@ static	int	random_value(const int val)
   int	ret;
   
 #if HAVE_RANDOM
-  ret = ((random() % ((x) * 10)) / 10);
+  ret = ((random() % (val * 10)) / 10);
 #else
-  ret = ((rand() % ((x) * 10)) / 10);
+  ret = ((rand() % (val * 10)) / 10);
 #endif
   
   return ret;

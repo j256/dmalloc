@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.h,v 1.41 1999/03/04 19:07:15 gray Exp $
+ * $Id: error.h,v 1.42 1999/03/05 00:30:50 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -46,11 +46,15 @@
 
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 extern
-char		*dmalloc_logpath;
+char		*_dmalloc_logpath;
 
 /* address to look for.  when discovered call dmalloc_error() */
 extern
-DMALLOC_PNT	dmalloc_address;
+DMALLOC_PNT	_dmalloc_address;
+
+/* when to stop at an address */
+extern
+long		_dmalloc_address_seen_n;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
 extern
@@ -85,7 +89,8 @@ int		_dmalloc_aborting_b;
  * print the time into local buffer which is returned
  */
 extern
-char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b);
+char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
+			   const int buf_size, const int elapsed_b);
 #endif /* if STORE_TIMEVAL */
 
 #if STORE_TIMEVAL == 0
@@ -93,7 +98,8 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b);
  * print the time into local buffer which is returned
  */
 extern
-char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b);
+char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
+			const int elapsed_b);
 #endif /* if STORE_TIMEVAL == 0 */
 
 /*

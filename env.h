@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: env.h,v 1.15 1999/03/04 19:06:26 gray Exp $
+ * $Id: env.h,v 1.16 1999/03/05 00:28:39 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -52,7 +52,7 @@
  */
 extern
 void	_dmalloc_address_break(const char *addr_all, unsigned long *addr_p,
-			       int *addr_count_p);
+			       long *addr_count_p);
 
 /*
  * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
@@ -67,7 +67,7 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  */
 extern
 void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
-			     int *addr_count_p, unsigned int *debug_p,
+			     long *addr_count_p, unsigned int *debug_p,
 			     unsigned long *interval_p, int *lock_on_p,
 			     char **logpath_p, char **sfile_p,
 			     int *sline_p, int *scount_p);
@@ -77,10 +77,11 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
  * info) into BUF.
  */
 extern
-void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
+void	_dmalloc_environ_set(char *buf, const int buf_size,
+			     const int long_tokens_b,
 			     const int short_tokens_b,
 			     const unsigned long address,
-			     const int addr_count, const unsigned int debug,
+			     const long addr_count, const unsigned int debug,
 			     const int interval, const int lock_on,
 			     const char *logpath, const char *sfile,
 			     const int sline, const int scount);

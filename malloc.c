@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.123 1999/03/04 19:09:39 gray Exp $
+ * $Id: malloc.c,v 1.124 1999/03/05 00:31:00 gray Exp $
  */
 
 /*
@@ -78,10 +78,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.123 1999/03/04 19:09:39 gray Exp $";
+#ident "$Id: malloc.c,v 1.124 1999/03/05 00:31:00 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.123 1999/03/04 19:09:39 gray Exp $";
+  "$Id: malloc.c,v 1.124 1999/03/05 00:31:00 gray Exp $";
 #endif
 #endif
 
@@ -114,7 +114,6 @@ static	int		do_shutdown_b = FALSE;	/* execute shutdown soon */
 static	int		memalign_warn_b = FALSE; /* memalign warning printed?*/
 
 /* debug variables */
-static	int		address_seen_n = ADDRESS_COUNT_INIT; /* # stop addr */
 static	char		*start_file = START_FILE_INIT;	/* file to start at */
 static	int		start_line = START_LINE_INIT;	/* line to start */
 static	int		start_count = START_COUNT_INIT; /* start after X */
@@ -290,20 +289,23 @@ static	int	check_debug_vars(const char *file, const int line)
 static	void	check_pnt(const char *file, const int line, const void *pnt,
 			  const char *label)
 {
-  static int	addr_c = 0;
+  static unsigned long	addr_c = 0;
+  char			where_buf[64];
   
-  if (dmalloc_address == ADDRESS_INIT || pnt != dmalloc_address) {
+  if (_dmalloc_address == ADDRESS_INIT || pnt != _dmalloc_address) {
     return;
   }
   
   addr_c++;
-  _dmalloc_message("address '%#lx' found in '%s' at pass %d from '%s'",
+  _dmalloc_message("address '%#lx' found in '%s' at pass %ld from '%s'",
 		   (unsigned long)pnt, label, addr_c,
-		   _chunk_display_where(file, line));
+		   _chunk_display_where(file, line, where_buf,
+					sizeof(where_buf)));
   
   /* NOTE: if address_seen_n == 0 then never quit */
-  if (address_seen_n == ADDRESS_COUNT_INIT
-      || (address_seen_n > 0 && addr_c >= address_seen_n)) {
+  if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT
+      || (_dmalloc_address_seen_n > 0
+	  && addr_c >= (unsigned long)_dmalloc_address_seen_n)) {
     dmalloc_errno = ERROR_IS_FOUND;
     dmalloc_error("check_pnt");
   }
@@ -314,10 +316,10 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
  */
 static	void	process_environ(void)
 {
-  _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&dmalloc_address,
-		       &address_seen_n, &_dmalloc_flags,
+  _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&_dmalloc_address,
+		       &_dmalloc_address_seen_n, &_dmalloc_flags,
 		       &_dmalloc_check_interval, &thread_lock_on,
-		       &dmalloc_logpath, &start_file, &start_line,
+		       &_dmalloc_logpath, &start_file, &start_line,
 		       &start_count);
   thread_lock_c = thread_lock_on;
   
@@ -501,18 +503,21 @@ void	_dmalloc_shutdown(void)
 #if STORE_TIMEVAL
   {
     TIMEVAL_TYPE	now;
+    char		buf[64];
     GET_TIMEVAL(now);
     _dmalloc_message("ending time = %lu.%lu, elapsed since start = %s",
 		     (unsigned long)now.tv_sec,
 		     (unsigned long)now.tv_usec,
-		     _dmalloc_ptimeval(&now, TRUE));
+		     _dmalloc_ptimeval(&now, buf, sizeof(buf), 1));
   }
 #else
 #if HAVE_TIME
   {
     TIME_TYPE	now = time(NULL);
+    char	buf[64];
     _dmalloc_message("ending time = %lu, elapsed since start = %s",
-		     (unsigned long)now, _dmalloc_ptime(&now, TRUE));
+		     (unsigned long)now,
+		     _dmalloc_ptime(&now, buf, sizeof(buf), 1));
   }
 #endif
 #endif

@@ -1,3 +1,11 @@
+Thu Mar  4 19:28:45 1999  Gray Watson  <gray@whopper.letters.com>
+
+	* Removed a number of static variables for string buffers.  Yuck.
+
+	* Removed PERMISSION file and all references to commercial-ness.
+
+	* Moved to internal sprintf code for snprintf, etc..
+
 Fri Dec 11 00:04:04 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.1.2.
@@ -1388,5 +1396,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.206 1998/12/11 05:06:37 gray Exp $
+$Id: ChangeLog,v 1.207 1999/03/05 00:30:24 gray Exp $
 -------------------------------------------------------------------------------

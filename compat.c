@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: compat.c,v 1.42 1999/03/04 19:10:32 gray Exp $
+ * $Id: compat.c,v 1.43 1999/03/05 00:29:38 gray Exp $
  */
 
 /*
@@ -36,12 +36,56 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.42 1999/03/04 19:10:32 gray Exp $";
+#ident "$Id: compat.c,v 1.43 1999/03/05 00:29:38 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.42 1999/03/04 19:10:32 gray Exp $";
+  "$Id: compat.c,v 1.43 1999/03/05 00:29:38 gray Exp $";
 #endif
 #endif
+
+/*
+ * Local vsnprintf which handles the buffer-size or not.  Returns the
+ * number of characters copied into BUF.
+ */
+int	loc_vsnprintf(char *buf, const int buf_size, const char *format,
+		      va_list args)
+{
+  char	*buf_p;
+  
+#if HAVE_VSNPRINTF
+  (void)vsnprintf(buf, buf_size, format, args);
+#else
+#if HAVE_VPRINTF
+  (void)vsprintf(buf, format, args);
+#else
+  /* Oh well.  Just do a strcpy of the format */
+  (void)strncpy(buf, format, buf_size - 1);
+  buf[buf_size - 1] = '\0';
+#endif
+#endif
+  
+  /* now find the end of the buffer */
+  for (buf_p = buf; *buf_p != '\0'; buf_p++) {
+  }
+  
+  return buf_p - buf;
+}
+
+/*
+ * Local snprintf which handles the buf-size not.  Returns the number
+ * of characters copied into BUF.
+ */
+int	loc_snprintf(char *buf, const int buf_size, const char *format, ...)
+{
+  va_list	args;  
+  int		len;
+  
+  va_start(args, format);
+  len = loc_vsnprintf(buf, buf_size, format, args);
+  va_end(args);
+  
+  return len;
+}
 
 #if HAVE_MEMCPY == 0
 /*
