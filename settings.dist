@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.15 1997/12/08 02:45:24 gray Exp $
+ * $Id: settings.dist,v 1.16 1997/12/08 05:47:36 gray Exp $
  */
 
 /*
@@ -270,22 +270,24 @@
  */
 
 /* when we should initialize our mutex variable */
-#define INIT_LOCK_ON		2
+#define THREAD_INIT_LOCK	2
 
 #define THREAD_LOCK		do { \
-				  if (thread_lock_on <= 0) \
+				  if (thread_lock_on == 0) { \
 				    pthread_mutex_lock(&dmalloc_mutex); \
+				  } \
 				} while (0)
 #define THREAD_UNLOCK		do { \
 				  if (thread_lock_on > 0) { \
 				    thread_lock_on--; \
-				    if (thread_lock_on == INIT_LOCK_ON) { \
+				    if (thread_lock_on == THREAD_INIT_LOCK) { \
 				      /* we init here to avoid recursion */ \
 				      THREAD_LOCK_INIT; \
 				    } \
 				  } \
-				  else \
+				  else { \
 				    pthread_mutex_unlock(&dmalloc_mutex); \
+				  } \
 				} while (0)
 
 /*
