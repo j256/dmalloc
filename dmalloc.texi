@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.252 2004/04/09 17:35:01 gray Exp $
+@c $Id: dmalloc.texi,v 1.253 2004/06/29 21:49:14 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -2880,7 +2880,7 @@ both used, the token values will be added to the debug value.
 @item lockon
 @cindex lockon setting
 Set this to a number which is the ``lock-on'' period.  This dictates
-with the threaded version of the library to not initialize or lock the
+to the threaded version of the library to not initialize or lock the
 mutex lock around the library until after a certain number of allocation
 calls have been made.  See the ``Using With Threads'' section for more
 information about the operation of the library with threads.
