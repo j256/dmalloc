@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.117 2004/08/13 21:26:51 gray Exp $
+$Id: NEWS,v 1.118 2004/10/12 13:53:37 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 5.4.0 (07/10/2004):
+Version 5.4.0 (10/12/2004):
 
+	* Added return.h support for ARM processors.
+	* Made allocation of 0 sized chunks the default.
 	* Fixed some missing ; and a int/unsigned-int bug.
 	* Added return.h support for AIX 4.3 RS/6000.
 	* Added backwards compatibility for %d usage in logfile name.

@@ -1,3 +1,11 @@
+2004-10-12  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.4.0.
+
+	* Added return.h support for ARM processors from Silvester Erdeg.
+
+	* Improved the manual a bit.
+
 2004-09-13  Gray Watson  <gray@outside.256.com>
 
 	* Made allocating zero size chunks the default.
@@ -13,7 +21,7 @@
 
 2004-07-10  Gray Watson  <gray@outside.256.com>
 
-	* Starting release of 5.4.0.
+	* Starting release of 5.4.0 with beta.
 
 2004-07-09  Gray Watson  <gray@outside.256.com>
 
@@ -2220,5 +2228,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.324 2004/09/27 20:18:16 gray Exp $
+$Id: ChangeLog,v 1.325 2004/10/12 13:53:37 gray Exp $
 -------------------------------------------------------------------------------
