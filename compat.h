@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: compat.h,v 1.29 1997/12/05 21:09:39 gray Exp $
+ * $Id: compat.h,v 1.30 1998/10/21 22:56:25 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -37,7 +37,7 @@
  */
 extern
 void	memcpy(char *dest, const char *src, DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMCPY == 0 */
 
 #if HAVE_MEMCMP == 0
 /*
@@ -45,7 +45,7 @@ void	memcpy(char *dest, const char *src, DMALLOC_SIZE len);
  */
 extern
 int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMCMP == 0 */
 
 #if HAVE_MEMSET == 0
 /*
@@ -53,7 +53,7 @@ int	memcmp(const char *str1, const char *str2, DMALLOC_SIZE len);
  */
 extern
 char	*memset(char *str, int ch, DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMSET == 0 */
 
 #if HAVE_STRCHR == 0
 /*
@@ -61,7 +61,7 @@ char	*memset(char *str, int ch, DMALLOC_SIZE len);
  */
 extern
 char	*strchr(const char *str, int ch);
-#endif
+#endif /* if HAVE_STRCHR == 0 */
 
 #if HAVE_STRRCHR == 0
 /*
@@ -69,7 +69,7 @@ char	*strchr(const char *str, int ch);
  */
 extern
 char	*strrchr(const char *str, int ch);
-#endif
+#endif /* if HAVE_STRRCHR == 0 */
 
 #if HAVE_STRCAT == 0
 /*
@@ -77,7 +77,7 @@ char	*strrchr(const char *str, int ch);
  */
 extern
 char	*strcat(char *str1, const char *str2);
-#endif
+#endif /* if HAVE_STRCAT == 0 */
 
 #if HAVE_STRLEN == 0
 /*
@@ -85,7 +85,7 @@ char	*strcat(char *str1, const char *str2);
  */
 extern
 int	strlen(const char *str);
-#endif
+#endif /* if HAVE_STRLEN == 0 */
 
 #if HAVE_STRCMP == 0
 /*
@@ -93,7 +93,7 @@ int	strlen(const char *str);
  */
 extern
 int	strcmp(const char *str1, const char *str2);
-#endif
+#endif /* if HAVE_STRCMP == 0 */
 
 #if HAVE_STRNCMP == 0
 /*
@@ -102,7 +102,7 @@ int	strcmp(const char *str1, const char *str2);
  */
 extern
 int	strncmp(const char *str1, const char *str2, const int len);
-#endif
+#endif /* if HAVE_STRNCMP == 0 */
 
 #if HAVE_STRCPY == 0
 /*
@@ -110,7 +110,7 @@ int	strncmp(const char *str1, const char *str2, const int len);
  */
 extern
 char	*strcpy(char *str1, const char *str2);
-#endif
+#endif /* if HAVE_STRCPY == 0 */
 
 #if HAVE_STRNCPY == 0
 /*
@@ -118,7 +118,7 @@ char	*strcpy(char *str1, const char *str2);
  */
 extern
 char	*strncpy(char *str1, const char *str2, const int len);
-#endif
+#endif /* if HAVE_STRNCPY == 0 */
 
 #if HAVE_STRTOK == 0
 /*
@@ -128,7 +128,7 @@ char	*strncpy(char *str1, const char *str2, const int len);
  */
 extern
 char	*strtok(char *str, char *delim);
-#endif
+#endif /* if HAVE_STRTOK == 0 */
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

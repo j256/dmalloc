@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: arg_check.h,v 1.11 1997/12/05 21:09:34 gray Exp $
+ * $Id: arg_check.h,v 1.12 1998/10/21 22:56:09 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -38,7 +38,7 @@
  */
 extern
 int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_BCMP */
 
 #if HAVE_BCOPY
 /*
@@ -46,7 +46,7 @@ int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
  */
 extern
 void	_dmalloc_bcopy(const char *from, char *to, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_BCOPY */
 
 #if HAVE_MEMCMP
 /*
@@ -54,7 +54,7 @@ void	_dmalloc_bcopy(const char *from, char *to, const DMALLOC_SIZE len);
  */
 extern
 int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMCMP */
 
 #if HAVE_MEMCPY
 /*
@@ -62,7 +62,7 @@ int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
  */
 extern
 char	*_dmalloc_memcpy(char *to, const char *from, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMCPY */
 
 #if HAVE_MEMSET
 /*
@@ -70,7 +70,7 @@ char	*_dmalloc_memcpy(char *to, const char *from, const DMALLOC_SIZE len);
  */
 extern
 char	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMSET */
 
 #if HAVE_INDEX
 /*
@@ -78,7 +78,7 @@ char	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len);
  */
 extern
 char	*_dmalloc_index(const char *str, const char ch);
-#endif
+#endif /* if HAVE_INDEX */
 
 #if HAVE_RINDEX
 /*
@@ -86,7 +86,7 @@ char	*_dmalloc_index(const char *str, const char ch);
  */
 extern
 char	*_dmalloc_rindex(const char *str, const char ch);
-#endif
+#endif /* if HAVE_RINDEX */
 
 #if HAVE_STRCAT
 /*
@@ -94,7 +94,7 @@ char	*_dmalloc_rindex(const char *str, const char ch);
  */
 extern
 char	*_dmalloc_strcat(char *to, const char *from);
-#endif
+#endif /* if HAVE_STRCAT */
 
 #if HAVE_STRCMP
 /*
@@ -102,7 +102,7 @@ char	*_dmalloc_strcat(char *to, const char *from);
  */
 extern
 int	_dmalloc_strcmp(const char *s1, const char *s2);
-#endif
+#endif /* if HAVE_STRCMP */
 
 #if HAVE_STRLEN
 /*
@@ -110,7 +110,7 @@ int	_dmalloc_strcmp(const char *s1, const char *s2);
  */
 extern
 DMALLOC_SIZE	_dmalloc_strlen(const char *str);
-#endif
+#endif /* if HAVE_STRLEN */
 
 #if HAVE_STRTOK
 /*
@@ -118,7 +118,7 @@ DMALLOC_SIZE	_dmalloc_strlen(const char *str);
  */
 extern
 char	*_dmalloc_strtok(char *str, const char *sep);
-#endif
+#endif /* if HAVE_STRTOK */
 
 #if HAVE_BZERO
 /*
@@ -126,7 +126,7 @@ char	*_dmalloc_strtok(char *str, const char *sep);
  */
 extern
 void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_BZERO */
 
 #if HAVE_MEMCCPY
 /*
@@ -135,7 +135,7 @@ void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
 extern
 char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
 			  const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMCCPY */
 
 #if HAVE_MEMCHR
 /*
@@ -143,7 +143,7 @@ char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
  */
 extern
 char	*_dmalloc_memchr(const char *s1, const char ch, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_MEMCHR */
 
 #if HAVE_STRCHR
 /*
@@ -151,7 +151,7 @@ char	*_dmalloc_memchr(const char *s1, const char ch, const DMALLOC_SIZE len);
  */
 extern
 char	*_dmalloc_strchr(const char *str, const char ch);
-#endif
+#endif /* if HAVE_STRCHR */
 
 #if HAVE_STRRCHR
 /*
@@ -159,7 +159,7 @@ char	*_dmalloc_strchr(const char *str, const char ch);
  */
 extern
 char	*_dmalloc_strrchr(const char *str, const char ch);
-#endif
+#endif /* if HAVE_STRRCHR */
 
 #if HAVE_STRCPY
 /*
@@ -167,7 +167,7 @@ char	*_dmalloc_strrchr(const char *str, const char ch);
  */
 extern
 char	*_dmalloc_strcpy(char *to, const char *from);
-#endif
+#endif /* if HAVE_STRCPY */
 
 #if HAVE_STRNCPY
 /*
@@ -175,7 +175,7 @@ char	*_dmalloc_strcpy(char *to, const char *from);
  */
 extern
 char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_STRNCPY */
 
 #if HAVE_STRCASECMP
 /*
@@ -183,7 +183,7 @@ char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len);
  */
 extern
 int	_dmalloc_strcasecmp(const char *s1, const char *s2);
-#endif
+#endif /* if HAVE_STRCASECMP */
 
 #if HAVE_STRNCASECMP
 /*
@@ -192,7 +192,7 @@ int	_dmalloc_strcasecmp(const char *s1, const char *s2);
 extern
 int	_dmalloc_strncasecmp(const char *s1, const char *s2,
 			     const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_STRNCASECMP */
 
 #if HAVE_STRSPN
 /*
@@ -200,7 +200,7 @@ int	_dmalloc_strncasecmp(const char *s1, const char *s2,
  */
 extern
 int	_dmalloc_strspn(const char *str, const char *list);
-#endif
+#endif /* if HAVE_STRSPN */
 
 #if HAVE_STRCSPN
 /*
@@ -208,7 +208,7 @@ int	_dmalloc_strspn(const char *str, const char *list);
  */
 extern
 int	_dmalloc_strcspn(const char *str, const char *list);
-#endif
+#endif /* if HAVE_STRCSPN */
 
 #if HAVE_STRNCAT
 /*
@@ -216,7 +216,7 @@ int	_dmalloc_strcspn(const char *str, const char *list);
  */
 extern
 char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_STRNCAT */
 
 #if HAVE_STRNCMP
 /*
@@ -225,7 +225,7 @@ char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len);
 extern
 int	_dmalloc_strncmp(const char *s1, const char *s2,
 			 const DMALLOC_SIZE len);
-#endif
+#endif /* if HAVE_STRNCMP */
 
 #if HAVE_STRPBRK
 /*
@@ -233,7 +233,7 @@ int	_dmalloc_strncmp(const char *s1, const char *s2,
  */
 extern
 char	*_dmalloc_strpbrk(const char *str, const char *list);
-#endif
+#endif /* if HAVE_STRPBRK */
 
 #if HAVE_STRSTR
 /*
@@ -241,7 +241,7 @@ char	*_dmalloc_strpbrk(const char *str, const char *list);
  */
 extern
 char	*_dmalloc_strstr(const char *str, const char *pat);
-#endif
+#endif /* if HAVE_STRSTR */
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.34 1998/09/28 21:36:09 gray Exp $
+ * $Id: error.h,v 1.35 1998/10/21 22:55:54 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -60,13 +60,13 @@ unsigned long	_dmalloc_iter_c;
 /* overhead information storing when the library started up for elapsed time */
 extern
 struct timeval	_dmalloc_start;
-#endif
+#endif /* if STORE_TIMEVAL */
 
 #if STORE_TIMEVAL == 0
 /* no comments found for this variable */
 extern
 long		_dmalloc_start;
-#endif
+#endif /* if STORE_TIMEVAL == 0 */
 
 /* global flag which indicates when we are aborting */
 extern
@@ -79,7 +79,7 @@ int		_dmalloc_aborting_b;
 extern
 char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
 			   const int elapsed_b);
-#endif
+#endif /* if STORE_TIMEVAL */
 
 #if STORE_TIMEVAL == 0
 /*
@@ -87,7 +87,7 @@ char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
  */
 extern
 char	*_dmalloc_ptime(const long *time_p, const int elapsed_b);
-#endif
+#endif /* if STORE_TIMEVAL == 0 */
 
 /*
  * message writer with printf like arguments
