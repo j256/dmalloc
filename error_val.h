@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.31 2003/09/06 14:59:41 gray Exp $
+ * $Id: error_val.h,v 1.32 2003/09/08 14:52:01 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -49,6 +49,7 @@
 #define ERROR_OVER_FENCE		27	/* failed picket fence upper */
 #define ERROR_WOULD_OVERWRITE		28	/* would overwrite fence */
 #define ERROR_IS_FREE			29	/* pointer is already free */
+#define ERROR_NOT_START_BLOCK		30	/* pointer not to start mem */
 
 /* allocation errors */
 #define ERROR_BAD_SIZE			40	/* bad size value */
@@ -105,6 +106,7 @@ __attribute__ ((unused))
   { ERROR_OVER_FENCE,		"failed OVER picket-fence magic-number check"},
   { ERROR_WOULD_OVERWRITE,	"use of pointer would exceed allocation" },
   { ERROR_IS_FREE,		"pointer is on free list" },
+  { ERROR_NOT_START_BLOCK,	"pointer is not to start of memory block" },
   
   /* allocation errors */
   { ERROR_BAD_SIZE,		"invalid allocation size" },
