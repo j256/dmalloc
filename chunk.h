@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.h,v 1.50 1998/11/09 16:54:26 gray Exp $
+ * $Id: chunk.h,v 1.51 1998/11/12 23:56:09 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -68,7 +68,7 @@ extern
 int	_chunk_read_info(const void *pnt, unsigned int *size_p,
 			 unsigned int *alloc_size_p, char **file_p,
 			 unsigned int *line_p, void **ret_attr_p,
-			 const char *where, int **seen_cp);
+			 const char *where, unsigned long **seen_cp);
 
 /*
  * Log the heap structure plus information on the blocks if necessary
