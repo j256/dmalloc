@@ -2,6 +2,8 @@ Wed Mar 10 11:18:13 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.2.0.
 
+	* Improved the autoconfig of abort and qsort safety.
+
 	* Fixed hash problem on 64-bit alphas.
 
 	* Fixed a number of missing prototypes and include problems.
@@ -1441,5 +1443,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.216 1999/03/11 00:57:26 gray Exp $
+$Id: ChangeLog,v 1.217 1999/03/11 05:37:55 gray Exp $
 -------------------------------------------------------------------------------
