@@ -20,7 +20,7 @@
 #
 # The author may be contacted at gray.watson@letters.com
 #
-# $Id: ra_info.pl,v 1.3 1995/03/23 15:12:53 gray Exp $
+# $Id: ra_info.pl,v 1.4 1998/12/27 06:13:52 gray Exp $
 #
 
 #
@@ -52,6 +52,9 @@ $| = 1;
 # get rid of the (gdb)
 printf (gdb "set prompt\n");
 printf (gdb "echo \\n\n");
+
+# load in the shared libraries
+printf (gdb "sharedlibrary\n");
 
 while ( <malloc> ) {
   $count = 0;
