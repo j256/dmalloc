@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.156 2003/05/15 02:43:27 gray Exp $
+# $Id: Makefile.in,v 1.157 2003/05/15 20:10:19 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -20,7 +20,7 @@ OBJS	= arg_check.o compat.o dmalloc_tab.o env.o heap.o protect.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o
-VERSION	!= sed -e '/dmalloc_version/s/^.*\([0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*\).*$$/\1/p' -e d version.h
+VERSION	!= sed -e '/dmalloc_version/s/^.*\([0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*\(-b[0-9]\)*\).*$$/\1/p' -e d version.h
 
 DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
@@ -74,7 +74,7 @@ FLS	=  conf.h.in configure.in config.help \
 	ChangeLog.1 Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
 	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
-	debug_val.h env.[ch] error.[ch] error_val.h heap.[ch] \
+	env.[ch] error.[ch] error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h \
 	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc_funcs.h \
 	protect.[ch] return.h version.h \
@@ -239,13 +239,15 @@ continuous :: $(TEST)
 
 compile_test :: settings.h
 	rm -f settings.h.t
-	for setting in `cut -f1 -d' ' settings.test` ;\
+	for setting in `grep -v '^#' settings.test | cut -f1 -d' ' ` ;\
 	do \
 		val=`grep "^$$setting " settings.test | cut -f2 -d' '` ;\
 		echo "$$setting -> $$val" ;\
-		sed -e "s/$$setting[ \t].*$$/$$setting $$val/" settings.dist \
-			> settings.h.t ;\
+		perl -n -e "s/(#define[ \t]$$setting[ \t]+[^ \t]+$$)/#define $$setting $$val\n/; print;" \
+			settings.dist > settings.h.t ;\
 		mv settings.h.t settings.h ;\
+		perl -n -e 'print "$$1$$_" if '"s/(#define[ \t]$$setting[ \t]+[^ \t]+$$)/#define $$setting $$val\n/;" \
+			settings.dist ;\
 		rm -f $(TEST) ;\
 		echo "Making $(TEST)" ;\
 		make $(TEST) > /dev/null ;\
@@ -287,7 +289,7 @@ dmalloc.dvi : $(srcdir)/dmalloc.texi
 	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
-INSTALL : $(srcdir)/$(INFOFILE)
+INSTALL : $(INFOFILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
 		> $@.t
