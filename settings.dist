@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.37 1999/03/07 23:55:19 gray Exp $
+ * $Id: settings.dist,v 1.38 1999/03/08 04:26:32 gray Exp $
  */
 
 /*
@@ -327,7 +327,7 @@
  * leaks.  See the MEMORY_TABLE_LOG value below to 0 to disable the
  * table.
  *
- * NOTE: the library will actually allocation 2 times this many
+ * NOTE: the library will actually allocated 2 times this many
  * entries for speed reasons.
  */
 #define MEMORY_TABLE_SIZE 4096
