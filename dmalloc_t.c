@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.53 1997/03/18 20:34:04 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.54 1997/03/21 17:19:42 gray Exp $";
 #endif
 
 /* external routines */
@@ -80,7 +80,7 @@ static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
 static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
 static	char		random_debug = ARGV_FALSE;	/* random flag */
 static	char		silent = ARGV_FALSE;		/* silent flag */
-static	unsigned int	seed_random = -1;		/* random seed */
+static	unsigned int	seed_random = 0;		/* random seed */
 static	char		verbose = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
@@ -617,7 +617,7 @@ int	main(int argc, char ** argv)
   if (silent && (verbose || interactive))
     silent = ARGV_FALSE;
   
-  if (seed_random == (-1))
+  if (seed_random == 0)
     seed_random = time(0) ^ 0xDEABEEF;
   (void)srand(seed_random);
   
