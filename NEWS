@@ -6,7 +6,7 @@ Version 1.3.1:
 
 Version 1.3.0:
 
-	* Added MALLOC_TRACE variable and malloc_dbg -t functionality.
+	* Added MALLOC_TRACE variable and malloc_dbg -t (NOTE: later removed)
 	* Added some C++ from Peter Miller to the manual.
 	* Removed LGPL and replaced it with fully free software notices.
 	* _malloc_perror renamed to _malloc_error

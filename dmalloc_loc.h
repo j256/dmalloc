@@ -18,7 +18,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.22 1993/08/12 22:12:03 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.23 1993/08/27 00:55:25 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -41,7 +41,6 @@
 #define INTERVAL_ENVIRON	"MALLOC_INTERVAL"
 #define LOGFILE_ENVIRON		"MALLOC_LOGFILE"
 #define START_ENVIRON		"MALLOC_START"
-#define TRACE_ENVIRON		"MALLOC_TRACE"
 
 /******************************* useful defines ******************************/
 

@@ -8,3 +8,4 @@ malloc.ps
 malloc_t
 malloc_dbg
 const.h
+malloc_dbg.h

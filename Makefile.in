@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.31 1993/08/27 00:07:36 gray Exp $
+# $Id: Makefile.in,v 1.32 1993/08/27 00:55:10 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -24,11 +24,11 @@ UTIL	= malloc_dbg
 
 MANFILE	= malloc.info
 
-PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
+PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
 	ChangeLog Manifest NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
 	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h return.h \
+	malloc_dbg.c malloc_dbg.[12] malloc_lp.[ch] malloc_loc.h return.h \
 	version.h malloc_t.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
 PORTCFG	= contrib/README contrib/dec_notes
@@ -37,12 +37,11 @@ PARTS	= 1 2 3 4 5
 MAXPART	= 5
 SHAR1	= ChangeLog Makefile.in Manifest NEWS NOTES README TODO malloc.c
 SHAR2	= chunk.c
-SHAR3	= configure error.c error.h error_str.h error_val.h malloc.info
-SHAR4	= chunk.h chunk_loc.h compat.c compat.h conf.h.in malloc.texi \
+SHAR3	= configure error.[ch] error_str.h error_val.h malloc.info
+SHAR4	= chunk.h chunk_loc.h compat.[ch] conf.h.in const.h.in malloc.texi \
 	malloc_t.c mallocrc
-SHAR5	= configure.in dbg_tokens.h dbg_values.h heap.c heap.h malloc_dbg.c \
-	malloc_dbg.h malloc_loc.h malloc_lp.c malloc_lp.h arg_check.c \
-	arg_check.h version.h
+SHAR5	= configure.in dbg_tokens.h dbg_values.h heap.[ch] malloc_dbg.c \
+	malloc_dbg.[12] malloc_loc.h malloc_lp.[ch] arg_check.[ch] version.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -78,7 +77,11 @@ const.h : const.h.in config.status
 	rm -f $@
 	sh ./config.status
 
-malloc_dbg.h : malloc_dbg.1 malloc_dbg.2 const.h
+conf.h : conf.h.in config.status
+	rm -f $@
+	sh ./config.status
+
+malloc_dbg.h : malloc_dbg.1 const.h malloc_dbg.2
 	rm -f $@ $@.t
 	cat malloc_dbg.1 const.h malloc_dbg.2 > $@.t
 	mv $@.t $@
@@ -88,14 +91,16 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(LIBRARY) $(ROOT)/lib
+$(UTIL) : malloc_dbg.o $(LIBRARY)
 	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
 
+configure : configure.in
+	touch $@
+
 .PHONY : port
-# NOTE: no $(PORTFLS) here else we remake configure with autoconf
-port : malloc.info
+port : $(PORTFLS)
 	@ answer 'Is it okay to remove the $@ directory? '
 	rm -rf $@
 	mkdir $@ $@/contrib

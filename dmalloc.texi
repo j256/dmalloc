@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.32 1993/08/26 23:09:05 gray Exp $
+@c $Id: dmalloc.texi,v 1.33 1993/08/27 00:55:18 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -479,9 +479,14 @@ allocating or freeing that address.
 
 The address can also have an @samp{:number} argument.  For instance, if
 it was set it to @samp{0x3e45:10}, the library will kill itself the 10th
-time it sees address @samp{0x3e45}.
+time it sees address @samp{0x3e45}.  By setting the number argument to
+0, the program will never stop when it sees the address.  This is useful
+for logging all activity on the address.
 
 This makes it easier to track down specific addresses not being freed.
+
+@emph{NOTE}: malloc will also log all activity on this address along
+with a count.
 
 @item MALLOC_INTERVAL
 @cindex MALLOC_INTERVAL variable
@@ -509,14 +514,6 @@ it sees a call from anywhere in the @file{malloc_t.c} file.
 
 This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.
-
-@item MALLOC_TRACE
-@cindex MALLOC_TRACE variable
-@cindex address tracing
-When this env variable is set to a hex address (taken from the malloc
-log-file for instance) malloc will log all activity on this address
-along with a count.  This assists in tracking problem addresses or
-locating memory leaks.
 @end table
 
 @node Debug Tokens, Argument Checking, Environment Variables, Features
@@ -751,9 +748,6 @@ by default in my malloc alias.
 Set the @samp{MALLOC_START} env variable to number (alternatively
 @samp{file:line}).
 
-@item -t address
-Set the @samp{MALLOC_TRACE} variable to address.
-
 @item -v
 Give verbose output.  Especially useful when dumping current settings or
 listing all of the tags.
@@ -768,7 +762,6 @@ that you have for the malloc environmental variables.  For example:
         MALLOC_INTERVAL not set
         MALLOC_LOGFILE == 'malloc'
         MALLOC_START not set
-        MALLOC_TRACE not set
 @end example
 
 With a -v option and no arguments, malloc_dbg dumps out the current
@@ -782,7 +775,6 @@ settings in a verbose manner.  For example:
         MALLOC_INTERVAL not set
         MALLOC_LOGFILE not set
         MALLOC_START not set
-        MALLOC_TRACE not set
 @end example
 
 Here are some more examples:

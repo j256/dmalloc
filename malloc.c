@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.39 1993/08/26 23:09:02 gray Exp $";
+  "$Id: malloc.c,v 1.40 1993/08/27 00:55:16 gray Exp $";
 #endif
 
 /*
@@ -59,12 +59,11 @@ EXPORT	void		*malloc_address	= NULL;
 #else
 EXPORT	char		*malloc_address	= NULL;
 #endif
-/* address to trace activity on. */
-#if __STDC__
-EXPORT	void		*malloc_trace	= NULL;
-#else
-EXPORT	char		*malloc_trace	= NULL;
-#endif
+/*
+ * argument to malloc_address, if 0 then never call _malloc_error()
+ * else call it after seeing malloc_address for this many times.
+ */
+EXPORT	int		malloc_address_count	= 0;
 
 /* local routines */
 LOCAL	int		malloc_startup(void);
@@ -76,12 +75,10 @@ LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
 LOCAL	char		log_path[512]	= { NULLC }; /* storage for env path */
 
 /* debug variables */
-LOCAL	int		address_count	= 0;	/* address argument */
 LOCAL	char		start_file[512] = { NULLC }; /* file to start at */
 LOCAL	int		start_line	= 0;	/* line in module to start */
 LOCAL	int		start_count	= -1;	/* start after X */
 LOCAL	int		check_interval	= -1;	/* check every X */
-LOCAL	int		trace_count	= 0;	/* times trace address seen */
 
 /****************************** local utilities ******************************/
 
@@ -166,39 +163,26 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
 }
 
 /*
- * check out a pointer to see if we were looking for it.
- * may not return.
+ * check out a pointer to see if we were looking for it.  may not
+ * return.
  */
 LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
 			  const char * label)
 {
   static int	addc = 0;
   
-  if ((malloc_address == NULL || pnt != malloc_address)
-      && (malloc_trace == NULL || pnt != malloc_trace))
+  if (malloc_address == NULL || pnt != malloc_address)
     return;
   
-  /* handle trace address */
-  if (malloc_trace != NULL && pnt == malloc_trace) {
-    trace_count++;
-    
-    _malloc_message("trace address '%#lx' from '%s' at pass %d from '%s'",
-		    pnt, label, trace_count, _chunk_display_pnt(file, line));
-    
-    /* we may need to continue to handle address */
-    if (malloc_address == NULL || pnt != malloc_address)
-      return;
+  addc++;
+  _malloc_message("address '%#lx' found in '%s' at pass %d from '%s'",
+		  pnt, label, addc, _chunk_display_pnt(file, line));
+  
+  /* NOTE: if malloc_address_count == 0 then never quit */
+  if (malloc_address_count > 0 && addc >= malloc_address_count) {
+    malloc_errno = MALLOC_POINTER_FOUND;
+    _malloc_error("check_pnt");
   }
-  
-  if (++addc < address_count)
-    return;
-  
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-    _malloc_message("found address '%#lx' after %d pass%s from '%s'",
-		    pnt, addc, (addc == 1 ? "" : "es"),
-		    _chunk_display_pnt(file, line));
-  malloc_errno = MALLOC_POINTER_FOUND;
-  _malloc_error("check_pnt");
 }
 
 /*
@@ -229,10 +213,10 @@ LOCAL	void	get_environ(void)
     addp = (char *)index(env, ':');
     if (addp != NULL) {
       *addp = NULLC;
-      address_count = atoi(addp + 1);
+      malloc_address_count = atoi(addp + 1);
     }
     else
-      address_count = 1;
+      malloc_address_count = 1;
     
     malloc_address = (char *)hex_to_long(env);
   }
@@ -262,11 +246,6 @@ LOCAL	void	get_environ(void)
     else
       start_count = atoi(env);
   }
-  
-  /* watch for a certain address */
-  env = (char *)getenv(TRACE_ENVIRON);
-  if (env != NULL)
-    malloc_trace = (char *)hex_to_long(env);
 }
 
 /************************** startup/shutdown calls ***************************/
