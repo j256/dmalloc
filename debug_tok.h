@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.32 2000/06/20 22:42:22 gray Exp $
+ * $Id: debug_tok.h,v 1.33 2000/11/07 17:03:51 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -46,18 +46,17 @@ static	attr_t		attributes[] = {
       "log general statistics" },
   { "log-non-free",	"lnf",	DEBUG_LOG_NONFREE,
       "log non-freed pointers" },
-  { "log-thread-id",	"lti",	0,
-      "Disabled token -- see LOG_THREAD_ID in settings.h" },
+  { "log-known",	"lkn",	DEBUG_LOG_KNOWN,
+      "log only known non-freed" },
   { "log-trans",	"ltr",	DEBUG_LOG_TRANS,
       "log memory transactions" },
-  { "log-stamp",	"lst",	0,
-      "Disabled token -- see LOG_TIME_NUMBER in settings.h" },
   { "log-admin",	"lad",	DEBUG_LOG_ADMIN,
       "log administrative info" },
   { "log-blocks",	"lbl",	DEBUG_LOG_BLOCKS,
       "log blocks when heap-map" },
-  { "log-unknown",	"lun",	DEBUG_LOG_UNKNOWN,
-      "log unknown non-freed" },
+  /* this is the default now and log-known is the opposite */
+  { "log-unknown",	"lun",	0,
+      "Disabled token -- this is the default now" },
   { "log-bad-space",	"lbs",	DEBUG_LOG_BAD_SPACE,
       "dump space from bad pnt" },
   { "log-nonfree-space","lns",	DEBUG_LOG_NONFREE_SPACE,
@@ -95,9 +94,6 @@ static	attr_t		attributes[] = {
       "log heap-map on heap-check" },
   { "print-messages",	"pme",	DEBUG_PRINT_MESSAGES,
       "write messages to stderr" },
-  /* OLD VERSION -- can be removed later */
-  { "print-error",	"per",	DEBUG_PRINT_MESSAGES,
-      "old version -- please use print-messages" },
   { "catch-null",	"cnu",	DEBUG_CATCH_NULL,
       "abort if no memory available" },
   { "never-reuse",	"nre",	DEBUG_NEVER_REUSE,
@@ -107,9 +103,6 @@ static	attr_t		attributes[] = {
       "allow non-linear heap space" },
   { "allow-free-null",	"afn",	DEBUG_ALLOW_FREE_NULL,
       "allow the frees of NULL pointers" },
-  /* OLD VERSION -- can be removed later */
-  { "allow-zero",	"aze",	DEBUG_ALLOW_FREE_NULL,
-      "old version -- please use allow-free-null" },
   { "error-dump",	"edu",	DEBUG_ERROR_DUMP,
       "dump core on error and then continue" },
   

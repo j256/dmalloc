@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.97 2000/10/10 23:06:25 gray Exp $
+ * $Id: dmalloc.c,v 1.98 2000/11/07 17:00:23 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.97 2000/10/10 23:06:25 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.98 2000/11/07 17:00:23 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.97 2000/10/10 23:06:25 gray Exp $";
+  "$Id: dmalloc.c,v 1.98 2000/11/07 17:00:23 gray Exp $";
 #endif
 #endif
 
@@ -90,7 +90,7 @@ typedef struct {
 } default_t;
 
 #define RUNTIME_FLAGS	(DEBUG_LOG_STATS | DEBUG_LOG_NONFREE | \
-			 DEBUG_LOG_BAD_SPACE | DEBUG_LOG_UNKNOWN | \
+			 DEBUG_LOG_BAD_SPACE | \
 			 DEBUG_CHECK_FENCE | \
 			 DEBUG_CATCH_NULL)
 #define LOW_FLAGS	(RUNTIME_FLAGS | \
