@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: arg_check.c,v 1.20 1999/03/04 19:10:34 gray Exp $
+ * $Id: arg_check.c,v 1.21 1999/03/09 20:51:14 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.20 1999/03/04 19:10:34 gray Exp $";
+#ident "$Id: arg_check.c,v 1.21 1999/03/09 20:51:14 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.20 1999/03/04 19:10:34 gray Exp $";
+  "$Id: arg_check.c,v 1.21 1999/03/09 20:51:14 gray Exp $";
 #endif
 #endif
 
@@ -70,7 +70,7 @@ int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking bcopy's arguments.
  */
-void	_dmalloc_bcopy(const char *from, char *to, const DMALLOC_SIZE len)
+void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("bcopy", from, CHUNK_PNT_LOOSE, len) != NOERROR

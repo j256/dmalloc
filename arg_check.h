@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: arg_check.h,v 1.15 1999/03/04 19:08:13 gray Exp $
+ * $Id: arg_check.h,v 1.16 1999/03/09 20:51:15 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -42,7 +42,7 @@ int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
  * Dummy function for checking bcopy's arguments.
  */
 extern
-void	_dmalloc_bcopy(const char *from, char *to, const DMALLOC_SIZE len);
+void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len);
 #endif /* if HAVE_BCOPY */
 
 #if HAVE_MEMCMP
