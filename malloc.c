@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.70 1994/10/12 17:22:38 gray Exp $";
+  "$Id: malloc.c,v 1.71 1994/11/12 23:09:39 gray Exp $";
 #endif
 
 /*
@@ -55,11 +55,7 @@ EXPORT	char		*dmalloc_logpath = LOGPATH_INIT;
 /* internal dmalloc error number for reference purposes only */
 EXPORT	int		dmalloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call dmalloc_error() */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	void		*dmalloc_address = ADDRESS_INIT;
-#else
-EXPORT	char		*dmalloc_address = ADDRESS_INIT;
-#endif
+EXPORT	DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
 /*
  * argument to dmalloc_address, if 0 then never call dmalloc_error()
  * else call it after seeing dmalloc_address for this many times.
@@ -72,27 +68,13 @@ EXPORT	void		_dmalloc_shutdown(void);
 EXPORT	void		_dmalloc_log_heap_map(void);
 EXPORT	void		_dmalloc_log_stats(void);
 EXPORT	void		_dmalloc_log_unfreed(void);
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	int		_dmalloc_verify(const void * pnt);
-#else
-EXPORT	int		_dmalloc_verify(const char * pnt);
-#endif
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	int		_malloc_verify(const void * pnt);
-#else
-EXPORT	int		_malloc_verify(const char * pnt);
-#endif
+EXPORT	int		_dmalloc_verify(const DMALLOC_PNT pnt);
+EXPORT	int		_malloc_verify(const DMALLOC_PNT pnt);
 EXPORT	void		_dmalloc_debug(const int debug);
 EXPORT	int		_dmalloc_debug_current(void);
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	int		_dmalloc_examine(const void * pnt, DMALLOC_SIZE * size,
+EXPORT	int		_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
 					 char ** file, unsigned int * line,
-					 void ** ret_attr);
-#else
-EXPORT	int		_dmalloc_examine(const char * pnt, DMALLOC_SIZE * size,
-					 char ** file, unsigned int * line,
-					 char ** ret_attr);
-#endif
+					 DMALLOC_PNT * ret_attr);
 EXPORT	char		*_dmalloc_strerror(const int errnum);
 
 
@@ -306,11 +288,7 @@ EXPORT	void	_dmalloc_shutdown(void)
 /*
  * allocate and return a SIZE block of bytes.  returns 0L on error.
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	*malloc(DMALLOC_SIZE size)
-#else
-EXPORT	char	*malloc(DMALLOC_SIZE size)
-#endif
+EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
 {
   void		*newp;
   
@@ -341,11 +319,7 @@ EXPORT	char	*malloc(DMALLOC_SIZE size)
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
  * of SIZE bytes and zero the block.  returns 0L on error.
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	*calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
-#else
-EXPORT	char	*calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
-#endif
+EXPORT	DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 {
   void		*newp;
   DMALLOC_SIZE	len = num_elements * size;
@@ -366,11 +340,7 @@ EXPORT	char	*calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
  * all of OLD_PNT to the new area or truncating.  returns 0L on error.
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	*realloc(void * old_pnt, DMALLOC_SIZE new_size)
-#else
-EXPORT	char	*realloc(char * old_pnt, DMALLOC_SIZE new_size)
-#endif
+EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 {
   void		*newp;
   
@@ -409,11 +379,7 @@ EXPORT	char	*realloc(char * old_pnt, DMALLOC_SIZE new_size)
  * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
  * depending on whether STDC is defined by your compiler.
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	free(void * pnt)
-#else
-EXPORT	int	free(void * pnt)
-#endif
+EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 {
   int		ret;
   
@@ -433,7 +399,7 @@ EXPORT	int	free(void * pnt)
   if (pnt == NULL) {
 #if ALLOW_FREE_NULL_MESSAGE
     _dmalloc_message("WARNING: tried to free(0) from '%s'",
-		    _chunk_display_pnt(_dmalloc_file, _dmalloc_line));
+		     _chunk_display_pnt(_dmalloc_file, _dmalloc_line));
 #endif
     ret = FREE_NOERROR;
   }
@@ -457,11 +423,7 @@ EXPORT	int	free(void * pnt)
 /*
  * same as free(PNT)
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	void	cfree(void * pnt)
-#else
-EXPORT	int	cfree(void * pnt)
-#endif
+EXPORT	DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 {
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
@@ -536,11 +498,7 @@ EXPORT	void	_dmalloc_log_unfreed(void)
  * NOTE: called by way of leap routine in dmalloc_lp.c
  * returns MALLOC_VERIFY_ERROR or MALLOC_VERIFY_NOERROR
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	int	_dmalloc_verify(const void * pnt)
-#else
-EXPORT	int	_dmalloc_verify(const char * pnt)
-#endif
+EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
 {
   int	ret;
   
@@ -572,11 +530,7 @@ EXPORT	int	_dmalloc_verify(const char * pnt)
 /*
  * same as dmalloc_verify
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	int	_malloc_verify(const void * pnt)
-#else
-EXPORT	int	_malloc_verify(const char * pnt)
-#endif
+EXPORT	int	_malloc_verify(const DMALLOC_PNT pnt)
 {
   return _dmalloc_verify(pnt);
 }
@@ -618,15 +572,9 @@ EXPORT	int	_dmalloc_debug_current(void)
  * if FILE returns 0L then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-#if defined(__STDC__) && __STDC__ == 1
-EXPORT	int	_dmalloc_examine(const void * pnt, DMALLOC_SIZE * size,
-				char ** file, unsigned int * line,
-				void ** ret_attr)
-#else
-EXPORT	int	_dmalloc_examine(const char * pnt, DMALLOC_SIZE * size,
-				char ** file, unsigned int * line,
-				char ** ret_attr)
-#endif
+EXPORT	int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
+				 char ** file, unsigned int * line,
+				 DMALLOC_PNT * ret_attr)
 {
   int		ret;
   
