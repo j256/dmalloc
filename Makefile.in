@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.91 1995/12/29 04:49:38 gray Exp $
+# $Id: Makefile.in,v 1.92 1997/01/16 22:31:53 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -21,7 +21,7 @@ DEFS	= -DSTDC_HEADERS=@STDC_HEADERS@ $(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
 
-CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith \
+CFLAGS	= -g $(CCFLS) -W -Wunused -Wpointer-arith \
 	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
