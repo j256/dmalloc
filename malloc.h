@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.28 2000/03/21 18:19:16 gray Exp $
+ * $Id: malloc.h,v 1.29 2000/03/24 21:48:09 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -210,6 +210,27 @@ int	_dmalloc_examine(const char *file, const int line,
  */
 extern
 void	_dmalloc_track(const dmalloc_track_t track_func);
+
+/*
+ * Return to the caller the current ``mark'' which can be used later
+ * to dmalloc_log_changed pointers since this point.  Multiple marks
+ * can be saved and used.
+ */
+extern
+unsigned long	_dmalloc_mark(void);
+
+/*
+ * Dump the pointers that have changed since the mark which was
+ * returned my _dmalloc_mark.  If not_freed_b is set to non-0 then log
+ * the new pointers that are non-freed.  If free_b is set to non-0
+ * then log the new pointers that are freed.  If details_b set to
+ * non-0 then dump the individual pointers that have changed otherwise
+ * just dump the summaries.
+ */
+extern
+void	_dmalloc_log_changed(const char *file, const int line,
+			     const unsigned long mark, const int not_freed_b,
+			     const int free_b, const int details_b);
 
 /*
  * Dmalloc version of strerror to return the string version of

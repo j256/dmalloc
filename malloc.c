@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.143 2000/03/21 22:13:50 gray Exp $
+ * $Id: malloc.c,v 1.144 2000/03/24 21:47:58 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.143 2000/03/21 22:13:50 gray Exp $";
+#ident "$Id: malloc.c,v 1.144 2000/03/24 21:47:58 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.143 2000/03/21 22:13:50 gray Exp $";
+  "$Id: malloc.c,v 1.144 2000/03/24 21:47:58 gray Exp $";
 #endif
 #endif
 
@@ -346,6 +346,8 @@ static	int	dmalloc_startup(void)
     _dmalloc_examine_func = _dmalloc_examine;
     _dmalloc_vmessage_func = _dmalloc_vmessage;
     _dmalloc_track_func = _dmalloc_track;
+    _dmalloc_mark_func = _dmalloc_mark;
+    _dmalloc_log_changed_func = _dmalloc_log_changed;
     _dmalloc_strerror_func = _dmalloc_strerror;
 #endif
   }
@@ -453,7 +455,13 @@ void	_dmalloc_shutdown(void)
   
   /* report on non-freed pointers */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE)) {
-    _chunk_dump_unfreed();
+    _chunk_log_changed(0, 1, 0,
+#if DUMP_UNFREED_SUMMARY_ONLY
+		       0
+#else
+		       1
+#endif
+		       );
   }
   
 #if STORE_TIMEVAL
@@ -982,7 +990,17 @@ void	_dmalloc_log_unfreed(const char *file, const int line)
     _dmalloc_message("dumping the unfreed pointers");
   }
   
-  _chunk_dump_unfreed();
+  /*
+   * to log the non-free we are interested in the pointers currently
+   * being used
+   */
+  _chunk_log_changed(0, 1, 0,
+#if DUMP_UNFREED_SUMMARY_ONLY
+		     0
+#else
+		     1
+#endif
+		     );
   
   in_alloc_b = FALSE;
   
@@ -1125,6 +1143,45 @@ int	_dmalloc_examine(const char *file, const int line,
 void	_dmalloc_track(const dmalloc_track_t track_func)
 {
   tracking_func = track_func;
+}
+
+/*
+ * Return to the caller the current ``mark'' which can be used later
+ * to dmalloc_log_changed pointers since this point.  Multiple marks
+ * can be saved and used.
+ */
+unsigned long	_dmalloc_mark(void)
+{
+  return _dmalloc_iter_c;
+}
+
+/*
+ * Dump the pointers that have changed since the mark which was
+ * returned by dmalloc_mark.  If not_freed_b is set to non-0 then log
+ * the new pointers that are non-freed.  If free_b is set to non-0
+ * then log the new pointers that are freed.  If details_b set to
+ * non-0 then dump the individual pointers that have changed otherwise
+ * just dump the summaries.
+ */
+void	_dmalloc_log_changed(const char *file, const int line,
+			     const unsigned long mark, const int not_freed_b,
+			     const int free_b, const int details_b)
+{
+  if (check_debug_vars(file, line) != NOERROR) {
+    return;
+  }
+  
+  _chunk_log_changed(mark, not_freed_b, free_b, details_b);
+  
+  in_alloc_b = FALSE;
+  
+#if LOCK_THREADS
+  unlock_thread();
+#endif
+  
+  if (do_shutdown_b) {
+    _dmalloc_shutdown();
+  }
 }
 
 /*
