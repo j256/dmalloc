@@ -5,6 +5,7 @@
  */
 
 #include <fcntl.h>				/* for O_WRONLY */
+#include <signal.h>				/* for kill signals */
 #include <stdio.h>				/* for STDERR */
 #include <stdarg.h>				/* for message vsprintf */
 
@@ -20,7 +21,7 @@
 #include "malloc_dbg.h"
 #include "malloc_errors.h"
 
-RCS_ID("$Id: error.c,v 1.1 1992/10/21 07:34:10 gray Exp $");
+RCS_ID("$Id: error.c,v 1.2 1992/10/22 04:46:25 gray Exp $");
 
 /*
  * message writer for passing in args lists, like vprintf
@@ -82,7 +83,7 @@ EXPORT	void	_malloc_die(void)
 {
   /* do I need to drop core? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_ERROR_ABORT))
-    abort();
+    (void)kill(getpid(), SIGABRT);
   
   /* oh well, just die */
   exit(1);

@@ -13,7 +13,7 @@
 
 #include "malloc.h"
 
-RCS_ID("$Id: dmalloc_t.c,v 1.7 1992/10/21 07:34:30 gray Exp $");
+RCS_ID("$Id: dmalloc_t.c,v 1.8 1992/10/22 04:46:38 gray Exp $");
 
 /*
  * hexadecimal STR to integer translation
@@ -144,8 +144,14 @@ EXPORT	int	main(int argc, char ** argv)
     
     /* do random heap hits */
     if (strcmp(line, "random") == 0) {
-      for (count = 1; count < 1000; count += 10)
-	(void)FREE(MALLOC(rand() % (count * 10) + 1));
+      for (count = 1; count < 1000; count += 10) {
+	int	amount;
+	char	*data;
+	
+	amount = rand() % (count * 10) + 1;
+	data = MALLOC(amount);
+	(void)FREE(data);
+      }
       continue;
     }
     

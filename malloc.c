@@ -21,7 +21,7 @@
 #include "malloc_errors.h"
 #include "malloc_loc.h"
 
-RCS_ID("$Id: malloc.c,v 1.1 1992/10/21 07:34:14 gray Exp $");
+RCS_ID("$Id: malloc.c,v 1.2 1992/10/22 04:46:26 gray Exp $");
 
 /*
  * library calls
@@ -31,9 +31,6 @@ IMPORT	char	*getenv();
 /*
  * exported variables
  */
-/* production flag which indicates that no malloc features should be enabled */
-EXPORT	char		malloc_production = FALSE;
-
 /* logfile for dumping malloc info, MALLOC_LOGFILE env. var overrides this */
 EXPORT	char		*malloc_logpath	= NULL;
 
@@ -42,7 +39,7 @@ LOCAL	int		malloc_startup(void);	/* used before defined */
 EXPORT	void		malloc_shutdown(void);
 
 /* local variables */
-LOCAL	int		malloc_enabled	= 0;	/* have we started yet? */
+LOCAL	int		malloc_enabled	= FALSE; /* have we started yet? */
 LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
 LOCAL	char		log_path[128];		/* storage for env path */
 
@@ -102,29 +99,29 @@ LOCAL	int	check_debug_vars(char * file, int line)
   
   in_alloc = TRUE;
   
-  if (malloc_enabled == 0)
+  if (! malloc_enabled)
     if (malloc_startup() != NOERROR)
       return ERROR;
   
   /* check start file/line specifications */
-  if (! _malloc_check
+  if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP)
       && start_file[0] != NULLC && file != NULL
       && strcmp(start_file, file) == 0
       && (line == 0 || line == start_line))
-    _malloc_check = TRUE;
+    BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
   
   /* start checking heap after X times */
   if (start_count != -1 && --start_count == 0)
-    _malloc_check = TRUE;
+    BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
   
   /* checking heap every X times */
   if (check_interval != -1) {
     if (++iterc >= check_interval) {
-      _malloc_check = TRUE;
+      BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
       iterc = 0;
     }
     else
-      _malloc_check = FALSE;
+      BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
   }
   
   return NOERROR;
@@ -174,7 +171,7 @@ LOCAL	void	get_environ()
   if ((env = getenv(START_ENVIRON)) != NULL) {
     char	*startp;
     
-    _malloc_check = FALSE;
+    BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
     
     if ((startp = STRING_SEARCH(env, ':')) != NULL) {
       *startp = NULLC;
@@ -193,14 +190,14 @@ LOCAL	void	get_environ()
 LOCAL	int	malloc_startup(void)
 {
   /* have we started already? */
-  if (malloc_enabled == 1)
+  if (malloc_enabled)
     return ERROR;
   
   /* set this here so if an error occurs below, it will not try again */
-  malloc_enabled = 1;
+  malloc_enabled = TRUE;
   
-  if (! malloc_production)
-    get_environ();
+  /* get the environmental variables */
+  get_environ();
   
   /* startup heap code */
   _heap_startup();
@@ -233,12 +230,16 @@ EXPORT	void	malloc_shutdown(void)
 #endif
   
   /* dump some statistics to the logfile */
-  _chunk_list_count();
-  _chunk_stats();
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_STATS))
+    _chunk_list_count();
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_STATS))
+    _chunk_stats();
   
   /* report on non-freed pointers */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_NONFREE))
     _chunk_dump_not_freed();
+  
+  /* NOTE: do not set malloc_enabled to false here */
 }
 
 /******************************** calloc calls *******************************/
@@ -462,7 +463,7 @@ EXPORT	int	malloc_verify(char * pnt)
   if (pnt != 0)
     ret = _chunk_pnt_check(pnt);
   else
-    ret = _chunk_heap_check(CHUNK_CHECK_ALL);
+    ret = _chunk_heap_check();
   
   in_alloc = FALSE;
   
