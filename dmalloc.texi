@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.203 2001/03/10 22:49:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.204 2001/03/29 01:34:58 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -153,310 +153,15 @@ without express or implied warranty.
 @cindex overview
 
 @menu
-* Allocation Basics::           Basic description of terms and functions.
-* Features::                    General features of the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
+* Allocation Basics::           Basic description of terms and functions.
+* Features::                    General features of the library.
+* How It Works::                How the library checks your program.
 * Troubleshooting::             Some solutions to common problems.
 @end menu
 
-@node Allocation Basics, Features, Overview, Overview
-@section Basic Description of Terms and Functions
-
-@cindex allocation basics
-@cindex basic allocation information
-
-@menu
-* Basic Definitions::           General memory terms and concepts.
-* Malloc Functions::            Functionality supported by all malloc libs.
-@end menu
-
-@node Basic Definitions, Malloc Functions, Allocation Basics, Allocation Basics
-@subsection General Memory Terms and Concepts
-
-@cindex basic definitions
-@cindex memory definitions
-
-Any program can be divided into 2 logical parts: text and data.  Text is
-the actual program code in machine-readable format and data is the
-information that the text operates on when it is executing.  The data,
-in turn, can be divided into 3 logical parts according to where it is
-stored: @dfn{static}, @dfn{stack}, and @dfn{heap}.
-
-@cindex static memory
-
-Static data is the information whose storage space is compiled into the
-program.
-
-@example
-/* global variables are allocated as static data */
-int numbers[10];
-
-main()
-@{
-        @dots{}
-@}
-@end example
-
-@cindex stack memory
-
-Stack data is data allocated at runtime to hold information used inside
-of functions.  This data is managed by the system in the space called
-stack space.
-
-@example
-void foo()
-@{
-        /* this local variable is stored on the stack */
-        float total;
-        @dots{}
-@}
-
-main()
-@{
-        foo();
-@}
-@end example
-
-@cindex heap memory
-
-Heap data is also allocated at runtime and provides a programmer with
-dynamic memory capabilities.
-
-@example
-main()
-@{
-        /* the address is stored on the stack */
-        char * string;
-        @dots{}
-
-        /*
-         * Allocate a string of 10 bytes on the heap.  Store the
-         * address in string which is on the stack.
-         */
-        string = (char *)malloc(10);
-        @dots{}
-
-        /* de-allocate the heap memory now that we're done with it */
-        (void)free(string);
-        @dots{}
-@}
-@end example
-
-It is the heap data that is managed by this library.
-
-Although the above is an example of how to use the malloc and free
-commands, it is not a good example of why using the heap for runtime
-storage is useful.
-
-Consider this: You write a program that reads a file into memory,
-processes it, and displays results.  You would like to handle files with
-arbitrary size (from 10 bytes to 1.2 megabytes and more).  One problem,
-however, is that the entire file must be in memory at one time to do the
-calculations.  You don't want to have to allocate 1.2 megabytes when you
-might only be reading in a 10 byte file because it is wasteful of system
-resources.  Also, you are worried that your program might have to handle
-files of more than 1.2 megabytes.
-
-A solution: first checkout the file's size and then, using the
-heap-allocation routines, get enough storage to read the entire file
-into memory.  The program will only be using the system resources
-necessary for the job and you will be guaranteed that your program can
-handle any sized file.
-
-@node Malloc Functions,  , Basic Definitions, Allocation Basics
-@subsection Functionality Supported by All Malloc Libraries
-
-@cindex malloc functions
-
-All malloc libraries support 4 basic memory allocation commands.  These
-include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
-more information about their capabilities, check your system's manual
-pages -- in unix, do a @code{man 3 malloc}.
-
-@deftypefun
-void *malloc ( unsigned int @var{size} )
-@cindex malloc
-
-Usage: @code{pnt = (type *)malloc(size)}
-
-The malloc routine is the basic memory allocation routine.  It allocates
-an area of @code{size} bytes.  It will return a pointer to the space
-requested.
-
-@end deftypefun
-@deftypefun
-void *calloc ( unsigned int @var{number}, unsigned int
-@var{size} )
-@cindex calloc
-@cindex Allocation of zeros
-@cindex zeros, allocation of
-
-Usage: @code{pnt = (type *)calloc(number, size)}
-
-The calloc routine allocates a certain @code{number} of items, each of
-@code{size} bytes, and returns a pointer to the space.  It is
-appropriate to pass in a @code{sizeof(type)} value as the size argument.
-
-Also, calloc nulls the space that it returns, assuring that the memory
-is all zeros.
-
-@end deftypefun
-@deftypefun
-void *realloc ( void *@var{old_pnt}, unsigned int
-@var{new_size} )
-@cindex realloc
-
-Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
-
-The realloc function expands or shrinks the memory allocation in
-@code{old_pnt} to @code{new_size} number of bytes.  Realloc copies as
-much of the information from @code{old_pnt} as it can into the
-@code{new_pnt} space it returns, up to @code{new_size} bytes.  If there
-is a problem allocating this memory, 0L will be returned.
-
-If the @code{old_pnt} is 0L then realloc will do the equivalent of a
-@code{malloc(new_size)}.  If @code{new_size} is 0 and @code{old_pnt} is
-not 0L, then it will do the equivalent of @code{free(old_pnt)} and will
-return 0L.
-
-@end deftypefun
-@deftypefun
-void free ( void *@var{pnt} )
-@cindex free
-
-Usage: @code{free(pnt)}
-
-The free routine releases allocation in @code{pnt} which was returned by
-malloc, calloc, or realloc back to the heap.  This allows other parts of
-the program to re-use memory that is not needed anymore.  It guarantees
-that the process does not grow too big and swallow a large portion of
-the system resources.
-
-@end deftypefun
-
-@emph{NOTE}: the returned address from the memory
-allocation/reallocation functions should be cast to the appropriate
-pointer type for the variable being assigned.  Also this may no longer
-be necessary on your system, it can still provide some documentation
-value to the code.
-
-@emph{WARNING}: there is a quite common myth that all of the space that
-is returned by malloc libraries has already been cleared.  @emph{Only}
-the @code{calloc} routine will zero the memory space it returns.
-
-@node Features, Installation, Allocation Basics, Overview
-@section General Features of the Library
-
-@cindex features
-
-The debugging features that are available in this debug malloc library
-can be divided into a couple basic classifications:
-
-@table @asis
-@item file and line number information
-@cindex file/line numbers
-@cindex cpp
-One of the nice things about a good debugger is its ability to provide
-the file and line number of an offending piece of code.  This library
-attempts to give this functionality with the help of @dfn{cpp}, the C
-preprocessor.  @xref{Allocation Macros}.
-
-@item return-address information
-@cindex return-address
-To debug calls to the library from external sources (i.e. those files
-that could not use the allocation macros), some facilities have been
-provided to supply the caller's address.  This address, with the help of
-a debugger, can help you locate the source of a problem.  @xref{Return
-Address}.
-
-@item fence-post (i.e. bounds) checking
-@cindex fence-post checking
-@cindex bounds checking
-@cindex checking bounds
-@dfn{Fence-post} memory is the area immediately above or below memory
-allocations.  It is all too easy to write code that accesses above or
-below an allocation -- especially when dealing with arrays or strings.
-The library can write special values in the areas around every
-allocation so it will notice when these areas have been overwritten.
-@xref{Fence-Post Overruns}.
-
-@emph{NOTE}: The library cannot notice when the program @emph{reads}
-from these areas, only when it writes values.  Also, fence-post checking
-will increase the amount of memory the program allocates.
-
-@item heap-constancy verification
-@cindex constancy verification
-The administration of the library is reasonably complex.  If any of the
-heap-maintenance information is corrupted, the program will either crash
-or give unpredictable results.
-
-By enabling heap-consistency checking, the library will run through its
-administrative structures to make sure all is in order.  This will mean
-that problems will be caught faster and diagnosed better.
-
-The drawback of this is, of course, that the library often takes quite a
-long time to do this.  It is suitable to enable this only during
-development and debugging sessions.
-
-@emph{NOTE}: the heap checking routines cannot guarantee that the tests
-will not cause a segmentation-fault if the heap administration
-structures are properly (or improperly if you will) overwritten.  In
-other words, the tests will verify that everything is okay but may not
-inform the user of problems in a graceful manner.
-
-@item logging statistics
-@cindex logging statistics
-@cindex statistics
-@cindex memory leaks
-@cindex leaking memory
-One of the reasons why the debug malloc library was initially developed
-was to track programs' memory usage -- specifically to locate
-@dfn{memory leaks} which are places where allocated memory is never
-getting freed.  @xref{Memory Leaks}.
-
-The library has a number of logging capabilities that can track un-freed
-memory pointers as well as runtime memory usage, memory transactions,
-administrative actions, and final statistics.
-
-@item examining unfreed memory
-@cindex unfreed memory
-@cindex non-freed memory
-Another common problem happens when a program frees a memory pointer but
-goes on to use it again by mistake.  This can lead to mysterious crashes
-and unexplained problems.
-
-To combat this, the library can write special values into a block of
-memory after it has been freed.  This serves two purposes: it will make
-sure that the program will get garbage data if it trying to access the
-area again, and it will allow the library to verify the area later for
-signs of overwriting.
-@end table
-
-If any of the above debugging features detect an error, the library will
-try to recover.  If logging is enabled then an error will be logged with
-as much information as possible.
-
-The error messages that the library displays are designed to give the
-most information for developers.  If the error message is not
-understood, then it is most likely just trying to indicate that a part
-of the heap has been corrupted.
-
-@cindex dump core
-@cindex core dump
-The library can be configured to quit immediately when an error is
-detected and to dump a core file or memory-image.  This can be examined
-with a debugger to determine the source of the problem.  The library can
-either stop after dumping core or continue running.
-
-@cindex system memory problems
-@cindex memory problems in system functions
-@emph{NOTE}: do not be surprised if the library catches problems with
-your system's routines.  It took me hours to finally come to the
-conclusion that the localtime call, included in SunOS release 4.1,
-overwrites one of its fence-post markers.
-
-@node Installation, Getting Started, Features, Overview
+@node Installation, Getting Started, Overview, Overview
 @section How to Install the Library
 
 @cindex installing the library
@@ -587,7 +292,7 @@ which case @samp{/usr/local} will have been replaced with @samp{PATH}.
 See the ``Getting Started'' section to get up and running with the
 library.  @xref{Getting Started}.
 
-@node Getting Started, Troubleshooting, Installation, Overview
+@node Getting Started, Allocation Basics, Installation, Overview
 @section Getting Started with the Library
 
 @cindex quick start
@@ -696,7 +401,364 @@ See the next section for help with this.  @xref{Troubleshooting}.
 
 @end enumerate
 
-@node Troubleshooting, , Getting Started, Overview
+@node Allocation Basics, Features, Getting Started, Overview
+@section Basic Description of Terms and Functions
+
+@cindex allocation basics
+@cindex basic allocation information
+
+@menu
+* Basic Definitions::           General memory terms and concepts.
+* Malloc Functions::            Functionality supported by all malloc libs.
+@end menu
+
+@node Basic Definitions, Malloc Functions, Allocation Basics, Allocation Basics
+@subsection General Memory Terms and Concepts
+
+@cindex basic definitions
+@cindex memory definitions
+
+Any program can be divided into 2 logical parts: text and data.  Text is
+the actual program code in machine-readable format and data is the
+information that the text operates on when it is executing.  The data,
+in turn, can be divided into 3 logical parts according to where it is
+stored: @dfn{static}, @dfn{stack}, and @dfn{heap}.
+
+@cindex static memory
+
+Static data is the information whose storage space is compiled into the
+program.
+
+@example
+/* global variables are allocated as static data */
+int numbers[10];
+
+main()
+@{
+        @dots{}
+@}
+@end example
+
+@cindex stack memory
+
+Stack data is data allocated at runtime to hold information used inside
+of functions.  This data is managed by the system in the space called
+stack space.
+
+@example
+void foo()
+@{
+        /* this local variable is stored on the stack */
+        float total;
+        @dots{}
+@}
+
+main()
+@{
+        foo();
+@}
+@end example
+
+@cindex heap memory
+
+Heap data is also allocated at runtime and provides a programmer with
+dynamic memory capabilities.
+
+@example
+main()
+@{
+        /* the address is stored on the stack */
+        char * string;
+        @dots{}
+
+        /*
+         * Allocate a string of 10 bytes on the heap.  Store the
+         * address in string which is on the stack.
+         */
+        string = (char *)malloc(10);
+        @dots{}
+
+        /* de-allocate the heap memory now that we're done with it */
+        (void)free(string);
+        @dots{}
+@}
+@end example
+
+It is the heap data that is managed by this library.
+
+Although the above is an example of how to use the malloc and free
+commands, it is not a good example of why using the heap for runtime
+storage is useful.
+
+Consider this: You write a program that reads a file into memory,
+processes it, and displays results.  You would like to handle files with
+arbitrary size (from 10 bytes to 1.2 megabytes and more).  One problem,
+however, is that the entire file must be in memory at one time to do the
+calculations.  You don't want to have to allocate 1.2 megabytes when you
+might only be reading in a 10 byte file because it is wasteful of system
+resources.  Also, you are worried that your program might have to handle
+files of more than 1.2 megabytes.
+
+A solution: first checkout the file's size and then, using the
+heap-allocation routines, get enough storage to read the entire file
+into memory.  The program will only be using the system resources
+necessary for the job and you will be guaranteed that your program can
+handle any sized file.
+
+@node Malloc Functions,, Basic Definitions, Allocation Basics
+@subsection Functionality Supported by All Malloc Libraries
+
+@cindex malloc functions
+
+All malloc libraries support 4 basic memory allocation commands.  These
+include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
+more information about their capabilities, check your system's manual
+pages -- in unix, do a @code{man 3 malloc}.
+
+@deftypefun
+void *malloc ( unsigned int @var{size} )
+@cindex malloc
+
+Usage: @code{pnt = (type *)malloc(size)}
+
+The malloc routine is the basic memory allocation routine.  It allocates
+an area of @code{size} bytes.  It will return a pointer to the space
+requested.
+
+@end deftypefun
+@deftypefun
+void *calloc ( unsigned int @var{number}, unsigned int
+@var{size} )
+@cindex calloc
+@cindex Allocation of zeros
+@cindex zeros, allocation of
+
+Usage: @code{pnt = (type *)calloc(number, size)}
+
+The calloc routine allocates a certain @code{number} of items, each of
+@code{size} bytes, and returns a pointer to the space.  It is
+appropriate to pass in a @code{sizeof(type)} value as the size argument.
+
+Also, calloc nulls the space that it returns, assuring that the memory
+is all zeros.
+
+@end deftypefun
+@deftypefun
+void *realloc ( void *@var{old_pnt}, unsigned int
+@var{new_size} )
+@cindex realloc
+
+Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
+
+The realloc function expands or shrinks the memory allocation in
+@code{old_pnt} to @code{new_size} number of bytes.  Realloc copies as
+much of the information from @code{old_pnt} as it can into the
+@code{new_pnt} space it returns, up to @code{new_size} bytes.  If there
+is a problem allocating this memory, 0L will be returned.
+
+If the @code{old_pnt} is 0L then realloc will do the equivalent of a
+@code{malloc(new_size)}.  If @code{new_size} is 0 and @code{old_pnt} is
+not 0L, then it will do the equivalent of @code{free(old_pnt)} and will
+return 0L.
+
+@end deftypefun
+@deftypefun
+void free ( void *@var{pnt} )
+@cindex free
+
+Usage: @code{free(pnt)}
+
+The free routine releases allocation in @code{pnt} which was returned by
+malloc, calloc, or realloc back to the heap.  This allows other parts of
+the program to re-use memory that is not needed anymore.  It guarantees
+that the process does not grow too big and swallow a large portion of
+the system resources.
+
+@end deftypefun
+
+@emph{NOTE}: the returned address from the memory
+allocation/reallocation functions should be cast to the appropriate
+pointer type for the variable being assigned.  Also this may no longer
+be necessary on your system, it can still provide some documentation
+value to the code.
+
+@emph{WARNING}: there is a quite common myth that all of the space that
+is returned by malloc libraries has already been cleared.  @emph{Only}
+the @code{calloc} routine will zero the memory space it returns.
+
+@node Features, How It Works, Allocation Basics, Overview
+@section General Features of the Library
+
+@cindex features
+
+The debugging features that are available in this debug malloc library
+can be divided into a couple basic classifications:
+
+@table @asis
+@item file and line number information
+@cindex file/line numbers
+@cindex cpp
+One of the nice things about a good debugger is its ability to provide
+the file and line number of an offending piece of code.  This library
+attempts to give this functionality with the help of @dfn{cpp}, the C
+preprocessor.  @xref{Allocation Macros}.
+
+@item return-address information
+@cindex return-address
+To debug calls to the library from external sources (i.e. those files
+that could not use the allocation macros), some facilities have been
+provided to supply the caller's address.  This address, with the help of
+a debugger, can help you locate the source of a problem.  @xref{Return
+Address}.
+
+@item fence-post (i.e. bounds) checking
+@cindex fence-post checking
+@cindex bounds checking
+@cindex checking bounds
+@dfn{Fence-post} memory is the area immediately above or below memory
+allocations.  It is all too easy to write code that accesses above or
+below an allocation -- especially when dealing with arrays or strings.
+The library can write special values in the areas around every
+allocation so it will notice when these areas have been overwritten.
+@xref{Fence-Post Overruns}.
+
+@emph{NOTE}: The library cannot notice when the program @emph{reads}
+from these areas, only when it writes values.  Also, fence-post checking
+will increase the amount of memory the program allocates.
+
+@item heap-constancy verification
+@cindex constancy verification
+The administration of the library is reasonably complex.  If any of the
+heap-maintenance information is corrupted, the program will either crash
+or give unpredictable results.
+
+By enabling heap-consistency checking, the library will run through its
+administrative structures to make sure all is in order.  This will mean
+that problems will be caught faster and diagnosed better.
+
+The drawback of this is, of course, that the library often takes quite a
+long time to do this.  It is suitable to enable this only during
+development and debugging sessions.
+
+@emph{NOTE}: the heap checking routines cannot guarantee that the tests
+will not cause a segmentation-fault if the heap administration
+structures are properly (or improperly if you will) overwritten.  In
+other words, the tests will verify that everything is okay but may not
+inform the user of problems in a graceful manner.
+
+@item logging statistics
+@cindex logging statistics
+@cindex statistics
+@cindex memory leaks
+@cindex leaking memory
+One of the reasons why the debug malloc library was initially developed
+was to track programs' memory usage -- specifically to locate
+@dfn{memory leaks} which are places where allocated memory is never
+getting freed.  @xref{Memory Leaks}.
+
+The library has a number of logging capabilities that can track un-freed
+memory pointers as well as runtime memory usage, memory transactions,
+administrative actions, and final statistics.
+
+@item examining unfreed memory
+@cindex unfreed memory
+@cindex non-freed memory
+Another common problem happens when a program frees a memory pointer but
+goes on to use it again by mistake.  This can lead to mysterious crashes
+and unexplained problems.
+
+To combat this, the library can write special values into a block of
+memory after it has been freed.  This serves two purposes: it will make
+sure that the program will get garbage data if it trying to access the
+area again, and it will allow the library to verify the area later for
+signs of overwriting.
+@end table
+
+If any of the above debugging features detect an error, the library will
+try to recover.  If logging is enabled then an error will be logged with
+as much information as possible.
+
+The error messages that the library displays are designed to give the
+most information for developers.  If the error message is not
+understood, then it is most likely just trying to indicate that a part
+of the heap has been corrupted.
+
+@cindex dump core
+@cindex core dump
+The library can be configured to quit immediately when an error is
+detected and to dump a core file or memory-image.  This can be examined
+with a debugger to determine the source of the problem.  The library can
+either stop after dumping core or continue running.
+
+@cindex system memory problems
+@cindex memory problems in system functions
+@emph{NOTE}: do not be surprised if the library catches problems with
+your system's routines.  It took me hours to finally come to the
+conclusion that the localtime call, included in SunOS release 4.1,
+overwrites one of its fence-post markers.
+
+@node How It Works, Troubleshooting, Features, Overview
+@section How the Library Checks Your Program
+
+This is one of the newer sections of the library implying that it is
+incomplete.  If you have any questions or issues that you'd like to see
+handled here, please let me know.
+
+The dmalloc library replaces the heap library calls normally found in
+your system libraries with its own versions.  When you make a call to
+malloc (for example), you are calling dmalloc's version of the memory
+allocation function.  When you allocate memory with these functions, the
+dmalloc library keeps track of a number of pieces of debugging
+information about your pointer including: where it was allocated,
+exactly how much memory was requested, when the call was made, etc..
+This information can then be verified when the pointer is freeds or
+reallocated and the details can be logged on any errors.
+
+Whenever you reallocate or free a memory addres, the dmalloc library
+always performs a number of checks on the pointer to make sure that it
+is valid and has not been corrupted.  You can configure the library to
+perform additional checks suchs as detected fence-post writing.  The
+library can also be configured to overwrite memory with non-zeros (only
+if calloc is not called) when it is allocated and erase the memory when
+the pointers are freed.
+
+@cindex check-heap
+In addition to per-pointer checks, you can configure the library to
+perform complete heap checks.  These complete checks verify all internal
+heap structures and include walking all of the known allocated pointers
+to verify each one in turn.  You need this level of checking to find
+random pointers in your program which got corrupted but that won't be
+freed for a while.  To turn on these checks, you will need to enable the
+'check-heap' debug token.  @xref{Environment Variable}.  By default this
+will cause the heap to be fully checked each and every time dmalloc is
+called whether it is a malloc, free, realloc, or another dmalloc
+overloaded function.
+
+Performing a full heap check can take a good bit of CPU and it may be
+that you will want to run it sporadically.  This can be accomplished in
+a couple different ways including the '-i' interval argument to the
+dmalloc utility.  @xref{Dmalloc Program}.  This will cause the check to
+be run every Xth time.  For instance, 'dmalloc -i 3' will cause the heap
+to be checked before every 3rd call to a memory function.  Values of 100
+or even 1000 for high memory usage programs are more useful than smaller
+ones.
+
+You can also cause the program to start doing detailed heap checking
+after a certain point.  For instance, with 'dmalloc -s 1000' option, you
+can tell the dmalloc library to enable the heap checks after the 1000th
+memory call.  Examine the dmalloc log file produced and use the
+iteration count if you have @code{LOG_ITERATION_COUNT} enabled in your
+@file{settings.h} file.
+
+The start option can also have the format @samp{file:line}.  For
+instance, if it is set to @samp{dmalloc_t.c:126}, dmalloc will start
+checking the heap after it sees a dmalloc call from the
+@file{dmalloc_t.c} file, line number 126.  If you use
+@samp{dmalloc_t.c:0}, with a 0 line number, then dmalloc will start
+checking the heap after it sees a call from anywhere in the
+@file{dmalloc_t.c} file.
+
+@node Troubleshooting,, How It Works, Overview
 @section Some Solutions to Common Problems
 
 @cindex troubleshooting
@@ -1920,11 +1982,12 @@ Set this to a number X and dmalloc will begin checking the heap after X
 times.  This means the intensive debugging can be started after a
 certain point in a program.
 
-@samp{start} also has the format file:line.  For instance, if it is set
-to @samp{dmalloc_t.c:126} dmalloc will start checking the heap after it
-sees a dmalloc call from the @file{dmalloc_t.c} file, line number 126.
-If line number is 0 then dmalloc will start checking the heap after it
-sees a call from anywhere in the @file{dmalloc_t.c} file.
+@samp{start} also has the format @samp{file:line}.  For instance, if it
+is set to @samp{dmalloc_t.c:126} dmalloc will start checking the heap
+after it sees a dmalloc call from the @file{dmalloc_t.c} file, line
+number 126.  If you use @samp{dmalloc_t.c:0}, with a 0 line number, then
+dmalloc will start checking the heap after it sees a call from anywhere
+in the @file{dmalloc_t.c} file.
 
 This allows the intensive debugging to be started after a certain
 routine or file has been reached in the program.

@@ -1,3 +1,14 @@
+2001-03-28  Gray Watson  <gray@outside.256.com>
+
+	* Added the 'How It Works' section to the manual.
+
+	* Removed necessity of strcat.
+
+	* Removed use of strcpy internally.
+
+	* Fixed problem with use of start-count and start-file not
+	disabling the check-heap flag.
+
 Mon Feb 26 12:17:25 2001  Gray Watson  <gray@whopper.be.256.com>
 
 	* Releasing dmalloc version 4.8.2.
@@ -1762,5 +1773,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.273 2001/02/28 05:14:26 gray Exp $
+$Id: ChangeLog,v 1.274 2001/03/29 01:35:16 gray Exp $
 -------------------------------------------------------------------------------
