@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: settings.dist,v 1.27 1998/10/26 14:24:41 gray Exp $
+ * $Id: settings.dist,v 1.28 1998/10/28 15:19:04 gray Exp $
  */
 
 /*
@@ -93,11 +93,11 @@
 /*
  * The largest allowable allocations in bits.  This is only for
  * verification purposes.  Any allocation larger than this (in bits)
- * will generate a ERROR_TOO_BIG error (#15).  the default (24)
- * indicates that an allocation of more than 16mb (2^24) will generate
+ * will generate a ERROR_TOO_BIG error (#15).  The default
+ * indicates that an allocation of more than 64mb (2^26) will generate
  * an error.
  */
-#define LARGEST_BLOCK 24
+#define LARGEST_BLOCK 26
 
 /*
  * Although I don't know why you would want to tune this since this is

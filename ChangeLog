@@ -1,3 +1,7 @@
+Wed Oct 28 10:17:13 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Increased the default max memory size from 16mb to 64mb.
+
 Thu Oct 15 11:06:41 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Released dmalloc version 4.0.3.
@@ -1331,5 +1335,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.197 1998/10/15 20:26:02 gray Exp $
+$Id: ChangeLog,v 1.198 1998/10/28 15:19:03 gray Exp $
 -------------------------------------------------------------------------------
