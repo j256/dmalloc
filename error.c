@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.110 2003/09/05 21:29:44 gray Exp $
+ * $Id: error.c,v 1.111 2003/11/17 22:21:53 gray Exp $
  */
 
 /*
@@ -352,11 +352,11 @@ void	_dmalloc_reopen_log(void)
   }
   
   if (dmalloc_logpath == NULL) {
-    dmalloc_message("Closing logfile to be reopened as '%s'",
-		     dmalloc_logpath);
+    dmalloc_message("Closing logfile to not be reopened");
   }
   else {
-    dmalloc_message("Closing logfile to not be reopened");
+    dmalloc_message("Closing logfile to be reopened as '%s'",
+		     dmalloc_logpath);
   }
   
   (void)close(outfile_fd);
