@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.179 2003/05/15 02:43:36 gray Exp $
+ * $Id: chunk.c,v 1.180 2003/05/15 05:35:24 gray Exp $
  */
 
 /*
@@ -1634,8 +1634,7 @@ static	skip_alloc_t	*find_slot(const void *user_pnt,
   }
   
   if (! check_slot(slot_p, user_pnt)) {
-    /* not found */
-    dmalloc_errno = ERROR_NOT_FOUND;
+    /* error set in check slot */
     return NULL;
   }
   
@@ -1957,6 +1956,7 @@ int	_dmalloc_chunk_heap_check(void)
   for (slot_p = skip_address_list->sa_next_p[0];
        slot_p != NULL;
        slot_p = slot_p->sa_next_p[0]) {
+    skip_alloc_t	*block_slot_p;
     
     /* better be in the heap */
     if (! IS_IN_HEAP(slot_p)) {
@@ -1969,15 +1969,15 @@ int	_dmalloc_chunk_heap_check(void)
      * now we look up the slot pointer itself and make sure it exists
      * in a valid block
      */
-    slot_p = find_address(slot_p, 1 /* loose */, skip_update);
-    if (slot_p == NULL) {
+    block_slot_p = find_address(slot_p, 0 /* loose */, skip_update);
+    if (block_slot_p == NULL) {
       dmalloc_errno = ERROR_ADMIN_LIST;
       dmalloc_error("_dmalloc_chunk_heap_check");
       return 0;
     }
     
     /* point at the block */
-    block_p = slot_p->sa_mem;
+    block_p = block_slot_p->sa_mem;
     
     /* check block magic */
     if (block_p->eb_magic1 != ENTRY_BLOCK_MAGIC1) {
@@ -1987,7 +1987,7 @@ int	_dmalloc_chunk_heap_check(void)
     }
     
     /* make sure the slot level matches */
-    if (slot_p->sa_level_n == block_p->eb_level_n) {
+    if (slot_p->sa_level_n != block_p->eb_level_n) {
       dmalloc_errno = ERROR_ADDRESS_LIST;
       dmalloc_error("_dmalloc_chunk_heap_check");
       return 0;
@@ -2002,6 +2002,7 @@ int	_dmalloc_chunk_heap_check(void)
   }
   
 #if 0    
+  if (1) {
     /*
      * check for different types
      */
@@ -2358,9 +2359,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   /* find our slot which does a lot of other checking */
   slot_p = find_slot(user_pnt, NULL /* prev */, NULL /* next */);
   if (slot_p == NULL) {
-    if (exact_b) {
-      /* it wasn't found */
-      dmalloc_errno = ERROR_NOT_FOUND;
+    if (exact_b || dmalloc_errno == ERROR_NOT_FOUND) {
       log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, "pointer-check");
       dmalloc_error(func);
       return 0;
