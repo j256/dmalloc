@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.26 1993/08/30 20:14:09 gray Exp $
+ * $Id: chunk.h,v 1.27 1993/10/17 00:50:22 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -42,14 +42,14 @@ IMPORT	char		*_malloc_unknown_file;
 IMPORT	int		_calloc_count;  /* # callocs, done in alloc */
 
 /*
- * display a bad pointer with FILE and LINE information
- */
-IMPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line);
-
-/*
  * startup the low level malloc routines
  */
 IMPORT	int	_chunk_startup(void);
+
+/*
+ * display a bad pointer with FILE and LINE information
+ */
+IMPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line);
 
 /*
  * run extensive tests on the entire heap depending on TYPE
@@ -61,7 +61,7 @@ IMPORT	int	_chunk_heap_check(void);
  * (or 0 if unknown).  CHECK is flags for types of checking (see chunk.h).
  * returns [NO]ERROR
  */
-IMPORT	int	_chunk_pnt_check(const char * func, void * pnt,
+IMPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 				 const int check, const int min_size);
 
 /*
@@ -102,7 +102,7 @@ IMPORT	void	_chunk_stats(void);
 /*
  * dump the unfreed memory, logs the unfreed information to logger
  */
-IMPORT	void	_chunk_dump_not_freed(void);
+IMPORT	void	_chunk_dump_unfreed(void);
 
 /*
  * log the heap structure plus information on the blocks if necessary

@@ -18,20 +18,32 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.17 1993/09/26 19:58:08 gray Exp $
+ * $Id: chunk_loc.h,v 1.18 1993/10/17 00:50:24 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
 #define __CHUNK_LOC_H__
 
 /* defines for the malloc subsystem */
-#define BLOCK_SIZE	(1 << BASIC_BLOCK)
 
 /*
  * the default smallest allowable allocations in bits.  this is
  * adjusted at runtime to conform to other settings.
  */
 #define DEFAULT_SMALLEST_BLOCK	4
+
+/* size of a block */
+#define BLOCK_SIZE		(1 << BASIC_BLOCK)
+
+/* pointer to the start of the block which holds PNT */
+#define WHAT_BLOCK(pnt)		(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
+
+/* adjust internal PNT to user-space */
+#define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_below_adm)
+#define USER_TO_CHUNK(pnt)	((char *)(pnt) - pnt_below_adm)
+
+/* get the number of blocks to hold SIZE */
+#define NUM_BLOCKS(size)	(size + (BLOCK_SIZE - 1) / BLOCK_SIZE)
 
 /*
  * number of ba_block entries is a bblock_adm_t which must fit in a
@@ -50,9 +62,6 @@
 
 #define CHUNK_MAGIC_BASE	0xDEA007	/* base magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
-
-#define WHAT_BLOCK(pnt)		(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
-#define CHUNK_TO_USER(pnt)	((char *)(pnt) + pnt_below_adm)
 
 /* bb_flags values */
 #define BBLOCK_ALLOCATED	0x3F		/* block has been allocated */
