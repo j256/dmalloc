@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.238 2003/09/29 23:13:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.239 2003/10/04 19:23:13 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -114,12 +114,13 @@ application, test program, and documentation.  Online documentation as
 well as the full source is available at URL @uref{http://dmalloc.com/}.
 Details on the library's mailing list are available there as well.
 
-Please use the forums (@uref{http://dmalloc.com/forums/}) to discuss any
-problems or to request features.  If you are still having problems, the
-author can be reached via his home page (@uref{http://256.com/gray/})
-with questions or feedback.  Please include the version number of the
-library that you are using, your machine and operating system types, and
-the value of the DMALLOC_OPTIONS environment variable.
+Please use the forums at URL @uref{http://dmalloc.com/forums/} to
+discuss any problems or to request features.  If you are still having
+problems, the author can be reached via his home page at URL
+@uref{http://256.com/gray/} with questions or feedback.  Please include
+the version number of the library that you are using, your machine and
+operating system types, and the value of the DMALLOC_OPTIONS environment
+variable.
 
 Gray Watson.
 
@@ -182,7 +183,7 @@ carefully.
 @enumerate
 
 @item Make sure you have the latest version of the library available
-from the home page @uref{http://dmalloc.com/}.
+from the home page at URL @uref{http://dmalloc.com/}.
 
 @cindex settings.dist file
 
@@ -312,7 +313,7 @@ library:
 @enumerate
 
 @item Make sure you have the latest version of the library available
-from the home page @uref{http://dmalloc.com/}.
+from the home page at URL @uref{http://dmalloc.com/}.
 
 @item Follow the installation instructions on how to configure,
 make, and install the library (i.e. type: @kbd{make install}).
@@ -348,11 +349,16 @@ or
 function dmalloc @{ eval `/usr/local/bin/dmalloc -b $*`; @}
 @end example
 
+After you add the alias you need to log out and log back in to have it
+take effect, or you can execute the above appropriate command on the
+command line.
+
 By the way, if you are looking for a shell, I heartily recommend trying
-out zsh.  It is a bourne shell written from scratch with much the same
-features as tcsh without the csh crap.  If you are @emph{still} using
-csh or tcsh, you should add the following to your @file{.cshrc} file
-(notice the @kbd{-C} option for c-shell output):
+out zsh at URL @uref{http://www.zsh.org/}.  It is a bourne shell
+written from scratch with much the same features as tcsh without the csh
+crap.  If you are @emph{still} using csh or tcsh, you should add the
+following to your @file{.cshrc} file (notice the @kbd{-C} option for
+c-shell output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
@@ -778,9 +784,9 @@ this list -- either problems you are still having or tips that you would
 like to pass on.
 
 When diagnosing a problem, if possible, always make sure you are running
-the most up to date version of Dmalloc available from the home page
-@uref{http://dmalloc.com/}.  Problems are often fixed and a new release
-is published before people encounter them.
+the most up to date version of Dmalloc available from the home page at
+URL @uref{http://dmalloc.com/}.  Problems are often fixed and a new
+release is published before people encounter them.
 
 @table @samp
 
@@ -2037,7 +2043,7 @@ programmers only please.
 
 The Cygwin environment is a Linux-like environment for Windows.  It
 provides Linux look and feel as well as a programming environment.  See
-@uref{http://www.cygwin.com/} for more details.
+URL @uref{http://www.cygwin.com/} for more details.
 
 @cindex reading environment, problems with
 @cindex getenv, problems with
@@ -2256,8 +2262,8 @@ To find out the usage for the debug malloc program try @samp{dmalloc
 --usage-long}.  The standardized usage message that will be displayed is
 one of the many features of the argv library included with this package.
 
-It is available on the web at @uref{http://256.com/sources/argv/}.  See
-the documentation there for more information.
+It is available on the web at URL @uref{http://256.com/sources/argv/}.
+See the documentation there for more information.
 
 Here is a detailed list of the flags that can passed to dmalloc:
 
