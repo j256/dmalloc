@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.27 1993/11/30 10:36:49 gray Exp $
+ * $Id: conf.h.in,v 1.28 1993/12/06 06:19:27 gray Exp $
  */
 
 /*
@@ -105,6 +105,14 @@
 #define ERROR_SIGNAL SIGABRT
 
 /*
+ * number of bytes to write at the top of allocations (if fence-post
+ * checking is enabled).  A larger number means more memory space used
+ * up but better protection about fence overruns.  See the manual for
+ * more information.
+ */
+#define FENCE_TOP 4
+
+/*
  ************************************************************************
  * CONFIGURE DEFINES: Should not need to tune by hand
  ************************************************************************
@@ -138,22 +146,22 @@
 #define BASIC_BLOCK 12
 
 /*
- * the alignment value of all allocations in number of bits for
+ * the alignment value of all allocations in number of bytes for
  * loading admin information before an allocation.  if possible, the
  * configure script will set this to be the value returned by
  * sizeof(long) which in most systems is the register width.
  *
- * NOTE: the value will never be auto-configured to be less than 3
- * bits (where sizeof(long) == 8) because some system (like sparc for
- * instance) report the sizeof(long) == 4 while the register size is 8
- * bytes.  certain memory needs to be of the same base as the register
- * size (stack frames, code, etc.).  any ideas how I can determine the
- * register size in a better (and portable) fashion?
+ * NOTE: the value will never be auto-configured to be less than 8
+ * because some system (like sparc for instance) report the sizeof(long)
+ * == 4 while the register size is 8 bytes.  certain memory needs to be of
+ * the same base as the register size (stack frames, code, etc.).  any
+ * ideas how I can determine the register size in a better (and portable)
+ * fashion?
  *
  * NOTE: larger the number the more memory may be wasted by certain
  *       debugging settings like fence-post checking.
  */
-#define ALLOCATION_ALIGNMENT 3
+#define ALLOCATION_ALIGNMENT 8
 
 /*
  * LIBRARY DEFINES:
