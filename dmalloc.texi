@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.164 1999/03/09 04:59:43 gray Exp $
+@c $Id: dmalloc.texi,v 1.165 1999/03/09 23:20:52 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -2055,11 +2055,6 @@ know who is using this (cough, cough) feature and for what reason.
 Realloc() of a NULL pointer is supported in which case the library will
 just make a call to malloc().  This can be disabled with the help of a
 manual compilation option in the @file{conf.h} file.
-
-@item
-The library does @emph{not} provide memalign() support as of yet, but
-may in future releases.  The author is interested to know who is using
-these functions and for what reason.
 
 @item
 Some systems allow free(0) to not be an error for some reason.  Since 0
