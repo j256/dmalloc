@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.116 2004/10/12 19:38:57 gray Exp $
+ * $Id: dmalloc_t.c,v 1.117 2004/10/19 14:50:44 gray Exp $
  */
 
 /*
@@ -833,7 +833,7 @@ static	int	check_special(void)
     old_flags = dmalloc_debug_current();
     
     /* sure on free-blank on and check-fence off */
-    dmalloc_debug((old_flags | DEBUG_FREE_BLANK) & (~DEBUG_CHECK_FENCE));
+    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
     
     if (! silent_b) {
       (void)printf("  Overwriting memory above allocation.\n");
@@ -1987,7 +1987,7 @@ static	int	check_special(void)
   /********************/
   
   /*
-   * Check block rounding by sbrk.
+   * Check block rounding by allocator.
    */
   {
     unsigned long	size;
@@ -2054,7 +2054,196 @@ static	int	check_special(void)
   }
   
   /********************/
-
+  
+  /*
+   * Make sure per-pointer blanking flags work.
+   */
+  {
+    unsigned long	size;
+    unsigned int	old_flags = dmalloc_debug_current();
+    char		save_ch;
+    
+    if (! silent_b) {
+      (void)printf("  Checking per-pointer blanking flags\n");
+    }
+    
+    /* disable alloc and check blanking */ 
+    dmalloc_debug(old_flags & (~(DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK)));
+    
+    /* allocate a pointer */
+    size = _dmalloc_rand() % MAX_ALLOC + 10;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* now enable alloc and check blanking */ 
+    dmalloc_debug(old_flags | DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK);
+    
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /********/
+    
+    /* now, enable alloc and check blanking */ 
+    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK)
+		  & (~DEBUG_CHECK_FENCE));
+    
+    /* allocate a pointer */
+    size = BLOCK_SIZE / 2 + 1;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* now disable alloc blanking */ 
+    dmalloc_debug(old_flags | DEBUG_CHECK_BLANK);
+    
+    /* overwrite one of the top chars */
+    save_ch = *((char *)pnt + size);
+    *((char *)pnt + size) = '\0';
+    
+    /* free the pointer should still see the error */
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /* restore the overwrite */
+    *((char *)pnt + size) = save_ch;
+    
+    /* restore flags */
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure free-blank doesn't imply alloc-blank
+   */
+  {
+    unsigned long	size;
+    unsigned int	old_flags = dmalloc_debug_current();
+    
+    if (! silent_b) {
+      (void)printf("  Checking free versus alloc blank\n");
+    }
+    
+    /* enable free blank only without fence-post, alloc, or check blank */ 
+    dmalloc_debug((old_flags | DEBUG_FREE_BLANK)
+		  & (~(DEBUG_CHECK_FENCE | DEBUG_CHECK_BLANK
+		       | DEBUG_ALLOC_BLANK)));
+    
+    /* allocate a pointer */
+    size = BLOCK_SIZE / 2 + 1;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* overwrite one of the top chars */
+    *((char *)pnt + size) = '\0';
+    
+    /* this shouldn't notice */
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /* NOTE: no restoring of overwritten chars here because of free-blank */
+    
+    /* restore flags */
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that a pointer reallocating, get's the per-pointer
+   * alloc flags enabled.
+   */
+  {
+    unsigned long	size;
+    unsigned int	old_flags = dmalloc_debug_current();
+    char		save_ch;
+    
+    if (! silent_b) {
+      (void)printf("  Checking per-pointer alloc flags and realloc\n");
+    }
+    
+    /* enable alloc blanking without fence-posts */
+    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
+    
+    /* allocate a pointer that should fill the block */
+    size = BLOCK_SIZE;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* now disable all checking */
+    dmalloc_debug(old_flags
+		  & (~(DEBUG_CHECK_FENCE | DEBUG_CHECK_BLANK
+		       | DEBUG_ALLOC_BLANK | DEBUG_FREE_BLANK)));
+    
+    pnt = realloc(pnt, size - 1);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not realloc %#lx to %lu bytes.\n",
+		     (long)pnt, size - 1);
+      }
+      return 0;
+    }
+    
+    /* overwrite one of the top chars */
+    save_ch = *((char *)pnt + size - 1);
+    *((char *)pnt + size - 1) = '\0';
+    
+    /* we should notice the overwrite */
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /* restore the overwrite */
+    *((char *)pnt + size - 1) = save_ch;
+    
+    /* restore flags */
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
   /*
    * NOTE: add tests which should result in errors before the -------
    * message above

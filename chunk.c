@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.206 2004/08/13 21:26:27 gray Exp $
+ * $Id: chunk.c,v 1.207 2004/10/19 14:50:43 gray Exp $
  */
 
 /*
@@ -846,6 +846,7 @@ static	void	get_pnt_info(const skip_alloc_t *slot_p, pnt_info_t *info_p)
 {
   info_p->pi_fence_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE);
   info_p->pi_valloc_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC);
+  info_p->pi_blanked_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
   
   info_p->pi_alloc_start = slot_p->sa_mem;
   
@@ -1216,15 +1217,31 @@ static	void	clear_alloc(skip_alloc_t *slot_p, pnt_info_t *info_p,
   int	num;
   
   /*
+   * NOTE: The alloc blank flag is set so we blank a slot when it is
+   * allocated.  It used to be that the allocated spaces were blanked
+   * and the free spaces of the allocated chunk were blanked only if
+   * the FREE_BLANK flag was enabled.  Wrong!
+   */
+  
+  /*
+   * Set our slot blank flag if the flags are set now.  This will
+   * carry over with a realloc.
+   */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+    BIT_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
+  }
+  
+  /*
    * If we have a fence post protected valloc then there is almost a
    * full block at the front what is "free".  Set it with blank chars.
    */
-  num = (char *)info_p->pi_fence_bottom - (char *)info_p->pi_alloc_start;
-  if (num > 0 && (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
-		  || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))) {
-    memset(info_p->pi_alloc_start, FREE_BLANK_CHAR, num);
-    /* set our slot blank flag */
-    BIT_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
+  if (info_p->pi_fence_b) {
+    num = (char *)info_p->pi_fence_bottom - (char *)info_p->pi_alloc_start;
+    /* alloc-blank NOT free-blank */
+    if (num > 0 && BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
+      memset(info_p->pi_alloc_start, ALLOC_BLANK_CHAR, num);
+    }
   }
   
   /*
@@ -1238,8 +1255,7 @@ static	void	clear_alloc(skip_alloc_t *slot_p, pnt_info_t *info_p,
     if (func_id == DMALLOC_FUNC_CALLOC || func_id == DMALLOC_FUNC_RECALLOC) {
       memset(start_p, 0, num);
     }
-    else if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
-	     || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+    else if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
       memset(start_p, ALLOC_BLANK_CHAR, num);
     }
   }
@@ -1251,11 +1267,12 @@ static	void	clear_alloc(skip_alloc_t *slot_p, pnt_info_t *info_p,
   }
   
   /*
-   * now clear the rest of the block above any fence post space with
-   * free characters
+   * Now clear the rest of the block above any fence post space with
+   * free characters.
+   *
+   * NOTE alloc-blank NOT free-blank
    */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
     
     if (info_p->pi_fence_b) {
       start_p = (char *)info_p->pi_fence_top + FENCE_TOP_SIZE;
@@ -1266,11 +1283,8 @@ static	void	clear_alloc(skip_alloc_t *slot_p, pnt_info_t *info_p,
     
     num = (char *)info_p->pi_alloc_bounds - start_p;
     if (num > 0) {
-      memset(start_p, FREE_BLANK_CHAR, num);
+      memset(start_p, ALLOC_BLANK_CHAR, num);
     }
-    
-    /* set our slot blank flag */
-    BIT_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK);
   }
 }
 
@@ -1618,7 +1632,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
    * If we have a valloc allocation then the _user_ pnt should be
    * block aligned otherwise the chunk_pnt should be.
    */
-  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC)) {
+  if (pnt_info.pi_valloc_b) {
     
     if ((long)pnt_info.pi_user_start % BLOCK_SIZE != 0) {
       dmalloc_errno = ERROR_NOT_ON_BLOCK;
@@ -1630,28 +1644,29 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
     }
     
     /* now check the below space to make sure it is still clear */
-    num = (char *)pnt_info.pi_fence_bottom - (char *)pnt_info.pi_alloc_start;
-    if (num > 0 && BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
-      for (mem_p = pnt_info.pi_alloc_start;
-	   mem_p < (char *)pnt_info.pi_fence_bottom;
-	   mem_p++) {
-	if (*mem_p != FREE_BLANK_CHAR) {
-	  dmalloc_errno = ERROR_FREE_OVERWRITTEN;
-	  return 0;
+    if (pnt_info.pi_fence_b && pnt_info.pi_blanked_b) {
+      num = (char *)pnt_info.pi_fence_bottom - (char *)pnt_info.pi_alloc_start;
+      if (num > 0) {
+	for (mem_p = pnt_info.pi_alloc_start;
+	     mem_p < (char *)pnt_info.pi_fence_bottom;
+	     mem_p++) {
+	  if (*mem_p != ALLOC_BLANK_CHAR) {
+	    dmalloc_errno = ERROR_FREE_OVERWRITTEN;
+	    return 0;
+	  }
 	}
       }
     }
   }
   
   /* check out the fence-posts */
-  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE)
-      && (! fence_read(&pnt_info))) {
+  if (pnt_info.pi_fence_b && (! fence_read(&pnt_info))) {
     /* errno set in fence_read */
     return 0;
   }
   
   /* check above the allocation to see if it's been overwritten */
-  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_BLANK)) {
+  if (pnt_info.pi_blanked_b) {
     
     if (pnt_info.pi_fence_b) {
       mem_p = (char *)pnt_info.pi_fence_top + FENCE_TOP_SIZE;
@@ -1661,7 +1676,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
     }
     
     for (; mem_p < (char *)pnt_info.pi_alloc_bounds; mem_p++) {
-      if (*mem_p != FREE_BLANK_CHAR) {
+      if (*mem_p != ALLOC_BLANK_CHAR) {
 	dmalloc_errno = ERROR_FREE_OVERWRITTEN;
 	return 0;
       }
@@ -2374,7 +2389,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   
   get_pnt_info(slot_p, &pnt_info);
   
-  /* not clear the allocation */
+  /* clear the allocation */
   clear_alloc(slot_p, &pnt_info, 0 /* no old-size */, func_id);
   
   slot_p->sa_file = file;
