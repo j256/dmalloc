@@ -1,3 +1,9 @@
+Version 1.3.2:
+
+	* Removed MALLOC_TRACE and -t, replaced with MALLOC_ADDRESS:0.
+	* Fixed some const problems.
+	* Added ability of MALLOC_LOGFILE.%d for getpid
+
 Version 1.3.1:
 
 	* Added 'log-ra' token to log info on non-freed return-address memory
