@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.80 1999/03/04 16:32:55 gray Exp $
+ * $Id: error.c,v 1.81 1999/03/04 17:24:12 gray Exp $
  */
 
 /*
@@ -30,9 +30,11 @@
  */
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
-#include <stdarg.h>				/* for message vsprintf */
 #include <stdio.h>				/* for sprintf */
 
+#if HAVE_STDARG_H
+# include <stdarg.h>				/* for message vsprintf */
+#endif
 #if HAVE_UNISTD_H
 # include <unistd.h>				/* for write */
 #endif
@@ -74,10 +76,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.80 1999/03/04 16:32:55 gray Exp $";
+#ident "$Id: error.c,v 1.81 1999/03/04 17:24:12 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.80 1999/03/04 16:32:55 gray Exp $";
+  "$Id: error.c,v 1.81 1999/03/04 17:24:12 gray Exp $";
 #endif
 #endif
 
@@ -225,7 +227,12 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   
   /* write the format + info into str */
   va_start(args, format);
+#if HAVE_VPRINTF
   (void)vsprintf(str_p, format, args);
+#else
+  /* Oh well, just copy the format in.  Yuck. */
+  (void)strcpy(str_p, format);
+#endif
   va_end(args);
   
   /* was it an empty format? */
