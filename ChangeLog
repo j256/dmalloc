@@ -8,7 +8,8 @@ Mon Sep 20 20:36:23 1993  Gray Watson  (gray at toaster.antaire.com)
 Fri Sep 10 17:10:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Fixed debug value changes in mid-stream.  Repaired configuration
-	error with memcpy/bcopy and memcmp/bcmp.
+	error with memcpy/bcopy and memcmp/bcmp via feedback from Marc
+	Evans (?).
 
 Tue Sep  7 00:49:50 1993  Gray Watson  (gray at toaster.antaire.com)
 

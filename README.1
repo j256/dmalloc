@@ -1,18 +1,20 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.27 1993/08/25 18:24:17 gray Exp $
+$Id: README.1,v 1.28 1993/09/22 04:29:20 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
 
 1) Run 'sh ./configure' to configure the library and generate the
-	conf.h and Makefile as well as configure the argv
+	conf.h, const.h, and Makefile as well as configure the argv
 	subdirectory.  Examine the conf.h files as well as the
 	Makefiles to make sure configure set things up correctly.
+	You also may want to examine the manual settings section
+	in conf.h to tune some specific features of the library.
 
 	NOTE: It seems that some versions of tr (especially from
-	HP-UX) don't understand "tr '[a-z]' '[A-Z]'". You may need to
-	either get gnu's tr or generate the conf.h and Makefile by
-	hand.
+	HP-UX) don't understand "tr '[a-z]' '[A-Z]'".  Since configure
+	uses tr often, you may need to either get gnu's tr or generate
+	the conf.h and Makefile by hand.
 
 2) Typing 'make' should be enough to build libmalloc.a and
 	malloc_dbg program as well as the argv subdirectory.
@@ -28,13 +30,21 @@ get up and running with the library.
 REPOSITORY:
 
 Currently, you can get the newest and bestest versions of the
-malloc_dbg library from anonymous ftp via ftp.psc.edu in the
-/pub/malloc_dbg directory.
+malloc_dbg library from anonymous ftp via gatekeeper.dec.com in the
+/pub/misc/malloc_dbg directory.
+
+The versions in this repository also include such files as a
+postscript version of the manual and other large files which may not
+have been included in the distribution you recieved.
 
 This repository has been made available through the generosity of the
-Pittsburgh Supercomputing Center with special help from Doug Balog.
+Digital Equipment Corporation with special help from Dave Hill and the
+gatekeepers.
 
 Thanks much to them both.
+
+Additional thanks to Doug Balog and Pittsburgh Supercomputing Center
+for past repository space and assistance.
 
 ANTAIRE REPOSITORY:
 
