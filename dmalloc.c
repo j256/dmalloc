@@ -47,7 +47,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.42 1994/09/20 17:59:54 gray Exp $";
+  "$Id: dmalloc.c,v 1.43 1994/09/20 18:56:56 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -371,9 +371,13 @@ LOCAL	void	dump_current(void)
   
   if (addr == ADDRESS_INIT)
     (void)fprintf(stderr, "Address      not-set\n");
-  else
-    (void)fprintf(stderr, "Address      %#lx, count = %d\n",
-		  (long)addr, addr_count);
+  else {
+    if (addr_count == ADDRESS_COUNT_INIT)
+      (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
+    else
+      (void)fprintf(stderr, "Address      %#lx, count = %d\n",
+		    (long)addr, addr_count);
+  }
   
   if (inter == INTERVAL_INIT)
     (void)fprintf(stderr, "Interval     not-set\n");
