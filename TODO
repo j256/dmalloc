@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.1 1993/06/26 21:16:11 gray Exp $
+$Id: TODO,v 1.2 1993/07/20 05:53:31 gray Exp $
 -------------------------------------------------------------------------------
 
 IMPORTANT:
@@ -53,9 +53,35 @@ CHECKING:
 
 -------------------------------------------------------------------------------
 
+MANUALS:
+
+-  add to the documentation a STRATEGY file, for example:
+
+	I turned a programmer loose with your package yesterday. He
+	read the docs, linked the lib in, ran the program with all
+	checking on, got a fence overrun and was stumped. I had to
+	explain to him:
+
+	- set a breakpoint at _malloc_perror()
+	- run the program until it stops there indicating that before this
+		malloc call, the heap got messed up somehow
+	- check the error code to determine what went specifically went wrong
+		- print malloc_errno
+		- malloc_dbg -e value-returned-from-print
+	- look at the code between the last good call and the current call to
+		find the problem
+		- there's always the chance that some other code caused the
+			problem of course.
+
+-------------------------------------------------------------------------------
+
 GENERAL:
 
-- provide support for reference counts on allocations:
+- non-graphical map of the heap. 
+	- just a long dump of all the addresses in the heap
+		addr: size, caller, crc
+	- so diffs can be run on the output to see what's changed	
+- maybe provide support for reference counts on allocations:
 	- have a call which increments the reference count of the node
 	- free will decrement the reference count and free if 0
 	- have a call which reports on the reference count of the node
@@ -75,7 +101,6 @@ GENERAL:
 	- this would mean we do not have to hit each bblock entry to redo
 		the type flag
 - handle memalign, valloc, maybe some form of mallopt
-- maybe use getpagesize (mach_dep.c) to determine BASIC block size
 - handle 0 length allocations correctly if the #define is set
 	- i.e. maybe give back a small section with bounds-checking touching
 - manage dblock_admin entries better
@@ -83,7 +108,6 @@ GENERAL:
 	- add to normal db_free lists, zero out each of the entries.  if they
 		are both zero or some magic X then we need to get more bblock
 		space for the dblocks.
-- maybe make malloc_dbg use no stdio so no unwanted memory allocations.
 - turn realloc into an intelligent beasty that looks on either side
 	of existing chunk (if expanding) for free space and manages free-lists
 	appropriately

@@ -45,16 +45,22 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.31 1993/07/19 16:31:52 gray Exp $";
+  "$Id: malloc.c,v 1.32 1993/07/20 05:53:43 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
-/* logfile for dumping malloc info, MALLOC_LOGFILE env. var overrides this */
+/* logfile for dumping malloc info, MALLOC_LOGFILE env var overrides this */
 EXPORT	char		*malloc_logpath	= NULL;
 /* internal malloc error number for reference purposes only */
 EXPORT	int		malloc_errno = 0;
+/* address to look for.  when discovered call _malloc_perror() */
+#if __STDC__
+EXPORT	void		*malloc_address	= NULL;
+#else
+EXPORT	char		*malloc_address	= NULL;
+#endif
 
 /* local routines */
 LOCAL	int		malloc_startup(void);
@@ -66,7 +72,6 @@ LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
 LOCAL	char		log_path[128]	= { NULLC }; /* storage for env path */
 
 /* debug variables */
-LOCAL	char		*malloc_address	= NULL;	/* address to catch */
 LOCAL	int		address_count	= 0;	/* address argument */
 LOCAL	char		start_file[128] = { NULLC }; /* file to start at */
 LOCAL	int		start_line	= 0;	/* line in module to start */

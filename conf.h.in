@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.14 1993/07/19 18:56:41 gray Exp $
+ * $Id: conf.h.in,v 1.15 1993/07/20 05:53:39 gray Exp $
  */
 
 /*
@@ -48,15 +48,6 @@
  * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
-
-/*
- * the smallest allowable allocations in bits.  The smallest is
- * important because of limitations in terms of internal
- * administrative slots.  Depending on the size of pointers this may
- * have to be increased to get malloc-dbg to stop failing with a
- * MALLOC_BAD_SETUP error.
- */
-#define SMALLEST_BLOCK 4
 
 /*
  * the largest allowable allocations in bits.  This is only for

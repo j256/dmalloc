@@ -47,7 +47,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.19 1993/07/19 18:56:43 gray Exp $";
+  "$Id: dmalloc.c,v 1.20 1993/07/20 05:53:46 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -84,7 +84,7 @@ LOCAL	argv_t	args[] = {
       NULL,			"set output for bourne shells" },
   { ARGV_OR },
   { 'C',	"c-shell",	ARGV_BOOL,	&cshell,
-      NULL,			"set output for C-type shells)" },
+      NULL,			"set output for C-type shells" },
   { 'c',	"clear",	ARGV_BOOL,	&clear,
       NULL,			"clear all variables not set" },
   { 'd',	"debug-mask",	ARGV_HEX,	&debug,

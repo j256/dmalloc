@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.37 1993/07/19 16:31:34 gray Exp $";
+  "$Id: chunk.c,v 1.38 1993/07/20 05:53:34 gray Exp $";
 #endif
 
 /* checking information */
@@ -71,6 +71,7 @@ LOCAL	dblock_t	*free_dblock[BASIC_BLOCK];
 /* administrative structures */
 LOCAL	bblock_adm_t	*bblock_adm_head = NULL; /* pointer to 1st bb_admin */
 LOCAL	bblock_adm_t	*bblock_adm_tail = NULL; /* pointer to last bb_admin */
+LOCAL	int		smallest_block	= 0;	/* smallest size in bits */
 
 /* user information shifts for display purposes */
 LOCAL	int		pnt_below_adm	= 0;	/* add to pnt for display */
@@ -254,12 +255,17 @@ EXPORT	int	_chunk_startup(void)
 {
   int	binc;
   
-  /* verify some conditions */
+  /* calculate the smallest possible block */
+  for (smallest_block = DEFAULT_SMALLEST_BLOCK;
+       DB_PER_ADMIN < BLOCK_SIZE / (1 << smallest_block);
+       smallest_block++);
+  
+  /* verify that some conditions are not true */
   if (BB_PER_ADMIN <= 2
       || sizeof(bblock_adm_t) > BLOCK_SIZE
-      || DB_PER_ADMIN < (BLOCK_SIZE / (1 << SMALLEST_BLOCK))
+      || DB_PER_ADMIN < (BLOCK_SIZE / (1 << smallest_block))
       || sizeof(dblock_adm_t) > BLOCK_SIZE
-      || SMALLEST_BLOCK < ALLOCATION_ALIGNMENT) {
+      || smallest_block < ALLOCATION_ALIGNMENT) {
     malloc_errno = MALLOC_BAD_SETUP;
     _malloc_perror("_chunk_startup");
     return ERROR;
@@ -1724,9 +1730,9 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     return MALLOC_ERROR;
   }
   
-  /* normalize to SMALLEST_BLOCK.  No use spending 16 bytes to admin 1 byte */
-  if (bitc < SMALLEST_BLOCK)
-    bitc = SMALLEST_BLOCK;
+  /* normalize to smallest_block.  No use spending 16 bytes to admin 1 byte */
+  if (bitc < smallest_block)
+    bitc = smallest_block;
   
   /* allocate divided block if small */
   if (bitc < BASIC_BLOCK) {
@@ -2099,7 +2105,7 @@ EXPORT	void	_chunk_list_count(void)
   
   /* print header bit-counts */
   info[0] = NULLC;
-  for (bitc = SMALLEST_BLOCK; bitc <= LARGEST_BLOCK; bitc++) {
+  for (bitc = smallest_block; bitc <= LARGEST_BLOCK; bitc++) {
     (void)sprintf(tmp, "%*d", FREE_COLUMN, bitc);
     (void)strcat(info, tmp);
   }
@@ -2108,7 +2114,7 @@ EXPORT	void	_chunk_list_count(void)
   
   /* dump the free (and later used) list counts */
   info[0] = NULLC;
-  for (bitc = SMALLEST_BLOCK; bitc <= LARGEST_BLOCK; bitc++) {
+  for (bitc = smallest_block; bitc <= LARGEST_BLOCK; bitc++) {
     if (bitc < BASIC_BLOCK)
       for (count = 0, dblockp = free_dblock[bitc]; dblockp != NULL;
 	   count++, dblockp = dblockp->db_next);

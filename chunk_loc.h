@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.11 1993/07/19 16:31:40 gray Exp $
+ * $Id: chunk_loc.h,v 1.12 1993/07/20 05:53:38 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -29,6 +29,12 @@
 
 /* defines for the malloc subsystem */
 #define BLOCK_SIZE	(1 << BASIC_BLOCK)
+
+/*
+ * the default smallest allowable allocations in bits.  this is
+ * adjusted at runtime to conform to other settings.
+ */
+#define DEFAULT_SMALLEST_BLOCK	4
 
 /*
  * number of ba_block entries is a bblock_adm_t which must fit in a

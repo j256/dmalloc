@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.20 1993/07/19 16:31:28 gray Exp $
+# $Id: Makefile.in,v 1.21 1993/07/20 05:53:26 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -12,7 +12,7 @@ DEFS	= $(DEFINES)
 INCS	= -I. -Iargv $(INCLUDES)
 LIBS	= -L. -Largv -largv -lmalloc_dbg $(LIBRARIES)
 
-CFLAGS	= -g -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
+CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
 DESTDIR	= $(ROOT)
@@ -22,7 +22,7 @@ UTIL	= malloc_dbg
 
 MANFILE	= malloc.info
 
-PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
+PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
 	COPYING-LIB ChangeLog Manifest NOTES README TODO \
 	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
 	error.[ch] error_str.h error_val.h heap.[ch] malloc.c mallocrc \
@@ -78,11 +78,12 @@ $(UTIL) : malloc_dbg.o $(LIBRARY) $(ROOT)/lib
 	mv a.out $@
 
 .PHONY : port
+# NOTE: no $(PORTFLS) here else we remake configure with autoconf
 port : malloc.info
 	@ answer 'Is it okay to remove the $@ directory? '
 	rm -rf $@
 	mkdir $@
-	cp $(PORTFILES) $@
+	cp $(PORTFLS) $@
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'

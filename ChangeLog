@@ -1,4 +1,11 @@
+Tue Jul 20 01:52:02 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added smallest_block runtime calculations and now export
+	malloc_address to be setable by debugger at runtime.
+
 Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Made malloc_address exported per Dave's comments.
 
 	* Added Dave Hill's idea of auto-sensing of shell by malloc_dbg.
 	Also added -C option to malloc_dbg to force cshell output.
