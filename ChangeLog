@@ -1,3 +1,22 @@
+Thu Sep 17 08:42:14 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Improved the pthread autoconfiguration and the code.  Removed
+        the gross macro code sections.
+
+	* Lots of small code improvements.
+
+	* Got rid of the _dmalloc_file and _dmalloc_line stuff which was
+	_very_ unportable.  Thanks Marty for pointed this out.  Reduced
+	the race conditions there and improved the handling of default
+	values.
+
+	* Added FTX return.h information.  Thanks Wim.
+
+Wed Sep 16 16:28:49 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added strdup ifdef in the dmalloc.h and assocated leap
+	functions.
+
 Tue Feb 10 21:12:40 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.3.1 to get rid of the -beta.
@@ -1237,5 +1256,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.184 1998/02/11 02:14:21 gray Exp $
+$Id: ChangeLog,v 1.185 1998/09/17 16:08:37 gray Exp $
 -------------------------------------------------------------------------------
