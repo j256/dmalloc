@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.188 2003/06/09 23:14:17 gray Exp $
+ * $Id: chunk.c,v 1.189 2003/06/10 00:05:30 gray Exp $
  */
 
 /*
@@ -2833,9 +2833,7 @@ void	_dmalloc_chunk_log_stats(void)
 {
   unsigned long	overhead, tot_space, wasted, ext_space;
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    dmalloc_message("dumping chunk statistics");
-  }
+  dmalloc_message("Dumping Chunk Statistics:");
   
   tot_space = alloc_current + free_space_bytes;
   overhead = admin_block_c * BLOCK_SIZE;
@@ -2942,24 +2940,23 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
   int		size_c = 0, block_c = 0, checking_list_c = 0;
   
   if (log_not_freed_b && log_freed_b) {
-    which_str = "not-freed and freed";
+    which_str = "Not-Freed and Freed";
   }
   else if (log_not_freed_b) {
-    which_str = "not-freed";
+    which_str = "Not-Freed";
   }
   else if (log_freed_b) {
-    which_str = "freed";
+    which_str = "Freed";
   }
   else {
     return;
   }
   
   if (mark == 0) {
-    dmalloc_message("dumping %s pointers changed since program start:",
-		    which_str);
+    dmalloc_message("Dumping %s Pointers Changed Since Start:", which_str);
   }
   else {
-    dmalloc_message("dumping %s pointers changed since mark %lu:",
+    dmalloc_message("Dumping %s Pointers Changed Since Mark %lu:",
 		    which_str, mark);
   }
   
