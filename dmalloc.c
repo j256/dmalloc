@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.95 2000/06/20 22:42:33 gray Exp $
+ * $Id: dmalloc.c,v 1.96 2000/09/13 18:24:40 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.95 2000/06/20 22:42:33 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.96 2000/09/13 18:24:40 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.95 2000/06/20 22:42:33 gray Exp $";
+  "$Id: dmalloc.c,v 1.96 2000/09/13 18:24:40 gray Exp $";
 #endif
 #endif
 
@@ -75,7 +75,7 @@ static	char	*rcs_id =
 #define DEBUG_ARG		'd'		/* debug argument */
 #define INTERVAL_ARG		'i'		/* interval argument */
 #define THREAD_LOCK_ON_ARG	'o'		/* lock-on argument */
-#define TOKENS_PER_LINE		5		/* num debug toks per line */
+#define LINE_WIDTH		75		/* num debug toks per line */
 
 #define FILE_NOT_FOUND		1
 #define FILE_FOUND		2
@@ -248,35 +248,51 @@ static	void	choose_shell(void)
 /*
  * dump the current flags set in the debug variable VAL
  */
-static	void	dump_debug(const int val)
+static	void	dump_debug(const unsigned long val)
 {
   attr_t	*attr_p;
-  int		tok_c = 0, work = val;
+  char		*str;
+  unsigned long	work = val;
+  int		col_c = 0, len;
   
   for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
-    /* the below is necessary to handle the 'none' HACK */
+    /* the below test for work == 0 is necessary to handle the 'none' token */
     if ((work == 0 && attr_p->at_value == 0)
-	|| (attr_p->at_value != 0
-	    && BIT_IS_SET(work, attr_p->at_value))) {
+	|| (attr_p->at_value != 0 && BIT_IS_SET(work, attr_p->at_value))) {
       BIT_CLEAR(work, attr_p->at_value);
       
-      if (tok_c == 0) {
+      if (col_c == 0) {
 	(void)fprintf(stderr, "   ");
+	col_c += 3;
       }
       
       if (very_verbose_b) {
-	(void)fprintf(stderr, "%s -- %s", attr_p->at_string, attr_p->at_desc);
+	(void)fprintf(stderr, "%s (%s) -- %s (%#lx)\n",
+		      attr_p->at_string, attr_p->at_short, attr_p->at_desc,
+		      attr_p->at_value);
+	col_c = 0;
       }
       else {
-	(void)fprintf(stderr, "%s", attr_p->at_string);
+	if (short_tokens_b) {
+	  str = attr_p->at_short;
+	}
+	else {
+	  str = attr_p->at_string;
+	}
+	len = strlen(str);
+	if (col_c + len + 2 > LINE_WIDTH) {
+	  (void)fprintf(stderr, "\n");
+	  (void)fprintf(stderr, "   ");
+	  col_c = 3;
+	}
+	(void)fprintf(stderr, "%s", str);
+	col_c += len;
+	
+	/* if we've got more to go then print the , */
 	if (work != 0) {
 	  (void)fprintf(stderr, ", ");
+	  col_c += 2;
 	}
-	tok_c = (tok_c + 1) % TOKENS_PER_LINE;
-      }
-      
-      if (tok_c == 0) {
-	(void)fprintf(stderr, "\n");
       }
       
       if (work == 0) {
@@ -285,12 +301,12 @@ static	void	dump_debug(const int val)
     }
   }
   
-  if (tok_c != 0) {
+  if (col_c != 0) {
     (void)fprintf(stderr, "\n");
   }
   
   if (work != 0) {
-    (void)fprintf(stderr, "%s: warning, unknown debug flags: %#x\n",
+    (void)fprintf(stderr, "%s: warning, unknown debug flag(s): %#lx\n",
 		  argv_program, work);
   }
 }
@@ -955,7 +971,8 @@ int	main(int argc, char **argv)
       }
       else if (verbose_b) {
 	(void)fprintf(stderr, "%s -- %s\n",
-		      attr_p->at_string, attr_p->at_desc);
+		      (short_tokens_b ? attr_p->at_short : attr_p->at_string),
+		      attr_p->at_desc);
       }
       else {
 	(void)fprintf(stderr, "%s\n", attr_p->at_string);
