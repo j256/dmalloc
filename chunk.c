@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $
+ * $Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $
  */
 
 /*
@@ -63,13 +63,13 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
-#ident "@(#) $Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
+#ident "$Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
+#ident "@(#) $Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
+  "$Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
 static	char	*rcs_id_w =
-  "@(#) $Id: chunk.c,v 1.161 2000/05/16 18:40:05 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
 #endif
 #endif
 
@@ -693,6 +693,12 @@ static	int	find_free_bblocks(const unsigned int many,
   int		bit_c, bit_n, block_n, pos, best = 0;
   bblock_adm_t	*adm_p;
   
+  /* if we are never reusing then always say we don't have any */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+    *bblock_pp = NULL;
+    return 1;
+  }
+  
   /*
    * NOTE: it is here were we can implement first/best/worst fit.
    * Depending on fragmentation, we may want to impose limits on the
@@ -1202,7 +1208,14 @@ static	dblock_t	*find_free_dblock(const int bit_n)
   dblock_t	*dblock_p;
 #if FREED_POINTER_DELAY
   dblock_t	*prev_p;
+#endif
   
+  /* if we are never reusing then always say we don't have any */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+    return NULL;
+  }
+  
+#if FREED_POINTER_DELAY
   /* find a value dblock entry */
   for (dblock_p = free_dblock[bit_n], prev_p = NULL;
        dblock_p != NULL;
@@ -1223,7 +1236,6 @@ static	dblock_t	*find_free_dblock(const int bit_n)
     }
     break;
   }
-  
 #else /* FREED_POINTER_DELAY == 0 */
   dblock_p = free_dblock[bit_n];
   free_dblock[bit_n] = dblock_p->db_next;
@@ -1690,11 +1702,9 @@ int	_chunk_check(void)
 	    
 	    /* did we not find it and we are reusing pointers */
 	    if (dblist_p == NULL) {
-	      if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-		dmalloc_errno = ERROR_BAD_FREE_LIST;
-		dmalloc_error("_chunk_check");
-		return 0;
-	      }
+	      dmalloc_errno = ERROR_BAD_FREE_LIST;
+	      dmalloc_error("_chunk_check");
+	      return 0;
 	    }
 	    else {
 	      free_dblock_c[bblock_p->bb_bit_n]--;
@@ -1842,11 +1852,9 @@ int	_chunk_check(void)
 	
 	/* did we find it? */
 	if (bblist_p == NULL) {
-	  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-	    dmalloc_errno = ERROR_BAD_FREE_LIST;
-	    dmalloc_error("_chunk_check");
-	    return 0;
-	  }
+	  dmalloc_errno = ERROR_BAD_FREE_LIST;
+	  dmalloc_error("_chunk_check");
+	  return 0;
 	}
 	else {
 	  free_bblock_c[bblock_p->bb_bit_n]--;
@@ -2959,14 +2967,9 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     dblock_p->db_flags = DBLOCK_FREE;
     dblock_p->db_bblock = bblock_p;
     dblock_p->db_use_iter = _dmalloc_iter_c;
-    /* put pointer on the dblock free list if we are reusing memory */
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-      dblock_p->db_next = NULL;
-    }
-    else {
-      dblock_p->db_next = free_dblock[bit_n];
-      free_dblock[bit_n] = dblock_p;
-    }
+    /* put pointer on the dblock free list */
+    dblock_p->db_next = free_dblock[bit_n];
+    free_dblock[bit_n] = dblock_p;
     
     /* should we set free memory with BLANK_CHAR? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
@@ -3085,8 +3088,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
    */
   
   if (prev_p != NULL
-      && BIT_IS_SET(prev_p->bb_flags, BBLOCK_START_FREE)
-      && (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE))) {
+      && BIT_IS_SET(prev_p->bb_flags, BBLOCK_START_FREE)) {
     
     /* find prev in free list and remove it */
     for (this_p = free_bblock[prev_p->bb_bit_n], list_p = NULL;
@@ -3119,8 +3121,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   }
   if (next_p != NULL
       && (BIT_IS_SET(next_p->bb_flags, BBLOCK_START_FREE)
-	  || BIT_IS_SET(next_p->bb_flags, BBLOCK_FREE))
-      && (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE))) {
+	  || BIT_IS_SET(next_p->bb_flags, BBLOCK_FREE))) {
     
     /* find next in free list and remove it */
     for (this_p = free_bblock[next_p->bb_bit_n], list_p = NULL;
@@ -3150,18 +3151,12 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     NUM_BITS(block_n * BLOCK_SIZE, bit_n);
   }
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-    /* set the information for the bblock(s), NULL for the next pointer */
-    set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, NULL, 0, 0, NULL, bit_n);
-  }
-  else {
-    /* set the information for the bblock(s) */
-    set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, NULL, 0, 0,
-		     free_bblock[bit_n], bit_n);
-    
-    /* block goes at the start of the free list */
-    free_bblock[bit_n] = bblock_p;
-  }
+  /* set the information for the bblock(s) */
+  set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, NULL, 0, 0,
+		   free_bblock[bit_n], bit_n);
+  
+  /* block goes at the start of the free list */
+  free_bblock[bit_n] = bblock_p;
   
   return FREE_NOERROR;
 }
