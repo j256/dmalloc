@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.84 2000/03/21 18:19:12 gray Exp $
+ * $Id: dmalloc_t.c,v 1.85 2000/03/24 21:57:28 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.84 2000/03/21 18:19:12 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.85 2000/03/24 21:57:28 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.84 2000/03/21 18:19:12 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.85 2000/03/24 21:57:28 gray Exp $";
 #endif
 #endif
 
@@ -610,7 +610,9 @@ static	void	do_interactive(void)
       
       (void)printf("\tmap       - map the heap to the logfile\n");
       (void)printf("\tstats     - dump heap stats to the logfile\n");
-      (void)printf("\tunfreed   - list the unfree memory to the logfile\n\n");
+      (void)printf("\tunfreed   - list the unfree memory to the logfile\n");
+      (void)printf("\tmark      - display the current mark value\n");
+      (void)printf("\tchanged   - display what pointers have changed\n\n");
       
       (void)printf("\tverify    - check out a memory address (or all heap)\n");
       (void)printf("\toverwrite - overwrite some memory to test errors\n");
@@ -747,6 +749,21 @@ static	void	do_interactive(void)
     
     if (strncmp(line, "unfreed", len) == 0) {
       dmalloc_log_unfreed();
+      (void)printf("Done.\n");
+      continue;
+    }
+    
+    if (strncmp(line, "mark", len) == 0) {
+      (void)printf("Mark is %lu.\n", dmalloc_mark());
+      continue;
+    }
+    
+    if (strncmp(line, "changed", len) == 0) {
+      (void)printf("Enter the mark: ");
+      if (fgets(line, sizeof(line), stdin) == NULL) {
+	break;
+      }
+      dmalloc_log_changed(atoi(line), 1, 1, 1);
       (void)printf("Done.\n");
       continue;
     }
