@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.22 1993/11/30 02:41:33 gray Exp $
+ * $Id: chunk_loc.h,v 1.23 1993/12/06 06:21:33 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -82,6 +82,20 @@
 				  (ans) = _b; \
 				} while (0)
   
+/* fence post checking defines */
+#define FENCE_BOTTOM		ALLOCATION_ALIGNMENT
+/* NOTE: FENCE_TOP defined in conf.h */
+#define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
+#define FENCE_MAGIC_BOTTOM	0xC0C0AB1B
+#define FENCE_MAGIC_TOP		0xFACADE69
+
+#define FENCE_WRITE(pnt, size)	do { \
+				  bcopy(fence_bottom, (char *)(pnt), \
+					FENCE_BOTTOM); \
+				  bcopy(fence_top, (char *)(pnt) + (size) - \
+					FENCE_TOP, FENCE_TOP); \
+				} while (0)
+
 /*
  * number of da_block entries in a dblock_adm_t which must fit in a
  * basic block
@@ -89,7 +103,7 @@
 #define DB_PER_ADMIN	((BLOCK_SIZE - (sizeof(long) + sizeof(long))) \
 			 / sizeof(dblock_t))
 
-#define CHUNK_MAGIC_BASE	0xDEA007	/* base magic number */
+#define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
 /* bb_flags values */

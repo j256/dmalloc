@@ -1,3 +1,7 @@
+Mon Dec  6 01:18:29 1993  Gray Watson  (gray@fridge.antaire.com)
+
+	* new fence read/write code.  much cleaner.  new FENCE_TOP define.
+
 Tue Nov 30 05:35:39 1993  Gray Watson  (gray@fridge.antaire.com)
 
 	* added special tests to malloc_t.  cleaned up and tested
@@ -586,5 +590,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.80 1993/11/30 10:36:40 gray Exp $
+$Id: ChangeLog,v 1.81 1993/12/06 06:21:22 gray Exp $
 -------------------------------------------------------------------------------
