@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.124 1999/03/10 21:40:24 gray Exp $
+# $Id: Makefile.in,v 1.125 1999/03/11 05:37:34 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -8,7 +8,7 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o dmalloc_tab.o
+OBJS	= arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
