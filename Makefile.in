@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.154 2003/05/13 16:38:43 gray Exp $
+# $Id: Makefile.in,v 1.155 2003/05/13 18:16:47 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -241,13 +241,13 @@ compile_test :: settings.h
 	rm -f settings.h.t
 	for setting in `cut -f1 -d' ' settings.test` ;\
 	do \
-		val=`grep $$setting settings.test | cut -f2 -d' '` ;\
+		val=`grep "^$$setting " settings.test | cut -f2 -d' '` ;\
 		echo "$$setting -> $$val" ;\
 		sed -e "s/$$setting[ \t].*$$/$$setting $$val/" settings.dist \
 			> settings.h.t ;\
 		mv settings.h.t settings.h ;\
 		rm -f $(TEST) ;\
-		make $(TEST) > /dev/null ;\
+		make $(TEST)  ;\
 		make light ;\
 	done
 	rm -f settings.h.t

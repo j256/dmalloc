@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.30 2001/11/30 23:50:46 gray Exp $
+ * $Id: env.c,v 1.31 2003/05/13 18:16:48 gray Exp $
  */
 
 /*
@@ -49,12 +49,28 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: env.c,v 1.30 2001/11/30 23:50:46 gray Exp $"
+#ident "$Id: env.c,v 1.31 2003/05/13 18:16:48 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.30 2001/11/30 23:50:46 gray Exp $";
+  "$Id: env.c,v 1.31 2003/05/13 18:16:48 gray Exp $";
 #endif
 #endif
+
+/*
+ * Environmental labels.
+ *
+ * NOTE: the decision has been made _not_ to do the sizeof() hack for
+ * portability reasons.
+ */
+#define ADDRESS_LABEL		"addr"
+#define DEBUG_LABEL		"debug"
+#define INTERVAL_LABEL		"inter"
+#define LOCK_ON_LABEL		"lockon"
+#define LOGFILE_LABEL		"log"
+#define START_LABEL		"start"
+#define LIMIT_LABEL		"limit"
+
+#define ASSIGNMENT_CHAR		'='
 
 /* local variables */
 static	char		log_path[512]	= { '\0' }; /* storage for env path */
@@ -145,7 +161,8 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 				 long *addr_count_p, unsigned int *debug_p,
 				 unsigned long *interval_p, int *lock_on_p,
 				 char **logpath_p, char **sfile_p,
-				 int *sline_p, int *scount_p)
+				 int *sline_p, int *scount_p,
+				 unsigned long *limit_p)
 {
   char		*env_p, *this_p;
   char		buf[1024];
@@ -162,6 +179,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
   SET_POINTER(sfile_p, NULL);
   SET_POINTER(sline_p, 0);
   SET_POINTER(scount_p, 0);
+  SET_POINTER(limit_p, 0);
   
   /* make a copy */
   (void)strncpy(buf, env_str, sizeof(buf));
@@ -254,6 +272,15 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
       continue;
     }
     
+    /* set the memory limit to the library */
+    len = strlen(LIMIT_LABEL);
+    if (strncmp(this_p, LIMIT_LABEL, len) == 0
+	&& *(this_p + len) == ASSIGNMENT_CHAR) {
+      this_p += len + 1;
+      SET_POINTER(limit_p, (unsigned long)atol(this_p));
+      continue;
+    }
+    
     /* need to check the short/long debug options */
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
       if (strcmp(this_p, attr_p->at_string) == 0) {
@@ -286,9 +313,10 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const DMALLOC_PNT address,
 			     const unsigned long addr_count,
 			     const unsigned int debug,
-			     const int interval, const int lock_on,
+			     const unsigned long interval, const int lock_on,
 			     const char *logpath, const char *start_file_p,
-			     const int start_line, const int start_count)
+			     const int start_line, const int start_count,
+			     const unsigned long limit_val)
 {
   char	*buf_p = buf, *bounds_p = buf + buf_size;
   
@@ -320,7 +348,7 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
     }
   }
   if (interval > 0) {
-    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%lu,",
 			  INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
   }
   if (lock_on > 0) {
@@ -345,6 +373,10 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
   else if (start_count > 0) {
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
 			  START_LABEL, ASSIGNMENT_CHAR, start_count);
+  }
+  if (limit_val > 0) {
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%lu,",
+			  LIMIT_LABEL, ASSIGNMENT_CHAR, limit_val);
   }
   
   /* cut off the last comma */

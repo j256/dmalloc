@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.213 2003/05/13 14:56:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.214 2003/05/13 18:16:48 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1912,6 +1912,13 @@ options can be specified.
 @item -n
 Without changing the environment, output the commands resulting from the
 supplied options.
+
+@cindex memory limit
+@item -M limit
+Set the memory allocation limit which will abort the program if the
+total memory allocations exceed this number of bytes.  The limit can be
+a number with a k, m, or g at the end to indicate kilobyte, megabyte,
+and gigabyte respectively.  Ex: 100k, 200m, 1g.
 
 @cindex lock on
 @item -o times

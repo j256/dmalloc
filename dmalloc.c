@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.104 2003/05/13 16:38:44 gray Exp $
+ * $Id: dmalloc.c,v 1.105 2003/05/13 18:16:48 gray Exp $
  */
 
 /*
@@ -58,10 +58,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.104 2003/05/13 16:38:44 gray Exp $"
+#ident "$Id: dmalloc.c,v 1.105 2003/05/13 18:16:48 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.104 2003/05/13 16:38:44 gray Exp $";
+  "$Id: dmalloc.c,v 1.105 2003/05/13 18:16:48 gray Exp $";
 #endif
 #endif
 
@@ -136,6 +136,7 @@ static	int	debug_tokens_b = 0;		/* list debug tokens */
 static	char	*logpath = NULL;		/* for LOGFILE setting */
 static	int	long_tokens_b = 0;		/* long-tok output */
 static	argv_array_t	minus;			/* tokens to remove */
+static	unsigned long limit_arg = 0;		/* memory limit */
 static	int	make_changes_b = 1;		/* make no changes to env */
 static	argv_array_t	plus;			/* tokens to add */
 static	int	remove_auto_b = 0;		/* auto-remove settings */
@@ -180,6 +181,8 @@ static	argv_t	args[] = {
     "path",			"file to log messages to" },
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
     "token(s)",			"del tokens from current debug" },
+  { 'M',	"memory-limit",	ARGV_U_SIZE,	&limit_arg,
+    "value",			"limit allocates to this amount" },
   { 'n',	"no-changes",	ARGV_BOOL_NEG,	&make_changes_b,
     NULL,			"make no changes to the env" },
   { THREAD_LOCK_ON_ARG, "lock-on", ARGV_INT,	&thread_lock_on,
@@ -680,7 +683,7 @@ static	void	dump_current(void)
   char		*lpath, *start_file, token[64];
   const char	*env_str;
   DMALLOC_PNT	addr;
-  unsigned long	inter;
+  unsigned long	inter, limit_val;
   long		addr_count;
   int		lock_on, start_line, start_count;
   unsigned int	flags;
@@ -692,7 +695,7 @@ static	void	dump_current(void)
   }
   _dmalloc_environ_process(env_str, &addr, &addr_count, &flags,
 			   &inter, &lock_on, &lpath,
-			   &start_file, &start_line, &start_count);
+			   &start_file, &start_line, &start_count, &limit_val);
   
   if (flags == 0) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
@@ -738,6 +741,13 @@ static	void	dump_current(void)
   }
   else {
     (void)fprintf(stderr, "Logpath      '%s'\n", lpath);
+  }
+  
+  if (limit_val == 0) {
+    (void)fprintf(stderr, "Mem-Limit    not-set\n");
+  }
+  else {
+    (void)fprintf(stderr, "Mem-Limit    %lu\n", limit_val);
   }
   
   if (start_file == NULL && start_count == 0) {
@@ -830,7 +840,7 @@ int	main(int argc, char **argv)
   char		*lpath, *sfile;
   const char	*env_str;
   DMALLOC_PNT	addr;
-  unsigned long	inter;
+  unsigned long	inter, limit_val;
   long		addr_count;
   int		lock_on;
   int		sline, scount;
@@ -869,7 +879,8 @@ int	main(int argc, char **argv)
     env_str = "";
   }
   _dmalloc_environ_process(env_str, &addr, &addr_count, &flags, &inter,
-			   &lock_on, &lpath, &sfile, &sline, &scount);
+			   &lock_on, &lpath, &sfile, &sline, &scount,
+			   &limit_val);
   
   /*
    * So, if a tag was specified on the command line then we set the
@@ -968,6 +979,11 @@ int	main(int argc, char **argv)
     scount = 0;
   }
   
+  if (limit_arg > 0) {
+    limit_val = limit_arg;
+    set_b = 1;
+  }
+  
   if (errno_to_print > 0) {
     (void)fprintf(stderr, "%s: dmalloc_errno value '%d' = \n",
 		  argv_program, errno_to_print);
@@ -1009,7 +1025,8 @@ int	main(int argc, char **argv)
   
   if (clear_b || set_b) {
     _dmalloc_environ_set(buf, sizeof(buf), long_tokens_b, addr, addr_count,
-			 debug, inter, lock_on, lpath, sfile, sline, scount);
+			 debug, inter, lock_on, lpath, sfile, sline, scount,
+			 limit_val);
     set_variable(OPTIONS_ENVIRON, buf);
   }
   else if (errno_to_print == 0

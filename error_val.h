@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.27 2003/05/13 16:36:37 gray Exp $
+ * $Id: error_val.h,v 1.28 2003/05/13 18:16:49 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -55,6 +55,7 @@
 #define ERROR_ALLOC_NONLINEAR		44	/* no linear address space */
 #define ERROR_BAD_SIZE_INFO		45	/* info doesn't match size */
 #define ERROR_EXTERNAL_HUGE		46	/* external allocation big */
+#define ERROR_OVER_LIMIT		47	/* over allocation limit */
 
 /* free errors */
 #define ERROR_NOT_ON_BLOCK		60	/* not on block boundary */
@@ -133,6 +134,7 @@ __attribute__ ((unused))
   { ERROR_ALLOC_NONLINEAR,	"heap failed to produce linear address space"},
   { ERROR_BAD_SIZE_INFO,	"bad size in information structure" },
   { ERROR_EXTERNAL_HUGE,	"external sbrk too large, cannot be handled" },
+  { ERROR_OVER_LIMIT,		"over user specified allocation limit" },
   
   /* free errors */
   { ERROR_NOT_ON_BLOCK,	 	"pointer is not on block boundary" },

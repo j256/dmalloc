@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.158 2003/05/13 16:35:54 gray Exp $
+ * $Id: malloc.c,v 1.159 2003/05/13 18:16:49 gray Exp $
  */
 
 /*
@@ -82,10 +82,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.158 2003/05/13 16:35:54 gray Exp $"
+#ident "$Id: malloc.c,v 1.159 2003/05/13 18:16:49 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.158 2003/05/13 16:35:54 gray Exp $";
+  "$Id: malloc.c,v 1.159 2003/05/13 18:16:49 gray Exp $";
 #endif
 #endif
 
@@ -271,7 +271,7 @@ static	void	process_environ(const char *option_str)
 			   (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
 			   &_dmalloc_check_interval, &_dmalloc_lock_on,
 			   &dmalloc_logpath, &start_file, &start_line,
-			   &start_count);
+			   &start_count, &_dmalloc_memory_limit);
   thread_lock_c = _dmalloc_lock_on;
   
   /* if we set the start stuff, then check-heap comes on later */

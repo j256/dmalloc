@@ -4,6 +4,9 @@
 
 	* Removed dmalloc_lp.[ch] stuff.
 
+	* Added -M --memory-limit argument to dmalloc and ability to limit
+	the library from allocating more than a certain number of bytes.
+
 	* Getting ready for a huge checkin after a good bunch of work.
 
 2002-06-06  Gray Watson  <gray@outside.256.com>
@@ -1852,5 +1855,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.279 2003/05/13 16:38:42 gray Exp $
+$Id: ChangeLog,v 1.280 2003/05/13 18:16:47 gray Exp $
 -------------------------------------------------------------------------------
