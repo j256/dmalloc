@@ -58,7 +58,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.65 1997/03/20 20:45:32 gray Exp $";
+  "$Id: dmalloc.c,v 1.66 1997/03/21 14:32:30 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -394,8 +394,19 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
     return new_debug;
   
   if (! list_tags && tag_find == NULL) {
-    if (strp != NULL)
-      *strp = "unknown";
+    default_t	*def_p;
+    
+    /* check the default list to see if we have a match there */
+    if (strp != NULL) {
+      for (def_p = defaults; def_p->de_string != NULL; def_p++) {
+	if (def_p->de_flags == debug_value) {
+	  *strp = def_p->de_string;
+	  break;
+	}
+      }
+      if (def_p->de_string == NULL)
+	*strp = "unknown";
+    }
   }
   else {
     default_t	*defp;
