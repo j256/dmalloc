@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.118 1999/03/04 19:17:25 gray Exp $
+# $Id: Makefile.in,v 1.119 1999/03/07 23:06:01 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -8,7 +8,7 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o
+OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o table.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
@@ -95,9 +95,11 @@ installftp :: README_ftp $(DOCS)
 # put situation specific lines here
 dmalloc.h.2 : config.status
 	$(SHELL) config.status
+	touch $@
 
 settings.h : $(srcdir)/settings.dist config.status
 	$(SHELL) config.status
+	touch $@
 
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
 	rm -f $(.TARGET) $(.TARGET).t
@@ -160,10 +162,10 @@ heavy :: $(TEST) light
 	$(TEST) -s -t 100000
 
 continuous :: $(TEST)
-	while test 1 ;\
-		do  (\
-			$(TEST) -n -t 100000 ;\
-		); done
+	while $(TEST) -n -t 100000 ;\
+		do  \
+			echo '' ;\
+		done
 
 port :: $(FLS) $(CONTFLS) Makefile.all.in
 	@ answer 'Is it okay to remove the $(.TARGET) directory? '
@@ -242,9 +244,11 @@ $(INFOFILE) : $(srcdir)/dmalloc.texi
 #
 Makefile : $(srcdir)/Makefile.in config.status
 	$(SHELL) config.status
+	touch $@
 
 conf.h : $(srcdir)/conf.h.in config.status
 	$(SHELL) config.status
+	touch $@
 
 config.status : $(srcdir)/configure
 	$(SHELL) config.status --recheck
