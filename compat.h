@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: compat.h,v 1.24 1995/06/28 23:51:53 gray Exp $
+ * $Id: compat.h,v 1.25 1995/07/04 00:21:29 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -75,6 +75,13 @@ IMPORT	char	*strcat(char * str1, const char * str2);
 #endif
 
 /*
+ * return the length in characters of STR
+ */
+#if HAVE_STRLEN == 0
+IMPORT	int	strlen(const char * str);
+#endif
+
+/*
  * returns -1,0,1 on whether STR1 is <,==,> STR2
  */
 #if HAVE_STRCMP == 0
@@ -82,10 +89,24 @@ IMPORT	int	strcmp(const char * str1, const char * str2);
 #endif
 
 /*
- * return the length in characters of STR
+ * compare at most LEN chars in STR1 and STR2 and return -1,0,1 or STR1 - STR2
  */
-#if HAVE_STRLEN == 0
-IMPORT	DMALLOC_SIZE	strlen(const char * str);
+#if HAVE_STRNCMP == 0
+IMPORT	int	strncmp(const char * str1, const char * str2, const int len);
+#endif
+
+/*
+ * copies STR2 to STR1.  returns STR1
+ */
+#if HAVE_STRCPY == 0
+IMPORT	char	*strcpy(char * str1, const char * str2);
+#endif
+
+/*
+ * copy STR2 to STR1 until LEN or null
+ */
+#if HAVE_STRNCPY == 0
+IMPORT	char	*strncpy(char * str1, const char * str2, const int len);
 #endif
 
 /*

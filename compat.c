@@ -37,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.33 1995/06/28 23:51:52 gray Exp $";
+  "$Id: compat.c,v 1.34 1995/07/04 00:21:28 gray Exp $";
 #endif
 
 #if HAVE_BCOPY == 0
@@ -82,6 +82,22 @@ EXPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
 }
 #endif /* HAVE_BCMP == 0 */
 
+#if HAVE_MEMSET == 0
+/*
+ * set LEN characters in STR to character CH
+ * NOTE: remember Gray, there is no bset().
+ */
+EXPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len)
+{
+  char	*hold = str;
+  
+  for (; len > 0; len--, str++)
+    *str = (char)ch;
+  
+  return hold;
+}
+#endif /* HAVE_MEMSET == 0 */
+
 #if HAVE_STRCHR == 0
 /*
  * find CH in STR by searching backwards through the string
@@ -118,22 +134,6 @@ EXPORT	char	*strrchr(const char * str, int ch)
 }
 #endif /* HAVE_STRRCHR == 0 */
 
-#if HAVE_MEMSET == 0
-/*
- * set LEN characters in STR to character CH
- * NOTE: remember Gray, there is no bset().
- */
-EXPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len)
-{
-  char	*hold = str;
-  
-  for (; len > 0; len--, str++)
-    *str = (char)ch;
-  
-  return hold;
-}
-#endif /* HAVE_MEMSET == 0 */
-
 #if HAVE_STRCAT == 0
 /*
  * concatenate STR2 onto the end of STR1
@@ -152,6 +152,20 @@ EXPORT	char	*strcat(char * str1, const char * str2)
 }
 #endif /* HAVE_STRCAT == 0 */
 
+#if HAVE_STRLEN == 0
+/*
+ * return the length in characters of STR
+ */
+EXPORT	int	strlen(const char * str)
+{
+  int	len;
+  
+  for (len = 0; *str != NULLC; str++, len++);
+  
+  return len;
+}
+#endif /* HAVE_STRLEN == 0 */
+
 #if HAVE_STRCMP == 0
 /*
  * returns -1,0,1 on whether STR1 is <,==,> STR2
@@ -162,54 +176,6 @@ EXPORT	int	strcmp(const char * str1, const char * str2)
   return *str1 - *str2;
 }
 #endif /* HAVE_STRCMP == 0 */
-
-#if HAVE_STRCPY == 0
-/*
- * copies STR2 to STR1.  returns STR1
- */
-EXPORT	char	*strcpy(char * str1, const char * str2)
-{
-  char	*strp;
-  
-  for (strp = str1; *str2 != NULLC; strp++, str2++)
-    *strp = *str2;
-  *strp = NULLC;
-  
-  return str1;
-}
-#endif /* HAVE_STRCPY == 0 */
-
-#if HAVE_STRDUP == 0
-/*
- * alloc space for PTR (with NULL) and copy it to new space, user must free
- */
-EXPORT	char	*strdup(const char * ptr)
-{
-  char	*ret;
-  int	len;
-  
-  len = strlen(ptr);
-  ret = (char *)malloc(len + 1);
-  if (ret != NULL)
-    (void)strcpy(ret, ptr);
-  
-  return ret;
-}
-#endif
-
-#if HAVE_STRLEN == 0
-/*
- * return the length in characters of STR
- */
-EXPORT	DMALLOC_SIZE	strlen(const char * str)
-{
-  int	len;
-  
-  for (len = 0; *str != NULLC; str++, len++);
-  
-  return len;
-}
-#endif /* HAVE_STRLEN == 0 */
 
 #if HAVE_STRNCMP == 0
 /*
@@ -226,6 +192,22 @@ EXPORT	int	strncmp(const char * str1, const char * str2, const int len)
   return 0;
 }
 #endif /* HAVE_STRNCMP == 0 */
+
+#if HAVE_STRCPY == 0
+/*
+ * copies STR2 to STR1.  returns STR1
+ */
+EXPORT	char	*strcpy(char * str1, const char * str2)
+{
+  char	*strp;
+  
+  for (strp = str1; *str2 != NULLC; strp++, str2++)
+    *strp = *str2;
+  *strp = NULLC;
+  
+  return str1;
+}
+#endif /* HAVE_STRCPY == 0 */
 
 #if HAVE_STRNCPY == 0
 /*
@@ -247,28 +229,6 @@ EXPORT	char	*strncpy(char * str1, const char * str2, const int len)
   return str1;
 }
 #endif /* HAVE_STRNCPY == 0 */
-
-#if HAVE_STRSTR == 0
-/*
- * find STR2 inside STR1, returns NULL if not found
- */
-EXPORT	char	*strstr(const char * str1, const char * str2)
-{
-  int		len1, len2;
-  
-  /* find the 2 lengths */
-  len1 = strlen(str1);
-  len2 = strlen(str2);
-  len1 -= len2;
-  
-  /* look for the string */
-  for (; len1 >= 0; len1--, str1++)
-    if (strncmp(str1, str2, len2) == 0)
-      return (char *)str1;
-  
-  return NULL;
-}
-#endif
 
 #if HAVE_STRTOK == 0
 /*
