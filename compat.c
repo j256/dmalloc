@@ -34,8 +34,18 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.17 1993/08/18 02:06:19 gray Exp $";
+  "$Id: compat.c,v 1.18 1993/08/26 23:08:55 gray Exp $";
 #endif
+
+#if HAVE_GETPID == 0
+/*
+ * return a fake pid for brain-dead systems without getpid()
+ */
+EXPORT	int	getpid(void)
+{
+  return 0;
+}
+#endif /* HAVE_GETPID == 0 */
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
 /*

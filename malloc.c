@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.38 1993/08/24 22:24:24 gray Exp $";
+  "$Id: malloc.c,v 1.39 1993/08/26 23:09:02 gray Exp $";
 #endif
 
 /*
@@ -216,7 +216,8 @@ LOCAL	void	get_environ(void)
   /* get the malloc debug logfile name into a holding variable */
   env = (char *)getenv(LOGFILE_ENVIRON);
   if (env != NULL) {
-    (void)strcpy(log_path, env);
+    /* NOTE: this may cause core dumps if env contains a bad format string */
+    (void)sprintf(log_path, env, getpid());
     malloc_logpath = log_path;
   }
   

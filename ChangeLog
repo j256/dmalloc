@@ -1,3 +1,11 @@
+Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added MALLOC_LOGFILE feature where %d in the string will be
+	replaced with the pid of the process.  Had to add getpid to
+	configure and compat.
+
+	* Fixed some problems with compat.h defines.
+
 Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Releasing version 1.3.1.  Uploaded to the ftp site.

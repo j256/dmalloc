@@ -18,7 +18,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.17 1993/07/23 21:24:20 gray Exp $
+ * $Id: conf.h.in,v 1.18 1993/08/26 23:08:58 gray Exp $
  */
 
 /*
@@ -129,6 +129,8 @@
 #define HAVE_STRCMP 0
 #define HAVE_STRLEN 0
 #define HAVE_STRTOK 0
+
+#define HAVE_GETPID 0
 
 /*
  * the below functions are here to provide function argument checking only.

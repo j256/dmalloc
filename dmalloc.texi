@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.31 1993/08/25 00:34:44 gray Exp $
+@c $Id: dmalloc.texi,v 1.32 1993/08/26 23:09:05 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -456,13 +456,23 @@ variable especially.
 
 @item MALLOC_LOGFILE
 @cindex MALLOC_LOGFILE variable
+@cindex logging information to disk
 Set this variable to a filename so that if @samp{MALLOC_DEBUG} has
 logging enabled, the library can log transactions, administration
 information, and/or errors to the file so memory problems and usage can
 be tracked.
 
+To get different logfiles for different processes, you can assign
+@samp{MALLOC_LOGFILE} to a string with @code{%d} in it (for instance
+@samp{logfile.%d}).  This will be replaced with the pid of the running
+process (for instance @samp{logfile.2451}).
+
+@emph{WARNING}: it is easy to core dump any program with malloc_dbg, if
+you send in a format with arguments other than the one @code{%d}.
+
 @item MALLOC_ADDRESS
 @cindex MALLOC_ADDRESS variable
+@cindex address locating
 When this env variable is set to a hex address (taken from the malloc
 log-file for instance) malloc will abort when it finds itself either
 allocating or freeing that address.
@@ -502,6 +512,7 @@ routine or file has been reached in the program.
 
 @item MALLOC_TRACE
 @cindex MALLOC_TRACE variable
+@cindex address tracing
 When this env variable is set to a hex address (taken from the malloc
 log-file for instance) malloc will log all activity on this address
 along with a count.  This assists in tracking problem addresses or
@@ -1159,7 +1170,7 @@ malloc_dbg library in with the C++ program you want to debug.
 
 The above functions effectively redirect @code{new} to the more familiar
 @code{malloc} and @code{delete} to the more familiar @code{free}.  They
-also give the known error behaviour, too.
+also give the known error behavior, too.
 
 I am not a C++ hacker so feedback in the form of other hints and ideas
 for C++ users would be much appreciated.
@@ -1303,9 +1314,9 @@ sbrk or compatible function usages
 
 @item
 @cindex heap growing
-Whether the systems's heap grows towards high or low memory.  The
-chunk.c code is designed (loosely) around the fact that consecutive
-calls to sbrk should give higher memory addresses.
+Whether the systems' heap grows towards high or low memory.  The chunk.c
+code is designed (loosely) around the fact that consecutive calls to
+sbrk should give higher memory addresses.
 
 I have not been able to test the library on a system whose heap grows
 towards low memory.  If you are trying to run the library on such a
@@ -1372,7 +1383,7 @@ values and priorities.  <cpsr@@csli.stanford.edu>
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
 We at the Antaire Corporation are the proud and enthusiastic owners,
-users, and distributers of the BSD/386 operating system.  For $1+k you
+users, and distributors of the BSD/386 operating system.  For $1+k you
 get a @emph{complete} BSD-flavor operating system with @emph{full
 source} for 386 and 486 systems (binary licenses are available).  Along
 with the obvious benefits of full source code come excellent customer
