@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.96 2003/05/13 18:16:18 gray Exp $
+ * $Id: dmalloc_t.c,v 1.97 2003/05/15 02:42:38 gray Exp $
  */
 
 /*
@@ -52,17 +52,8 @@
 /*
  * NOTE: these are only needed to test certain features of the library.
  */
-#include "debug_val.h"
+#include "debug_tok.h"
 #include "error_val.h"
-
-#if INCLUDE_RCS_IDS
-#if IDENT_WORKS
-#ident "$Id: dmalloc_t.c,v 1.96 2003/05/13 18:16:18 gray Exp $"
-#else
-static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.96 2003/05/13 18:16:18 gray Exp $";
-#endif
-#endif
 
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
@@ -82,6 +73,7 @@ static	pnt_info_t	*pointer_grid;
 
 /* argument variables */
 static	int		default_iter_n = DEFAULT_ITERATIONS; /* # of iters */
+static	char		*env_string = NULL;		/* env options */
 static	int		interactive_b = ARGV_FALSE;	/* interactive flag */
 static	int		log_trans_b = ARGV_FALSE;	/* log transactions */
 static	int		no_special_b = ARGV_FALSE;	/* no-special flag */
@@ -94,23 +86,25 @@ static	int		verbose_b = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
   { INTER_CHAR,	"interactive",		ARGV_BOOL_INT,		&interactive_b,
-      NULL,			"turn on interactive mode" },
+    NULL,			"turn on interactive mode" },
+  { 'e',	"env-string",		ARGV_CHAR_P,		&env_string,
+    "string",			"string of env commands to set" },
   { 'l',	"log-trans",		ARGV_BOOL_INT,		&log_trans_b,
-      NULL,			"log transactions via tracking-func" },
+    NULL,			"log transactions via tracking-func" },
   { 'm',	"max-alloc",		ARGV_INT,		&max_alloc,
-      "bytes",			"maximum allocation to test" },
+    "bytes",			"maximum allocation to test" },
   { 'n',	"no-special",		ARGV_BOOL_INT,		&no_special_b,
-      NULL,			"do not run special tests" },
+    NULL,			"do not run special tests" },
   { 'p',	"max-pointers",		ARGV_INT,		&max_pointers,
-      "pointers",		"number of pointers to test" },
+    "pointers",		"number of pointers to test" },
   { 'r',	"random-debug",		ARGV_BOOL_INT,	       &random_debug_b,
-      NULL,			"randomly change debug flag" },
+    NULL,			"randomly change debug flag" },
   { 's',	"silent",		ARGV_BOOL_INT,		&silent_b,
-      NULL,			"do not display messages" },
+    NULL,			"do not display messages" },
   { 'S',	"seed-random",		ARGV_U_INT,		&seed_random,
-      "number",			"seed for random function" },
+    "number",			"seed for random function" },
   { 't',	"times",		ARGV_INT,	       &default_iter_n,
-      "number",			"number of iterations to run" },
+    "number",			"number of iterations to run" },
   { 'v',	"verbose",		ARGV_BOOL_INT,		&verbose_b,
     NULL,			"enables verbose messages" },
   { ARGV_LAST }
@@ -921,6 +915,13 @@ int	main(int argc, char **argv)
   
   if (silent_b && (verbose_b || interactive_b)) {
     silent_b = ARGV_FALSE;
+  }
+  
+  if (env_string != NULL) {
+    dmalloc_debug_setup(env_string);
+    if (! silent_b) {
+      (void)printf("Set dmalloc environment to: %s\n", env_string);
+    }
   }
   
   /* repeat until we get a non 0 seed */
