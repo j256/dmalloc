@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.150 2000/11/15 00:37:23 gray Exp $
+# $Id: Makefile.in,v 1.151 2001/07/12 23:11:46 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -11,6 +11,9 @@ exec_prefix = @exec_prefix@
 srcdir = @srcdir@
 VPATH = @srcdir@
 shlibdir = @shlibdir@
+
+CC = @CC@
+CXX = @CXX@
 
 HFLS	= dmalloc.h
 OBJS	= arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o \
@@ -62,7 +65,7 @@ CFLAGS	= -g $(CCFLS) -Wall -Wpointer-arith -Wshadow -Waggregate-return \
 	-Wmissing-prototypes
 
 LDFLAGS	= $(LLDFLAGS)
-DESTDIR	= /usr/local/local
+DESTDIR	= /usr/local
 WWWDIR	= /var/httpd/root/dmalloc.com
 TEST	= $(MODULE)_t
 UTIL	= $(MODULE)
@@ -110,7 +113,7 @@ distclean :: clean
 	rm -rf port
 
 installincs :: $(HFLS)
-	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
+	install -cev -m 444 $(HFLS) $(DESTDIR)/include
 
 installcxx :: $(LIB_CXX)
 	install -cevr -m 644 $(LIB_CXX) $(DESTDIR)/lib
@@ -130,10 +133,18 @@ installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 
 installdocs :: $(DOCS)
 	install -cev -m 444 $(DOCS) $(WWWDIR)/docs
-	cd $(WWWDIR)/docs ; for file in $(DOCS) ; \
-		do gzip -9fc $$file > $$file.gz.t ; \
-		install -cev -m 444 $$file.gz.t $$file.gz ; \
+	cd $(WWWDIR)/docs ; for file in $(DOCS) ;\
+		do gzip -9fc $$file > $$file.gz.t ;\
+		install -cev -m 444 $$file.gz.t $$file.gz ;\
 		rm -f $$file.gz.t ; done
+	-cd $(WWWDIR)/docs/online ;\
+		umask 022 ;\
+		texi2html -menu -glossary -number -split_node \
+			../dmalloc.texi ;\
+		for f in dmalloc*.html ; do \
+			sed -e 's,</BODY>,<P><A HREF="http://dmalloc.com/">Dmalloc Home Page</A>.  Copyright 2001 by <A HREF="http://256.com/gray/">Gray Watson</A></BODY>,' $$f > $$f.t ;\
+			mv $$f.t $$f ;\
+		done
 
 installshlib : $(SHLIBRARY)
 	install -cevr -m 644 $(srcdir)/$(SHLIBRARY) $(shlibdir)
@@ -209,7 +220,7 @@ malloc_th.o : malloc.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
 		-c $(srcdir)/malloc.c -o $@
 
-tests :: $(TEST)
+tests :: $(TEST) compile_test
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
@@ -236,6 +247,21 @@ continuous :: $(TEST)
 			echo '' ;\
 		done
 
+compile_test :: settings.h
+	rm -f settings.h.t
+	for setting in `cut -f1 -d' ' settings.test` ;\
+	do \
+		val=`grep $$setting settings.test | cut -f2 -d' '` ;\
+		echo "$$setting -> $$val" ;\
+		sed -e "s/$$setting[ \t].*$$/$$setting $$val/" settings.dist \
+			> settings.h.t ;\
+		mv settings.h.t settings.h ;\
+		rm -f $(TEST) ;\
+		make $(TEST) > /dev/null ;\
+		make light ;\
+	done
+	rm -f settings.h.t
+
 port :: $(FLS) $(CONTFLS) Makefile.all.in
 	@ test ! -d dmalloc-$(VERSION) || \
 		answer 'Is it okay to remove the dmalloc-$(VERSION) dir? '
@@ -251,13 +277,13 @@ port :: $(FLS) $(CONTFLS) Makefile.all.in
 dmalloc.ps : dmalloc.texi
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; \
+	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ;\
 		dvips -o ../$@ dmalloc.dvi )
 	rm -rf work
 
 dmalloc.html : $(srcdir)/dmalloc.texi
 	rm -f $@
-	makeinfo --number-sections --html --verbose $(srcdir)/dmalloc.texi
+	texi2html -number -monolithic ../dmalloc.texi
 
 dmalloc.dvi : dmalloc.texi
 	rm -rf work
