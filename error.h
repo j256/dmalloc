@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.19 1995/03/03 17:38:12 gray Exp $
+ * $Id: error.h,v 1.20 1995/05/05 15:41:54 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -34,6 +34,9 @@ IMPORT	long		_dmalloc_flags;
 
 /* global iteration counter for activities */
 IMPORT	unsigned long	_dmalloc_iterc;
+
+/* time the library started up for elapsed time calculations */
+IMPORT	long		_dmalloc_start;
 
 /*
  * message writer with printf like arguments

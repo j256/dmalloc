@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.53 1995/03/03 17:38:12 gray Exp $";
+  "$Id: error.c,v 1.54 1995/05/05 15:41:53 gray Exp $";
 #endif
 
 /* external routines */
@@ -56,6 +56,9 @@ EXPORT	long		_dmalloc_flags = 0;
 
 /* global iteration counter for activities */
 EXPORT	unsigned long	_dmalloc_iterc = 0;
+
+/* time the library started up for elapsed time calculations */
+EXPORT	long		_dmalloc_start = 0;
 
 /*
  * message writer with printf like arguments
@@ -133,6 +136,12 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
        */
       _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags, dmalloc_address);
+      
+#if HAVE_TIME
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+      _dmalloc_message("starting time = %ld", _dmalloc_start);
+#endif
+#endif
     }
     
     /* write str to the outfile */
