@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.60 2003/06/08 21:26:18 gray Exp $
+ * $Id: settings.dist,v 1.61 2003/06/10 00:24:43 gray Exp $
  */
 
 /*
@@ -217,11 +217,34 @@
 #define DUMP_SPACE 20
 
 /*
+ * At the front of each log message, print the output from the time()
+ * call as a number.  This requires that the time function be defined.
+ */
+#define LOG_TIME_NUMBER		1
+#define TIME_INCLUDE		<time.h>
+
+/*
  * Write the iteration count at the start of every log entry.  This is
  * handy when you are using the DMALLOC_START variable and want to
  * begin the tough debugging at a certain point.
  */
-#define LOG_ITERATION_COUNT 1
+#define LOG_ITERATION 1
+
+/*
+ * Write the pid number at the start of every log entry if the
+ * getpid() function is available.  This is handy when you are using
+ * dmalloc with a program which forks.  See LOG_REOPEN below.
+ */
+#define LOG_PID 0
+
+/*
+ * If the getpid() function is available, notice when the pid of the
+ * process changes and reopen the logfile.  This is handy when you are
+ * using dmalloc with a program which forks and you want the separate
+ * forked programs to have separate logs.  Use with the %p pid
+ * expansion in the logfile name.
+ */
+#define LOG_REOPEN 1
 
 /*
  * Store the number of times a pointer is "seen" being allocated or
@@ -231,7 +254,7 @@
  *
  * NOTE: This creates a certain amount of memory overhead.
  */
-#define STORE_SEEN_COUNT 1
+#define LOG_PNT_SEEN_COUNT 1
 
 /*
  * Store the iteration count when a pointer is allocated -- it
@@ -241,14 +264,7 @@
  *
  * NOTE: This creates a certain amount of memory overhead.
  */
-#define STORE_ITERATION_COUNT 0
-
-/*
- * At the front of each log message, print the output from the time()
- * call as a number.  This requires that the time function be defined.
- */
-#define LOG_TIME_NUMBER		1
-#define TIME_INCLUDE		<time.h>
+#define LOG_PNT_ITERATION 0
 
 /*
  * At the front of each log message, print the output from the ctime()
@@ -275,14 +291,14 @@
  *
  * NOTE: This creates a certain amount of memory overhead.
  */
-#define STORE_TIME		0
+#define LOG_PNT_TIME		0
 #ifndef TIME_INCLUDE
 #define TIME_INCLUDE		<time.h>
 #endif
 #ifndef TIME_TYPE
 #define TIME_TYPE		unsigned int
 #endif
-#define STORE_TIMEVAL		0
+#define LOG_PNT_TIMEVAL		0
 #define TIMEVAL_INCLUDE		<sys/time.h>
 #define TIMEVAL_TYPE		struct timeval
 #define GET_TIMEVAL(timeval)	(void)gettimeofday(&(timeval), NULL)
@@ -415,7 +431,7 @@
  * value is translated to the string necessary to be included with the
  * ``t'' in the logfile.
  */
-#define LOG_THREAD_ID			0
+#define LOG_PNT_THREAD_ID		0
 #define THREAD_TYPE			pthread_t
 #define THREAD_GET_ID()			pthread_self()
 #if HAVE_SNPRINTF
