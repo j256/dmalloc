@@ -1,6 +1,12 @@
 Thu Oct 15 11:06:41 1998  Gray Watson  <gray@burger.letters.com>
 
-	* Relased dmalloc version 4.0.2.
+	* Released dmalloc version 4.0.3.
+
+	* Found and fixed a bug when reallocing a previous valloced
+        section.  Not a good idea anyway since it will not preserve the
+        block-aligned status (should it).
+
+	* Released dmalloc version 4.0.2.
 
 	* Fixed a problem in return.h and DMALLOC_UNKNOWN_FILE.  Ugh.
         Thanks much to Mike Sacauskis for pointing this out.
@@ -1323,5 +1329,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.195 1998/10/15 15:17:46 gray Exp $
+$Id: ChangeLog,v 1.196 1998/10/15 20:20:08 gray Exp $
 -------------------------------------------------------------------------------
