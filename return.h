@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: return.h,v 1.27 1999/05/06 15:12:27 gray Exp $
+ * $Id: return.h,v 1.28 1999/10/15 22:13:52 gray Exp $
  */
 
 /*
@@ -240,6 +240,28 @@ asm void ASM_GET_RET_ADDR(file)
 #define GET_RET_ADDR(file)  asm("stw %%r2, %0" : "=m" (file) :  );
 
 #endif
+
+/*************************************/
+
+/*
+ * For Powerpc 603 based system running LynxOS 2.3.1 using gcc/gas.
+ * From Shawn Carey <smc@questra.com>.
+ */
+#if defined(__powerpc__) && defined(__GNUC__) && !defined(__OPTIMIZE__)
+
+/*
+ * This won't compile if "-O2" is used, but it seems to work fine with
+ * "-O0".  I'm no assembler expert; I was happy enough to come up with
+ * something that works at all...  :-)
+ */
+
+#define GET_RET_ADDR(file) \
+do { \
+  asm("mflr 0"); \
+  asm("stw 0,%0" : "=g" (file)); \
+} while(0)
+
+#endif /* __powerpc__ && __GNUC__ && !__OPTIMIZE__ */
 
 /*************************************/
 

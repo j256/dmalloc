@@ -1,3 +1,7 @@
+Fri Oct 15 18:13:39 1999  Gray Watson  <gray@burger.256.com>
+
+	* Added power pc return.h macros from Shawn.
+
 Thu Oct 14 10:08:58 1999  Gray Watson  <gray@burger.256.com>
 
 	* Releasing dmalloc version 4.3.0 beta 3.
@@ -1489,5 +1493,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.225 1999/10/14 14:09:34 gray Exp $
+$Id: ChangeLog,v 1.226 1999/10/15 22:13:51 gray Exp $
 -------------------------------------------------------------------------------
