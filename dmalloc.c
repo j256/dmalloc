@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: dmalloc.c,v 1.80 1998/11/10 17:48:04 gray Exp $
+ * $Id: dmalloc.c,v 1.81 1998/11/12 16:29:44 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.80 1998/11/10 17:48:04 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.81 1998/11/12 16:29:44 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.80 1998/11/10 17:48:04 gray Exp $";
+  "$Id: dmalloc.c,v 1.81 1998/11/12 16:29:44 gray Exp $";
 #endif
 #endif
 
@@ -99,8 +99,8 @@ typedef struct {
 #define HIGH_FLAGS	(MEDIUM_FLAGS | \
 			 DEBUG_CHECK_BLANK | DEBUG_CHECK_FUNCS)
 #define ALL_FLAGS	(HIGH_FLAGS | \
-			 DEBUG_LOG_TRANS | DEBUG_LOG_STAMP | \
-			 DEBUG_LOG_ADMIN | DEBUG_LOG_BLOCKS | \
+			 DEBUG_LOG_TRANS | DEBUG_LOG_ADMIN | \
+			 DEBUG_LOG_BLOCKS | \
 			 DEBUG_HEAP_CHECK_MAP | DEBUG_NEVER_REUSE)
 /* NOTE: print-error is not in this list because it is special */
 
@@ -292,24 +292,29 @@ static	void	dump_debug(const int val)
  */
 static	long	token_to_value(const char *tok)
 {
-  int	attr_c;
-  long	ret = 0;
+  attr_t	*attr_p;
   
-  for (attr_c = 0; attributes[attr_c].at_string != NULL; attr_c++) {
-    if (strcmp(tok, attributes[attr_c].at_string) == 0) {
+  /* find the matching attribute string */
+  for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
+    if (strcmp(tok, attr_p->at_string) == 0
+	|| strcmp(tok, attr_p->at_short) == 0) {
       break;
     }
   }
   
-  if (attributes[attr_c].at_string == NULL) {
-    (void)fprintf(stderr, "%s: unknown token '%s'\n",
-		  argv_program, tok);
-  }
-  else {
-    ret = attributes[attr_c].at_value;
+  if (attr_p->at_string == NULL) {
+    (void)fprintf(stderr, "%s: unknown token '%s'\n", argv_program, tok);
+    return 0;
   }
   
-  return ret;
+  /* if we have a 0 value and not none then this is a disabled token */
+  if (attr_p->at_value == 0 && strcmp(tok, "none") != 0) {
+    (void)fprintf(stderr, "%s: token '%s' has been disabled: %s\n",
+		  argv_program, tok, attr_p->at_desc);
+    return 0;
+  }
+  
+  return attr_p->at_value;
 }
 
 /*
@@ -775,6 +780,10 @@ int	main(int argc, char **argv)
     attr_t	*attr_p;
     (void)fprintf(stderr, "Debug Tokens:\n");
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
+      /* skip any disabled tokens */
+      if (attr_p->at_value == 0 && strcmp(attr_p->at_string, "none") != 0) {
+	continue;
+      }
       if (very_verbose_b) {
 	(void)fprintf(stderr, "%s (%s) -- %s (%#lx)\n",
 		      attr_p->at_string, attr_p->at_short, attr_p->at_desc,
