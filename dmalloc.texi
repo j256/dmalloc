@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.231 2003/09/08 14:49:56 gray Exp $
+@c $Id: dmalloc.texi,v 1.232 2003/09/08 14:52:17 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1855,10 +1855,10 @@ when @code{getenv} is called from within @code{malloc} causing a
 segfault.
 
 To work around this, I have added to the configure script a check to
-make sure that calls to @code{getenv} are okay inside of malloc.  If
-they are not then you are going to have to add some code into the
-@code{main} function in your program to initialize the dmalloc flags
-yourself.  Here is a code sample:
+make sure that calls to @code{getenv} are okay inside of malloc.  See
+@code{GETENV_SAFE} in @file{conf.h}.  If they are not then you are going
+to have to add some code into the @code{main} function in your program
+to initialize the dmalloc flags yourself.  Here is a code sample:
 
 @cindex dmalloc_debug_setup usage
 
