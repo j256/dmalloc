@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.58 1994/09/20 18:24:02 gray Exp $
+# $Id: Makefile.in,v 1.59 1994/10/04 17:48:04 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -35,7 +35,7 @@ PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
 	argv.[ch] argv_loc.h \
 	dmalloc.texi dmalloc.info dmalloc.ps texinfo.tex \
 	install.sh mkinstalldirs Deansify.pl
-PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
+PORTCFG	= contrib/README contrib/atexit.c contrib/dec_notes contrib/ra_info.pl
 
 MAXSIZE	= 85k
 # NOTE: the wc level should be below 90k due to shar overhead

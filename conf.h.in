@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.38 1994/09/12 17:19:14 gray Exp $
+ * $Id: conf.h.in,v 1.39 1994/10/04 17:47:01 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -101,7 +101,9 @@
 /*
  * automatically call dmalloc_shutdown if on_exit or atexit is
  * available.  See below for whether configure found on_exit or atexit
- * calls.
+ * calls.  If neither is available, take a look at atexit.c in the
+ * contrib directory which may provide this useful functionality for
+ * your system.
  */
 #define AUTO_SHUTDOWN 1
 
@@ -198,6 +200,10 @@
  * statistics.  use the AUTO_SHUTDOWN define above to disable this.
  * please send me mail if this functionality exists on your system but
  * in another name.
+ *
+ * NOTE: If neither is available, take a look at atexit.c in the
+ * contrib directory which may provide this useful functionality for
+ * your system.
  */
 #define HAVE_ATEXIT 0
 #define HAVE_ON_EXIT 0

@@ -1,3 +1,8 @@
+Tue Oct  4 13:39:40 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added DG/UX code to return.h and atexit code and notes to the
+	distribution.  Thanks Joerg.
+
 Mon Sep 26 11:59:56 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Releasing version 3.0.2.
@@ -834,5 +839,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.120 1994/09/26 17:54:38 gray Exp $
+$Id: ChangeLog,v 1.121 1994/10/04 17:46:52 gray Exp $
 -------------------------------------------------------------------------------
