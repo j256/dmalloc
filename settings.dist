@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.67 2004/07/14 12:33:33 gray Exp $
+ * $Id: settings.dist,v 1.68 2004/09/13 05:14:04 gray Exp $
  */
 
 /*
@@ -36,7 +36,7 @@
  * FYI: if fence post checking is requested, the top and bottom of the
  * fence post information will be touching.
  */
-#define ALLOW_ALLOC_ZERO_SIZE 0
+#define ALLOW_ALLOC_ZERO_SIZE 1
 
 /*
  * Should we allow realloc of a NULL pointer?  If set to one, this
