@@ -1,3 +1,9 @@
+Wed Oct 13 18:38:26 1999  Gray Watson  <gray@burger.256.com>
+
+	* Releasing dmalloc version 4.3.0 beta 2.
+
+	* Changed #ifdef USE_DMALLOC_LEAP -> #if USE_DMALLOC_LEAP.  Doh.
+
 Mon Oct 11 12:37:13 1999  Gray Watson  <gray@burger.256.com>
 
 	* Releasing dmalloc version 4.3.0 beta 1.
@@ -1477,5 +1483,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.223 1999/10/11 23:59:39 gray Exp $
+$Id: ChangeLog,v 1.224 1999/10/13 22:41:14 gray Exp $
 -------------------------------------------------------------------------------
