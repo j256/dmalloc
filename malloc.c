@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.146 2000/05/15 22:25:14 gray Exp $
+ * $Id: malloc.c,v 1.147 2000/05/16 18:43:23 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.146 2000/05/15 22:25:14 gray Exp $";
+#ident "$Id: malloc.c,v 1.147 2000/05/16 18:43:23 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.146 2000/05/15 22:25:14 gray Exp $";
+  "$Id: malloc.c,v 1.147 2000/05/16 18:43:23 gray Exp $";
 #endif
 #endif
 
@@ -91,15 +91,14 @@ static	char	*rcs_id =
 static	int		enabled_b = 0;		/* have we started yet? */
 static	int		in_alloc_b = 0;		/* can't be here twice */
 static	int		do_shutdown_b = 0;	/* execute shutdown soon */
-static	int		memalign_warn_b = 0;	 /* memalign warning printed?*/
+static	int		memalign_warn_b = 0;	/* memalign warning printed?*/
 static	dmalloc_track_t	tracking_func = NULL;	/* memory trxn tracking func */
 
 /* debug variables */
-static	char		*start_file = START_FILE_INIT;	/* file to start at */
-static	int		start_line = START_LINE_INIT;	/* line to start */
-static	int		start_count = START_COUNT_INIT; /* start after X */
-static	int		thread_lock_on = LOCK_ON_INIT;	/* start locking when*/
-static	int		thread_lock_c = 0;		/* lock counter */
+static	char		*start_file = NULL;	/* file to start at */
+static	int		start_line = 0;		/* line to start */
+static	int		start_count = 0;	/* start after X */
+static	int		thread_lock_c = 0;	/* lock counter */
 
 /****************************** thread locking *******************************/
 
@@ -221,7 +220,7 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   static unsigned long	addr_c = 0;
   char			where_buf[64];
   
-  if (_dmalloc_address == ADDRESS_INIT || pnt != _dmalloc_address) {
+  if (_dmalloc_address == NULL || pnt != _dmalloc_address) {
     return;
   }
   
@@ -231,9 +230,8 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
 		   _chunk_desc_pnt(where_buf, sizeof(where_buf), file, line));
   
   /* NOTE: if address_seen_n == 0 then never quit */
-  if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT
-      || (_dmalloc_address_seen_n > 0
-	  && addr_c >= (unsigned long)_dmalloc_address_seen_n)) {
+  if (_dmalloc_address_seen_n > 0
+      && addr_c >= _dmalloc_address_seen_n) {
     dmalloc_errno = ERROR_IS_FOUND;
     dmalloc_error("check_pnt");
   }
@@ -244,17 +242,12 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
  */
 static	void	process_environ(void)
 {
-  _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&_dmalloc_address,
+  _dmalloc_environ_get(OPTIONS_ENVIRON, &_dmalloc_address,
 		       &_dmalloc_address_seen_n, &_dmalloc_flags,
-		       &_dmalloc_check_interval, &thread_lock_on,
+		       &_dmalloc_check_interval, &_dmalloc_lock_on,
 		       &_dmalloc_logpath, &start_file, &start_line,
 		       &start_count);
-  thread_lock_c = thread_lock_on;
-  
-  /* if it was not set then no flags set */
-  if (_dmalloc_flags == (unsigned int)DEBUG_INIT) {
-    _dmalloc_flags = 0;
-  }
+  thread_lock_c = _dmalloc_lock_on;
   
   /* if we set the start stuff, then check-heap comes on later */
   if (start_count != -1) {
@@ -268,7 +261,7 @@ static	void	process_environ(void)
   
 #if LOCK_THREADS == 0
   /* was thread-lock-on specified but not configured? */
-  if (thread_lock_on != LOCK_ON_INIT) {
+  if (_dmalloc_lock_on > 0) {
     dmalloc_errno = ERROR_LOCK_NOT_CONFIG;
     _dmalloc_die(0);
   }
@@ -520,7 +513,7 @@ static	int	check_debug_vars(const char *file, const int line)
   
   /*
    * NOTE: we need to do this outside of lock to get env vars
-   * otherwise our thread_lock_on variable won't be initialized and
+   * otherwise our _dmalloc_lock_on variable won't be initialized and
    * the THREAD_LOCK will flip.
    */
   if (! enabled_b) {
@@ -544,8 +537,8 @@ static	int	check_debug_vars(const char *file, const int line)
   in_alloc_b = 1;
   
   /* check start file/line specifications */
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      && start_file != START_FILE_INIT
+  if ((! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
+      && start_file != NULL
       && file != DMALLOC_DEFAULT_FILE
       && line != DMALLOC_DEFAULT_LINE
       && strcmp(start_file, file) == 0
@@ -554,14 +547,13 @@ static	int	check_debug_vars(const char *file, const int line)
   }
   
   /* start checking heap after X times */
-  if (start_count != START_COUNT_INIT && --start_count == 0) {
+  if (start_count > 0 && --start_count == 0) {
     BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
   }
   
   /* checking heap every X times */
   _dmalloc_iter_c++;
-  if (_dmalloc_check_interval != INTERVAL_INIT
-      && _dmalloc_check_interval > 0) {
+  if (_dmalloc_check_interval > 0) {
     if (_dmalloc_iter_c % _dmalloc_check_interval == 0) {
       BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
     }
