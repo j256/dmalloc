@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.76 1994/11/12 23:37:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.77 1994/11/12 23:52:15 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -141,7 +141,7 @@ is" without express or implied warranty.
 * Features::                    The general features of the library.
 * How To Get::			How to get the library.
 * Installation::                How to install the library.
-* Quick Start::                 How to start using the library.
+* Getting Started::             Getting started with the library.
 * Using a Debugger::            Using a debugger with the library.
 @end menu
 
@@ -441,7 +441,7 @@ Thanks much to them all.
 
 @end table
 
-@node Installation, Quick Start, How To Get, Overview
+@node Installation, Getting Started, How To Get, Overview
 @section Installing the Library
 
 @cindex installing the library
@@ -492,11 +492,11 @@ heavy} to up the ante.  Use @kbd{malloc_t --usage} for the list of all
 
 @end enumerate
 
-See the Quick Start section to get up and running with the library.
-@xref{Quick Start}.
+See the Getting Started section to get up and running with the library.
+@xref{Getting Started}.
 
-@node Quick Start, Using a Debugger, Installation, Overview
-@section Starting to Use the Library
+@node Getting Started, Using a Debugger, Installation, Overview
+@section Getting Started with the Library
 
 @cindex quick start
 @cindex getting started
@@ -561,7 +561,7 @@ combination of debug tokens.  @xref{RC File}.
 
 @end enumerate
 
-@node Using a Debugger,  , Quick Start, Overview
+@node Using a Debugger,  , Getting Started, Overview
 @section Using a Debugger with the Library
 
 @cindex debugger usage
@@ -1822,7 +1822,7 @@ Overview.
 * Features::                    The general features of the library.
 * How To Get::			Where to find and how to get the library.
 * Installation::                How to install the library.
-* Quick Start::                 How to start using the library.
+* Getting Started::             Getting started with the library.
 * Using a Debugger::            Using a debugger with the library.
 
 Allocation Basics.
