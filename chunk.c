@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.126 1998/11/12 21:50:26 gray Exp $
+ * $Id: chunk.c,v 1.127 1998/11/12 22:22:29 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.126 1998/11/12 21:50:26 gray Exp $";
+#ident "$Id: chunk.c,v 1.127 1998/11/12 22:22:29 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.126 1998/11/12 21:50:26 gray Exp $";
+  "$Id: chunk.c,v 1.127 1998/11/12 22:22:29 gray Exp $";
 #endif
 #endif
 
@@ -67,6 +67,11 @@ void		_chunk_log_heap_map(void);
 /* free lists of bblocks and dblocks */
 static	bblock_t	*free_bblock[MAX_SLOTS];
 static	dblock_t	*free_dblock[BASIC_BLOCK];
+#if FREED_POINTER_DELAY
+/* free queues for bblocks and dblocks */
+static	free_queue_t	*free_bblock_queues[MAX_SLOTS];
+static	free_queue_t	*free_dblock_queues[BASIC_BLOCK];
+#endif
 
 /* administrative structures */
 static	bblock_adm_t	*bblock_adm_head = NULL; /* pointer to 1st bb_admin */
@@ -137,12 +142,20 @@ int	_chunk_startup(void)
     return ERROR;
   }
   
-  /* initialize free bins */
+  /* initialize free bins and queues */
   for (bin_c = 0; bin_c < MAX_SLOTS; bin_c++) {
     free_bblock[bin_c] = NULL;
+#if FREED_POINTER_DELAY
+    free_bblock_queues[bin_c].fq_head = 0;
+    free_bblock_queues[bin_c].fq_tail = 0;
+#endif
   }
   for (bin_c = 0; bin_c < BASIC_BLOCK; bin_c++) {
     free_dblock[bin_c] = NULL;
+#if FREED_POINTER_DELAY
+    free_dblock_queues[bin_c].fq_head = 0;
+    free_dblock_queues[bin_c].fq_tail = 0;
+#endif
   }
   
   /* make array for NUM_BITS calculation */
@@ -167,7 +180,8 @@ int	_chunk_startup(void)
     
     value = FENCE_MAGIC_BOTTOM;
     max_p = fence_bottom + FENCE_BOTTOM_SIZE;
-    for (pos_p = fence_bottom; pos_p < max_p;
+    for (pos_p = fence_bottom;
+	 pos_p < max_p;
 	 pos_p += sizeof(FENCE_MAGIC_TYPE)) {
       if (pos_p + sizeof(FENCE_MAGIC_TYPE) <= max_p) {
 	memcpy(pos_p, (char *)&value, sizeof(FENCE_MAGIC_TYPE));
@@ -594,7 +608,8 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
   bit_c += BASIC_BLOCK;
   
   for (; bit_c < MAX_SLOTS; bit_c++) {
-    for (bblock_p = free_bblock[bit_c], prev_p = NULL; bblock_p != NULL;
+    for (bblock_p = free_bblock[bit_c], prev_p = NULL;
+	 bblock_p != NULL;
 	 prev_p = bblock_p, bblock_p = bblock_p->bb_next) {
       
       if (bblock_p->bb_block_n >= many
@@ -1064,7 +1079,8 @@ static	dblock_t	*get_dblock_admin(const int many)
   
   /* initialize the db_slots */
   for (dblock_p = dblock_adm_p->da_block;
-       dblock_p < dblock_adm_p->da_block + DB_PER_ADMIN; dblock_p++) {
+       dblock_p < dblock_adm_p->da_block + DB_PER_ADMIN;
+       dblock_p++) {
     dblock_p->db_bblock = NULL;
     dblock_p->db_next = NULL;
   }
@@ -1234,7 +1250,8 @@ int	_chunk_check(void)
       free_bblock_c[bit_c] = 0;
       
       /* parse bblock free list doing minimal pointer checking */
-      for (bblock_p = free_bblock[bit_c]; bblock_p != NULL;
+      for (bblock_p = free_bblock[bit_c];
+	   bblock_p != NULL;
 	   bblock_p = bblock_p->bb_next, free_bblock_c[bit_c]++) {
 	/*
 	 * NOTE: this should not present problems since the bb_next is
@@ -1253,7 +1270,8 @@ int	_chunk_check(void)
       free_dblock_c[bit_c] = 0;
       
       /* parse dblock free list doing minimal pointer checking */
-      for (dblock_p = free_dblock[bit_c]; dblock_p != NULL;
+      for (dblock_p = free_dblock[bit_c];
+	   dblock_p != NULL;
 	   dblock_p = dblock_p->db_next, free_dblock_c[bit_c]++) {
 	/*
 	 * NOTE: this might miss problems if the slot is allocated but
@@ -1510,7 +1528,8 @@ int	_chunk_check(void)
 	    dblock_t	*dblist_p;
 	    
 	    /* find the free block in the free list */
-	    for (dblist_p = free_dblock[bblock_p->bb_bit_n]; dblist_p != NULL;
+	    for (dblist_p = free_dblock[bblock_p->bb_bit_n];
+		 dblist_p != NULL;
 		 dblist_p = dblist_p->db_next) {
 	      if (dblist_p == dblock_p) {
 		break;
@@ -1661,7 +1680,8 @@ int	_chunk_check(void)
 	if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
 	  
 	  /* find the free block in the free list */
-	  for (bblist_p = free_bblock[bblock_p->bb_bit_n]; bblist_p != NULL;
+	  for (bblist_p = free_bblock[bblock_p->bb_bit_n];
+	       bblist_p != NULL;
 	       bblist_p = bblist_p->bb_next) {
 	    if (bblist_p == bblock_p)
 	      break;
@@ -1692,7 +1712,8 @@ int	_chunk_check(void)
       if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
 	pnt = BLOCK_POINTER(this_adm_p->ba_pos_n +
 			    (bblock_p - this_adm_p->ba_blocks));
-	for (byte_p = (char *)pnt; byte_p < (char *)pnt + BLOCK_SIZE;
+	for (byte_p = (char *)pnt;
+	     byte_p < (char *)pnt + BLOCK_SIZE;
 	     byte_p++) {
 	  if (*byte_p != BLANK_CHAR) {
 	    dmalloc_errno = ERROR_FREE_NON_BLANK;
@@ -2238,7 +2259,8 @@ void	_chunk_log_heap_map(void)
 		   (unsigned long)_heap_base, (unsigned long)_heap_last,
 		   (long)HEAP_SIZE);
   
-  for (bb_admin_c = 0, bblock_adm_p = bblock_adm_head; bblock_adm_p != NULL;
+  for (bb_admin_c = 0, bblock_adm_p = bblock_adm_head;
+       bblock_adm_p != NULL;
        bb_admin_c++, bblock_adm_p = bblock_adm_p->ba_next) {
     char_c = 0;
     
@@ -2309,7 +2331,8 @@ void	_chunk_log_heap_map(void)
   }
   
   tblock_c = 0;
-  for (bb_admin_c = 0, bblock_adm_p = bblock_adm_head; bblock_adm_p != NULL;
+  for (bb_admin_c = 0, bblock_adm_p = bblock_adm_head;
+       bblock_adm_p != NULL;
        bb_admin_c++, bblock_adm_p = bblock_adm_p->ba_next) {
     
     for (bblock_c = 0, bblock_p = bblock_adm_p->ba_blocks;
@@ -3066,7 +3089,8 @@ void	_chunk_list_count(void)
       }
     }
     else {
-      for (block_c = 0, bblock_p = free_bblock[bit_c]; bblock_p != NULL;
+      for (block_c = 0, bblock_p = free_bblock[bit_c];
+	   bblock_p != NULL;
 	   block_c++, bblock_p = bblock_p->bb_next) {
       }
     }
