@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.18 1993/11/23 07:42:13 gray Exp $
+# $Id: dmallocrc,v 1.19 1994/01/20 01:47:13 gray Exp $
 #
 
 #
@@ -51,6 +51,7 @@
 # print-perror			dump errors and messages to STDERR
 # catch-null			abort program if library can't get sbrk space
 # never-reuse			never reuse memory that has been freed
+# allow-nonlinear		allow non-linear heap space
 #
 
 # no debugging (for disabling memory checking)
@@ -119,9 +120,12 @@ verbose		log-stats, log-non-free, log-perror, log-trans, log-admin, \
 		catch-null, print-perror
 
 # the kitchen-sink
-all		log-stats, log-non-free, log-perror, log-trans, log-admin, \
-		log-blocks, log-unknown, log-bad-space, log-unknown, \
+all		log-stats, log-non-free, log-perror, log-trans, log-stamp, \
+		log-admin, log-blocks, log-unknown, log-bad-space, \
+		log-unknown, \
 		check-fence, check-heap, check-lists, check-free, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
-		heap-check-map, print-perror, catch-null
+		heap-check-map, print-perror, catch-null, never-reuse
+
+# NOTE: for specific occasions: allow-nonlinear

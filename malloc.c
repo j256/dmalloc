@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.55 1993/12/20 19:15:41 gray Exp $";
+  "$Id: malloc.c,v 1.56 1994/01/20 01:46:59 gray Exp $";
 #endif
 
 /*
@@ -261,8 +261,9 @@ LOCAL	void	get_environ(void)
     
     startp = (char *)index(env, ':');
     if (startp != NULL) {
-      *startp = NULLC;
       (void)strcpy(start_file, env);
+      startp = start_file + (startp - env);
+      *startp = NULLC;
       start_line = atoi(startp + 1);
       start_count = 0;
     }
@@ -289,7 +290,8 @@ LOCAL	int	malloc_startup(void)
   get_environ();
   
   /* startup heap code */
-  _heap_startup();
+  if (_heap_startup() == ERROR)
+    return ERROR;
   
   /* startup the chunk lower-level code */
   if (_chunk_startup() == ERROR)

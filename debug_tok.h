@@ -18,11 +18,15 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.1 1993/12/20 19:15:31 gray Exp $
+ * $Id: debug_tok.h,v 1.2 1994/01/20 01:46:50 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
 #define __DEBUG_TOK_H__
+
+/*
+ * NOTE: see debug_val.h for instructions about changes here
+ */
 
 #include "malloc_loc.h"			/* for LOCAL */
 #include "debug_val.h"			/* for debug codes */
@@ -49,7 +53,7 @@ LOCAL	attr_t		attributes[] = {
   { "check-fence",	DEBUG_CHECK_FENCE,	"check fence-post errors" },
   { "check-heap",	DEBUG_CHECK_HEAP,	"examine heap adm structs" },
   { "check-lists",	DEBUG_CHECK_LISTS,	"check free lists" },
-  { "check-free",	DEBUG_CHECK_FREE,	"check blanked free memory" },
+  { "check-free",	DEBUG_CHECK_BLANK,	"check blanked memory" },
   { "check-funcs",	DEBUG_CHECK_FUNCS,	"check functions" },
   
   { "realloc-copy",	DEBUG_REALLOC_COPY,	"copy all re-allocations" },
@@ -60,6 +64,7 @@ LOCAL	attr_t		attributes[] = {
   { "print-perror",	DEBUG_PRINT_PERROR,	"print errors to stderr" },
   { "catch-null",	DEBUG_CATCH_NULL,	"abort before return null" },
   { "never-reuse",	DEBUG_NEVER_REUSE,	"never re-use freed memory" },
+  { "allow-nonlinear",	DEBUG_ALLOW_NONLINEAR,	"allow non-linear heap space"},
   
   { NULL }
 };

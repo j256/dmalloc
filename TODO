@@ -1,5 +1,22 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.11 1993/12/20 07:28:54 gray Exp $
+$Id: TODO,v 1.12 1994/01/20 01:46:36 gray Exp $
+-------------------------------------------------------------------------------
+
+HEAP OPERATIONS:
+
+- realloc should look on either side (prefering above of course) for
+	free bblocks and absorb them
+	- find free section we can use
+	- remove from free list(s)
+	- rewrite admin chunks for used
+	- rewrite admin chunks for left-overs (if there are any)
+	- readd left-overs to free list (if there are any)
+- free should look on either side for free space to combine with
+	- find free section (above/below/both)
+	- remove from free list(s)
+	- rewrite admin chunks for new base/size
+	- add to correct free list
+
 -------------------------------------------------------------------------------
 
 CHECKING:
@@ -8,6 +25,15 @@ CHECKING:
 	only the fence posts
 - maybe add another debug level which stores crc information about internal
 	heap structures and verifies it during run time.  slow, slow!!
+- add 'use-mprotect' token to allow the user to access only user-allocated
+	pages
+- try and determine how purify gives the user per-allocation bounds
+	checking on READS.
+- watch for non-contiguous memory and mark those blocks as external
+	- have some sort of EXTERNAL flag
+	- make sure checked/freed/realloced/etc. pointers are not in that area
+	- we may need to round sbrk() calls if someone else did not do a
+		page-size call (see get_bblocks in chunk, need non-alloc flag)
 - think of ways we can reorganize the heap and move allocations around
 	since problems sometimes pop-up with different heap organizations:
 
@@ -17,9 +43,13 @@ CHECKING:
 	- maybe when allocating for a block of X bits, get 2 blocks or
 		some allocation factor
 	- maybe some sort of compact heap orientation like ndt organization.
+		- need a different dblock admin maintenance or
+		- need to allowcate max dblock-admin for every block
 	- maybe generate some magical value which corresponds to the
 		orientation becasue you want to be able to reproduce
 		the error (bsd random?)
+	- probably need an internal randomizer with log-able seed
+		value and the ability to set the seed
 
 -------------------------------------------------------------------------------
 
@@ -42,8 +72,8 @@ GENERAL:
 	- could be dangerous if folks are changing 'type' of allocation
 		from string to ...
 - write perl script to summarize the memory usage per file.
-- for fence underflow, print out the pointer below and for fence
-	overflow the allocation above if possible
+- for fence underflow, print out the pointer below's info and for fence
+	overflow the pointer above's info
 - handle memalign, valloc, maybe some form of mallopt
 	- maybe mallopt could be mapped into malloc_debug()
 - manage dblock_admin entries better:
@@ -51,9 +81,6 @@ GENERAL:
 	- add to normal db_free lists, zero out each of the entries.
 		if they are both zero or some magic X then we need to
 		get more bblock space for the dblocks.
-- turn realloc into an intelligent beasty that looks on either side
-	of existing chunk (if expanding) for free space and manages
-	free-lists appropriately
 
 -------------------------------------------------------------------------------
 
@@ -62,8 +89,6 @@ TESTING / STATISTICS:
 - maybe use the new gnu testing code
 - general tons of small blocks and watch for dblock_admin entry leak
 	like with large ndb_shell scripts
-- add statistics whenever it frees memory to see the viability of
-	combining adjacent blocks
 - maybe a program that would try a standard set of tests on a number of
 	different combinations of debug-values to look for dependancies.
 

@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.33 1993/12/20 19:15:52 gray Exp $";
+  "$Id: dmalloc.c,v 1.34 1994/01/20 01:47:09 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -576,7 +576,11 @@ EXPORT	int	main(int argc, char ** argv)
       attr_t	*attrp;
       (void)fprintf(stderr, "Debug Tokens:\n");
       for (attrp = attributes; attrp->at_string != NULL; attrp++)
-	(void)fprintf(stderr, "%s\n", attrp->at_string);
+	if (very_verbose)
+	  (void)fprintf(stderr, "%s -- %s\n",
+			attrp->at_string, attrp->at_desc);
+	else
+	  (void)fprintf(stderr, "%s\n", attrp->at_string);
     }
   }
   else if (! printed)

@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.32 1993/12/20 19:15:39 gray Exp $";
+  "$Id: heap.c,v 1.33 1994/01/20 01:46:53 gray Exp $";
 #endif
 
 /* external routines */
@@ -81,15 +81,16 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
   
 #if HAVE_SBRK
   if (ret != HEAP_ALLOC_ERROR) {
-    /* did someone else extend the heap in our absence.  VERY BAD! */
-    if (ret != _heap_last) {
+    /* did someone else extend the heap in our absence? */
+    if (! BIT_IS_SET(_malloc_flags, DEBUG_ALLOW_NONLINEAR)
+	&& ret != _heap_last) {
       malloc_errno = ERROR_ALLOC_NONLINEAR;
       _malloc_error("_heap_alloc");
       ret = HEAP_ALLOC_ERROR;
     }
     else {
       /* increment last pointer */
-      _heap_last = (char *)_heap_last + size;
+      _heap_last = (char *)ret + size;
     }
   }
 #endif
@@ -123,12 +124,19 @@ EXPORT	void	*_heap_end(void)
 }
 
 /*
- * initialize heap pointers
+ * initialize heap pointers.  returns [NO]ERROR
  */
-EXPORT	void	_heap_startup(void)
+EXPORT	int	_heap_startup(void)
 {
   _heap_base = _heap_end();
+  if (_heap_base == HEAP_ALLOC_ERROR)
+    return ERROR;
+  
   _heap_last = _heap_base;
+  if (_heap_last == HEAP_ALLOC_ERROR)
+    return ERROR;
+  
+  return NOERROR;
 }
 
 /*

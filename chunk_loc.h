@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.23 1993/12/06 06:21:33 gray Exp $
+ * $Id: chunk_loc.h,v 1.24 1994/01/20 01:46:48 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -107,14 +107,15 @@
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
 /* bb_flags values */
-#define BBLOCK_ALLOCATED	0x3F		/* block has been allocated */
-#define BBLOCK_START_USER	0x01		/* start of some user space */
-#define BBLOCK_USER		0x02		/* allocated by user space */
-#define BBLOCK_ADMIN		0x04		/* pointing to bblock admin */
-#define BBLOCK_DBLOCK		0x08		/* pointing to divided block */
-#define BBLOCK_DBLOCK_ADMIN	0x10		/* pointing to dblock admin */
-#define BBLOCK_FREE		0x20		/* block is free */
-#define BBLOCK_ADMIN_FREE	0x40		/* ba_count pnt to free slot */
+#define BBLOCK_ALLOCATED	0x00FF		/* block has been allocated */
+#define BBLOCK_START_USER	0x0001		/* start of some user space */
+#define BBLOCK_USER		0x0002		/* allocated by user space */
+#define BBLOCK_ADMIN		0x0004		/* pointing to bblock admin */
+#define BBLOCK_DBLOCK		0x0008		/* pointing to divided block */
+#define BBLOCK_DBLOCK_ADMIN	0x0010		/* pointing to dblock admin */
+#define BBLOCK_FREE		0x0020		/* block is free */
+#define BBLOCK_EXTERNAL		0x0040		/* externally used block */
+#define BBLOCK_ADMIN_FREE	0x0080		/* ba_count pnt to free slot */
 
 /*
  * single divided-block administrative structure

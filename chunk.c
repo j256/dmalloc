@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.65 1993/12/20 19:15:26 gray Exp $";
+  "$Id: chunk.c,v 1.66 1994/01/20 01:46:41 gray Exp $";
 #endif
 
 /*
@@ -814,7 +814,7 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
   free_space_count += 1 << bitn;
   
   if (BIT_IS_SET(_malloc_flags, DEBUG_FREE_BLANK)
-      || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE))
+      || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK))
     (void)memset((char *)pnt + (1 << bitn), BLANK_CHAR,
 		 BLOCK_SIZE - (1 << bitn));
   
@@ -1200,7 +1200,7 @@ EXPORT	int	_chunk_heap_check(void)
 	      (1 << dblockp->db_bblock->bb_bitn);
 	  
 	  /* should we verify that we have a block of BLANK_CHAR? */
-	  if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE)) {
+	  if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK)) {
 	    for (bytep = (char *)pnt;
 		 bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitn);
 		 bytep++)
@@ -1294,7 +1294,7 @@ EXPORT	int	_chunk_heap_check(void)
       freec--;
       
       /* should we verify that we have a block of BLANK_CHAR? */
-      if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE)) {
+      if (BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK)) {
 	pnt = BLOCK_POINTER(this_admp->ba_count +
 			    (bblockp - this_admp->ba_blocks));
 	for (bytep = (char *)pnt; bytep < (char *)pnt + BLOCK_SIZE; bytep++)
@@ -2056,7 +2056,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     
     /* should we set free memory with BLANK_CHAR? */
     if (BIT_IS_SET(_malloc_flags, DEBUG_FREE_BLANK)
-	|| BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE))
+	|| BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK))
       (void)memset(pnt, BLANK_CHAR, 1 << bitn);
     
     return FREE_NOERROR;
@@ -2126,7 +2126,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   
   /* should we set free memory with BLANK_CHAR? */
   if (BIT_IS_SET(_malloc_flags, DEBUG_FREE_BLANK)
-      || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE))
+      || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_BLANK))
     (void)memset(pnt, BLANK_CHAR, blockn * BLOCK_SIZE);
   
   return FREE_NOERROR;

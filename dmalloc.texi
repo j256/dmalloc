@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.44 1993/12/20 19:15:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.45 1994/01/20 01:47:04 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -600,6 +600,18 @@ space from sbrk
 have the heap never use space that has been used before and freed.
 @emph{WARNING}: This should be used with caution since you may run out
 of heap space.
+
+@item allow-nonlinear
+have the heap not complain when additional program functionality seems
+to have made use of the system's heap-allocation routines directly.
+
+@emph{WARNING}: This should be used with caution since it may hide
+certain heap problems.
+
+@emph{NOTE}: If you are using the pthreads package, you will probably
+have to enable this since it seems to employ sbrk directly for some
+reason.
+
 @end table
 
 @node Argument Checking,  , Debug Tokens, Features

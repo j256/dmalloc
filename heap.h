@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.17 1993/10/17 00:39:24 gray Exp $
+ * $Id: heap.h,v 1.18 1994/01/20 01:46:55 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -93,9 +93,9 @@ IMPORT	void	*_heap_alloc(const unsigned int size);
 IMPORT	void	*_heap_end(void);
 
 /*
- * initialize heap pointers
+ * initialize heap pointers.  returns [NO]ERROR
  */
-IMPORT	void	_heap_startup(void);
+IMPORT	int	_heap_startup(void);
 
 /*
  * align (by extending) _heap_base to BASE byte boundary
