@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.h,v 1.39 2000/04/18 01:55:56 gray Exp $
+ * $Id: compat.h,v 1.40 2001/03/29 00:21:33 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -86,14 +86,6 @@ char	*strchr(const char *str, const int ch);
 extern
 char	*strrchr(const char *str, const int ch);
 #endif /* if HAVE_STRRCHR == 0 */
-
-#if HAVE_STRCAT == 0
-/*
- * Concatenate STR2 onto the end of STR1
- */
-extern
-char	*strcat(char *str1, const char *str2);
-#endif /* if HAVE_STRCAT == 0 */
 
 #if HAVE_STRLEN == 0
 /*

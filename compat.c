@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.52 2000/11/13 15:47:17 gray Exp $
+ * $Id: compat.c,v 1.53 2001/03/29 00:21:33 gray Exp $
  */
 
 /*
@@ -42,10 +42,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: compat.c,v 1.52 2000/11/13 15:47:17 gray Exp $"
+#ident "$Id: compat.c,v 1.53 2001/03/29 00:21:33 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.52 2000/11/13 15:47:17 gray Exp $";
+  "$Id: compat.c,v 1.53 2001/03/29 00:21:33 gray Exp $";
 #endif
 #endif
 
@@ -206,26 +206,6 @@ char	*strrchr(const char *str, const int ch)
   }
 }
 #endif /* HAVE_STRRCHR == 0 */
-
-#if HAVE_STRCAT == 0
-/*
- * Concatenate STR2 onto the end of STR1
- */
-char	*strcat(char *str1, const char *str2)
-{
-  char	*str1_p;
-  
-  for (str1_p = str1; *str1_p != '\0'; str1_p++) {
-  }
-  
-  while (*str2 != '\0') {
-    *str1_p++ = *str2++;
-  }
-  *str1_p = '\0';
-  
-  return str1;
-}
-#endif /* HAVE_STRCAT == 0 */
 
 #if HAVE_STRLEN == 0
 /*
