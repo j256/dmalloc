@@ -1,13 +1,12 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.60 1994/10/18 23:55:09 gray Exp $
+# $Id: Makefile.in,v 1.61 1994/11/03 22:26:16 gray Exp $
 #
 
 HFLS	= dmalloc.h
 OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
 	malloc.o
-OBJS_INST= dmalloc_lp.o
 FILLFLS	= arg_check.c chunk.c error.c heap.c dmalloc_t.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
@@ -22,6 +21,7 @@ LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= $(ROOT)
 TEST	= dmalloc_t
 LIBRARY	= libdmalloc.a
+LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
 
 MANFILE	= dmalloc.info
@@ -52,11 +52,11 @@ SHARFLS	= conf.h.in Makefile.in configure configure.in config.help \
 	contrib/ra_info.pl
 
 .PHONY : all
-all : $(LIBRARY) $(UTIL)
+all : $(LIBRARY) $(LIB_DIS) $(UTIL)
 
 .PHONY : clobber
 clobber :
-	rm -f $(LIBRARY) $(TEST) $(UTIL)
+	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f part.? dmalloc.head dmalloc.info dmalloc.h
 
 .PHONY : distclean
@@ -69,8 +69,9 @@ installincs : $(HFLS)
 	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
 
 .PHONY : installlibs
-installlibs : installincs $(LIBRARY) $(OBJS_INST) $(MANFILE)
+installlibs : installincs $(LIBRARY) $(LIB_DIS) $(MANFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
+	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
 	install -cev -m 444 $(OBJS_INST) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
 
@@ -95,7 +96,10 @@ dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 $(LIBRARY) : $(OBJS)
 	ar cr $(LIBRARY) $?
 	ranlib $@
-	- chmod 660 $@
+
+$(LIB_DIS) : dmalloc_lp.o
+	ar cr $(LIB_DIS) $?
+	ranlib $@
 
 $(UTIL) : dmalloc.o argv.o compat.o env.o
 	rm -f $@

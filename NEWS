@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.46 1994/10/27 01:24:04 gray Exp $
+$Id: NEWS,v 1.47 1994/11/03 22:26:18 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Default is now to build/install a libdmalloclp.a library.
 	* Removed the log-error tag.  If logfile set then errors are logged.
 	* Fixed problem with new args clearing all old ones.
 	* Added dmalloc.h.2 creation to config.status file.

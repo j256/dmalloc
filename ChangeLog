@@ -1,3 +1,7 @@
+Thu Nov  3 17:25:29 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Default is now to build/install a libdmalloclp.a library.
+
 Wed Oct 26 21:13:11 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Removed the log-error tag.  Pretty worthless.  If you had
@@ -359,8 +363,6 @@ Wed Oct 20 19:30:34 1993  Gray Watson  (gray@toaster.antaire.com)
 	* Added all malloc utility functions to malloc_lp.c.  Now
 	programs can call malloc_shutdown (for instance) without fear.
 	See malloc_lp.h.
-
-	base 2) and better free list management with block splitting.
 
 Sat Oct 16 19:18:53 1993  Gray Watson  (gray@toaster.antaire.com)
 
@@ -875,5 +877,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.128 1994/10/27 01:24:01 gray Exp $
+$Id: ChangeLog,v 1.129 1994/11/03 22:26:10 gray Exp $
 -------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.65 1994/10/15 23:58:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.66 1994/11/03 22:26:22 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1098,15 +1098,12 @@ defined then you must first recompile all those modules without the flag
 enabled.
 
 @item
-Now you are ready to relink with a new library.  If you have not
-compiled all your source with @code{DMALLOC_DISABLED} defined then you
-need to include the @file{dmalloc_lp.o} file on the link line.  You need
-to keep and eye out for multiple definition errors from your linker
-since @file{dmalloc_lp.o} has hooks to various functions such as
-@code{dmalloc_verify()}.
+If you have not compiled all your source with @code{DMALLOC_DISABLED}
+defined then you need to link your program with the
+@file{libdmalloclp.a} library.
 
 @example
-gcc -O -g main.o dmalloc_lp.o -L/usr/local/lib -lgmalloc
+gcc -O -g main.o -L/usr/local/lib -ldmalloclp -lgmalloc
 @end example
 
 If you have disabled dmalloc with the @code{DMALLOC_DISABLED} flag or
@@ -1115,8 +1112,7 @@ never included
 @*
 @end iftex
 @file{dmalloc.h} in any of your C files,
-then you will not need to include the @file{dmalloc_lp.o} file on the
-link line.
+then you will not need the @file{libdmalloclp.a} library.
 
 @example
 gcc -O -g main.o -L/usr/local/lib -lgmalloc
