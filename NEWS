@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.15 1994/02/17 22:48:24 gray Exp $
+$Id: NEWS,v 1.16 1994/02/18 03:56:43 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.0:
 
+	* Lots of changes to add argv files in place of argv subdir.
 	* Added initial support for external block locating.
 	* Added 'allow-nonlinear' token to remove special checks.
 	* Renamed dbg_tokens.h -> debug_tok.h and dbg_values.h -> debug_val.h

@@ -1,18 +1,18 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.41 1993/12/20 19:15:19 gray Exp $
+# $Id: Makefile.in,v 1.42 1994/02/18 03:56:41 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
-OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
-OBJS_IN	= malloc_lp.o
+OBJS	= arg_check.o argv.o chunk.o compat.o error.o heap.o malloc.o \
+	malloc_lp.o
+OBJS_INST= malloc_lp.o
 FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
 
-ARGV	= argv
 DEFS	= $(DEFINES)
-INCS	= -I. -I$(ARGV) $(INCLUDES)
-LIBS	= -L$(ARGV) -l$(ARGV) $(LIBRARIES)
+INCS	= -I. $(INCLUDES)
+LIBS	= $(LIBRARIES)
 
 CFLAGS	= -g $(CCFLS) -pipe -W -Wreturn-type -Wunused -Wpointer-arith \
 	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
@@ -27,22 +27,24 @@ MANFILE	= malloc.info
 
 PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
 	configure.help \
-	ChangeLog Manifest NEWS NOTES README TODO mallocrc \
+	ChangeLog Manifest INSTALL NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
 	malloc_dbg.c malloc_dbg.[12] malloc_lp.[ch] malloc_loc.h return.h \
 	version.h malloc_t.c \
-	malloc.info malloc.texi malloc.ps texinfo.tex
+	argv.[ch] argv_loc.h \
+	malloc.info malloc.texi malloc.ps texinfo.tex \
+	Deansify.pl
 PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
-PARTS	= 1 2 3 4 5 6 7
-MAXPART	= 7
+PARTS	= 1 2 3 4 5 6
+MAXPART	= 6
 # NOTE: the wc level should be below 90k due to shar overhead
 SHAR1	= conf.h.in const.h.in Makefile.in configure configure.in \
 	configure.help \
 	ChangeLog Manifest
 SHAR2	= chunk.[ch] chunk_loc.h
-SHAR3	= NEWS NOTES README TODO mallocrc \
+SHAR3	= INSTALL NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] compat.[ch] debug_tok.h \
 	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc_lp.c
@@ -52,15 +54,7 @@ SHAR5	= malloc_dbg.c malloc_dbg.[12] \
 	malloc.texi
 SHAR6	= contrib contrib/README contrib/dec_notes contrib/ra_info.pl \
 	malloc.c \
-	argv \
-	argv/ChangeLog argv/Makefile.in argv/Manifest argv/NOTES \
-	argv/README argv/TODO \
-	argv/argv.c argv/argv.h.[12] 
-SHAR7	= argv/argv_loc.h argv/argv_test.c argv/argv_type.h \
-	argv/argv_util.[ch] argv/queue.h argv/version.h \
-	argv/compat.[ch] argv/configure.in argv/configure argv/conf.h.in \
-	argv/const.h.in \
-	argv/argv.info argv/argv.texi
+	argv.c argv.h argv_loc.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -73,14 +67,14 @@ clobber :
 .PHONY : distclean
 distclean : clobber
 	rm -f configure config.status Makefile conf.h const.h
-	rm -rf port
+	rm -rf port malloc.ps
 
 .PHONY : installincs
 installincs : $(HFLS)
 	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
 
 .PHONY : installlibs
-installlibs : installincs $(LIBRARY) $(OBJS_IN) $(MANFILE)
+installlibs : installincs $(LIBRARY) $(OBJS_INST) $(MANFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cev -m 444 $(OBJS_IN) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
@@ -111,26 +105,19 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(ARGV)/lib$(ARGV).a
+$(UTIL) : malloc_dbg.o argv.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $@.o $(LIBS)
+	$(CC) $(LDFLAGS) $@.o argv.o $(LIBS)
 	mv a.out $@
 
-$(ARGV)/$(ARGV).h :
-	( cd $(ARGV) ; $(MAKE) $(ARGV).h )
-
-$(ARGV)/lib$(ARGV).a :
-	( cd $(ARGV) ; $(MAKE) )
-
 .PHONY : port
-port : $(PORTFLS) $(ARGV)
+port : $(PORTFLS)
 	@ answer 'Is it okay to remove the $@ directory? '
 	rm -rf $@
 	mkdir $@ $@/contrib
 	cp $(PORTFLS) $@
 	cp $(PORTCFG) $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
-	cp -r $(ARGV) $@
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'
 
@@ -144,7 +131,7 @@ fill : $(FILLFLS)
 
 tests : $(TEST)
 
-$(TEST) : $(TEST).o $(LIBRARY) $(ARGV)/lib$(ARGV).a
+$(TEST) : $(TEST).o $(LIBRARY)
 	rm -f $@
 	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
 	mv a.out $@

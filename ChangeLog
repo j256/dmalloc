@@ -1,5 +1,9 @@
 Thu Feb 17 17:47:05 1994  Gray Watson  (gray@fridge.antaire.com)
 
+	* Released version 2.0.0.
+
+	* Lots of changes to add argv files in place of argv subdir.
+
 	* added initial support for external block locating.  this is
 	going to be a toughy to solve.  there is a catch-22 here.
 
@@ -633,5 +637,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.89 1994/02/17 22:48:21 gray Exp $
+$Id: ChangeLog,v 1.90 1994/02/18 03:56:30 gray Exp $
 -------------------------------------------------------------------------------

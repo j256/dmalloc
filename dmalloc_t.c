@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.33 1994/01/25 21:27:18 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.34 1994/02/18 03:56:57 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -349,7 +349,7 @@ static	void	do_interactive(void)
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
   
   for (;;) {
-    (void)printf("prompt> ");
+    (void)printf("> ");
     (void)fgets(line, sizeof(line), stdin);
     linep = (char *)index(line, '\n');
     if (linep != NULL)
@@ -422,10 +422,10 @@ static	void	do_interactive(void)
     }
     
     if (strncmp(line, "overwrite", len) == 0) {
-      char	overwrite[] = "WOW!";
+      char	*overwrite = "WOW!";
       
       pnt = get_address();
-      bcopy(overwrite, (char *)pnt, sizeof(overwrite) - 1);
+      bcopy(overwrite, (char *)pnt, strlen(overwrite));
       (void)printf("Done.\n");
       continue;
     }
@@ -514,7 +514,7 @@ int	main(int argc, char ** argv)
   
   if (! silent)
     (void)printf("Running special tests...\n");
-  (void)check_special();
+  ret = check_special();
   if (! silent)
     (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   

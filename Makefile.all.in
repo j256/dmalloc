@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.32 1993/12/20 19:15:17 gray Exp $
+# $Id: Makefile.all.in,v 1.33 1994/02/18 03:56:38 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -15,12 +15,9 @@ infodir = $(prefix)/info
 # default c-compiler
 CC = @CC@
 
-# argv subdirectory
-ARGV = argv
-
 DEFS =
-INCS = -I$(srcdir) -I$(srcdir)/$(ARGV)
-LIBS = @LIBS@ -L$(srcdir)/$(ARGV) -l$(ARGV)
+INCS = -I$(srcdir)
+LIBS = @LIBS@
 
 LIBRARY	= libmalloc_dbg.a
 UTIL = malloc_dbg
@@ -40,7 +37,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = malloc_dbg.h
-OBJS = arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
+OBJS = arg_check.o argv.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN = malloc_lp.o
 
 CFLAGS = $(CCFLAGS)
@@ -52,12 +49,10 @@ all : $(LIBRARY) $(UTIL)
 # .PHONY : clean
 clean :
 	rm -f a.out core *.o *.t
-	( cd $(ARGV) ; $(MAKE) $@ )
 
 # .PHONY : clobber
 clobber : clean
 	rm -f $(LIBRARY) $(TEST) $(UTIL) malloc_dbg.h
-	( cd $(ARGV) ; $(MAKE) $@ )
 
 # .PHONY : realclean
 realclean : clobber
@@ -65,7 +60,6 @@ realclean : clobber
 # .PHONY : distclean
 distclean : clobber
 	rm -f config.status Makefile conf.h const.h
-	( cd $(ARGV) ; $(MAKE) $@ )
 #	rm -f configure
 
 # .PHONY : installincs
@@ -94,21 +88,19 @@ $(LIBRARY) : $(OBJS)
 	@RANLIB@ $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
+$(UTIL) : malloc_dbg.o argv.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $@.o $(LIBS)
+	$(CC) $(LDFLAGS) $@.o argv.o $(LIBS)
 	mv a.out $@
 
-$(ARGV)/$(ARGV).h :
-	( cd $(ARGV) ; $(MAKE) $(ARGV).h )
-
-$(ARGV)/lib$(ARGV).a :
-	( cd $(ARGV) ; $(MAKE) )
+# .PHONY : noansi
+noansi : Deansify.pl
+	perl ./Deansify.pl *.[ch]
 
 # .PHONY : tests
 tests : $(TEST)
 
-$(TEST) : $(TEST).o $(LIBRARY) $(ARGV)/lib$(ARGV).a
+$(TEST) : $(TEST).o $(LIBRARY)
 	rm -f $@
 	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
 	mv a.out $@
@@ -142,6 +134,7 @@ heavy : $(TEST) light
 
 arg_check.o : arg_check.c malloc_dbg.h conf.h chunk.h malloc_loc.h debug_val.h \
   error.h arg_check.h 
+argv.o : argv.c conf.h argv.h argv_loc.h version.h malloc_loc.h 
 chunk.o : chunk.c malloc_dbg.h conf.h chunk.h malloc_loc.h chunk_loc.h compat.h \
   debug_val.h error.h error_val.h heap.h version.h 
 compat.o : compat.c malloc_dbg.h conf.h compat.h malloc_loc.h 
@@ -150,7 +143,8 @@ heap.o : heap.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h debug_val.h \
   error.h error_val.h heap.h 
 malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h debug_val.h \
   error.h error_str.h error_val.h heap.h malloc_lp.h return.h 
-malloc_dbg.o : malloc_dbg.c argv/argv.h malloc_dbg.h conf.h compat.h malloc_loc.h \
+malloc_dbg.o : malloc_dbg.c argv.h malloc_dbg.h conf.h compat.h malloc_loc.h \
   debug_tok.h debug_val.h error_str.h error_val.h version.h 
 malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h malloc_lp.h 
-malloc_t.o : malloc_t.c argv/argv.h malloc_dbg.h conf.h 
+malloc_t.o : malloc_t.c argv.h malloc_dbg.h conf.h 
+prot.o : prot.c 
