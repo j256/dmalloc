@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.19 1997/12/08 09:34:47 gray Exp $
+ * $Id: settings.dist,v 1.20 1997/12/18 13:19:58 gray Exp $
  */
 
 /*
@@ -54,6 +54,15 @@
  * specially the first time.
  */
 #define ALLOW_REALLOC_NULL 1
+
+/*
+ * Should we allow realloc to a 0 size to cause the pointer to be
+ * freed?  If set to one, this will call free when a pointer is
+ * realloced to a size of 0.  Thanks to Stefan.Froehlich@tuwien.ac.at
+ * for patiently pointing that the realloc in just about every Unix
+ * has this functionality.
+ */
+#define ALLOW_REALLOC_SIZE_ZERO 1
 
 /*
  * Should we allow the free of a NULL pointer and if it happens,

@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.99 1997/12/08 06:26:30 gray Exp $";
+  "$Id: malloc.c,v 1.100 1997/12/18 13:19:57 gray Exp $";
 #endif
 
 /*
@@ -436,7 +436,6 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
 #if DMALLOC_SIZE_UNSIGNED == 0
-  /* yes, this could be always false if size is unsigned */
   if (size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
     dmalloc_error("malloc");
@@ -490,9 +489,12 @@ DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 }
 
 /*
- * resizes OLD_PNT to NEW_SIZE bytes and return the new space after
- * either copying all of OLD_PNT to the new area or truncating.
- * returns 0L on error.
+ * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
+ * either copying all of OLD_PNT to the new area or truncating.  If
+ * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
+ * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
+ * equivalent of free(OLD_PNT) and will return 0L.  Returns 0L on
+ * error.
  */
 #undef realloc
 DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
@@ -502,7 +504,6 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
 #if DMALLOC_SIZE_UNSIGNED == 0
-  /* yes, this could be always false if new_size is unsigned */
   if (new_size < 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
     dmalloc_error("realloc");
@@ -522,11 +523,25 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   }
   else
 #endif
-    new_p = _chunk_realloc(_dmalloc_file, _dmalloc_line, old_pnt, new_size);
+#if ALLOW_REALLOC_SIZE_ZERO
+    if (new_size == 0) {
+      /*
+       * If realloc(old_pnt, 0) then free(old_pnt).  Thanks to
+       * Stefan.Froehlich@tuwien.ac.at for patiently pointing that the
+       * realloc in just about every Unix has this functionality.
+       */
+      (void)_chunk_free(_dmalloc_file, _dmalloc_line, old_pnt);
+      new_p = NULL;
+    }
+    else
+#endif
+      new_p = _chunk_realloc(_dmalloc_file, _dmalloc_line, old_pnt, new_size);
   
   in_alloc_b = FALSE;
   
-  check_pnt(_dmalloc_file, _dmalloc_line, new_p, "realloc-out");
+  if (new_p != NULL) {
+    check_pnt(_dmalloc_file, _dmalloc_line, new_p, "realloc-out");
+  }
   
   _dmalloc_file = DMALLOC_DEFAULT_FILE;
   _dmalloc_line = DMALLOC_DEFAULT_LINE;
