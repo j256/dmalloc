@@ -61,7 +61,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.89 1997/01/16 15:20:14 gray Exp $";
+  "$Id: malloc.c,v 1.90 1997/01/16 20:26:31 gray Exp $";
 #endif
 
 /*
@@ -116,6 +116,8 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   if (_dmalloc_aborting)
     return ERROR;
   
+  THREAD_LOCK;
+  
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
     dmalloc_error("check_debug_vars");
@@ -123,8 +125,6 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
     _dmalloc_die(FALSE);
     /*NOTREACHED*/
   }
-  
-  THREAD_LOCK;
   
   in_alloc = TRUE;
   
@@ -292,13 +292,17 @@ EXPORT	void	_dmalloc_shutdown(void)
 {
   /* NOTE: do not generate errors for IN_TWICE here */
   
+  /* if we're already in die mode leave fast and quietly */
+  if (_dmalloc_aborting)
+    return;
+  
+  THREAD_LOCK;
+  
   /* if we've died in dmalloc somewhere then leave fast and quietly */
-  if (in_alloc || _dmalloc_aborting)
+  if (in_alloc)
     return;
   
   in_alloc = TRUE;
-  
-  THREAD_LOCK;
   
   /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
@@ -415,10 +419,10 @@ EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
     return MALLOC_ERROR;
   }
   
-  check_pnt(_dmalloc_file, _dmalloc_line, old_pnt, "realloc-in");
-  
   if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR)
     return REALLOC_ERROR;
+  
+  check_pnt(_dmalloc_file, _dmalloc_line, old_pnt, "realloc-in");
   
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL)
@@ -450,8 +454,6 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
   
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
-  check_pnt(_dmalloc_file, _dmalloc_line, pnt, "free");
-  
   if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
 #if defined(__STDC__) && __STDC__ == 1
     return;
@@ -459,6 +461,8 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
     return FREE_ERROR;
 #endif
   }
+  
+  check_pnt(_dmalloc_file, _dmalloc_line, pnt, "free");
   
 #if ALLOW_FREE_NULL
   if (pnt == NULL) {
@@ -588,17 +592,17 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
   if (_dmalloc_aborting)
     return DMALLOC_VERIFY_ERROR;
   
+  THREAD_LOCK;
+  
   if (in_alloc) {
     dmalloc_errno = ERROR_IN_TWICE;
-    dmalloc_error("check_debug_vars");
+    dmalloc_error("dmalloc_verify");
     /* NOTE: dmalloc_error may die already */
     _dmalloc_die(FALSE);
     /*NOTREACHED*/
   }
   
   in_alloc = TRUE;
-  
-  THREAD_UNLOCK;
   
   if (pnt == NULL)
     ret = _chunk_check();
@@ -627,7 +631,7 @@ EXPORT	int	_malloc_verify(const DMALLOC_PNT pnt)
 }
 
 /*
- * set the global debug functionality FLAGS to debug (0 to disable all
+ * set the global debug functionality FLAGS (0 to disable all
  * debugging).  NOTE: after this module has started up, you cannot set
  * certain flags such as fence-post or free-space checking.
  */

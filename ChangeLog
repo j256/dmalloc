@@ -1,3 +1,11 @@
+Thu Jan 16 15:22:06 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing version 3.2.0.
+
+	* Fixed the locking for pthread programs.  Dumb errors.
+
+	* Ran new fillproto on h-files.  IMPORT -> extern.
+
 Thu Dec 28 20:39:00 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.1.3.
@@ -1136,5 +1144,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.168 1995/12/29 02:05:58 gray Exp $
+$Id: ChangeLog,v 1.169 1997/01/16 20:26:30 gray Exp $
 -------------------------------------------------------------------------------
