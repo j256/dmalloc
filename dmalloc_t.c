@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.35 1994/02/18 23:19:52 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.36 1994/04/07 21:13:11 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -54,12 +54,13 @@ struct pnt_info_st {
 
 typedef struct pnt_info_st pnt_info_t;
 
-static	pnt_info_t	pointer_grid[MAX_POINTERS];
+static	pnt_info_t	*pointer_grid;
 
 /* argument variables */
 static	int		default_itern = DEFAULT_ITERATIONS; /* # of iters */
 static	char		interactive = ARGV_FALSE;	/* interactive flag */
 static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
+static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
 static	char		silent = ARGV_FALSE;		/* silent flag */
 static	char		verbose = ARGV_FALSE;		/* verbose flag */
 
@@ -68,6 +69,8 @@ static	argv_t		arg_list[] = {
       NULL,			"turn on interactive mode" },
   { 'm',	"max-alloc",		ARGV_INT,		&max_alloc,
       "bytes",			"maximum allocation to test" },
+  { 'p',	"max-pointers",		ARGV_INT,		&max_pointers,
+      "pointers",		"number of pointers to test" },
   { 's',	"silent",		ARGV_BOOL,		&silent,
       NULL,			"do not display messages" },
   { 't',	"times",		ARGV_INT,		&default_itern,
@@ -129,13 +132,21 @@ static	void	*get_address(void)
 static	int	do_random(const int itern)
 {
   int		iterc, last, amount, max = max_alloc;
-  pnt_info_t	*freep = pointer_grid, *usedp = NULL;
+  pnt_info_t	*freep, *usedp = NULL;
   pnt_info_t	*pntp, *lastp, *thisp;
   
   malloc_errno = last = 0;
   
+  pointer_grid = ALLOC(pnt_info_t, max_pointers);
+  if (pointer_grid == NULL) {
+    (void)printf("%s: problems allocating space for %d pointer slots.\n",
+		 argv_program, max_pointers);
+    return 0;
+  }
+  
   /* initialize free list */
-  for (pntp = pointer_grid; pntp < pointer_grid + MAX_POINTERS; pntp++) {
+  freep = pointer_grid;
+  for (pntp = pointer_grid; pntp < pointer_grid + max_pointers; pntp++) {
     pntp->pi_size = 0;
     pntp->pi_pnt = NULL;
     pntp->pi_next = pntp + 1;
@@ -189,7 +200,7 @@ static	int	do_random(const int itern)
 		       (long)pntp->pi_pnt);
       }
       else {
-	pntp = pointer_grid + (rand() % MAX_POINTERS);
+	pntp = pointer_grid + (rand() % max_pointers);
 	if (pntp->pi_pnt == NULL)
 	  continue;
 	
@@ -227,7 +238,7 @@ static	int	do_random(const int itern)
     /*
      * choose a rand slot to free and make sure it is not a free-slot
      */
-    pntp = pointer_grid + (rand() % MAX_POINTERS);
+    pntp = pointer_grid + (rand() % max_pointers);
     if (pntp->pi_pnt == NULL)
       continue;
     
@@ -258,9 +269,11 @@ static	int	do_random(const int itern)
   }
   
   /* free used pointers */
-  for (pntp = pointer_grid; pntp < pointer_grid + MAX_POINTERS; pntp++)
+  for (pntp = pointer_grid; pntp < pointer_grid + max_pointers; pntp++)
     if (pntp->pi_pnt != NULL)
       FREE(pntp->pi_pnt);
+  
+  FREE(pointer_grid);
   
   if (malloc_errno == 0)
     return 1;
