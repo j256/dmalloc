@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.46 1995/06/28 23:49:44 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.47 1995/08/14 14:58:21 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -311,14 +311,15 @@ static	int	do_random(const int itern)
 static	int	check_special(void)
 {
   void	*pnt;
+  int	hold = dmalloc_errno, ret;
   
   if (! silent)
     (void)printf("The following tests will generate errors:\n");
   
   if (! silent)
     (void)printf("  Trying to realloc a 0L pointer.\n");
-#if ALLOW_REALLOC_NULL
   pnt = REMALLOC(NULL, 10);
+#if ALLOW_REALLOC_NULL
   if (pnt == NULL) {
     if (! silent)
       (void)printf("   ERROR: re-allocation of 0L returned error.\n");
@@ -326,8 +327,9 @@ static	int	check_special(void)
   else
     FREE(pnt);
 #else
-  pnt = REMALLOC(NULL, 10);
-  if (pnt != NULL) {
+  if (pnt == NULL)
+    dmalloc_errno = 0;
+  else {
     if (! silent)
       (void)printf("   ERROR: re-allocation of 0L did not return error.\n");
     FREE(pnt);
@@ -336,51 +338,37 @@ static	int	check_special(void)
   
   if (! silent)
     (void)printf("  Trying to free 0L pointer.\n");
+  FREE(NULL);
 #if ALLOW_FREE_NULL
-  {
-    int		hold = dmalloc_errno;
-    
-    dmalloc_errno = 0;
-    
-    FREE(NULL);
-    if (dmalloc_errno != 0 && ! silent)
-      (void)printf("   ERROR: free of 0L returned error.\n");
-    
-    dmalloc_errno = hold;
-  }
+  if (dmalloc_errno != 0 && ! silent)
+    (void)printf("   ERROR: free of 0L returned error.\n");
 #else
-  {
-    int		hold = dmalloc_errno;
+  if (dmalloc_errno == 0 && ! silent)
+    (void)printf("   ERROR: free of 0L did not return error.\n");
+  else
     dmalloc_errno = 0;
-    
-    FREE(NULL);
-    if (dmalloc_errno == 0 && ! silent)
-      (void)printf("   ERROR: free of 0L did not return error.\n");
-    
-    dmalloc_errno = hold;
-  }
 #endif
   
   if (! silent)
     (void)printf("  Allocating a block of too-many bytes.\n");
-  {
-    int		hold = dmalloc_errno;
+  pnt = MALLOC((1 << LARGEST_BLOCK) + 1);
+  if (pnt == NULL)
     dmalloc_errno = 0;
-    
-    pnt = MALLOC((1 << LARGEST_BLOCK) + 1);
-    if (pnt != NULL) {
-      if (! silent)
-	(void)printf("   ERROR: allocation of > largest allowed size did not return error.\n");
-      FREE(pnt);
-    }
-    
-    dmalloc_errno = hold;
+  else {
+    if (! silent)
+      (void)printf("   ERROR: allocation of > largest allowed size did not return error.\n");
+    FREE(pnt);
   }
   
   if (dmalloc_errno == 0)
-    return 1;
+    ret = 1;
   else
-    return 0;
+    ret = 0;
+  
+  if (hold != 0)
+    dmalloc_errno = hold;
+  
+  return ret;
 }
 
 /*
