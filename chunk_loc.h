@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.33 1995/05/13 00:34:27 gray Exp $
+ * $Id: chunk_loc.h,v 1.34 1995/05/16 00:13:02 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -70,7 +70,7 @@
 #define USER_TO_CHUNK(pnt)	((char *)(pnt) - pnt_below_adm)
 
 /* get the number of blocks to hold SIZE */
-#define NUM_BLOCKS(size)	((size + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
+#define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
 
 /*
  * number of ba_block entries is a bblock_adm_t which must fit in a
