@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.94 2000/05/16 18:36:51 gray Exp $
+ * $Id: error.c,v 1.95 2000/10/10 23:06:26 gray Exp $
  */
 
 /*
@@ -76,11 +76,11 @@
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
-#ifdef __GNUC__
-#ident "$Id: error.c,v 1.94 2000/05/16 18:36:51 gray Exp $";
+#if IDENT_WORKS
+#ident "$Id: error.c,v 1.95 2000/10/10 23:06:26 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.94 2000/05/16 18:36:51 gray Exp $";
+  "$Id: error.c,v 1.95 2000/10/10 23:06:26 gray Exp $";
 #endif
 #endif
 

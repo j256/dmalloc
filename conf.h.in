@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.83 2000/07/21 22:39:46 gray Exp $
+ * $Id: conf.h.in,v 1.84 2000/10/10 23:06:24 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -113,6 +113,13 @@
  * settings.h file.
  */
 #define RETURN_MACROS_WORK 0
+
+/*
+ * Why can't the compiler folks agree about this.  I really hate Unix
+ * sometimes for its blatant disregard for anything approaching a
+ * standard.
+ */
+#define IDENT_WORKS 0
 
 /*
  * Which pthread include file to use.

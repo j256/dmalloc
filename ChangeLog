@@ -1,21 +1,33 @@
+Tue Oct 10 19:03:14 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added autoconfig handling of #ident.  I really hate Unix
+	sometimes for its blatant disregard for anything approaching a
+	standard.  Idiots.
+
+Wed Sep 13 14:24:46 2000  Gray Watson  <gray@256.com>
+
+	* Fixed a bug in chunk.c found by Ian Badcoe.
+
+	* Improved the displaying of tokens my dmalloc utility.
+
 Tue Jul 25 11:57:49 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.7.1.
 
 	* Fixed problem with check-blank being specified but not
- 	free-blank or alloc-blank.  I thought I fixed this before.
+	free-blank or alloc-blank.  I thought I fixed this before.
 
 Mon Jul 24 15:30:04 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.7.0.
 
 	* Added support for --disable-cxx and --enable-threads for turning
- 	on or off C++ and thread support.
+	on or off C++ and thread support.
 
 Fri Jul 21 17:00:25 2000  Gray Watson  <gray@256.com>
 
 	* Added autoconfiguration code to see if the return macros work
- 	for an architecture.
+	for an architecture.
 
 	* Renamed USE_RET_ADDRESS to USE_RETURN_MACROS in return.h.
 
@@ -26,19 +38,19 @@ Tue Jun 20 18:30:55 2000  Gray Watson  <gray@256.com>
 	* Fixed problems with -p and -m not setting the debug flags.
 
 	* Added 'force-linear' token and depreciated the 'allow-nonlinear'
- 	token.  Non-linear heaps really are the default these days (on AIX
- 	for example).  Now, you can enable the force-linear if you want to
- 	ensure a linear heap.
+	token.  Non-linear heaps really are the default these days (on AIX
+	for example).  Now, you can enable the force-linear if you want to
+	ensure a linear heap.
 
 Wed May 17 11:29:55 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.6.0.
 
 	* Fixed an incompatibility with the dmalloc_t -r, sbrk, and the
- 	DEBUG_ALLOW_NONLINEAR flag.
+	DEBUG_ALLOW_NONLINEAR flag.
 
 	* Improved the implementation of the NEVER_REUSE flag.  Found
- 	problems with the dmalloc_t -r random debug flag.
+	problems with the dmalloc_t -r random debug flag.
 
 	* Added BUILD.txt instructions to the repository.
 
@@ -47,7 +59,7 @@ Tue May 16 14:34:14 2000  Gray Watson  <gray@256.com>
 	* Added BLOCK_ROUND macros to heap.h.
 
 	* Made initial attempt to protect blocks in chunk.c.  Got pretty
- 	hairy way too fast so backed it out.
+	hairy way too fast so backed it out.
 
 	* Added SET_POINTER macro and cleaned some code.
 
@@ -1665,5 +1677,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.259 2000/07/25 16:06:53 gray Exp $
+$Id: ChangeLog,v 1.260 2000/10/10 23:06:27 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.56 2000/06/20 22:37:56 gray Exp $
+ * $Id: heap.c,v 1.57 2000/10/10 23:06:26 gray Exp $
  */
 
 /*
@@ -44,11 +44,11 @@
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
-#ifdef __GNUC__
-#ident "$Id: heap.c,v 1.56 2000/06/20 22:37:56 gray Exp $";
+#if IDENT_WORKS
+#ident "$Id: heap.c,v 1.57 2000/10/10 23:06:26 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.56 2000/06/20 22:37:56 gray Exp $";
+  "$Id: heap.c,v 1.57 2000/10/10 23:06:26 gray Exp $";
 #endif
 #endif
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.27 2000/05/15 22:30:19 gray Exp $
+ * $Id: arg_check.c,v 1.28 2000/10/10 23:06:23 gray Exp $
  */
 
 /*
@@ -43,11 +43,11 @@
 #include "arg_check.h"
 
 #if INCLUDE_RCS_IDS
-#ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.27 2000/05/15 22:30:19 gray Exp $";
+#if IDENT_WORKS
+#ident "$Id: arg_check.c,v 1.28 2000/10/10 23:06:23 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.27 2000/05/15 22:30:19 gray Exp $";
+  "$Id: arg_check.c,v 1.28 2000/10/10 23:06:23 gray Exp $";
 #endif
 #endif
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.50 2000/05/15 22:23:12 gray Exp $
+ * $Id: compat.c,v 1.51 2000/10/10 23:06:24 gray Exp $
  */
 
 /*
@@ -41,11 +41,11 @@
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
-#ifdef __GNUC__
-#ident "$Id: compat.c,v 1.50 2000/05/15 22:23:12 gray Exp $";
+#if IDENT_WORKS
+#ident "$Id: compat.c,v 1.51 2000/10/10 23:06:24 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.50 2000/05/15 22:23:12 gray Exp $";
+  "$Id: compat.c,v 1.51 2000/10/10 23:06:24 gray Exp $";
 #endif
 #endif
 
