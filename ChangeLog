@@ -2,6 +2,10 @@ Wed Mar 10 11:18:13 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.2.0.
 
+	* Fixed a number of missing prototypes and include problems.
+
+	* Added QSORT_OKAY switch to configure for linux.
+
 	* Fixed STDC ifdefs for C++.  Thanks Eric.
 
 Tue Mar  9 14:26:11 1999  Gray Watson  <gray@burger.letters.com>
@@ -1435,5 +1439,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.214 1999/03/10 16:19:23 gray Exp $
+$Id: ChangeLog,v 1.215 1999/03/10 23:26:44 gray Exp $
 -------------------------------------------------------------------------------

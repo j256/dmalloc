@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.3 1999/03/10 21:40:08 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.4 1999/03/10 23:26:47 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.3 1999/03/10 21:40:08 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.4 1999/03/10 23:26:47 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.3 1999/03/10 21:40:08 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.4 1999/03/10 23:26:47 gray Exp $";
 #endif
 #endif
 
@@ -164,7 +164,7 @@ static	unsigned int	hash(const unsigned char *key,
   return c;
 }
 
-#if HAVE_QSORT
+#if HAVE_QSORT && QSORT_OKAY
 /*
  * static int entry_cmp
  *
@@ -358,7 +358,7 @@ void	_table_alloc(const char *file, const unsigned int line,
       /* we found an open slot */
       tab_p->mt_file = file;
       tab_p->mt_line = line;
-#if HAVE_QSORT
+#if HAVE_QSORT && QSORT_OKAY
       /* remember its position in the table so we can unsort it later */
       tab_p->mt_entry_pos_p = tab_p;
 #endif
@@ -476,7 +476,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   }
   
   /* sort the entry by the total size if we have qsort */
-#if HAVE_QSORT
+#if HAVE_QSORT && QSORT_OKAY
   qsort(memory_table, MEM_ENTRIES_N, sizeof(mem_table_t), entry_cmp);
 #else
   _dmalloc_message("qsort not available, displaying first entries");
@@ -517,7 +517,7 @@ void	_table_log_info(const int entry_n, const int in_use_b)
   (void)loc_snprintf(source, sizeof(source), "Total of %d", entry_c);
   log_entry(&total, in_use_b, source);
   
-#if HAVE_QSORT
+#if HAVE_QSORT && QSORT_OKAY
   /*
    * If we sorted the array, we have to put it back the way it was if
    * we want to continue and handle memory transactions.  We should be

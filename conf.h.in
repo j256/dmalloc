@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: conf.h.in,v 1.76 1999/03/09 20:53:02 gray Exp $
+ * $Id: conf.h.in,v 1.77 1999/03/10 23:26:45 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -98,6 +98,13 @@
  */
 #define SIGNAL_OKAY 0
 #define RETSIGTYPE void
+
+/*
+ * This checks to see if the qsort routine allocates memory.  If so
+ * then it will make the library go recursive.  This seems to be true
+ * on Linux.  Too bad.
+ */
+#define QSORT_OKAY 0
 
 /*
  * Which pthread include file to use.
