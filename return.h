@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.20 1998/09/17 15:46:19 gray Exp $
+ * $Id: return.h,v 1.21 1998/09/17 16:05:05 gray Exp $
  */
 
 /*
@@ -109,7 +109,7 @@
  * $31 is the frame pointer.  $2 looks to be the return address but maybe
  * not consistently.
  */
-#define GET_RET_ADDR(file, line)        asm("sw $2, file")
+#define GET_RET_ADDR(file)	asm("sw $2, file")
 
 #endif
 
@@ -125,13 +125,13 @@
 
 #ifdef __GNUC__
 
-#define GET_RET_ADDR(file, line)	asm("bis $26, $26, %0" : "=r" (file))
+#define GET_RET_ADDR(file)	asm("bis $26, $26, %0" : "=r" (file))
 
 #else /* __GNUC__ */
 
 #include <c_asm.h>
 
-#define GET_RET_ADDR(file)		file = (char *)asm("bis %ra,%ra,%v0")
+#define GET_RET_ADDR(file)	file = (char *)asm("bis %ra,%ra,%v0")
 
 #endif /* __GNUC__ */
 
@@ -208,7 +208,7 @@ asm void ASM_GET_RET_ADDR(file)
         ld.l    -40(%fp),%r31
 %       error
 }
-#define GET_RET_ADDR(file, line)	ASM_GET_RET_ADDR(file)
+#define GET_RET_ADDR(file)	ASM_GET_RET_ADDR(file)
 
 #endif /* _FTX & i860 */
 
