@@ -1,11 +1,34 @@
+Sat Oct 16 19:18:53 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* removed debug token log-ra, log-unknown should be enough.
+
+Thu Oct 14 19:48:42 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* malloc_heap_map() -> malloc_log_heap_map() for consistancy.
+
+Wed Oct 13 17:58:55 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added malloc_log_unfreed() to dump non-free memory to
+	logfile.  Good for comparing heaps to see differences.
+
+	* Added -p flag to malloc_dbg to allow adding of tokens to
+	debug value.
+
+	* added DEBUG_LOG_STAMP to add timestamps to log entries.
+	
+	* Added malloc_log_stats() to dump stats to a file.
+
+	* Re-added cfree() call.  No reason not to have it.
+
 Sun Sep 26 14:36:54 1993  Gray Watson  (gray@fridge.antaire.com)
 
-	* Major changes.  Lots of procedures moved around.  Rewrote a
-	large part of get_bblocks and removed get_bblock_adm.
-
-Sat Sep 25 13:45:33 1993  Gray Watson  (gray at toaster.antaire.com)
+	* For new version 2.0.0b.  Major changes.  Lots of procedures
+	moved around.  Rewrote a large part of get_bblocks and removed
+	get_bblock_adm.
 
 	* Releasing version 1.3.4.
+
+	* Added -std1 configuration changes and bcopy fixes.
 
 	* Fixed up the messages to provide more information and to just
 	reflect reality.  Some real dumb errors found.
@@ -22,7 +45,7 @@ Mon Sep 20 20:36:23 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Releasing version 1.3.3.
 
 	* Added ALLOW_FREE_NULL defines because of some systems allowing
-	free(0).  Yeach!  Via freeback from Dave Hill.
+	free(0).  Yeach!  Via freeback from Dave.
 
 Fri Sep 10 17:10:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -63,16 +86,16 @@ Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Releasing version 1.3.1.
 
 	* Added log-ra token to log specific information about non-freed
-	memory with only return-address information.
+	memory with only return-address information (NOTE: later removed).
 
 	* Added the beginnings of return-address handling via feedback
-	from Dave Hill.  Need to resolve some XXX sections in chunk and
+	from Dave.  Need to resolve some XXX sections in chunk and
 	get more architecture/compiler hacks in return.h.  Along the way
 	had to change the malloc_examine() arguments to add ret_attr.
 
 	* Added -L or --list to malloc_dbg to list all the rc-file tags.
 
-	* Fixed some problems in chunk.c via Dave Hill's feedback and
+	* Fixed some problems in chunk.c via Dave's feedback and
 	renamed malloc_str.[ch] to be arg_check.[ch].
 
 Tue Aug 17 16:22:20 1993  Gray Watson  (gray at toaster.antaire.com)
@@ -112,10 +135,10 @@ Tue Jul 20 01:52:02 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Made malloc_address exported per Dave Hill's comments so it
+	* Made malloc_address exported per Dave's comments so it
 	can be setable by debugger at runtime.
 
-	* Added Dave Hill's idea of auto-sensing of shell by malloc_dbg.
+	* Added Dave's idea of auto-sensing of shell by malloc_dbg.
 	Also added -C option to malloc_dbg to force cshell output.
 
 	* Removed the dblock checking tokens CHECK_DBLOCK and
@@ -123,11 +146,11 @@ Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 	anyway!  I also renumbered CHECK_FREE and CHECK_FUNCS in the
 	process.
 
-	* Fixed a number of int/long problems since Dave Hill is running
+	* Fixed a number of int/long problems since Dave is running
 	malloc on a 64 bit alpha.
 
 	* Made a number of changes to the configure scripts and conf.h per
-	Dave Hill's comments.  Added BASIC_BLOCK and ALLOCATION_ALIGNMENT
+	Dave's comments.  Added BASIC_BLOCK and ALLOCATION_ALIGNMENT
 	to the auto-config stuff.
 
 Fri Jul 16 00:01:31 1993  Gray Watson  (gray at toaster.antaire.com)

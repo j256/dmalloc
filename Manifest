@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.22 1993/08/25 21:30:16 gray Exp $
+$Id: Manifest,v 1.23 1993/10/17 00:43:04 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -46,6 +46,10 @@ configure		Configure script.
 configure.in		Used by autoconf to create the configure
 			script.
 
+const.h			Small header file to be included in malloc_dbg.h.
+
+const.h.in		Used by configure to create the const.h stuff.
+
 contrib/		directory of contributions from other sources
 
 dbg_tokens.h		Tokens that correspond to debugging
@@ -75,6 +79,8 @@ malloc.ps		Possible postcript file for TeX-less folks.
 malloc.texi		Texinfo user manual for generating TeX or Info
 			formats.
 
+malloc_dbg.[12]		Used to create malloc_dbg.h.
+
 malloc_dbg.c		Program that assists in the setting of the
 			MALLOC_DEBUG and other debug environmental
 			variables.
@@ -93,6 +99,8 @@ malloc_t.c		Meager test program for testing the malloc
 
 mallocrc		Sample RC file that is used to set the debug
 			flags.
+
+return.h		Defines to get the return-address for non-malloc calls.
 
 texinfo.tex		File included to allow tex output from the
 			malloc.texi file.

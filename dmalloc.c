@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.29 1993/10/05 04:32:16 gray Exp $";
+  "$Id: dmalloc.c,v 1.30 1993/10/17 00:43:16 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -70,6 +70,7 @@ LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	list		= FALSE;	/* list rc tokens */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
+LOCAL	argv_array_t	plus;			/* tokens to add */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
@@ -99,6 +100,8 @@ LOCAL	argv_t	args[] = {
       "path",			"file to log messages to" },
   { 'L',	"list",		ARGV_BOOL,	&list,
       NULL,			"list tokens in rc file" },
+  { 'p',	"plus",		ARGV_CHARP | ARGV_ARRAY,	&plus,
+      "token(s)",		"add tokens to current debug" },
   { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHARP,	&start,
@@ -208,6 +211,29 @@ LOCAL	void	dump_debug(const int val)
 }
 
 /*
+ * translate TOK into its proper value which is returned
+ */
+LOCAL	long	token_to_value(const char * tok)
+{
+  int	attrc;
+  long	ret = 0;
+  
+  for (attrc = 0; attributes[attrc].at_string != NULL; attrc++) {
+    if (strcmp(tok, attributes[attrc].at_string) == 0)
+      break;
+  }
+  
+  if (attributes[attrc].at_string == NULL) {
+    (void)fprintf(stderr, "%s: unknown token '%s'\n",
+		  argv_program, tok);
+  }
+  else
+    ret = attributes[attrc].at_value;
+  
+  return ret;
+}
+
+/*
  * process the user configuration looking for the TAG_FIND.  if it is
  * null then look for DEBUG_VALUE in the file and return the token for
  * it in STRP.  routine returns the new debug value matching tag.
@@ -246,7 +272,6 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   cont = FALSE;
   
   while (fgets(buf, sizeof(buf), infile) != NULL) {
-    int		attrc;
     char	*tokp, *endp;
     
     /* ignore comments and empty lines */
@@ -284,19 +309,8 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       }
       
       /* are we processing the tag of choice? */
-      if (found || tag_find == NULL) {
-	for (attrc = 0; attributes[attrc].at_string != NULL; attrc++) {
-	  if (strcmp(tokp, attributes[attrc].at_string) == 0)
-	    break;
-	}
-	
-	if (attributes[attrc].at_string == NULL) {
-	  (void)fprintf(stderr, "%s: unknown token '%s'\n",
-			argv_program, tokp);
-	}
-	else
-	  new_debug |= attributes[attrc].at_value;
-      }
+      if (found || tag_find == NULL)
+	new_debug |= token_to_value(tokp);
       
       tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
     } while (tokp != NULL);
@@ -446,6 +460,16 @@ EXPORT	int	main(int argc, char ** argv)
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
     debug = process(0L, tag, NULL);
+  }
+  
+  if (plus.aa_entryn > 0) {
+    int	plusc;
+    
+    for (plusc = 0; plusc < plus.aa_entryn; plusc++)
+      if (debug == NO_VALUE)
+	debug = token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
+      else
+	debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
   }
   
   if (debug != NO_VALUE) {

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.28 1993/10/07 05:54:41 gray Exp $
+# $Id: Makefile.all.in,v 1.29 1993/10/17 00:43:00 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -62,7 +62,7 @@ realclean : clobber
 
 # .PHONY : distclean
 distclean : clobber
-	rm -f Makefile conf.h config.status
+	rm -f config.status Makefile conf.h const.h
 #	rm -f configure
 
 # .PHONY : installincs

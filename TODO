@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.7 1993/08/25 00:34:37 gray Exp $
+$Id: TODO,v 1.8 1993/10/17 00:43:08 gray Exp $
 -------------------------------------------------------------------------------
 
 IMPORTANT:
@@ -80,25 +80,21 @@ MANUALS:
 
 GENERAL:
 
-- non-graphical map of the heap. 
-	- just a long dump of all the addresses in the heap
-		addr: size, caller, crc?, expanded?
-	- so diffs can be run on the output to see what's changed	
+- maybe some sort of cheap crc on memory in non-freed memory sections so
+	you can see what portions of memory changed
 - maybe provide support for reference counts on allocations:
 	- have a call which increments the reference count of the node
 	- free will decrement the reference count and free if 0
 	- have a call which reports on the reference count of the node
 	- may need additional admin space
 	- debug token?
-- check for more string functions
-	- add strdup, strcpy, strncpy
 - maybe have bit in allocation struct somewhere that it is a string and
 	maybe have a checking level/value that runs though the strings
 	and makes sure they have a NULL in them.
 - maybe have a function that summaries the memory usage per file.
 	runs through the unfreed pointers and keeps a table per file.c
-	in terms of number of pointers and bytes per file.  Could be a
-	perl script.
+	in terms of number of pointers and bytes per file.
+	- could be a perl script.
 - for fence underflow, print out the allocation below and for fence
 	overflow the allocation above if possible
 - have either a bunch of free or used bblocks be:
@@ -107,8 +103,7 @@ GENERAL:
 		the type flag
 - handle memalign, valloc, maybe some form of mallopt
 - handle 0 length allocations correctly if the #define is set
-	- i.e. maybe give back a small section with bounds-checking
-		touching
+	- i.e. give back a small section with bounds-checking touching
 - manage dblock_admin entries better:
 	- map out usage and get some stats
 	- add to normal db_free lists, zero out each of the entries.

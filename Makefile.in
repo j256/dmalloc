@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.36 1993/10/07 05:55:31 gray Exp $
+# $Id: Makefile.in,v 1.37 1993/10/17 00:43:02 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -14,8 +14,8 @@ DEFS	= $(DEFINES)
 INCS	= -I. -I$(ARGV) $(INCLUDES)
 LIBS	= -L. -L$(ARGV) -l$(ARGV) -lmalloc_dbg $(LIBRARIES)
 
-CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
-	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
+CFLAGS	= -g $(CCFLS) -pipe -W -Wreturn-type -Wunused -Wpointer-arith \
+	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= $(ROOT)
@@ -54,7 +54,7 @@ clobber :
 
 .PHONY : distclean
 distclean : clobber
-	rm -f configure config.status Makefile conf.h
+	rm -f configure config.status Makefile conf.h const.h
 	rm -rf port
 
 .PHONY : installincs

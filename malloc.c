@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.49 1993/10/07 05:54:43 gray Exp $";
+  "$Id: malloc.c,v 1.50 1993/10/17 00:43:10 gray Exp $";
 #endif
 
 /*
@@ -294,7 +294,7 @@ EXPORT	void	malloc_shutdown(void)
   
   /* report on non-freed pointers */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_NONFREE))
-    _chunk_dump_not_freed();
+    _chunk_dump_unfreed();
   
   /* NOTE: do not set malloc_enabled to false here */
 }
@@ -459,7 +459,7 @@ EXPORT	int	cfree(void * pnt)
  * log the heap structure plus information on the blocks if necessary.
  * returns ERROR or NO_ERROR
  */
-EXPORT	int	malloc_heap_map(void)
+EXPORT	int	malloc_log_heap_map(void)
 {
   /* check the heap since we are dumping info from it */
   if (check_debug_vars(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE) != NOERROR)
@@ -507,7 +507,7 @@ EXPORT	int	malloc_verify(void * pnt)
 
 /*
  * set the global debug functionality flags to DEBUG (0 to disable).
- * NOTE: after this module has started up, you cannot set certain flags 
+ * NOTE: after this module has started up, you cannot set certain flags
  * such as fence-post or free-space checking.
  * returns ERROR or NOERROR
  */
@@ -537,6 +537,46 @@ EXPORT	int	malloc_debug_current(void)
 {
   /* should not check the heap here since we are dumping the debug variable */
   return _malloc_debug;
+}
+
+/*
+ * dump malloc statistics to logfile
+ */
+EXPORT	void	malloc_log_stats(void)
+{
+  SET_RET_ADDR(_malloc_file, _malloc_line);
+  
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
+    return;
+  
+  _chunk_list_count();
+  _chunk_stats();
+  
+  in_alloc = FALSE;
+  
+  _malloc_file = MALLOC_DEFAULT_FILE;
+  _malloc_line = MALLOC_DEFAULT_LINE;
+}
+
+/*
+ * dump malloc statistics to logfile
+ */
+EXPORT	void	malloc_log_unfreed(void)
+{
+  SET_RET_ADDR(_malloc_file, _malloc_line);
+  
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
+    return;
+  
+  if (! BIT_IS_SET(_malloc_debug, DEBUG_LOG_TRANS))
+    _malloc_message("dumping the unfreed pointers");
+  
+  _chunk_dump_unfreed();
+  
+  in_alloc = FALSE;
+  
+  _malloc_file = MALLOC_DEFAULT_FILE;
+  _malloc_line = MALLOC_DEFAULT_LINE;
 }
 
 /*
