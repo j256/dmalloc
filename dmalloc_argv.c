@@ -16,7 +16,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be contacted via http://dmalloc.com/
  */
 
 #include <ctype.h>
@@ -37,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.9 1999/03/08 15:52:30 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.10 2000/05/15 15:42:58 gray Exp $";
 #endif
 
 /* internal routines */
