@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.147 1999/03/10 21:34:34 gray Exp $
+ * $Id: chunk.c,v 1.148 1999/03/10 22:05:28 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.147 1999/03/10 21:34:34 gray Exp $";
+#ident "$Id: chunk.c,v 1.148 1999/03/10 22:05:28 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.147 1999/03/10 21:34:34 gray Exp $";
+  "$Id: chunk.c,v 1.148 1999/03/10 22:05:28 gray Exp $";
 #endif
 #endif
 
@@ -326,6 +326,7 @@ static	char	*display_pnt(const void *pnt, const overhead_t *over_p,
 			     char *buf, const int buf_size)
 {
   char	*buf_p, *bounds_p;
+  int	elapsed_b;
   
   buf_p = buf;
   bounds_p = buf_p + buf_size;
@@ -341,15 +342,28 @@ static	char	*display_pnt(const void *pnt, const overhead_t *over_p,
 			over_p->ov_iteration);
 #endif
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+    elapsed_b = 1;
+  }
+  else {
+    elapsed_b = 0;
+  }
+  if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
 #if STORE_TIMEVAL
-    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
-			  _dmalloc_ptimeval(&over_p->ov_timeval, FALSE));
+    {
+      char	time_buf[64];
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
+			    _dmalloc_ptimeval(&over_p->ov_timeval, time_buf,
+					      sizeof(time_buf), elapsed_b));
+    }
 #else
 #if STORE_TIME
-    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
-			  _dmalloc_ptime(&over_p->ov_time, FALSE));
+    {
+      char	time_buf[64];
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
+			    _dmalloc_ptime(&over_p->ov_time, time_buf,
+					   sizeof(time_buf), elapsed_b));
+    }
 #endif
 #endif
   }
