@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 #
 # script to run gdb on return-addresses
 # Usage: $0 malloc-log-file binary
@@ -20,7 +20,7 @@
 #
 # The author may be contacted at gray.watson@letters.com
 #
-# $Id: ra_info.pl,v 1.4 1998/12/27 06:13:52 gray Exp $
+# $Id: ra_info.pl,v 1.5 1999/08/25 12:34:52 gray Exp $
 #
 
 #
