@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.274 2005/03/10 21:25:27 gray Exp $
+@c $Id: dmalloc.texi,v 1.275 2005/03/18 23:42:23 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1389,7 +1389,7 @@ sections for various error-code types.
 @cindex no error
 @cindex ERROR_NONE
 
-@item 1 (ERROR_NONE)
+@item 1 (ERROR_NONE) no error
 No error.  It is good coding practice to set the no-error code to be
 non-0 value because it forces you to set it explicitly.
 
@@ -1415,7 +1415,7 @@ with all error codes not listed here.
 @cindex bad setup error
 @cindex ERROR_BAD_SETUP
 
-@item 10 (ERROR_BAD_SETUP)
+@item 10 (ERROR_BAD_SETUP) initialization and setup failed
 Bad setup value.  This is currently unused but it is intended to report
 on invalid setup configuration information.
 
@@ -1429,7 +1429,7 @@ on invalid setup configuration information.
 @cindex malloc library has gone recursive
 @cindex ERROR_IN_TWICE
 
-@item 11 (ERROR_IN_TWICE)
+@item 11 (ERROR_IN_TWICE) malloc library has gone recursive
 Library went recursive.  This usually indicates that you are not using
 the threaded version of the library.  Or if you are then you are not
 using the @samp{-o} "lock-on" option.  @xref{Using With Threads}.
@@ -1442,7 +1442,7 @@ using the @samp{-o} "lock-on" option.  @xref{Using With Threads}.
 @cindex thread locking has not been configured
 @cindex ERROR_LOCK_NOT_CONFIG
 
-@item 13 (ERROR_LOCK_NOT_CONFIG)
+@item 13 (ERROR_LOCK_NOT_CONFIG) thread locking has not been configured
 Thread locking has not been configured.  This indicates that you
 attempted to use the @samp{-o} "lock-on" option without linking with
 the thread version of the library.  You should probably be using
@@ -1460,7 +1460,7 @@ compilation line.
 @cindex is null error
 @cindex ERROR_IS_NULL
 
-@item 20 (ERROR_IS_NULL)
+@item 20 (ERROR_IS_NULL) pointer is null
 Pointer is null.  The program passed a NULL (0L) pointer to @code{free}
 and you have the @code{error-free-null} token enabled.
 
@@ -1473,7 +1473,7 @@ and you have the @code{error-free-null} token enabled.
 @cindex pointer is not pointing to heap data space
 @cindex ERROR_NOT_IN_HEAP
 
-@item 21 (ERROR_NOT_IN_HEAP)
+@item 21 (ERROR_NOT_IN_HEAP) pointer is not pointing to heap data space
 Pointer is not pointing to heap data space.  This means that the program
 passed an out-of-bounds pointer to @code{free} or @code{realloc}.  This
 could be someone trying to work with a wild pointer or trying to free a
@@ -1490,7 +1490,7 @@ pointer from a different source than @code{malloc}.
 @cindex mmap
 @cindex sbrk
 
-@item 22 (ERROR_NOT_FOUND)
+@item 22 (ERROR_NOT_FOUND) cannot locate pointer in heap
 Cannot locate pointer in heap.  The user passed in a pointer which the
 heap did not know about.  Either this pointer was allocated by some
 other mechanism (like @code{mmap} or @code{sbrk} directly) or it is a
@@ -1508,7 +1508,7 @@ one does not know about the pointers allocated by the other.
 @cindex is found error
 @cindex ERROR_IS_FOUND
 
-@item 23 (ERROR_IS_FOUND)
+@item 23 (ERROR_IS_FOUND) found pointer the user was looking for
 This indicates that the pointer specified in the address part of the
 environmental variable was discovered by the library.  @xref{Environment
 Variable}.  This error is useful so you can put a breakpoint in a
@@ -1523,7 +1523,7 @@ With a Debugger}.
 @cindex bad file error
 @cindex ERROR_BAD_FILE
 
-@item 24 (ERROR_BAD_FILE)
+@item 24 (ERROR_BAD_FILE) possibly bad .c filename pointer
 A possibly invalid filename was discovered in the dmalloc administrative
 sections.  This could indicate some corruption of the internal tables.
 It also could mean that you have a source file whose name is longer than
@@ -1538,7 +1538,7 @@ file.
 @cindex bad line error
 @cindex ERROR_BAD_LINE
 
-@item 25 (ERROR_BAD_LINE)
+@item 25 (ERROR_BAD_LINE) possibly bad .c file line-number
 A line-number was out-of-bounds in the dmalloc administrative sections.
 This could indicate some corruption of the internal tables.  It also
 could mean that you have a source file containing more than @code{30000}
@@ -1553,7 +1553,7 @@ file.
 @cindex under fence error
 @cindex ERROR_UNDER_FENCE
 
-@item 26 (ERROR_UNDER_FENCE)
+@item 26 (ERROR_UNDER_FENCE) failed UNDER picket-fence magic-number check
 This indicates that a pointer had its lower bound picket-fence magic
 number overwritten.  If the @code{check-fence} token is enabled, the
 library writes magic values above and below allocations to protect
@@ -1568,7 +1568,7 @@ past its allocate and wrote into the next pointer's space.
 @cindex over fence error
 @cindex ERROR_OVER_FENCE
 
-@item 27 (ERROR_OVER_FENCE)
+@item 27 (ERROR_OVER_FENCE) failed OVER picket-fence magic-number check
 This indicates that a pointer had its upper bound picket-fence magic
 space overwritten.  If the @code{check-fence} token is enabled, the
 library writes magic values above and below allocations to protect
@@ -1589,7 +1589,7 @@ functions should @emph{always} be replaced with: @code{strncat},
 @cindex would overwrite error
 @cindex ERROR_WOULD_OVERWRITE
 
-@item 28 (ERROR_WOULD_OVERWRITE)
+@item 28 (ERROR_WOULD_OVERWRITE) use of pointer would exceed allocation
 This error is generated by the function pointer checking code usually
 enabled with the @code{check-funcs} token.  Dmalloc overloads a number of
 string and memory copying functions and verifies that the buffers (if
@@ -1603,7 +1603,7 @@ allocated in the heap) would not be overwritten by the function.
 @cindex not start block error
 @cindex ERROR_NOT_START_BLOCK
 
-@item 30 (ERROR_NOT_START_BLOCK)
+@item 30 (ERROR_NOT_START_BLOCK) pointer is not to start of memory block
 This indicates that the user passed in a pointer to be freed or
 reallocated that was not at the start of the allocation.  You would get
 this error, for example, if you allocate and get pointer @code{X} but
@@ -1617,7 +1617,7 @@ then try to free @code{X+1}.
 @cindex bad size error
 @cindex ERROR_BAD_SIZE
 
-@item 40 (ERROR_BAD_SIZE)
+@item 40 (ERROR_BAD_SIZE) invalid allocation size
 This error indicates that a size value in the internal structures of the
 library were corrupted.  This could be a random pointer problem, pointer
 overflow, or some other corruption.
@@ -1630,7 +1630,7 @@ overflow, or some other corruption.
 @cindex too big error
 @cindex ERROR_TOO_BIG
 
-@item 41 (ERROR_TOO_BIG)
+@item 41 (ERROR_TOO_BIG) largest maximum allocation size exceeded
 An allocation asked for memory larger than the configured maximum.  This
 is a user configured setting.  See @code{LARGEST_ALLOCATION} in the
 @file{settings.dist} file.  It is used to protect against wild
@@ -1645,7 +1645,7 @@ should tune the @code{LARGEST_ALLOCATION} value appropriately.
 @cindex alloc failed error
 @cindex ERROR_ALLOC_FAILED
 
-@item 43 (ERROR_ALLOC_FAILED)
+@item 43 (ERROR_ALLOC_FAILED) could not grow heap by allocating memory
 The library could not allocate more heap space and the program has run
 out of memory.  This could indicate that you've overflowed some system
 imposed limit.  On many operation systems, the @code{ulimit} call can
@@ -1662,7 +1662,7 @@ about the allocated pointers.
 @cindex over limit error
 @cindex ERROR_OVER_LIMIT
 
-@item 45 (ERROR_OVER_LIMIT)
+@item 45 (ERROR_OVER_LIMIT) over user specified allocation limit
 The library has allocated more memory than was specified in the
 memory-limit environmental variable.  @xref{Environment Variable}.
 
@@ -1674,7 +1674,7 @@ memory-limit environmental variable.  @xref{Environment Variable}.
 @cindex not on block boundary error
 @cindex ERROR_NOT_ON_BLOCK
 
-@item 60 (ERROR_NOT_ON_BLOCK)
+@item 60 (ERROR_NOT_ON_BLOCK) pointer is not on block boundary
 The user tried to free or realloc a pointer that was not pointing to a
 block boundary.  You would get this error, for example, if you allocate
 and get pointer @code{X} but then try to free @code{X+1}.
@@ -1687,7 +1687,7 @@ and get pointer @code{X} but then try to free @code{X+1}.
 @cindex already free error
 @cindex ERROR_ALREADY_FREE
 
-@item 61 (ERROR_ALREADY_FREE)
+@item 61 (ERROR_ALREADY_FREE) tried to free previously freed pointer
 The user tried to free a pointer than has already been freed.  This is a
 very common mistake and can lead to serious problems.  It can be because
 a destructor is being called twice for some reason.  Although tracking
@@ -1704,7 +1704,7 @@ pointers to NULL (0L) after you free them as a rule.
 @cindex free-blank
 @cindex check-blank
 
-@item 67 (ERROR_FREE_OVERWRITTEN)
+@item 67 (ERROR_FREE_OVERWRITTEN) free space has been overwritten
 If either the @code{free-blank} or @code{check-blank} tokens are enabled
 then the library will overwrite memory when it is freed with the
 ``dmalloc-free'' byte (hex 0xdf, octal 0337, decimal 223).  If the
@@ -1720,7 +1720,7 @@ pointer after it has been freed.
 @cindex admin list error
 @cindex ERROR_ADMIN_LIST
 
-@item 70 (ERROR_ADMIN_LIST)
+@item 70 (ERROR_ADMIN_LIST) bad admin structure list
 An internal corruption in the library's administrative structures has
 been detected.  This could be a random pointer problem, pointer
 overflow, or some other corruption.
@@ -1733,7 +1733,7 @@ overflow, or some other corruption.
 @cindex address list error
 @cindex ERROR_ADDRESS_LIST
 
-@item 72 (ERROR_ADDRESS_LIST)
+@item 72 (ERROR_ADDRESS_LIST) internal address list corruption
 An internal corruption in the library's administrative structures has
 been detected.  This could be a random pointer problem, pointer
 overflow, or some other corruption.
@@ -1746,7 +1746,7 @@ overflow, or some other corruption.
 @cindex slot corrupt error
 @cindex ERROR_SLOT_CORRUPT
 
-@item 73 (ERROR_SLOT_CORRUPT)
+@item 73 (ERROR_SLOT_CORRUPT) internal memory slot corruption
 An internal corruption in the library's administrative structures has
 been detected.  This could be a random pointer problem, pointer
 overflow, or some other corruption.
