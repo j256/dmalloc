@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.192 2003/09/06 15:00:20 gray Exp $
+ * $Id: chunk.c,v 1.193 2003/09/08 14:43:40 gray Exp $
  */
 
 /*
@@ -1598,9 +1598,12 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
  * slot_p -> Slot that we are checking.
  *
  * user_pnt -> User pointer which was used to get the slot or NULL.
+ *
+ * exact_b -> Set to 1 to find the pointer specifically.  Otherwise we
+ * can find the pointer inside of an allocation.
  */
 static	int	check_used_slot(const skip_alloc_t *slot_p,
-				const void *user_pnt)
+				const void *user_pnt, const int exact_b)
 {
   const char	*file, *name_p, *bounds_p, *mem_p;
   unsigned int	line, num;
@@ -1616,12 +1619,9 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
   /* get pointer info */
   get_pnt_info(slot_p, &pnt_info);
   
-  /*
-   * since we did a loose match to find the block even with fence post
-   * data, make sure that we have the user pointer
-   */
-  if (user_pnt != NULL && user_pnt != pnt_info.pi_user_start) {
-    dmalloc_errno = ERROR_NOT_FOUND;
+  /* if we need the exact pointer, make sure that the user_pnt agrees */
+  if (exact_b && user_pnt != pnt_info.pi_user_start) {
+    dmalloc_errno = ERROR_NOT_START_BLOCK;
     return 0;
   }
   
@@ -1804,6 +1804,9 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
  *
  * user_pnt -> Pointer we are tracking.
  *
+ * exact_b -> Set to 1 to find the pointer specifically.  Otherwise we
+ * can find the pointer inside of an allocation.
+ *
  * update_p -> Pointer to the skip_alloc entry we are using to hold
  * the update pointers.
  *
@@ -1814,6 +1817,7 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
  * slot right after the one found.
  */
 static	skip_alloc_t	*find_slot(const void *user_pnt,
+				   const int exact_b,
 				   skip_alloc_t *update_p,
 				   skip_alloc_t **prev_pp,
 				   skip_alloc_t **next_pp)
@@ -1826,14 +1830,14 @@ static	skip_alloc_t	*find_slot(const void *user_pnt,
   }
   
   /* try to find the address with loose match */
-  slot_p = find_address(user_pnt, 0 /* loose check */, update_p);
+  slot_p = find_address(user_pnt, exact_b, update_p);
   if (slot_p == NULL) {
     /* not found */
     dmalloc_errno = ERROR_NOT_FOUND;
     return NULL;
   }
   
-  if (! check_used_slot(slot_p, user_pnt)) {
+  if (! check_used_slot(slot_p, user_pnt, exact_b)) {
     /* error set in check slot */
     return NULL;
   }
@@ -2021,7 +2025,7 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   }
   
   /* might as well check the pointer now */
-  if (! check_used_slot(slot_p, user_pnt)) {
+  if (! check_used_slot(slot_p, user_pnt, 1 /* exact */)) {
     /* errno set in check_slot */
     log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, where);
     dmalloc_error("_dmalloc_chunk_read_info");
@@ -2219,7 +2223,8 @@ int	_dmalloc_chunk_heap_check(void)
     
     /* now check the allocation */
     if (checking_list_c == 0) {
-      ret = check_used_slot(slot_p, NULL /* no user pnt */);
+      ret = check_used_slot(slot_p, NULL /* no user pnt */,
+			    0 /* loose pnt checking */);
     }
     else {
       ret = check_free_slot(slot_p);
@@ -2260,7 +2265,7 @@ int	_dmalloc_chunk_heap_check(void)
  * If -1 then do a strlen + 1 for the \0.  If 0 then ignore.
  */
 int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
-			    const int exact_b, const int min_size)
+				 const int exact_b, const int min_size)
 {
   skip_alloc_t	*slot_p;
   unsigned int	min;
@@ -2269,27 +2274,23 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
     dmalloc_message("checking pointer '%#lx'", (unsigned long)user_pnt);
   }
   
-  /* find our slot which does a lot of other checking */
-  slot_p = find_slot(user_pnt, skip_update, NULL /* prev */, NULL /* next */);
+  /* try to find the address */
+  slot_p = find_address(user_pnt, exact_b, skip_update);
   if (slot_p == NULL) {
-    /*
-     * if the error is something other than not-found or if it is
-     * not-found and the pointer _must_ be exactly found
-     */
-    if (dmalloc_errno != ERROR_NOT_FOUND || exact_b) {
+    if (exact_b) {
+      dmalloc_errno = ERROR_NOT_FOUND;
       log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, "pointer-check");
       dmalloc_error(func);
       return 0;
     }
     else {
-      /* the pointer might not be the heap or might be NULL */
       dmalloc_errno = ERROR_NONE;
       return 1;
     }
   }
   
-  /* make sure that the user slot is valid */
-  if (! check_used_slot(slot_p, user_pnt)) {
+  /* now make sure that the user slot is valid */
+  if (! check_used_slot(slot_p, user_pnt, exact_b)) {
     /* dmalloc_error set in check_used_slot */
     log_error_info(NULL, 0, slot_p->sa_file, slot_p->sa_line,
 		   user_pnt, 0, NULL, "pointer-check");
@@ -2589,8 +2590,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   update_p = skip_update;
   
   /* find which block it is in */
-  slot_p = find_slot(user_pnt, update_p, NULL /* no prev_p */,
-		     NULL /* no next_p */);
+  slot_p = find_slot(user_pnt, 1 /* exact pnt */, update_p,
+		     NULL /* no prev_p */, NULL /* no next_p */);
   if (slot_p == NULL) {
     /* errno set in find_slot */
     log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
