@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.264 2004/10/12 13:23:05 gray Exp $
+@c $Id: dmalloc.texi,v 1.265 2004/10/12 13:53:28 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -3388,6 +3388,9 @@ release can be published before people encounter them.
 
 @table @samp
 
+@cindex slow running
+@cindex why running slow
+@cindex too slow
 @item Why does my program run so slow?
 
 @cindex check-heap
