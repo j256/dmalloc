@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk_loc.h,v 1.51 1998/10/26 14:24:27 gray Exp $
+ * $Id: chunk_loc.h,v 1.52 1998/11/09 16:54:54 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -43,16 +43,6 @@
 #include TIMEVAL_INCLUDE
 #endif
 #endif
-
-/* defines for the malloc subsystem */
-
-/* checking information */
-#define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
-#define MAX_FILE_LENGTH		   40		/* max __FILE__ length */
-#define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
-
-/* free info */
-#define BLANK_CHAR		'\305'		/* to blank free space with */
 
 /* log-bad-space info */
 #define SPECIAL_CHARS		"\"\"''\\\\n\nr\rt\tb\bf\fa\007"
@@ -141,7 +131,7 @@
 #define BBLOCK_DBLOCK_ADMIN	0x0010		/* pointing to dblock admin */
 #define BBLOCK_FREE		0x0020		/* block is free */
 #define BBLOCK_EXTERNAL		0x0040		/* externally used block */
-#define BBLOCK_ADMIN_FREE	0x0080		/* ba_free_n pnt to free slot */
+#define BBLOCK_ADMIN_FREE	0x0080		/* ba_free_n pnt to free slot*/
 #define BBLOCK_STRING		0x0100		/* block is a string (unused)*/
 #define BBLOCK_VALLOC		0x0200		/* block is aligned alloc */
 
@@ -243,7 +233,7 @@ struct bblock_st {
   } bb_nums;
   
   /* to reference union elements as bb elements */
-#define bb_bit_n		bb_nums.nu_bit_n		/* User-dblock, Free */
+#define bb_bit_n	bb_nums.nu_bit_n	/* User-dblock, Free */
 #define bb_line		bb_nums.nu_line		/* User-bblock */
   
   union {
@@ -257,7 +247,7 @@ struct bblock_st {
   
   /* to reference union elements as bb elements */
 #define bb_free_n	bb_info.in_free_n	/* BBlock-admin-free */
-#define	bb_pos_n		bb_info.in_pos_n		/* BBlock-admin */
+#define	bb_pos_n	bb_info.in_pos_n	/* BBlock-admin */
 #define	bb_block_n	bb_info.in_block_n	/* Free */
 #define	bb_size		bb_info.in_size		/* User-bblock */
 #define	bb_dblock	bb_info.in_dblock	/* User-dblock */

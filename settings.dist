@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: settings.dist,v 1.28 1998/10/28 15:19:04 gray Exp $
+ * $Id: settings.dist,v 1.29 1998/11/09 16:54:54 gray Exp $
  */
 
 /*
@@ -89,6 +89,27 @@
  * or if you indeed have this problem.
  */
 #define USE_RET_ADDRESS 1
+
+/*
+ * Write this character into memory when it is allocated and not
+ * calloc'ed if the alloc-blank token is enabled and when it has been
+ * freed if the free-blank token is enabled.  You can verify that
+ * these sections have not been overwritten with the check-blank
+ * token.
+ */
+#define BLANK_CHAR		'\305'
+
+/*
+ * The following information sets limits on the size of the source
+ * file name and line numbers returned by the __FILE__ and __LINE__
+ * compiler macros.  You may need to tune then to fit your environment
+ * although I would argue that if you have filenames longer than 40
+ * charactes or files longer than 10,000 lines, you are doing
+ * something wrong.
+ */
+#define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
+#define MAX_FILE_LENGTH		   40		/* max __FILE__ length */
+#define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
 
 /*
  * The largest allowable allocations in bits.  This is only for
