@@ -1,10 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.28 1994/07/21 18:43:21 gray Exp $
+$Id: NEWS,v 1.29 1994/07/22 15:49:51 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.1.1:
 
-	* Marty Leisner <leisner@sdsp.mc.xerox.com> compiles library on MS-DOG!
+	* Added ability to combine adjacent free blocks into one.
+	* 0 or negative MALLOC_INTERVAL values act as if no interval value.
+	* Made a 'malloc_dbg -i 0' undefine MALLOC_INTERVAL.
+	* Fixed calloc return-address problem from user feedback.
+	* Added KILL_PROCESS macro to configuration scripts.
+	* Marty Leisner compiles library on MS-DOG!
 	* Fixed some problems with malloc_errno set after call to error.
 
 Version 2.1.0:

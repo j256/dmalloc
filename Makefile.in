@@ -1,13 +1,14 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.50 1994/03/25 06:20:11 gray Exp $
+# $Id: Makefile.in,v 1.51 1994/07/22 15:49:49 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
 OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_INST= malloc_lp.o
 FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_t.c
+DOCS	= malloc.texi malloc.info malloc.ps
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
@@ -75,6 +76,11 @@ installlibs : installincs $(LIBRARY) $(OBJS_INST) $(MANFILE)
 .PHONY : install
 install : installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
+
+.PHONY : install
+installftp : README_ftp $(DOCS)
+	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README
+	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 
 # put situation specific lines here
 malloc_dbg.2 : configure

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.17 1994/07/21 18:43:14 gray Exp $
+$Id: TODO,v 1.18 1994/07/22 15:49:57 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -11,11 +11,6 @@ HEAP OPERATIONS:
 	- rewrite admin chunks for used
 	- rewrite admin chunks for left-overs (if there are any)
 	- readd left-overs to free list (if there are any)
-- free should look on either side for free space to combine with
-	- find free section (above/below/both)
-	- remove from free list(s)
-	- rewrite admin chunks for new base/size
-	- add to correct free list
 
 -------------------------------------------------------------------------------
 
@@ -64,6 +59,16 @@ DOCUMENTATION:
 
 -------------------------------------------------------------------------------
 
+TESTING / STATISTICS:
+
+- maybe use the new gnu testing code
+- general tons of small blocks and watch for dblock_admin entry leak
+	like with large ndb_shell scripts
+- maybe a program that would try a standard set of tests on a number of
+	different combinations of debug-values to look for dependencies.
+
+-------------------------------------------------------------------------------
+
 GENERAL:
 
 - maybe have some sort etext support for systems that don't have it?
@@ -102,14 +107,9 @@ GENERAL:
 	for when dumping non-freed blocks list
 - maybe add another time logging flag to dump the elapsed time since start
 
--------------------------------------------------------------------------------
-
-TESTING / STATISTICS:
-
-- maybe use the new gnu testing code
-- general tons of small blocks and watch for dblock_admin entry leak
-	like with large ndb_shell scripts
-- maybe a program that would try a standard set of tests on a number of
-	different combinations of debug-values to look for dependencies.
+- maybe an environment variable to designate which program(s) you want to
+	debug. found with strstr.
+	- or could use .mallocrc entry
+	- could have program:tag entries for default behavior in program
 
 -------------------------------------------------------------------------------

@@ -1,3 +1,22 @@
+Fri Jul 22 11:48:26 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Added ability to combine adjacent free blocks into one.
+
+Thu Jul 21 14:44:25 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* 0 or negative MALLOC_INTERVAL values act as if no interval value.
+
+	* Made a 'malloc_dbg -i 0' undefine MALLOC_INTERVAL.
+
+	* Fixed calloc return-address problem from Gregory Stark's feedback.
+
+	* Added KILL_PROCESS macro to configuration scripts.  Replaces
+	ERROR_SIGNAL.
+
+Thu Jul 10 00:00:00 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Marty Leisner compiles library on MS-DOG!
+
 Sun May 22 18:37:31 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Fixed some problems with malloc_errno set after call to error.
@@ -170,6 +189,7 @@ Mon Nov 15 00:39:51 1993  Gray Watson  (gray@fridge.antaire.com)
 	tokens.
 
 	* added ERROR_SIGNAL configure entry.  defaults to SIGABRT.
+	(NOTE: later removed).
 
 Sun Nov 14 23:08:03 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -714,5 +734,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.105 1994/05/22 22:38:53 gray Exp $
+$Id: ChangeLog,v 1.106 1994/07/22 15:49:44 gray Exp $
 -------------------------------------------------------------------------------
