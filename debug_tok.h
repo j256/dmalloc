@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.22 1997/12/05 21:09:39 gray Exp $
+ * $Id: debug_tok.h,v 1.23 1997/12/07 23:17:30 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -79,9 +79,6 @@ static	attr_t		attributes[] = {
       "check free lists" },
   { "check-blank",	"cbl",	DEBUG_CHECK_BLANK,
       "check blanked memory" },
-  /* NOTE: this should be after check-blank */
-  { "check-free",	"cfr",	DEBUG_CHECK_BLANK,
-      "PLEASE USE AND SEE CHECK-BLANK" },
   { "check-funcs",	"cfu",	DEBUG_CHECK_FUNCS,
       "check functions" },
   
