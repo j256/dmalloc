@@ -1,7 +1,7 @@
 /*
  * Environment handling routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.23 2000/03/20 23:19:25 gray Exp $
+ * $Id: env.c,v 1.24 2000/03/21 18:19:13 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.23 2000/03/20 23:19:25 gray Exp $";
+#ident "$Id: env.c,v 1.24 2000/03/21 18:19:13 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.23 2000/03/20 23:19:25 gray Exp $";
+  "$Id: env.c,v 1.24 2000/03/21 18:19:13 gray Exp $";
 #endif
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * Local definitions for the user allocation level
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_loc.h,v 1.43 2000/03/20 23:19:23 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.44 2000/03/21 18:19:11 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__

@@ -1,7 +1,7 @@
 /*
  * Defines for low level memory management routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.57 2000/03/20 23:19:20 gray Exp $
+ * $Id: chunk.h,v 1.58 2000/03/21 18:19:07 gray Exp $
  */
 
 #ifndef __CHUNK_H__

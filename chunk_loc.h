@@ -1,7 +1,7 @@
 /*
  * Local defines for the low level memory routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.60 2000/03/21 01:37:56 gray Exp $
+ * $Id: chunk_loc.h,v 1.61 2000/03/21 18:19:07 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__

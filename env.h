@@ -1,7 +1,7 @@
 /*
  * Defines for the env routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.17 2000/03/20 23:19:26 gray Exp $
+ * $Id: env.h,v 1.18 2000/03/21 18:19:13 gray Exp $
  */
 
 #ifndef __ENV_H__

@@ -1,7 +1,7 @@
 /*
  * defines to get the return-address for non-dmalloc_lp malloc calls.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.29 2000/03/20 23:19:28 gray Exp $
+ * $Id: return.h,v 1.30 2000/03/21 18:19:16 gray Exp $
  */
 
 /*

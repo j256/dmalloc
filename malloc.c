@@ -1,7 +1,7 @@
 /*
  * user-level memory-allocation routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.141 2000/03/21 01:51:23 gray Exp $
+ * $Id: malloc.c,v 1.142 2000/03/21 18:19:15 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.141 2000/03/21 01:51:23 gray Exp $";
+#ident "$Id: malloc.c,v 1.142 2000/03/21 18:19:15 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.141 2000/03/21 01:51:23 gray Exp $";
+  "$Id: malloc.c,v 1.142 2000/03/21 18:19:15 gray Exp $";
 #endif
 #endif
 

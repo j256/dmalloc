@@ -1,7 +1,7 @@
 /*
  * manual configuration flags
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.45 2000/03/20 23:19:28 gray Exp $
+ * $Id: settings.dist,v 1.46 2000/03/21 18:19:16 gray Exp $
  */
 
 /*

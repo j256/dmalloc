@@ -1,7 +1,7 @@
 /*
  * Defines for the error and message code.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.45 2000/03/21 01:16:25 gray Exp $
+ * $Id: error.h,v 1.46 2000/03/21 18:19:13 gray Exp $
  */
 
 #ifndef __ERROR_H__

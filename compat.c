@@ -1,7 +1,7 @@
 /*
  * Compatibility functions for those systems who are missing them.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.47 2000/03/20 23:19:20 gray Exp $
+ * $Id: compat.c,v 1.48 2000/03/21 18:19:08 gray Exp $
  */
 
 /*
@@ -42,10 +42,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.47 2000/03/20 23:19:20 gray Exp $";
+#ident "$Id: compat.c,v 1.48 2000/03/21 18:19:08 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.47 2000/03/20 23:19:20 gray Exp $";
+  "$Id: compat.c,v 1.48 2000/03/21 18:19:08 gray Exp $";
 #endif
 #endif
 

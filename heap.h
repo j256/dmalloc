@@ -1,7 +1,7 @@
 /*
  * defines for the system specific memory routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.h,v 1.36 2000/03/20 23:19:27 gray Exp $
+ * $Id: heap.h,v 1.37 2000/03/21 18:19:15 gray Exp $
  */
 
 #ifndef __HEAP_H__

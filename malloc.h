@@ -1,7 +1,7 @@
 /*
  * Function prototypes for the malloc user level routines.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.27 2000/03/21 01:51:24 gray Exp $
+ * $Id: malloc.h,v 1.28 2000/03/21 18:19:16 gray Exp $
  */
 
 #ifndef __MALLOC_H__

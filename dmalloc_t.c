@@ -1,7 +1,7 @@
 /*
  * Test program for malloc code
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.83 2000/03/20 23:19:24 gray Exp $
+ * $Id: dmalloc_t.c,v 1.84 2000/03/21 18:19:12 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.83 2000/03/20 23:19:24 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.84 2000/03/21 18:19:12 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.83 2000/03/20 23:19:24 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.84 2000/03/21 18:19:12 gray Exp $";
 #endif
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * Token attributes for the dmalloc program and _dmalloc_flags
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.30 2000/03/20 23:19:22 gray Exp $
+ * $Id: debug_tok.h,v 1.31 2000/03/21 18:19:09 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__

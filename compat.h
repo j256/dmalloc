@@ -1,7 +1,7 @@
 /*
  * Header file for compatibility functions.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.h,v 1.37 2000/03/20 23:19:21 gray Exp $
+ * $Id: compat.h,v 1.38 2000/03/21 18:19:08 gray Exp $
  */
 
 #ifndef __COMPAT_H__

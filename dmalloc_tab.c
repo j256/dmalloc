@@ -1,7 +1,7 @@
 /*
  * Memory table routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.10 2000/03/20 23:19:25 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.11 2000/03/21 18:19:12 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.10 2000/03/20 23:19:25 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.11 2000/03/21 18:19:12 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.10 2000/03/20 23:19:25 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.11 2000/03/21 18:19:12 gray Exp $";
 #endif
 #endif
 

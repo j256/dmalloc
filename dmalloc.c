@@ -1,7 +1,7 @@
 /*
  * program that handles the dmalloc variables.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.91 2000/03/20 23:19:22 gray Exp $
+ * $Id: dmalloc.c,v 1.92 2000/03/21 18:19:10 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.91 2000/03/20 23:19:22 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.92 2000/03/21 18:19:10 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.91 2000/03/20 23:19:22 gray Exp $";
+  "$Id: dmalloc.c,v 1.92 2000/03/21 18:19:10 gray Exp $";
 #endif
 #endif
 

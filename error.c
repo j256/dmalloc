@@ -1,7 +1,7 @@
 /*
  * Error and message routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.91 2000/03/21 01:16:25 gray Exp $
+ * $Id: error.c,v 1.92 2000/03/21 18:19:13 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.91 2000/03/21 01:16:25 gray Exp $";
+#ident "$Id: error.c,v 1.92 2000/03/21 18:19:13 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.91 2000/03/21 01:16:25 gray Exp $";
+  "$Id: error.c,v 1.92 2000/03/21 18:19:13 gray Exp $";
 #endif
 #endif
 

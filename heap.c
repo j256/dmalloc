@@ -1,7 +1,7 @@
 /*
  * system specific memory routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.53 2000/03/20 23:19:27 gray Exp $
+ * $Id: heap.c,v 1.54 2000/03/21 18:19:14 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: heap.c,v 1.53 2000/03/20 23:19:27 gray Exp $";
+#ident "$Id: heap.c,v 1.54 2000/03/21 18:19:14 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.53 2000/03/20 23:19:27 gray Exp $";
+  "$Id: heap.c,v 1.54 2000/03/21 18:19:14 gray Exp $";
 #endif
 #endif
 

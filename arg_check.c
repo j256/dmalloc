@@ -1,7 +1,7 @@
 /*
  * Functions for testing of string routines arguments.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.23 2000/03/20 23:19:18 gray Exp $
+ * $Id: arg_check.c,v 1.24 2000/03/21 18:19:06 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.23 2000/03/20 23:19:18 gray Exp $";
+#ident "$Id: arg_check.c,v 1.24 2000/03/21 18:19:06 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.23 2000/03/20 23:19:18 gray Exp $";
+  "$Id: arg_check.c,v 1.24 2000/03/21 18:19:06 gray Exp $";
 #endif
 #endif
 

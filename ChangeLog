@@ -1,3 +1,9 @@
+Tue Mar 21 13:15:46 2000  Gray Watson  <gray@whopper.256.com>
+
+	* Releasing dmalloc version 4.4.0 beta 2.
+
+	* Fixed problem with chunk checking of dblock structures.
+
 Mon Mar 20 18:19:06 2000  Gray Watson  <gray@whopper.256.com>
 
 	* Releasing dmalloc version 4.4.0 beta 1.
@@ -1533,5 +1539,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.234 2000/03/21 01:47:20 gray Exp $
+$Id: ChangeLog,v 1.235 2000/03/21 18:19:05 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*
  * Defines for malloc string routines...
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.h,v 1.18 2000/03/20 23:19:19 gray Exp $
+ * $Id: arg_check.h,v 1.19 2000/03/21 18:19:06 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__

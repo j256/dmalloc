@@ -1,7 +1,7 @@
 /*
  * global error codes for chunk allocation problems
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.24 2000/03/21 01:34:56 gray Exp $
+ * $Id: error_val.h,v 1.25 2000/03/21 18:19:14 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__

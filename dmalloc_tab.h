@@ -1,7 +1,7 @@
 /*
  * Local defines for the memory table.
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.h,v 1.2 2000/03/20 23:19:25 gray Exp $
+ * $Id: dmalloc_tab.h,v 1.3 2000/03/21 18:19:12 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_H__

@@ -1,7 +1,7 @@
 /*
  * Memory chunk low-level allocation routines
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $
+ * $Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $
  */
 
 /*
@@ -62,25 +62,25 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $";
+#ident "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $";
+  "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
 #endif
 #endif
 
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $";
-#ident "@(#) Dmalloc package Copyright 1999 by Gray Watson";
-#ident "$Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $";
+#ident "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
+#ident "@(#) Dmalloc package Copyright 2000 by Gray Watson";
+#ident "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
 #ident "@(#) Source for dmalloc available from http://dmalloc.com/";
 #else
 static	char	*copyright =
-  "$Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $";
+  "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
 static	char	*copyright_w =
-  "@(#) Dmalloc package Copyright 1999 by Gray Watson";
+  "@(#) Dmalloc package Copyright 2000 by Gray Watson";
 static	char	*source_url =
-  "$Id: chunk.c,v 1.155 2000/03/21 18:16:02 gray Exp $";
+  "$Id: chunk.c,v 1.156 2000/03/21 18:19:07 gray Exp $";
 static	char	*source_url_w =
   "@(#) Source for dmalloc available from http://dmalloc.com/";
 #endif

@@ -1,7 +1,7 @@
 /*
  * version string for the library
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2000 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.91 2000/03/21 01:47:21 gray Exp $
+ * $Id: version.h,v 1.92 2000/03/21 18:19:16 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -36,8 +36,8 @@
  *
  * Make sure to also cvs tag the release.  dmalloc_release_X_X_X[_bX]
  */
-static	char	*dmalloc_version = "4.4.0_b1";
+static	char	*dmalloc_version = "4.4.0_b2";
 
-/* Version Date: $Date: 2000/03/21 01:47:21 $ */
+/* Version Date: $Date: 2000/03/21 18:19:16 $ */
 
 #endif /* ! __VERSION_H__ */
