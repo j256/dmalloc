@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.116 1998/11/09 18:11:54 gray Exp $
+ * $Id: malloc.c,v 1.117 1998/11/12 22:59:32 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.116 1998/11/09 18:11:54 gray Exp $";
+#ident "$Id: malloc.c,v 1.117 1998/11/12 22:59:32 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.116 1998/11/09 18:11:54 gray Exp $";
+  "$Id: malloc.c,v 1.117 1998/11/12 22:59:32 gray Exp $";
 #endif
 #endif
 
@@ -499,17 +499,19 @@ void	_dmalloc_shutdown(void)
   
 #if STORE_TIMEVAL
   {
-    struct timeval	now;
+    TIMEVAL_TYPE	now;
     GET_TIMEVAL(now);
-    _dmalloc_message("ending time = %ld.%ld, elapsed since start = %s",
-		     now.tv_sec, now.tv_usec, _dmalloc_ptimeval(&now, TRUE));
+    _dmalloc_message("ending time = %lu.%lu, elapsed since start = %s",
+		     (unsigned long)now.tv_sec,
+		     (unsigned long)now.tv_usec,
+		     _dmalloc_ptimeval(&now, TRUE));
   }
 #else
 #if HAVE_TIME
   {
-    long	now = time(NULL);
-    _dmalloc_message("ending time = %ld, elapsed since start = %s",
-		     now, _dmalloc_ptime(&now, TRUE));
+    TIME_TYPE	now = time(NULL);
+    _dmalloc_message("ending time = %lu, elapsed since start = %s",
+		     (unsigned long)now, _dmalloc_ptime(&now, TRUE));
   }
 #endif
 #endif
