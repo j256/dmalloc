@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.66 2003/05/13 18:16:33 gray Exp $
+ * $Id: chunk_loc.h,v 1.67 2003/05/20 04:04:23 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -56,39 +56,22 @@
  */
 #define MAX_SKIP_LEVEL		32
 
-/* pointer to the start of the block which holds PNT */
-#define BLOCK_NUM_TO_PNT(pnt)	(((long)(pnt) / BLOCK_SIZE) * BLOCK_SIZE)
-
-/* adjust internal PNT to user-space */
-#define CHUNK_TO_USER(pnt, f_b)	\
-	((f_b) ? (char *)(pnt) + FENCE_BOTTOM_SIZE : (pnt))
-#define USER_TO_CHUNK(pnt, f_b)	\
-	((f_b) ? (char *)(pnt) - FENCE_BOTTOM_SIZE : (pnt))
-
-/* get the number of blocks to hold SIZE */
-#define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
-
 /* NOTE: FENCE_BOTTOM_SIZE and FENCE_TOP_SIZE defined in settings.h */
 #define FENCE_OVERHEAD_SIZE	(FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE)
 #define FENCE_MAGIC_BOTTOM	0xC0C0AB1B
 #define FENCE_MAGIC_TOP		0xFACADE69
-/* type of the fence magic values */
-#define FENCE_MAGIC_TYPE	int
 /* smallest allocated block */
 #define CHUNK_SMALLEST_BLOCK	\
-   (FENCE_BOTTOM_SIZE + DEFAULT_SMALLEST_ALLOCATION)
+	(FENCE_BOTTOM_SIZE + DEFAULT_SMALLEST_ALLOCATION)
 
-#define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
-#define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
-
-/* flags associated with the skip_alloc_t type */
+/* flags associated with the skip_alloc_t type's sa_flags field */
 #define ALLOC_FLAG_USER		BIT_FLAG(0)	/* slot is user allocated */
 #define ALLOC_FLAG_FREE		BIT_FLAG(1)	/* slot is free */
 #define ALLOC_FLAG_EXTERN	BIT_FLAG(2)	/* slot allocated externally */
 #define ALLOC_FLAG_ADMIN	BIT_FLAG(3)	/* administrative space */
-
-#define ALLOC_FLAG_FENCE	BIT_FLAG(10)	/* slot is fence posted */
-#define ALLOC_FLAG_VALLOC	BIT_FLAG(11)	/* slot is block aligned */
+#define ALLOC_FLAG_BLANK	BIT_FLAG(4)	/* slot is fence posted */
+#define ALLOC_FLAG_FENCE	BIT_FLAG(5)	/* slot is fence posted */
+#define ALLOC_FLAG_VALLOC	BIT_FLAG(6)	/* slot is block aligned */
 
 /*
  * Below defines an allocation structure either on the free or used
@@ -98,13 +81,17 @@
  */
 typedef struct skip_alloc_st {
   
-  unsigned int		sa_flags;	/* what it is */
+  unsigned char		sa_flags;	/* what it is */
+  
+  /* some small data types up front to save on space */
+  unsigned char		sa_level_n;	/* how tall our node is */
+  unsigned short	sa_line;	/* line where it was allocated */
+  
   unsigned int		sa_user_size;	/* size requested by user (wo fence) */
   unsigned int		sa_total_size;	/* total size of the block */
   
   void			*sa_mem;	/* pointer to the memory in question */
-  const char		*sa_file;	/* .c filename where alloced */
-  unsigned int		sa_line;	/* line where it was alloced */
+  const char		*sa_file;	/* .c filename where allocated */
   unsigned long		sa_use_iter;	/* when last ``used'' */
   
 #if STORE_SEEN_COUNT
@@ -128,7 +115,6 @@ typedef struct skip_alloc_st {
    * Array of next pointers.  This may extend past the end of the
    * function if we allocate for space larger than the structure.
    */
-  unsigned int		sa_level_n;
   struct skip_alloc_st	*sa_next_p[1];
   
 } skip_alloc_t;
@@ -177,6 +163,7 @@ typedef struct entry_block_st {
 typedef struct {
   int		pi_fence_b;		/* fence-posts are on for pointer */
   int		pi_valloc_b;		/* pointer is valloc-aligned */
+  int		pi_blanked_b;		/* pointer was blanked */
   void		*pi_alloc_start;	/* pnt to start of allocation */
   void		*pi_fence_bottom;	/* pnt to the bottom fence area */
   void		*pi_user_start;		/* pnt to start of user allocation */
