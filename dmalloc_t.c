@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.99 2003/05/20 04:01:08 gray Exp $
+ * $Id: dmalloc_t.c,v 1.100 2003/06/04 23:45:07 gray Exp $
  */
 
 /*
@@ -46,8 +46,9 @@
 # endif
 #endif
 
-#include "dmalloc_argv.h"
 #include "dmalloc.h"
+#include "dmalloc_argv.h"
+#include "dmalloc_rand.h"
 
 /*
  * NOTE: these are only needed to test certain features of the library.
@@ -165,19 +166,38 @@ static	void	*get_address(void)
 }
 
 /*
- * Select a random value in VAL
+ * Free a slot from the used_p list and put it on the free list
  */
-static	int	random_value(const int val)
+static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
+			  pnt_info_t **used_pp, pnt_info_t **free_pp)
 {
-  int	ret;
+  pnt_info_t	*this_p, *prev_p;
   
-#if HAVE_RANDOM
-  ret = ((random() % (val * 10)) / 10);
-#else
-  ret = ((rand() % (val * 10)) / 10);
-#endif
+  if (verbose_b) {
+    (void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
+		 iter_c + 1, slot_p->pi_size, slot_p - pointer_grid,
+		 (long)slot_p->pi_pnt);
+  }
   
-  return ret;
+  slot_p->pi_pnt = NULL;
+  
+  /* find pnt in the used list */
+  for (this_p = *used_pp, prev_p = NULL;
+       this_p != NULL;
+       prev_p = this_p, this_p = this_p->pi_next) {
+    if (this_p == slot_p) {
+      break;
+    }
+  }
+  if (prev_p == NULL) {
+    *used_pp = slot_p->pi_next;
+  }
+  else {
+    prev_p->pi_next = slot_p->pi_next;
+  }
+  
+  slot_p->pi_next = *free_pp;
+  *free_pp = slot_p;
 }
 
 /*
@@ -186,13 +206,14 @@ static	int	random_value(const int val)
 static	int	do_random(const int iter_n)
 {
   unsigned int	flags;
-  int		iter_c, last, amount, max = max_alloc, free_c;
+  int		iter_c, prev_errno, amount, max_avail, free_c;
+  int		final = 1;
   char		*chunk_p;
   pnt_info_t	*free_p, *used_p = NULL;
-  pnt_info_t	*pnt_p, *last_p, *this_p;
+  pnt_info_t	*pnt_p;
   
-  dmalloc_errno = ERROR_NONE;
-  last = ERROR_NONE;
+  max_avail = max_alloc;
+  
   flags = dmalloc_debug_current();
   
   pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
@@ -213,19 +234,26 @@ static	int	do_random(const int iter_n)
   (pnt_p - 1)->pi_next = NULL;
   free_c = max_pointers;
   
+  prev_errno = ERROR_NONE;
   for (iter_c = 0; iter_c < iter_n;) {
-    int		which;
+    int		which_func, which;
     
-    if (dmalloc_errno != last && ! silent_b) {
+    if (dmalloc_errno != prev_errno && ! silent_b) {
       (void)printf("ERROR: iter %d, %s (err %d)\n",
 		   iter_c, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
-      last = dmalloc_errno;
+      prev_errno = dmalloc_errno;
+      final = 0;
+    }
+    
+    /* special case when doing non-linear stuff, sbrk took all memory */
+    if (max_avail < MIN_AVAIL && free_p == NULL) {
+      break;
     }
     
     if (random_debug_b) {
       unsigned int	new_flag;
       do {
-	which = random_value(sizeof(int) * 8);
+	which = _dmalloc_rand() % (sizeof(int) * 8);
 	new_flag = 1 << which;
       } while (new_flag == DEBUG_FORCE_LINEAR);
       flags ^= new_flag;
@@ -235,229 +263,232 @@ static	int	do_random(const int iter_n)
       dmalloc_debug(flags);
     }
     
-    /* special case when doing non-linear stuff, sbrk took all memory */
-    if (max < MIN_AVAIL && free_c == max_pointers) {
-      break;
+    /* decide whether to malloc a new pointer or free/realloc an existing */
+    which = _dmalloc_rand() % 4;
+    
+    if ((free_p == NULL
+	 || which == 3
+	 || max_avail < MIN_AVAIL
+	 || free_c == max_pointers)
+	&& used_p != NULL) {
+      
+      /* choose a random slot to free */
+      which = _dmalloc_rand() % (max_pointers - free_c);
+      for (pnt_p = used_p; which > 0; which--) {
+	pnt_p = pnt_p->pi_next;
+      }
+      
+      free(pnt_p->pi_pnt);
+      free_slot(iter_c, pnt_p, &used_p, &free_p);
+      free_c++;
+      
+      if (verbose_b) {
+	(void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
+		     iter_c + 1, pnt_p->pi_size, pnt_p - pointer_grid,
+		     (long)pnt_p->pi_pnt);
+      }
+      
+      max_avail += pnt_p->pi_size;
+      iter_c++;
+      continue;
     }
     
-    if (free_c < max_pointers && used_p == NULL) {
+    /* sanity check */
+    if (free_p == NULL) {
       (void)fprintf(stderr, "%s: problem with test program free list\n",
 		    argv_program);
       exit(1);
     }
     
-    /* decide whether to malloc a new pointer or free/realloc an existing */
-    which = random_value(4);
-    
-    /*
-     * < MIN_AVAIL means alloc as long as we have enough memory and
-     * there are free slots we do an allocation, else we free
-     */
-    if (free_c == max_pointers
-	|| (free_c > 0 && which < 3 && max >= MIN_AVAIL)) {
-      amount = random_value(max / 2);
+    /* rest are allocations */
+    amount = _dmalloc_rand() % (max_avail / 2);
 #if ALLOW_ALLOC_ZERO_SIZE == 0
-      if (amount == 0) {
-	amount = 1;
-      }
+    if (amount == 0) {
+      amount = 1;
+    }
 #endif
+    
+    which_func = _dmalloc_rand() % 6;
+    
+    switch (which_func) {
       
-      which = random_value(16);
+      /* malloc */
+    case 0:
+      pnt_p = free_p;
+      pnt_p->pi_pnt = malloc(amount);
       
-      switch (which) {
-	
-      case 0: case 1: case 2:
-	pnt_p = free_p;
-	pnt_p->pi_pnt = malloc(amount);
-	
-	if (verbose_b) {
-	  (void)printf("%d: malloc %d of max %d into slot %d.  got %#lx\n",
-		       iter_c + 1, amount, max, pnt_p - pointer_grid,
-		       (long)pnt_p->pi_pnt);
-	}
-	break;
-	
-      case 3: case 4: case 5:
-	pnt_p = free_p;
-	pnt_p->pi_pnt = calloc(amount, sizeof(char));
-	
-	if (verbose_b) {
-	  (void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
-		       iter_c + 1, amount, max, pnt_p - pointer_grid,
-		       (long)pnt_p->pi_pnt);
-	}
-	
-	/* test the returned block to make sure that is has been cleared */
-	if (pnt_p->pi_pnt != NULL) {
-	  for (chunk_p = pnt_p->pi_pnt;
-	       chunk_p < (char *)pnt_p->pi_pnt + amount;
-	       chunk_p++) {
-	    if (*chunk_p != '\0') {
-	      if (! silent_b) {
-		(void)printf("calloc of %d was not fully zeroed on iteration #%d\n",
-			     amount, iter_c + 1);
-	      }
-	      break;
+      if (verbose_b) {
+	(void)printf("%d: malloc %d of max %d into slot %d.  got %#lx\n",
+		     iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		     (long)pnt_p->pi_pnt);
+      }
+      break;
+      
+      /* calloc */
+    case 1:
+      pnt_p = free_p;
+      pnt_p->pi_pnt = calloc(amount, sizeof(char));
+      
+      if (verbose_b) {
+	(void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
+		     iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		     (long)pnt_p->pi_pnt);
+      }
+      
+      /* test the returned block to make sure that is has been cleared */
+      if (pnt_p->pi_pnt != NULL) {
+	for (chunk_p = pnt_p->pi_pnt;
+	     chunk_p < (char *)pnt_p->pi_pnt + amount;
+	     chunk_p++) {
+	  if (*chunk_p != '\0') {
+	    if (! silent_b) {
+	      (void)printf("calloc of %d was not fully zeroed on iteration #%d\n",
+			   amount, iter_c + 1);
 	    }
+	    break;
 	  }
 	}
-	break;
+      }
+      break;
+      
+      /* realloc */
+    case 2:
+      if (free_c == max_pointers) {
+	continue;
+      }
 
-      case 6: case 7: case 8:
-	if (free_c == max_pointers) {
-	  continue;
-	}
-	
-	which = random_value(max_pointers - free_c);
-	for (pnt_p = used_p; which > 0; which--) {
-	  pnt_p = pnt_p->pi_next;
-	}
-	
-	pnt_p->pi_pnt = realloc(pnt_p->pi_pnt, amount);
-	max += pnt_p->pi_size;
-	
-	if (verbose_b) {
-	  (void)printf("%d: realloc %d from %d of max %d slot %d.  got %#lx\n",
-		       iter_c + 1, amount, pnt_p->pi_size, max,
-		       pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
-	}
-	break;
-	
-      case 9: case 10: case 11:
-	if (free_c == max_pointers) {
-	  continue;
-	}
-	
-	which = random_value(max_pointers - free_c);
-	for (pnt_p = used_p; which > 0; which--) {
-	  pnt_p = pnt_p->pi_next;
-	}
-	
-	pnt_p->pi_pnt = recalloc(pnt_p->pi_pnt, amount);
-	max += pnt_p->pi_size;
-	
-	if (verbose_b) {
-	  (void)printf("%d: recalloc %d from %d of max %d slot %d.  got %#lx\n",
-		       iter_c + 1, amount, pnt_p->pi_size, max,
-		       pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
-	}
-	
-	/* test the returned block to make sure that is has been cleared */
-	if (pnt_p->pi_pnt != NULL && amount > pnt_p->pi_size) {
-	  for (chunk_p = (char *)pnt_p->pi_pnt + pnt_p->pi_size;
-	       chunk_p < (char *)pnt_p->pi_pnt + amount;
-	       chunk_p++) {
-	    if (*chunk_p != '\0') {
-	      if (! silent_b) {
-		(void)printf("recalloc %d from %d was not fully zeroed on iteration #%d\n",
-			     amount, pnt_p->pi_size, iter_c + 1);
-	      }
-	      break;
+      which = _dmalloc_rand() % (max_pointers - free_c);
+      for (pnt_p = used_p; which > 0; which--) {
+	pnt_p = pnt_p->pi_next;
+      }
+      
+      pnt_p->pi_pnt = realloc(pnt_p->pi_pnt, amount);
+      /*
+       * note that we've free the old size, we'll account for the
+       * alloc below
+       */
+      max_avail += pnt_p->pi_size;
+      
+      if (verbose_b) {
+	(void)printf("%d: realloc %d from %d of max %d slot %d.  got %#lx\n",
+		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
+		     pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
+      }
+      
+      if (amount == 0) {
+	free_slot(iter_c, pnt_p, &used_p, &free_p);
+	free_c++;
+	pnt_p = NULL;
+	continue;
+      }
+      break;
+      
+      /* recalloc */
+    case 3:
+      if (free_c == max_pointers) {
+	continue;
+      }
+      
+      which = _dmalloc_rand() % (max_pointers - free_c);
+      for (pnt_p = used_p; which > 0; which--) {
+	pnt_p = pnt_p->pi_next;
+      }
+      
+      pnt_p->pi_pnt = recalloc(pnt_p->pi_pnt, amount);
+      /*
+       * note that we've free the old size, we'll account for the
+       * alloc below
+       */
+      max_avail += pnt_p->pi_size;
+      
+      if (verbose_b) {
+	(void)printf("%d: recalloc %d from %d of max %d slot %d.  got %#lx\n",
+		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
+		     pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
+      }
+      
+      /* test the returned block to make sure that is has been cleared */
+      if (pnt_p->pi_pnt != NULL && amount > pnt_p->pi_size) {
+	for (chunk_p = (char *)pnt_p->pi_pnt + pnt_p->pi_size;
+	     chunk_p < (char *)pnt_p->pi_pnt + amount;
+	     chunk_p++) {
+	  if (*chunk_p != '\0') {
+	    if (! silent_b) {
+	      (void)printf("recalloc %d from %d was not fully zeroed on iteration #%d\n",
+			   amount, pnt_p->pi_size, iter_c + 1);
 	    }
+	    break;
 	  }
 	}
-	break;
-	
-      case 12: case 13: case 14:
-	pnt_p = free_p;
-	pnt_p->pi_pnt = valloc(amount);
-	
-	if (verbose_b) {
-	  (void)printf("%d: valloc %d of max %d into slot %d.  got %#lx\n",
-		       iter_c + 1, amount, max, pnt_p - pointer_grid,
-		       (long)pnt_p->pi_pnt);
-	}
-	break;
-	
-      case 15:
+      }
+      
+      if (amount == 0) {
+	free_slot(iter_c, pnt_p, &used_p, &free_p);
+	free_c++;
+	pnt_p = NULL;
+	continue;
+      }
+      break;
+      
+      /* valloc */
+    case 4:
+      pnt_p = free_p;
+      pnt_p->pi_pnt = valloc(amount);
+      
+      if (verbose_b) {
+	(void)printf("%d: valloc %d of max %d into slot %d.  got %#lx\n",
+		     iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		     (long)pnt_p->pi_pnt);
+      }
+      break;
+      
+      /* sbrk */
+    case 5:
 #if HAVE_SBRK
-	{
-	  void	*mem;
-	  
-	  mem = sbrk(amount);
-	  if (verbose_b) {
-	    (void)printf("%d: sbrk'd %d of max %d bytes.  got %#lx\n",
-			 iter_c + 1, amount, max, (long)mem);
-	  }
-	  /* don't store the memory */
-	  pnt_p = NULL;
+      /* do it less often then the other functions */
+      which = _dmalloc_rand() % 5;
+      if (which == 3) {
+	void	*mem;
+	
+	mem = sbrk(amount);
+	if (verbose_b) {
+	  (void)printf("%d: sbrk'd %d of max %d bytes.  got %#lx\n",
+		       iter_c + 1, amount, max_avail, (long)mem);
 	}
-#else
-	pnt_p = NULL;
+	/* don't store the memory */
+      }
 #endif
-	break;
-	
-      default:
-	pnt_p = NULL;
-	break;
-      }
+      continue;
+      break;
       
-      if (pnt_p != NULL) {
-	if (pnt_p->pi_pnt == NULL) {
-	  printf("which = %d\n", which);
-	  if (! silent_b) {
-	    (void)printf("%d: ERROR allocation of %d returned error\n",
-			 iter_c + 1, amount);
-	  }
-	  iter_c++;
-	  continue;
-	}
-	
-	/* set the size and take it off the free-list and put on used list */
-	pnt_p->pi_size = amount;
-	
-	if (pnt_p == free_p) {
-	  free_p = pnt_p->pi_next;
-	  pnt_p->pi_next = used_p;
-	  used_p = pnt_p;
-	  free_c--;
-	}
+    default:
+      continue;
+      break;
+    }
+    
+    if (pnt_p->pi_pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("%d: ERROR allocation of %d returned error\n",
+		     iter_c + 1, amount);
       }
-      
-      max -= amount;
+      final = 0;
       iter_c++;
       continue;
     }
     
-    /*
-     * choose a random slot to free and make sure it is not a free-slot
-     */
-    which = random_value(max_pointers - free_c);
-    for (pnt_p = used_p; which > 0; which--) {
-      pnt_p = pnt_p->pi_next;
+    /* set the size and take it off the free-list and put on used list */
+    pnt_p->pi_size = amount;
+    
+    if (pnt_p == free_p) {
+      free_p = pnt_p->pi_next;
+      pnt_p->pi_next = used_p;
+      used_p = pnt_p;
+      free_c--;
     }
     
-    free(pnt_p->pi_pnt);
-    
-    if (verbose_b) {
-      (void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
-		   iter_c + 1, pnt_p->pi_size, pnt_p - pointer_grid,
-		   (long)pnt_p->pi_pnt);
-    }
-    
-    pnt_p->pi_pnt = NULL;
-    
-    /* find pnt in the used list */
-    for (this_p = used_p, last_p = NULL;
-	 this_p != NULL;
-	 last_p = this_p, this_p = this_p->pi_next) {
-      if (this_p == pnt_p) {
-	break;
-      }
-    }
-    if (last_p == NULL) {
-      used_p = pnt_p->pi_next;
-    }
-    else {
-      last_p->pi_next = pnt_p->pi_next;
-    }
-    
-    pnt_p->pi_next = free_p;
-    free_p = pnt_p;
-    free_c++;
-    
-    max += pnt_p->pi_size;
+    max_avail -= amount;
     iter_c++;
+    continue;
   }
   
   /* free used pointers */
@@ -469,12 +500,7 @@ static	int	do_random(const int iter_n)
   
   free(pointer_grid);
   
-  if (dmalloc_errno == ERROR_NONE) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
+  return final;
 }
 
 /*
@@ -483,11 +509,11 @@ static	int	do_random(const int iter_n)
 static	int	check_special(void)
 {
   void	*pnt;
-  int	errno_hold = dmalloc_errno, ret, page_size;
+  int	errno_hold = dmalloc_errno, page_size;
+  int	final = 1;
   
-  if (! silent_b) {
-    (void)printf("The following tests will generate errors:\n");
-  }
+  /* reset the errno */
+  dmalloc_errno = ERROR_NONE;
   
   /* get our page size */
   page_size = dmalloc_page_size();
@@ -503,6 +529,7 @@ static	int	check_special(void)
     if (! silent_b) {
       (void)printf("   ERROR: re-allocation of 0L returned error.\n");
     }
+    final = 0;
   }
   else {
     free(pnt);
@@ -516,6 +543,7 @@ static	int	check_special(void)
       (void)printf("   ERROR: re-allocation of 0L did not return error.\n");
     }
     free(pnt);
+    final = 0;
   }
 #endif
   
@@ -526,12 +554,18 @@ static	int	check_special(void)
   }
   free(NULL);
 #if ALLOW_FREE_NULL
-  if (dmalloc_errno != ERROR_NONE && (! silent_b)) {
-    (void)printf("   ERROR: free of 0L returned error.\n");
+  if (dmalloc_errno != ERROR_NONE) {
+    if (! silent_b) {
+      (void)printf("   ERROR: free of 0L returned error.\n");
+    }
+    final = 0;
   }
 #else
-  if (dmalloc_errno == ERROR_NONE && (! silent_b)) {
-    (void)printf("   ERROR: free of 0L did not return error.\n");
+  if (dmalloc_errno == ERROR_NONE) {
+    if (! silent_b) {
+      (void)printf("   ERROR: free of 0L did not return error.\n");
+    }
+    final = 0;
   }
   else {
     dmalloc_errno = ERROR_NONE;
@@ -552,6 +586,7 @@ static	int	check_special(void)
       (void)printf("   ERROR: allocation of > largest allowed size did not return error.\n");
     }
     free(pnt);
+    final = 0;
   }
   
   /********************/
@@ -570,7 +605,7 @@ static	int	check_special(void)
     }
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = random_value(page_size * 2);
+      amount = _dmalloc_rand() % (page_size * 2);
       if (amount == 0) {
 	amount = 1;
       }
@@ -579,10 +614,11 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
+	final = 0;
 	continue;
       }
       free(pnt);
-      where = random_value(amount);
+      where = _dmalloc_rand() % amount;
       ch_hold = *((char *)pnt + where);
       *((char *)pnt + where) = 'h';
       
@@ -590,6 +626,7 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: overwriting free memory not detected.\n");
 	}
+	final = 0;
 	dmalloc_errno = ERROR_FREE_NON_BLANK;
       }
       else if (dmalloc_errno == ERROR_FREE_NON_BLANK) {
@@ -600,6 +637,7 @@ static	int	check_special(void)
 	  (void)printf("   ERROR: verify of overwritten memory returned: %s\n",
 		       dmalloc_strerror(dmalloc_errno));
 	}
+	final = 0;
       }
       *((char *)pnt + where) = ch_hold;
     }
@@ -625,7 +663,7 @@ static	int	check_special(void)
     dmalloc_debug(current_flags & ~DEBUG_CHECK_FENCE);
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = random_value(page_size * 2);
+      amount = _dmalloc_rand() % (page_size * 2);
       if (amount == 0) {
 	amount = 1;
       }
@@ -634,6 +672,7 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
 	}
+	final = 0;
 	continue;
       }
       if ((unsigned long)pnt % page_size != 0) {
@@ -641,6 +680,7 @@ static	int	check_special(void)
 	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
 		       (unsigned long)pnt);
 	}
+	final = 0;
 	dmalloc_errno = ERROR_NOT_ON_BLOCK;
       }
       free(pnt);
@@ -652,7 +692,7 @@ static	int	check_special(void)
     dmalloc_debug(current_flags | DEBUG_CHECK_FENCE);
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = random_value(page_size * 2);
+      amount = _dmalloc_rand() % (page_size * 2);
       if (amount == 0) {
 	amount = 1;
       }
@@ -661,6 +701,7 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
 	}
+	final = 0;
 	continue;
       }
       if ((unsigned long)pnt % page_size != 0) {
@@ -668,6 +709,7 @@ static	int	check_special(void)
 	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
 		       (unsigned long)pnt);
 	}
+	final = 0;
 	dmalloc_errno = ERROR_NOT_ON_BLOCK;
       }
       free(pnt);
@@ -686,7 +728,7 @@ static	int	check_special(void)
     }
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = random_value(page_size * 2);
+      amount = _dmalloc_rand() % (page_size * 2);
       if (amount == 0) {
 	amount = 1;
       }
@@ -695,9 +737,13 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
+	final = 0;
 	continue;
       }
-      wrong = random_value(amount);
+      wrong = _dmalloc_rand() % amount;
+      if (wrong == 0) {
+	wrong = 1;
+      }
       if (dmalloc_free(__FILE__, __LINE__, (char *)pnt + wrong,
 		       DMALLOC_FUNC_FREE) == FREE_ERROR) {
 	if (dmalloc_errno == ERROR_NOT_FOUND) {
@@ -708,12 +754,14 @@ static	int	check_special(void)
 	    (void)printf("   ERROR: free bad pointer produced: %s\n",
 			 dmalloc_strerror(dmalloc_errno));
 	  }
+	  final = 0;
 	}
       }
       else {
 	if (! silent_b) {
 	  (void)printf("   ERROR: no problem freeing bad pointer.\n");
 	}
+	final = 0;
 	dmalloc_errno = ERROR_NOT_FOUND;
       }
       free(pnt);
@@ -723,9 +771,8 @@ static	int	check_special(void)
   /********************/
   
   {
-    int			iter_c, amount;
     char		*alloc_p;
-    unsigned int	current_flags;
+    unsigned int	current_flags, iter_c, amount;
     
     if (! silent_b) {
       (void)printf("  Checking alloc blanking\n");
@@ -733,10 +780,10 @@ static	int	check_special(void)
     
     current_flags = dmalloc_debug_current();
     /* turn on alloc blanking */
-    dmalloc_debug(current_flags & ~DEBUG_ALLOC_BLANK);
+    dmalloc_debug(current_flags | DEBUG_ALLOC_BLANK);
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = random_value(page_size * 2);
+      amount = _dmalloc_rand() % (page_size * 2);
       if (amount == 0) {
 	amount = 1;
       }
@@ -745,6 +792,7 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
+	final = 0;
 	continue;
       }
       for (alloc_p = pnt; alloc_p < (char *)pnt + amount; alloc_p++) {
@@ -752,6 +800,7 @@ static	int	check_special(void)
 	  if (! silent_b) {
 	    (void)printf("   ERROR: allocation not fully blanked.\n");
 	  }
+	  final = 0;
 	  dmalloc_errno = ERROR_ALLOC_FAILED;
 	}
       }
@@ -764,7 +813,7 @@ static	int	check_special(void)
     dmalloc_debug(current_flags | DEBUG_CHECK_FENCE);
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = random_value(page_size * 2);
+      amount = _dmalloc_rand() % (page_size * 2);
       if (amount == 0) {
 	amount = 1;
       }
@@ -773,6 +822,7 @@ static	int	check_special(void)
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
 	}
+	final = 0;
 	continue;
       }
       if ((unsigned long)pnt % page_size != 0) {
@@ -780,6 +830,7 @@ static	int	check_special(void)
 	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
 		       (unsigned long)pnt);
 	}
+	final = 0;
 	dmalloc_errno = ERROR_NOT_ON_BLOCK;
       }
       free(pnt);
@@ -790,18 +841,8 @@ static	int	check_special(void)
   
   /********************/
 
-  if (dmalloc_errno == ERROR_NONE) {
-    ret = 1;
-  }
-  else {
-    ret = 0;
-  }
-  
-  if (errno_hold != 0) {
-    dmalloc_errno = errno_hold;
-  }
-  
-  return ret;
+  dmalloc_errno = errno_hold;
+  return final;
 }
 
 /*
@@ -1158,7 +1199,7 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
 int	main(int argc, char **argv)
 {
   unsigned int	store_flags;
-  int		ret;
+  int		ret, final = 0;
   
   argv_process(arg_list, argc, argv);
   
@@ -1190,11 +1231,7 @@ int	main(int argc, char **argv)
 #endif /* ! HAVE_GETPID */
 #endif /* ! HAVE_TIME */
   }
-#if HAVE_RANDOM
-  (void)srandom(seed_random);
-#else
-  (void)srand(seed_random);
-#endif
+  _dmalloc_srand(seed_random);
   
   if (! silent_b) {
     (void)printf("Random seed is %u\n", seed_random);
@@ -1217,28 +1254,22 @@ int	main(int argc, char **argv)
     }
     (void)fflush(stdout);
     
-    ret = do_random(default_iter_n);
-    if (! silent_b) {
-      (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
-    }
-  }
-  dmalloc_debug(store_flags);
-  
-  if (dmalloc_errno != ERROR_NONE) {
-    /*
-     * Even if we are silent, we must give the random seed which is
-     * the only way we can reproduce the problem.
-     */
-    if (silent_b) {
-      (void)fprintf(stderr, "Random seed is %u.  Error: %s (%d)\n",
-		    seed_random, dmalloc_strerror(dmalloc_errno),
-		    dmalloc_errno);
+    if (do_random(default_iter_n)) {
+      if (! silent_b) {
+	(void)printf("  Succeeded.\n");
+      }
     }
     else {
-      (void)fprintf(stderr, "Final error: %s (%d)\n",
-		    dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      if (silent_b) {
+	(void)printf("Random tests failed.  Last dmalloc error: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      else {
+	(void)printf("  Failed.  Last dmalloc error: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 1;
     }
-    exit(1);
   }
   
   /* check the special malloc functions but don't allow silent dumps */
@@ -1248,9 +1279,39 @@ int	main(int argc, char **argv)
     if (! silent_b) {
       (void)printf("Running special tests...\n");
     }
-    ret = check_special();
-    if (! silent_b) {
-      (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
+    if (check_special()) {
+      if (! silent_b) {
+	(void)printf("  Succeeded.\n");
+      }
+    }
+    else {
+      if (silent_b) {
+	(void)printf("ERROR: Running special tests failed.  Last dmalloc error: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      else {
+	(void)printf("  Failed.  Last dmalloc error: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 1;
+    }
+  }
+  dmalloc_debug(store_flags);
+  
+  if (final != 0) {
+    /*
+     * Even if we are silent, we must give the random seed which is
+     * the only way we can reproduce the problem.
+     */
+    if (silent_b) {
+      (void)fprintf(stderr,
+		    "Random seed is %u.  Final dmalloc error: %s (%d)\n",
+		    seed_random, dmalloc_strerror(dmalloc_errno),
+		    dmalloc_errno);
+    }
+    else {
+      (void)fprintf(stderr, "Final dmalloc error: %s (%d)\n",
+		    dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }
   
@@ -1269,5 +1330,6 @@ int	main(int argc, char **argv)
   malloc_shutdown();
 #endif
   
-  exit(0);
+  exit(final);
 }
+
