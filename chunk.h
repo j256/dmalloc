@@ -16,9 +16,9 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.25 1993/08/24 22:24:19 gray Exp $
+ * $Id: chunk.h,v 1.26 1993/08/30 20:14:09 gray Exp $
  */
 
 #ifndef __CHUNK_H__

@@ -16,9 +16,9 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.24 1993/08/27 02:53:21 gray Exp $
+ * $Id: version.h,v 1.25 1993/08/30 20:14:45 gray Exp $
  */
 
 #include "malloc_loc.h"				/* for LOCAL */
@@ -30,4 +30,4 @@
  */
 LOCAL	char	*malloc_version = "1.3.2";
 
-/* Version Date: $Date: 1993/08/27 02:53:21 $ */
+/* Version Date: $Date: 1993/08/30 20:14:45 $ */

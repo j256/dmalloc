@@ -16,9 +16,9 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: compat.h,v 1.13 1993/08/26 23:08:56 gray Exp $
+ * $Id: compat.h,v 1.14 1993/08/30 20:14:14 gray Exp $
  */
 
 #ifndef __COMPAT_H__

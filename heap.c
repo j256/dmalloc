@@ -16,7 +16,7 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  */
 
 /*
@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.28 1993/08/18 02:06:23 gray Exp $";
+  "$Id: heap.c,v 1.29 1993/08/30 20:14:28 gray Exp $";
 #endif
 
 /* external routines */

@@ -16,7 +16,7 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  */
 
 /*
@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.40 1993/08/27 00:55:16 gray Exp $";
+  "$Id: malloc.c,v 1.41 1993/08/30 20:14:32 gray Exp $";
 #endif
 
 /*

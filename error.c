@@ -16,7 +16,7 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  */
 
 /*
@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.29 1993/07/23 21:24:27 gray Exp $";
+  "$Id: error.c,v 1.30 1993/08/30 20:14:21 gray Exp $";
 #endif
 
 /*

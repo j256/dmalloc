@@ -16,9 +16,9 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: error.h,v 1.12 1993/07/23 21:24:29 gray Exp $
+ * $Id: error.h,v 1.13 1993/08/30 20:14:23 gray Exp $
  */
 
 #ifndef __ERROR_H__

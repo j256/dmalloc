@@ -16,9 +16,9 @@
  * the software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of the program may be contacted at gray.watson@antaire.com
+ * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.23 1993/08/27 00:55:25 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.24 1993/08/30 20:14:36 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
