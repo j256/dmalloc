@@ -1,6 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.109 2003/07/08 18:09:50 gray Exp $
+$Id: NEWS,v 1.110 2003/09/08 14:50:42 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.2.2:
+
+	* Added GETENV_SAFE testing for Cygwin environments.  Feedback needed.
+	* Fixed bug in function args pnt checking.  Thanks TJ and Philippe.
+	* Improved pnt checking code to properly check free space above alloc.
+	* Fixed possible lock leak in the shutdown code.  Thanks TJ.
+	* Changed the installing of libraries to install-data. 
 
 Version 5.2.1:
 
