@@ -1,3 +1,30 @@
+2003-06-08  Gray Watson  <gray@outside.256.com>
+
+	* Removed the check-lists debug token which was not being used
+	with the new heap organizations.
+
+	* Fixed the realloc-copy and never-reuse functionality and added
+	checks to dmalloc_t for them.
+
+	* Fixed a number of problems with the table data.
+
+	* Improved the stats output a bit.
+
+	* Added additional checks for wierd realloc and free problems.
+
+2003-06-06  Gray Watson  <gray@outside.256.com>
+
+	* Expanded the arguments to dmalloc_examine to return more
+	information about the pointer.  This was explicitly needed to
+	better test the library's setting of the values.
+
+	* Found and fixed a problem where the last-used mark was not being
+	set properly.  Added checks to dmalloc_t for this.
+
+	* Found and fixed a bad problem where the leaked memory was not
+	being reported correctly.  Very bad.  Added checks in dmalloc_t
+	for this.
+
 2003-06-04  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.0.2.
@@ -1913,5 +1940,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.292 2003/06/04 23:54:05 gray Exp $
+$Id: ChangeLog,v 1.293 2003/06/08 19:39:36 gray Exp $
 -------------------------------------------------------------------------------
