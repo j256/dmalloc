@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.51 1993/11/23 07:41:48 gray Exp $";
+  "$Id: malloc.c,v 1.52 1993/11/30 10:36:51 gray Exp $";
 #endif
 
 /*
@@ -420,10 +420,8 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
   if (old_pnt == NULL)
     newp = _chunk_malloc(_malloc_file, _malloc_line, new_size);
   else
-    newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
-#else
-  newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
 #endif
+    newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
   
   check_pnt(_malloc_file, _malloc_line, newp, "realloc-out");
   

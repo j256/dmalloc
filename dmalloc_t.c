@@ -29,9 +29,14 @@
 #include "argv.h"
 #include "malloc_dbg.h"
 
+/*
+ * NOTE: this is only needed to test certain features of the library.
+ */
+#include "conf.h"
+
 #if INCLUDE_RCS_IDS
-LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.30 1993/11/23 09:37:23 gray Exp $";
+static	char	*rcs_id =
+  "$Id: dmalloc_t.c,v 1.31 1993/11/30 10:36:55 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -120,11 +125,11 @@ static	void	*get_address(void)
  */
 static	int	do_random(const int itern)
 {
-  int		iterc, amount, max = MAX_AMOUNT;
+  int		iterc, last, amount, max = MAX_AMOUNT;
   pnt_info_t	*freep = pointer_grid, *usedp = NULL;
   pnt_info_t	*pntp, *lastp, *thisp;
   
-  malloc_errno = 0;
+  malloc_errno = last = 0;
   
   /* initialize free list */
   for (pntp = pointer_grid; pntp < pointer_grid + MAX_POINTERS; pntp++) {
@@ -138,9 +143,11 @@ static	int	do_random(const int itern)
   for (iterc = 0; iterc < itern;) {
     int		which;
     
-    if (malloc_errno != 0 && ! silent)
-      (void)printf("ERROR: error code %d on iteration #%d: %s\n",
-		   malloc_errno, iterc, malloc_strerror(malloc_errno));
+    if (malloc_errno != last && ! silent) {
+      (void)printf("ERROR: iter %d: %s(%d)\n",
+		   iterc, malloc_strerror(malloc_errno), malloc_errno);
+      last = malloc_errno;
+    }
     
     which = (rand() % 20) / 10;
     
@@ -149,9 +156,15 @@ static	int	do_random(const int itern)
      * free slots else we free
      */
     if (which == 0 && max > 10 && freep != NULL) {
-      do {
+      for (;;) {
 	amount = rand() % (max / 2);
-      } while (amount == 0);
+	if (amount > 0)
+	  break;
+#if ALLOW_ALLOC_ZERO_SIZE
+	if (amount == 0)
+	  break;
+#endif
+      }
       
       which = (rand() % 30) / 10;
       if (which == 0) {
@@ -176,6 +189,7 @@ static	int	do_random(const int itern)
 	pntp = pointer_grid + (rand() % MAX_POINTERS);
 	if (pntp->pi_pnt == NULL)
 	  continue;
+	
 	pntp->pi_pnt = REMALLOC(pntp->pi_pnt, amount);
 	max += pntp->pi_size;
 	
@@ -252,6 +266,75 @@ static	int	do_random(const int itern)
 }
 
 /*
+ * do some special tests, returns 1 on success else 0
+ */
+static	int	check_special(void)
+{
+  void	*pnt;
+  
+#if ALLOW_REALLOC_NULL
+  pnt = REMALLOC(NULL, 10);
+  if (pnt == NULL) {
+    if (! silent)
+      (void)printf("   ERROR: re-allocation of 0L returned error.\n");
+  }
+  else
+    FREE(pnt);
+#else
+  pnt = REMALLOC(NULL, 10);
+  if (pnt != NULL) {
+    if (! silent)
+      (void)printf("   ERROR: re-allocation of 0L did not return error.\n");
+    FREE(pnt);
+  }
+#endif
+  
+#if ALLOW_FREE_NULL
+  {
+    int		hold = malloc_errno;
+    
+    malloc_errno = 0;
+    
+    FREE(NULL);
+    if (malloc_errno != 0 && ! silent)
+      (void)printf("   ERROR: free of 0L returned error.\n");
+    
+    malloc_errno = hold;
+  }
+#else
+  {
+    int		hold = malloc_errno;
+    malloc_errno = 0;
+    
+    FREE(NULL);
+    if (malloc_errno == 0 && ! silent)
+      (void)printf("   ERROR: free of 0L did not return error.\n");
+    
+    malloc_errno = hold;
+  }
+#endif
+  
+  {
+    int		hold = malloc_errno;
+    malloc_errno = 0;
+    
+    pnt = MALLOC((1 << LARGEST_BLOCK) + 1);
+    if (pnt != NULL) {
+      if (! silent)
+	(void)printf("   ERROR: allocation of > largest allowed size did not return error.\n");
+      FREE(pnt);
+    }
+    
+    malloc_errno = hold;
+  }
+  
+  if (malloc_errno == 0)
+    return 1;
+  else
+    return 0;
+}
+
+/*
  * run the interactive section of the program
  */
 static	void	do_interactive(void)
@@ -276,13 +359,18 @@ static	void	do_interactive(void)
     if (strncmp(line, "?", len) == 0
 	|| strncmp(line, "help", len) == 0) {
       (void)printf("\thelp      - print this message\n");
+      
       (void)printf("\tmalloc    - allocate memory\n");
-      (void)printf("\tfree      - deallocate memory\n");
       (void)printf("\trealloc   - reallocate memory\n");
+      (void)printf("\tfree      - deallocate memory\n");
+      
+      (void)printf("\tverify    - check out a memory address (or all heap)\n");
       (void)printf("\tmap       - map the heap to the logfile\n");
       (void)printf("\toverwrite - overwrite some memory to test errors\n");
+      
       (void)printf("\trandom    - randomly execute a number of [de] allocs\n");
-      (void)printf("\tverify    - check out a memory address (or all heap)\n");
+      (void)printf("\tspecial   - run some special tests\n");
+      
       (void)printf("\tquit      - quit this test program\n");
       continue;
     }
@@ -355,6 +443,16 @@ static	void	do_interactive(void)
       continue;
     }
     
+    /* do random heap hits */
+    if (strncmp(line, "special", len) == 0) {
+      if (check_special())
+	(void)printf("It succeeded.\n");
+      else
+	(void)printf("It failed.\n");
+      
+      continue;
+    }
+    
     if (strncmp(line, "verify", len) == 0) {
       int	ret;
       
@@ -394,6 +492,12 @@ int	main(int argc, char ** argv)
     if (! silent)
       (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   }
+  
+  if (! silent)
+    (void)printf("Running special tests...\n");
+  (void)check_special();
+  if (! silent)
+    (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   
   /* you will need to uncomment this if you can't auto-shutdown */
 #if 0

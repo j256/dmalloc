@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.26 1993/11/23 07:41:32 gray Exp $
+ * $Id: conf.h.in,v 1.27 1993/11/30 10:36:49 gray Exp $
  */
 
 /*
@@ -35,9 +35,9 @@
 
 /*
  * should we allow zero length allocations?  this will generate the
- * smallest possible allocation with top and bottom of any fence post
- * information touching.  WARNING: this has not been tested although
- * some code does exist for it.
+ * smallest possible allocation.  FYI: if fence post checking is
+ * requested, the top and bottom of the fence post information will be
+ * touching.
  */
 #define ALLOW_ALLOC_ZERO_SIZE 0
 
@@ -81,8 +81,10 @@
  * although I don't know why you would want to tune this since this is
  * pretty dependant on my general heap mechanisms, here are some
  * options to use general first, best, and worst fit algorithms.  if
- * you don't know what these are then don't touch.  NOTE: they may go
- * away in the future and/or be replaced by debug-tokens.
+ * you don't know what these are, then DON'T TOUCH.  NOTES: they may
+ * go away in the future and/or be replaced by debug-tokens.  I've
+ * tested all three and have not noticed and large differences.  Also,
+ * they only apply for allocations > basic-block (page) size.
  */
 #define FIRST_FIT 1
 #define BEST_FIT 0

@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.61 1993/11/30 02:41:26 gray Exp $";
+  "$Id: chunk.c,v 1.62 1993/11/30 10:36:45 gray Exp $";
 #endif
 
 /*
@@ -272,9 +272,8 @@ LOCAL	int	fence_read(const char * file, const unsigned int line,
   long		*longp;
   
   /*
-   * write magic numbers into block in bottom of allocation
-   *
-   * WARNING: assuming a word-boundary here
+   * check magic numbers in bottom of allocation block
+   * NOTE: assuming a word-boundary here
    */
   for (longp = (long *)pnt; longp < (long *)((char *)pnt + FENCE_BOTTOM);
        longp++)
@@ -287,8 +286,7 @@ LOCAL	int	fence_read(const char * file, const unsigned int line,
     }
   
   /*
-   * write magic numbers into block in top of allocation
-   *
+   * check numbers at top of allocation block
    * WARNING: not guaranteed a word-boundary here
    */
   for (longp = (long *)((char *)pnt + size - FENCE_TOP);
@@ -315,13 +313,18 @@ LOCAL	void	fence_write(void * pnt, const unsigned int size)
   unsigned long	top = FENCE_MAGIC_TOP;
   long		*longp;
   
-  /* write magic numbers into block in bottom of allocation */
+  /*
+   * write magic numbers into block in bottom of allocation
+   * NOTE: assuming a word-boundary here
+   */
   for (longp = (long *)pnt; longp < (long *)((char *)pnt + FENCE_BOTTOM);
        longp++)
     *longp = FENCE_MAGIC_BASE;
   
-  /* write magic numbers into block in top of allocation */
-  /* WARNING: not guaranteed a word-boundary here */
+  /*
+   * write magic numbers into block in top of allocation
+   * WARNING: not guaranteed a word-boundary here
+   */
   for (longp = (long *)((char *)pnt + size - FENCE_TOP);
        longp < (long *)((char *)pnt + size);
        longp++)
@@ -1888,8 +1891,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (byten == 0) {
-    log_bad_pnt(file, line, NULL, "bad zero byte allocation request",
-		FALSE);
+    log_bad_pnt(file, line, NULL, "bad zero byte allocation request", FALSE);
     malloc_errno = ERROR_BAD_SIZE;
     _malloc_error("_chunk_malloc");
     return MALLOC_ERROR;
@@ -2152,11 +2154,14 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   /* counts calls to realloc */
   realloc_count++;
   
-  /*
-   * XXX: will need to drop the new_bitn shit if we are dealing with
-   * blocks and see if we have reallocated past into another block and
-   * then free and realloc.
-   */
+#if ALLOW_ALLOC_ZERO_SIZE == 0
+  if (new_size == 0) {
+    log_bad_pnt(file, line, NULL, "bad zero byte allocation request", FALSE);
+    malloc_errno = ERROR_BAD_SIZE;
+    _malloc_error("_chunk_realloc");
+    return REALLOC_ERROR;
+  }
+#endif
   
   /*
    * TODO: for bblocks it would be nice to examine the above memory

@@ -1,3 +1,8 @@
+Tue Nov 30 05:35:39 1993  Gray Watson  (gray@fridge.antaire.com)
+
+	* added special tests to malloc_t.  cleaned up and tested
+	alloc(0).
+
 Mon Nov 29 21:39:54 1993  Gray Watson  (gray@fridge.antaire.com)
 
 	* turned num_bits into a macro and condenced log_heap_map.  added
@@ -581,5 +586,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.79 1993/11/30 02:41:21 gray Exp $
+$Id: ChangeLog,v 1.80 1993/11/30 10:36:40 gray Exp $
 -------------------------------------------------------------------------------
