@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.12 1993/03/31 00:35:31 gray Exp $
+$Id: NOTES,v 1.13 1993/04/06 04:24:29 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -92,5 +92,13 @@ OVERHEAD:
 
 - dblock: 8 bytes per pointer
 - bblock: 12 bytes per pointer
+
+-------------------------------------------------------------------------------
+
+THANKS:
+
+Special thanks to Scott Michel <scottm@intime.intime.COM> for
+listening to my endless chatter and finding/solvings lots of stupid
+problems during the alpha stages of this library.
 
 -------------------------------------------------------------------------------

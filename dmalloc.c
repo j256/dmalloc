@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.5 1993/04/05 01:29:10 gray Exp $";
+  "$Id: dmalloc.c,v 1.6 1993/04/06 04:24:39 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -125,6 +125,8 @@ LOCAL	void	usage(void)
 		"seeing file [and line] %%s\n");
   (void)fprintf(stderr, "  [tag]             = debug token to find in mallocrc"
 		"\n");
+  (void)fprintf(stderr, "if no arguments are specified then it dumps the "
+		"current env setings.\n");
 }
 
 /*

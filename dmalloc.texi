@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.11 1993/04/05 22:30:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.12 1993/04/06 04:24:36 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -47,7 +47,7 @@ translation approved by the author instead of in the original English.
 @end ifinfo
 
 @titlepage
-@title Malloc Library
+@title Malloc Debug Library
 @author Gray Watson @samp{<gray.watson@@antaire.com>}
 
 @page
@@ -109,11 +109,10 @@ This package is covered by the GNU Library Public License.  See the file
 this package that you feel is reasonable but prohibited by the license,
 please contact me to see if we can work it out.
 
-@strong{PLEASE NOTICE}: this is not the GNU Public License but the
-@emph{library} public license.  This license allows you to do more with
-the library than the standard public license distributed with most GNU
-software.  Please read @file{COPYING-LIB} or contact me for more
-information.
+@emph{NOTICE}: this is not the GNU Public License but the @emph{library}
+public license.  This license allows you to do more with the library
+than the standard public license distributed with most GNU software.
+Please read @file{COPYING-LIB} or contact me for more information.
 
 The rest of this section contains some messages from the Free Software
 Foundation.  If you find this stuff offensive or annoying, remember that
@@ -194,7 +193,6 @@ program.
            @dots{}
         @}
 @end example
-
 Stack data is data allocated at run-time to hold information used inside
 of functions.  This data is managed by the system in the space called
 stack space.
@@ -208,7 +206,6 @@ stack space.
            @dots{}
         @}
 @end example
-
 Heap data is also allocated at run-time and provides a programmer with
 dynamic memory capabilities.
 
@@ -227,7 +224,6 @@ dynamic memory capabilities.
            @dots{}
         @}
 @end example
-
 It is the heap data that is managed by this library.
 
 Although the above is an example of how to use the malloc and free
@@ -257,14 +253,14 @@ include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.
 
 @table @samp
 @item malloc
-Usage: @code{pnt = (pointer-type)malloc(unsigned int size);}
+Usage: @code{pnt = (type *)malloc(unsigned int size);}
 
 The malloc routine is the basic memory allocation routine.  It allocates
 an area of size bytes.  It will return a pointer to the space requested.
 
 @item calloc
-Usage: @code{pnt = (pointer-type)calloc(unsigned int number, unsigned
-int size);}
+Usage: @code{pnt = (type *)calloc(unsigned int number, unsigned int
+size);}
 
 The calloc routine allocates a certain number of items, each of size
 bytes, and returns a pointer to the space.  It is appropriate to pass in
@@ -274,7 +270,7 @@ Also, calloc nulls the space that it returns, assuring that the memory
 is all zeros.
 
 @item realloc
-Usage: @code{new_pnt = (pointer-type)realloc(void * old_pnt, unsigned
+Usage: @code{new_pnt = (type *)realloc(void * old_pnt, unsigned
 int new_size);}
 
 The realloc function expands or shrinks the memory allocation in old_pnt
@@ -294,12 +290,12 @@ resources.
 @end table
 
 @emph{NOTE}: the returned address from the memory
-allocation/reallocation functions should always be cast to the
+allocation/reallocation functions should @emph{always} be cast to the
 appropriate pointer type for the variable being assigned.
 
-@strong{WARNING}: there is a quite common myth that all of the space
-that is returned by malloc libraries has already been cleared.
-@emph{Only} the calloc routine will zero the memory space it returns.
+@emph{WARNING}: there is a quite common myth that all of the space that
+is returned by malloc libraries has already been cleared.  @emph{Only}
+the calloc routine will zero the memory space it returns.
 
 @node Features, Usage, Allocation Basics, Top
 @chapter Description of the Benefits of the Library.
@@ -310,15 +306,16 @@ that is returned by malloc libraries has already been cleared.
 * malloc_dbg program::          Env variable setting utility.
 * RC file::                     Format of the run-time configuration file.
 * Debug tokens::                Description of the debugging token flags.
+* Argument checking::           Special checking of function arguments.
 @end menu
 
 @node Overview, Environment variables,  , Features
 @section General Debugging Concepts.
 
 The features of this library are controlled by a number of environmental
-variables.  They enable the memory debugging features at runtine to help
+variables.  They enable the memory debugging features at runtime to help
 locate problems, chart memory leaks, provide basic bounds checking, log
-statistics, etc.  @xref{Environment variables}.
+statistics, etc.. @xref{Environment variables}.
 
 The debugging features that are available can be broken down into a
 couple basic classifications:
@@ -328,13 +325,14 @@ couple basic classifications:
 One of the nice things about a good debugger is its ability to provide
 the file and line number of an offending piece of code.  This library
 attempts to give this functionality with the help of @dfn{cpp}, the C
-preprocessor.  If the file @file{malloc.h} was included, the library
-will provide file and line information for the library to access.
+preprocessor.  If the file @file{malloc.h} is included, the library can
+provide file and line information for the warning messages and errors it
+generates.
 
 @item fence-post (i.e. bounds) checking
-@dfn{Fence-post} memory is the area immediately below or above memory
-allocations.  Often in programming, the code will inadvertently access
-below or above an allocation (especially when dealing with arrays or
+@dfn{Fence-post} memory is the area immediately above or below memory
+allocations.  I have found it all to easy to write code that accesses
+above or below an allocation (especially when dealing with arrays or
 strings).  The library can write special values in the areas around
 every allocation so it will notice when these areas have been
 overwritten.
@@ -383,7 +381,6 @@ memory after it has been freed.  This serves two purposes: it will make
 sure that the program will get garbage data if it trying to access the
 area again, and it will allow the library to verify the area later for
 signs of overwriting.
-
 @end table
 
 If any of the above debugging features detect an error, the library will
@@ -392,10 +389,10 @@ as much information as possible.
 
 The error messages that the library displays are designed to give the
 most information for developers.  If the error message is not
-understood, then it is most likely just trying to indicate that a
-certain part of the heap has been corrupted.  The bug is most likely
-near the point that the library found the error so reviewing the code
-around this area is recommended.
+understood, then it is most likely just trying to indicate that a part
+of the heap has been corrupted.  The bug is most likely near the last
+call made to the library so reviewing the code around this area is
+recommended.
 
 The library can be configured to quit immediately when an error is
 detected and to dump a core file or memory-image.  This can be examined
@@ -409,8 +406,8 @@ problem is detected.
 
 Other malloc-debug libraries also support the ability to dump core and
 then continue running.  I decided not to support this once it was
-determined that some versions of fork make calls to malloc which would
-cause the library to go recursive.
+determined that some versions of @code{fork} make calls to malloc which
+would cause the library to go recursive.
 
 @emph{NOTE}: do not be surprised if the library catches problems with
 your system's library routines.  It took me four hours once to finally
@@ -418,7 +415,7 @@ come to the conclusion that the localtime call, included in SunOS
 release 4.1, was overwriting one of its fence-post markers.
 
 @node Environment variables, malloc_dbg program, Overview, Features
-@section The Variable Names and Their Features.
+@section Environment Variables - Their Names and Features.
 
 @dfn{Environment variables} are variables that are part of the user's
 working environment and are shared by all the programs.  The below
@@ -426,25 +423,23 @@ variables are used by the malloc library to enable or disable the memory
 debugging features, at runtime.
 
 They can be set either by hand or with the help of the malloc_dbg
-program @xref{malloc_dbg program}.
+program.  @xref{malloc_dbg program}.
 
 To set them by hand, C shell (or tcsh) users need to invoke:
 
 @example
         setenv variable value;
 @end example
-
 Bourne shell (or bash, ksh) users should use:
 
 @example
         variable=value;
         export variable;
 @end example
-
 @table @samp
 @item MALLOC_DEBUG
 This env variable should be set to a value in hexadecimal which
-corresponds to a set of functionality tokens @xref{Debug tokens}.  For
+corresponds to a set of functionality tokens.  @xref{Debug tokens}.  For
 instance, if the user wanted to enabled logging of memory transactions
 (value @samp{0x008}) and wanted to check fence-post memory (value
 @samp{0x400}) then @samp{MALLOC_DEBUG} should be set to @samp{0x408}.
@@ -499,13 +494,12 @@ routine or file has been reached in the program.
 @section Env Variable Setting Utility.
 
 The malloc_dbg program is designed to assist in the setting of the
-environmental variables, especially @samp{MALLOC_DEBUG}
-@xref{Environment variables}.
-
-It is designed to print the shell commands necessary to make the
-appropriate changes to the environment.  Unfortunately, it cannot make
-the changes on its own so the output from malloc_dbg should be sent
-through the @code{eval} shell command which will do the commands.
+environmental variables, especially @samp{MALLOC_DEBUG}.
+@xref{Environment variables}.  It is designed to print the shell
+commands necessary to make the appropriate changes to the environment.
+Unfortunately, it cannot make the changes on its own so the output from
+malloc_dbg should be sent through the @code{eval} shell command which
+will do the commands.
 
 With shells that have aliasing or macro capabilities: csh, tcsh, bash,
 ksh, etc., setting up an alias to malloc_dbg to do the eval call is
@@ -515,14 +509,12 @@ their @file{.cshrc} file:
 @example
         alias malloc 'eval `malloc_dbg \!*`'
 @end example
-
-This allows the user to execute @code{malloc args...} and the debugging
-variables will be set automatically.
+This allows the user to execute @code{malloc args}.
 
 The most basic usage for the program is @code{malloc_dbg [-b] tag}.  The
 -b flag is for generating Bourne-shell type commands (C-shell type are
 the default).  The tag argument should match a line from the user's
-run-time configuration file @xref{RC file}.
+run-time configuration file.  @xref{RC file}.
 
 Here is a detailed list of the flags that can passed to malloc_dbg:
 
@@ -561,7 +553,6 @@ Set the @samp{MALLOC_LOGFILE} env variable to filename.
 @item -s number
 Set the @samp{MALLOC_START} env variable to number (alternatively
 file:line).
-
 @end table
 
 If no arguments are specified, malloc_dbg dumps out the current settings
@@ -587,12 +578,12 @@ The rc file file should contain lines in the general form of:
         @code{tag token1, token2, ...}
 
 tag is to be matched with the tag argument passed to the malloc_dbg
-program @xref{malloc_dbg program}.  token1, token2, ... are debug
-capability tokens @xref{Debug tokens}.
-        
-A line can be finished with a \ meaning it continues onto the next line.
-Lines beginning with '#' are treated as comments and are ignored along
-with empty lines.
+program, token1, token2, ... are debug capability tokens.
+@xref{malloc_dbg program} and @ref{Debug tokens}.
+
+A line can be finished with a '\' meaning it continues onto the next
+line.  Lines beginning with '#' are treated as comments and are ignored
+along with empty lines.
 
 I have the below contents in my @file{.mallocrc} file:
 
@@ -618,7 +609,6 @@ debug3	log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 
 @dots{}
 @end example
-
 With the above file, when I say @code{eval `malloc_dbg debug1`}, I
 enable the logging of statistics, the logging of non-freed memory,
 logging of errors, logging of bad pointer information, and the checking
@@ -627,7 +617,7 @@ of fence-post memory areas.
 When I say @code{eval `malloc_dbg none`}, all memory debugging features
 are disabled.
 
-@node Debug tokens,  , RC file, Features
+@node Debug tokens, Argument Checking, RC file, Features
 @section Description of the Debugging Token Flags.
 
 The below tokens and their corresponding descriptions are for the
@@ -661,7 +651,7 @@ log full administrative information
 log detailed block information when malloc_heap_map is called
 
 @item log-unknown
-log unknown non-freed memory pointers as well as known
+like log-non-free but logs unknown non-freed memory pointers
 
 @item check-fence
 check fence-post memory areas
@@ -702,8 +692,41 @@ log a heap-map to the logfile every time the heap is checked
 
 @item print-perror
 log any errors and messages to the screen via standard-error
-
 @end table
+
+@node Argument Checking,  , Debug tokens, Features
+@section Check Certain Function Arguments.
+
+One potential problem with the library and its multitude of checks and
+diagnoses is that they only get performed when a malloc function is
+called.  One solution this is to include @file{malloc.h} and compile
+your source code with the @code{MALLOC_FUNC_CHECK} flag defined and
+enable the @code{check-funcs} token @xref{Debug tokens}.
+
+@example
+        gcc -DMALLOC_FUNC_CHECK file.c
+@end example
+Once you have compiled your source with FUNC_CHECK enabled, you will
+have to recompile with it off to disconnect the library @xref{Disabling
+the Library}.
+
+When this is defined malloc will override a number of functions and will
+insert a routine which knowns how to check its own arguments and then
+call the real function.  Malloc can check such functions as bcopy,
+index, strcat, and strcasecmp (for the full list see the end of
+@file{malloc.h}).
+
+When you call strlen, for instance, malloc will make sure the string
+argument's fence-post areas have not been overwritten, its file and line
+number locations are good, etc.  With bcopy, malloc will make sure that
+the destination string has enough space to store the number of bytes
+specified.
+
+For all of the arguments checked, if the pointer is not in the heap then
+it is ignored since malloc does know anything about it.
+
+@emph{NOTE}: this is one of the newest parts of the library so problems
+may still be lurking.
 
 @node Usage, Code, Features, Top
 @chapter How to Run Programs With the Library.
@@ -731,7 +754,6 @@ able to produce verbose reports on memory not freed:
 	not freed: 0x38410 ( 22 bytes) from 'malloc_t.c:92'
         not freed: 0x38600 ( 10232 bytes) from 'malloc_t.c:104'
 @end example
-	
 These lines from a log file shows that two allocations were not freed.
 One at address 0x38410 of size 22 bytes in source file @file{malloc_t.c}
 at line 92 and another at address 0x38600 of size 10232 bytes at line
@@ -784,7 +806,6 @@ and returns it.  It is like strdup but for non-strings.  Non-gcc users
 should use @code{BDUP(&item, sizeof(item), new_item_pnt);} where
 new_item_pnt is the variable which will be assigned the pointer to the
 copy of item.
-
 @end table
 
 In the above macro list, I have also included a STRDUP and a BDUP macro.
@@ -825,9 +846,8 @@ of zero if the library has not detected any problems.
 
 @item void malloc_shutdown(void);
 This routine shuts the library down and logs the final statistics and
-information especially the un-freed memory pointers.  It should be run
-right before exit() or as the last function before the closing @code{@}}
-in @code{main()}.
+information especially the non-freed memory pointers.  It should be run
+right before @code{exit()} or as the last function in @code{main()}.
 
 @example
         main()
@@ -837,7 +857,6 @@ in @code{main()}.
                 exit(0);
         @}
 @end example
-
 @item int malloc_heap_map(void);
 This routine will log to the logfile (if it is enabled) a graphical
 representation of the current heap space.  It needs some work but should
@@ -870,8 +889,8 @@ This routine provides some very interesting functionality.  It returns
 the size of a pnt's allocation as well as the file and line from which
 it was allocated.
 
-@emph{NOTE}: This is not provided by most (if not all) of other malloc
-libraries so should only be used for short-term debugging.
+@emph{NOTE}: This function is @emph{certainly} not portable and is not
+provided by other malloc libraries.
 
 @item char * malloc_strerror(int errnum);
 @code{malloc_strerror} returns the string representation of the error
@@ -881,7 +900,6 @@ the logging of more verbose memory error messages.
 You can also display the string representation of an error value by a
 call to the @file{malloc_dbg} program with a @samp{-e #} option
 @xref{malloc_dbg program}.
-
 @end table
 
 @node Disabling the Library,  , Extensions, Usage
@@ -890,43 +908,52 @@ call to the @file{malloc_dbg} program with a @samp{-e #} option
 When you are finished with the development and debugging sessions, you
 may want to disable the malloc-debug library and put in its place either
 the system's memory-allocation routines, gnu-malloc, or maybe your own.
-I have tried to make this a reasonably painless process.
+I have tried to make this a reasonably painless process.  The ease of
+the extraction depends heavily on how many of the library's features
+your made use of during your coding.
 
-if you are not using the uppercase allocation macros in
-@file{malloc.h} or  then all you need to do is relink with a new
-malloc library.
+I am open to any reasonable suggestions as to how to improve this
+process while maintaining the effectiveness of the debugging.
 
-First off, if you are using any of the special functions provided by the
-malloc-debug library, you will need to disable or #ifdef them out if you
-want to switch to another malloc library.
+@itemize @bullet
+@item
+If you compiled any of your source modules with @code{MALLOC_FUNC_CHECK}
+defined then you must first recompile all those modules without the flag
+enabled.
 
-To change the malloc-library at link time, just relink with a new malloc
-library and include on the link-line the @file{malloc_lp.o} file.  This
-means that your memory routines will still be calling malloc_leap, etc.
-although the new malloc library will not be using the file and line
-information that the leap routines make available.  In this case, your
-program will incur the small overhead of an extra function call.
+@item
+If you are using any of the special functions provided by the
+malloc-debug library (such as @code{malloc_shutdown()}), then you will
+need to @code{#ifdef}, remove, or comment them out of your code.
 
-@example
-        gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
-@end example
-
-If you want to totally disable the malloc-debug library then you will
-need to recompile all the C files that include @file{malloc.h} while
-defining MALLOC_DEBUG_DISABLE.  This will cause the malloc leap macros
-to not be applied.
+@item
+If you want to @emph{totally} disable the malloc-debug library then you
+will need to recompile all the C files that include @file{malloc.h}
+while defining @code{MALLOC_DEBUG_DISABLE}.  This will cause the malloc
+leap macros to not be applied @xref{Allocation macros}.
 
 @example
         gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
 @end example
+@item
+Now you are ready to relink with a new library.  If you have not
+compiled all your source with @code{MALLOC_DEBUG_DISABLED} defined then
+you need to include the @file{malloc_lp.o} file on the link line.
 
-After recompiling all the sources with the MALLOC_DEBUG_DISABLE flag,
-you can then relink with another malloc library without the file
-@file{malloc_lp.o}.
+@example
+        gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
+@end example
+If you have disabled malloc with the @code{MALLOC_DEBUG_DISABLED} flag
+or never included @file{malloc.h} in any of your C files, then you will
+not need to include the @file{malloc_lp.o} file on the link line.
 
 @example
         gcc -O -g main.o -L/usr/local/lib -lgmalloc
 @end example
+If you get unresolved references like @code{_malloc_leap} or
+@code{_malloc_bcopy} then something was not disabled as it should have
+been.
+@end itemize
 
 @node Code, Plugs, Usage, Top
 @chapter Information on the Source and General Concerns.
@@ -961,7 +988,6 @@ administration for a set of divided blocks
 
 @item chunk
 some anonymous amount of memory
-
 @end table
 
 @node Compatibility, Portability, Definitions, Code

@@ -33,7 +33,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.14 1993/04/05 22:30:23 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.15 1993/04/06 04:24:44 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -100,7 +100,7 @@ EXPORT	int	main(int argc, char ** argv)
     (void)printf("------------------------------------------------------\n");
     (void)printf("prompt> ");
     (void)fgets(line, sizeof(line), stdin);
-    linep = index(line, '\n');
+    linep = (char *)index(line, '\n');
     if (linep != NULL)
       *linep = '\0';
     
