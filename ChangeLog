@@ -1,3 +1,7 @@
+Sat Aug 27 19:33:16 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed problem with IMPORT in malloc_dbg.3 via user feedback.
+
 Mon Aug  8 22:43:44 1994  Gray Watson  (gray@mixer.antaire.com)
 
 	* Releasing version 2.2.0.
@@ -757,5 +761,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.109 1994/08/09 02:45:50 gray Exp $
+$Id: ChangeLog,v 1.110 1994/08/27 23:33:33 gray Exp $
 -------------------------------------------------------------------------------
