@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: protect.c,v 1.2 2000/05/15 22:30:46 gray Exp $
+ * $Id: protect.c,v 1.3 2000/05/17 15:18:26 gray Exp $
  */
 
 /*
@@ -42,14 +42,15 @@
 #include "dmalloc.h"
 #include "dmalloc_loc.h"
 #include "error.h"
+#include "heap.h"
 #include "protect.h"
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: protect.c,v 1.2 2000/05/15 22:30:46 gray Exp $";
+#ident "$Id: protect.c,v 1.3 2000/05/17 15:18:26 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: protect.c,v 1.2 2000/05/15 22:30:46 gray Exp $";
+  "$Id: protect.c,v 1.3 2000/05/17 15:18:26 gray Exp $";
 #endif
 #endif
 
@@ -66,14 +67,22 @@ static	char	*rcs_id =
  *
  * ARGUMENTS:
  *
- * block_pnt -> Pointer to block that we are protecting.
+ * mem -> Pointer to block that we are protecting.
  *
  * block_n -> Number of blocks that we are protecting.
  */
-void	protect_set_read_only(void *block_pnt, const int block_n)
+void	protect_set_read_only(void *mem, const int block_n)
 {
 #if PROTECT_ALLOWED && PROTECT_BLOCKS
   int	size = block_n * BLOCK_SIZE;
+  void	*block_pnt;
+  
+  if (ON_BLOCK(mem)) {
+    block_pnt = mem;
+  }
+  else {
+    block_pnt = BLOCK_ROUND(mem);
+  }
   
   if (mprotect(block_pnt, size, PROT_READ) != 0) {
     _dmalloc_message("mprotect on '%#lx' size %d failed",
@@ -95,14 +104,22 @@ void	protect_set_read_only(void *block_pnt, const int block_n)
  *
  * ARGUMENTS:
  *
- * block_pnt -> Pointer to block that we are protecting.
+ * mem -> Pointer to block that we are protecting.
  *
  * block_n -> Number of blocks that we are protecting.
  */
-void	protect_set_read_write(void *block_pnt, const int block_n)
+void	protect_set_read_write(void *mem, const int block_n)
 {
 #if PROTECT_ALLOWED && PROTECT_BLOCKS
   int	prot, size = block_n * BLOCK_SIZE;
+  void	*block_pnt;
+  
+  if (ON_BLOCK(mem)) {
+    block_pnt = mem;
+  }
+  else {
+    block_pnt = BLOCK_ROUND(mem);
+  }
   
   /*
    * We set executable if possible in case the user has allocated
@@ -132,14 +149,22 @@ void	protect_set_read_write(void *block_pnt, const int block_n)
  *
  * ARGUMENTS:
  *
- * block_pnt -> Pointer to block that we are protecting.
+ * mem -> Pointer to block that we are protecting.
  *
  * block_n -> Number of blocks that we are protecting.
  */
-void	protect_set_no_access(void *block_pnt, const int block_n)
+void	protect_set_no_access(void *mem, const int block_n)
 {
 #if PROTECT_ALLOWED && PROTECT_BLOCKS
   int	size = block_n * BLOCK_SIZE;
+  void	*block_pnt;
+  
+  if (ON_BLOCK(mem)) {
+    block_pnt = mem;
+  }
+  else {
+    block_pnt = BLOCK_ROUND(mem);
+  }
   
   if (mprotect(block_pnt, size, PROT_NONE) != 0) {
     _dmalloc_message("mprotect on '%#lx' size %d failed",
