@@ -394,7 +394,7 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt);
  * DESCRIPTION:
  *
  * Verify a pointer which has previously been allocated by the
- * library.
+ * library or check the entire heap.
  *
  * RETURNS:
  *

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.179 2004/01/31 16:21:12 gray Exp $
+ * $Id: malloc.c,v 1.180 2004/07/01 15:34:18 gray Exp $
  */
 
 /*
@@ -1337,7 +1337,7 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
  * DESCRIPTION:
  *
  * Verify a pointer which has previously been allocated by the
- * library.
+ * library or check the entire heap.
  *
  * RETURNS:
  *
