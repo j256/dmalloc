@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.152 1998/11/12 21:30:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.153 1998/11/12 21:42:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -895,7 +895,7 @@ thread programmers only please.
 @menu
 * Programming::                   How to program with the library.
 * Using Dmalloc With a Debugger:: Using a debugger with the library.
-* Environment Variable ::         The variable name and its features.
+* Environment Variable::          The variable name and its features.
 * Debug Tokens::                  Description of the debugging tokens.
 * RC File::                       Format of the run-time configuration file.
 * Dmalloc Program::               Env variable setting utility.
@@ -2339,7 +2339,7 @@ Details.
 
 * Programming::                   How to program with the library.
 * Using Dmalloc With a Debugger:: Using a debugger with the library.
-* Environment Variable ::         The variable name and its features.
+* Environment Variable::          The variable name and its features.
 * Debug Tokens::                  Description of the debugging tokens.
 * RC File::                       Format of the run-time configuration file.
 * Dmalloc Program::               Env variable setting utility.
