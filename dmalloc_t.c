@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.101 2003/06/06 19:04:16 gray Exp $
+ * $Id: dmalloc_t.c,v 1.102 2003/06/08 19:37:46 gray Exp $
  */
 
 /*
@@ -520,6 +520,166 @@ static	int	do_random(const int iter_n)
 }
 
 /*
+ * Do some special tests as soon as we run the test program.  Returns
+ * 1 on success else 0.
+ */
+static	int	check_initial_special(void)
+{
+  void	*pnt;
+  int	final = 1, iter_c;
+  
+  /********************/
+  
+  do {
+    int		amount;
+    
+    /*
+     * So I ran across a bad check for the seen value versus the
+     * iteration count.  It was only seen when there were a greater
+     * number of reallocs to the same pointer at the start of the
+     * program running.
+     */
+    
+    if (! silent_b) {
+      (void)printf("  Checking realloc(malloc) seen count\n");
+    }
+    
+    do {
+      /* NOTE: must be less than 1024 because below depends on this */
+      amount = _dmalloc_rand() % 10;
+    } while (amount == 0);
+    pnt = malloc(amount);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+      }
+      final = 0;
+      break;
+    }
+    
+    for (iter_c = 0; iter_c < 100; iter_c++) {
+      
+      /* change the amount */
+      pnt = realloc(pnt, amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not reallocate %d bytes.\n", amount);
+	}
+	final = 0;
+	break;
+      }
+    }
+    
+    if (pnt == NULL) {
+      break;
+    }
+    
+    /*
+     * now try freeing the pointer with a free that provides a return
+     * value
+     */
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: free of realloc(malloc) pointer %lx failed.\n",
+		     (unsigned long)pnt);
+      }
+      final = 0;
+    }
+    
+    /* now check the heap to verify tha the freed slot is good */
+    if (malloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: malloc_verify failed\n");
+      }
+      final = 0;
+    }
+  } while(0);
+  
+  /********************/
+  
+#define NEVER_REUSE_ITERS	20
+
+  {
+    void		*new_pnt, *pnts[NEVER_REUSE_ITERS];
+    unsigned int	old_flags, amount, check_c;
+    
+    if (! silent_b) {
+      (void)printf("  Checking never-reuse token\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    dmalloc_debug(old_flags | DEBUG_NEVER_REUSE);
+    
+    for (iter_c = 0; iter_c < NEVER_REUSE_ITERS; iter_c++) {
+      amount = 1024;
+      pnts[iter_c] = malloc(amount);
+      if (pnts[iter_c] == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	}
+	final = 0;
+	break;
+      }
+    }
+    
+    /* now free them */
+    for (iter_c = 0; iter_c < NEVER_REUSE_ITERS; iter_c++) {
+      if (dmalloc_free(__FILE__, __LINE__, pnts[iter_c],
+		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: free of pointer %lx failed.\n",
+		       (unsigned long)pnts[iter_c]);
+	}
+	final = 0;
+      }
+    }
+    
+    /*
+     * now allocate them again and make sure we don't get the same
+     * pointers
+     */
+    for (iter_c = 0; iter_c < NEVER_REUSE_ITERS; iter_c++) {
+      amount = 1024;
+      new_pnt = malloc(amount);
+      if (new_pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	}
+	final = 0;
+      }
+      
+      /* did we get a previous pointer? */
+      for (check_c = 0; check_c < NEVER_REUSE_ITERS; check_c++) {
+	if (new_pnt == pnts[check_c]) {
+	  if (! silent_b) {
+	    (void)printf("   ERROR: pointer %lx was improperly reused.\n",
+			 (unsigned long)new_pnt);
+	  }
+	  final = 0;
+	  break;
+	}
+      }
+      
+      if (dmalloc_free(__FILE__, __LINE__, new_pnt,
+		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: free of pointer %lx failed.\n",
+		       (unsigned long)new_pnt);
+	}
+	final = 0;
+      }
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+
+  /********************/
+
+  return final;
+}
+
+/*
  * Do some special tests, returns 1 on success else 0
  */
 static	int	check_special(void)
@@ -538,36 +698,11 @@ static	int	check_special(void)
   dmalloc_message("NOTE: ignore any errors until the next ------\n");
   
   /********************/
-  
-  if (! silent_b) {
-    (void)printf("  Trying to realloc a 0L pointer.\n");
-  }
-  pnt = realloc(NULL, 10);
-#if ALLOW_REALLOC_NULL
-  if (pnt == NULL) {
-    if (! silent_b) {
-      (void)printf("   ERROR: re-allocation of 0L returned error.\n");
-    }
-    final = 0;
-  }
-  else {
-    free(pnt);
-  }
-#else
-  if (pnt == NULL) {
-    dmalloc_errno = ERROR_NONE;
-  }
-  else {
-    if (! silent_b) {
-      (void)printf("   ERROR: re-allocation of 0L did not return error.\n");
-    }
-    free(pnt);
-    final = 0;
-  }
-#endif
-  
-  /********************/
 
+  /*
+   * Check to make sure that we are handling free(0L) correctly.
+   */
+  
   if (! silent_b) {
     (void)printf("  Trying to free 0L pointer.\n");
   }
@@ -591,8 +726,21 @@ static	int	check_special(void)
   }
 #endif
   
+  /* now test the dmalloc_free function */
+  if (dmalloc_free(__FILE__, __LINE__, NULL,
+		   DMALLOC_FUNC_FREE) != FREE_ERROR) {
+    if (! silent_b) {
+      (void)printf("   ERROR: free of NULL should have failed.\n");
+    }
+    final = 0;
+  }
+
   /********************/
 
+  /*
+   * Check to make sure that large mallocs are handled correctly.
+   */
+  
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
   }
@@ -610,24 +758,27 @@ static	int	check_special(void)
   
   /********************/
   
+  /*
+   * Check to see if overwritten freed memory is detected.
+   */
+  
   if (malloc_verify(NULL) == DMALLOC_NOERROR) {
     int			iter_c, amount, where;
-    unsigned int	current_flags;
+    unsigned int	old_flags;
     unsigned char	ch_hold;
     
-    current_flags = dmalloc_debug_current();
+    old_flags = dmalloc_debug_current();
     
-    dmalloc_debug(current_flags | DEBUG_FREE_BLANK);
+    dmalloc_debug(old_flags | DEBUG_FREE_BLANK);
     
     if (! silent_b) {
       (void)printf("  Overwriting free memory.\n");
     }
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      if (amount == 0) {
-	amount = 1;
-      }
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
@@ -661,83 +812,73 @@ static	int	check_special(void)
       *((char *)pnt + where) = ch_hold;
     }
     
-    dmalloc_debug(current_flags);
+    dmalloc_debug(old_flags);
   }
   
   /********************/
-
+  
+  /*
+   * Check to see if the space above an allocated pnt is detected.
+   */
+  
   {
-    int			iter_c, amount;
-    unsigned int	current_flags;
+    int			iter_c, amount, where;
+    unsigned int	old_flags;
+    unsigned char	ch_hold;
+    
+    old_flags = dmalloc_debug_current();
+    
+    dmalloc_debug(old_flags | DEBUG_FREE_BLANK);
     
     if (! silent_b) {
-      (void)printf("  Testing valloc()\n");
+      (void)printf("  Overwriting free memory.\n");
     }
     
-    current_flags = dmalloc_debug_current();
-    
-    /*
-     * First check without frence posts
-     */
-    dmalloc_debug(current_flags & ~DEBUG_CHECK_FENCE);
-    
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      if (amount == 0) {
-	amount = 1;
-      }
-      pnt = valloc(amount);
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      free(pnt);
+      where = _dmalloc_rand() % amount;
+      ch_hold = *((char *)pnt + where);
+      *((char *)pnt + where) = 'h';
+      
+      if (malloc_verify(NULL) == DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: overwriting free memory not detected.\n");
 	}
 	final = 0;
-	dmalloc_errno = ERROR_NOT_ON_BLOCK;
+	dmalloc_errno = ERROR_FREE_NON_BLANK;
       }
-      free(pnt);
+      else if (dmalloc_errno == ERROR_FREE_NON_BLANK) {
+	dmalloc_errno = ERROR_NONE;
+      }
+      else {
+	if (! silent_b) {
+	  (void)printf("   ERROR: verify of overwritten memory returned: %s\n",
+		       dmalloc_strerror(dmalloc_errno));
+	}
+	final = 0;
+      }
+      *((char *)pnt + where) = ch_hold;
     }
     
-    /*
-     * Now test with fence posts enabled
-     */
-    dmalloc_debug(current_flags | DEBUG_CHECK_FENCE);
-    
-    for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      if (amount == 0) {
-	amount = 1;
-      }
-      pnt = valloc(amount);
-      if (pnt == NULL) {
-	if (! silent_b) {
-	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
-	}
-	final = 0;
-	continue;
-      }
-      if ((unsigned long)pnt % page_size != 0) {
-	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
-	}
-	final = 0;
-	dmalloc_errno = ERROR_NOT_ON_BLOCK;
-      }
-      free(pnt);
-    }
-    
-    dmalloc_debug(current_flags);
+    dmalloc_debug(old_flags);
   }
   
   /********************/
+  
+  /*
+   * See if we can free invalid pointers and get the appropriate errors
+   */
   
   {
     int	iter_c, amount, wrong;
@@ -747,10 +888,9 @@ static	int	check_special(void)
     }
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      if (amount == 0) {
-	amount = 1;
-      }
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
@@ -764,7 +904,7 @@ static	int	check_special(void)
 	wrong = 1;
       }
       if (dmalloc_free(__FILE__, __LINE__, (char *)pnt + wrong,
-		       DMALLOC_FUNC_FREE) == FREE_ERROR) {
+		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (dmalloc_errno == ERROR_NOT_FOUND) {
 	  dmalloc_errno = ERROR_NONE;
 	}
@@ -788,81 +928,16 @@ static	int	check_special(void)
   }
   
   /********************/
-  
-  {
-    char		*alloc_p;
-    unsigned int	current_flags, iter_c, amount;
-    
-    if (! silent_b) {
-      (void)printf("  Checking alloc blanking\n");
-    }
-    
-    current_flags = dmalloc_debug_current();
-    /* turn on alloc blanking */
-    dmalloc_debug(current_flags | DEBUG_ALLOC_BLANK);
-    
-    for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      if (amount == 0) {
-	amount = 1;
-      }
-      pnt = malloc(amount);
-      if (pnt == NULL) {
-	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
-	}
-	final = 0;
-	continue;
-      }
-      for (alloc_p = pnt; alloc_p < (char *)pnt + amount; alloc_p++) {
-	if (*alloc_p != ALLOC_BLANK_CHAR) {
-	  if (! silent_b) {
-	    (void)printf("   ERROR: allocation not fully blanked.\n");
-	  }
-	  final = 0;
-	  dmalloc_errno = ERROR_ALLOC_FAILED;
-	}
-      }
-      free(pnt);
-    }
-    
-    /*
-     * Now test with fence posts enabled
-     */
-    dmalloc_debug(current_flags | DEBUG_CHECK_FENCE);
-    
-    for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      if (amount == 0) {
-	amount = 1;
-      }
-      pnt = valloc(amount);
-      if (pnt == NULL) {
-	if (! silent_b) {
-	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
-	}
-	final = 0;
-	continue;
-      }
-      if ((unsigned long)pnt % page_size != 0) {
-	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
-	}
-	final = 0;
-	dmalloc_errno = ERROR_NOT_ON_BLOCK;
-      }
-      free(pnt);
-    }
-    
-    dmalloc_debug(current_flags);
-  }
-  
-  /********************/
+
+  /*
+   * Saw a number of problems where the used_iter value was not being
+   * set and the proper flags were not being set on the slots.
+   */
   
   {
     char		*loc_file, *ex_file;
-    unsigned int	amount, loc_line, ex_line;
+    void		*new_pnt;
+    unsigned int	amount, loc_line, ex_line, old_flags;
     unsigned long	loc_mark, ex_mark, old_seen, ex_seen;
     DMALLOC_SIZE	ex_user_size, ex_tot_size;
     int			iter_c;
@@ -871,12 +946,18 @@ static	int	check_special(void)
       (void)printf("  Checking dmalloc_examine information\n");
     }
     
+    old_flags = dmalloc_debug_current();
+    /*
+     * We have to turn off the realloc-copy and new-reuse flags
+     * otherwise this won't work.
+     */
+    dmalloc_debug(old_flags & ~DEBUG_REALLOC_COPY & ~DEBUG_NEVER_REUSE);
+    
     for (iter_c = 0; iter_c < 20; iter_c++) {
-      amount = _dmalloc_rand() % (page_size * 2);
-      /* we need 2 because we are doing a 2-1 below */
-      if (amount < 2) {
-	amount = 2;
-      }
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+	/* we need 2 because we are doing a 2-1 below */
+      } while (amount < 2);
       pnt = malloc(amount); loc_file = __FILE__; loc_line = __LINE__;
       if (pnt == NULL) {
 	if (! silent_b) {
@@ -919,8 +1000,18 @@ static	int	check_special(void)
        * incrementing because the library will never reposition an
        * allocation if shrinking.
        */
-      pnt = realloc(pnt, amount - 1);
-      if (pnt == NULL) {
+      new_pnt = realloc(pnt, amount - 1);
+      if (new_pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
+		       amount + 1);
+	}
+	final = 0;
+	continue;
+      }
+      
+      /* should always get a new pointer */
+      if (new_pnt != pnt) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
 		       amount + 1);
@@ -961,14 +1052,337 @@ static	int	check_special(void)
 	final = 0;
       }
     }
+    
+    dmalloc_debug(old_flags);
   }
-  
+ 
   /********************/
-  
+ 
   dmalloc_message("NOTE: ignore the errors from the above ----- to here.\n");
   dmalloc_message("-------------------------------------------------------\n");
   
   dmalloc_errno = errno_hold;
+  
+  /*
+   * The following errors whould not generate a dmalloc_errno nor any
+   * error messages
+   */
+  
+  /********************/
+  
+  /*
+   * Make sure that realloc of NULL pointers either works or doesn't
+   * depending on the proper ALLOW_REALLOC_NULL setting.
+   */
+  
+  {
+    if (! silent_b) {
+      (void)printf("  Trying to realloc a 0L pointer.\n");
+    }
+    pnt = realloc(NULL, 10);
+#if ALLOW_REALLOC_NULL
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: re-allocation of 0L returned error.\n");
+      }
+      final = 0;
+    }
+    else {
+      free(pnt);
+    }
+#else
+    if (pnt == NULL) {
+      dmalloc_errno = ERROR_NONE;
+    }
+    else {
+      if (! silent_b) {
+	(void)printf("   ERROR: re-allocation of 0L did not return error.\n");
+      }
+      free(pnt);
+      final = 0;
+    }
+#endif
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that valloc returns properly page-aligned memory.
+   */
+  
+  {
+    int			iter_c, amount;
+    unsigned int	old_flags;
+    
+    if (! silent_b) {
+      (void)printf("  Testing valloc()\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    
+    /*
+     * First check without frence posts
+     */
+    dmalloc_debug(old_flags & ~DEBUG_CHECK_FENCE);
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = valloc(amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      if ((unsigned long)pnt % page_size != 0) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
+		       (unsigned long)pnt);
+	}
+	final = 0;
+	dmalloc_errno = ERROR_NOT_ON_BLOCK;
+      }
+      free(pnt);
+    }
+    
+    /*
+     * Now test with fence posts enabled
+     */
+    dmalloc_debug(old_flags | DEBUG_CHECK_FENCE);
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = valloc(amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      if ((unsigned long)pnt % page_size != 0) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
+		       (unsigned long)pnt);
+	}
+	final = 0;
+	dmalloc_errno = ERROR_NOT_ON_BLOCK;
+      }
+      free(pnt);
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that the blanking flags actually blank all of the
+   * allocated pointer space.
+   */
+  
+  {
+    char		*alloc_p;
+    unsigned int	old_flags, iter_c, amount;
+    
+    if (! silent_b) {
+      (void)printf("  Checking alloc blanking\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    /* turn on alloc blanking */
+    dmalloc_debug(old_flags | DEBUG_ALLOC_BLANK);
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = malloc(amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      for (alloc_p = pnt; alloc_p < (char *)pnt + amount; alloc_p++) {
+	if (*alloc_p != ALLOC_BLANK_CHAR) {
+	  if (! silent_b) {
+	    (void)printf("   ERROR: allocation not fully blanked.\n");
+	  }
+	  final = 0;
+	  dmalloc_errno = ERROR_ALLOC_FAILED;
+	}
+      }
+      free(pnt);
+    }
+    
+    /*
+     * Now test with fence posts enabled
+     */
+    dmalloc_debug(old_flags | DEBUG_CHECK_FENCE);
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = valloc(amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      if ((unsigned long)pnt % page_size != 0) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
+		       (unsigned long)pnt);
+	}
+	final = 0;
+	dmalloc_errno = ERROR_NOT_ON_BLOCK;
+      }
+      free(pnt);
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure realloc copy works right.
+   */
+  
+  {
+    void		*new_pnt;
+    unsigned int	amount, old_flags;
+    int			iter_c;
+    
+    if (! silent_b) {
+      (void)printf("  Checking realloc_copy token\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    dmalloc_debug(old_flags | DEBUG_REALLOC_COPY);
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = malloc(amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      
+      /* we should get the same pointer */
+      new_pnt = realloc(pnt, amount);
+      if (new_pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
+		       amount + 10);
+	}
+	final = 0;
+	continue;
+      }
+      
+      if (new_pnt == pnt) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: realloc produced same pointer.\n");
+	}
+	final = 0;
+	continue;
+      }
+      
+      if (dmalloc_free(__FILE__, __LINE__, new_pnt,
+		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: free bad pointer produced: %s\n",
+		       dmalloc_strerror(dmalloc_errno));
+	}
+	final = 0;
+      }
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure realloc copy works right.
+   */
+  
+  {
+    void		*new_pnt;
+    unsigned int	amount, old_flags;
+    int			iter_c;
+    
+    if (! silent_b) {
+      (void)printf("  Checking never-reuse token\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    dmalloc_debug(old_flags | DEBUG_NEVER_REUSE);
+    
+    for (iter_c = 0; iter_c < 20; iter_c++) {
+      do {
+	amount = _dmalloc_rand() % (page_size * 2);
+      } while (amount == 0);
+      pnt = malloc(amount);
+      if (pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	}
+	final = 0;
+	continue;
+      }
+      
+      /* we should get the same pointer */
+      new_pnt = realloc(pnt, amount);
+      if (new_pnt == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
+		       amount + 10);
+	}
+	final = 0;
+	continue;
+      }
+      
+      if (new_pnt == pnt) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: realloc produced same pointer.\n");
+	}
+	final = 0;
+	continue;
+      }
+      
+      if (dmalloc_free(__FILE__, __LINE__, new_pnt,
+		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: free bad pointer produced: %s\n",
+		       dmalloc_strerror(dmalloc_errno));
+	}
+	final = 0;
+      }
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+
+  /********************/
+  
+  /* NOTE: add tests which get errors before the ------- message above */
+  
   return final;
 }
 
@@ -1371,6 +1785,35 @@ int	main(int argc, char **argv)
   }
   
   store_flags = dmalloc_debug_current();
+  
+  /*************************************************/
+  
+  if (! no_special_b) {
+    
+    /* some special tests to run first thing */
+    if (! silent_b) {
+      (void)printf("Running initial tests...\n");
+    }
+    if (check_initial_special()) {
+      if (! silent_b) {
+	(void)printf("  Succeeded.\n");
+      }
+    }
+    else {
+      if (silent_b) {
+	(void)printf("ERROR: Initial tests failed.  Last dmalloc error: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      else {
+	(void)printf("  Failed.  Last dmalloc error: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 1;
+    }
+  }
+  
+  /*************************************************/
+  
   if (interactive_b) {
     do_interactive();
   }
@@ -1388,7 +1831,7 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("Random tests failed.  Last dmalloc error: %s\n",
+	(void)printf("ERROR: Random tests failed.  Last dmalloc error: %s\n",
 		     dmalloc_strerror(dmalloc_errno));
       }
       else {
@@ -1398,6 +1841,8 @@ int	main(int argc, char **argv)
       final = 1;
     }
   }
+  
+  /*************************************************/
   
   /* check the special malloc functions but don't allow silent dumps */
   if ((! no_special_b)
@@ -1423,6 +1868,9 @@ int	main(int argc, char **argv)
       final = 1;
     }
   }
+  
+  /*************************************************/
+  
   dmalloc_debug(store_flags);
   
   if (final != 0) {
@@ -1431,14 +1879,13 @@ int	main(int argc, char **argv)
      * the only way we can reproduce the problem.
      */
     if (silent_b) {
-      (void)fprintf(stderr,
-		    "Random seed is %u.  Final dmalloc error: %s (%d)\n",
-		    seed_random, dmalloc_strerror(dmalloc_errno),
-		    dmalloc_errno);
+      (void)printf("Random seed is %u.  Final dmalloc error: %s (%d)\n",
+		   seed_random, dmalloc_strerror(dmalloc_errno),
+		   dmalloc_errno);
     }
     else {
-      (void)fprintf(stderr, "Final dmalloc error: %s (%d)\n",
-		    dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      (void)printf("Final dmalloc error: %s (%d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }
   
@@ -1447,8 +1894,8 @@ int	main(int argc, char **argv)
   /* last thing is to verify the heap */
   ret = malloc_verify(NULL);
   if (ret != DMALLOC_NOERROR) {
-    (void)fprintf(stderr, "Final malloc_verify returned failure: %s (%d)\n",
-		  dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+    (void)printf("Final malloc_verify returned failure: %s (%d)\n",
+		 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
   }
   
   /* you will need this if you can't auto-shutdown */
@@ -1459,4 +1906,3 @@ int	main(int argc, char **argv)
   
   exit(final);
 }
-
