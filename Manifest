@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.26 1994/09/10 23:26:43 gray Exp $
+$Id: Manifest,v 1.27 1994/11/08 23:54:42 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -62,6 +62,8 @@ dmalloc.c		Program that assists in the setting of the
 			DMALLOC_DEBUG and other debug environmental
 			variables.
 
+dmalloc.cc		C++ routines to help using library with C++ code.
+
 dmalloc.h		Installed malloc .h file to be included in
 			those .c files where file and line debugging
 			information is required.
@@ -87,6 +89,8 @@ dmalloc_t.c		Meager test program for testing the malloc
 dmallocrc		Sample RC file that is used to set the debug
 			flags.
 
+env.[ch]		Environmental variable processing routines.
+
 error.[ch]		Debugging routines and others that provide
 			user output.
 
@@ -97,9 +101,13 @@ error_val.h		General error codes for the malloc module.
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.
 
+install.sh		A shell script for systems without a sane install.
+
 malloc.c		Higher level alloc routines including malloc,
 			free, realloc, etc.  These are the routines to
 			be called from user space.
+
+mkinstalldirs		A script that makes the directories to install into.
 
 return.h		Defines to get the return-address for non-malloc calls.
 

@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.62 1994/11/04 00:14:26 gray Exp $
+# $Id: Makefile.in,v 1.63 1994/11/08 23:54:40 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -83,6 +83,8 @@ install : installlibs $(UTIL)
 installftp : README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
+	cd ftp/docs ; gzip $(DOCS)
+	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 
 # put situation specific lines here
 dmalloc.h.2 : configure
@@ -161,6 +163,23 @@ dmalloc.ps : dmalloc.texi
 	( cd work ; texi2dvi ../dmalloc.texi ; texi2dvi ../dmalloc.texi ; \
 	  dvips -o ../$@ dmalloc.dvi )
 	rm -rf work
+
+INSTALL : INSTALL.1 dmalloc.info
+	rm -f $@ $@.t
+	cp INSTALL.1 $@.t
+	echo '' >> $@.t
+	echo 'INSTALLATION:' >> $@.t
+	sed -e '1,/,  Node: Installation/d' -e '/,  Prev: Installation/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	echo '' >> $@.t
+	echo 'QUICK START:' >> $@.t
+	sed -e '1,/,  Node: Quick Start/d' -e '/,  Prev: Quick Start/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	mv $@.t $@
 
 dmalloc.head : dmalloc.info
 	rm -f $@ $@.t

@@ -1,3 +1,7 @@
+Tue Nov  8 18:54:04 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Lots of changes to the .texi documentation and notes files.
+
 Thu Nov  3 17:25:29 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Released version 3.0.3.
@@ -881,5 +885,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.131 1994/11/04 00:14:23 gray Exp $
+$Id: ChangeLog,v 1.132 1994/11/08 23:54:32 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.45 1994/10/04 17:42:25 gray Exp $
+$Id: README.1,v 1.46 1994/11/08 23:54:44 gray Exp $
 -------------------------------------------------------------------------------
 
 DEBUG-MALLOC:
@@ -8,13 +8,13 @@ The dmalloc library has been designed as a drop in replacement for
 the system's malloc, realloc, calloc, free and other memory management
 routines while providing powerful heap-memory debugging facilities.
 
-The module is reasonably portable having been successfully run on the
-following operating systems: AIX, BSDI, DG/UX, HPUX, Irix, MS-DOG,
-OSF, Solaris, SunOS, Ultrix, and probably a couple others.
+The library is reasonably portable having been run successfully on at
+least the following operating systems: AIX, BSDI, DG/UX, HPUX, Irix,
+MS-DOG, OSF, Solaris, SunOS, and Ultrix.
 
-The package includes the library, configuration scripts, debug
-utility application, test program, extensive documentation (text,
-texi, info, ps), and samples.
+The package includes the library, configuration scripts, a debug
+utility application, a test program, and extensive documentation
+(text, texi, info, ps).
 
 -------------------------------------------------------------------------------
 
@@ -58,14 +58,6 @@ generate TeX hardcopy output with the help of the texinfo.tex file.
 A dmalloc.ps postscript file may also have been included for you
 TeX-less folks.
 
-Important sections from dmalloc.info:
-
-* Overview::                    General debugging concepts.
-* Debug Tokens::                Description of the debugging token flags.
-* Extensions::                  Additional non-standard routines.
-* Dmalloc Program::             Env variable setting utility.
-* Debugging with the Library::  How to debug problems with the library
-
 -------------------------------------------------------------------------------
 
 GENERAL:
@@ -98,14 +90,16 @@ GENERAL:
 ARGV LIBRARY:
 
 My argv library which should have been included with this package
-(argv.[ch], argv_loc.h).  I use it with all my binaries.  It is like
-getopt in that it provides a standardized way of processing arguments
-but I find it significantly better.  You have to write no C code to do
-the actual processing, it handles short -l and long --logfile style
-options, gives standard short and long usage messages, and many other
-features while trying to comply with POSIX specs.
+(argv.[ch], argv_loc.h).  I use it with all my binaries.
 
-For copies of the library, try ftp.antaire.com in the
+It functions similar to the getopt routines in that it provides a
+standardized way of processing arguments.  However, that is where the
+similarity ends.  You have to write no C code to do the actual
+processing, it handles short -l and long --logfile style options,
+gives standard short and long usage messages, and many other features
+while trying to comply with POSIX specs.
+
+For copies of the library, ftp to ftp.antaire.com in the
 /antaire/src/argv directory.
 
 -------------------------------------------------------------------------------
@@ -115,7 +109,7 @@ THANKS:
 Many net folk contributed to the library and my thanks goes out to
 them all.
 
-Special thanks, however, to my core contributors/testers: Scott
+However, special thanks must go to my core contributors/testers: Scott
 Michel, Greg Sylvain, Bali Jatinder, Marc Evans, Dave Hill, Manfred
 Hauswirth, Richard Birnbaum, Francois Pinard, Irv Lustig, and Marty
 Leisner.
