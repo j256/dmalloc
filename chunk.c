@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.130 1998/11/16 16:51:34 gray Exp $
+ * $Id: chunk.c,v 1.131 1999/02/16 02:33:57 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.130 1998/11/16 16:51:34 gray Exp $";
+#ident "$Id: chunk.c,v 1.131 1999/02/16 02:33:57 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.130 1998/11/16 16:51:34 gray Exp $";
+  "$Id: chunk.c,v 1.131 1999/02/16 02:33:57 gray Exp $";
 #endif
 #endif
 
@@ -1135,7 +1135,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
   /* is there anything on the dblock free list? */
   dblock_p = find_free_dblock(bit_n);
   
-  if (dblock_p != NULL && ! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+  if (dblock_p != NULL && (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE))) {
     free_space_count -= 1 << bit_n;
     
     /* find pointer to memory chunk */
@@ -1703,7 +1703,7 @@ int	_chunk_check(void)
        * NOTE: this should not present problems since the bb_next is
        * NOT unioned with bb_file.
        */
-      if (bblock_p->bb_next != NULL && ! IS_IN_HEAP(bblock_p->bb_next)) {
+      if (bblock_p->bb_next != NULL && (! IS_IN_HEAP(bblock_p->bb_next))) {
 	dmalloc_errno = ERROR_BAD_FREE_LIST;
 	dmalloc_error("_chunk_check");
 	return ERROR;
@@ -1986,8 +1986,8 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
   }
   
   /* are we on a normal block */
-  if (! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)
-      && ! (BIT_IS_SET(check, CHUNK_PNT_LOOSE)
+  if ((! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER))
+      && (! (BIT_IS_SET(check, CHUNK_PNT_LOOSE))
 	    && BIT_IS_SET(bblock_p->bb_flags, BBLOCK_USER))) {
     dmalloc_errno = ERROR_NOT_START_USER;
     log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, "pointer-check",
@@ -3271,7 +3271,7 @@ void	_chunk_dump_unfreed(void)
 	unknown_b = 1;
       }
       
-      if (! unknown_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+      if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	_dmalloc_message("not freed: '%s' (%ld bytes) from '%s'",
 			 display_pnt(CHUNK_TO_USER(pnt),
 				     &bblock_p->bb_overhead),
@@ -3363,7 +3363,7 @@ void	_chunk_dump_unfreed(void)
 	  unknown_b = 1;
 	}
 	
-	if (! unknown_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+	if ((! unknown_b) || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			   display_pnt(CHUNK_TO_USER(pnt),
 				       &dblock_p->db_overhead),
