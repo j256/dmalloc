@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.180 2000/03/30 17:45:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.181 2000/04/18 01:53:37 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -707,6 +707,10 @@ dmalloc utility.  @xref{Dmalloc Program}.
 This could be caused by a number of different problems.
 
 @enumerate
+
+@item Are you sure you followed all of the items in the ``Getting Started''
+section?  Please review them if there is any doubt.  @xref{Getting
+Started}.
 
 @cindex env
 @cindex printenv
