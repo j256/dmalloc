@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.107 1998/09/19 00:24:45 gray Exp $
+# $Id: Makefile.in,v 1.108 1998/10/05 02:51:58 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -93,7 +93,7 @@ installth ::
 installftp :: README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README.txt
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
-	cd ftp/docs ; gzip -fv $(DOCS)
+	cd ftp/docs ; gzip -9fv $(DOCS)
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs
 
 # put situation specific lines here
