@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.29 2000/03/24 21:48:09 gray Exp $
+ * $Id: malloc.h,v 1.30 2000/04/18 01:53:58 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -221,7 +221,7 @@ unsigned long	_dmalloc_mark(void);
 
 /*
  * Dump the pointers that have changed since the mark which was
- * returned my _dmalloc_mark.  If not_freed_b is set to non-0 then log
+ * returned by dmalloc_mark.  If not_freed_b is set to non-0 then log
  * the new pointers that are non-freed.  If free_b is set to non-0
  * then log the new pointers that are freed.  If details_b set to
  * non-0 then dump the individual pointers that have changed otherwise
