@@ -64,8 +64,12 @@
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: error.c,v 1.73 1998/10/15 20:26:12 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.72 1998/10/08 15:06:21 gray Exp $";
+  "$Id: error.c,v 1.73 1998/10/15 20:26:12 gray Exp $";
+#endif
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)

@@ -50,8 +50,12 @@
 #include "error.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: env.c,v 1.15 1998/10/15 20:26:11 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.14 1998/09/19 00:12:53 gray Exp $";
+  "$Id: env.c,v 1.15 1998/10/15 20:26:11 gray Exp $";
+#endif
 #endif
 
 /* local variables */

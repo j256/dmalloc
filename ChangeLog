@@ -2,6 +2,8 @@ Thu Oct 15 11:06:41 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Released dmalloc version 4.0.3.
 
+	* Moved to #ident for rcs-ids in GCC.
+
 	* Found and fixed a bug when reallocing a previous valloced
         section.  Not a good idea anyway since it will not preserve the
         block-aligned status (should it).
@@ -1329,5 +1331,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.196 1998/10/15 20:20:08 gray Exp $
+$Id: ChangeLog,v 1.197 1998/10/15 20:26:02 gray Exp $
 -------------------------------------------------------------------------------

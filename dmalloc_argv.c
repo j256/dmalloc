@@ -40,8 +40,12 @@
 #include "dmalloc_argv_loc.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: dmalloc_argv.c,v 1.6 1998/10/15 20:26:08 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.5 1998/10/08 15:05:43 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.6 1998/10/15 20:26:08 gray Exp $";
+#endif
 #endif
 
 /* internal routines */

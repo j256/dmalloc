@@ -44,8 +44,12 @@
 #include "error_val.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: dmalloc_t.c,v 1.70 1998/10/15 20:26:10 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.69 1998/10/15 20:17:33 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.70 1998/10/15 20:26:10 gray Exp $";
+#endif
 #endif
 
 /* external routines */

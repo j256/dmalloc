@@ -47,8 +47,12 @@
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: heap.c,v 1.48 1998/10/15 20:26:13 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.47 1998/10/07 18:52:26 gray Exp $";
+  "$Id: heap.c,v 1.48 1998/10/15 20:26:13 gray Exp $";
+#endif
 #endif
 
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */

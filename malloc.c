@@ -71,8 +71,12 @@
 #include "return.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: malloc.c,v 1.111 1998/10/15 20:26:14 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.110 1998/10/08 15:02:43 gray Exp $";
+  "$Id: malloc.c,v 1.111 1998/10/15 20:26:14 gray Exp $";
+#endif
 #endif
 
 /* local routines */

@@ -36,8 +36,12 @@
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: compat.c,v 1.38 1998/10/15 20:26:06 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.37 1997/12/05 21:09:38 gray Exp $";
+  "$Id: compat.c,v 1.38 1998/10/15 20:26:06 gray Exp $";
+#endif
 #endif
 
 #if HAVE_MEMCPY == 0

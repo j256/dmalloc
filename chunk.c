@@ -49,8 +49,12 @@
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: chunk.c,v 1.122 1998/10/15 20:26:05 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.121 1998/10/15 20:16:58 gray Exp $";
+  "$Id: chunk.c,v 1.122 1998/10/15 20:26:05 gray Exp $";
+#endif
 #endif
 
 /* local routines */

@@ -44,8 +44,12 @@
 #include "arg_check.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: arg_check.c,v 1.17 1998/10/15 20:26:03 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.16 1997/12/05 21:09:34 gray Exp $";
+  "$Id: arg_check.c,v 1.17 1998/10/15 20:26:03 gray Exp $";
+#endif
 #endif
 
 #if HAVE_BCMP

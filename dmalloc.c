@@ -59,8 +59,12 @@
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
+#ifdef __GNUC__
+#ident "$Id: dmalloc.c,v 1.78 1998/10/15 20:26:07 gray Exp $";
+#else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.77 1998/09/29 15:41:31 gray Exp $";
+  "$Id: dmalloc.c,v 1.78 1998/10/15 20:26:07 gray Exp $";
+#endif
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
