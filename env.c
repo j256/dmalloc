@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.33 2003/06/08 05:54:06 gray Exp $
+ * $Id: env.c,v 1.34 2003/06/10 00:25:00 gray Exp $
  */
 
 /*
@@ -235,16 +235,8 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, LOGFILE_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-#if HAVE_GETPID
-      /*
-       * NOTE: this may cause core dumps if this_p contains a bad
-       * format string
-       */
-      (void)loc_snprintf(log_path, sizeof(log_path), this_p, getpid());
-#else
       (void)strncpy(log_path, this_p, sizeof(log_path));
       log_path[sizeof(log_path) - 1] = '\0';
-#endif
       SET_POINTER(logpath_p, log_path);
       continue;
     }
