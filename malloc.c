@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.129 1999/03/10 16:17:54 gray Exp $
+ * $Id: malloc.c,v 1.130 1999/03/10 16:26:48 gray Exp $
  */
 
 /*
@@ -29,6 +29,9 @@
 
 #if HAVE_STDLIB_H
 # include <stdlib.h>				/* for atexit */
+#endif
+#if HAVE_STRING_H
+# include <string.h>				/* for strlen, strcpy */
 #endif
 
 #include "conf.h"				/* up here for _INCLUDE */
@@ -78,10 +81,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.129 1999/03/10 16:17:54 gray Exp $";
+#ident "$Id: malloc.c,v 1.130 1999/03/10 16:26:48 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.129 1999/03/10 16:17:54 gray Exp $";
+  "$Id: malloc.c,v 1.130 1999/03/10 16:26:48 gray Exp $";
 #endif
 #endif
 
