@@ -23,6 +23,9 @@
  */
 
 /*
+ * This is the malloc_dbg program which is designed to enable the user
+ * to easily enable the multitude of malloc-debug capabilities.
+ *
  * NOTE: all printf in this file should be fprintf to stderr unless you want
  * them to be eval'ed by the shell.
  */
@@ -41,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.2 1992/12/21 20:33:54 gray Exp $";
+  "$Id: dmalloc.c,v 1.3 1993/03/26 09:16:47 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */

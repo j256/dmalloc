@@ -23,7 +23,7 @@
  */
 
 /*
- * algorithm level for the malloc routines.  these routines handle the
+ * This file contains algorithm level routine for the heap.  They handle the
  * manipulation and administration of chunks of memory.
  */
 
@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.24 1993/02/20 19:33:36 gray Exp $";
+  "$Id: chunk.c,v 1.25 1993/03/26 09:16:21 gray Exp $";
 #endif
 
 /* checking information */
@@ -390,8 +390,8 @@ LOCAL	dblock_t	*get_dblock_admin(int many)
     dblock_admp = (dblock_adm_t *)bblockp->bb_mem;
   else
     dblock_admp = (dblock_adm_t *)_heap_alloc(BLOCK_SIZE);
-    if (dblock_admp == (dblock_adm_t *)HEAP_ALLOC_ERROR)
-      return NULL;
+  if (dblock_admp == (dblock_adm_t *)HEAP_ALLOC_ERROR)
+    return NULL;
   
   bblockp->bb_flags = BBLOCK_DBLOCK_ADMIN;
   bblockp->bb_slotp = dblock_admp;
@@ -469,33 +469,26 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
     mem = _heap_alloc(BLOCK_SIZE);
     if (mem == HEAP_ALLOC_ERROR)
       return NULL;
+    bblockp->bb_mem = mem;
   }
   
   /* setup bblock information */
   bblockp->bb_flags	= BBLOCK_DBLOCK;
   bblockp->bb_bitc	= bitc;
   bblockp->bb_dblock	= dblockp;
-  bblockp->bb_mem	= mem;
   
   /* add the rest to the free list (has to be at least 1 other dblock) */
   free_dblock[bitc] = ++dblockp;
   free_space_count += 1 << bitc;
   
-  if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)) {
-    freep = mem + (1 << bitc);
-    (void)memset(freep, FREE_CHAR, 1 << bitc);
-  }
-  
   for (; dblockp < *admp + (1 << (BASIC_BLOCK - bitc)) - 1; dblockp++) {
     dblockp->db_next	= dblockp + 1;
     dblockp->db_bblock	= bblockp;
     free_space_count	+= 1 << bitc;
-    
-    if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)) {
-      freep += 1 << bitc;
-      (void)memset(freep, FREE_CHAR, 1 << bitc);
-    }
   }
+  
+  if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
+    (void)memset(mem + (1 << bitc), FREE_CHAR, BLOCK_SIZE - (1 << bitc));
   
   /* last one points to NULL */
   dblockp->db_next	= NULL;
@@ -814,7 +807,7 @@ EXPORT	int	_chunk_heap_check(void)
       continue;
     }
     
-    /* we better not have has a no allocation block before */
+    /* we better not have seen a not-allocated block before */
     if (undef == 1) {
       malloc_errno = MALLOC_BAD_BLOCK_ORDER;
       _malloc_perror("_chunk_heap_check");
@@ -956,9 +949,8 @@ EXPORT	int	_chunk_heap_check(void)
 	return ERROR;
       }
       
-      /* check fence-posts for memory chunk */
-      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)
-	  && BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DB_FENCE)) {
+      /* check dblock entry very closely if necessary */
+      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DBLOCK)) {
 	for (dblockc = 0, dblockp = bblockp->bb_dblock;
 	     dblockp < bblockp->bb_dblock +
 	     (1 << (BASIC_BLOCK - bblockp->bb_bitc));
@@ -1000,12 +992,15 @@ EXPORT	int	_chunk_heap_check(void)
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
-	  
-	  mem = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
-	  if (fence_read(dblockp->db_file, dblockp->db_line,
-			 mem, dblockp->db_size) != NOERROR)
-	    return ERROR;
 	}
+      }
+      
+      if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)
+	  && BIT_IS_SET(_malloc_debug, DEBUG_CHECK_DB_FENCE)) {
+	mem = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
+	if (fence_read(dblockp->db_file, dblockp->db_line,
+		       mem, dblockp->db_size) != NOERROR)
+	  return ERROR;
       }
       break;
       

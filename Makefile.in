@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.9 1993/02/12 04:49:45 gray Exp $
+# $Id: Makefile.in,v 1.10 1993/03/26 09:16:15 gray Exp $
 #
 
 HFLS	= malloc.h malloc_lp.h
@@ -12,7 +12,7 @@ LIBS	= -L. -lmalloc $(LIBRARIES)
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
 
-CFLAGS	= $(CCFLAGS)
+CFLAGS	= -g
 DESTDIR	= /usr/antaire
 TESTS	= malloc_t
 LIBRARY	= libmalloc.a

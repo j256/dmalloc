@@ -22,6 +22,11 @@
  * The author of the program may be contacted at gray.watson@antaire.com
  */
 
+/*
+ * Test program for the malloc library.  Current it is interactive although
+ * probably should be script based.
+ */
+
 #include <stdio.h>				/* for stdin */
 
 #define MALLOC_T_MAIN
@@ -34,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.10 1992/12/22 18:01:44 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.11 1993/03/26 09:16:55 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000

@@ -1,3 +1,14 @@
+Fri Mar 26 04:00:14 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Upgraded to 1.1.6
+
+	* Found some problems with malloc debug codes.  Use of DB_FENCE
+	and CHECK_LISTS and some others were improper.  A MALLOC_DEBUG
+	value of 0x403000 would crash all malloc programs.
+
+	* Added some better comments to all files and cleaned up most
+	files too.
+
 Fri Mar 12 18:35:02 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Upgraded to 1.1.5.

@@ -1,5 +1,5 @@
 /*
- * version number
+ * version string for the library
  *
  * Copyright 1992 by Gray Watson and the Antaire Corporation
  *
@@ -24,4 +24,4 @@
 
 #include "malloc.h"
 
-LOCAL	char	*malloc_version = "1.1.5";
+LOCAL	char	*malloc_version = "1.1.6";

@@ -22,6 +22,12 @@
  * The author of the program may be contacted at gray.watson@antaire.com
  */
 
+/*
+ * This file contains the user-level calls to the memory allocation
+ * routines.  It handles a lot of the miscellaneous support garbage for
+ * chunk.c which is the real heap manager.
+ */
+
 #define MALLOC_MAIN
 
 #include "malloc.h"
@@ -39,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.17 1993/02/12 04:50:03 gray Exp $";
+  "$Id: malloc.c,v 1.18 1993/03/26 09:16:43 gray Exp $";
 #endif
 
 /*

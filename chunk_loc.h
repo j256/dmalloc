@@ -9,19 +9,19 @@
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library (see COPYING-LIB); if not, write to the
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * 
+ *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.7 1992/11/10 23:25:09 gray Exp $
+ * $Id: chunk_loc.h,v 1.8 1993/03/26 09:16:26 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -34,6 +34,8 @@
 #define LARGEST_NORMAL_BLOCK	16	/* largest normal allocation in bits */
 
 #define BLOCK_SIZE		(1 << BASIC_BLOCK)
+
+#define IS_DBLOCK(size)		((size) < BLOCK_SIZE)
 
 /* number of blocks in the administrative structures */
 #define BB_PER_ADMIN	((BLOCK_SIZE - \
@@ -78,11 +80,11 @@ struct dblock_st {
     struct dblock_st	*pn_next;		/* next in the free list */
     char		*pn_file;		/* .c filename where alloced */
   } db_pnt;
-
+  
   /* to reference union elements as db elements */
 #define db_next		db_pnt.pn_next		/* F */
 #define db_file		db_pnt.pn_file		/* U */
-
+  
 };
 typedef struct dblock_st	dblock_t;
 

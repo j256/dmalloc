@@ -22,6 +22,11 @@
  * The author of the program may be contacted at gray.watson@antaire.com
  */
 
+/*
+ * This file holds the compatibility routines necessary for the library if
+ * your system does not have them.
+ */
+
 #define COMPAT_MAIN
 
 #include "malloc.h"
@@ -32,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.5 1993/01/02 00:17:06 gray Exp $";
+  "$Id: compat.c,v 1.6 1993/03/26 09:16:28 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
