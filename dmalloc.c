@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.101 2001/07/12 23:10:31 gray Exp $
+ * $Id: dmalloc.c,v 1.102 2001/11/30 16:04:02 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.101 2001/07/12 23:10:31 gray Exp $"
+#ident "$Id: dmalloc.c,v 1.102 2001/11/30 16:04:02 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.101 2001/07/12 23:10:31 gray Exp $";
+  "$Id: dmalloc.c,v 1.102 2001/11/30 16:04:02 gray Exp $";
 #endif
 #endif
 
@@ -143,6 +143,7 @@ static	argv_array_t	plus;			/* tokens to add */
 static	int	remove_auto_b = 0;		/* auto-remove settings */
 static	int	short_tokens_b = 0;		/* short-tok output */
 static	char	*start = NULL;			/* for START settings */
+static	int	usage_b = 0;			/* usage messages */
 static	int	verbose_b = 0;			/* verbose flag */
 static	int	very_verbose_b = 0;		/* very-verbose flag */
 static	char	*tag = NULL;			/* maybe a tag argument */
@@ -197,6 +198,8 @@ static	argv_t	args[] = {
     "file:line",		"start check heap after this" },
   { 't',	"list-tags",	ARGV_BOOL_INT,	&list_tags_b,
     NULL,			"list tags in rc file" },
+  { 'u',	"usage",	ARGV_BOOL_INT,	&usage_b,
+    NULL,			"print usage messages" },
   { 'v',	"verbose",	ARGV_BOOL_INT,	&verbose_b,
     NULL,			"turn on verbose output" },
   { 'V',	"very-verbose",	ARGV_BOOL_INT,	&very_verbose_b,
@@ -809,6 +812,29 @@ static	char	*local_strerror(const int error_num)
   return INVALID_ERROR;
 }
 
+/*
+ * static void header
+ *
+ * DESCRIPTION:
+ *
+ * Print out a little usage header to the user.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+static	void	header(void)
+{
+  (void)fprintf(stderr,
+		"Debug Malloc Utility: http://dmalloc.com/\n");
+  (void)fprintf(stderr,
+		"  This utility helps set the Debug Malloc environment variables.\n");
+}
+
 int	main(int argc, char **argv)
 {
   char		buf[1024];
@@ -828,12 +854,15 @@ int	main(int argc, char **argv)
   argv_process(args, argc, argv);
   
   if (help_b) {
-    (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
-    (void)fprintf(stderr,
-		  "  This utility helps set the Debug Malloc environment variables.\n");
+    header();
     (void)fprintf(stderr,
 		  "  For a list of the command-line options enter: %s --usage\n",
 		  argv_argv[0]);
+    exit(0);
+  }
+  if (usage_b) {
+    header();
+    argv_usage(args, ARGV_USAGE_ALL);
     exit(0);
   }
   
