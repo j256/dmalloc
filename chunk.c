@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.143 1999/03/08 17:26:20 gray Exp $
+ * $Id: chunk.c,v 1.144 1999/03/09 15:53:57 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.143 1999/03/08 17:26:20 gray Exp $";
+#ident "$Id: chunk.c,v 1.144 1999/03/09 15:53:57 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.143 1999/03/08 17:26:20 gray Exp $";
+  "$Id: chunk.c,v 1.144 1999/03/09 15:53:57 gray Exp $";
 #endif
 #endif
 
@@ -341,8 +341,8 @@ static	char	*display_pnt(const void *pnt, const overhead_t *over_p,
 #endif
   }
   
-#if STORE_THREAD_ID
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
+#if LOG_THREAD_ID
+  {
     char	thread_id[256];
     
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|t");
@@ -1220,10 +1220,8 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
 #endif
   }
   
-#if STORE_THREAD_ID
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
-    dblock_p->db_overhead.ov_thread_id = THREAD_GET_ID;
-  }
+#if LOG_THREAD_ID
+  dblock_p->db_overhead.ov_thread_id = THREAD_GET_ID();
 #endif
   
   *over_p = &dblock_p->db_overhead;
@@ -2595,10 +2593,8 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 #endif
     }
     
-#if STORE_THREAD_ID
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
-      bblock_p->bb_overhead.ov_thread_id = THREAD_GET_ID;
-    }
+#if LOG_THREAD_ID
+    bblock_p->bb_overhead.ov_thread_id = THREAD_GET_ID();
 #endif
     
     over_p = &bblock_p->bb_overhead;
