@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.244 2003/11/18 15:28:29 gray Exp $
+@c $Id: dmalloc.texi,v 1.245 2003/11/18 15:43:01 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -372,7 +372,7 @@ If you are using rc shell, you should add the following to your
 @file{.rcrc} file (notice the @kbd{-R} option for rc-shell output):
 
 @example
-fn dmalloc {eval `{/usr/local/bin/dmalloc $*}}
+fn dmalloc @{eval `@{/usr/local/bin/dmalloc $*@}@}
 @end example
 
 By the way, if you are looking for a shell, I heartily recommend trying
