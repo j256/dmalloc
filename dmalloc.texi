@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.97 1995/06/21 18:22:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.98 1995/06/28 23:58:03 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -109,7 +109,7 @@ using as well as your machine and operating system types.
 Gray Watson.
 
 @menu
-* Copying::                     Library copying conditions.
+* Copying::                     Library copying and licensing conditions.
 * Overview::                    Description of how to debug with the library.
 * Details::                     Details about the library's operations.
 * Source Code::                 Information on the source and general concerns.
@@ -121,46 +121,55 @@ Gray Watson.
 @end menu
 
 @node Copying, Overview, Top, Top
-@chapter Library Copying Conditions
+@chapter Library Copying and Licensing Conditions
 
 @cindex copying
 @cindex license
 @cindex library permissions
 @cindex permissions of the library
 
+Copyright @copyright{} 1992 - 1995 by Gray Watson.
+
 Gray Watson makes no representations about the suitability of the
 software described herein for any purpose.  It is provided ``as is''
-without express or implied warranty.
+without express or implied warranty.  The name of Gray Watson cannot be
+used in advertising or publicity pertaining to distribution of the
+document or software without specific, written prior permission.
 
 Permission to use, copy, modify, and distribute this software for any
 @emph{non-commercial} purpose without fee is hereby granted, provided
-that the copyright notice and this permission notice appear in all
-copies, and that the name of Gray Watson not be used in advertising or
-publicity pertaining to distribution of the document or software without
-specific, written prior permission.
-
-Due to the fact that I am a consultant these days (read no stable
-revenue source) and given that I still spend a lot of time developing
-and maintaining this library, I have added the requirement that
-commercial entities license the software for a nominal fee.  This also
-allows me to provide better support and updates on a more frequent
-basis.
+that the above copyright notice, any documentation files associated with
+the software, and this permission section appear in all copies.
 
 @cindex commercial license
 
-A @emph{commercially} licensed copy of the software which allows the
-licensee to use, copy, or modify the software for any commercial purpose
-is available for US$35.  The license is good for a single installed copy
-of the library.  For site licenses or any other reasonable agreements,
-please contact me directly.  Licensees get a registered copy of the
-software as well as more attentive product support.
+In order to fund maintenance and continued development of this product,
+I have added the recommendation that commercial entities license the
+software for a nominal fee.  This also allows me to provide better
+support and updates on a more frequent basis.  Non-commercial user
+registration is greatly appreciated.
+
+A licensed copy of the software is available for US$35.  Commercial
+entities should purchase one license per workstation, or one per dmalloc
+user, whichever is the smaller number.  This license cannot be
+distributed with the software.  For ``site'' license discounts or any
+other reasonable agreements, please contact me directly.  Licensees get
+a registered copy of the software as well as more attentive product
+support.
+
+It should be noted that a ``site'' can be defined as anything you'd
+like.  It can be a physical location (a room, building, etc.), an
+organizational grouping (a workgroup, department, etc.) or any other
+logical grouping (``the seventeen tech writers scattered about'', etc.).
 
 A copy of the software on a Unix tar floppy is available for US$10 and a
 printed and bound copy of the manual is available for US$15.
-International shipping costs are not included.
+International shipping costs outside of the US or Canada, please add
+US$5 for the extra postal charges.
 
 Please include the following registration information with your check
-made out to Gray Watson.
+made out to Gray Watson.  Money orders are also accepted.  Purchase
+orders are as well, although amounts less than US$50 are discouraged.
 
 @itemize
 @item Name
@@ -2044,7 +2053,7 @@ Top.
 * Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
-* Full Node Listings::          Listing of all the nodes in the manual.
+* Full Node Listing::           Listing of all the nodes in the manual.
 
 Overview.
 
