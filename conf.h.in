@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.90 2003/09/05 21:29:08 gray Exp $
+ * $Id: conf.h.in,v 1.91 2003/09/08 14:43:22 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -144,6 +144,17 @@
  * LOCK_THREADS setting is enabled in the settings.h.
  */
 #define THREAD_LOCK_INIT_VAL 0L
+
+/*
+ * Under the Cygwin environment, when malloc calls getenv, it core
+ * dumps.  This is because Cygwin, as far as I know, is loading the
+ * shared libraries for the various system functions and goes
+ * recursive with a call to getenv.  Ugh.
+ *
+ * So we have to delay the getenv call.  This sets when we can do the
+ * getenv call so the environmental processing is delayed.
+ */
+#define GETENV_SAFE 0
 
 /*
  * LIBRARY DEFINES:

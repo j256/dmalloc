@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.172 2003/09/05 21:45:40 gray Exp $
+ * $Id: malloc.c,v 1.173 2003/09/08 14:43:21 gray Exp $
  */
 
 /*
@@ -334,6 +334,7 @@ static	int	dmalloc_startup(const char *debug_str)
 #endif
 #endif
     
+#if GETENV_SAFE
     /* get the options flag */
     if (debug_str == NULL) {
       env_str = getenv(OPTIONS_ENVIRON);
@@ -344,6 +345,7 @@ static	int	dmalloc_startup(const char *debug_str)
     
     /* process the environmental variable(s) */
     process_environ(env_str);
+#endif
     
     /*
      * Tune the environment here.  If we have a start-file,
@@ -443,7 +445,7 @@ static	int	dmalloc_in(const char *file, const int line,
    * the THREAD_LOCK will flip.
    */
   if (! enabled_b) {
-    if (! dmalloc_startup(NULL)) {
+    if (! dmalloc_startup(NULL /* no options string */)) {
       return 0;
     }
   }
@@ -1346,7 +1348,7 @@ unsigned int	dmalloc_debug(const unsigned int flags)
   unsigned int	old_flags;
   
   if (! enabled_b) {
-    (void)dmalloc_startup(NULL);
+    (void)dmalloc_startup(NULL /* no options string */);
   }
   
   old_flags = _dmalloc_flags;
@@ -1376,7 +1378,7 @@ unsigned int	dmalloc_debug(const unsigned int flags)
 unsigned int	dmalloc_debug_current(void)
 {
   if (! enabled_b) {
-    (void)dmalloc_startup(NULL);
+    (void)dmalloc_startup(NULL /* no options string */);
   }
   
   /* should not check the heap here since we are dumping the debug variable */
@@ -1543,7 +1545,7 @@ void	dmalloc_track(const dmalloc_track_t track_func)
 unsigned long	dmalloc_mark(void)
 {
   if (! enabled_b) {
-    (void)dmalloc_startup(NULL);
+    (void)dmalloc_startup(NULL /* no options string */);
   }
   
   return _dmalloc_iter_c;
@@ -1567,7 +1569,7 @@ unsigned long	dmalloc_mark(void)
 unsigned int	dmalloc_page_size(void)
 {
   if (! enabled_b) {
-    (void)dmalloc_startup(NULL);
+    (void)dmalloc_startup(NULL /* no options string */);
   }
   
   return BLOCK_SIZE;

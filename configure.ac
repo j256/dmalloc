@@ -18,10 +18,10 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.13 2003/07/08 18:09:51 gray Exp $
+# $Id: configure.ac,v 1.14 2003/09/08 14:43:22 gray Exp $
 #
-AC_REVISION($Revision: 1.13 $)
-AC_INIT(dmalloc, 5.2.1, [http://dmalloc.com/])
+AC_REVISION($Revision: 1.14 $)
+AC_INIT(dmalloc, 5.2.2, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
@@ -56,7 +56,7 @@ AC_PROG_CC
 AC_PROG_CXX
 
 # hopefully we have a stdc c-compiler
-if test "$if ac_cv_prog_cc_stdc" = "no" ; then
+if test "$ac_cv_prog_cc_stdc" = "no" ; then
 	AC_MSG_WARN()
 	AC_MSG_WARN(WARNING: no ansi compiler.  this build may fail.)
 	AC_MSG_WARN()
@@ -373,6 +373,65 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 [ AC_DEFINE(SIGNAL_OKAY, 0) AC_MSG_RESULT([no]) ]
 )
 
+#
+# check the safety of the getenv function
+#
+AC_CHECK_FUNCS(getenv)
+AC_MSG_CHECKING([getenv safe])
+AC_RUN_IFELSE([[
+static char heap_mem[102400], *heap_p = heap_mem;
+free (char *pnt) {
+}
+char *malloc (int size) {
+  char *pnt;
+  getenv("PATH");
+  pnt = heap_p;
+  heap_p += size;
+  return pnt;
+}
+char *calloc (int number, int size) {
+  char *start, *pnt, *end;
+  getenv("PATH");
+  /* it should be already 0s */
+  start = malloc (number * size);
+  pnt = start;
+  end = start + size;
+  while (pnt < end) { *pnt++ = '\0'; }
+  return start;
+}
+char *realloc (char *old_pnt, int new_size) {
+  char *start, *pnt, *end;
+  getenv("PATH");
+  start = malloc (new_size);
+  pnt = start;
+  end = start + new_size;
+  while (pnt < end) { *pnt++ = *old_pnt++; }
+  return start;
+}
+main() { malloc(10); _exit(0); }
+]],
+[ AC_DEFINE(GETENV_SAFE, 1)
+  AC_MSG_RESULT([yes])
+  getenv_safe=yes ],
+# if it succeeds then something called free on the way out
+[ AC_DEFINE(GETENV_SAFE, 0)
+  AC_MSG_RESULT([no])
+  getenv_safe=no ],
+[ AC_DEFINE(GETENV_SAFE, 1)
+  AC_MSG_RESULT([yes])
+  getenv_safe=yes ]
+)
+
+if test x$getenv_safe != xyes; then
+  AC_MSG_WARN([Since getenv is not safe, you MUST add the following])
+  AC_MSG_WARN([code to the front of main():])
+  AC_MSG_WARN([[  #ifdef DMALLOC]])
+  AC_MSG_WARN([[    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
+  AC_MSG_WARN([[  #endif]])
+  AC_MSG_WARN([You will need to compile your program with: -DDMALLOC])
+  AC_MSG_WARN([See the CYGWIN section in the documentation for details.])
+fi
+
 ##############################################################################
 
 #
@@ -411,7 +470,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.13 2003/07/08 18:09:51 gray Exp $"
+#ident "$Id: configure.ac,v 1.14 2003/09/08 14:43:22 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
