@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.41 1995/03/10 19:43:24 gray Exp $
+ * $Id: conf.h.in,v 1.42 1995/05/05 15:42:27 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -137,6 +137,31 @@
  * begin the tough debugging at a certain point.
  */
 #define LOG_ITERATION_COUNT 1
+
+/*
+ * Store the number of times a pointer is allocated or freed.  NOTE:
+ * This creates a certain amount of memory overhead.
+ */
+#define STORE_POINTER_COUNT 1
+
+/*
+ * Store the interation count or when a pointer is allocated [or
+ * freed].  This is to give you some idea when during program
+ * execution, a pointer was allocated but not freed.  NOTE: This
+ * creates a certain amount of memory overhead.
+ */
+#define STORE_ITERATION_COUNT 1
+
+/*
+ * Store the current OR elapsed time (only one of them should be
+ * activated) in seconds (from the time() routine) when a pointer is
+ * allocated [or freed].  This is to give you some idea when a pointer
+ * was allocated but not freed.  The library will log the starting and
+ * the ending time if either of these flags is set.  NOTE: This
+ * creates a certain amount of memory overhead.
+ */
+#define STORE_CURRENT_TIME 1
+#define STORE_ELAPSED_TIME 0
 
 /*
  ************************************************************************
