@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.84 2000/02/17 14:06:30 gray Exp $
+# $Id: Makefile.all.in,v 1.85 2000/03/21 01:56:20 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -219,42 +219,38 @@ heavy : $(TEST) light
 # These dependencies are automatically generated.  Do not edit by hand.
 #
 
-arg_check.o: arg_check.c /usr/local/include/dmalloc.h conf.h \
- settings.h chunk.h debug_val.h dmalloc_loc.h error.h arg_check.h
-chunk.o: chunk.c conf.h settings.h /usr/local/include/dmalloc.h \
- chunk.h chunk_loc.h dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h \
- error.h error_val.h heap.h
-compat.o: compat.c /usr/local/include/dmalloc.h conf.h settings.h \
- compat.h dmalloc_loc.h
-dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h \
- /usr/local/include/dmalloc.h compat.h debug_tok.h dmalloc_loc.h \
- debug_val.h env.h error_str.h error_val.h version.h
+arg_check.o: arg_check.c dmalloc.h conf.h settings.h chunk.h \
+ debug_val.h dmalloc_loc.h error.h arg_check.h
+chunk.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
+ dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h error.h error_val.h \
+ heap.h
+compat.o: compat.c dmalloc.h conf.h settings.h compat.h dmalloc_loc.h
+dmalloc.o: dmalloc.c dmalloc_argv.h conf.h settings.h dmalloc.h \
+ compat.h debug_tok.h dmalloc_loc.h debug_val.h env.h error_str.h \
+ error_val.h version.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
  dmalloc_argv_loc.h compat.h
-dmalloc_lp.o: dmalloc_lp.c /usr/local/include/dmalloc.h conf.h \
- settings.h error_val.h dmalloc_loc.h dmalloc_lp.h malloc.h error.h \
- return.h
-dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h \
- /usr/local/include/dmalloc.h debug_val.h dmalloc_loc.h error_val.h
+dmalloc_lp.o: dmalloc_lp.c dmalloc.h conf.h settings.h error_val.h \
+ dmalloc_loc.h dmalloc_lp.h malloc.h error.h return.h
+dmalloc_t.o: dmalloc_t.c conf.h settings.h dmalloc_argv.h dmalloc.h \
+ debug_val.h dmalloc_loc.h error_val.h
 dmalloc_tab.o: dmalloc_tab.c conf.h settings.h chunk.h compat.h \
- /usr/local/include/dmalloc.h dmalloc_loc.h error.h error_val.h \
- dmalloc_tab.h dmalloc_tab_loc.h
-env.o: env.c conf.h settings.h /usr/local/include/dmalloc.h compat.h \
- dmalloc_loc.h debug_tok.h debug_val.h env.h error.h
-error.o: error.c conf.h settings.h /usr/local/include/dmalloc.h \
- compat.h debug_val.h dmalloc_loc.h env.h error.h error_val.h \
- version.h
-heap.o: heap.c /usr/local/include/dmalloc.h conf.h settings.h chunk.h \
- compat.h debug_val.h dmalloc_loc.h error.h error_val.h heap.h
-malloc.o: malloc.c conf.h settings.h /usr/local/include/dmalloc.h \
- chunk.h compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
- error_val.h heap.h dmalloc_lp.h return.h
-chunk_th.o: chunk.c conf.h settings.h /usr/local/include/dmalloc.h \
- chunk.h chunk_loc.h dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h \
- error.h error_val.h heap.h
-error_th.o: error.c conf.h settings.h /usr/local/include/dmalloc.h \
- compat.h debug_val.h dmalloc_loc.h env.h error.h error_val.h \
- version.h
-malloc_th.o: malloc.c conf.h settings.h /usr/local/include/dmalloc.h \
- chunk.h compat.h debug_val.h dmalloc_loc.h env.h error.h error_str.h \
- error_val.h heap.h dmalloc_lp.h return.h
+ dmalloc.h dmalloc_loc.h error.h error_val.h dmalloc_tab.h \
+ dmalloc_tab_loc.h
+env.o: env.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h \
+ debug_tok.h debug_val.h env.h error.h
+error.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
+ dmalloc_loc.h env.h error.h error_val.h version.h
+heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
+ debug_val.h dmalloc_loc.h error.h error_val.h heap.h
+malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
+ debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
+ heap.h dmalloc_lp.h malloc.h return.h
+chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
+ dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h error.h error_val.h \
+ heap.h
+error_th.o: error.c conf.h settings.h dmalloc.h compat.h debug_val.h \
+ dmalloc_loc.h env.h error.h error_val.h version.h
+malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
+ debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
+ heap.h dmalloc_lp.h malloc.h return.h
