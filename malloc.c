@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.144 2000/03/24 21:47:58 gray Exp $
+ * $Id: malloc.c,v 1.145 2000/05/15 15:43:22 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.144 2000/03/24 21:47:58 gray Exp $";
+#ident "$Id: malloc.c,v 1.145 2000/05/15 15:43:22 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.144 2000/03/24 21:47:58 gray Exp $";
+  "$Id: malloc.c,v 1.145 2000/05/15 15:43:22 gray Exp $";
 #endif
 #endif
 
@@ -702,9 +702,9 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
 #if ALLOW_REALLOC_SIZE_ZERO
     if (new_size == 0) {
       /*
-       * If realloc(old_pnt, 0) then free(old_pnt).  Thanks to
-       * Stefan.Froehlich@tuwien.ac.at for patiently pointing that the
-       * realloc in just about every Unix has this functionality.
+       * If realloc(old_pnt, 0) then free(old_pnt).  Thanks to Stefan
+       * Froehlich for patiently pointing that the realloc in just
+       * about every Unix has this functionality.
        */
       (void)_chunk_free(file, line, old_pnt, 0);
       new_p = NULL;

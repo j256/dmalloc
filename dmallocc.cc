@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmallocc.cc,v 1.1 2000/05/08 12:21:28 gray Exp $
+ * $Id: dmallocc.cc,v 1.2 2000/05/15 15:43:22 gray Exp $
  */
 
 /*
@@ -76,8 +76,7 @@ operator delete(void *pnt)
 }
 
 /*
- * An overload function for the C++ delete[].  Thanks to Jens Krinke
- * <j.krinke@gmx.de>
+ * An overload function for the C++ delete[].  Thanks to Jens Krinke.
  */
 void
 operator delete[](void *pnt)
