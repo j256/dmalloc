@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.97 1997/12/05 21:09:51 gray Exp $";
+  "$Id: malloc.c,v 1.98 1997/12/08 04:15:34 gray Exp $";
 #endif
 
 /*
@@ -408,10 +408,12 @@ void	_dmalloc_shutdown(void)
   /* NOTE: do not set enabled_b to false here */
 }
 
-#ifdef FINI_DMALLOC
+#if FINI_DMALLOC
 /*
  * Automatic OSF function to close dmalloc.  Pretty cool OS/compiler
- * hack.
+ * hack.  By default it is not necessary because we use atexit() and
+ * on_exit() to register the close functions.  These are more
+ * portable.
  */
 void	__fini_dmalloc()
 {
