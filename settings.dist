@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.17 1997/12/08 06:26:31 gray Exp $
+ * $Id: settings.dist,v 1.18 1997/12/08 07:38:02 gray Exp $
  */
 
 /*
@@ -229,7 +229,7 @@
 /****************************** thread settings ******************************/
 
 /*
- * the following definition allows use of the library in threaded
+ * The following definition allows use of the library in threaded
  * programs.  The most common package is MIT's pthreads so this is the
  * default.  Please send me mail if these definitions are configurable
  * enough to work with your thread package.
@@ -249,8 +249,8 @@
  * attempt to call the global lock while inside of the pthreads
  * initialization code, the pthread library may core dump.  So we have
  * the dmalloc library not do the lock the first X times with the
- * lock-on dmalloc program env setting.  This is a HACK, however
- * necessary.
+ * lock-on dmalloc program env setting (dmalloc -o X).  This is a
+ * HACK, however necessary.
  *
  * You will have to play with the lock-on value.  Too many will cause two
  * threads to march into the dmalloc code generating a ERROR_IN_TWICE

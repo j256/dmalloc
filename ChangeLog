@@ -1,6 +1,11 @@
-Sun Dec  7 21:44:17 1997  Gray Watson  <gray@burger.letters.com>
+Mon Dec  8 02:34:14 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 3.3.0.
+
+	* Fixed problems with pthread locking and various conditions.
+        Added a warning if lock-on is set without allow-nonlinear.
+
+Sun Dec  7 21:44:17 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Added THREAD_LOCK_INIT_VAL autoconfigure.
 
@@ -1210,5 +1215,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.179 1997/12/08 02:45:20 gray Exp $
+$Id: ChangeLog,v 1.180 1997/12/08 07:38:01 gray Exp $
 -------------------------------------------------------------------------------
