@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.198 2000/11/14 23:58:20 gray Exp $
+@c $Id: dmalloc.texi,v 1.199 2000/11/15 15:40:33 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -475,12 +475,15 @@ from the home page @uref{http://dmalloc.com/}.
 
 @cindex settings.dist file
 
-@item You probably will want to edit the settings in
+@item You may want to edit or at least review the settings in
 @file{settings.dist} to tune specific features of the library.  The
-@file{configure} script will copy this file to @file{settings.h}
-which is where you should be adding per-architecture settings.
+@file{configure} script will copy this file to @file{settings.h} which
+is where you should be adding per-architecture settings.
 
 @cindex configure script
+@cindex --disable-cxx
+@cindex --enable-threads
+@cindex --enable-shlib
 @cindex conf.h file
 
 @item Type @kbd{sh ./configure} to configure the library.  You may want
@@ -489,13 +492,9 @@ configure.  You may want to use the @kbd{--disable-cxx} option if you do
 not want the Makefile to build the C++ version of dmalloc.  You may want
 to use the @kbd{--enable-threads} option to build the threaded version
 of dmalloc.  You may want to use the @kbd{--enable-shlib} option to
-build the shared versions of the dmalloc libraries.  Configure should
+build the shared versions of the dmalloc libraries.  @kbd{sh ./configure
+--help} lists the available options to configure.  Configure should
 generate the @file{Makefile} and configuration files automatically.
-
-@emph{NOTE}: It seems that some versions of tr (especially from HP-UX)
-don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr
-often, you may need to either get GNU's tr (in their textutils package)
-or generate the @file{Makefile} and @file{conf.h} files by hand.
 
 @item You may want to examine the @file{Makefile} and @file{conf.h} files
 created by configure to make sure it did its job correctly.
@@ -538,8 +537,9 @@ compiler, you may still be able to add some sort of option to your
 compiler to make it ANSI.  If there such is an option, please send it to
 the author so it can be added to the configure script.
 
-@item If you use threads, typing @kbd{make threads} should be enough
-to build @file{libdmallocth.a} which is the threaded version of the
+@item If you use threads and did not add the @kbd{--enable-threads}
+argument to configure, typing @kbd{make threads} should be enough to
+build @file{libdmallocth.a} which is the threaded version of the
 library.  This may or may not work depending on the configuration
 scripts ability to detect your local thread functionality.  Feel free to
 send me mail with improvements.
@@ -606,8 +606,8 @@ library:
 @item Make sure you have the latest version of the library available
 from the home page @uref{http://dmalloc.com/}.
 
-@item Follow the installation instructions on how to configure and
-make and install the library (i.e. type: @kbd{make install}).
+@item Follow the installation instructions on how to configure,
+make, and install the library (i.e. type: @kbd{make install}).
 @xref{Installation}.
 
 @cindex automatic shutdown
@@ -655,7 +655,8 @@ as well and compile with @kbd{cc -DDMALLOC @dots{}}:
 #endif
 @end example
 
-@item Link the dmalloc library into your program.
+@item Link the dmalloc library into your program.  The dmalloc library
+should probably be placed at or near the end of the library list.
 
 @item Enable the debugging features by typing @kbd{dmalloc -l logfile
 -i 100 low} (for example).  This will:
@@ -1450,11 +1451,6 @@ approximately when this problem happened.  @xref{Debug Tokens},
 @section Using the Library with a Thread Package
 
 @cindex threads
-
-This is the newest section of the library and therefore contains the
-least information about a subject on which I probably could write a
-book.  My apologies.
-
 @cindex pthreads
 
 Threads are special operating system facilities which allow your
@@ -1466,14 +1462,14 @@ you or if any of the terminology below does not make sense, see manuals
 about POSIX threads (pthreads) before going any further.  O'Reilly
 publishes a pretty good pthreads manual for example.
 
-The support for threads in dmalloc is minimal although probably adequate
-for most if not all testing scenarios.  It provides support for mutex
-locking itself to protect against race conditions that result in
-multiple simultaneous execution.  One of the major problems is that most
-thread libraries uses malloc themselves.  Since all of dmalloc's
-initialization happens when a call to malloc is made, we may be
-attempting to initialize or lock the mutex while the thread library is
-booting up.  A baaaad thing since thread libraries aren't reentrant.
+The support for threads in dmalloc should be adequate for most if not
+all testing scenarios.  It provides support for mutex locking itself to
+protect against race conditions that result in multiple simultaneous
+execution.  One of the major problems is that most thread libraries uses
+malloc themselves.  Since all of dmalloc's initialization happens when a
+call to malloc is made, we may be attempting to initialize or lock the
+mutex while the thread library is booting up.  A baaaad thing since
+thread libraries aren't reentrant.
 
 @cindex lock on
 
@@ -1486,8 +1482,9 @@ abort or other bad things might happen.  You adjust the number of times
 to wait at runtime with the ``lock-on'' option to the dmalloc program
 (for example @kbd{dmalloc -o 20}).  @xref{Dmalloc Program}.  Times
 values between 2 and 30 are probably good although operating systems
-will vary significantly.  You know its too low if your program core
-dumps and too high if the library generates an exception.
+will vary significantly.  You know its too low if your program
+immediately core dumps and too high if the dmalloc library says its gone
+recursive.
 
 An additional complexity is when we are initializing the lock before
 mutex locking around the library.  As mentioned, the initialization
@@ -1499,15 +1496,40 @@ which seems to work for me.  If people need to have this runtime
 configurable or would like to present an alternative default, please let
 me know.
 
-To build the library with the threaded stubs type @kbd{make threads}
-which should build @file{libdmallocth.a}.  The auto-configurations for
-these functions is in its infancy and may or may not work depending on
-the script's ability to detect your local thread functionality.  Feel
-free to send me mail with comments or improvements to them.
+So to use dmalloc with a threaded program, follow the following steps
+carefully.
 
-So that's it.  If you have any specific questions or would like addition
-information posted in this section, please let me know.  Experienced
-thread programmers only please.
+@enumerate
+
+@item Follow the installation instructions on how to configure,
+make, and install the library but make sure to add the
+@kbd{--enable-threads} argument to configure.  @xref{Installation}.
+
+@item Typing @kbd{make} should be enough to build the threaded versions
+of the libraries including @file{libdmallocth.a}.
+
+@item Link the dmalloc theaded library into your program.  The dmalloc
+library should probably be placed at or near the end of the library
+list.
+
+@item Enable the debugging options that you need by typing
+@kbd{dmalloc -l logfile -i 100 low} (for example).  @kbd{dmalloc
+--usage} will provide verbose usage info for the dmalloc program.
+@xref{Dmalloc Program}.
+
+@item Enable the ``lock-on'' option (for example @kbd{dmalloc -o 20}).
+As explained above, you may have to try different values before getting
+it right.
+
+@item If everything works, you should be able to run your program, have
+it not immediately crash, and the dmalloc library should not complain
+about recursion.
+
+@end enumerate
+
+If you have any specific questions or would like addition information
+posted in this section, please let me know.  Experienced thread
+programmers only please.
 
 @node Dmalloc Program, Source Code, Programming, Top
 @chapter Dmalloc Utility Program
