@@ -1,3 +1,33 @@
+2003-06-09  Gray Watson  <gray@outside.256.com>
+
+	* Added detection of gethostname() function for %h logpath
+	handling.
+
+	* Added new logfile process with %h hostname, %t time, %p
+	process-id, and %i for thread-id.
+
+	* Removed the old logfile % processing.  %d, %l, or %u no long
+	expand to the pid.
+
+	* Added LOG_PID to drop the pid on each line of the logfile.
+
+	* Added LOG_REOPEN to reopen the logfile when the pid of the
+	process changes as with a fork.  Thanks to James Hawtin.
+
+	* Renamed the LOG_ITERATION_COUNT to LOG_ITERATION in settings.dist.
+
+	* Renamed the STORE_SEEN_COUNT to be LOG_PNT_SEEN_COUNT.
+
+	* Renamed the STORE_ITERATION_COUNT to be LOG_PNT_ITERATION.
+
+	* Renamed the STORE_TIME to be LOG_PNT_TIME.
+
+	* Renamed the STORE_TIMEVAL to be LOG_PNT_TIMEVAL.
+
+	* Renamed the LOG_THREAD_ID to be LOG_PNT_THREAD_ID.
+
+	* Improved the log_stats and log_changed output.
+
 2003-06-08  Gray Watson  <gray@outside.256.com>
 
 	* Releasing version 5.1.0.
@@ -1953,5 +1983,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.294 2003/06/08 21:26:16 gray Exp $
+$Id: ChangeLog,v 1.295 2003/06/10 00:40:11 gray Exp $
 -------------------------------------------------------------------------------
