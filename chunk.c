@@ -28,7 +28,7 @@
 #include "malloc_levels.h"
 #include "malloc_loc.h"
 
-RCS_ID("$Id: chunk.c,v 1.5 1992/09/04 21:22:50 gray Exp $");
+RCS_ID("$Id: chunk.c,v 1.6 1992/09/22 03:20:15 gray Exp $");
 
 /* for formating */
 #define FREE_COLUMN		    5		/* for dump_free formating */
@@ -1588,9 +1588,10 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     
     /* do we need to print transaction info? */
     if (_malloc_debug_level >= DEBUG_LOG_TRANS)
-      _malloc_message("*** free: freeing dblock pnter '%#lx': size %u, "
-		      "file '%s:%u'",
-		      pnt + pnt_below_adm, dblockp->db_size - pnt_total_adm,
+      _malloc_message("*** free: freeing dblock pnter '%#lx': from '%s:%u', "
+		      "size %u, file '%s:%u'",
+		      pnt + pnt_below_adm, file, line,
+		      dblockp->db_size - pnt_total_adm,
 		      dblockp->db_file, dblockp->db_line);
     
     /* count the bits */
@@ -1639,9 +1640,10 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   
   /* do we need to print transaction info? */
   if (_malloc_debug_level >= DEBUG_LOG_TRANS)
-    _malloc_message("*** free: freeing bblock pnter '%#lx': size %u, "
-		    "file '%s:%u'",
-		    pnt + pnt_below_adm, bblockp->bb_size - pnt_total_adm,
+    _malloc_message("*** free: freeing bblock pnter '%#lx': from '%s:%u', "
+		    "size %u, file '%s:%u'",
+		    pnt + pnt_below_adm, file, line,
+		    bblockp->bb_size - pnt_total_adm,
 		    bblockp->bb_file, bblockp->bb_line);
   
   /* count the bits */
@@ -1801,7 +1803,7 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line, char * oldp,
    */
   if (_malloc_debug_level >= DEBUG_LOG_TRANS)
     _malloc_message("*** realloced from %#lx (%u bytes) to %#lx (%u bytes), "
-		    "file '%s:%u'",
+		    "from file '%s:%u'",
 		    oldp, old_size, newp, new_size, file, line);
   
   /* newp is already user-level real */
@@ -1956,7 +1958,7 @@ EXPORT	void	_chunk_dump_not_freed()
       if (strcmp(DEFAULT_FILE, bblockp->bb_file) == 0 &&
 	  bblockp->bb_line == DEFAULT_LINE) {
 	unknown_bblockc++;
-	unknown_sizec += bblockp->bb_size;
+	unknown_sizec += bblockp->bb_size - pnt_total_adm;
       }
       else
 	if (_malloc_debug_level >= DEBUG_LOG_STATS)
@@ -1965,7 +1967,7 @@ EXPORT	void	_chunk_dump_not_freed()
 		 mem  + pnt_below_adm, bblockp->bb_size - pnt_total_adm,
 		 bblockp->bb_file, bblockp->bb_line);
       
-      sizec += bblockp->bb_size;
+      sizec += bblockp->bb_size - pnt_total_adm;
       bblockc++;
       break;
       
@@ -2023,7 +2025,7 @@ EXPORT	void	_chunk_dump_not_freed()
 	if (strcmp(DEFAULT_FILE, dblockp->db_file) == 0 &&
 	    dblockp->db_line == DEFAULT_LINE) {
 	  unknown_dblockc++;
-	  unknown_sizec += dblockp->db_size;
+	  unknown_sizec += dblockp->db_size - pnt_total_adm;
 	}
 	else
 	  if (_malloc_debug_level >= DEBUG_LOG_STATS)
@@ -2032,7 +2034,7 @@ EXPORT	void	_chunk_dump_not_freed()
 		   mem  + pnt_below_adm, dblockp->db_size - pnt_total_adm,
 		   dblockp->db_file, dblockp->db_line);
 	
-	sizec += dblockp->db_size;
+	sizec += dblockp->db_size - pnt_total_adm;
 	dblockc++;
       }
       break;

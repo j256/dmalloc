@@ -1,3 +1,11 @@
+Mon Sep 21 20:39:38 1992  Gray Watson  (gray at toaster)
+
+	* Fixed some size problems with bounds checking enabled.
+
+	* Made free be able to report who freed a pointer.  I don't know
+	why this wasn't caught before.  free wasn't even using its
+	file/line arguments.
+
 Thu Sep  3 03:23:39 1992  Gray Watson  (gray at toaster)
 
 	* Added ability to realloc(NULL with an ifdef to disable.  Useful
