@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.49 1993/09/10 21:16:03 gray Exp $";
+  "$Id: chunk.c,v 1.50 1993/09/10 21:44:55 gray Exp $";
 #endif
 
 /* checking information */
@@ -1190,6 +1190,7 @@ EXPORT	int	_chunk_heap_check(void)
 		_malloc_error("_chunk_heap_check");
 		return ERROR;
 	      }
+	  }
 	  
 	  continue;
 	}
@@ -1297,13 +1298,14 @@ EXPORT	int	_chunk_heap_check(void)
 	    _malloc_error("_chunk_heap_check");
 	    return ERROR;
 	  }
-      break;
-      
-    default:
-      malloc_errno = ERROR_BAD_FLAG;
-      _malloc_error("_chunk_heap_check");
-      return ERROR;
-      break;
+	break;
+	
+      default:
+	malloc_errno = ERROR_BAD_FLAG;
+	_malloc_error("_chunk_heap_check");
+	return ERROR;
+	break;
+      }
     }
   }
   
