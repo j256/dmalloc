@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.8 2000/03/30 17:44:03 gray Exp $ -->
-<TITLE> Dmalloc Release Notes - 4.5.1 </TITLE>
+<!-- $Id: RELEASE.html,v 1.9 2000/04/18 19:46:08 gray Exp $ -->
+<TITLE> Dmalloc Release Notes - 4.5.2 </TITLE>
 </HEAD>
 <BODY>
 
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.5.1 <BR>
+Version: Release 4.5.2 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.5.0.html">4.5.0</A> <BR>
-Date: March 30, 2000
+Last-Version: <A HREF="dmalloc-4.5.1.html">4.5.1</A> <BR>
+Date: April 18, 2000
 </H4>
 </CENTER>
 
@@ -31,7 +31,8 @@ Date: March 30, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Quick bug fix release to repair a compilation error.
+<P> Quick bug fix release to repair a problem in the chunk pointer
+checking.
 
 <P>
 <HR>
@@ -95,9 +96,8 @@ Date: March 30, 2000
 
 <UL>
 
-<P><LI> Fixed a compilation problem in dmalloc_lp.c where I was
-returning a void from another function call.  Not sure why gcc -Wall
-didn't catch this.
+<P><LI> Fixed a bug with the way the library checks pointers.
+Introduced when we added a flag to the dblock allocation structures.
 
 </UL>
 

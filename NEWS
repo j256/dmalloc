@@ -1,6 +1,12 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.91 2000/03/30 15:39:38 gray Exp $
+$Id: NEWS,v 1.92 2000/04/18 19:46:08 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.5.2:
+
+	* Fixed bug in chunk.c pointer checking.  Thanks Ezra.
+	* Cleaned up some of the compat.[ch] headers to better match reality.
+	* Reorganized dmalloc.texi documentation and moved to using makeinfo.
 
 Version 4.5.1:
 
