@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.26 1994/04/07 03:03:38 gray Exp $
+ * $Id: chunk_loc.h,v 1.27 1994/06/02 21:40:52 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -157,7 +157,7 @@ struct bblock_st {
   } bb_num;
   
   /* to reference union elements as bb elements */
-#define bb_bitn		bb_num.nu_bitn		/* D */
+#define bb_bitn		bb_num.nu_bitn		/* DF */
 #define bb_line		bb_num.nu_line		/* U */
   
   union {
