@@ -1,3 +1,12 @@
+Tue Jun 20 18:30:55 2000  Gray Watson  <gray@256.com>
+
+	* Fixed problems with -p and -m not setting the debug flags.
+
+	* Added 'force-linear' token and depreciated the 'allow-nonlinear'
+ 	token.  Non-linear heaps really are the default these days (on AIX
+ 	for example).  Now, you can enable the force-linear if you want to
+ 	ensure a linear heap.
+
 Wed May 17 11:29:55 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.6.0.
@@ -1633,5 +1642,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.253 2000/05/17 16:46:33 gray Exp $
+$Id: ChangeLog,v 1.254 2000/06/20 22:42:38 gray Exp $
 -------------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.186 2000/05/17 15:41:41 gray Exp $
+@c $Id: dmalloc.texi,v 1.187 2000/06/20 22:42:15 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -544,13 +544,16 @@ See the ``Using With Threads'' section for more information about the
 operation of the library with your threaded program.  @xref{Using With
 Threads}.
 
-@item If you use C++, typing @kbd{make cc} should be enough to build
-@file{libdmalloc++.a} which is the C++ version of the library.  See the
-@file{dmallocc.cc} C++ file which contains basic code to overload the
-@code{new}, @code{new[]}, @code{delete}, and @code{delete[]} C++
-operators.  My apologies on the minimal C++ support.  I am still living
-in a mostly C world.  Any help improving this interface without
-sacrificing portability would be appreciated.
+@item If you have a C++ compiler installed, the library should have
+automatically built @file{libdmallocxx.a} which is the C++ version of
+the library.  If it was not done automatically, you can build it by
+typing @kbd{make cxx}.  You should link this library into your C++
+programs instead of @file{libdmalloc.a}.  See the @file{dmallocc.cc} C++
+file which contains basic code to overload the @code{new}, @code{new[]},
+@code{delete}, and @code{delete[]} C++ operators.  My apologies on the
+minimal C++ support.  I am still living in a mostly C world.  Any help
+improving this interface without sacrificing portability would be
+appreciated.
 
 @cindex testing the library
 @cindex dmalloc_t test program
@@ -1492,10 +1495,6 @@ which seems to work for me.  If people need to have this runtime
 configurable or would like to present an alternative default, please let
 me know.
 
-In addition to the ``lock-on'' option, you probably will need to enable
-the @samp{allow-nonlinear} token if you thread library needs to call
-sbrk directly to allocate some storage.  @xref{Debug Tokens}.
-
 To build the library with the threaded stubs type @kbd{make threads}
 which should build @file{libdmallocth.a}.  The auto-configurations for
 these functions is in its infancy and may or may not work depending on
@@ -1976,6 +1975,20 @@ been overwritten.
 Check the arguments of some functions (mostly string operations) looking
 for bad pointers.
 
+@cindex force-linear
+@item force-linear
+Have the heap complain when additional program functionality seems to
+have made use of the system's heap-allocation routine @code{sbrk}
+directly behind the dmalloc library's back.  This is disabled by default
+since an increasing number of operating system functions seem to be
+doing this, especially pthreads packages.
+
+@cindex catch-signals
+@item catch-signals
+Shutdown the library automatically on SIGHUP, SIGINT, or SIGTERM.  This
+will cause the library to dump its statistics (if requested) when you
+press control-c on the program (for example).
+
 @cindex realloc-copy
 @item realloc-copy
 Always copy data to a new pointer when realloc.
@@ -2041,17 +2054,6 @@ space from sbrk.
 Have the heap never use space that has been used before and freed.
 @xref{Memory Leaks}.  @emph{WARNING}: This should be used with caution
 since you may run out of heap space.
-
-@cindex allow-nonlinear
-@item allow-nonlinear
-Have the heap not complain when additional program functionality seems
-to have made use of the system's heap-allocation routine @code{sbrk}
-directly.  This is now enabled by default since an increasing number of
-operating system functions seem to be doing this -- one example is the
-pthreads package.
-
-@emph{WARNING}: This should be used with caution since it may hide
-certain heap problems.
 
 @cindex allow-free-null
 @item allow-free-null

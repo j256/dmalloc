@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.93 2000/05/16 19:46:35 gray Exp $
+ * $Id: dmalloc.c,v 1.94 2000/06/20 22:37:56 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.93 2000/05/16 19:46:35 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.94 2000/06/20 22:37:56 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.93 2000/05/16 19:46:35 gray Exp $";
+  "$Id: dmalloc.c,v 1.94 2000/06/20 22:37:56 gray Exp $";
 #endif
 #endif
 
@@ -92,7 +92,7 @@ typedef struct {
 #define RUNTIME_FLAGS	(DEBUG_LOG_STATS | DEBUG_LOG_NONFREE | \
 			 DEBUG_LOG_BAD_SPACE | DEBUG_LOG_UNKNOWN | \
 			 DEBUG_CHECK_FENCE | \
-			 DEBUG_CATCH_NULL | DEBUG_ALLOW_NONLINEAR)
+			 DEBUG_CATCH_NULL)
 #define LOW_FLAGS	(RUNTIME_FLAGS | \
 			 DEBUG_LOG_ELAPSED_TIME | \
 			 DEBUG_FREE_BLANK | DEBUG_ERROR_ABORT | \
@@ -895,9 +895,9 @@ int	main(int argc, char **argv)
   if (argv_was_used(args, THREAD_LOCK_ON_ARG)) {
     lock_on = thread_lock_on;
     set_b = 1;
-    if (! BIT_IS_SET(debug, DEBUG_ALLOW_NONLINEAR)) {
+    if (BIT_IS_SET(debug, DEBUG_FORCE_LINEAR)) {
       (void)fprintf(stderr,
-		    "WARNING: the allow-nonlinear flag is not enabled\n");
+		    "WARNING: the force-linear flag is enabled\n");
     }
   }
   else if (clear_b) {

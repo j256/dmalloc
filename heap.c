@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.55 2000/05/15 22:22:28 gray Exp $
+ * $Id: heap.c,v 1.56 2000/06/20 22:37:56 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: heap.c,v 1.55 2000/05/15 22:22:28 gray Exp $";
+#ident "$Id: heap.c,v 1.56 2000/06/20 22:37:56 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.55 2000/05/15 22:22:28 gray Exp $";
+  "$Id: heap.c,v 1.56 2000/06/20 22:37:56 gray Exp $";
 #endif
 #endif
 
@@ -172,7 +172,7 @@ void	*_heap_alloc(const unsigned int size, void **extern_p,
     
     /* if we went down then this is a real error! */
     if ((! IS_GROWTH(heap_new, _heap_last))
-	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
+	|| BIT_IS_SET(_dmalloc_flags, DEBUG_FORCE_LINEAR)) {
       dmalloc_errno = ERROR_ALLOC_NONLINEAR;
       dmalloc_error("_heap_alloc");
       return HEAP_ALLOC_ERROR;

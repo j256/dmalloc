@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.31 2000/03/21 18:19:09 gray Exp $
+ * $Id: debug_tok.h,v 1.32 2000/06/20 22:42:22 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -79,6 +79,8 @@ static	attr_t		attributes[] = {
   { "check-funcs",	"cfu",	DEBUG_CHECK_FUNCS,
       "check functions" },
   
+  { "force-linear",	"fli",	DEBUG_FORCE_LINEAR,
+      "force heap space to be linear" },
   { "catch-signals",	"csi",	DEBUG_CATCH_SIGNALS,
       "shutdown program on SIGHUP, SIGINT, SIGTERM" },
   { "realloc-copy",	"rco",	DEBUG_REALLOC_COPY,
@@ -100,7 +102,8 @@ static	attr_t		attributes[] = {
       "abort if no memory available" },
   { "never-reuse",	"nre",	DEBUG_NEVER_REUSE,
       "never re-use freed memory" },
-  { "allow-nonlinear",	"ano",	DEBUG_ALLOW_NONLINEAR,
+  /* does nothing anymore since this is the default */
+  { "allow-nonlinear",	"ano",	0,
       "allow non-linear heap space" },
   { "allow-free-null",	"afn",	DEBUG_ALLOW_FREE_NULL,
       "allow the frees of NULL pointers" },

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.88 2000/05/17 16:24:52 gray Exp $
+ * $Id: dmalloc_t.c,v 1.89 2000/06/20 22:37:56 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.88 2000/05/17 16:24:52 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.89 2000/06/20 22:37:56 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.88 2000/05/17 16:24:52 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.89 2000/06/20 22:37:56 gray Exp $";
 #endif
 #endif
 
@@ -265,11 +265,11 @@ static	int	do_random(const int iter_n)
       }
 #endif
       
-      if (flags & DEBUG_ALLOW_NONLINEAR) {
-	which = random_value(16);
+      if (flags & DEBUG_FORCE_LINEAR) {
+	which = random_value(15);
       }
       else {
-	which = random_value(15);
+	which = random_value(16);
       }
       
       switch (which) {
