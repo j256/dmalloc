@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.40 1994/09/12 17:13:28 gray Exp $";
+  "$Id: dmalloc.c,v 1.41 1994/09/16 18:53:31 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -74,6 +74,7 @@ LOCAL	char	list_tags	= FALSE;	/* list rc tags */
 LOCAL	char	list_tokens	= FALSE;	/* list debug tokens */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
 LOCAL	argv_array_t	minus;			/* tokens to remove */
+LOCAL	char	no_changes	= FALSE;	/* make no changes to env */
 LOCAL	argv_array_t	plus;			/* tokens to add */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
@@ -107,6 +108,8 @@ LOCAL	argv_t	args[] = {
       NULL,			"list tags in rc file" },
   { 'm',	"minus",	ARGV_CHARP | ARGV_ARRAY,	&minus,
       "token(s)",		"del tokens from current debug" },
+  { 'n',	"no-changes",	ARGV_BOOL,	&no_changes,
+      NULL,			"make no changes to the env" },
   { 'p',	"plus",		ARGV_CHARP | ARGV_ARRAY,	&plus,
       "token(s)",		"add tokens to current debug" },
   { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
@@ -426,13 +429,15 @@ LOCAL	void	dump_current(void)
 LOCAL	void	set_variable(const char * var, const char * value)
 {
   if (bourne) {
-    (void)printf("%s=%s; export %s;\n", var, value, var);
-    if (verbose)
+    if (! no_changes)
+      (void)printf("%s=%s; export %s;\n", var, value, var);
+    if (no_changes || verbose)
       (void)fprintf(stderr, "Outputed: %s=%s; export %s;\n", var, value, var);
   }
   else {
-    (void)printf("setenv %s %s;\n", var, value);
-    if (verbose)
+    if (! no_changes)
+      (void)printf("setenv %s %s;\n", var, value);
+    if (no_changes || verbose)
       (void)fprintf(stderr, "Outputed: setenv %s %s;\n", var, value);
   }
   
@@ -445,13 +450,15 @@ LOCAL	void	set_variable(const char * var, const char * value)
 LOCAL	void	unset_variable(const char * var)
 {
   if (bourne) {
-    (void)printf("unset %s;\n", var);
-    if (verbose)
+    if (! no_changes)
+      (void)printf("unset %s;\n", var);
+    if (no_changes || verbose)
       (void)fprintf(stderr, "Outputed: unset %s;\n", var);
   }
   else {
-    (void)printf("unsetenv %s;\n", var);
-    if (verbose)
+    if (! no_changes)
+      (void)printf("unsetenv %s;\n", var);
+    if (no_changes || verbose)
       (void)fprintf(stderr, "Outputed: unsetenv %s;\n", var);
   }
   
@@ -578,6 +585,10 @@ EXPORT	int	main(int argc, char ** argv)
       (void)fprintf(stderr, "Debug Tokens:\n");
       for (attrp = attributes; attrp->at_string != NULL; attrp++)
 	if (very_verbose)
+	  (void)fprintf(stderr, "%s (%s) -- %s (%#x)\n",
+			attrp->at_string, attrp->at_short, attrp->at_desc,
+			attrp->at_value);
+	else if (verbose)
 	  (void)fprintf(stderr, "%s -- %s\n",
 			attrp->at_string, attrp->at_desc);
 	else
