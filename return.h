@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.15 1997/11/05 16:26:10 gray Exp $
+ * $Id: return.h,v 1.16 1997/12/08 04:23:35 gray Exp $
  */
 
 /*
@@ -128,10 +128,10 @@
 
 #ifdef __GNUC__
 
-#define SET_RET_ADDR(file, line)	\\
-  do { \\
-    if (file == DMALLOC_DEFAULT_FILE) \\
-      asm("bis \$26, \$26, %0" : "=r" (file)); \\
+#define SET_RET_ADDR(file, line)	\
+  do { \
+    if (file == DMALLOC_DEFAULT_FILE) \
+      asm("bis $26, $26, %0" : "=r" (file)); \
   } while(0)
 
 #else /* __GNUC__ */

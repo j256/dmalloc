@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.71 1997/12/08 01:57:10 gray Exp $";
+  "$Id: dmalloc.c,v 1.72 1997/12/08 04:23:34 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -718,7 +718,7 @@ int	main(int argc, char **argv)
     else {
       lock_on = thread_lock_on;
     }
-    set = TRUE;
+    set_b = TRUE;
 #else
     (void)fprintf(stderr, "WARNING: LOCK_THREADS not-configured\n");
     lock_on = LOCK_ON_INIT;
