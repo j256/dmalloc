@@ -37,11 +37,11 @@
 #include "conf.h"
 #include "error.h"
 #include "heap.h"
-#include "malloc_errno.h"
+#include "malloc_err.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.14 1992/11/15 00:17:33 gray Exp $";
+  "$Id: heap.c,v 1.15 1992/12/17 23:30:38 gray Exp $";
 #endif
 
 /* external routines */

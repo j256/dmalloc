@@ -1,9 +1,9 @@
 #
-# $Id: Makefile.in,v 1.3 1992/11/23 00:26:37 gray Exp $
+# $Id: Makefile.in,v 1.4 1992/12/17 23:30:20 gray Exp $
 #
 
-HFLS	= malloc.h malloc_leap.h
-OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_leap.o
+HFLS	= malloc.h malloc_lp.h
+OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
@@ -11,18 +11,18 @@ LIBS	= -L. -lmalloc $(LIBRARIES)
 
 CFLAGS	= $(CCFLAGS)
 DESTDIR	= /usr/antaire
-TESTS	= malloc_test
+TESTS	= malloc_t
 LIBRARY	= libmalloc.a
-UTIL	= malloc_debug
+UTIL	= malloc_dbg
 
 MANFILE	= malloc.info
 
 PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
 	COPYING-LIB ChangeLog Manifest NOTES README TTD \
-	chunk.[ch] chunk_loc.h compat.[ch] debug_tokens.h debug_values.h \
+	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
 	error.[ch] error_str.h heap.[ch] malloc.[ch] mallocrc malloc.info \
-	malloc.texinfo malloc_debug.c malloc_errno.h malloc_leap.[ch] \
-	malloc_loc.h malloc_test.c sample.c version.h
+	malloc.texi malloc_dbg.c malloc_err.h malloc_lp.[ch] \
+	malloc_loc.h malloc_t.c sample.c version.h
 
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -48,7 +48,7 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_debug.o $(LIBRARY) /usr/antaire/lib
+$(UTIL) : malloc_dbg.o $(LIBRARY) /usr/antaire/lib
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
 
@@ -64,7 +64,7 @@ port : malloc.info
 
 tests : $(TESTS)
 
-malloc_test : malloc_test.o $(LIBRARY)
+malloc_t : malloc_t.o $(LIBRARY)
 
 include /usr/antaire/Default.make
 include Makefile.dep

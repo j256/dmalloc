@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.9 1992/11/10 23:24:58 gray Exp $
+$Id: Manifest,v 1.10 1992/12/17 23:30:21 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -32,7 +32,9 @@ configure		Configure script.
 
 configure.in		Used by autoconf to create the configure script.
 
-debug_tokens.h		Tokens that correspond to debugging functionality.
+dbg_tokens.h		Tokens that correspond to debugging functionality.
+
+dbg_values.h		Values corresponding to the debug tokens.
 
 error.[ch]		Debugging routines and others that provide user output.
 
@@ -48,18 +50,18 @@ malloc.[ch]		Higher level alloc routines including malloc, free,
 malloc.info		User-level gnu info manual file for the malloc
 			routines.  Suitable as a text manual also.
 
-malloc.texinfo		Texinfo user manual for TeX or Info formats.
+malloc.texi		Texinfo user manual for generating TeX or Info formats.
 
-malloc_debug.c		Program that assists in the setting of the MALLOC_DEBUG
+malloc_dbg.c		Program that assists in the setting of the MALLOC_DEBUG
 			and other debug environmental variables.
 
-malloc_errno.h		General error codes for the malloc module.
-
-malloc_leap.[ch]	Leap-frog routines to provide file/line info to lib.
+malloc_err.h		General error codes for the malloc module.
 
 malloc_loc.h		Local defines for all of the malloc routines.
 
-malloc_test.c		Meager test program for testing the malloc routines.
+malloc_lp.[ch]		Leap-frog routines to provide file/line info to lib.
+
+malloc_t.c		Meager test program for testing the malloc routines.
 
 mallocrc		Sample RC file that is used to set the debug flags.
 

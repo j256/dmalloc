@@ -30,16 +30,16 @@
 #include "chunk.h"
 #include "compat.h"
 #include "conf.h"
-#include "debug_values.h"
+#include "dbg_values.h"
 #include "error.h"
 #include "error_str.h"
 #include "heap.h"
-#include "malloc_errno.h"
-#include "malloc_leap.h"
+#include "malloc_err.h"
+#include "malloc_lp.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.11 1992/11/15 00:17:35 gray Exp $";
+  "$Id: malloc.c,v 1.12 1992/12/17 23:30:40 gray Exp $";
 #endif
 
 /*

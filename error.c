@@ -34,12 +34,12 @@
 #include "chunk.h"
 #include "compat.h"
 #include "conf.h"
-#include "debug_values.h"
+#include "dbg_values.h"
 #include "error.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.13 1992/12/07 18:41:42 gray Exp $";
+  "$Id: error.c,v 1.14 1992/12/17 23:30:35 gray Exp $";
 #endif
 
 /*

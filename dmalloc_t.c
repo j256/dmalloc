@@ -1,19 +1,41 @@
 /*
  * test program for malloc code
  *
- * Copyright 1991 by the Antaire Corporation
+ * Copyright 1992 by Gray Watson and the Antaire Corporation
+ *
+ * This file is part of the malloc-debug package.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * 
+ * The author of the program may be contacted at gray.watson@antaire.com
  */
 
-#define MALLOC_TEST_MAIN
+#include <stdio.h>				/* for stdin */
 
-#if defined(ANTAIRE)
-#include "useful.h"
-#include "terminate.h"
-#endif
+#define MALLOC_T_MAIN
 
 #include "malloc.h"
+#include "malloc_loc.h"
 
-RCS_ID("$Id: dmalloc_t.c,v 1.8 1992/10/22 04:46:38 gray Exp $");
+#include "conf.h"
+#include "compat.h"
+
+#if INCLUDE_RCS_IDS
+LOCAL	char	*rcs_id =
+  "$Id: dmalloc_t.c,v 1.9 1992/12/17 23:30:53 gray Exp $";
+#endif
 
 /*
  * hexadecimal STR to integer translation
@@ -53,8 +75,8 @@ LOCAL	long	get_address(void)
   
   do {
     (void)printf("Enter a hex address: ");
-    (void)gets(line);
-  } while (line[0] == NULLC);
+    (void)fgets(line, sizeof(line), stdin);
+  } while (line[0] == '\0');
   
   pnt = hex_to_int(line);
   
@@ -65,7 +87,7 @@ EXPORT	int	main(int argc, char ** argv)
 {
   int	size, count;
   long	pnt, magic;
-  char	line[80];
+  char	line[80], *linep;
   
   argc--, argv++;
   
@@ -77,9 +99,13 @@ EXPORT	int	main(int argc, char ** argv)
   for (;;) {
     (void)printf("------------------------------------------------------\n");
     (void)printf("prompt> ");
-    (void)gets(line);
+    (void)fgets(line, sizeof(line), stdin);
+    linep = strrchr(line, '\n');
+    if (linep != NULL)
+      *linep = '\0';
     
-    if (strcmp(line, "?") == 0 || strcmp(line, "help") == 0) {
+    if (strcmp(line, "?") == 0
+	|| strcmp(line, "help") == 0) {
       (void)printf("------------------------------------------------------\n");
       (void)printf("HELP:\n\n");
       
@@ -103,7 +129,7 @@ EXPORT	int	main(int argc, char ** argv)
     
     if (strcmp(line, "malloc") == 0) {
       (void)printf("How much: ");
-      (void)gets(line);
+      (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
       (void)printf("malloc(%d) returned: %#lx\n", size, (long)MALLOC(size));
       continue;
@@ -120,7 +146,7 @@ EXPORT	int	main(int argc, char ** argv)
       pnt = get_address();
       
       (void)printf("How much: ");
-      (void)gets(line);
+      (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
       
       (void)printf("realloc(%#lx, %d) returned: %#lx\n",
@@ -138,7 +164,7 @@ EXPORT	int	main(int argc, char ** argv)
       pnt = get_address();
       
       magic = 0x12345678;
-      MEMORY_COPY(&magic, (char *)pnt, sizeof(magic));
+      bcopy(&magic, (char *)pnt, sizeof(magic));
       continue;
     }
     
@@ -177,8 +203,5 @@ EXPORT	int	main(int argc, char ** argv)
 		"failure"));
   (void)printf("------------------------------------------------------\n");
   
-#if defined(ANTAIRE)
-  terminate(0);
-#endif
   exit(0);
 }

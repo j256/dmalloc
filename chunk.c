@@ -36,15 +36,15 @@
 #include "chunk_loc.h"
 #include "compat.h"
 #include "conf.h"
-#include "debug_values.h"
+#include "dbg_values.h"
 #include "error.h"
 #include "heap.h"
-#include "malloc_errno.h"
+#include "malloc_err.h"
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.20 1992/11/16 04:31:07 gray Exp $";
+  "$Id: chunk.c,v 1.21 1992/12/17 23:30:27 gray Exp $";
 #endif
 
 /* checking information */
