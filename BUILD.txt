@@ -16,12 +16,8 @@ library gets released.
 
 6) make distclean ; autoconf ; configure ; make port
 
-7) Rename the port directory to be dmalloc-X.X.X[-betaX]
-
-8) Tarzip the dmalloc-X.X.X[-betaX] directory.
-
-9) Copy down to Linux, OSF, FreeBSD, other operation systems and run
-tests.
+7) Copy down to OpenBSD, Linux, OSF, FreeBSD, other operation systems
+and run tests.
 
 	- [ maybe mkdir x ; cd x ]
 	- ./configure or ../configure
@@ -31,5 +27,36 @@ tests.
 	- make heavy
 	- examine the log file, check version, look for exceptions
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
+
+8) Copy to OpenBSD and build the package.
+
+	1) cd /usr/ports/devel/dmalloc
+	2) make clean
+	3) Update Makefile from repository.
+	4) make (make sure it can pull it from the online repository)
+	5) make deinstall (maybe need to do a pkg_delete dmalloc-X.X.X)
+	6) make reinstall
+	7) make plist
+	8) Compare pkg/PLIST with pkg/PLIST-auto
+	9) make package
+	10) try a pkg_add and pkg_delete on the package
+	11) Copy the resulting package to the repository
+
+9) Copy to RPM and build the package.
+
+	1) Update the dmalloc.spec file
+	2) rpm -ba dmalloc.spec
+	3) Try to rpm -U dmalloc-X.X.X-1.i386.rpm
+	4) Copy the resulting RPM and SRPM to the repository
+
+10) Install the tgz file and html file in the repository
+
+11) Ftp the new version files over to download.sourforge.net/incoming
+
+12) Edit releases/index.html to include the new version
+
+13) Possibly announce on freshmeat
+
+14) Announce on egroups.
 
 -------------------------------------------------------------------------------
