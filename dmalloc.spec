@@ -1,20 +1,18 @@
 #
 # Dmalloc RPM file for building of .rpm files for Redhat Linux systems.
 #
-# $Id: dmalloc.spec,v 1.1 2000/05/08 12:20:58 gray Exp $
+# $Id: dmalloc.spec,v 1.2 2000/05/08 12:35:26 gray Exp $
 #
 Summary: Debug Malloc (Dmalloc)
 Name: dmalloc
-URL: http://dmalloc.com/
-%define version 4.5.2
-Version: %{version}
+Version: 4.5.2
 Release: 1
-Copyright: public domain
 Group: Development/Libraries
-Source: http://dmalloc.com/releases/dmalloc-%{version}.tar.gz
-BuildRoot: /var/tmp/dmalloc-buildroot
+Copyright: public domain
+URL: http://dmalloc.com/
+Source: http://dmalloc.com/releases/%{name}-%{version}.tar.gz
+BuildRoot: /var/tmp/%{name}-buildroot
 Prefix: /usr
-Conflicts: dmalloc < %{version}
 
 %description
 The debug memory allocation or "dmalloc" library has been designed as
@@ -24,20 +22,21 @@ debugging facilities configurable at runtime.  These facilities
 include such things as memory-leak tracking, fence-post write
 detection, file/line number reporting, and general logging of
 statistics.  It also provides support for the debugging of threaded
-programs.  Releases and documentation available online. http://dmalloc.com/
+programs.  Releases and documentation available online. 
+http://dmalloc.com/
 
 %prep
 %setup
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
+CFLAGS="${RPM_OPT_FLAGS}" ./configure --prefix=${RPM_BUILD_ROOT}/usr
 make all threads
 
 %install
-make installprefix="$RPM_BUILD_ROOT" install installth
+make install installth
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(644,root,root,755)
