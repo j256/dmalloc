@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.42 1995/06/21 18:20:07 gray Exp $";
+  "$Id: heap.c,v 1.43 1995/08/18 18:31:45 gray Exp $";
 #endif
 
 /* external routines */
@@ -56,81 +56,77 @@ EXPORT	void		*_heap_base = NULL;	/* base of our heap */
 EXPORT	void		*_heap_last = NULL;	/* end of our heap */
 
 /*
- * check to make sure the heap is still linear.  avoids race conditions
- * returns [NO]ERROR
- */
-EXPORT	int	_heap_check(void)
-{
-  int		diff, blockn;
-  void		*ret;
-  
-#if HAVE_SBRK
-  ret = sbrk(0);
-  if (ret != _heap_last) {
-    /* if we went down then real error! */
-    if (ret < _heap_last
-	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
-      dmalloc_errno = ERROR_ALLOC_NONLINEAR;
-      dmalloc_error("_heap_alloc");
-      return ERROR;
-    }
-    
-    /* adjust chunk admin information */
-    blockn = ((char *)ret - (char *)_heap_last) / BLOCK_SIZE + 1;
-    if (_chunk_note_external(blockn, ret) != NOERROR)
-      return ERROR;
-    
-    /* compensate for wasted space */
-    diff = BLOCK_SIZE - ((long)ret % BLOCK_SIZE);
-    _heap_last = (char *)ret + diff;
-    
-    /* align back to BLOCK_SIZE */
-    if (sbrk(diff) == SBRK_ERROR)
-      return ERROR;
-  }
-#endif
-  
-  return NOERROR;
-}
-
-/*
  * function to get SIZE memory bytes from the end of the heap
  */
 EXPORT	void	*_heap_alloc(const unsigned int size)
 {
   void		*ret = HEAP_ALLOC_ERROR;
+  char		str[128];
   
 #if HAVE_SBRK
   ret = sbrk(size);
-  if (ret == SBRK_ERROR) {
-    dmalloc_errno = ERROR_ALLOC_FAILED;
-    dmalloc_error("_heap_alloc");
+  if (ret == SBRK_ERROR)
     ret = HEAP_ALLOC_ERROR;
-  }
 #endif
   
-  /* did we not allocate any heap space? */
+  /* did we not successfully allocate any heap space? */
   if (ret == HEAP_ALLOC_ERROR) {
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
-      char	str[128];
       (void)sprintf(str, "\r\ndmalloc: critical error: could not allocate %u more bytes from heap\r\n",
 		    size);
       (void)write(STDERR, str, strlen(str));
       _dmalloc_die(FALSE);
     }
-    return HEAP_ALLOC_ERROR;
-  }
-  
-#if HAVE_SBRK
-  if (ret != _heap_last) {
-    dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+    dmalloc_errno = ERROR_ALLOC_FAILED;
     dmalloc_error("_heap_alloc");
     return HEAP_ALLOC_ERROR;
   }
   
+  /* did someone else use sbrk in the meantime? */
+  if (ret != _heap_last) {
+    int		diff, blockn;
+    
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
+      _dmalloc_message("correcting non-linear heap");
+    
+    /* if we went down then this is a real error! */
+    if (ret < _heap_last
+	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
+      dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+      dmalloc_error("_heap_alloc");
+      return HEAP_ALLOC_ERROR;
+    }
+    
+    /* adjust chunk admin information to align to blocksize */
+    blockn = ((char *)ret - (char *)_heap_last) / BLOCK_SIZE;
+    
+    /* align back to correct values */
+    diff = BLOCK_SIZE - ((long)ret % BLOCK_SIZE);
+    if (diff == BLOCK_SIZE)
+      diff = 0;
+    
+    if (diff > 0) {
+      ret = (char *)ret + diff;
+      _heap_last = ret;
+      blockn++;
+    }
+    
+    /* correct non-linear space with sbrk and note external blocks */
+    if ((diff > 0 && sbrk(diff) == SBRK_ERROR)
+	|| _chunk_note_external(blockn, ret) != NOERROR) {
+      if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
+	(void)sprintf(str, "\r\ndmalloc: critical error: could not adjust heap to achieve linear space\r\n");
+	(void)write(STDERR, str, strlen(str));
+	_dmalloc_die(FALSE);
+      }
+      dmalloc_errno = ERROR_ALLOC_FAILED;
+      dmalloc_error("_heap_alloc");
+      return HEAP_ALLOC_ERROR;
+    }
+  }
+  
   /* increment last pointer */
   _heap_last = (char *)ret + size;
-#endif
   
   return ret;
 }

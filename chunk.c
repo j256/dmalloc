@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.96 1995/08/13 20:02:56 gray Exp $";
+  "$Id: chunk.c,v 1.97 1995/08/18 18:31:43 gray Exp $";
 #endif
 
 /*
@@ -602,12 +602,6 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
       return bblockp;
     }
   }
-  
-  /* we need to check for non-linear problems here */
-  if (! extend
-      && BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)
-      && _heap_check() != NOERROR)
-    return NULL;
   
   /* next check the admin free list */
   while (many > freec) {

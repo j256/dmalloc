@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.47 1995/08/14 14:58:21 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.48 1995/08/18 18:31:44 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -133,7 +133,8 @@ static	void	*get_address(void)
   
   do {
     (void)printf("Enter a hex address: ");
-    (void)fgets(line, sizeof(line), stdin);
+    if (fgets(line, sizeof(line), stdin) == NULL)
+      return NULL;
   } while (line[0] == '\0');
   
   pnt = (void *)hex_to_long(line);
@@ -384,7 +385,8 @@ static	void	do_interactive(void)
   
   for (;;) {
     (void)printf("> ");
-    (void)fgets(line, sizeof(line), stdin);
+    if (fgets(line, sizeof(line), stdin) == NULL)
+      break;
     linep = strchr(line, '\n');
     if (linep != NULL)
       *linep = '\0';
@@ -426,7 +428,8 @@ static	void	do_interactive(void)
       int	size;
       
       (void)printf("How much to malloc: ");
-      (void)fgets(line, sizeof(line), stdin);
+      if (fgets(line, sizeof(line), stdin) == NULL)
+	break;
       size = atoi(line);
       (void)printf("malloc(%d) returned '%#lx'\n", size, (long)MALLOC(size));
       continue;
@@ -436,7 +439,8 @@ static	void	do_interactive(void)
       int	size;
       
       (void)printf("How much to calloc: ");
-      (void)fgets(line, sizeof(line), stdin);
+      if (fgets(line, sizeof(line), stdin) == NULL)
+	break;
       size = atoi(line);
       (void)printf("calloc(%d) returned '%#lx'\n",
 		   size, (long)CALLOC(char, size));
@@ -449,7 +453,8 @@ static	void	do_interactive(void)
       pnt = get_address();
       
       (void)printf("How much to realloc: ");
-      (void)fgets(line, sizeof(line), stdin);
+      if (fgets(line, sizeof(line), stdin) == NULL)
+	break;
       size = atoi(line);
       
       (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
@@ -497,7 +502,8 @@ static	void	do_interactive(void)
       int	size;
       
       (void)printf("How much to sbrk: ");
-      (void)fgets(line, sizeof(line), stdin);
+      if (fgets(line, sizeof(line), stdin) == NULL)
+	break;
       size = atoi(line);
       (void)printf("sbrk(%d) returned '%#lx'\n", size, (long)sbrk(size));
       continue;
@@ -509,7 +515,8 @@ static	void	do_interactive(void)
       int	itern;
       
       (void)printf("How many iterations[%d]: ", default_itern);
-      (void)fgets(line, sizeof(line), stdin);
+      if (fgets(line, sizeof(line), stdin) == NULL)
+	break;
       if (line[0] == '\0' || line[0] == '\n')
 	itern = default_itern;
       else
