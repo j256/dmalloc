@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.62 2003/05/13 16:24:13 gray Exp $
+ * $Id: heap.c,v 1.63 2003/05/13 18:15:32 gray Exp $
  */
 
 /*
@@ -45,18 +45,18 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: heap.c,v 1.62 2003/05/13 16:24:13 gray Exp $"
+#ident "$Id: heap.c,v 1.63 2003/05/13 18:15:32 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.62 2003/05/13 16:24:13 gray Exp $";
+  "$Id: heap.c,v 1.63 2003/05/13 18:15:32 gray Exp $";
 #endif
 #endif
 
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
 
 /* exported variables */
-void	*_dmalloc_heap_base = NULL;			/* base of our heap */
-void	*_dmalloc_heap_last = NULL;			/* end of our heap */
+void		*_dmalloc_heap_base = NULL;	/* base of our heap */
+void		*_dmalloc_heap_last = NULL;	/* end of our heap */
 
 /****************************** local functions ******************************/
 
