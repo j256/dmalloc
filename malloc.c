@@ -30,7 +30,7 @@
 
 #define MALLOC_DEBUG_DISABLE
 
-#include "malloc.h"
+#include "malloc_dbg.h"
 #include "malloc_loc.h"
 
 #include "chunk.h"
@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.25 1993/04/14 22:13:57 gray Exp $";
+  "$Id: malloc.c,v 1.26 1993/04/15 21:58:19 gray Exp $";
 #endif
 
 /*
@@ -312,7 +312,7 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
  * of SIZE bytes and zero the block.  returns NULL on error.
  */
-EXPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size)
+EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
 {
   void		*newp;
   unsigned int	len = num_elements * size;

@@ -21,13 +21,13 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.10 1993/04/08 21:46:38 gray Exp $
+ * $Id: heap.h,v 1.11 1993/04/15 21:58:18 gray Exp $
  */
 
 #ifndef __HEAP_H__
 #define __HEAP_H__
 
-#include "malloc.h"			/* for LOCAL and bool stuff */
+#include "malloc_dbg.h"			/* for LOCAL and bool stuff */
 
 /*
  * error code returned by heap allocation routine

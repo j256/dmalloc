@@ -29,11 +29,11 @@
 
 #include <stdio.h>				/* for stdin */
 
-#include "malloc.h"
+#include "malloc_dbg.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.17 1993/04/09 06:34:47 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.18 1993/04/15 21:58:30 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000
@@ -145,8 +145,7 @@ EXPORT	int	main(int argc, char ** argv)
       long	pnt;
       
       pnt = get_address();
-      (void)printf("free(%#lx) returned: %s\n",
-		   pnt, (FREE(pnt) == FREE_NOERROR ? "success" : "failure"));
+      FREE(pnt);
       continue;
     }
     
@@ -201,7 +200,7 @@ EXPORT	int	main(int argc, char ** argv)
 	
 	amount = rand() % (count * 10) + 1;
 	data = MALLOC(amount);
-	(void)FREE(data);
+	FREE(data);
       }
       
       (void)printf("Done.\n");

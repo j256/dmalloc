@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: error_val.h,v 1.2 1993/04/05 22:30:12 gray Exp $
+ * $Id: error_val.h,v 1.3 1993/04/15 21:58:14 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -53,37 +53,38 @@
 #define MALLOC_TOO_BIG			14	/* allocation too large */
 #define MALLOC_USER_NON_CONTIG		15	/* user space contig error */
 #define MALLOC_ALLOC_FAILED		16	/* could not get more space */
-#define MALLOC_BAD_SIZE_INFO		17	/* info doesn't match size */
+#define MALLOC_ALLOC_NONLINEAR		17	/* no linear address space */
+#define MALLOC_BAD_SIZE_INFO		18	/* info doesn't match size */
 
 /* free errors */
-#define MALLOC_NOT_ON_BLOCK		18	/* not on block boundary */
-#define MALLOC_ALREADY_FREE		19	/* already in free list */
-#define MALLOC_NOT_START_USER		20	/* not start of user alloc */
-#define MALLOC_NOT_USER			21	/* not user allocated */
-#define MALLOC_BAD_FREE_LIST		22	/* free-list mess-up */
-#define MALLOC_FREE_NON_CONTIG		23	/* free space contig error */
-#define MALLOC_BAD_FREE_MEM		24	/* bad memory pointer */
-#define MALLOC_FREE_NON_BLANK		25	/* free space should be 0's */
+#define MALLOC_NOT_ON_BLOCK		19	/* not on block boundary */
+#define MALLOC_ALREADY_FREE		20	/* already in free list */
+#define MALLOC_NOT_START_USER		21	/* not start of user alloc */
+#define MALLOC_NOT_USER			22	/* not user allocated */
+#define MALLOC_BAD_FREE_LIST		23	/* free-list mess-up */
+#define MALLOC_FREE_NON_CONTIG		24	/* free space contig error */
+#define MALLOC_BAD_FREE_MEM		25	/* bad memory pointer */
+#define MALLOC_FREE_NON_BLANK		26	/* free space should be 0's */
 
 /* dblock errors */
-#define MALLOC_BAD_DBLOCK_SIZE		26	/* dblock bad size */
-#define MALLOC_BAD_DBLOCK_POINTER	27	/* bad dblock pointer */
-#define MALLOC_BAD_DBLOCK_MEM		28	/* bad memory pointer */
-#define MALLOC_BAD_DBADMIN_POINTER	29	/* bad dblock admin pointer */
-#define MALLOC_BAD_DBADMIN_MAGIC	30	/* bad dblock admin pointer */
-#define MALLOC_BAD_DBADMIN_SLOT		31	/* bad dblock slot info */
+#define MALLOC_BAD_DBLOCK_SIZE		27	/* dblock bad size */
+#define MALLOC_BAD_DBLOCK_POINTER	28	/* bad dblock pointer */
+#define MALLOC_BAD_DBLOCK_MEM		29	/* bad memory pointer */
+#define MALLOC_BAD_DBADMIN_POINTER	30	/* bad dblock admin pointer */
+#define MALLOC_BAD_DBADMIN_MAGIC	31	/* bad dblock admin pointer */
+#define MALLOC_BAD_DBADMIN_SLOT		32	/* bad dblock slot info */
 
 /* administrative errors */
-#define MALLOC_BAD_ADMINP		32	/* out of bounds */
-#define MALLOC_BAD_ADMIN_LIST		33	/* out of bounds */
-#define MALLOC_BAD_ADMIN_MAGIC		34	/* bad magic numbers */
-#define MALLOC_BAD_ADMIN_COUNT		35	/* bad count number */
-#define MALLOC_BAD_BLOCK_ADMINP		36	/* bblock adminp bad */
-#define MALLOC_BAD_BLOCK_ADMINC		37	/* bblock adminp->count bad */
+#define MALLOC_BAD_ADMINP		33	/* out of bounds */
+#define MALLOC_BAD_ADMIN_LIST		34	/* out of bounds */
+#define MALLOC_BAD_ADMIN_MAGIC		35	/* bad magic numbers */
+#define MALLOC_BAD_ADMIN_COUNT		36	/* bad count number */
+#define MALLOC_BAD_BLOCK_ADMINP		37	/* bblock adminp bad */
+#define MALLOC_BAD_BLOCK_ADMINC		38	/* bblock adminp->count bad */
 
 /* heap check verification */
-#define MALLOC_BAD_BLOCK_ORDER		38	/* block allocation bad */
-#define MALLOC_BAD_FLAG			39	/* bad basic-block flag */
+#define MALLOC_BAD_BLOCK_ORDER		39	/* block allocation bad */
+#define MALLOC_BAD_FLAG			40	/* bad basic-block flag */
 
 #define IS_MALLOC_ERRNO(e)	((e) >= MALLOC_NO_ERROR && \
 				 (e) <= MALLOC_BAD_FLAG)

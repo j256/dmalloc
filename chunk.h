@@ -21,13 +21,13 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.18 1993/04/14 22:13:50 gray Exp $
+ * $Id: chunk.h,v 1.19 1993/04/15 21:57:59 gray Exp $
  */
 
 #ifndef __CHUNK_H__
 #define __CHUNK_H__
 
-#include "malloc.h"			/* for IMPORT ... */
+#include "malloc_dbg.h"			/* for IMPORT ... */
 
 /* some argument defines */
 #define CHUNK_PNT_EXACT		1	/* pointer must be on block */

@@ -29,7 +29,7 @@
 
 #define MALLOC_DEBUG_DISABLE
 
-#include "malloc.h"
+#include "malloc_dbg.h"
 #include "malloc_loc.h"
 
 #include "chunk.h"
@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.19 1993/04/08 21:46:36 gray Exp $";
+  "$Id: heap.c,v 1.20 1993/04/15 21:58:16 gray Exp $";
 #endif
 
 /* external routines */
@@ -69,8 +69,16 @@ EXPORT	void	*_heap_alloc(unsigned int size)
     ret = HEAP_ALLOC_ERROR;
   }
   else {
-    /* increment last pointer */
-    (char *)_heap_last += size;
+    /* did someone else extend the heap in our absence.  VERY BAD! */
+    if (ret != _heap_last) {
+      malloc_errno = MALLOC_ALLOC_NONLINEAR;
+      _malloc_perror("_heap_alloc");
+      ret = HEAP_ALLOC_ERROR;
+    }
+    else {
+      /* increment last pointer */
+      (char *)_heap_last += size;
+    }
   }
 #endif
   

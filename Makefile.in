@@ -1,8 +1,8 @@
 #
-# $Id: Makefile.in,v 1.14 1993/04/14 22:13:42 gray Exp $
+# $Id: Makefile.in,v 1.15 1993/04/15 21:57:51 gray Exp $
 #
 
-HFLS	= malloc.h
+HFLS	= malloc_dbg.h
 OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_lp.o malloc_str.o
 OBJS_IN	= malloc_lp.o 
 FILLFLS	= chunk.c error.c heap.c malloc_dbg.c malloc_lp.c malloc_str.c \
@@ -10,7 +10,7 @@ FILLFLS	= chunk.c error.c heap.c malloc_dbg.c malloc_lp.c malloc_str.c \
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
-LIBS	= -L. -lmalloc $(LIBRARIES)
+LIBS	= -L. -lmalloc_dbg $(LIBRARIES)
 
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
@@ -20,7 +20,7 @@ CFLAGS	= -g -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wuninitialized -Wparentheses -Waggregate-return
 DESTDIR	= /usr/antaire
 TESTS	= malloc_t
-LIBRARY	= libmalloc.a
+LIBRARY	= libmalloc_dbg.a
 UTIL	= malloc_dbg
 
 MANFILE	= malloc.info
@@ -28,8 +28,8 @@ MANFILE	= malloc.info
 PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
 	COPYING-LIB ChangeLog Manifest NOTES README TTD \
 	chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h dbg_values.h \
-	error.[ch] error_str.h error_val.h heap.[ch] malloc.[ch] mallocrc \
-	malloc.info malloc.texi malloc_dbg.c malloc_lp.[ch] malloc_loc.h \
+	error.[ch] error_str.h error_val.h heap.[ch] malloc.c mallocrc \
+	malloc.info malloc.texi malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h \
 	malloc_str.[ch] malloc_t.c sample.c version.h
 
 .PHONY : all

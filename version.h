@@ -22,7 +22,7 @@
  * The author of the program may be contacted at gray.watson@antaire.com
  */
 
-#include "malloc.h"
+#include "malloc_dbg.h"
 
 /*
  * NOTE to gray: whenever this is changed, a corresponding Changlog

@@ -34,7 +34,7 @@
 
 #define MALLOC_DEBUG_DISABLE
 
-#include "malloc.h"
+#include "malloc_dbg.h"
 #include "malloc_loc.h"
 
 #include "compat.h"
@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.9 1993/04/14 22:14:01 gray Exp $";
+  "$Id: dmalloc.c,v 1.10 1993/04/15 21:58:22 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */

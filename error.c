@@ -33,7 +33,7 @@
 
 #define MALLOC_DEBUG_DISABLE
 
-#include "malloc.h"
+#include "malloc_dbg.h"
 #include "malloc_loc.h"
 
 #include "chunk.h"
@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.21 1993/04/14 22:13:55 gray Exp $";
+  "$Id: error.c,v 1.22 1993/04/15 21:58:10 gray Exp $";
 #endif
 
 /*
