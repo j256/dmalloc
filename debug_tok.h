@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: debug_tok.h,v 1.26 1998/11/12 16:25:49 gray Exp $
+ * $Id: debug_tok.h,v 1.27 1998/11/12 21:29:55 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -78,20 +78,20 @@ static	attr_t		attributes[] = {
   { "check-lists",	"cli",	DEBUG_CHECK_LISTS,
       "check free lists" },
   { "check-blank",	"cbl",	DEBUG_CHECK_BLANK,
-      "check blanked memory" },
+      "check mem overwritten by alloc-blank, free-blank" },
   { "check-funcs",	"cfu",	DEBUG_CHECK_FUNCS,
       "check functions" },
   
   { "catch-signals",	"csi",	DEBUG_CATCH_SIGNALS,
-      "shutdown lib on SIGHUP, SIGINT, SIGTERM" },
+      "shutdown program on SIGHUP, SIGINT, SIGTERM" },
   { "realloc-copy",	"rco",	DEBUG_REALLOC_COPY,
       "copy all re-allocations" },
   { "free-blank",	"fbl",	DEBUG_FREE_BLANK,
-      "blank free'd memory" },
+      "overwrite freed memory space with BLANK_CHAR" },
   { "error-abort",	"eab",	DEBUG_ERROR_ABORT,
       "abort immediately on error" },
   { "alloc-blank",	"abl",	DEBUG_ALLOC_BLANK,
-      "blank newly alloced memory" },
+      "overwrite newly alloced memory with BLANK_CHAR" },
   { "heap-check-map",	"hcm",	DEBUG_HEAP_CHECK_MAP,
       "log heap-map on heap-check" },
   { "print-messages",	"pme",	DEBUG_PRINT_MESSAGES,
