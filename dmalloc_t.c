@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.78 1999/03/08 04:59:01 gray Exp $
+ * $Id: dmalloc_t.c,v 1.79 1999/03/08 15:56:23 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.78 1999/03/08 04:59:01 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.79 1999/03/08 15:56:23 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.78 1999/03/08 04:59:01 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.79 1999/03/08 15:56:23 gray Exp $";
 #endif
 #endif
 
@@ -76,34 +76,37 @@ static	pnt_info_t	*pointer_grid;
 
 /* argument variables */
 static	int		default_iter_n = DEFAULT_ITERATIONS; /* # of iters */
-static	char		interactive_b = ARGV_FALSE;	/* interactive flag */
-static	char		no_special_b = ARGV_FALSE;	/* no-special flag */
+static	int		interactive_b = ARGV_FALSE;	/* interactive flag */
+static	int		log_trans_b = ARGV_FALSE;	/* log transactions */
+static	int		no_special_b = ARGV_FALSE;	/* no-special flag */
 static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
 static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
-static	char		random_debug_b = ARGV_FALSE;	/* random flag */
-static	char		silent_b = ARGV_FALSE;		/* silent flag */
+static	int		random_debug_b = ARGV_FALSE;	/* random flag */
+static	int		silent_b = ARGV_FALSE;		/* silent flag */
 static	unsigned int	seed_random = 0;		/* random seed */
-static	char		verbose_b = ARGV_FALSE;		/* verbose flag */
+static	int		verbose_b = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
-  { INTER_CHAR,	"interactive",		ARGV_BOOL,		&interactive_b,
+  { INTER_CHAR,	"interactive",		ARGV_BOOL_INT,		&interactive_b,
       NULL,			"turn on interactive mode" },
+  { 'l',	"log-trans",		ARGV_BOOL_INT,		&log_trans_b,
+      NULL,			"log transactions via tracking-func" },
   { 'm',	"max-alloc",		ARGV_INT,		&max_alloc,
       "bytes",			"maximum allocation to test" },
-  { 'n',	"no-special",		ARGV_BOOL,		&no_special_b,
+  { 'n',	"no-special",		ARGV_BOOL_INT,		&no_special_b,
       NULL,			"do not run special tests" },
   { 'p',	"max-pointers",		ARGV_INT,		&max_pointers,
       "pointers",		"number of pointers to test" },
-  { 'r',	"random-debug",		ARGV_BOOL,	       &random_debug_b,
+  { 'r',	"random-debug",		ARGV_BOOL_INT,	       &random_debug_b,
       NULL,			"randomly change debug flag" },
-  { 's',	"silent",		ARGV_BOOL,		&silent_b,
+  { 's',	"silent",		ARGV_BOOL_INT,		&silent_b,
       NULL,			"do not display messages" },
   { 'S',	"seed-random",		ARGV_U_INT,		&seed_random,
       "number",			"seed for random function" },
-  { 't',	"times",		ARGV_INT,		&default_iter_n,
+  { 't',	"times",		ARGV_INT,	       &default_iter_n,
       "number",			"number of iterations to run" },
-  { 'v',	"verbose",		ARGV_BOOL,		&verbose_b,
-      NULL,			"enables verbose messages" },
+  { 'v',	"verbose",		ARGV_BOOL_INT,		&verbose_b,
+    NULL,			"enables verbose messages" },
   { ARGV_LAST }
 };
 
@@ -335,7 +338,7 @@ static	int	do_random(const int iter_n)
 	
 	if (verbose_b) {
 	  (void)printf("%d: recalloc %d from %d of max %d slot %d.  got %#lx\n",
-		       iter_c + 1, pnt_p->pi_size, amount, max,
+		       iter_c + 1, amount, pnt_p->pi_size, max,
 		       pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
 	}
 	
@@ -817,6 +820,70 @@ static	void	do_interactive(void)
   }
 }
 
+/*
+ * Allocation tracking function called each time an allocation occurs.
+ * FILE may be a return address if LINE is 0.  FUNC_ID is one of the
+ * above DMALLOC_FUNC_ defines.  BYTE_SIZE is how many bytes were
+ * requested with a possible ALIGNMENT.  OLD_ADDR is for realloc and
+ * free functions.  NEW_ADDR is the pointer returned by the allocation
+ * functions.
+ */
+static	void	track_alloc_trxn(const char *file, const unsigned int line,
+				 const int func_id,
+				 const DMALLOC_SIZE byte_size,
+				 const DMALLOC_SIZE alignment,
+				 const DMALLOC_PNT old_addr,
+				 const DMALLOC_PNT new_addr)
+{
+  char	file_line[64];
+  
+  if (file == NULL && line == 0) {
+    strcpy(file_line, "unknown");
+  }
+  else if (line == 0) {
+    (void)sprintf(file_line, "ra=%#lx", (long)file);
+  }
+  else {
+    (void)sprintf(file_line, "%s:%d", file, line);
+  }
+  
+  switch (func_id) {
+  case DMALLOC_FUNC_MALLOC:
+    (void)printf("%s malloc %d bytes got %#lx\n",
+		 file_line, byte_size, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_CALLOC:
+    (void)printf("%s calloc %d bytes got %#lx\n",
+		 file_line, byte_size, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_REALLOC:
+    (void)printf("%s realloc %d bytes from %#lx got %#lx\n",
+		 file_line, byte_size, (long)old_addr, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_RECALLOC:
+    (void)printf("%s recalloc %d bytes from %#lx got %#lx\n",
+		 file_line, byte_size, (long)old_addr, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_MEMALIGN:
+    (void)printf("%s memalign %d bytes alignment %d got %#lx\n",
+		 file_line, byte_size, alignment, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_VALLOC:
+    (void)printf("%s valloc %d bytes alignment %d got %#lx\n",
+		 file_line, byte_size, alignment, (long)new_addr);
+    break;
+  case DMALLOC_FUNC_FREE:
+    (void)printf("%s free %#lx\n", file_line, (long)old_addr);
+    break;
+  default:
+    (void)printf("%s unknown function %d bytes, %d alignment, %#lx old-addr "
+		 "%#lx new-addr\n",
+		 file_line, byte_size, alignment, (long)old_addr,
+		 (long)new_addr);
+    break;
+  }
+}
+
 int	main(int argc, char **argv)
 {
   int	ret;
@@ -855,6 +922,10 @@ int	main(int argc, char **argv)
   }
   
   dmalloc_message("random seed is %u\n", seed_random);
+  
+  if (log_trans_b) {
+    dmalloc_track(track_alloc_trxn);
+  }
   
   if (interactive_b) {
     do_interactive();
