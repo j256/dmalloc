@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.18 1998/09/17 12:43:49 gray Exp $
+ * $Id: return.h,v 1.19 1998/09/17 13:30:34 gray Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ asm void ASM_GET_RET_ADDR(file)
 
 /* for all others, do nothing */
 #ifndef GET_RET_ADDR
-#define GET_RET_ADDR(file)
+#define GET_RET_ADDR(file)	file = DMALLOC_UNKNOWN_FILE
 #endif
 
 #endif /* ! __RETURN_H__ */
