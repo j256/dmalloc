@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.h,v 1.44 2000/03/20 23:19:26 gray Exp $
+ * $Id: error.h,v 1.45 2000/03/21 01:16:25 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -85,6 +85,13 @@ TIME_TYPE	_dmalloc_start;
 /* global flag which indicates when we are aborting */
 extern
 int		_dmalloc_aborting_b;
+
+/*
+ * Open up our log file and write some version of settings
+ * information.
+ */
+extern
+void	_dmalloc_open_log(void);
 
 #if STORE_TIMEVAL
 /*

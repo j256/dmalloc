@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.90 2000/03/20 23:19:26 gray Exp $
+ * $Id: error.c,v 1.91 2000/03/21 01:16:25 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.90 2000/03/20 23:19:26 gray Exp $";
+#ident "$Id: error.c,v 1.91 2000/03/21 01:16:25 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.90 2000/03/20 23:19:26 gray Exp $";
+  "$Id: error.c,v 1.91 2000/03/21 01:16:25 gray Exp $";
 #endif
 #endif
 
@@ -124,6 +124,78 @@ TIME_TYPE	_dmalloc_start = 0;
 
 /* global flag which indicates when we are aborting */
 int		_dmalloc_aborting_b = FALSE;
+
+/* local variables */
+static int	outfile_fd = -1;		/* output file descriptor */
+
+/*
+ * Open up our log file and write some version of settings
+ * information.
+ */
+void	_dmalloc_open_log(void)
+{
+  char	str[1024];
+  
+  /* if it's already open or if we don't have a log file configured */
+  if (outfile_fd >= 0
+      || _dmalloc_logpath == LOGPATH_INIT) {
+    return;
+  }
+  
+  /* open our logfile */
+  outfile_fd = open(_dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  if (outfile_fd < 0) {
+    (void)loc_snprintf(str, sizeof(str),
+		       "debug-malloc library: could not open '%s'\r\n",
+		       _dmalloc_logpath);
+    (void)write(STDERR, str, strlen(str));
+    /* disable log_path */
+    _dmalloc_logpath = LOGPATH_INIT;
+    return;
+  }
+  
+  /*
+   * NOTE: this makes it go recursive here, but it will never enter
+   * this section of code.
+   */
+  
+  _dmalloc_message("Dmalloc version '%s' from '%s'",
+		   dmalloc_version, DMALLOC_HOME);
+  _dmalloc_message("flags = %#x, logfile '%s'",
+		   _dmalloc_flags, _dmalloc_logpath);
+  if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT) {
+    _dmalloc_message("interval = %lu, addr = %#lx",
+		     _dmalloc_check_interval,
+		     (unsigned long)_dmalloc_address);
+  }
+  else {
+    _dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
+		     _dmalloc_check_interval,
+		     (unsigned long)_dmalloc_address,
+		     _dmalloc_address_seen_n);
+  }
+#if LOCK_THREADS
+  _dmalloc_message("threads enabled, lock-init = %d", THREAD_INIT_LOCK);
+#endif
+    
+#if STORE_TIMEVAL
+  {
+    char	time_buf[64];
+    _dmalloc_message("starting time = %s",
+		     _dmalloc_ptimeval(&_dmalloc_start, time_buf,
+				       sizeof(time_buf), 0));
+  }
+#else
+#if HAVE_TIME /* NOT STORE_TIME */
+  {
+    char	time_buf[64];
+    _dmalloc_message("starting time = %s",
+		     _dmalloc_ptime(&_dmalloc_start, time_buf,
+				    sizeof(time_buf), 0));
+  }
+#endif
+#endif
+}
 
 #if STORE_TIMEVAL
 /*
@@ -198,7 +270,6 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  */
 void	_dmalloc_vmessage(const char *format, va_list args)
 {
-  static int	outfile = -1;
   char		str[1024], *str_p, *bounds_p;
   int		len;
   
@@ -209,6 +280,11 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   if (_dmalloc_logpath == LOGPATH_INIT
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     return;
+  }
+  
+  /* do we need to open the logfile? */
+  if (_dmalloc_logpath != LOGPATH_INIT && outfile_fd < 0) {
+    _dmalloc_open_log();
   }
   
 #if HAVE_TIME
@@ -254,68 +330,9 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   }
   len = str_p - str;
   
-  /* do we need to log the message? */
+  /* do we need to write the message to the logfile */
   if (_dmalloc_logpath != LOGPATH_INIT) {
-    /*
-     * do we need to open the outfile?
-     * it will be closed by _exit().  yeach.
-     */
-    if (outfile < 0) {
-      outfile = open(_dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-      if (outfile < 0) {
-	(void)loc_snprintf(str, sizeof(str),
-			   "debug-malloc library: could not open '%s'\n",
-			   _dmalloc_logpath);
-	(void)write(STDERR, str, strlen(str));
-	/* disable log_path */
-	_dmalloc_logpath = LOGPATH_INIT;
-	return;
-      }
-      
-      /*
-       * NOTE: this makes it go recursive here but it will never enter
-       * this section of code.
-       */
-      _dmalloc_message("Dmalloc version '%s' from '%s'",
-		       dmalloc_version, DMALLOC_HOME);
-      _dmalloc_message("flags = %#x, logfile '%s'",
-		       _dmalloc_flags, _dmalloc_logpath);
-      if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT) {
-	_dmalloc_message("interval = %lu, addr = %#lx",
-			 _dmalloc_check_interval,
-			 (unsigned long)_dmalloc_address);
-      }
-      else {
-	_dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
-			 _dmalloc_check_interval,
-			 (unsigned long)_dmalloc_address,
-			 _dmalloc_address_seen_n);
-      }
-#if LOCK_THREADS
-      _dmalloc_message("threads enabled, lock-init = %d", THREAD_INIT_LOCK);
-#endif
-      
-#if STORE_TIMEVAL
-      {
-	char	time_buf[64];
-	_dmalloc_message("starting time = %s",
-			 _dmalloc_ptimeval(&_dmalloc_start, time_buf,
-					   sizeof(time_buf), 0));
-      }
-#else
-#if HAVE_TIME /* NOT STORE_TIME */
-      {
-	char	time_buf[64];
-	_dmalloc_message("starting time = %s",
-			 _dmalloc_ptime(&_dmalloc_start, time_buf,
-					sizeof(time_buf), 0));
-      }
-#endif
-#endif
-    }
-    
-    /* write str to the outfile */
-    (void)write(outfile, str, len);
+    (void)write(outfile_fd, str, len);
   }
   
   /* do we need to print the message? */
@@ -354,11 +371,11 @@ void	_dmalloc_die(const int silent_b)
     
     /* print a message that we are going down */
     (void)loc_snprintf(str, sizeof(str),
-		       "debug-malloc library: %s program, fatal error\n",
+		       "debug-malloc library: %s program, fatal error\r\n",
 		       stop_str);
     (void)write(STDERR, str, strlen(str));
     if (dmalloc_errno != ERROR_NONE) {
-      (void)loc_snprintf(str, sizeof(str), "   Error: %s (err %d)\n",
+      (void)loc_snprintf(str, sizeof(str), "   Error: %s (err %d)\r\n",
 			 _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       (void)write(STDERR, str, strlen(str));
     }

@@ -1,5 +1,11 @@
 Mon Mar 20 18:19:06 2000  Gray Watson  <gray@whopper.256.com>
 
+	* Added _dmalloc_open_log function to error.c to fix some
+ 	reentrance problems with open().
+
+	* Removed the stupid chunk.c unions.  Why did I ever do that?  It
+ 	made debugging and absolute bear.
+
 	* www.dmalloc.com -> dmalloc.com.
 
 Mon Mar  6 12:05:01 2000  Gray Watson  <gray@burger.256.com>
@@ -1520,5 +1526,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.231 2000/03/20 23:19:17 gray Exp $
+$Id: ChangeLog,v 1.232 2000/03/21 01:16:25 gray Exp $
 -------------------------------------------------------------------------------
