@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.139 2000/03/20 23:19:28 gray Exp $
+ * $Id: malloc.c,v 1.140 2000/03/21 01:38:19 gray Exp $
  */
 
 /*
@@ -79,15 +79,14 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.139 2000/03/20 23:19:28 gray Exp $";
+#ident "$Id: malloc.c,v 1.140 2000/03/21 01:38:19 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.139 2000/03/20 23:19:28 gray Exp $";
+  "$Id: malloc.c,v 1.140 2000/03/21 01:38:19 gray Exp $";
 #endif
 #endif
 
 /* local routines */
-static	int	dmalloc_startup(void);
 void		_dmalloc_shutdown(void);
 DMALLOC_PNT	_loc_malloc(const char *file, const int line,
 			    const DMALLOC_SIZE size, const int func_id,
@@ -127,12 +126,18 @@ static	int		thread_lock_c = 0;		/* lock counter */
 
 #if LOCK_THREADS
 #ifdef THREAD_MUTEX_T
-/* define a global variable we use as a lock counter */
-#ifdef PTHREAD_MUTEX_INITIALIZER
-static THREAD_MUTEX_T dmalloc_mutex = PTHREAD_MUTEX_INITIALIZER;
-#else
+/*
+ * Define a global variable we use as a lock counter.
+ *
+ * NOTE: we do not use the PTHREAD_MUTEX_INITIALIZER since this
+ * basically delays the pthread_mutex_init call to when
+ * pthread_mutex_lock is called for the first time (at least on
+ * freebsd).  Since we don't want to go recursive into the pthread
+ * library when we go to lock our mutex variable, we want to force the
+ * initialization to happen beforehand with a call to
+ * pthread_mute_init.
+ */
 static THREAD_MUTEX_T dmalloc_mutex;
-#endif
 #else
 #error We need to have THREAD_MUTEX_T defined by the configure script
 #endif
@@ -203,8 +208,16 @@ static	void	unlock_thread(void)
      * into the library.  Ugh.
      */
     if (thread_lock_c == THREAD_INIT_LOCK) {
-#if HAVE_PTHREAD_MUTEX_INIT && !defined(PTHREAD_MUTEX_INITIALIZER)
-      /* we init instead of the lock point to avoid recursion */
+#if HAVE_PTHREAD_MUTEX_INIT
+      /*
+       * NOTE: we do not use the PTHREAD_MUTEX_INITIALIZER since this
+       * basically delays the pthread_mutex_init call to when
+       * pthread_mutex_lock is called for the first time (at least on
+       * freebsd).  Since we don't want to go recursive into the
+       * pthread library when we go to lock our mutex variable, we
+       * want to force the initialization to happen beforehand with a
+       * call to pthread_mute_init.
+       */
       pthread_mutex_init(&dmalloc_mutex, THREAD_LOCK_INIT_VAL);
 #endif
     }
@@ -218,76 +231,6 @@ static	void	unlock_thread(void)
 #endif
 
 /****************************** local utilities ******************************/
-
-/*
- * a call to the alloc routines has been made, check the debug variables
- * returns ERROR or NOERROR.
- */
-static	int	check_debug_vars(const char *file, const int line)
-{
-  if (_dmalloc_aborting_b) {
-    return ERROR;
-  }
-  
-  /*
-   * NOTE: we need to do this outside of lock to get env vars
-   * otherwise our thread_lock_on variable won't be initialized and
-   * the THREAD_LOCK will flip.
-   */
-  if (! enabled_b) {
-    if (dmalloc_startup() != NOERROR) {
-      return ERROR;
-    }
-  }
-  
-#if LOCK_THREADS
-  lock_thread();
-#endif
-  
-  if (in_alloc_b) {
-    dmalloc_errno = ERROR_IN_TWICE;
-    dmalloc_error("check_debug_vars");
-    /* NOTE: dmalloc_error may die already */
-    _dmalloc_die(FALSE);
-    /*NOTREACHED*/
-  }
-  
-  in_alloc_b = TRUE;
-  
-  /* check start file/line specifications */
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      && start_file != START_FILE_INIT
-      && file != DMALLOC_DEFAULT_FILE
-      && line != DMALLOC_DEFAULT_LINE
-      && strcmp(start_file, file) == 0
-      && (start_line == 0 || start_line == line)) {
-    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
-  }
-  
-  /* start checking heap after X times */
-  if (start_count != START_COUNT_INIT && --start_count == 0) {
-    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
-  }
-  
-  /* checking heap every X times */
-  _dmalloc_iter_c++;
-  if (_dmalloc_check_interval != INTERVAL_INIT
-      && _dmalloc_check_interval > 0) {
-    if (_dmalloc_iter_c % _dmalloc_check_interval == 0) {
-      BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
-    }
-    else { 
-      BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
-    }
-  }
-  
-  /* after all that, do we need to check the heap? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)) {
-    (void)_chunk_check();
-  }
-  
-  return NOERROR;
-}
 
 /*
  * check out a pointer to see if we were looking for it.  this should
@@ -377,52 +320,70 @@ static	RETSIGTYPE	signal_handler(const int sig)
  */
 static	int	dmalloc_startup(void)
 {
+  static int	all_up_b = 0;
+  
   /* have we started already? */
-  if (enabled_b) {
+  if (all_up_b) {
     return ERROR;
   }
   
-  /* set this here so if an error occurs below, it will not try again */
-  enabled_b = TRUE;
-  
+  if (! enabled_b) {
+    /* set this up here so if an error occurs below, it will not try again */
+    enabled_b = TRUE;
+    
 #if STORE_TIMEVAL
-  GET_TIMEVAL(_dmalloc_start);
+    GET_TIMEVAL(_dmalloc_start);
 #else
 #if HAVE_TIME /* NOT STORE_TIME */
-  _dmalloc_start = time(NULL);
+    _dmalloc_start = time(NULL);
 #endif
 #endif
-  
-  /* process the environmental variable(s) */
-  process_environ();
-  
-  /* startup heap code */
-  if (_heap_startup() == ERROR) {
-    return ERROR;
-  }
-  
-  /* startup the chunk lower-level code */
-  if (_chunk_startup() == ERROR) {
-    return ERROR;
-  }
-  
-  /* set leap variables */
+    
+    /* process the environmental variable(s) */
+    process_environ();
+    
+    /* startup heap code */
+    if (_heap_startup() == ERROR) {
+      return ERROR;
+    }
+    
+    /* startup the chunk lower-level code */
+    if (_chunk_startup() == ERROR) {
+      return ERROR;
+    }
+    
+    /* set leap variables */
 #if USE_DMALLOC_LEAP
-  _dmalloc_malloc_func = _loc_malloc;
-  _dmalloc_realloc_func = _loc_realloc;
-  _dmalloc_free_func = _loc_free;
-  _dmalloc_shutdown_func = _dmalloc_shutdown;
-  _dmalloc_log_heap_map_func = _dmalloc_log_heap_map;
-  _dmalloc_log_stats_func = _dmalloc_log_stats;
-  _dmalloc_log_unfreed_func = _dmalloc_log_unfreed;
-  _dmalloc_verify_func = _dmalloc_verify;
-  _dmalloc_debug_func = _dmalloc_debug;
-  _dmalloc_debug_current_func = _dmalloc_debug_current;
-  _dmalloc_examine_func = _dmalloc_examine;
-  _dmalloc_vmessage_func = _dmalloc_vmessage;
-  _dmalloc_track_func = _dmalloc_track;
-  _dmalloc_strerror_func = _dmalloc_strerror;
+    _dmalloc_malloc_func = _loc_malloc;
+    _dmalloc_realloc_func = _loc_realloc;
+    _dmalloc_free_func = _loc_free;
+    _dmalloc_shutdown_func = _dmalloc_shutdown;
+    _dmalloc_log_heap_map_func = _dmalloc_log_heap_map;
+    _dmalloc_log_stats_func = _dmalloc_log_stats;
+    _dmalloc_log_unfreed_func = _dmalloc_log_unfreed;
+    _dmalloc_verify_func = _dmalloc_verify;
+    _dmalloc_debug_func = _dmalloc_debug;
+    _dmalloc_debug_current_func = _dmalloc_debug_current;
+    _dmalloc_examine_func = _dmalloc_examine;
+    _dmalloc_vmessage_func = _dmalloc_vmessage;
+    _dmalloc_track_func = _dmalloc_track;
+    _dmalloc_strerror_func = _dmalloc_strerror;
 #endif
+  }
+  
+#if LOCK_THREADS
+  if (thread_lock_c > 0) {
+    return NOERROR;
+  }
+#endif
+  
+  /*
+   * We have initialized all of our code.
+   *
+   * NOTE: set this up here so if an error occurs below, it will not
+   * try again
+   */
+  all_up_b = 1;
   
   /*
    * NOTE: we may go recursive below here becasue atexit or on_exit
@@ -479,6 +440,13 @@ void	_dmalloc_shutdown(void)
   if (_dmalloc_aborting_b) {
     return;
   }
+  
+  /*
+   * Make sure that the log file is open.  We do this here because we
+   * might cause an allocation in the open() and don't want to go
+   * recursive.
+   */
+  _dmalloc_open_log();
   
 #if LOCK_THREADS
   lock_thread();
@@ -552,6 +520,76 @@ void	__fini_dmalloc()
   dmalloc_shutdown();
 }
 #endif
+
+/*
+ * a call to the alloc routines has been made, check the debug variables
+ * returns ERROR or NOERROR.
+ */
+static	int	check_debug_vars(const char *file, const int line)
+{
+  if (_dmalloc_aborting_b) {
+    return ERROR;
+  }
+  
+  /*
+   * NOTE: we need to do this outside of lock to get env vars
+   * otherwise our thread_lock_on variable won't be initialized and
+   * the THREAD_LOCK will flip.
+   */
+  if (! enabled_b) {
+    if (dmalloc_startup() != NOERROR) {
+      return ERROR;
+    }
+  }
+  
+#if LOCK_THREADS
+  lock_thread();
+#endif
+  
+  if (in_alloc_b) {
+    dmalloc_errno = ERROR_IN_TWICE;
+    dmalloc_error("check_debug_vars");
+    /* NOTE: dmalloc_error may die already */
+    _dmalloc_die(FALSE);
+    /*NOTREACHED*/
+  }
+  
+  in_alloc_b = TRUE;
+  
+  /* check start file/line specifications */
+  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
+      && start_file != START_FILE_INIT
+      && file != DMALLOC_DEFAULT_FILE
+      && line != DMALLOC_DEFAULT_LINE
+      && strcmp(start_file, file) == 0
+      && (start_line == 0 || start_line == line)) {
+    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+  }
+  
+  /* start checking heap after X times */
+  if (start_count != START_COUNT_INIT && --start_count == 0) {
+    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+  }
+  
+  /* checking heap every X times */
+  _dmalloc_iter_c++;
+  if (_dmalloc_check_interval != INTERVAL_INIT
+      && _dmalloc_check_interval > 0) {
+    if (_dmalloc_iter_c % _dmalloc_check_interval == 0) {
+      BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    }
+    else { 
+      BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    }
+  }
+  
+  /* after all that, do we need to check the heap? */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)) {
+    (void)_chunk_check();
+  }
+  
+  return NOERROR;
+}
 
 /******************************* memory calls ********************************/
 
@@ -1033,25 +1071,19 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
 }
 
 /*
- * set the global debug functionality FLAGS (0 to disable all
- * debugging).  NOTE: after this module has started up, you cannot set
- * certain flags such as fence-post or free-space checking.
+ * Set the global debug functionality FLAGS (0 to disable all
+ * debugging).
+ *
+ * NOTE: you cannot set certain flags such as fence-post or free-space
+ * checking with this function.
  */
 void	_dmalloc_debug(const int flags)
 {
-  /* should not check the heap here since we are setting the debug variable */
+  /* make sure that the not-changeable flag values are preserved */
+  _dmalloc_flags &= DEBUG_NOT_CHANGEABLE;
   
-  /* if we've not started up then set the variable */
-  if (! enabled_b) {
-    _dmalloc_flags = flags;
-  }
-  else {
-    /* make sure that the not-changeable flag values are preserved */
-    _dmalloc_flags &= DEBUG_NOT_CHANGEABLE;
-    
-    /* add the new flags - the not-addable ones */
-    _dmalloc_flags |= flags & ~DEBUG_NOT_ADDABLE;
-  }
+  /* add the new flags - the not-addable ones */
+  _dmalloc_flags |= flags & ~DEBUG_NOT_ADDABLE;
 }
 
 /*
@@ -1113,9 +1145,6 @@ int	_dmalloc_examine(const char *file, const int line,
  */
 void	_dmalloc_track(const dmalloc_track_t track_func)
 {
-  if (! enabled_b) {
-    (void)dmalloc_startup();
-  }
   tracking_func = track_func;
 }
 
