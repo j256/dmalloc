@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.163 2003/05/21 04:10:08 gray Exp $
+# $Id: Makefile.in,v 1.164 2003/05/21 04:15:18 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -75,12 +75,13 @@ INFOFILE= $(MODULE).info
 FLS	=  conf.h.in configure.ac config.help \
 	ChangeLog.1 Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
 	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
-	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
-	env.[ch] error.[ch] error_val.h heap.[ch] \
-	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h \
-	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc_funcs.h \
-	protect.[ch] return.h version.h \
-	settings.dist dmalloc_argv.[ch] dmalloc_argv_loc.h dmallocc.cc \
+	arg_check.c arg_check.h chunk.c chunk.h chunk_loc.h \
+	compat.c compat.h debug_tok.h env.c env.h error.c error.h error_val.h \
+	heap.c heap.h malloc.c dmalloc.c dmalloc.h.1 dmalloc.h.3 \
+	dmalloc_loc.h dmalloc_tab.c dmalloc_tab.h dmalloc_tab_loc.h \
+	dmalloc_t.c malloc_funcs.h protect.c protect.h return.h version.h \
+	settings.dist dmalloc_argv.c dmalloc_argv.h dmalloc_argv_loc.h \
+	dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
 	$(srcdir)/configure Makefile.bsd.ports
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
