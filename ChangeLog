@@ -1,3 +1,10 @@
+Thu Oct 15 11:06:41 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Relased dmalloc version 4.0.2.
+
+	* Fixed a problem in return.h and DMALLOC_UNKNOWN_FILE.  Ugh.
+        Thanks much to Mike Sacauskis for pointing this out.
+
 Thu Oct  8 11:07:25 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Released dmalloc version 4.0.1.
@@ -1316,5 +1323,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.194 1998/10/08 15:16:22 gray Exp $
+$Id: ChangeLog,v 1.195 1998/10/15 15:17:46 gray Exp $
 -------------------------------------------------------------------------------

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.22 1998/10/05 01:08:24 gray Exp $
+ * $Id: return.h,v 1.23 1998/10/15 15:17:50 gray Exp $
  */
 
 /*
@@ -60,9 +60,6 @@
  * it may be better -- less prone to be erased.  However, it produces
  * some bogus data -- it seems to return the last return-address or
  * something like that.
- *
- * This does't seem to work with optimizations turned on for some
- * reason.  Anyone know why?
  *
  * Alexandre Oliva <oliva@dcc.unicamp.br> recently advised to change
  * the "=g" to a "=m".  If you are having problems, you may want to
@@ -178,8 +175,6 @@
 
 #endif /* m88k */
 
-#endif /* USE_RET_ADDRESS */
-
 /*************************************/
 
 /*
@@ -226,11 +221,15 @@ asm void ASM_GET_RET_ADDR(file)
 
 #endif /* _FTX & i860 */
 
+/*************************************/
+
+#endif /* USE_RET_ADDRESS */
+
 /********************************** default **********************************/
 
 /* for all others, do nothing */
 #ifndef GET_RET_ADDR
-#define GET_RET_ADDR(file)	file = DMALLOC_UNKNOWN_FILE
+#define GET_RET_ADDR(file)	file = DMALLOC_DEFAULT_FILE
 #endif
 
 #endif /* ! __RETURN_H__ */
