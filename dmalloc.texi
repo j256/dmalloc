@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.223 2003/06/08 21:26:18 gray Exp $
+@c $Id: dmalloc.texi,v 1.224 2003/06/09 18:16:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1057,11 +1057,8 @@ The library has a number of variables that are not a standard part of
 most malloc libraries:
 
 @table @code
-@item char * dmalloc_logpath
-@cindex dmalloc_logpath variable
-@cindex logfile name
-This variable can be used to set the dmalloc log filename.  The env
-variable DMALLOC_LOGFILE overrides this variable.
+
+@c --------------------------------
 
 @item int dmalloc_errno
 @cindex dmalloc_errno number
@@ -1072,27 +1069,22 @@ does for the system calls.  It can be passed to @code{dmalloc_strerror()}
 (see below) to get a string version of the error.  It will have a value
 of zero if the library has not detected any problems.
 
-@item int dmalloc_address
-@cindex dmalloc_address variable
-@cindex address to look for
-@cindex looking for an address
-This variable holds the address to be specifically looked for when
-allocating or freeing by the library.
+@c --------------------------------
 
-@item int dmalloc_address_count
-@cindex dmalloc_address_count variable
-This variable stores the argument to the address library setting.  If it
-is set to a greater than 0 value then after the library has seen the
-@samp{addr} address this many times, it will call
-@code{dmalloc_error()}.
+@item char * dmalloc_logpath
+@cindex dmalloc_logpath variable
+@cindex logfile name
+This variable can be used to set the dmalloc log filename.  The env
+variable DMALLOC_LOGFILE overrides this variable.
 
-This works well in conjunction with the @code{STORE_SEEN_COUNT} option.
-@xref{Memory Leaks}.
+@c --------------------------------
 
 @end table
 
 Additionally the library provides a number of non-standard malloc
 routines:
+
+@c --------------------------------
 
 @deftypefun
 void dmalloc_shutdown ( void )
@@ -1117,37 +1109,7 @@ main()
 @end example
 @end deftypefun
 
-@deftypefun
-void dmalloc_log_heap_map ( void )
-
-@cindex dmalloc_log_heap_map function
-@cindex log a heap map
-@cindex heap map
-
-This routine logs to the logfile (if it is enabled) a graphical
-representation of the current heap space.
-@end deftypefun
-
-@deftypefun
-void dmalloc_log_stats ( void )
-@cindex dmalloc_log_stats function
-@cindex log statistics
-@cindex statistics logging
-
-This routine outputs the current dmalloc statistics to the log file.
-@end deftypefun
-
-@deftypefun
-void dmalloc_log_unfreed( void )
-
-@cindex dmalloc_log_unfreed function
-@cindex log unfreed memory
-@cindex unfreed memory log
-
-This function dumps the unfreed-memory information to the log file.
-This is also useful to dump the currently allocated points to the log
-file to be compared against another dump later on.
-@end deftypefun
+@c --------------------------------
 
 @deftypefun
 int dmalloc_verify ( char * @var{pnt} )
@@ -1166,75 +1128,96 @@ is not enabled, @samp{dmalloc_verify()} cannot check the fence-post
 areas in the heap.
 @end deftypefun
 
+@c --------------------------------
+
 @deftypefun
-void dmalloc_debug ( long @var{debug} )
+unsigned int dmalloc_debug ( const unsigned int @var{flags} )
 
 @cindex dmalloc_debug function
 @cindex override debug settings
+@cindex set debug functionality flags
+@cindex server usage of dmalloc
+@cindex cgi-bin usage of dmalloc
+@cindex usage of dmalloc in a server
+@cindex usage of dmalloc with cgi-bin
 
-This routine overrides the debug setting from the environment variable
-and sets the library debugging features explicitly.  For instance, if
-debugging should never be enabled for a program, a call to
-@code{dmalloc_debug(0)} as the first call in @code{main()} will disable
-all the memory debugging from that point on.
+This routine sets the debug functionality flags and returns the previous
+flag value.  It is helpful in server or cgi-bin programs where
+environmental variables cannot be used.  For instance, if debugging
+should never be enabled for a program, a call to @code{dmalloc_debug(0)}
+as the first call in @code{main()} will disable all the memory debugging
+from that point on.
 
-One problem however is that some systems make calls to memory allocation
-functions @emph{before} @code{main()} is reached therefore before
-@code{dmalloc_debug()} can be called meaning some debugging information
-may be generated regardless.
+@emph{NOTE}: you cannot add or remove certain flags such as signal
+handlers since they are setup at initialization time only.
+
+@emph{NOTE}: you can also use @code{dmalloc_debug_setup} below.
+
 @end deftypefun
 
+@c --------------------------------
+
 @deftypefun
-long dmalloc_debug_current ( void )
+unsigned int dmalloc_debug_current ( void )
 
 @cindex dmalloc_debug_current function
 @cindex current debug value
 
-This routine returns the current debug value from the environment
-variable.  This allows you to save a copy of the debug dmalloc settings
-to be changed and then restored later.
+This routine returns the current debug functionality value value.  This
+allows you to save a copy of the debug dmalloc settings to be changed
+and then restored later.
+
 @end deftypefun
 
+@c --------------------------------
+
 @deftypefun
-int dmalloc_examine ( char * @var{pnt}, int * @var{size},
-char ** @var{file}, int * @var{line}, void ** @var{ret_address} )
+void dmalloc_debug_setup ( const char * @var{options_str} )
+
+@cindex dmalloc_debug_setup
+@cindex override debug settings
+@cindex set debug functionality flags
+@cindex server usage of dmalloc
+@cindex cgi-bin usage of dmalloc
+@cindex usage of dmalloc in a server
+@cindex usage of dmalloc with cgi-bin
+
+This routine sets the global debugging functionality as an option
+string.  Normally this would be pased in in the DMALLOC_OPTIONS
+environmental variable.  This is here to override the env or for
+circumstances where modifying the environment is not possible or does
+not apply such as servers or cgi-bin programs.
+
+#end deftypefun
+
+@c --------------------------------
+
+@deftypefun
+int dmalloc_examine ( const DMALLOC_PNT @var{pnt}, DMALLOC_SIZE *
+@var{user_size_p}, DMALLOC_SIZE * @var{total_size_p}, char **
+@var{file_p}, int * @var{line_p}, DMALLOC_PNT * @var{ret_addr_p},
+unsigned long * @var{user_mark_p}, unsigned long * @var{seen_p} )
 
 @cindex dmalloc_examine function
 @cindex examine a pointer
 @cindex pointer information
 
 This function returns the size of a pointer's allocation as well as the
-file and line or the return-address from where it was allocated.  It
-will return NOERROR or ERROR depending on whether pnt is good or not.
+total size given including adminstrative overhead, file and line or the
+return-address from where it was allocated, the last pointer when the
+pointer was "used", and the number of times the pointer has been "seen".
+It will return DMALLOC_NOERROR or DMALLOC_ERROR depending on whether pnt
+is good or not.
 
 @emph{NOTE}: This function is @emph{certainly} not provided by most if
 not all other malloc libraries.
+
 @end deftypefun
 
-@deftypefun
-void dmalloc_message ( char * @var{format}, @var{...} )
-
-@cindex dmalloc_message function
-
-Write a message into the dmalloc logfile using printf-like arguments.
-
-@emph{NOTE:} this is only available is STDARG is defined by the library
-and you have the @file{stdarg.h} include file.
-@end deftypefun
+@c --------------------------------
 
 @deftypefun
-void dmalloc_vmessage ( char * @var{format}, va_list @var{args} )
-
-@cindex dmalloc_vmessage function
-
-Write a message into the dmalloc logfile using vprintf-like arguments.
-
-@emph{NOTE:} this is only available is STDARG is defined by the library
-and you have the @file{stdarg.h} include file.
-@end deftypefun
-
-@deftypefun
-void dmalloc_track ( dmalloc_track_t @var{track_func} )
+void dmalloc_track ( const dmalloc_track_t @var{track_func} )
 
 @cindex dmalloc_track function
 @cindex track memory calls
@@ -1243,10 +1226,13 @@ Register an allocation tracking function which will be called each time
 an allocation occurs.  Pass in NULL to disable.  To take a look at what
 information is provided, see the dmalloc_track_t function typedef in
 dmalloc.h.
+
 @end deftypefun
 
+@c --------------------------------
+
 @deftypefun
-unsigned long dmalloc_mark ( void )
+unsigned unsigned long dmalloc_mark ( void )
 
 @cindex dmalloc_mark function
 @cindex memory position marker
@@ -1254,51 +1240,128 @@ unsigned long dmalloc_mark ( void )
 @cindex using with servers
 @cindex servers, using with
 
-Return to the caller the current "mark" which can be used later to
-dmalloc_log_changed pointers since this point.  Multiple marks can be
-saved and used.
+Return to the caller the current "mark" which can be used later to log
+the pointers which have changed since this mark with the
+@code{dmalloc_log_changed} function.  Multiple marks can be saved and
+used.
 
 This is very useful when using the library with a server which does not
 exit.  You can then save a mark before a transaction or event happens
 and then check to see what has changed using the
-@code{dmalloc_log_changed()} function below.
+@code{dmalloc_log_changed} function below.
+
 @end deftypefun
 
+@c --------------------------------
+
 @deftypefun
-unsigned long dmalloc_log_changed ( unsigned long @var{mark},
-int @var{not_freed_b}, int @var{freed_b}, int @var{details_b} )
+unsigned unsigned int dmalloc_page_size ( void )
+
+@cindex page size
+@cindex size of memory pages
+
+Return to the caller the memory page-size being used by the library.
+This should be the same value as the one returned by the
+@code{getpagesize()} function, if available.
+
+@end deftypefun
+
+@c --------------------------------
+
+@deftypefun
+void dmalloc_log_stats ( void )
+@cindex dmalloc_log_stats function
+@cindex log statistics
+@cindex statistics logging
+
+This routine outputs the current dmalloc statistics to the log file.
+@end deftypefun
+
+@c --------------------------------
+
+@deftypefun
+void dmalloc_log_unfreed( void )
+
+@cindex dmalloc_log_unfreed function
+@cindex log unfreed memory
+@cindex unfreed memory log
+
+This function dumps the unfreed-memory information to the log file.
+This is also useful to dump the currently allocated points to the log
+file to be compared against another dump later on.
+
+@end deftypefun
+
+@c --------------------------------
+
+@deftypefun
+void dmalloc_log_changed ( const unsigned long @var{mark}, const int
+@var{not_freed_b}, const int @var{freed_b}, const int @var{details_b} )
 
 @cindex dmalloc_log_changed function
-@cindex changed memory
+@cindex changed memory log
 @cindex checkpoint memory usage
 @cindex log memory changes
 
 Dump the pointers that have changed since the mark which was returned by
-dmalloc_mark.  If not_freed_b is set to non-0 then log the new pointers
-that are non-freed.  If free_b is set to non-0 then log the new pointers
-that are freed.  If details_b set to non-0 then dump the individual
-pointers that have changed otherwise just dump the summaries.
+@code{dmalloc_mark}.  If @code{not_freed_b} is set to non-0 then log the
+pointers that have not been freed.  If @code{free_b} is set to non-0
+then log the pointers that have been freed.  If @code{details_b} set to
+non-0 then dump the individual pointers that have changed otherwise just
+dump the summaries.
 
 This can be used in conjunction with the @code{dmalloc_mark()} function
 to help servers which never exit find transactions or events which are
 leaking memory.
+
 @end deftypefun
 
+@c --------------------------------
+
 @deftypefun
-const char * dmalloc_strerror ( int @var{errnum} )
+void dmalloc_vmessage ( const char * @var{format}, va_list @var{args} )
+
+@cindex dmalloc_vmessage function
+@cindex write message to logfile
+@cindex logfile message writer
+
+Write a message into the dmalloc logfile using vprintf-like arguments.
+
+@end deftypefun
+
+@c --------------------------------
+
+@deftypefun
+void dmalloc_message ( const char * @var{format}, @var{...} )
+
+@cindex dmalloc_message function
+@cindex write message to logfile
+@cindex logfile message writer
+
+Write a message into the dmalloc logfile using printf-like arguments.
+
+@end deftypefun
+
+@c --------------------------------
+
+@deftypefun
+const char * dmalloc_strerror ( const int @var{errnum} )
 
 @cindex dmalloc_strerror function
 @cindex string error message
 @cindex error message
 
 This function returns the string representation of the error value in
-errnum (which probably should be dmalloc_errno).  This allows the
+@code{errnum} (which probably should be dmalloc_errno).  This allows the
 logging of more verbose memory error messages.
 
 You can also display the string representation of an error value by a
 call to the @file{dmalloc} program with a @samp{-e #} option.
 @xref{Dmalloc Program}.
+
 @end deftypefun
+
+@c --------------------------------
 
 @node C++ and the Library, Disabling the Library, Extensions, Programming
 @section Using the Library with C++
