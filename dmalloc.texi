@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.139 1998/09/29 13:50:32 gray Exp $
+@c $Id: dmalloc.texi,v 1.140 1998/10/05 02:18:20 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -731,7 +731,11 @@ library:
 
 @enumerate
 
-@item First, please examine the @file{PERMISSIONS} file.  If you are using
+@item Make sure you have the latest version of the library.  It is
+available via anonymous ftp from @samp{ftp.letters.com} in the
+@file{/src/dmalloc} directory.  @xref{How To Get}.
+
+@item Please examine the @file{PERMISSIONS} file.  If you are using
 the library in a commercial setting, please consider paying for a
 licensed copy of the software.
 
