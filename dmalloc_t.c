@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.105 2003/09/06 15:01:04 gray Exp $
+ * $Id: dmalloc_t.c,v 1.106 2003/09/08 15:21:41 gray Exp $
  */
 
 /*
@@ -937,7 +937,7 @@ static	int	check_special(void)
       }
       if (dmalloc_free(__FILE__, __LINE__, (char *)pnt + wrong,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
-	if (dmalloc_errno == ERROR_NOT_FOUND) {
+	if (dmalloc_errno == ERROR_NOT_START_BLOCK) {
 	  dmalloc_errno = ERROR_NONE;
 	}
 	else {
