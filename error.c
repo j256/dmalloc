@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.50 1994/11/09 17:45:45 gray Exp $";
+  "$Id: error.c,v 1.51 1994/11/11 01:26:47 gray Exp $";
 #endif
 
 /*
@@ -146,15 +146,21 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
  */
 EXPORT	void	_dmalloc_die(void)
 {
-  char	str[1024];
+  char	str[1024], *stop_str;
+  
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
+    stop_str = "dumping";
+  else
+    stop_str = "halting";
   
   /* print a message that we are going down */
-  if (dmalloc_errno == ERROR_NONE)
-    (void)sprintf(str, "dmalloc: halting program, fatal error\n");
-  else
-    (void)sprintf(str, "dmalloc: halting program, fatal error: #%d\n",
-		  dmalloc_errno);
+  (void)sprintf(str, "dmalloc: %s program, fatal error\n", stop_str);
   (void)write(STDERR, str, strlen(str));
+  if (dmalloc_errno != ERROR_NONE) {
+    (void)sprintf(str, "   Error: %s (err %d)\n",
+		  _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+    (void)write(STDERR, str, strlen(str));
+  }
   
   /* do I need to drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
