@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.176 2000/03/21 18:19:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.177 2000/03/21 20:08:16 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -526,25 +526,12 @@ optimization flags.  If this doesn't work then you may need to disable
 the @samp{USE_RET_ADDRESS} variable in the @file{settings.h} file.
 
 @cindex ANSI-C compiler
-@cindex Deansify.pl script
 
-@emph{NOTE}: The code is pretty dependent on a good ANSI-C compiler.  If
-the configure script gives the @samp{WARNING} that you do not have an
-ANSI-C compiler, you may still be able to add some sort of option to
-your compiler to make it ANSI.  If there such is an option, please send
-it to the author so it can be added to the configure script.  Otherwise,
-you will have to try @kbd{make noansi}.  This will run the
-@file{Deansify.pl} perl script on the code which:
-
-@itemize @bullet
-@item @emph{WARNING}: modifies the source code in place
-@item changes @file{stdarg.h} and @code{...} to @file{varargs.h} and
-@code{va_alist}
-@item changes all @code{void *} references to @code{char *}.
-@item fixes all functions to remove @code{foo(char * var)} declarations.
-@end itemize
-
-If it doesn't work you may have to do Deansify.pl's job by hand.
+@emph{NOTE}: The code is dependent on an ANSI-C compiler.  If the
+configure script gives the @samp{WARNING} that you do not have an ANSI-C
+compiler, you may still be able to add some sort of option to your
+compiler to make it ANSI.  If there such is an option, please send it to
+the author so it can be added to the configure script.
 
 @item If you use threads, typing @kbd{make threads} should be enough
 to build @file{libdmallocth.a} which is the threaded version of the

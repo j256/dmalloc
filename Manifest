@@ -1,12 +1,9 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.34 1999/03/04 19:16:25 gray Exp $
+$Id: Manifest,v 1.35 2000/03/21 20:08:15 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
 Changelog		Log entries detailing major module changes.
-
-Deansify.pl		Perl script to attempt to convert the code to
-			non-ansi format. (yeaauuck!)
 
 INSTALL			Installation guide.
 

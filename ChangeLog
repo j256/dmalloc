@@ -2,6 +2,8 @@ Tue Mar 21 13:15:46 2000  Gray Watson  <gray@whopper.256.com>
 
 	* Releasing dmalloc version 4.4.0 beta 2.
 
+	* Removed the stupid old Deansify.pl script.
+
 	* Added rpm.spec file to the distribution.
 
 	* Fixed problem with chunk checking of dblock structures.
@@ -1541,5 +1543,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.236 2000/03/21 19:21:54 gray Exp $
+$Id: ChangeLog,v 1.237 2000/03/21 20:08:52 gray Exp $
 -------------------------------------------------------------------------------

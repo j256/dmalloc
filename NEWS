@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.88 2000/03/21 01:47:20 gray Exp $
+$Id: NEWS,v 1.89 2000/03/21 20:08:53 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 4.4.0:
 
+	* Removed the stupid old Deansify.pl script.
+	* Added rpm.spec file to the distribution.
 	* Added code to fix some recursive problems with open and atexit.
 	* Basically encorporated Randell's changes [finally].  Thanks dude.
 	* Removed the stupid chunk.c unions.  Why did I ever do that?
