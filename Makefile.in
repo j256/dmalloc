@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.16 1993/06/03 20:02:15 gray Exp $
+# $Id: Makefile.in,v 1.17 1993/06/07 11:56:44 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -15,7 +15,7 @@ LIBS	= -L. -lmalloc_dbg $(LIBRARIES)
 CFLAGS	= -g -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
-DESTDIR	= /usr/antaire
+DESTDIR	= $(ROOT)
 TESTS	= malloc_t
 LIBRARY	= libmalloc_dbg.a
 UTIL	= malloc_dbg
@@ -56,14 +56,14 @@ distclean : clobber
 installincs : $(HFLS)
 	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
 
-.PHONY : installlib
-installlib : installincs $(LIBRARY) $(OBJS_IN) $(MANFILE)
+.PHONY : installlibs
+installlibs : installincs $(LIBRARY) $(OBJS_IN) $(MANFILE)
 	install -cev -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cev -m 444 $(OBJS_IN) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
 
 .PHONY : install
-install : installlib $(UTIL)
+install : installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
 
 # put situation specific lines here
@@ -72,7 +72,7 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(LIBRARY) /usr/antaire/lib
+$(UTIL) : malloc_dbg.o $(LIBRARY) $(ROOT)/lib
 	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
