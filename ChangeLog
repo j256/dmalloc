@@ -1,3 +1,7 @@
+Wed Feb 21 20:16:32 2001  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added strings to identify the thread version of a library.
+
 Thu Nov 30 19:01:10 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Added heap checking when we shutdown if check-blank is enabled.
@@ -1740,5 +1744,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.270 2000/12/01 00:08:03 gray Exp $
+$Id: ChangeLog,v 1.271 2001/02/22 01:17:17 gray Exp $
 -------------------------------------------------------------------------------
