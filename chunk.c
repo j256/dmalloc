@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.102 1997/01/16 21:02:54 gray Exp $";
+  "$Id: chunk.c,v 1.103 1997/01/18 05:23:24 gray Exp $";
 #endif
 
 /*
@@ -1029,7 +1029,7 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
 
 #if STORE_THREAD_ID
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
-    dblockp->db_overhead.ov_thread_id = GET_THREAD_ID;
+    dblockp->db_overhead.ov_thread_id = THREAD_GET_ID;
   }
 #endif
   
