@@ -1,28 +1,36 @@
+Thu Feb 22 19:24:38 2001  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added more information to heap-check error messages on freed
+	memory overwritten.  This is now possible since I unrolled the
+	unions from chunk_loc.h.  Thanks to Robert Nielsen for pointing
+	out this oversite.
+
 Wed Feb 21 20:16:32 2001  Gray Watson  <gray@whopper.be.256.com>
 
-	* Added strings to identify the thread version of a library.
+	* Added strings to identify if the library was compiled with
+ 	LOCK_THREADS enabled.
 
 Thu Nov 30 19:01:10 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Added heap checking when we shutdown if check-blank is enabled.
-  	This will verify that all of the freed memory was not overwritten.
+	This will verify that all of the freed memory was not overwritten.
 
 Mon Nov 27 19:01:10 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Added a separate ALLOC_BLANK_CHAR and FREE_BLANK_CHAR to the
- 	settings.dist file.  Now the default 0xc5 character has been
- 	replaced with 0xda for dmalloc-allocated memory and 0xdf for
- 	dmalloc-freed memory.
-	
+	settings.dist file.  Now the default 0xc5 character has been
+	replaced with 0xda for dmalloc-allocated memory and 0xdf for
+	dmalloc-freed memory.
+
 Tue Nov 14 15:09:02 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Releasing dmalloc version 4.8.1.
 
 	* Added --enable-shlib to configure which enables the building of
- 	shared libraries.
+	shared libraries.
 
 	* Added autoconf handling of the shlibdir for installing of shared
- 	libraries.
+	libraries.
 
 Mon Nov 13 10:47:21 2000  Gray Watson  <gray@whopper.be.256.com>
 
@@ -1744,5 +1752,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.271 2001/02/22 01:17:17 gray Exp $
+$Id: ChangeLog,v 1.272 2001/02/23 22:09:01 gray Exp $
 -------------------------------------------------------------------------------

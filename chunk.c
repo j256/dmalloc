@@ -18,14 +18,13 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.170 2001/02/22 01:15:34 gray Exp $
+ * $Id: chunk.c,v 1.171 2001/02/23 22:07:56 gray Exp $
  */
 
 /*
  * This file contains algorithm level routine for the heap.  They handle the
  * manipulation and administration of chunks of memory.
  */
-
 
 #include <ctype.h>
 
@@ -64,10 +63,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "@(#) $Id: chunk.c,v 1.170 2001/02/22 01:15:34 gray Exp $"
+#ident "@(#) $Id: chunk.c,v 1.171 2001/02/23 22:07:56 gray Exp $"
 #else
 static	char	*rcs_id =
-  "@(#) $Id: chunk.c,v 1.170 2001/02/22 01:15:34 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.171 2001/02/23 22:07:56 gray Exp $";
 #endif
 #endif
 
@@ -88,7 +87,7 @@ static	char	*source_url =
 #if IDENT_WORKS
 #ident "@(#) $Information: lock-threads is enabled $"
 #else
-static char *information = "@(#) $Information: lock-threads is enabled $"
+static char *information = "@(#) $Information: lock-threads is enabled $";
 #endif
 #endif
 
@@ -350,7 +349,7 @@ char	*_chunk_desc_pnt(char *buf, const int buf_size,
     (void)loc_snprintf(buf, buf_size, "ra=ERROR(line=%u)", line);
   }
   else {
-    (void)loc_snprintf(buf, buf_size, "%s:%u", file, line);
+    (void)loc_snprintf(buf, buf_size, "%.*s:%u", MAX_FILE_LENGTH, file, line);
   }
   
   return buf;
@@ -1587,7 +1586,8 @@ int	_chunk_check(void)
       /* check line number */
       if (bblock_p->bb_line > MAX_LINE_NUMBER) {
 	dmalloc_errno = ERROR_BAD_LINE;
-	log_error_info(NULL, 0, NULL, 0, NULL, "heap-check", 0);
+	log_error_info(bblock_p->bb_file, bblock_p->bb_line, NULL, 0, NULL,
+		       "heap-check", 0);
 	dmalloc_error("_chunk_check");
 	return 0;
       }
@@ -1723,7 +1723,8 @@ int	_chunk_check(void)
 	 */
 	if ((int)dblock_p->db_size > BLOCK_SIZE / 2) {
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
-	  log_error_info(NULL, 0, NULL, 0, NULL, "heap-check", 0);
+	  log_error_info(dblock_p->db_file, dblock_p->db_line, NULL, 0, NULL,
+			 "heap-check", 0);
 	  dmalloc_error("_chunk_check");
 	  return 0;
 	}
@@ -1770,8 +1771,8 @@ int	_chunk_check(void)
 	if ((! IS_IN_HEAP(dblock_p->db_bblock))
 	    || dblock_p->db_bblock->bb_flags != BBLOCK_DBLOCK) {
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
-	  log_error_info(NULL, 0, dblock_p->db_bblock, 0, NULL, "heap-check",
-			 1);
+	  log_error_info(dblock_p->db_file, dblock_p->db_line,
+			 dblock_p->db_bblock, 0, NULL, "heap-check", 1);
 	  dmalloc_error("_chunk_check");
 	  continue;
 	}
@@ -1792,7 +1793,8 @@ int	_chunk_check(void)
 		 byte_p++) {
 	      if (*byte_p != FREE_BLANK_CHAR) {
 		dmalloc_errno = ERROR_FREE_NON_BLANK;
-		log_error_info(NULL, 0, byte_p, 0, NULL, "heap-check", 1);
+		log_error_info(dblock_p->db_file, dblock_p->db_line, byte_p, 0,
+			       NULL, "heap-check", 1);
 		dmalloc_error("_chunk_check");
 		return 0;
 	      }
@@ -1805,7 +1807,8 @@ int	_chunk_check(void)
 	/* check out size, better be less than BLOCK_SIZE / 2 */
 	if ((int)dblock_p->db_size > BLOCK_SIZE / 2) {
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
-	  log_error_info(NULL, 0, NULL, 0, NULL, "heap-check", 0);
+	  log_error_info(dblock_p->db_file, dblock_p->db_line, NULL, 0, NULL,
+			 "heap-check", 0);
 	  dmalloc_error("_chunk_check");
 	  return 0;
 	}
@@ -1813,7 +1816,8 @@ int	_chunk_check(void)
 	/* check line number */
 	if (dblock_p->db_line > MAX_LINE_NUMBER) {
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
-	  log_error_info(NULL, 0, NULL, 0, NULL, "heap-check", 0);
+	  log_error_info(dblock_p->db_file, dblock_p->db_line, NULL, 0, NULL,
+			 "heap-check", 0);
 	  dmalloc_error("_chunk_check");
 	  return 0;
 	}
@@ -1890,7 +1894,8 @@ int	_chunk_check(void)
 	     byte_p++) {
 	  if (*byte_p != FREE_BLANK_CHAR) {
 	    dmalloc_errno = ERROR_FREE_NON_BLANK;
-	    log_error_info(NULL, 0, byte_p, 0, NULL, "heap-check", 1);
+	    log_error_info(bblock_p->bb_file, bblock_p->bb_line, byte_p, 0,
+			   NULL, "heap-check", 1);
 	    dmalloc_error("_chunk_check");
 	    /* continue to check the rest of the free list */
 	    break;
@@ -2046,8 +2051,8 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
       }
       else {
 	dmalloc_errno = ERROR_NOT_ON_BLOCK;
-	log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, "pointer-check",
-		       0);
+	log_error_info(bblock_p->bb_file, bblock_p->bb_line,
+		       CHUNK_TO_USER(pnt), 0, NULL, "pointer-check", 0);
 	dmalloc_error(func);
 	return 0;
       }
@@ -2060,7 +2065,8 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
     if (dblock_p->db_flags != DBLOCK_USER) {
       /* NOTE: we should run through free list here */
       dmalloc_errno = ERROR_IS_FREE;
-      log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, "pointer-check", 0);
+      log_error_info(dblock_p->db_file, dblock_p->db_line, CHUNK_TO_USER(pnt),
+		     0, NULL, "pointer-check", 0);
       dmalloc_error(func);
       return 0;
     }
@@ -2143,7 +2149,8 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
       && (! (BIT_IS_SET(check, CHUNK_PNT_LOOSE))
 	    && BIT_IS_SET(bblock_p->bb_flags, BBLOCK_USER))) {
     dmalloc_errno = ERROR_NOT_START_USER;
-    log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, "pointer-check", 0);
+    log_error_info(bblock_p->bb_file, bblock_p->bb_line, CHUNK_TO_USER(pnt),
+		   0, NULL, "pointer-check", 0);
     dmalloc_error(func);
     return 0;
   }
@@ -2275,7 +2282,8 @@ int	_chunk_read_info(const void *pnt, const char *where,
     if (((char *)pnt - (char *)bblock_p->bb_mem) %
 	(1 << bblock_p->bb_bit_n) != 0) {
       dmalloc_errno = ERROR_NOT_ON_BLOCK;
-      log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, where, 0);
+      log_error_info(bblock_p->bb_file, bblock_p->bb_line, CHUNK_TO_USER(pnt),
+		     0, NULL, where, 0);
       dmalloc_error("_chunk_read_info");
       return 0;
     }
@@ -2287,7 +2295,8 @@ int	_chunk_read_info(const void *pnt, const char *where,
     if (dblock_p->db_flags != DBLOCK_USER) {
       /* NOTE: we should run through free list here */
       dmalloc_errno = ERROR_IS_FREE;
-      log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, where, 0);
+      log_error_info(dblock_p->db_file, dblock_p->db_line, CHUNK_TO_USER(pnt),
+		     0, NULL, where, 0);
       dmalloc_error("_chunk_read_info");
       return 0;
     }
@@ -2319,7 +2328,8 @@ int	_chunk_read_info(const void *pnt, const char *where,
     /* verify that the pointer is either dblock or user allocated */
     if (! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
       dmalloc_errno = ERROR_NOT_USER;
-      log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, where, 0);
+      log_error_info(bblock_p->bb_file, bblock_p->bb_line, CHUNK_TO_USER(pnt),
+		     0, NULL, where, 0);
       dmalloc_error("_chunk_read_info");
       return 0;
     }
