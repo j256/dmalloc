@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.h,v 1.39 2000/05/17 15:18:12 gray Exp $
+ * $Id: heap.h,v 1.40 2002/07/24 19:05:07 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -138,8 +138,8 @@ int	_heap_startup(void);
  * of blocks in EXTERN_CP.
  */
 extern
-void	*_heap_alloc(const unsigned int size, void **extern_p,
-		     int *extern_cp);
+void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
+			int *extern_cp);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

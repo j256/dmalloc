@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.59 2001/05/21 22:44:25 gray Exp $
+ * $Id: heap.c,v 1.60 2002/07/24 19:05:07 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: heap.c,v 1.59 2001/05/21 22:44:25 gray Exp $"
+#ident "$Id: heap.c,v 1.60 2002/07/24 19:05:07 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.59 2001/05/21 22:44:25 gray Exp $";
+  "$Id: heap.c,v 1.60 2002/07/24 19:05:07 gray Exp $";
 #endif
 #endif
 
@@ -68,7 +68,7 @@ static	void	*heap_extend(const int incr)
   void	*ret = SBRK_ERROR;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
-    _dmalloc_message("extending heap space by %d bytes", incr);
+    dmalloc_message("extending heap space by %d bytes", incr);
   }
   
 #if HAVE_SBRK
@@ -171,8 +171,8 @@ int	_heap_startup(void)
  * returns a pointer to any external blocks in EXTERN_P and the number
  * of blocks in EXTERN_CP.
  */
-void	*_heap_alloc(const unsigned int size, void **extern_p,
-		     int *extern_cp)
+void	*_dh_heap_alloc(const unsigned int size, void **extern_p,
+			int *extern_cp)
 {
   void		*heap_new, *heap_diff;
   long		diff;
@@ -204,7 +204,7 @@ void	*_heap_alloc(const unsigned int size, void **extern_p,
     if ((! IS_GROWTH(heap_new, _heap_last))
 	|| BIT_IS_SET(_dmalloc_flags, DEBUG_FORCE_LINEAR)) {
       dmalloc_errno = ERROR_ALLOC_NONLINEAR;
-      dmalloc_error("_heap_alloc");
+      dmalloc_error("_dh_heap_alloc");
       return HEAP_ALLOC_ERROR;
     }
     
@@ -218,7 +218,7 @@ void	*_heap_alloc(const unsigned int size, void **extern_p,
     diff = BLOCK_SIZE - ((long)heap_new % BLOCK_SIZE);
     if (diff == BLOCK_SIZE) {
       if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-	_dmalloc_message("corrected non-linear heap for %d blocks", block_n);
+	dmalloc_message("corrected non-linear heap for %d blocks", block_n);
       }
       /* if external sbrk asked for full block(s) then no need to correct */
       break;
@@ -228,8 +228,8 @@ void	*_heap_alloc(const unsigned int size, void **extern_p,
     block_n++;
     
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-      _dmalloc_message("corrected non-linear non-aligned heap for %d blocks",
-		       block_n);
+      dmalloc_message("corrected non-linear non-aligned heap for %d blocks",
+		      block_n);
     }
     
     /* shift the heap a bit to account for non block alignment */

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.100 2002/02/14 23:42:53 gray Exp $
+ * $Id: error.c,v 1.101 2002/07/24 19:05:16 gray Exp $
  */
 
 /*
@@ -77,10 +77,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: error.c,v 1.100 2002/02/14 23:42:53 gray Exp $"
+#ident "$Id: error.c,v 1.101 2002/07/24 19:05:16 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.100 2002/02/14 23:42:53 gray Exp $";
+  "$Id: error.c,v 1.101 2002/07/24 19:05:16 gray Exp $";
 #endif
 #endif
 
@@ -97,11 +97,14 @@ static char *information = "@(#) $Information: lock-threads is enabled $"
 #define SECS_IN_MIN	60
 
 /* external routines */
-extern	char		*_dmalloc_strerror(const int errnum);
+extern	const char	*dmalloc_strerror(const int errnum);
 
 /*
  * exported variables
  */
+/* internal dmalloc error number for reference purposes only */
+int		dmalloc_errno = ERROR_NONE;
+
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 char		*dmalloc_logpath = NULL;
 /* address to look for.  when discovered call dmalloc_error() */
@@ -170,23 +173,23 @@ void	_dmalloc_open_log(void)
    * this section of code.
    */
   
-  _dmalloc_message("Dmalloc version '%s' from '%s'",
-		   dmalloc_version, DMALLOC_HOME);
-  _dmalloc_message("flags = %#x, logfile '%s'",
-		   _dmalloc_flags, dmalloc_logpath);
-  _dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
-		   _dmalloc_check_interval,
-		   (unsigned long)_dmalloc_address,
-		   _dmalloc_address_seen_n);
+  dmalloc_message("Dmalloc version '%s' from '%s'",
+		  dmalloc_version, DMALLOC_HOME);
+  dmalloc_message("flags = %#x, logfile '%s'",
+		  _dmalloc_flags, dmalloc_logpath);
+  dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld",
+		  _dmalloc_check_interval,
+		  (unsigned long)_dmalloc_address,
+		  _dmalloc_address_seen_n);
 #if LOCK_THREADS
-  _dmalloc_message("threads enabled, lock-on = %d, lock-init = %d",
-		   _dmalloc_lock_on, THREAD_INIT_LOCK);
+  dmalloc_message("threads enabled, lock-on = %d, lock-init = %d",
+		  _dmalloc_lock_on, THREAD_INIT_LOCK);
 #endif
     
 #if STORE_TIMEVAL
   {
     char	time_buf[64];
-    _dmalloc_message("starting time = %s",
+    dmalloc_message("starting time = %s",
 		     _dmalloc_ptimeval(&_dmalloc_start, time_buf,
 				       sizeof(time_buf), 0));
   }
@@ -194,7 +197,7 @@ void	_dmalloc_open_log(void)
 #if HAVE_TIME /* NOT STORE_TIME */
   {
     char	time_buf[64];
-    _dmalloc_message("starting time = %s",
+    dmalloc_message("starting time = %s",
 		     _dmalloc_ptime(&_dmalloc_start, time_buf,
 				    sizeof(time_buf), 0));
   }
@@ -253,11 +256,11 @@ void	_dmalloc_reopen_log(void)
   }
   
   if (dmalloc_logpath == NULL) {
-    _dmalloc_message("Closing logfile to be reopened as '%s'",
+    dmalloc_message("Closing logfile to be reopened as '%s'",
 		     dmalloc_logpath);
   }
   else {
-    _dmalloc_message("Closing logfile to not be reopened");
+    dmalloc_message("Closing logfile to not be reopened");
   }
   
   (void)close(outfile_fd);
@@ -373,7 +376,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
 /*
  * message writer with printf like arguments
  */
-void	_dmalloc_message(const char *format, ...)
+void	dmalloc_message(const char *format, ...)
   /* __attribute__ ((format (printf, 1, 2))) */
 {
   va_list	args;
@@ -405,7 +408,7 @@ void	_dmalloc_die(const int silent_b)
     (void)write(STDERR, str, strlen(str));
     if (dmalloc_errno != ERROR_NONE) {
       (void)loc_snprintf(str, sizeof(str), "   Error: %s (err %d)\r\n",
-			 _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+			 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       (void)write(STDERR, str, strlen(str));
     }
   }
@@ -450,8 +453,8 @@ void	dmalloc_error(const char *func)
     }
     
     /* print the malloc error message */
-    _dmalloc_message("ERROR: %s: %s (err %d)",
-		     func, _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+    dmalloc_message("ERROR: %s: %s (err %d)",
+		    func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
   }
   
   /* do I need to abort? */

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: protect.c,v 1.5 2000/11/13 15:46:51 gray Exp $
+ * $Id: protect.c,v 1.6 2002/07/24 19:04:24 gray Exp $
  */
 
 /*
@@ -47,10 +47,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: protect.c,v 1.5 2000/11/13 15:46:51 gray Exp $"
+#ident "$Id: protect.c,v 1.6 2002/07/24 19:04:24 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: protect.c,v 1.5 2000/11/13 15:46:51 gray Exp $";
+  "$Id: protect.c,v 1.6 2002/07/24 19:04:24 gray Exp $";
 #endif
 #endif
 
@@ -85,8 +85,8 @@ void	protect_set_read_only(void *mem, const int block_n)
   }
   
   if (mprotect(block_pnt, size, PROT_READ) != 0) {
-    _dmalloc_message("mprotect on '%#lx' size %d failed",
-		     (unsigned long)block_pnt, size);
+    dmalloc_message("mprotect on '%#lx' size %d failed",
+		    (unsigned long)block_pnt, size);
   }
 #endif
 }
@@ -130,8 +130,8 @@ void	protect_set_read_write(void *mem, const int block_n)
   prot |= PROT_EXEC;
 #endif
   if (mprotect(block_pnt, size, prot) != 0) {
-    _dmalloc_message("mprotect on '%#lx' size %d failed",
-		     (unsigned long)block_pnt, size);
+    dmalloc_message("mprotect on '%#lx' size %d failed",
+		    (unsigned long)block_pnt, size);
   }
 #endif
 }
@@ -167,8 +167,8 @@ void	protect_set_no_access(void *mem, const int block_n)
   }
   
   if (mprotect(block_pnt, size, PROT_NONE) != 0) {
-    _dmalloc_message("mprotect on '%#lx' size %d failed",
-		     (unsigned long)block_pnt, size);
+    dmalloc_message("mprotect on '%#lx' size %d failed",
+		    (unsigned long)block_pnt, size);
   }
 #endif
 }
