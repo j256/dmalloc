@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.19 1993/05/19 01:30:48 gray Exp $
+$Id: README.1,v 1.20 1993/05/24 17:00:21 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -19,9 +19,22 @@ INSTALLATION:
 CONFIGURE:
 
 It seems that some versions of tr (especially from HP-UX) are
-completely incompatible and don't understand 'tr [a-z] [A-Z]'.  I'd
+completely incompatible and don't understand "tr '[a-z]' '[A-Z]'".  I'd
 complain to HP about it and either get gnu's tr or try and generate
 the conf.h and Makefile by hand.
+
+-------------------------------------------------------------------------------
+
+REPOSITORY:
+
+Currently, you can get the newest and bestest versions of the
+malloc_dbg library from anonymous ftp via ftp.psc.edu in the
+/pub/malloc_dbg directory.
+
+This repository has been made available through the generosity of the
+Pittsburgh Supercomputing Center with special help from Doug Balog.
+
+Thanks much to them both.
 
 -------------------------------------------------------------------------------
 
@@ -43,7 +56,7 @@ GENERAL:
 
 - the system is pretty dependent on a good ansi-c compiler like gcc.
 	non-ansi folks with have to:
-	- undefine the -Dconst="" line in the Makefile
+	- define const to be nothing in malloc_dbg.h
 	- change stdarg.h and ... to varargs.h and va_alist, etc. in error.c
 	- possibly fix all the functions to remove the foo(char * var) decls.
 - the file Manifest contains a list of each of the file and what it does.
@@ -95,7 +108,18 @@ You need to do 6 things to make use of the library:
 
 -------------------------------------------------------------------------------
 
-AUTHOR
+THANKS:
+
+Many net folk contributed to the library and my thanks goes out to
+them all.
+
+Special thanks, however, to Scott Michel <scottm@intime.intime.COM>
+for listening to my endless chatter and finding/solvings lots of
+stupid problems during the alpha stages of this library.
+
+-------------------------------------------------------------------------------
+
+AUTHOR:
 
 If you have any questions or problems feel free to send me mail.
 gray.watson@antaire.com

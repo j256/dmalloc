@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.14 1993/05/19 01:30:47 gray Exp $
+$Id: NOTES,v 1.15 1993/05/24 17:00:18 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
 
-- do not be surprised if the library catches problems with your
+-	do not be surprised if the library catches problems with your
 	system's library routines.  It took me 6 hours once to finally
 	come to the conclusion that the localtime call, included in
 	SunOS release 4.1 (and maybe before/after), was overwriting
@@ -14,75 +14,55 @@ WARNINGS:
 
 GENERAL:
 
-- dumping core on errors and then continuing did not look to be a problem to
-	implement.  However it became "not recommended" as soon as it was
-	discovered that fork (which is needed) calls malloc itself.  If the
-	heap was corrupted or some other critical error has occurred then the
-	library would quickly go recursive.
+-	dumping core on errors and then continuing did not look to be
+	a problem to implement.  However it became "not recommended"
+	as soon as it was discovered that fork (which is needed) calls
+	malloc itself.  If the heap was corrupted or some other
+	critical error has occurred then the library would quickly go
+	recursive.
 
--------------------------------------------------------------------------------
+-	for coders, the library should have no code that depends on
+	heaps growing up or down (all subtraction or other position
+	dependent code must be changed to macros in heap.h)
+	>,<,-,+,etc
 
-CODING WARNINGS:
-
-- watch for heaps growing up or down (all subtraction or other position
-	dependent code must be changed to macros in heap.h) >,<,-,+,etc
-
-- watch for bounds checking assuming + or - code.
-
-- it is assumed that NONE of the __FILE__ arguments are on the heap because
-	to determine whether a dblock is free or not it looks at the next
-	argument (unioned with the file argument) and sees if it is null or
-	in the heap meaning it is at the end or middle of a free list.
-
--------------------------------------------------------------------------------
-
-- administration blocks are relocatable:
-	- any administration blocks are relocatable in the heap which means
-		that if we monitor the freeing of a block we have the
-		opportunity to swap a higher admin block down which would mean
-		we could possible locate as many admin blocks as possible in
-		low memory making more contiguous usable areas
-
-	- you have the freed blocks address
-
-	- as you go through the admin blocks, until you get to the right entry,
-		save a pointer to the highest (or lowest) one
-
-	- when you find the free block, find out if it is lower (or higher)
-		than the highest admin block and bcopy the admin block down and
-		redo the pointers
+-	it is assumed that NONE of the __FILE__ arguments are on the
+	heap because to determine whether a dblock is free or not it
+	looks at the next argument (unioned with the file argument)
+	and sees if it is null or in the heap meaning it is at the end
+	or middle of a free list.
 
 -------------------------------------------------------------------------------
 
 DBLOCK METHOD:
 
-- have the bblock admin struct point to the dblock admin structure block which
-	contains a number of dblock admin entries.
-- have a global pointer that points to last free dblock admin structure entry
-	and has a count of the number left in the block
+- have the bblock admin struct point to the dblock admin structure
+	block which contains a number of dblock admin entries.
+- have a global pointer that points to last free dblock admin
+	structure entry and has a count of the number left in the
+	block
 - only allocate contiguous dblock admin slots so have some fragmentation
 	- must have contiguous because bblocks do not have pointer to start of
 		array
-- maybe have a sorted free list of the number of free dblock admin structs.
-	sorted in descending order
-- you have the free pointer which gets you to the bblock where you can see if
-	it is a dblock and if it is on the correct boundary.  Then you go to
-	the dblock admin struct to get the file, line, size info.
+- maybe have a sorted free list of the number of free dblock admin
+	structs.  sorted in descending order
+- you have the free pointer which gets you to the bblock where you can
+	see if it is a dblock and if it is on the correct boundary.
+	Then you go to the dblock admin struct to get the file, line,
+	size info.
 - the bblock tells you of the number of bits in the chunk, etc.
-- have some way to run through the dblock admin slot blocks to verify that
-	crc's have not been overwritten.
+- have some way to run through the dblock admin slot blocks to verify
+	that crc's have not been overwritten.
 
 -------------------------------------------------------------------------------
 
 NEW ALGORITHMS:
 
-- maybe have some sort of bitmask for free space/used space like BSD disk
-	blocks
+- maybe have some sort of bitmask for free space/used space like BSD
+	disk blocks
 - look in your free_list for first block.
 	- if NULL then move up a bin and try to divide
 	- continue until up X blocks then sbrk a new smaller block
-- maybe try a finite number of free_bins above the one you want to limit
-	fragmentation, test this thing
 
 -------------------------------------------------------------------------------
 
@@ -90,16 +70,5 @@ OVERHEAD:
 
 - dblock: 8 bytes per pointer
 - bblock: 12 bytes per pointer
-
--------------------------------------------------------------------------------
-
-THANKS:
-
-Many net folk contributed to the library and my thanks goes out to
-them all.
-
-Special thanks, however, to Scott Michel <scottm@intime.intime.COM>
-for listening to my endless chatter and finding/solvings lots of
-stupid problems during the alpha stages of this library.
 
 -------------------------------------------------------------------------------

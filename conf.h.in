@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.11 1993/04/30 20:02:27 gray Exp $
+ * $Id: conf.h.in,v 1.12 1993/05/24 17:00:35 gray Exp $
  */
 
 /*
@@ -77,6 +77,11 @@
  * NOTE: this is not necessarily the smallest possible allocated memory chunk
  */
 #define ALLOCATION_ALIGNMENT_IN_BITS 3
+
+/*
+ * if your system unstands const.
+ */
+#define const	const
 
 /*
  * LIBRARY DEFINES:

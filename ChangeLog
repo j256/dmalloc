@@ -1,3 +1,8 @@
+Mon May 24 12:58:06 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added const checking to configure and reordered some include
+	files to put conf.h on top.
+
 Tue May 18 20:07:41 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added log-bad-space token and added expand_buf into chunk.c.

@@ -30,14 +30,14 @@
 #define MALLOC_DEBUG_DISABLE
 
 #include "malloc_dbg.h"
+#include "conf.h"
 
 #include "compat.h"
-#include "conf.h"
 #include "malloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.12 1993/04/30 20:02:24 gray Exp $";
+  "$Id: compat.c,v 1.13 1993/05/24 17:00:33 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
@@ -108,7 +108,7 @@ EXPORT	char	*rindex(const char * str, int ch)
   
   for (; *str != NULLC; str++)
     if (*str == (char)ch)
-      pnt = str;
+      pnt = (char *)str;
   
   return pnt;
 }
