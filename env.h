@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: env.h,v 1.12 1998/10/26 14:24:36 gray Exp $
+ * $Id: env.h,v 1.13 1999/03/02 17:41:45 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -31,7 +31,7 @@
 #define ADDRESS_INIT		0L
 #define ADDRESS_COUNT_INIT	(-1)
 #define DEBUG_INIT		(-1L)
-#define INTERVAL_INIT		(-1)
+#define INTERVAL_INIT		0
 #define LOCK_ON_INIT		(-1)
 #define LOGPATH_INIT		NULL
 #define START_FILE_INIT		NULL
@@ -71,7 +71,7 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
 extern
 void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
 			     int *addr_count_p, unsigned int *debug_p,
-			     int *interval_p, int *lock_on_p,
+			     unsigned long *interval_p, int *lock_on_p,
 			     char **logpath_p, char **sfile_p,
 			     int *sline_p, int *scount_p);
 

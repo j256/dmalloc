@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: dmalloc.c,v 1.82 1998/11/12 21:29:32 gray Exp $
+ * $Id: dmalloc.c,v 1.83 1999/03/02 17:40:01 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.82 1998/11/12 21:29:32 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.83 1999/03/02 17:40:01 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.82 1998/11/12 21:29:32 gray Exp $";
+  "$Id: dmalloc.c,v 1.83 1999/03/02 17:40:01 gray Exp $";
 #endif
 #endif
 
@@ -75,6 +75,7 @@ static	char	*rcs_id =
 #define TOKENIZE_CHARS	" \t,="			/* for tag lines */
 
 #define NO_VALUE		(-1)		/* no value ... value */
+#define INTERVAL_NO_VALUE	0		/* no value ... value */
 #define TOKENS_PER_LINE		5		/* num debug toks per line */
 
 /*
@@ -124,7 +125,7 @@ static	int	debug		= NO_VALUE;	/* for DEBUG */
 static	int	errno_to_print	= NO_VALUE;	/* to print the error string */
 static	char	gdb_b		= FALSE;	/* set gdb output */
 static	char	*inpath		= NULL;		/* for config-file path */
-static	int	interval	= NO_VALUE;	/* for setting INTERVAL */
+static	unsigned long interval	= INTERVAL_NO_VALUE; /* for setting INTERVAL */
 static	int	thread_lock_on	= NO_VALUE;	/* for setting LOCK_ON */
 static	char	keep_b		= FALSE;	/* keep settings override -r */
 static	char	list_tags_b	= FALSE;	/* list rc tags */
@@ -169,7 +170,7 @@ static	argv_t	args[] = {
       "errno",			"print error string for errno" },
   { 'f',	"file",		ARGV_CHAR_P,	&inpath,
       "path",			"config if not ~/.mallocrc" },
-  { 'i',	"interval",	ARGV_INT,	&interval,
+  { 'i',	"interval",	ARGV_U_LONG,	&interval,
       "value",			"check heap every number times" },
   { 'k',	"keep",		ARGV_BOOL,	&keep_b,
       NULL,			"keep settings (override -r)" },
@@ -502,8 +503,8 @@ static	void	dump_current(void)
 {
   char		*tok_p;
   char		*lpath, *start_file;
-  unsigned long	addr;
-  int		addr_count, inter, lock_on, start_line, start_count;
+  unsigned long	addr, inter;
+  int		addr_count, lock_on, start_line, start_count;
   unsigned int	flags;
   
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
@@ -538,7 +539,7 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Interval     not-set\n");
   }
   else {
-    (void)fprintf(stderr, "Interval     %d\n", inter);
+    (void)fprintf(stderr, "Interval     %lu\n", inter);
   }
   
   if (lock_on == LOCK_ON_INIT) {
@@ -614,8 +615,8 @@ int	main(int argc, char **argv)
   char		buf[1024];
   int		debug_set_b = FALSE, set_b = FALSE;
   char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
-  unsigned long	addr = ADDRESS_INIT;
-  int		addr_count = ADDRESS_COUNT_INIT, inter = INTERVAL_INIT;
+  unsigned long	addr = ADDRESS_INIT, inter = INTERVAL_INIT;
+  int		addr_count = ADDRESS_COUNT_INIT;
   int		lock_on = LOCK_ON_INIT;
   int		sline = START_LINE_INIT, scount = START_COUNT_INIT;
   unsigned int	flags = DEBUG_INIT;
@@ -714,7 +715,7 @@ int	main(int argc, char **argv)
     addr = ADDRESS_INIT;
   }
   
-  if (interval != NO_VALUE) {
+  if (interval != INTERVAL_NO_VALUE) {
     /* NOTE: special case, == 0 causes it to be undef'ed */
     if (interval == 0) {
       inter = INTERVAL_INIT;

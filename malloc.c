@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.119 1998/12/11 05:03:49 gray Exp $
+ * $Id: malloc.c,v 1.120 1999/03/02 17:41:55 gray Exp $
  */
 
 /*
@@ -81,10 +81,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.119 1998/12/11 05:03:49 gray Exp $";
+#ident "$Id: malloc.c,v 1.120 1999/03/02 17:41:55 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.119 1998/12/11 05:03:49 gray Exp $";
+  "$Id: malloc.c,v 1.120 1999/03/02 17:41:55 gray Exp $";
 #endif
 #endif
 
@@ -121,7 +121,6 @@ static	int		address_seen_n = ADDRESS_COUNT_INIT; /* # stop addr */
 static	char		*start_file = START_FILE_INIT;	/* file to start at */
 static	int		start_line = START_LINE_INIT;	/* line to start */
 static	int		start_count = START_COUNT_INIT; /* start after X */
-static	int		check_interval = INTERVAL_INIT; /* check every X */
 static	int		thread_lock_on = LOCK_ON_INIT;	/* start locking when*/
 static	int		thread_lock_c = 0;		/* lock counter */
 
@@ -269,8 +268,9 @@ static	int	check_debug_vars(const char *file, const int line)
   
   /* checking heap every X times */
   _dmalloc_iter_c++;
-  if (check_interval != INTERVAL_INIT && check_interval > 0) {
-    if (_dmalloc_iter_c % check_interval == 0) {
+  if (_dmalloc_check_interval != INTERVAL_INIT
+      && _dmalloc_check_interval > 0) {
+    if (_dmalloc_iter_c % _dmalloc_check_interval == 0) {
       BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
     }
     else { 
@@ -319,8 +319,9 @@ static	void	process_environ(void)
 {
   _dmalloc_environ_get(OPTIONS_ENVIRON, (unsigned long *)&dmalloc_address,
 		       &address_seen_n, &_dmalloc_flags,
-		       &check_interval, &thread_lock_on, &dmalloc_logpath,
-		       &start_file, &start_line, &start_count);
+		       &_dmalloc_check_interval, &thread_lock_on,
+		       &dmalloc_logpath, &start_file, &start_line,
+		       &start_count);
   thread_lock_c = thread_lock_on;
   
   /* if it was not set then no flags set */

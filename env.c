@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: env.c,v 1.17 1998/11/12 16:28:12 gray Exp $
+ * $Id: env.c,v 1.18 1999/03/02 17:41:44 gray Exp $
  */
 
 /*
@@ -53,10 +53,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.17 1998/11/12 16:28:12 gray Exp $";
+#ident "$Id: env.c,v 1.18 1999/03/02 17:41:44 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.17 1998/11/12 16:28:12 gray Exp $";
+  "$Id: env.c,v 1.18 1999/03/02 17:41:44 gray Exp $";
 #endif
 #endif
 
@@ -152,7 +152,7 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  */
 void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
 			     int *addr_count_p, unsigned int *debug_p,
-			     int *interval_p, int *lock_on_p,
+			     unsigned long *interval_p, int *lock_on_p,
 			     char **logpath_p, char **sfile_p,
 			     int *sline_p, int *scount_p)
 {
@@ -245,7 +245,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
       if (interval_p != NULL) {
-	*interval_p = atoi(this_p);
+	*interval_p = (unsigned long)atol(this_p);
       }
       continue;
     }
