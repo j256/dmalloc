@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.177 2004/01/14 16:17:59 gray Exp $
+ * $Id: malloc.c,v 1.178 2004/01/28 14:30:40 gray Exp $
  */
 
 /*
@@ -458,10 +458,28 @@ static	int	dmalloc_startup(const char *debug_str)
 }
 
 /*
+ * static int dmalloc_in
+ *
+ * DESCRIPTION:
+ *
  * Call to the alloc routines has been made.  Do some initialization,
  * locking, and check some debug variables.
  *
- * Returns ERROR or NOERROR.
+ * RETURNS:
+ *
+ * Success - 1
+ *
+ * Failure - 0
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.
+ *
+ * line -> Line-number of the caller.
+ *
+ * check_heap_b -> Set to 1 if it is okay to check the heap.  If set
+ * to 0 then the caller will check it itself or it is a non-invasive
+ * call.
  */
 static	int	dmalloc_in(const char *file, const int line,
 			   const int check_heap_b)
@@ -1364,6 +1382,64 @@ int	dmalloc_verify(const DMALLOC_PNT pnt)
 int	malloc_verify(const DMALLOC_PNT pnt)
 {
   return dmalloc_verify(pnt);
+}
+
+/*
+ * int dmalloc_verify_pnt
+ *
+ * DESCRIPTION:
+ *
+ * This function is mainly used by the arg_check.c functions to verify
+ * specific pointers.  This can be used by users to provide more fine
+ * grained tests on pointers.
+ *
+ * RETURNS:
+ *
+ * Success - MALLOC_VERIFY_NOERROR
+ *
+ * Failure - MALLOC_VERIFY_ERROR
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.  You can use
+ * __FILE__ for this argument or 0L for none.
+ *
+ * line -> Line-number of the caller.  You can use __LINE__ for this
+ * argument or 0 for none.
+ *
+ * func -> Function string which is checking the pointer.  0L if none.
+ *
+ * pnt -> Pointer we are checking.
+ *
+ * exact_b -> Set to 1 if this pointer was definitely handed back from
+ * a memory allocation.  If set to 0 then this pointer can be inside
+ * another allocation or outside the heap altogether.
+ *
+ * min_size -> Make sure that pointer can hold at least that many
+ * bytes if inside of the heap.  If -1 then make sure it can handle
+ * strlen(pnt) + 1 bytes (+1 for the \0).  If 0 then don't check the
+ * size.
+ */
+int	dmalloc_verify_pnt(const char *file, const int line, const char *func,
+			   const void *pnt, const int exact_b,
+			   const int min_size)
+{
+  int	ret;
+  
+  if (! dmalloc_in(file, line, 0)) {
+    return MALLOC_VERIFY_NOERROR;
+  }
+  
+  /* call the pnt checking chunk code */
+  ret = _dmalloc_chunk_pnt_check(func, pnt, exact_b, min_size);
+  dmalloc_out();
+  
+  if (ret) {
+    return MALLOC_VERIFY_NOERROR;
+  }
+  else {
+    return MALLOC_VERIFY_ERROR;
+  }
 }
 
 /*
