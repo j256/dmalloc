@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.58 2003/05/21 03:07:56 gray Exp $
+ * $Id: settings.dist,v 1.59 2003/06/06 21:02:31 gray Exp $
  */
 
 /*
@@ -321,11 +321,15 @@
  * memory table records the top locations by file/line or
  * return-address of all pointers allocated.  It also tabulates the
  * freed memory pointers so you can easily locate the large memory
- * leaks.  See the MEMORY_TABLE_LOG value below to 0 to disable the
- * table.
+ * leaks.  See the MEMORY_TABLE_TOP_LOG value below to 0 to disable
+ * the table.
  *
- * NOTE: the library will actually allocated 2 times this many
- * entries for speed reasons.
+ * NOTE: The table will only hold the _first_ pointers into the table.
+ * If you configure a size of 10 then the 11th pointer allocated will
+ * not be accounted for.
+ *
+ * NOTE: the library will actually allocated 2 times this many entries
+ * for speed reasons.
  */
 #define MEMORY_TABLE_SIZE 4096
 
@@ -336,7 +340,7 @@
  * NOTE: to display the top entries correctly, your OS must support
  * the quicksort function.
  */
-#define MEMORY_TABLE_LOG 10
+#define MEMORY_TABLE_TOP_LOG 10
 
 /*
  * Define this to 1 to only display the memory table summary of the
