@@ -40,7 +40,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.37 1994/05/11 19:28:44 gray Exp $";
+  "$Id: error.c,v 1.38 1994/05/30 21:36:34 gray Exp $";
 #endif
 
 /*
@@ -79,6 +79,12 @@ EXPORT	void	_malloc_message(const char * format, ...)
   (void)sprintf(strp, "%lu: ", _malloc_iterc);
   for (; *strp != NULLC; strp++);
 #endif
+  
+  /*
+   * NOTE: the following code, as well as the function definition
+   * above, would need to be altered to conform to non-ANSI-C
+   * specifications if necessary.
+   */
   
   /* write the format + info into str */
   va_start(args, format);
@@ -142,7 +148,8 @@ EXPORT	void	_malloc_die(void)
 }
 
 /*
- * malloc version of error of an error in STR
+ * handler of error codes from procedure FUNC.  the procedure should
+ * have set the errno already.
  */
 EXPORT	void	_malloc_error(const char * func)
 {
