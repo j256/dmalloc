@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.31 1999/03/09 05:17:37 gray Exp $
+$Id: TODO,v 1.32 1999/08/25 12:35:45 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -193,5 +193,11 @@ This causes problems since most (all?)  mprotect implementations work
 with page-size resolutions which means that every allocation (8 byte
 string) would require 8+pagesize (often > 4096 bytes).  Anyone have a
 easier way of accomplishing this?
+
+-------------------------------------------------------------------------------
+
+I would like to blacklist a list of 'ra=0x4013195c'. I would be *very*
+usefull to shut-up numerous leaks from standard C library.  Is there a
+way to do that ?
 
 -------------------------------------------------------------------------------
