@@ -37,11 +37,12 @@
 #include "debug_val.h"
 #include "env.h"				/* for LOGPATH_INIT */
 #include "error.h"
+#include "error_val.h"
 #include "dmalloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.48 1994/10/27 01:24:10 gray Exp $";
+  "$Id: error.c,v 1.49 1994/11/09 00:51:48 gray Exp $";
 #endif
 
 /*
@@ -146,6 +147,16 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
  */
 EXPORT	void	_dmalloc_die(void)
 {
+  char	str[1024];
+  
+  /* print a message that we are going down */
+  if (dmalloc_errno == ERROR_NONE)
+    (void)sprintf(str, "dmalloc: halting program, fatal error\n");
+  else
+    (void)sprintf(str, "dmalloc: halting program, fatal error: #%d\n",
+		  dmalloc_errno);
+  (void)write(STDERR, str, strlen(str));
+  
   /* do I need to drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
     KILL_PROCESS();
