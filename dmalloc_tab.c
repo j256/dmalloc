@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.1 1999/03/09 19:27:40 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.2 1999/03/10 16:41:16 gray Exp $
  */
 
 /*
@@ -28,9 +28,16 @@
  * Inspired by code from PSM <psm @ sics.se>.  Thanks much.
  */
 
+#if HAVE_STRING_H
+# include <string.h>
+#endif
+
 #include "conf.h"
+#include "chunk.h"
+#include "compat.h"
 #include "dmalloc.h"
 #include "dmalloc_loc.h"
+#include "error.h"
 #include "error_val.h"
 
 #include "dmalloc_tab.h"
@@ -38,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.1 1999/03/09 19:27:40 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.2 1999/03/10 16:41:16 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.1 1999/03/09 19:27:40 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.2 1999/03/10 16:41:16 gray Exp $";
 #endif
 #endif
 
@@ -220,12 +227,12 @@ static	void	log_entry(const mem_table_t *tab_p, const int in_use_b,
 			  const char *source)
 {
   if (in_use_b) {
-    _dmalloc_message("%11d %6d %11d %6d  %s\n",
+    _dmalloc_message("%11ld %6ld %11ld %6ld  %s\n",
 		     tab_p->mt_total_size, tab_p->mt_total_c,
 		     tab_p->mt_in_use_size, tab_p->mt_in_use_c, source);
   }
   else {
-    _dmalloc_message("%11d %6d  %s\n",
+    _dmalloc_message("%11ld %6ld  %s\n",
 		     tab_p->mt_total_size, tab_p->mt_total_c, source);
   }
 }

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: env.c,v 1.21 1999/03/05 00:28:37 gray Exp $
+ * $Id: env.c,v 1.22 1999/03/10 16:41:16 gray Exp $
  */
 
 /*
@@ -41,6 +41,7 @@
 #include "conf.h"
 #include "dmalloc.h"
 
+#include "compat.h"
 #include "dmalloc_loc.h"
 #include "debug_tok.h"
 #include "env.h"
@@ -48,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.21 1999/03/05 00:28:37 gray Exp $";
+#ident "$Id: env.c,v 1.22 1999/03/10 16:41:16 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.21 1999/03/05 00:28:37 gray Exp $";
+  "$Id: env.c,v 1.22 1999/03/10 16:41:16 gray Exp $";
 #endif
 #endif
 

@@ -18,13 +18,15 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: compat.c,v 1.45 1999/03/08 19:07:49 gray Exp $
+ * $Id: compat.c,v 1.46 1999/03/10 16:41:15 gray Exp $
  */
 
 /*
  * This file holds the compatibility routines necessary for the library to
  * function just in case your system does not have them.
  */
+
+#include <stdio.h>				/* for vsprintf */
 
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for ... */
@@ -40,10 +42,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.45 1999/03/08 19:07:49 gray Exp $";
+#ident "$Id: compat.c,v 1.46 1999/03/10 16:41:15 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.45 1999/03/08 19:07:49 gray Exp $";
+  "$Id: compat.c,v 1.46 1999/03/10 16:41:15 gray Exp $";
 #endif
 #endif
 
