@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.200 2004/01/14 16:17:56 gray Exp $
+ * $Id: chunk.c,v 1.201 2004/01/28 14:29:43 gray Exp $
  */
 
 /*
@@ -2223,7 +2223,13 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   pnt_info_t	pnt_info;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    dmalloc_message("checking pointer '%#lx'", (unsigned long)user_pnt);
+    if (func == NULL) {
+      dmalloc_message("checking pointer '%#lx'", (unsigned long)user_pnt);
+    }
+    else {
+      dmalloc_message("checking func '%s' pointer '%#lx'",
+		      func, (unsigned long)user_pnt);
+    }
   }
   
   /* try to find the address */
