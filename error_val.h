@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.25 2000/03/21 18:19:14 gray Exp $
+ * $Id: error_val.h,v 1.26 2003/05/13 14:55:25 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -67,12 +67,14 @@
 #define ERROR_FREE_NON_BLANK		67	/* free space should be 0's */
 
 /* dblock errors */
+#if 0
 #define ERROR_BAD_DBLOCK_SIZE		80	/* dblock bad size */
 #define ERROR_BAD_DBLOCK_POINTER	81	/* bad dblock pointer */
 #define ERROR_BAD_DBLOCK_MEM		82	/* bad memory pointer */
 #define ERROR_BAD_DBADMIN_POINTER	83	/* bad dblock admin pointer */
 #define ERROR_BAD_DBADMIN_MAGIC		84	/* bad dblock admin pointer */
 #define ERROR_BAD_DBADMIN_SLOT		85	/* bad dblock slot info */
+#endif
 
 /* administrative errors */
 #define ERROR_BAD_ADMIN_P		90	/* admin value out of bounds */
@@ -88,6 +90,7 @@
 
 /* memory table errors */
 #define ERROR_TABLE_CORRUPT		102	/* memory table corruption */
+#define ERROR_ADDRESS_LIST		103	/* invalid address list */
 
 /*
  * NOTE: you must update the IS_MALLOC_ERRNO below if you add errors
