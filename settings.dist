@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.16 1997/12/08 05:47:36 gray Exp $
+ * $Id: settings.dist,v 1.17 1997/12/08 06:26:31 gray Exp $
  */
 
 /*
@@ -285,7 +285,7 @@
 				      THREAD_LOCK_INIT; \
 				    } \
 				  } \
-				  else { \
+				  else if (thread_lock_on == 0) { \
 				    pthread_mutex_unlock(&dmalloc_mutex); \
 				  } \
 				} while (0)

@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.98 1997/12/08 04:15:34 gray Exp $";
+  "$Id: malloc.c,v 1.99 1997/12/08 06:26:30 gray Exp $";
 #endif
 
 /*
@@ -122,6 +122,17 @@ static	int	check_debug_vars(const char * file, const int line)
     return ERROR;
   }
   
+  /*
+   * NOTE: we need to do this outside of lock to get env vars
+   * otherwise our thread_lock_on variable won't be initialized and
+   * the THREAD_LOCK will flip.
+   */
+  if (! enabled_b) {
+    if (dmalloc_startup() != NOERROR) {
+      return ERROR;
+    }
+  }
+  
   THREAD_LOCK;
   
   if (in_alloc_b) {
@@ -133,12 +144,6 @@ static	int	check_debug_vars(const char * file, const int line)
   }
   
   in_alloc_b = TRUE;
-  
-  if (! enabled_b) {
-    if (dmalloc_startup() != NOERROR) {
-      return ERROR;
-    }
-  }
   
   /* check start file/line specifications */
   if (! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
@@ -290,17 +295,16 @@ static	int	dmalloc_startup(void)
   _dmalloc_examine_func = _dmalloc_examine;
   _dmalloc_strerror_func = _dmalloc_strerror;
   
+  /*
+   * NOTE: we may go recursive below here becasue atexit or on_exit
+   * may ask for memory to be allocated.  We won't worry about it and
+   * will just give it to them.  We hope that atexit didn't start the
+   * allocating.  Ugh.
+   */
 #if AUTO_SHUTDOWN
   {
     unsigned int	line_hold = _dmalloc_line;
     char		*file_hold = _dmalloc_file;
-    
-    /*
-     * HACK: we have to disable the in_alloc because we might be about
-     * to go recursize.  this should not get back here since dmalloc
-     * has been enabled_b.
-     */
-    in_alloc_b = FALSE;
     
     /* NOTE: I use the else here in case some dumb systems has both */
 #if HAVE_ATEXIT
@@ -310,8 +314,6 @@ static	int	dmalloc_startup(void)
     (void)on_exit(_dmalloc_shutdown, NULL);
 #endif
 #endif
-    
-    in_alloc_b = TRUE;
     
     _dmalloc_line = line_hold;
     _dmalloc_file = file_hold;
