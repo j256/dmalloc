@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.17 1993/04/15 21:57:53 gray Exp $
+$Id: README.1,v 1.18 1993/04/19 20:13:55 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -13,6 +13,15 @@ INSTALLATION:
 
 3) Typing 'make tests' should build the malloc_t test program
 	(more automated test facilities are needed!!)
+
+-------------------------------------------------------------------------------
+
+CONFIGURE:
+
+It seems that some versions of tr (especially from HP-UX) are
+completely incompatible and don't understand 'tr [a-z] [A-Z]'.  I'd
+complain to HP about it and either get gnu's tr or try and generate
+the conf.h and Makefile by hand.
 
 -------------------------------------------------------------------------------
 

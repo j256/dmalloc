@@ -23,8 +23,8 @@
  */
 
 /*
- * This file holds the compatibility routines necessary for the library if
- * your system does not have them.
+ * This file holds the compatibility routines necessary for the library to
+ * function just in case your system does not have them.
  */
 
 #define MALLOC_DEBUG_DISABLE
@@ -37,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.10 1993/04/15 21:58:00 gray Exp $";
+  "$Id: compat.c,v 1.11 1993/04/19 20:13:59 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0

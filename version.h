@@ -28,4 +28,4 @@
  * NOTE to gray: whenever this is changed, a corresponding Changlog
  * entry *must* be entered.
  */
-LOCAL	char	*malloc_version = "1.2.2";
+LOCAL	char	*malloc_version = "1.2.3";

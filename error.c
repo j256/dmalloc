@@ -24,7 +24,7 @@
 
 /*
  * This file contains the routines needed for processing error codes
- * produced by the compiler.
+ * produced by the library.
  */
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.22 1993/04/15 21:58:10 gray Exp $";
+  "$Id: error.c,v 1.23 1993/04/19 20:14:00 gray Exp $";
 #endif
 
 /*

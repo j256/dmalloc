@@ -24,7 +24,7 @@
 
 /*
  * Test program for the malloc library.  Current it is interactive although
- * probably should be script based.
+ * should be script based.
  */
 
 #include <stdio.h>				/* for stdin */
@@ -33,7 +33,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.18 1993/04/15 21:58:30 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.19 1993/04/19 20:14:06 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000

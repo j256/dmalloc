@@ -24,7 +24,8 @@
 
 /*
  * This is the malloc_dbg program which is designed to enable the user
- * to easily enable the multitude of malloc-debug capabilities.
+ * to easily set the environmental variables that control the malloc-debug
+ * library capabilities.
  *
  * NOTE: all stdout output from this program is designed to be run through
  *   eval by default.  Any messages for the user should be fprintf to stderr.
@@ -44,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.10 1993/04/15 21:58:22 gray Exp $";
+  "$Id: dmalloc.c,v 1.11 1993/04/19 20:14:02 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -294,7 +295,7 @@ LOCAL	int	process(int debug_value, char ** strp)
   infile = fopen(inpath, "r");
   if (infile == NULL) {
     (void)fprintf(stderr, "%s: could not read '%s': ", program, inpath);
-    (void)perror("");
+    perror("");
     exit(1);
   }
   
