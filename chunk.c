@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.108 1997/12/05 21:09:36 gray Exp $";
+  "$Id: chunk.c,v 1.109 1997/12/07 23:09:15 gray Exp $";
 #endif
 
 /*
@@ -2092,7 +2092,8 @@ void	_chunk_log_heap_map(void)
   bblock_adm_t	*bblock_adm_p;
   bblock_t	*bblock_p;
   char		line[BB_PER_ADMIN + 10];
-  int		char_c, bblock_c, tblock_c, bb_admin_c, undef = 0;
+  int		char_c, bblock_c, tblock_c, bb_admin_c;
+  int		undef_b = 0;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     _dmalloc_message("logging heap map information");
@@ -2175,15 +2176,15 @@ void	_chunk_log_heap_map(void)
 	 bblock_c++, bblock_p++, tblock_c++) {
       
       if (! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_ALLOCATED)) {
-	if (undef == 0) {
+	if (! undef_b) {
 	  _dmalloc_message("%d (%#lx): not-allocated block (till next)",
 			  tblock_c, BLOCK_POINTER(tblock_c));
-	  undef = 1;
+	  undef_b = 1;
 	}
 	continue;
       }
       
-      undef = 0;
+      undef_b = 0;
       
       if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_START_USER)) {
 	_dmalloc_message("%d (%#lx): start-of-user block: %d bytes from '%s'",
@@ -2902,7 +2903,7 @@ void	_chunk_dump_unfreed(void)
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
   void		*pnt;
-  char		unknown;
+  int		unknown_b;
   int		unknown_size_c = 0, unknown_block_c = 0;
   int		size_c = 0, block_c = 0;
   
@@ -2941,7 +2942,7 @@ void	_chunk_dump_unfreed(void)
       pnt = BLOCK_POINTER(this_adm_p->ba_posn +
 			  (bblock_p - this_adm_p->ba_blocks));
       
-      unknown = 0;
+      unknown_b = 0;
       
       /* unknown pointer? */
       if (bblock_p->bb_file == _dmalloc_unknown_file
@@ -2949,10 +2950,10 @@ void	_chunk_dump_unfreed(void)
 	  || bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
 	unknown_block_c++;
 	unknown_size_c += bblock_p->bb_size - pnt_total_adm;
-	unknown = 1;
+	unknown_b = 1;
       }
       
-      if (! unknown || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+      if (! unknown_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	_dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			 display_pnt(CHUNK_TO_USER(pnt),
 				     &bblock_p->bb_overhead),
@@ -3033,7 +3034,7 @@ void	_chunk_dump_unfreed(void)
 	    (1 << bb_p->bb_bit_n);
 	}
 	
-	unknown = 0;
+	unknown_b = 0;
 	
 	/* unknown pointer? */
 	if (dblock_p->db_file == _dmalloc_unknown_file
@@ -3041,10 +3042,10 @@ void	_chunk_dump_unfreed(void)
 	    || dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
 	  unknown_block_c++;
 	  unknown_size_c += dblock_p->db_size - pnt_total_adm;
-	  unknown = 1;
+	  unknown_b = 1;
 	}
 	
-	if (! unknown || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
+	if (! unknown_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			   display_pnt(CHUNK_TO_USER(pnt),
 				       &dblock_p->db_overhead),
