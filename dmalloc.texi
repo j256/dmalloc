@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.88 1995/05/13 00:00:44 gray Exp $
+@c $Id: dmalloc.texi,v 1.89 1995/05/16 00:26:44 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -77,7 +77,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 3.0.4 -- November 1994
+Version 3.0.6 -- May 1995
 @end ifinfo
 
 @cindex introduction
@@ -97,7 +97,8 @@ Linux, MS-DOG, OSF, Solaris, SunOS, and Ultrix.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
-texi, info, and ps).
+texi, info, and ps).  Documentation is available online at URL
+@code{http://www.letters.com/~gray/dmalloc}.
 
 The library is available via ftp from @samp{ftp.letters.com} in the
 @file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached at
