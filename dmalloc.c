@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.75 1998/09/17 13:32:14 gray Exp $";
+  "$Id: dmalloc.c,v 1.76 1998/09/18 19:11:12 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -524,18 +524,12 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Interval     %d\n", inter);
   }
   
-#if LOCK_THREADS
   if (lock_on == LOCK_ON_INIT) {
     (void)fprintf(stderr, "Lock-On      not-set\n");
   }
   else {
     (void)fprintf(stderr, "Lock-On      %d\n", lock_on);
   }
-#else
-  if (very_verbose_b) {
-    (void)fprintf(stderr, "Lock-On      not-configured\n");
-  }
-#endif
   
   if (lpath == LOGPATH_INIT) {
     (void)fprintf(stderr, "Logpath      not-set\n");
@@ -718,7 +712,6 @@ int	main(int argc, char **argv)
    * NOTE: this should be after the debug setting which this tests.
    */
   if (thread_lock_on != NO_VALUE) {
-#if LOCK_THREADS
     /* NOTE: special case, == 0 causes it to be undef'ed */
     if (thread_lock_on == 0) {
       lock_on = LOCK_ON_INIT;
@@ -731,10 +724,6 @@ int	main(int argc, char **argv)
       (void)fprintf(stderr,
 		    "WARNING: the allow-nonlinear flag is not enabled\n");
     }
-#else
-    (void)fprintf(stderr, "WARNING: LOCK_THREADS not-configured\n");
-    lock_on = LOCK_ON_INIT;
-#endif
   }
   else if (clear_b) {
     lock_on = LOCK_ON_INIT;
