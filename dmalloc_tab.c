@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.16 2003/05/13 14:57:50 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.17 2003/05/13 16:36:16 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_tab.c,v 1.16 2003/05/13 14:57:50 gray Exp $"
+#ident "$Id: dmalloc_tab.c,v 1.17 2003/05/13 16:36:16 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.16 2003/05/13 14:57:50 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.17 2003/05/13 16:36:16 gray Exp $";
 #endif
 #endif
 
@@ -558,7 +558,7 @@ static	void	add_entry(mem_table_t *total_p, const mem_table_t *tab_p)
 }
 
 /*
- * void _table_clear
+ * void _dmalloc_table_clear
  *
  * DESCRIPTION:
  *
@@ -573,7 +573,7 @@ static	void	add_entry(mem_table_t *total_p, const mem_table_t *tab_p)
  *
  * None.
  */
-void	_table_clear(void)
+void	_dmalloc_table_clear(void)
 {
   /* clear out our memory table */
   memset(memory_table, 0, sizeof(mem_table_t) * MEM_ENTRIES_N);
@@ -582,7 +582,7 @@ void	_table_clear(void)
 }
 
 /*
- * void _table_alloc
+ * void _dmalloc_table_alloc
  *
  * DESCRIPTION:
  *
@@ -600,8 +600,8 @@ void	_table_clear(void)
  *
  * size -> Size in bytes of the allocation.
  */
-void	_table_alloc(const char *file, const unsigned int line,
-		     const unsigned long size)
+void	_dmalloc_table_alloc(const char *file, const unsigned int line,
+			const unsigned long size)
 {
   unsigned int	bucket;
   mem_table_t	*tab_p, *tab_end_p, *tab_bounds_p;
@@ -659,7 +659,7 @@ void	_table_alloc(const char *file, const unsigned int line,
 }
 
 /*
- * void _table_free
+ * void _dmalloc_table_free
  *
  * DESCRIPTION:
  *
@@ -678,8 +678,8 @@ void	_table_alloc(const char *file, const unsigned int line,
  *
  * size -> Size in bytes of the allocation.
  */
-void	_table_free(const char *old_file, const unsigned int old_line,
-		    const DMALLOC_SIZE size)
+void	_dmalloc_table_free(const char *old_file, const unsigned int old_line,
+		       const DMALLOC_SIZE size)
 {
   unsigned int	bucket;
   int		found_b = 0;
@@ -729,7 +729,7 @@ void	_table_free(const char *old_file, const unsigned int old_line,
 }
 
 /*
- * void _table_log_info
+ * void _dmalloc_table_log_info
  *
  * DESCRIPTION:
  *
@@ -746,7 +746,7 @@ void	_table_free(const char *old_file, const unsigned int old_line,
  *
  * in_use_b -> Display the in-use numbers.
  */
-void	_table_log_info(const int entry_n, const int in_use_b)
+void	_dmalloc_table_log_info(const int entry_n, const int in_use_b)
 {
   mem_table_t	*tab_p, *tab_bounds_p, total;
   int		entry_c;
@@ -780,8 +780,8 @@ void	_table_log_info(const int entry_n, const int in_use_b)
       entry_c++;
       /* can we still print the pointer information? */
       if (entry_n == 0 || entry_c < entry_n) {
-	(void)_chunk_desc_pnt(source, sizeof(source),
-			      tab_p->mt_file, tab_p->mt_line);
+	(void)_dmalloc_chunk_desc_pnt(source, sizeof(source),
+				      tab_p->mt_file, tab_p->mt_line);
 	log_entry(tab_p, in_use_b, source);
       }
       add_entry(&total, tab_p);

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.157 2003/05/13 14:57:19 gray Exp $
+ * $Id: malloc.c,v 1.158 2003/05/13 16:35:54 gray Exp $
  */
 
 /*
@@ -74,7 +74,6 @@
 #include "debug_val.h"
 #include "env.h"
 #include "error.h"
-#include "error_str.h"
 #include "error_val.h"
 #include "heap.h"
 #include "dmalloc_loc.h"
@@ -83,10 +82,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.157 2003/05/13 14:57:19 gray Exp $"
+#ident "$Id: malloc.c,v 1.158 2003/05/13 16:35:54 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.157 2003/05/13 14:57:19 gray Exp $";
+  "$Id: malloc.c,v 1.158 2003/05/13 16:35:54 gray Exp $";
 #endif
 #endif
 
@@ -238,11 +237,11 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   addr_c++;
   dmalloc_message("address '%#lx' found in '%s' at pass %ld from '%s'",
 		  (unsigned long)pnt, label, addr_c,
-		  _chunk_desc_pnt(where_buf, sizeof(where_buf), file, line));
+		  _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf), file,
+					  line));
   
   /* NOTE: if address_seen_n == 0 then never quit */
-  if (_dmalloc_address_seen_n > 0
-      && addr_c >= _dmalloc_address_seen_n) {
+  if (_dmalloc_address_seen_n > 0 && addr_c >= _dmalloc_address_seen_n) {
     dmalloc_errno = ERROR_IS_FOUND;
     dmalloc_error("check_pnt");
   }
@@ -259,17 +258,20 @@ static	void	process_environ(const char *option_str)
    */
   static char	options[1024];
   
-  strncpy(options, option_str, sizeof(options));
-  options[sizeof(options) - 1] = '\0';
-  
   /* process the options flag */
-  if (option_str != NULL) {
-    _dmalloc_environ_process(options, &_dmalloc_address,
-			     (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
-			     &_dmalloc_check_interval, &_dmalloc_lock_on,
-			     &dmalloc_logpath, &start_file, &start_line,
-			     &start_count);
+  if (option_str == NULL) {
+    options[0] = '\0';
   }
+  else {
+    strncpy(options, option_str, sizeof(options));
+    options[sizeof(options) - 1] = '\0';
+  }
+  
+  _dmalloc_environ_process(options, &_dmalloc_address,
+			   (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
+			   &_dmalloc_check_interval, &_dmalloc_lock_on,
+			   &dmalloc_logpath, &start_file, &start_line,
+			   &start_count);
   thread_lock_c = _dmalloc_lock_on;
   
   /* if we set the start stuff, then check-heap comes on later */
@@ -356,12 +358,12 @@ static	int	dmalloc_startup(const char *debug_str)
     }
     
     /* startup heap code */
-    if (! _heap_startup()) {
+    if (! _dmalloc_heap_startup()) {
       return 0;
     }
     
     /* startup the chunk lower-level code */
-    if (! _chunk_startup()) {
+    if (! _dmalloc_chunk_startup()) {
       return 0;
     }
   }
@@ -460,20 +462,17 @@ void	dmalloc_shutdown(void)
    */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
-    (void)_chunk_check();
+    (void)_dmalloc_chunk_heap_check();
   }
   
   /* dump some statistics to the logfile */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STATS)) {
-    _chunk_list_count();
-  }
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STATS)) {
-    _chunk_stats();
+    _dmalloc_chunk_log_stats();
   }
   
   /* report on non-freed pointers */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE)) {
-    _chunk_log_changed(0, 1, 0,
+    _dmalloc_chunk_log_changed(0, 1, 0,
 #if DUMP_UNFREED_SUMMARY_ONLY
 		       0
 #else
@@ -601,7 +600,7 @@ static	int	dmalloc_in(const char *file, const int line,
   
   /* after all that, do we need to check the heap? */
   if (check_heap_b && BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)) {
-    (void)_chunk_check();
+    (void)_dmalloc_chunk_heap_check();
   }
   
   return 1;
@@ -685,7 +684,7 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
     /* align = alignment */
   }
   
-  new_p = _chunk_malloc(file, line, size, func_id, align);
+  new_p = _dmalloc_chunk_malloc(file, line, size, func_id, align);
   
   check_pnt(file, line, new_p, "malloc");
   
@@ -699,7 +698,9 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
     char	mess[1024], desc[128];
     (void)loc_snprintf(mess, sizeof(mess),
 		       "Out of memory while allocating %d bytes from '%s'\n",
-		       size, _chunk_desc_pnt(desc, sizeof(desc), file, line));
+		       size,
+		       _dmalloc_chunk_desc_pnt(desc, sizeof(desc),
+					       file, line));
     (void)write(STDERR, mess, strlen(mess));
     _exit(1);
   }
@@ -753,7 +754,7 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
     else {
       new_func_id = DMALLOC_FUNC_MALLOC;
     }
-    new_p = _chunk_malloc(file, line, new_size, new_func_id, 0);
+    new_p = _dmalloc_chunk_malloc(file, line, new_size, new_func_id, 0);
   }
   else
 #endif
@@ -764,12 +765,12 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
        * Froehlich for patiently pointing that the realloc in just
        * about every Unix has this functionality.
        */
-      (void)_chunk_free(file, line, old_pnt, 0);
+      (void)_dmalloc_chunk_free(file, line, old_pnt, 0);
       new_p = NULL;
     }
     else
 #endif
-      new_p = _chunk_realloc(file, line, old_pnt, new_size, func_id);
+      new_p = _dmalloc_chunk_realloc(file, line, old_pnt, new_size, func_id);
   
   if (new_p != NULL) {
     check_pnt(file, line, new_p, "realloc-out");
@@ -785,8 +786,8 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
     char	mess[1024], desc[128];
     (void)loc_snprintf(mess, sizeof(mess),
 		       "Out of memory while reallocating %d bytes from '%s'\n",
-		       new_size, _chunk_desc_pnt(desc, sizeof(desc), file,
-						 line));
+		       new_size, _dmalloc_chunk_desc_pnt(desc, sizeof(desc),
+							 file, line));
     (void)write(STDERR, mess, strlen(mess));
     _exit(1);
   }
@@ -812,7 +813,7 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt)
   
   check_pnt(file, line, pnt, "free");
   
-  ret = _chunk_free(file, line, pnt, 0);
+  ret = _dmalloc_chunk_free(file, line, pnt, 0);
   
   dmalloc_out();
   
@@ -1025,21 +1026,6 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 /******************************* utility calls *******************************/
 
 /*
- * Log the heap structure plus information on the blocks if necessary.
- */
-void	dmalloc_log_heap_map(void)
-{
-  /* check the heap since we are dumping info from it */
-  if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
-    return;
-  }
-  
-  _chunk_log_heap_map();
-  
-  dmalloc_out();
-}
-
-/*
  * Dump dmalloc statistics to logfile.
  */
 void	dmalloc_log_stats(void)
@@ -1048,8 +1034,7 @@ void	dmalloc_log_stats(void)
     return;
   }
   
-  _chunk_list_count();
-  _chunk_stats();
+  _dmalloc_chunk_log_stats();
   
   dmalloc_out();
 }
@@ -1071,13 +1056,13 @@ void	dmalloc_log_unfreed(void)
    * to log the non-free we are interested in the pointers currently
    * being used
    */
-  _chunk_log_changed(0, 1, 0,
+  _dmalloc_chunk_log_changed(0, 1, 0,
 #if DUMP_UNFREED_SUMMARY_ONLY
-		     0
+			0
 #else
-		     1
+			1
 #endif
-		     );
+			);
   
   dmalloc_out();
 }
@@ -1098,10 +1083,11 @@ int	dmalloc_verify(const DMALLOC_PNT pnt)
   /* should not check heap here because we will be doing it below */
   
   if (pnt == NULL) {
-    ret = _chunk_check();
+    ret = _dmalloc_chunk_heap_check();
   }
   else {
-    ret = _chunk_pnt_check("dmalloc_verify", pnt, 1 /* exact pointer */, 0);
+    ret = _dmalloc_chunk_pnt_check("dmalloc_verify", pnt,
+				   1 /* exact pointer */, 0 /* no min size */);
   }
   
   dmalloc_out();
@@ -1262,8 +1248,8 @@ int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
   }
   
   /* NOTE: we do not need the alloc-size info */
-  ret = _chunk_read_info(pnt, "dmalloc_examine", &size_map, NULL, file_p,
-			 line_p, ret_attr_p, NULL, NULL, NULL);
+  ret = _dmalloc_chunk_read_info(pnt, "dmalloc_examine", &size_map, NULL,
+				 file_p, line_p, ret_attr_p, NULL, NULL, NULL);
   
   dmalloc_out();
   
@@ -1315,7 +1301,7 @@ void	dmalloc_log_changed(const unsigned long mark, const int not_freed_b,
   if (! dmalloc_in(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, 1)) {
     return;
   }
-  _chunk_log_changed(mark, not_freed_b, free_b, details_b);
+  _dmalloc_chunk_log_changed(mark, not_freed_b, free_b, details_b);
   
   dmalloc_out();
 }
