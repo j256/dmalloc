@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.52 2003/05/13 14:57:01 gray Exp $
+ * $Id: settings.dist,v 1.53 2003/05/13 16:40:37 gray Exp $
  */
 
 /*
@@ -124,28 +124,11 @@
 #define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
 
 /*
- * The largest allowable allocations in bits.  This is only for
- * verification purposes.  Any allocation larger than this (in bits)
- * will generate a ERROR_TOO_BIG error (#15).  The default
- * indicates that an allocation of more than 64mb (2^26) will generate
- * an error.
+ * The largest allowable allocation size.  This is only for
+ * verification purposes.  Any allocation larger than this
+ * will generate a ERROR_TOO_BIG error.
  */
-#define LARGEST_BLOCK 26
-
-/*
- * Although I don't know why you would want to tune this since this is
- * pretty dependent on my general heap mechanisms, here are some
- * options to use general first, best, and worst fit algorithms.  If
- * you don't know what these are, then DON'T TOUCH.
- *
- * NOTES: they may go away in the future and/or be replaced by
- * debug-tokens.  I've tested all three and have not noticed any large
- * differences.  Also, they only apply for allocations > basic-block
- * (page) size.
- */
-#define FIRST_FIT 1
-#define BEST_FIT 0
-#define WORST_FIT 0
+#define LARGEST_BLOCK 268435456UL /* 256mb */
 
 /*
  * Automatically call dmalloc_shutdown if on_exit or atexit is
