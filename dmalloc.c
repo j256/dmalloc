@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.108 2003/05/20 04:00:47 gray Exp $
+ * $Id: dmalloc.c,v 1.109 2003/06/08 19:31:24 gray Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ typedef struct {
 			 DEBUG_FREE_BLANK | DEBUG_ERROR_ABORT | \
 			 DEBUG_ALLOC_BLANK)
 #define MEDIUM_FLAGS	(LOW_FLAGS | \
-			 DEBUG_CHECK_HEAP | DEBUG_CHECK_LISTS | \
+			 DEBUG_CHECK_HEAP | \
 			 DEBUG_REALLOC_COPY)
 #define HIGH_FLAGS	(MEDIUM_FLAGS | \
 			 DEBUG_CHECK_BLANK | DEBUG_CHECK_FUNCS)
