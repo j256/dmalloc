@@ -1,6 +1,10 @@
-Mon Oct 18 12:09:30 1999  Gray Watson  <gray@burger.256.com>
+Mon Nov  8 15:39:44 1999  Gray Watson  <gray@burger.256.com>
 
 	* Releasing dmalloc version 4.3.0.
+
+	* Fixed some problems with char * instead of void *.
+
+Mon Oct 18 12:09:30 1999  Gray Watson  <gray@burger.256.com>
 
 	* Added info about log-unknown to the Getting Started section and
  	more info about ident.
@@ -1500,5 +1504,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.227 1999/10/18 16:12:17 gray Exp $
+$Id: ChangeLog,v 1.228 1999/11/08 20:42:55 gray Exp $
 -------------------------------------------------------------------------------
