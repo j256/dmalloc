@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.74 1994/11/10 00:11:36 gray Exp $
+@c $Id: dmalloc.texi,v 1.75 1994/11/12 23:13:12 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -425,11 +425,10 @@ carefully.
 
 @enumerate
 
-@item Type @kbd{sh ./configure} to configure the library (add a @kbd{-v}
-to see what configure is doing) .  You may want to first examine the
-@file{config.help} file for some information about configure.  Configure
-should generate the @file{Makefile} and @file{conf.h} files
-automatically.
+@item Type @kbd{sh ./configure} to configure the library.  You may want
+to first examine the @file{config.help} file for some information about
+configure.  Configure should generate the @file{Makefile} and
+@file{conf.h} files automatically.
 
 @emph{NOTE}: It seems that some versions of tr (especially from HP-UX)
 don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr
@@ -766,41 +765,6 @@ characters.
 Usage: @code{FREE(pnt)}.  This frees memory pointers.
 @end deftypefun
 
-@deftypefun char * STRDUP ( char * @var{string} )
-
-Usage: @code{char_pnt = STRDUP("hello")}.  This macro duplicates the
-functionality of the @samp{strdup} function.  string can be either a
-static string like "hello" or a character pointer.  Non-gcc users should
-use @code{STRDUP("hello", char_pnt)} where char_pnt is the variable
-which will be assigned to the pointer to the copy of "hello".
-
-The strdup(3) function, it takes a string, allocates enough information
-to store the string (along with its null character), and then copies the
-string into the new space.  This macro does not actually call strdup but
-provides the same functionality while giving file and line memory
-information to the library.
-@end deftypefun
-
-@deftypefun void * BDUP ( void * @var{pnt}, int @var{size} )
-
-Usage: @code{new_item_pnt = BDUP(&item, sizeof(item))}.  This allocates
-space for size bytes, copies size bytes from pnt into the new allocation
-and returns it.  It is like strdup but for non-strings.  Non-gcc users
-should use @code{BDUP(&item, sizeof(item), new_item_pnt)} where
-new_item_pnt is the variable which will be assigned the pointer to the
-copy of item.
-
-BDUP should be used to duplicate structures or other elements that are
-not strings.  A pointer to an element and its size are passed in and the
-macro returns an allocated copy of it.
-@end deftypefun
-
-@cindex gcc
-
-gcc (GNUs superior c-compiler) has a neat feature in that it understands
-return-values from macros.  I have included a gcc form of these 2 macros
-(which makes them a lot more functional) as well as a non-gcc version.
-
 @node Return Address, Argument Checking, Allocation Macros, Programming
 @subsection Using the Return Address Information
 
@@ -826,6 +790,7 @@ not freed: 0x38600 ( 10232 bytes) from 'ra=0x10234d'
 not freed: 0x38220 ( 137 bytes) from 'ra=0x82cc'
 @end example
 
+@cindex gdb
 With the help of a debugger, these return-addresses (or ra) can then be
 identified.  I've provided a @file{ra_info.pl} perl script in the
 @file{contrib/} directory with the dmalloc sources which seems to work
@@ -1733,10 +1698,11 @@ This is useful in locating problems from dmalloc functions called from C
 files which did not include @file{dmalloc.h}: C library calls for
 instance.
 
+@cindex gcc
 See @file{return.h} for the available architecture/compiler
-combinations.  You may want to examine the assembly code from gcc
-version 2+ being run on the following code.  It should give you a good
-start on building a hack for your box.
+combinations.  You may want to examine the assembly code from gcc (GNUs
+superior c-compiler) version 2+ being run on the following code.  It
+should give you a good start on building a hack for your box.
 
 @example
 static char * x;
