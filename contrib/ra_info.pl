@@ -1,31 +1,31 @@
 #!/usr/local/bin/perl
 #
-# script to run gdb on ra addresses
+# script to run gdb on return-addresses
 # Usage: $0 malloc-log-file binary
 #
-# Copyright 1993 by the Antaire Corporation
+# Copyright 1995 by Gray Watson
 #
-# This file is part of the malloc-debug package.
+# This file is part of the dmalloc package.
 #
-# Permission to use, copy, modify, and distribute this software for any
-# purpose and without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies, and that
-# the name of Antaire not be used in advertising or publicity pertaining to
-# distribution of the document or software without specific, written prior
-# permission.
+# Permission to use, copy, modify, and distribute this software for
+# any purpose and without fee is hereby granted, provided that the
+# above copyright notice and this permission notice appear in all
+# copies, and that the name of Gray Watson not be used in advertising
+# or publicity pertaining to distribution of the document or software
+# without specific, written prior permission.
 #
-# The Antaire Corporation makes no representations about the suitability of
-# the software described herein for any purpose.  It is provided "as is"
+# Gray Watson makes no representations about the suitability of the
+# software described herein for any purpose.  It is provided "as is"
 # without express or implied warranty.
 #
-# The author may be contacted at gray.watson@antaire.com
+# The author may be contacted at gray.watson@letters.com
 #
-# $Id: ra_info.pl,v 1.2 1994/03/03 04:02:07 gray Exp $
+# $Id: ra_info.pl,v 1.3 1995/03/23 15:12:53 gray Exp $
 #
 
 #
 # Use this Perl script to run gdb and get information on the return-address
-# (ra) addresses from a malloc_dbg logfile output.  This will search for
+# (ra) addresses from a dmalloc logfile output.  This will search for
 # any ra= lines and will examine them and try to get the line number.
 #
 # NOTE: you may want to direct the output from the script to a file
@@ -35,12 +35,11 @@
 # Be sure to send me mail if there is an easier way to do all this.
 #
 
-
 ###############################################################################
 # usage message
 #
 if (@ARGV != 2 ) {
-  die "Usage:  $0 malloc-log-file binary-that-generated-log-file\n";
+  die "Usage:  $0  dmalloc-log  binary-that-generated-log\n";
 }
 
 $malloc = @ARGV[0];
