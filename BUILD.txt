@@ -4,7 +4,7 @@ The following set of tasks should be performed when the dmalloc
 library gets released.
 
 1) Update the version number in version.h, dmalloc.spec, dmalloc.texi
-(2 places), Makefile.bsd.ports, and dmalloc.h.3.
+(2 places), Makefile.bsd.ports, and dmalloc.h.3 (defines @ top).
 
 2) Update the ChangeLog and NEWS files.
 

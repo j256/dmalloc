@@ -1,6 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.97 2000/11/10 16:11:04 gray Exp $
+$Id: NEWS,v 1.98 2000/11/13 17:01:27 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.8.1:
+
+	* Added improvements to the shared library creation in the Makefile.
+	* Fixed the #ident "..."; semi-colon problem.
 
 Version 4.8.0:
 
