@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.194 2003/09/08 15:22:16 gray Exp $
+ * $Id: chunk.c,v 1.195 2003/09/09 23:18:09 gray Exp $
  */
 
 /*
@@ -1794,65 +1794,6 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
   return 1;
 }
 
-/*
- * static slot_alloc_t *find_slot
- *
- * Find a pointer's corresponding slot.
- *
- * RETURNS:
- *
- * Success - Pointer to the bblock
- *
- * Failure - NULL
- *
- * ARGUMENTS:
- *
- * user_pnt -> Pointer we are tracking.
- *
- * exact_b -> Set to 1 to find the pointer specifically.  Otherwise we
- * can find the pointer inside of an allocation.
- *
- * update_p -> Pointer to the skip_alloc entry we are using to hold
- * the update pointers.
- *
- * prev_pp <- Pointer to a slot which, if not NULL, will be set to the
- * slot right before the one found.
- *
- * next_pp <- Pointer to a slot which, if not NULL, will be set to the
- * slot right after the one found.
- */
-static	skip_alloc_t	*find_slot(const void *user_pnt,
-				   const int exact_b,
-				   skip_alloc_t *update_p,
-				   skip_alloc_t **prev_pp,
-				   skip_alloc_t **next_pp)
-{
-  skip_alloc_t	*slot_p;
-  
-  if (user_pnt == NULL) {
-    dmalloc_errno = ERROR_IS_NULL;
-    return NULL;
-  }
-  
-  /* try to find the address with loose match */
-  slot_p = find_address(user_pnt, 0 /* not exact pointer */, update_p);
-  if (slot_p == NULL) {
-    /* not found */
-    dmalloc_errno = ERROR_NOT_FOUND;
-    return NULL;
-  }
-  
-  if (! check_used_slot(slot_p, user_pnt, exact_b)) {
-    /* error set in check slot */
-    return NULL;
-  }
-  
-  SET_POINTER(prev_pp, update_p->sa_next_p[0]);
-  SET_POINTER(next_pp, slot_p->sa_next_p[0]);
-  
-  return slot_p;
-}
-
 /***************************** exported routines *****************************/
 
 /*
@@ -2595,15 +2536,23 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   
   update_p = skip_update;
   
-  /* find which block it is in */
-  slot_p = find_slot(user_pnt, 1 /* exact pnt */, update_p,
-		     NULL /* no prev_p */, NULL /* no next_p */);
+  /* try to find the address with loose match */
+  slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
-    /* errno set in find_slot */
+    /* not found */
+    dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
     dmalloc_error("_dmalloc_chunk_free");
     return FREE_ERROR;
   }
+  
+  if (! check_used_slot(slot_p, user_pnt, 1 /* exact pnt */)) {
+    /* error set in check slot */
+    log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
+    dmalloc_error("_dmalloc_chunk_free");
+    return FREE_ERROR;
+  }
+  
   if (! remove_slot(slot_p, update_p)) {
     /* error set and dumped in remove_slot */
     return FREE_ERROR;
@@ -2749,7 +2698,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   }
   
   /* find the old pointer with loose checking for fence post stuff */
-  slot_p = find_address(old_user_pnt, 0 /* loose pointer */, skip_update);
+  slot_p = find_address(old_user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(NULL, 0, NULL, 0, old_user_pnt, 0, NULL,

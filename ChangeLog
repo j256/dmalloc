@@ -1,3 +1,8 @@
+2003-09-09  Gray Watson  <gray@outside.256.com>
+
+	* Removed find_slot function in chunk.c since it was only used
+	once.
+
 2003-09-08  Gray Watson  <gray@outside.256.com>
 
 	* Changed the configure script to define the HAVE_... include
@@ -2059,5 +2064,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.306 2003/09/08 21:37:08 gray Exp $
+$Id: ChangeLog,v 1.307 2003/09/09 23:18:09 gray Exp $
 -------------------------------------------------------------------------------
