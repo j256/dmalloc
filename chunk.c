@@ -50,7 +50,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.119 1998/09/29 13:43:21 gray Exp $";
+  "$Id: chunk.c,v 1.120 1998/10/15 20:16:21 gray Exp $";
 #endif
 
 /* local routines */
@@ -2134,6 +2134,7 @@ static	int	chunk_write_info(const char *file, const unsigned int line,
 {
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
+  int		block_n;
   
   /* NOTE: pnt is already in chunk-space */
   
@@ -2184,9 +2185,23 @@ static	int	chunk_write_info(const char *file, const unsigned int line,
       return ERROR;
     }
     
+    block_n = NUM_BLOCKS(size);
+    
     /* reset values in the bblocks */
-    set_bblock_admin(NUM_BLOCKS(size), bblock_p, BBLOCK_START_USER, line,
-		     size, file);
+    if (BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC)) {
+      /*
+       * If the user is requesting a page-aligned block of data then
+       * we will need another block below the allocation just for the
+       * fence information.  Ugh.
+       */
+      if (fence_bottom_size > 0) {
+	block_n++;
+      }
+      set_bblock_admin(block_n, bblock_p, BBLOCK_VALLOC, line, size, file);
+    }
+    else {
+      set_bblock_admin(block_n, bblock_p, BBLOCK_START_USER, line, size, file);
+    }
   }
   
   return NOERROR;
