@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.32 1993/08/27 00:55:10 gray Exp $
+# $Id: Makefile.in,v 1.33 1993/08/27 02:53:19 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -95,9 +95,6 @@ $(UTIL) : malloc_dbg.o $(LIBRARY)
 	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
-
-configure : configure.in
-	touch $@
 
 .PHONY : port
 port : $(PORTFLS)

@@ -1,5 +1,7 @@
 Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Releaced version 1.3.2.  Uploaded to the ftp site.
+
 	* Removed MALLOC_TRACE and malloc_dbg -t.  Replaced by
 	MALLOC_ADDRESS:0 functionality and logging of a message every time
 	malloc_address is seen.
@@ -15,7 +17,7 @@ Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Releasing version 1.3.1.  Uploaded to the ftp site.
+	* Releasing version 1.3.1.
 
 	* Added log-ra token to log specific information about non-freed
 	memory with only return-address information.
