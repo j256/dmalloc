@@ -1,5 +1,7 @@
 Mon Nov  9 11:48:29 1998  Gray Watson  <gray@burger.letters.com>
 
+	* Releasing dmalloc version 4.1.0 beta.
+
 	* Moved some settings from chunk_loc.h into settings.dist.
 
 	* Improved the handling of free(NULL) and malloc(0) settings.
@@ -1347,5 +1349,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.199 1998/11/09 18:12:14 gray Exp $
+$Id: ChangeLog,v 1.200 1998/11/09 19:36:24 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,6 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.78 1998/10/15 20:20:09 gray Exp $
+$Id: NEWS,v 1.79 1998/11/09 19:36:25 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.1.0:
+
+	* Moved some settings from chunk_loc.h into settings.dist.
+	* Improved the handling of free(NULL) and malloc(0) settings.
+	* Added initial memalign support with a first-time error message.
+	* Renamed print-error token to print-messages.
+	* Increased the default max memory size from 16mb to 64mb.
 
 Version 4.0.3:
 
