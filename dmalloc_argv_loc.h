@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv_loc.h,v 1.3 1998/10/05 03:28:26 gray Exp $
+ * $Id: dmalloc_argv_loc.h,v 1.4 1998/10/08 15:05:44 gray Exp $
  */
 
-#ifndef __ARGV_LOC_H__
-#define __ARGV_LOC_H__
+#ifndef __DMALLOC_ARGV_LOC_H__
+#define __DMALLOC_ARGV_LOC_H__
 
-#include "argv.h"			/* to get the types */
+#include "dmalloc_argv.h"		/* to get the types */
 
 /*
  * some compilation options
@@ -222,4 +222,4 @@ static	argv_type_t	argv_types[] = {
   { 0 }
 };
 
-#endif /* ! __ARGV_LOC_H__ */
+#endif /* ! __DMALLOC_ARGV_LOC_H__ */

@@ -18,11 +18,11 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv.h,v 1.3 1998/10/05 03:28:26 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.4 1998/10/08 15:05:44 gray Exp $
  */
 
-#ifndef __ARGV_H__
-#define __ARGV_H__
+#ifndef __DMALLOC_ARGV_H__
+#define __DMALLOC_ARGV_H__
 
 /*
  * Version string for the library
@@ -38,7 +38,7 @@
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.3 1998/10/05 03:28:26 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.4 1998/10/08 15:05:44 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments
@@ -278,4 +278,4 @@ int	argv_copy_args(char *buf, const int max_size);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
-#endif /* ! __ARGV_H__ */
+#endif /* ! __DMALLOC_ARGV_H__ */

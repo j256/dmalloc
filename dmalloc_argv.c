@@ -36,12 +36,12 @@
 #include "dmalloc.h"
 #endif
 
-#include "argv.h"
-#include "argv_loc.h"
+#include "dmalloc_argv.h"
+#include "dmalloc_argv_loc.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.4 1998/10/05 03:28:25 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.5 1998/10/08 15:05:43 gray Exp $";
 #endif
 
 /* internal routines */
