@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.2 1994/01/20 01:46:50 gray Exp $
+ * $Id: debug_tok.h,v 1.3 1994/03/20 17:01:11 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -42,7 +42,7 @@ LOCAL	attr_t		attributes[] = {
   
   { "log-stats",	DEBUG_LOG_STATS,	"generally log statistics" },
   { "log-non-free",	DEBUG_LOG_NONFREE,	"report non-freed pointers" },
-  { "log-perror",	DEBUG_LOG_PERROR,	"log error messages" },
+  { "log-error",	DEBUG_LOG_ERROR,	"log error messages" },
   { "log-trans",	DEBUG_LOG_TRANS,	"log memory transactions" },
   { "log-stamp",	DEBUG_LOG_STAMP,	"add time stamp to log" },
   { "log-admin",	DEBUG_LOG_ADMIN,	"log background admin info" },
@@ -61,7 +61,7 @@ LOCAL	attr_t		attributes[] = {
   { "error-abort",	DEBUG_ERROR_ABORT,	"abort immediately on error" },
   { "alloc-blank",	DEBUG_ALLOC_BLANK,	"blank newly alloced memory" },
   { "heap-check-map",	DEBUG_HEAP_CHECK_MAP,	"heap-map on heap-check" },
-  { "print-perror",	DEBUG_PRINT_PERROR,	"print errors to stderr" },
+  { "print-error",	DEBUG_PRINT_ERROR,	"print errors to stderr" },
   { "catch-null",	DEBUG_CATCH_NULL,	"abort before return null" },
   { "never-reuse",	DEBUG_NEVER_REUSE,	"never re-use freed memory" },
   { "allow-nonlinear",	DEBUG_ALLOW_NONLINEAR,	"allow non-linear heap space"},

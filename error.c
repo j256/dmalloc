@@ -40,7 +40,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.34 1993/12/20 19:15:36 gray Exp $";
+  "$Id: error.c,v 1.35 1994/03/20 17:01:08 gray Exp $";
 #endif
 
 /*
@@ -62,7 +62,7 @@ EXPORT	void	_malloc_message(const char * format, ...)
   
   /* no logpath and no print then no workie */
   if (malloc_logpath == NULL
-      && ! BIT_IS_SET(_malloc_flags, DEBUG_PRINT_PERROR))
+      && ! BIT_IS_SET(_malloc_flags, DEBUG_PRINT_ERROR))
     return;
   
   /* maybe dump a time stamp */
@@ -110,7 +110,7 @@ EXPORT	void	_malloc_message(const char * format, ...)
   }
   
   /* do we need to print the message? */
-  if (BIT_IS_SET(_malloc_flags, DEBUG_PRINT_PERROR))
+  if (BIT_IS_SET(_malloc_flags, DEBUG_PRINT_ERROR))
     (void)write(STDERR, str, len);
 }
 
@@ -130,13 +130,13 @@ EXPORT	void	_malloc_die(void)
 }
 
 /*
- * malloc version of perror of an error in STR
+ * malloc version of error of an error in STR
  */
 EXPORT	void	_malloc_error(const char * func)
 {
   /* do we need to log or print the error? */
-  if ((BIT_IS_SET(_malloc_flags, DEBUG_LOG_PERROR) && malloc_logpath != NULL)
-      || BIT_IS_SET(_malloc_flags, DEBUG_PRINT_PERROR)) {
+  if ((BIT_IS_SET(_malloc_flags, DEBUG_LOG_ERROR) && malloc_logpath != NULL)
+      || BIT_IS_SET(_malloc_flags, DEBUG_PRINT_ERROR)) {
     
     /* default str value */
     if (func == NULL)
