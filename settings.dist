@@ -21,7 +21,12 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.5 1995/06/21 18:19:10 gray Exp $
+ * $Id: settings.dist,v 1.6 1995/07/04 02:04:55 gray Exp $
+ */
+
+/*
+ * PROGRAMMING NOTE: this file cannot be included before conf.h, so
+ * you might as well only include conf.h and never this file.
  */
 
 #ifndef __SETTINGS_H__
