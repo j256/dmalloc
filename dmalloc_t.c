@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.50 1995/09/06 18:07:16 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.51 1995/09/06 19:25:23 gray Exp $";
 #endif
 
 /* external routines */
@@ -281,6 +281,7 @@ static	int	do_random(const int itern)
 	}
 	break;
 #else
+	iterc++;
 	continue;
 #endif
       }
