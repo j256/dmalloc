@@ -1,3 +1,16 @@
+2001-07-12  Gray Watson  <gray@outside.256.com>
+
+	* Added dmalloc_debug_setup function with which you can set the
+	options with a function and not just the environmental variable.
+
+	* Finally got the main line compiling again.  Ugh.  Chunk code
+	looks a lot better however.
+	
+2001-05-23  Gray Watson  <gray@outside.256.com>
+
+	* Renamed _dmalloc_logpath to dmalloc_logpath to match the
+	documentation and dmalloc.h.  Thanks Christoph.
+
 2001-05-21  Gray Watson  <gray@outside.256.com>
 
 	* Solved problem with dmalloc_t and no sbrk.
@@ -1785,5 +1798,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.276 2001/05/21 22:44:25 gray Exp $
+$Id: ChangeLog,v 1.277 2001/07/12 23:12:13 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.32 1999/08/25 12:35:45 gray Exp $
+$Id: TODO,v 1.33 2001/07/12 23:12:13 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -199,5 +199,21 @@ easier way of accomplishing this?
 I would like to blacklist a list of 'ra=0x4013195c'. I would be *very*
 usefull to shut-up numerous leaks from standard C library.  Is there a
 way to do that ?
+
+-------------------------------------------------------------------------------
+
+but I'd like the extra feature of being able to SIGUSR1 a running
+program and get a memory footprint during the main cycle (I'll add
+this feature myself to dmalloc if I can get it working).
+
+-------------------------------------------------------------------------------
+
+It would be nice to have dmalloc_examine return good information from
+random pointers:
+
+- whether in heap or not
+- in use or not
+- free, realloc'd, calloc'd, etc.
+- more than 1 file/line/ra for alloc, realloc, free locations
 
 -------------------------------------------------------------------------------
