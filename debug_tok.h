@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.14 1995/03/10 19:43:25 gray Exp $
+ * $Id: debug_tok.h,v 1.15 1995/05/12 20:36:31 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -46,6 +46,8 @@ LOCAL	attr_t		attributes[] = {
       "log general statistics" },
   { "log-non-free",	"lnf",	DEBUG_LOG_NONFREE,
       "log non-freed pointers" },
+  { "log-thread-id",	"lti",	DEBUG_LOG_THREAD_ID,
+      "log thread-id for allocated pointer" },
   { "log-trans",	"ltr",	DEBUG_LOG_TRANS,
       "log memory transactions" },
   { "log-stamp",	"lst",	DEBUG_LOG_STAMP,
@@ -60,6 +62,10 @@ LOCAL	attr_t		attributes[] = {
       "dump space from bad pnt" },
   { "log-nonfree-space","lns",	DEBUG_LOG_NONFREE_SPACE,
       "dump space from non-freed pointers" },
+  { "log-elapsed-time",	"let",	DEBUG_LOG_ELAPSED_TIME,
+      "log elapsed-time for allocated pointer" },
+  { "log-current-time",	"lct",	DEBUG_LOG_CURRENT_TIME,
+      "log current-time for allocated pointer" },
   
   { "check-fence",	"cfe",	DEBUG_CHECK_FENCE,
       "check fence-post errors" },
