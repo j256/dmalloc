@@ -1,6 +1,16 @@
+Sun Sep  3 12:50:30 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing 3.1.2-beta.
+
+	* Added configure handling of 32768 page sizes.
+
+	* Removed stdlib inclusion in dmalloc.h.2 for size_t.
+
+	* Added some undefs for malloc, etc. for Linux.  Thanks Rick.
+
 Sat Sep  2 15:34:01 1995  Gray Watson  <gray@burger.letters.com>
 
-	* Releasing 1.1.2-alpha.
+	* Releasing 3.1.2-alpha.
 
 	* Added inital thread locking for debugging threaded programs.
 
@@ -1070,5 +1080,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.161 1995/09/02 21:40:09 gray Exp $
+$Id: ChangeLog,v 1.162 1995/09/03 16:52:24 gray Exp $
 -------------------------------------------------------------------------------
