@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.114 2004/07/10 03:49:52 gray Exp $
+ * $Id: dmalloc.c,v 1.115 2004/10/20 13:16:00 gray Exp $
  */
 
 /*
@@ -156,9 +156,6 @@ static	argv_t	args[] = {
   { 'R',	"rc-shell",	ARGV_BOOL_INT,	&rcshell_b,
     NULL,			"set output for rc shell" },
   
-  { 'L',	"long-tokens",	ARGV_BOOL_INT,	&long_tokens_b,
-    NULL,			"output long-tokens not 0x..." },
-  
   { 'a',	"address",	ARGV_CHAR_P,	&address,
     "address:#",		"stop when malloc sees address" },
   { 'c',	"clear",	ARGV_BOOL_INT,	&clear_b,
@@ -179,6 +176,8 @@ static	argv_t	args[] = {
     NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHAR_P,	&logpath,
     "path",			"file to log messages to" },
+  { 'L',	"long-tokens",	ARGV_BOOL_INT,	&long_tokens_b,
+    NULL,			"set env with tokens not 0x..." },
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
     "token(s)",			"del tokens from current debug" },
   { LIMIT_ARG,	"memory-limit",	ARGV_U_SIZE,	&limit_arg,
