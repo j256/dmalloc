@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.117 1998/11/12 22:59:32 gray Exp $
+ * $Id: malloc.c,v 1.118 1998/11/12 23:00:17 gray Exp $
  */
 
 /*
@@ -36,7 +36,14 @@
 
 #include "conf.h"				/* up here for _INCLUDE */
 
-/* for timeval type -- see conf.h */
+/* for time type -- see settings.h */
+#if STORE_TIME
+#ifdef TIME_INCLUDE
+#include TIME_INCLUDE
+#endif
+#endif
+
+/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
 #ifdef TIMEVAL_INCLUDE
 #include TIMEVAL_INCLUDE
@@ -74,10 +81,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.117 1998/11/12 22:59:32 gray Exp $";
+#ident "$Id: malloc.c,v 1.118 1998/11/12 23:00:17 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.117 1998/11/12 22:59:32 gray Exp $";
+  "$Id: malloc.c,v 1.118 1998/11/12 23:00:17 gray Exp $";
 #endif
 #endif
 

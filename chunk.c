@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.127 1998/11/12 22:22:29 gray Exp $
+ * $Id: chunk.c,v 1.128 1998/11/12 23:05:31 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.127 1998/11/12 22:22:29 gray Exp $";
+#ident "$Id: chunk.c,v 1.128 1998/11/12 23:05:31 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.127 1998/11/12 22:22:29 gray Exp $";
+  "$Id: chunk.c,v 1.128 1998/11/12 23:05:31 gray Exp $";
 #endif
 #endif
 
@@ -67,11 +67,6 @@ void		_chunk_log_heap_map(void);
 /* free lists of bblocks and dblocks */
 static	bblock_t	*free_bblock[MAX_SLOTS];
 static	dblock_t	*free_dblock[BASIC_BLOCK];
-#if FREED_POINTER_DELAY
-/* free queues for bblocks and dblocks */
-static	free_queue_t	*free_bblock_queues[MAX_SLOTS];
-static	free_queue_t	*free_dblock_queues[BASIC_BLOCK];
-#endif
 
 /* administrative structures */
 static	bblock_adm_t	*bblock_adm_head = NULL; /* pointer to 1st bb_admin */
@@ -145,17 +140,9 @@ int	_chunk_startup(void)
   /* initialize free bins and queues */
   for (bin_c = 0; bin_c < MAX_SLOTS; bin_c++) {
     free_bblock[bin_c] = NULL;
-#if FREED_POINTER_DELAY
-    free_bblock_queues[bin_c].fq_head = 0;
-    free_bblock_queues[bin_c].fq_tail = 0;
-#endif
   }
   for (bin_c = 0; bin_c < BASIC_BLOCK; bin_c++) {
     free_dblock[bin_c] = NULL;
-#if FREED_POINTER_DELAY
-    free_dblock_queues[bin_c].fq_head = 0;
-    free_dblock_queues[bin_c].fq_tail = 0;
-#endif
   }
   
   /* make array for NUM_BITS calculation */
@@ -354,12 +341,12 @@ static	char	*display_pnt(const void *pnt, const overhead_t *over_p)
   (void)sprintf(buf, "%#lx", (unsigned long)pnt);
   
 #if STORE_SEEN_COUNT
-  (void)sprintf(buf2, "|s%d", over_p->ov_seen_c);
+  (void)sprintf(buf2, "|s%lu", over_p->ov_seen_c);
   (void)strcat(buf, buf2);
 #endif
   
 #if STORE_ITERATION_COUNT
-  (void)sprintf(buf2, "|i%ld", over_p->ov_iteration);
+  (void)sprintf(buf2, "|i%lu", over_p->ov_iteration);
   (void)strcat(buf, buf2);
 #endif
   
@@ -608,6 +595,8 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
   bit_c += BASIC_BLOCK;
   
   for (; bit_c < MAX_SLOTS; bit_c++) {
+    /* XXX: empty the hold queue */
+    
     for (bblock_p = free_bblock[bit_c], prev_p = NULL;
 	 bblock_p != NULL;
 	 prev_p = bblock_p, bblock_p = bblock_p->bb_next) {
@@ -1120,6 +1109,8 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     }
   }
   else {
+    /* XXX: check the hold queue */
+    
     /* do we need to print admin info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
       _dmalloc_message("need to create a dblock for %dx %d byte blocks",
@@ -2020,7 +2011,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
 int	_chunk_read_info(const void *pnt, unsigned int *size_p,
 			 unsigned int *alloc_size_p, char **file_p,
 			 unsigned int *line_p, void **ret_attr_p,
-			 const char *where, int **seen_cp)
+			 const char *where, unsigned long **seen_cp)
 {
   bblock_t	*bblock_p;
   dblock_t	*dblock_p;
@@ -2898,7 +2889,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
   void		*new_p, *ret_addr;
   char		*old_file;
   const char	*trans_log;
-  int		*seen_cp;
+  unsigned long	*seen_cp;
   unsigned int	old_size, size, old_line, alloc_size;
   unsigned int	old_bit_n, new_bit_n;
   

@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.h,v 1.36 1998/10/26 14:24:37 gray Exp $
+ * $Id: error.h,v 1.37 1998/11/12 23:05:07 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -31,7 +31,14 @@
 
 #include "conf.h"				/* up here for _INCLUDE */
 
-/* for timeval type -- see conf.h */
+/* for time type -- see settings.h */
+#if STORE_TIME
+#ifdef TIME_INCLUDE
+#include TIME_INCLUDE
+#endif
+#endif
+
+/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
 #ifdef TIMEVAL_INCLUDE
 #include TIMEVAL_INCLUDE
@@ -59,13 +66,13 @@ unsigned long	_dmalloc_iter_c;
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
 extern
-struct timeval	_dmalloc_start;
+TIMEVAL_TYPE	_dmalloc_start;
 #endif /* if STORE_TIMEVAL */
 
 #if STORE_TIMEVAL == 0
 /* no comments found for this variable */
 extern
-long		_dmalloc_start;
+TIME_TYPE	_dmalloc_start;
 #endif /* if STORE_TIMEVAL == 0 */
 
 /* global flag which indicates when we are aborting */
@@ -77,8 +84,7 @@ int		_dmalloc_aborting_b;
  * print the time into local buffer which is returned
  */
 extern
-char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
-			   const int elapsed_b);
+char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b);
 #endif /* if STORE_TIMEVAL */
 
 #if STORE_TIMEVAL == 0
@@ -86,7 +92,7 @@ char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
  * print the time into local buffer which is returned
  */
 extern
-char	*_dmalloc_ptime(const long *time_p, const int elapsed_b);
+char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b);
 #endif /* if STORE_TIMEVAL == 0 */
 
 /*

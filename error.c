@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.c,v 1.76 1998/11/12 20:59:42 gray Exp $
+ * $Id: error.c,v 1.77 1998/11/12 23:05:06 gray Exp $
  */
 
 /*
@@ -46,7 +46,14 @@
 #endif
 #endif
 
-/* for timeval type -- see conf.h */
+/* for time type -- see settings.h */
+#if STORE_TIME
+#ifdef TIME_INCLUDE
+#include TIME_INCLUDE
+#endif
+#endif
+
+/* for timeval type -- see settings.h */
 #if STORE_TIMEVAL
 #ifdef TIMEVAL_INCLUDE
 #include TIMEVAL_INCLUDE
@@ -67,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.76 1998/11/12 20:59:42 gray Exp $";
+#ident "$Id: error.c,v 1.77 1998/11/12 23:05:06 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.76 1998/11/12 20:59:42 gray Exp $";
+  "$Id: error.c,v 1.77 1998/11/12 23:05:06 gray Exp $";
 #endif
 #endif
 
@@ -97,10 +104,10 @@ unsigned long	_dmalloc_iter_c = 0;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
-struct timeval	_dmalloc_start;
+TIMEVAL_TYPE	_dmalloc_start;
 #endif
 #if STORE_TIMEVAL == 0
-long		_dmalloc_start = 0;
+TIME_TYPE	_dmalloc_start = 0;
 #endif
 
 /* global flag which indicates when we are aborting */
@@ -110,12 +117,11 @@ int		_dmalloc_aborting_b = FALSE;
 /*
  * print the time into local buffer which is returned
  */
-char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
-			   const int elapsed_b)
+char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, const int elapsed_b)
 {
   static char	buf[64];
-  long		hrs, mins, secs;
-  long		usecs;
+  unsigned long	hrs, mins, secs;
+  unsigned long	usecs;
   
   buf[0] = '\0';
   
@@ -135,7 +141,7 @@ char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-  (void)sprintf(buf, "%ld:%ld:%ld.%ld", hrs, mins, secs, usecs);
+  (void)sprintf(buf, "%lu:%lu:%lu.%lu", hrs, mins, secs, usecs);
   
   return buf;
 }
@@ -145,10 +151,10 @@ char	*_dmalloc_ptimeval(const struct timeval *timeval_p,
 /*
  * print the time into local buffer which is returned
  */
-char	*_dmalloc_ptime(const long *time_p, const int elapsed_b)
+char	*_dmalloc_ptime(const TIME_TYPE *time_p, const int elapsed_b)
 {
   static char	buf[64];
-  long		hrs, mins, secs;
+  unsigned long	hrs, mins, secs;
   
   buf[0] = '\0';
   secs = *time_p;
@@ -161,7 +167,7 @@ char	*_dmalloc_ptime(const long *time_p, const int elapsed_b)
   mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
-  (void)sprintf(buf, "%ld:%ld:%ld", hrs, mins, secs);
+  (void)sprintf(buf, "%lu:%lu:%lu", hrs, mins, secs);
   
   return buf;
 }
@@ -186,14 +192,14 @@ void	_dmalloc_message(const char *format, ...)
   
 #if HAVE_TIME
 #if LOG_TIME_NUMBER
-  (void)sprintf(str_p, "%ld: ", (long)time(NULL));
+  (void)sprintf(str_p, "%lu: ", (unsigned long)time(NULL));
   for (; *str_p != '\0'; str_p++) {
   }
 #endif /* LOG_TIME_NUMBER */
 #if HAVE_CTIME
 #if LOG_CTIME_STRING
   {
-    TIME_NUMBER_TYPE	now;
+    TIME_TYPE	now;
     now = time(NULL);
     (void)sprintf(str_p, "%.24s: ", ctime(&now));
     for (; *str_p != '\0'; str_p++) {
@@ -273,11 +279,12 @@ void	_dmalloc_message(const char *format, ...)
 #endif
       
 #if STORE_TIMEVAL
-      _dmalloc_message("starting time = %ld.%ld",
-		       _dmalloc_start.tv_sec, _dmalloc_start.tv_usec);
+      _dmalloc_message("starting time = %lu.%lu",
+		       (unsigned long)_dmalloc_start.tv_sec,
+		       (unsigned long)_dmalloc_start.tv_usec);
 #else
 #if HAVE_TIME /* NOT STORE_TIME */
-      _dmalloc_message("starting time = %ld", _dmalloc_start);
+      _dmalloc_message("starting time = %lu", (unsigned long)_dmalloc_start);
 #endif
 #endif
     }
