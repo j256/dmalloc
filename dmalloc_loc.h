@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.26 1993/12/06 06:19:54 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.27 1994/01/22 06:35:29 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
 #define __MALLOC_LOC_H__
 
-#include "conf.h"				/* for HAVE_BCMP */
+#include "conf.h"			/* for HAVE_BCMP and BASIC_BLOCK */
 
 /*
  * env variables
@@ -106,5 +106,10 @@
 #define BIT_CLEAR(v,f)		(v) &= ~(f)
 #undef BIT_IS_SET
 #define BIT_IS_SET(v,f)		((v) & (f))
+
+/*
+ * global malloc defines
+ */
+#define BLOCK_SIZE		(1 << BASIC_BLOCK)	/* size of a block */
 
 #endif /* ! __MALLOC_LOC_H__ */

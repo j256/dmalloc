@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: heap.h,v 1.18 1994/01/20 01:46:55 gray Exp $
+ * $Id: heap.h,v 1.19 1994/01/22 06:35:26 gray Exp $
  */
 
 #ifndef __HEAP_H__
 #define __HEAP_H__
 
-#include "malloc_loc.h"				/* for LOCAL */
+#include "malloc_loc.h"				/* for LOCAL and BLOCK_SIZE */
 
 /*
  * error code returned by heap allocation routine
@@ -98,9 +98,9 @@ IMPORT	void	*_heap_end(void);
 IMPORT	int	_heap_startup(void);
 
 /*
- * align (by extending) _heap_base to BASE byte boundary
+ * align (by extending) _heap_base to block_size byte boundary
  */
-IMPORT	void	*_heap_align_base(const long base);
+IMPORT	void	*_heap_align_base(void);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

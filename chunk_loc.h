@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.24 1994/01/20 01:46:48 gray Exp $
+ * $Id: chunk_loc.h,v 1.25 1994/01/22 06:35:30 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -46,7 +46,6 @@
  */
 #define DEFAULT_SMALLEST_BLOCK	4
 
-#define BLOCK_SIZE		(1 << BASIC_BLOCK)	/* size of a block */
 #define BITS(type)		(sizeof(type) * 8)	/* # bits in TYPE */
 #define MAX_SLOTS		(BITS(long) - 1)	/* # of bit slots */
 
@@ -186,7 +185,7 @@ struct bblock_st {
   /* to reference union elements as bb elements */
 #define	bb_slotp	bb_pnt.pn_slotp		/* a */
 #define	bb_adminp	bb_pnt.pn_adminp	/* A */
-#define	bb_mem		bb_pnt.pn_mem		/* D (and tmp) */
+#define	bb_mem		bb_pnt.pn_mem		/* DE (and tmp) */
 #define	bb_next		bb_pnt.pn_next		/* F */
 #define	bb_file		bb_pnt.pn_file		/* U */
   
