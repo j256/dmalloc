@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.14 1997/07/07 07:25:24 gray Exp $
+ * $Id: settings.dist,v 1.15 1997/12/08 02:45:24 gray Exp $
  */
 
 /*
@@ -242,7 +242,7 @@
 /* define a global variable we use as a lock counter */
 #define THREAD_LOCK_GLOBAL	static pthread_mutex_t dmalloc_mutex;
 #define THREAD_LOCK_INIT	pthread_mutex_init(&dmalloc_mutex, \
-						   pthread_mutexattr_default);
+						   THREAD_LOCK_INIT_VAL);
 
 /*
  * The problem is that the pthreads library uses malloc itself.  If we

@@ -1,3 +1,9 @@
+Sun Dec  7 21:44:17 1997  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing dmalloc version 3.3.0.
+
+	* Added THREAD_LOCK_INIT_VAL autoconfigure.
+
 Fri Dec  5 12:09:26 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Performed some long overdue major code cleaning.  Added new
@@ -1204,5 +1210,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.178 1997/12/05 21:09:30 gray Exp $
+$Id: ChangeLog,v 1.179 1997/12/08 02:45:20 gray Exp $
 -------------------------------------------------------------------------------

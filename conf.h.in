@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.58 1997/07/07 08:11:58 gray Exp $
+ * $Id: conf.h.in,v 1.59 1997/12/08 02:45:22 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -101,6 +101,13 @@
  */
 #define SIGNAL_OKAY 0
 #define RETSIGTYPE void
+
+/*
+ * On some systems, you initialize mutex variables with NULL.  Others
+ * require various stupid non-portable incantations.  The OSF 3.2 guys
+ * should be ashamed of themselves.
+ */
+#define THREAD_LOCK_INIT_VAL 0L
 
 /*
  * LIBRARY DEFINES:
