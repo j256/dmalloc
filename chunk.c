@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.78 1994/07/22 15:49:20 gray Exp $";
+  "$Id: chunk.c,v 1.79 1994/08/02 03:12:12 gray Exp $";
 #endif
 
 /*
@@ -2122,7 +2122,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   free_count++;
   
   if (pnt == NULL) {
-    log_error_info(file, line, TRUE, pnt, "zero pointer", FALSE);
+    log_error_info(file, line, TRUE, pnt, "invalid pointer", FALSE);
     malloc_errno = ERROR_IS_NULL;
     _malloc_error("_chunk_free");
     return FREE_ERROR;
@@ -2349,7 +2349,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
   
   /* by now malloc.c should have taken care of the realloc(NULL) case */
   if (oldp == NULL) {
-    log_error_info(file, line, TRUE, oldp, "zero pointer", FALSE);
+    log_error_info(file, line, TRUE, oldp, "invalid pointer", FALSE);
     malloc_errno = ERROR_IS_NULL;
     _malloc_error("_chunk_realloc");
     return REALLOC_ERROR;
