@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.8 1999/03/11 22:16:07 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.9 1999/03/11 22:26:03 gray Exp $
  */
 
 /*
@@ -48,10 +48,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_tab.c,v 1.8 1999/03/11 22:16:07 gray Exp $";
+#ident "$Id: dmalloc_tab.c,v 1.9 1999/03/11 22:26:03 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_tab.c,v 1.8 1999/03/11 22:16:07 gray Exp $";
+  "$Id: dmalloc_tab.c,v 1.9 1999/03/11 22:26:03 gray Exp $";
 #endif
 #endif
 
@@ -363,18 +363,9 @@ static	void	split(unsigned char *first_p, unsigned char *last_p,
 		      const unsigned int ele_size)
 {
   unsigned char	*left_p, *right_p, *pivot_p, *left_last_p, *right_first_p;
-  unsigned char	*firsts[MAX_QSORT_SPLITS], *lasts[MAX_QSORT_SPLITS], *pivot;
+  unsigned char	*firsts[MAX_QSORT_SPLITS], *lasts[MAX_QSORT_SPLITS];
+  mem_table_t	pivot;
   unsigned int	width, split_c = 0, min_qsort_size, size1, size2;
-  
-  /*
-   * Allocate some space for our pivot value.  We also use this as
-   * holder space for our insert sort.
-   */
-  pivot = alloca(ele_size);
-  if (pivot == NULL) {
-    /* what else can we do? */
-    abort();
-  }
   
   min_qsort_size = MAX_QSORT_PARTITION * ele_size;
   
@@ -405,16 +396,16 @@ static	void	split(unsigned char *first_p, unsigned char *last_p,
      * save our pivot so we don't have to worry about hitting and
      * swapping it elsewhere while we iterate across the list below.
      */
-    memcpy(pivot, pivot_p, ele_size);
+    memcpy(&pivot, pivot_p, ele_size);
     
     do {
       
       /* shift the left side up until we reach the pivot value */
-      while (entry_cmp(left_p, pivot) < 0) {
+      while (entry_cmp(left_p, &pivot) < 0) {
 	left_p += ele_size;
       }
       /* shift the right side down until we reach the pivot value */
-      while (entry_cmp(pivot, right_p) < 0) {
+      while (entry_cmp(&pivot, right_p) < 0) {
 	right_p -= ele_size;
       }
       
@@ -447,13 +438,13 @@ static	void	split(unsigned char *first_p, unsigned char *last_p,
     if (size1 < min_qsort_size) {
       
       /* use the pivot as our temporary space */
-      insert_sort(first_p, left_last_p, pivot, ele_size);
+      insert_sort(first_p, left_last_p, (unsigned char *)&pivot, ele_size);
       
       /* is the 2nd part small as well? */
       if (size2 < min_qsort_size) {
 	
 	/* use the pivot as our temporary space */
-	insert_sort(right_first_p, last_p, pivot, ele_size);
+	insert_sort(right_first_p, last_p, (unsigned char *)&pivot, ele_size);
 	
 	/* pop a partition off our stack */
 	if (split_c == 0) {
@@ -473,7 +464,7 @@ static	void	split(unsigned char *first_p, unsigned char *last_p,
     else if (size2 < min_qsort_size) {
       
       /* use the pivot as our temporary space */
-      insert_sort(right_first_p, last_p, pivot, ele_size);
+      insert_sort(right_first_p, last_p, (unsigned char *)&pivot, ele_size);
       
       /* we can just handle the left side immediately */
       /* first_p = first_p */
