@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.117 2004/10/19 14:50:44 gray Exp $
+ * $Id: dmalloc_t.c,v 1.118 2004/11/11 15:37:31 gray Exp $
  */
 
 /*
@@ -75,13 +75,13 @@ typedef struct pnt_info_st {
 static	pnt_info_t	*pointer_grid;
 
 /* argument variables */
-static	int		default_iter_n = DEFAULT_ITERATIONS; /* # of iters */
+static	long		default_iter_n = DEFAULT_ITERATIONS; /* # of iters */
 static	char		*env_string = NULL;		/* env options */
 static	int		interactive_b = ARGV_FALSE;	/* interactive flag */
 static	int		log_trans_b = ARGV_FALSE;	/* log transactions */
 static	int		no_special_b = ARGV_FALSE;	/* no-special flag */
-static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
-static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
+static	long		max_alloc = MAX_ALLOC;		/* amt of mem to use */
+static	long		max_pointers = MAX_POINTERS;	/* # of pnts to use */
 static	int		random_debug_b = ARGV_FALSE;	/* random flag */
 static	int		silent_b = ARGV_FALSE;		/* silent flag */
 static	unsigned int	seed_random = 0;		/* random seed */
@@ -94,11 +94,11 @@ static	argv_t		arg_list[] = {
     "string",			"string of env commands to set" },
   { 'l',	"log-trans",		ARGV_BOOL_INT,		&log_trans_b,
     NULL,			"log transactions via tracking-func" },
-  { 'm',	"max-alloc",		ARGV_INT,		&max_alloc,
+  { 'm',	"max-alloc",		ARGV_SIZE,		&max_alloc,
     "bytes",			"maximum allocation to test" },
   { 'n',	"no-special",		ARGV_BOOL_INT,		&no_special_b,
     NULL,			"do not run special tests" },
-  { 'p',	"max-pointers",		ARGV_INT,		&max_pointers,
+  { 'p',	"max-pointers",		ARGV_SIZE,		&max_pointers,
     "pointers",		"number of pointers to test" },
   { 'r',	"random-debug",		ARGV_BOOL_INT,	       &random_debug_b,
     NULL,			"randomly change debug flag" },
@@ -106,7 +106,7 @@ static	argv_t		arg_list[] = {
     NULL,			"do not display messages" },
   { 'S',	"seed-random",		ARGV_U_INT,		&seed_random,
     "number",			"seed for random function" },
-  { 't',	"times",		ARGV_INT,	       &default_iter_n,
+  { 't',	"times",		ARGV_SIZE,	       &default_iter_n,
     "number",			"number of iterations to run" },
   { 'v',	"verbose",		ARGV_BOOL_INT,		&verbose_b,
     NULL,			"enables verbose messages" },
@@ -220,7 +220,7 @@ static	int	do_random(const int iter_n)
   
   pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
   if (pointer_grid == NULL) {
-    (void)printf("%s: problems allocating space for %d pointer slots.\n",
+    (void)printf("%s: problems allocating space for %ld pointer slots.\n",
 		 argv_program, max_pointers);
     return 0;
   }
@@ -763,10 +763,8 @@ static	int	check_special(void)
   
   if (dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
     int			iter_c, amount, where;
-    unsigned int	old_flags;
+    unsigned int	old_flags = dmalloc_debug_current();
     unsigned char	ch_hold;
-    
-    old_flags = dmalloc_debug_current();
     
     dmalloc_debug(old_flags | DEBUG_FREE_BLANK);
     
@@ -1396,6 +1394,148 @@ static	int	check_special(void)
   
   /********************/
  
+  /*
+   * Make sure per-pointer blanking flags work.
+   */
+  {
+    unsigned long	size;
+    unsigned int	old_flags = dmalloc_debug_current();
+    char		save_ch;
+    
+    if (! silent_b) {
+      (void)printf("  Checking per-pointer blanking flags\n");
+    }
+    
+    /* disable alloc and check blanking */ 
+    dmalloc_debug(old_flags & (~(DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK)));
+    
+    /* allocate a pointer */
+    size = _dmalloc_rand() % MAX_ALLOC + 10;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* now enable alloc and check blanking */ 
+    dmalloc_debug(old_flags | DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK);
+    
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /********/
+    
+    /* now, enable alloc and check blanking */ 
+    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK)
+		  & (~DEBUG_CHECK_FENCE));
+    
+    /* allocate a pointer */
+    size = BLOCK_SIZE / 2 + 1;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* now disable alloc blanking */ 
+    dmalloc_debug(old_flags | DEBUG_CHECK_BLANK);
+    
+    /* overwrite one of the top chars */
+    save_ch = *((char *)pnt + size);
+    *((char *)pnt + size) = '\0';
+    
+    /* free the pointer should still see the error */
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /* restore the overwrite */
+    *((char *)pnt + size) = save_ch;
+    
+    /* restore flags */
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that a pointer reallocating, get's the per-pointer
+   * alloc flags enabled.
+   */
+  {
+    unsigned long	size;
+    unsigned int	old_flags = dmalloc_debug_current();
+    char		save_ch;
+    
+    if (! silent_b) {
+      (void)printf("  Checking per-pointer alloc flags and realloc\n");
+    }
+    
+    /* enable alloc blanking without fence-posts */
+    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
+    
+    /* allocate a pointer that should fill the block */
+    size = BLOCK_SIZE;
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    /* now disable all checking */
+    dmalloc_debug(old_flags
+		  & (~(DEBUG_CHECK_FENCE | DEBUG_CHECK_BLANK
+		       | DEBUG_ALLOC_BLANK | DEBUG_FREE_BLANK)));
+    
+    pnt = realloc(pnt, size - 1);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not realloc %#lx to %lu bytes.\n",
+		     (long)pnt, size - 1);
+      }
+      return 0;
+    }
+    
+    /* overwrite one of the top chars */
+    save_ch = *((char *)pnt + size - 1);
+    *((char *)pnt + size - 1) = '\0';
+    
+    /* we should notice the overwrite */
+    if (dmalloc_free(__FILE__, __LINE__, pnt,
+		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
+      if (! silent_b) {
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    /* restore the overwrite */
+    *((char *)pnt + size - 1) = save_ch;
+    
+    /* restore flags */
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
   dmalloc_message("NOTE: ignore the errors from the above ----- to here.\n");
   dmalloc_message("-------------------------------------------------------\n");
   
@@ -1450,13 +1590,11 @@ static	int	check_special(void)
   
   {
     int			iter_c, amount;
-    unsigned int	old_flags;
+    unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
       (void)printf("  Testing valloc()\n");
     }
-    
-    old_flags = dmalloc_debug_current();
     
     /*
      * First check without frence posts
@@ -2056,85 +2194,6 @@ static	int	check_special(void)
   /********************/
   
   /*
-   * Make sure per-pointer blanking flags work.
-   */
-  {
-    unsigned long	size;
-    unsigned int	old_flags = dmalloc_debug_current();
-    char		save_ch;
-    
-    if (! silent_b) {
-      (void)printf("  Checking per-pointer blanking flags\n");
-    }
-    
-    /* disable alloc and check blanking */ 
-    dmalloc_debug(old_flags & (~(DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK)));
-    
-    /* allocate a pointer */
-    size = _dmalloc_rand() % MAX_ALLOC + 10;
-    pnt = malloc(size);
-    if (pnt == NULL) {
-      if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
-      }
-      return 0;
-    }
-    
-    /* now enable alloc and check blanking */ 
-    dmalloc_debug(old_flags | DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK);
-    
-    if (dmalloc_free(__FILE__, __LINE__, pnt,
-		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
-      if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
-      }
-      final = 0;
-    }
-    
-    /********/
-    
-    /* now, enable alloc and check blanking */ 
-    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK | DEBUG_CHECK_BLANK)
-		  & (~DEBUG_CHECK_FENCE));
-    
-    /* allocate a pointer */
-    size = BLOCK_SIZE / 2 + 1;
-    pnt = malloc(size);
-    if (pnt == NULL) {
-      if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
-      }
-      return 0;
-    }
-    
-    /* now disable alloc blanking */ 
-    dmalloc_debug(old_flags | DEBUG_CHECK_BLANK);
-    
-    /* overwrite one of the top chars */
-    save_ch = *((char *)pnt + size);
-    *((char *)pnt + size) = '\0';
-    
-    /* free the pointer should still see the error */
-    if (dmalloc_free(__FILE__, __LINE__, pnt,
-		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
-      if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
-      }
-      final = 0;
-    }
-    
-    /* restore the overwrite */
-    *((char *)pnt + size) = save_ch;
-    
-    /* restore flags */
-    dmalloc_debug(old_flags);
-  }
-  
-  /********************/
-  
-  /*
    * Make sure free-blank doesn't imply alloc-blank
    */
   {
@@ -2174,69 +2233,6 @@ static	int	check_special(void)
     }
     
     /* NOTE: no restoring of overwritten chars here because of free-blank */
-    
-    /* restore flags */
-    dmalloc_debug(old_flags);
-  }
-  
-  /********************/
-  
-  /*
-   * Make sure that a pointer reallocating, get's the per-pointer
-   * alloc flags enabled.
-   */
-  {
-    unsigned long	size;
-    unsigned int	old_flags = dmalloc_debug_current();
-    char		save_ch;
-    
-    if (! silent_b) {
-      (void)printf("  Checking per-pointer alloc flags and realloc\n");
-    }
-    
-    /* enable alloc blanking without fence-posts */
-    dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
-    
-    /* allocate a pointer that should fill the block */
-    size = BLOCK_SIZE;
-    pnt = malloc(size);
-    if (pnt == NULL) {
-      if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
-      }
-      return 0;
-    }
-    
-    /* now disable all checking */
-    dmalloc_debug(old_flags
-		  & (~(DEBUG_CHECK_FENCE | DEBUG_CHECK_BLANK
-		       | DEBUG_ALLOC_BLANK | DEBUG_FREE_BLANK)));
-    
-    pnt = realloc(pnt, size - 1);
-    if (pnt == NULL) {
-      if (! silent_b) {
-	(void)printf("   ERROR: could not realloc %#lx to %lu bytes.\n",
-		     (long)pnt, size - 1);
-      }
-      return 0;
-    }
-    
-    /* overwrite one of the top chars */
-    save_ch = *((char *)pnt + size - 1);
-    *((char *)pnt + size - 1) = '\0';
-    
-    /* we should notice the overwrite */
-    if (dmalloc_free(__FILE__, __LINE__, pnt,
-		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
-      if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
-      }
-      final = 0;
-    }
-    
-    /* restore the overwrite */
-    *((char *)pnt + size - 1) = save_ch;
     
     /* restore flags */
     dmalloc_debug(old_flags);
@@ -2472,7 +2468,7 @@ static	void	do_interactive(void)
     if (strncmp(line, "random", len) == 0) {
       int	iter_n;
       
-      (void)printf("How many iterations[%d]: ", default_iter_n);
+      (void)printf("How many iterations[%ld]: ", default_iter_n);
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
@@ -2685,7 +2681,7 @@ int	main(int argc, char **argv)
   }
   else {
     if (! silent_b) {
-      (void)printf("Running %d tests (use -%c for interactive)...\n",
+      (void)printf("Running %ld tests (use -%c for interactive)...\n",
 		   default_iter_n, INTER_CHAR);
     }
     (void)fflush(stdout);
