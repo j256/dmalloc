@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.78 1995/06/21 16:32:13 gray Exp $
+# $Id: Makefile.in,v 1.79 1995/06/21 17:12:14 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -57,7 +57,7 @@ clean ::
 
 distclean :: clean
 	rm -f configure config.status config.log config.cache conf.h
-	rm -f Makefile dmalloc.h.2 dmalloc.ps
+	rm -f Makefile dmalloc.h.2 dmalloc.ps dmalloc.dvi
 	rm -rf port
 
 installincs :: $(HFLS)
@@ -145,8 +145,14 @@ continuous :: $(TEST)
 dmalloc.ps : dmalloc.texi
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi ../dmalloc.texi ; texi2dvi ../dmalloc.texi ; \
-	  dvips -o ../$(.TARGET) dmalloc.dvi )
+	( cd work ; texi2dvi ../dmalloc.texi ; \
+		dvips -o ../$(.TARGET) dmalloc.dvi )
+	rm -rf work
+
+dmalloc.dvi : dmalloc.texi
+	rm -rf work
+	mkdir work
+	( cd work ; texi2dvi ../dmalloc.texi ; mv dmalloc.dvi .. )
 	rm -rf work
 
 INSTALL : INSTALL.1 dmalloc.info
