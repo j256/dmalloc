@@ -1,3 +1,10 @@
+2001-05-21  Gray Watson  <gray@outside.256.com>
+
+	* Solved problem with dmalloc_t and no sbrk.
+
+	* Added INTERNAL_MEMORY_SPACE setting to the settings.dist file to
+	help people with no sbrk function.
+
 2001-03-29  Gray Watson  <gray@outside.256.com>
 
 	* Fixed some additional problems with start-file, start-count, and
@@ -1778,5 +1785,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.275 2001/03/29 18:11:46 gray Exp $
+$Id: ChangeLog,v 1.276 2001/05/21 22:44:25 gray Exp $
 -------------------------------------------------------------------------------

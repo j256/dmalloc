@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.58 2000/11/13 15:46:51 gray Exp $
+ * $Id: heap.c,v 1.59 2001/05/21 22:44:25 gray Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: heap.c,v 1.58 2000/11/13 15:46:51 gray Exp $"
+#ident "$Id: heap.c,v 1.59 2001/05/21 22:44:25 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.58 2000/11/13 15:46:51 gray Exp $";
+  "$Id: heap.c,v 1.59 2001/05/21 22:44:25 gray Exp $";
 #endif
 #endif
 
@@ -73,6 +73,37 @@ static	void	*heap_extend(const int incr)
   
 #if HAVE_SBRK
   ret = sbrk(incr);
+#else
+#if INTERNAL_MEMORY_SPACE
+  {
+    static char	block_o_bytes[INTERNAL_MEMORY_SPACE];
+#if HEAP_GROWS_UP
+    static char *block_p = block_o_bytes;
+#else
+    static char *block_p = block_o_bytes + INTERNAL_MEMORY_SPACE;
+#endif
+    
+#if HEAP_GROWS_UP
+    if (block_p + incr >= block_o_bytes + INTERNAL_MEMORY_SPACE) {
+      ret = SBRK_ERROR;
+    }
+    else {
+      ret = block_p;
+      block_p += incr;
+    }
+#else
+    if (block_p - incr <= block_o_bytes) {
+      ret = SBRK_ERROR;
+    }
+    else {
+      block_p -= incr;
+      ret = block_p;
+    }
+#endif
+  }
+#endif /* if USE_MEMORY_CHUNK */
+#endif /* if HAVE_SBRK */
+  
   if (ret == SBRK_ERROR) {
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
@@ -85,7 +116,6 @@ static	void	*heap_extend(const int incr)
     dmalloc_errno = ERROR_ALLOC_FAILED;
     dmalloc_error("heap_extend");
   }
-#endif
   
   return ret;
 }

@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.204 2001/03/29 01:34:58 gray Exp $
+@c $Id: dmalloc.texi,v 1.205 2001/05/21 22:44:35 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -2378,7 +2378,10 @@ General portability issues center around:
 @itemize @bullet
 @item
 @cindex sbrk
-sbrk or compatible function usages
+@cindex INTERNAL_MEMORY_SPACE
+sbrk or compatible function usages.  The library does support a
+preallocated memory chunk heap.  See the INTERNAL_MEMORY_SPACE define in
+the @file{settings.dist} file.
 
 @item
 @cindex heap growing

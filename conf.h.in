@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.85 2001/03/29 00:22:09 gray Exp $
+ * $Id: conf.h.in,v 1.86 2001/05/21 22:44:25 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -42,7 +42,9 @@
  * routine that most systems employ.  This extends the program's data
  * space by INCR number of bytes.
  *
- * NOTE: please mail me if your system does not have this function.
+ * NOTE: If configure generates a 0 for this on your system, you
+ * should see the INTERNAL_MEMORY_SPACE setting in the settings.h file
+ * which is created from the settings.dist file.
  */
 #define HAVE_SBRK 0
 
@@ -51,8 +53,8 @@
  * much support for growing-down heaps because I do not have a system
  * to test it on.
  *
- * NOTE: please send me mail if configure generates a 0 for this on
- * your system.
+ * NOTE: please send me email with any fixes, problems, or questions
+ * if you system's heap grows up.
  */
 #define HEAP_GROWS_UP 1
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.49 2000/12/01 00:06:43 gray Exp $
+ * $Id: settings.dist,v 1.50 2001/05/21 22:44:25 gray Exp $
  */
 
 /*
@@ -380,6 +380,19 @@
  * PROT_NONE, PROT_READ, and PROT_WRITE defines.
  */
 #define PROTECT_BLOCKS 1
+
+/*
+ * If (and _only_ if) your system does not have sbrk(), you can have
+ * dmalloc pre-allocate its only heap space.  The default heap size is
+ * 1mb but you can set the space to be any size.  For super-small
+ * memory applications please understand that dmalloc is in no way
+ * optimized for space and so you can easily run out of memory with
+ * it.
+ *
+ * WARNING: this should only be used if HAVE_SBRK is 0.  Please send
+ * me email with any problems or comments on this feature.
+ */
+#define INTERNAL_MEMORY_SPACE (1024 * 1024)
 
 /****************************** thread settings ******************************/
 
