@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.42 1993/09/07 04:50:39 gray Exp $";
+  "$Id: malloc.c,v 1.43 1993/09/10 21:12:51 gray Exp $";
 #endif
 
 /*
@@ -463,20 +463,27 @@ EXPORT	int	malloc_verify(void * pnt)
 
 /*
  * set the global debug functionality flags to DEBUG (0 to disable).
+ * NOTE: after this module has started up, you cannot set certain flags 
+ * such as fence-post or free-space checking.
  * returns ERROR or NOERROR
  */
-EXPORT	int	malloc_debug(int debug)
+EXPORT	int	malloc_debug(const int debug)
 {
-  int	hold;
+  int	hold, dbg;
   
   /* should not check the heap here since we are setting the debug variable */
   
-  /* make sure that the not-changeable flags' values are preserved */
-  hold = _malloc_debug & DEBUG_NOT_CHANGEABLE;
-  debug &= ~DEBUG_NOT_CHANGEABLE;
-  _malloc_debug = debug | hold;
-  
-  in_alloc = FALSE;
+  /* if we've not started up then set the variable */
+  if (! malloc_enabled)
+    _malloc_debug = debug;
+  else {
+    /* make sure that the not-changeable flags' values are preserved */
+    hold = _malloc_debug & DEBUG_NOT_CHANGEABLE;
+    /* make sure that the not-addable flags' are not... added */
+    dbg = debug & ~DEBUG_NOT_ADDABLE;
+    
+    _malloc_debug = dbg | hold;
+  }
   
   return NOERROR;
 }
