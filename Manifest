@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.19 1993/08/18 02:06:09 gray Exp $
+$Id: Manifest,v 1.20 1993/08/25 01:02:12 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -18,6 +18,10 @@ README			Quick startup notes.
 TODO			Things to do list.  It only gets longer and
 			longer.
 
+arg_check.[ch]		Malloc routines used for testing of arguments.
+
+argv/			Argument library sub-directory.
+
 chunk.[ch]		Lower level allocation routines.  This is the
 			meat of the allocation algorithms.  Manages
 			and debugs the administration structures of
@@ -28,6 +32,8 @@ chunk_loc.h		Local defines specific to the chunk routines
 
 compat.[ch]		System compatibility routines if missing
 			functionality.
+
+conf.h			Configure defines produced by configure.
 
 conf.h.in		Used by configure to create the conf.h
 			configurations.
@@ -78,8 +84,6 @@ malloc_loc.h		Local defines for all of the malloc routines.
 
 malloc_lp.[ch]		Leap-frog routines to provide file/line info
 			to lib.
-
-malloc_str.[ch]		Malloc string routines for string testing.
 
 malloc_t.c		Meager test program for testing the malloc
 			routines.

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.20 1993/08/24 22:23:58 gray Exp $
+# $Id: Makefile.all.in,v 1.21 1993/08/25 01:02:10 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -40,7 +40,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = malloc_dbg.h
-OBJS = chunk.o compat.o error.o heap.o malloc.o malloc_lp.o arg_check.o
+OBJS = arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN = malloc_lp.o
 
 CFLAGS = $(CCFLAGS)
@@ -124,7 +124,6 @@ error.o : error.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h
   error.h 
 heap.o : heap.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
   error.h error_val.h heap.h 
-m.o : m.c 
 malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
   error.h error_str.h error_val.h heap.h malloc_lp.h return.h 
 malloc_dbg.o : malloc_dbg.c argv/argv.h malloc_dbg.h conf.h compat.h malloc_loc.h \
