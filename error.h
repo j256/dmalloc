@@ -18,13 +18,15 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.23 1995/05/16 00:12:10 gray Exp $
+ * $Id: error.h,v 1.24 1995/05/30 15:09:33 gray Exp $
  */
 
 #ifndef __ERROR_H__
 #define __ERROR_H__
 
 #include <stdarg.h>				/* for ... */
+
+#include "conf.h"				/* up here for _INCLUDE */
 
 /* for timeval type -- see conf.h */
 #if STORE_TIMEVAL

@@ -25,6 +25,8 @@
  * chunk.c which is the real heap manager.
  */
 
+#include "conf.h"				/* up here for _INCLUDE */
+
 /* for timeval type -- see conf.h */
 #if STORE_TIMEVAL
 #ifdef TIMEVAL_INCLUDE
@@ -35,7 +37,6 @@
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
-#include "conf.h"
 
 #include "chunk.h"
 #include "compat.h"
@@ -51,7 +52,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.77 1995/05/16 00:12:43 gray Exp $";
+  "$Id: malloc.c,v 1.78 1995/05/30 15:09:32 gray Exp $";
 #endif
 
 /*

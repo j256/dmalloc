@@ -27,6 +27,8 @@
 #include <fcntl.h>				/* for O_WRONLY, etc. */
 #include <stdarg.h>				/* for message vsprintf */
 
+#include "conf.h"				/* up here for _INCLUDE */
+
 /* for KILL_PROCESS define */
 #if USE_ABORT == 0
 #ifdef SIGNAL_INCLUDE
@@ -44,7 +46,6 @@
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
-#include "conf.h"
 
 #include "compat.h"
 #include "debug_val.h"
@@ -55,10 +56,11 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.58 1995/05/16 02:17:20 gray Exp $";
+  "$Id: error.c,v 1.59 1995/05/30 15:09:34 gray Exp $";
 #endif
 
-#define SECS_IN_HOUR	(60 * SECS_IN_MIN)
+#define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
+#define MINS_IN_HOUR	60
 #define SECS_IN_MIN	60
 
 /* external routines */
@@ -120,7 +122,7 @@ EXPORT	char	*_dmalloc_ptime(
   }
   
   hrs = secs / SECS_IN_HOUR;
-  mins = (secs / SECS_IN_MIN) % SECS_IN_HOUR;
+  mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
   secs %= SECS_IN_MIN;
   
 #if STORE_TIMEVAL
