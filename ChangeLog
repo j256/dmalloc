@@ -1,3 +1,7 @@
+Wed Jul  5 19:11:03 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Released version 3.1.0-beta.
+
 Mon Jul  3 19:57:05 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Encorporated new configed argv files from version 2.0.1.
@@ -1009,5 +1013,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.154 1995/07/03 23:57:25 gray Exp $
+$Id: ChangeLog,v 1.155 1995/07/05 23:14:29 gray Exp $
 -------------------------------------------------------------------------------
