@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.37 1993/10/17 00:43:02 gray Exp $
+# $Id: Makefile.in,v 1.38 1993/11/23 07:40:56 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -12,27 +12,28 @@ FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
 ARGV	= argv
 DEFS	= $(DEFINES)
 INCS	= -I. -I$(ARGV) $(INCLUDES)
-LIBS	= -L. -L$(ARGV) -l$(ARGV) -lmalloc_dbg $(LIBRARIES)
+LIBS	= -L$(ARGV) -l$(ARGV) $(LIBRARIES)
 
 CFLAGS	= -g $(CCFLS) -pipe -W -Wreturn-type -Wunused -Wpointer-arith \
 	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= $(ROOT)
-TESTS	= malloc_t
+TEST	= malloc_t
 LIBRARY	= libmalloc_dbg.a
 UTIL	= malloc_dbg
 
 MANFILE	= malloc.info
 
 PORTFLS	=  conf.h.in const.h.in Makefile.all.in configure configure.in \
+	configure.help \
 	ChangeLog Manifest NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
 	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
 	malloc_dbg.c malloc_dbg.[12] malloc_lp.[ch] malloc_loc.h return.h \
 	version.h malloc_t.c \
 	malloc.info malloc.texi malloc.ps texinfo.tex
-PORTCFG	= contrib/README contrib/dec_notes
+PORTCFG	= contrib/README contrib/dec_notes contrib/ra_info.pl
 
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
@@ -49,7 +50,7 @@ all : $(LIBRARY) $(UTIL)
 
 .PHONY : clobber
 clobber :
-	rm -f $(LIBRARY) $(TESTS) $(UTIL) 
+	rm -f $(LIBRARY) $(TEST) $(UTIL) 
 	rm -f part.? malloc.head malloc.info malloc_dbg.h
 
 .PHONY : distclean
@@ -93,22 +94,26 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
+$(UTIL) : malloc_dbg.o $(ARGV)/lib$(ARGV).a
 	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
 
-$(ARGV)/lib$(ARGV).a $(ARGV)/$(ARGV).h :
+$(ARGV)/$(ARGV).h :
+	( cd $(ARGV) ; $(MAKE) $(ARGV).h )
+
+$(ARGV)/lib$(ARGV).a :
 	( cd $(ARGV) ; $(MAKE) )
 
 .PHONY : port
-port : $(PORTFLS)
+port : $(PORTFLS) $(ARGV)
 	@ answer 'Is it okay to remove the $@ directory? '
 	rm -rf $@
 	mkdir $@ $@/contrib
 	cp $(PORTFLS) $@
 	cp $(PORTCFG) $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
+	cp -r $(ARGV) $@
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'
 
@@ -120,9 +125,19 @@ patch :
 fill : $(FILLFLS)
 	fillproto $(FILLFLS)
 
-tests : $(TESTS)
+tests : $(TEST)
 
-malloc_t : malloc_t.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
+$(TEST) : $(TEST).o $(LIBRARY) $(ARGV)/lib$(ARGV).a
+	rm -f $@
+	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
+	mv a.out $@
+
+malloc.ps : malloc.texi
+	@ answer 'Is it okay to remove the work directory? '
+	rm -rf work
+	mkdir work
+	( cd work ; texi2dvi ../malloc.texi ; dvips -o ../$@ malloc.dvi )
+	rm -rf work
 
 malloc.head : malloc.info
 	rm -f $@ $@.t

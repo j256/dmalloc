@@ -1,9 +1,59 @@
+Tue Nov 23 02:39:44 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* phased in the version 1.3.5 branch changes into the 2.0.0
+	version.  looks like it was reasonably painless.
+
 Mon Nov 22 22:21:56 1993  Gray Watson  (gray at toaster.antaire.com)
+
+  	* Integrated tons of new heap code with per/block allocations (not
+  	base 2) and better free list management with block splitting.
+
+	* Releasing version 1.3.5.
 
 	* Added more automatic and comprehensive malloc_t testing
 	facilities with argv options.
 
-	* Integrated tons of new heap code with per/block allocations (not
+	* removed library from linking with malloc_dbg.  good idea dave.
+
+	* integrated some fixes and remove pre-main shit.
+
+Mon Nov 15 00:39:51 1993  Gray Watson  (gray@fridge.antaire.com)
+
+	* Added -T option to malloc_dbg: list-tokens for listing of debug
+	tokens.
+
+	* added ERROR_SIGNAL configure entry.  defaults to SIGABRT.
+
+Sun Nov 14 23:08:03 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added 'never-reuse' token to never reuse free'd memory.
+
+Mon Nov  8 05:44:58 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* added ra_info to the contrib directory.  Big wow.
+
+Wed Nov  3 00:56:19 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added check for pre-main calls to malloc.  HACK!
+
+	* Added on_exit and atexit support to auto-call malloc_shutdown.
+	Thanks much to Manfred, Dave, Scott, and Rich.
+
+	* Added -m (minus) option to malloc_dbg.  Why didn't I think of
+	this before?
+
+Tue Nov  2 16:45:32 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Fixed problem with getenv processing.
+
+Wed Oct 20 19:30:34 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Renamed malloc_debug to malloc_flags.
+
+	* Added all malloc utility functions to malloc_lp.c.  Now
+	programs can call malloc_shutdown (for instance) without fear.
+	See malloc_lp.h.
+
 	base 2) and better free list management with block splitting.
 
 Sat Oct 16 19:18:53 1993  Gray Watson  (gray at toaster.antaire.com)
@@ -24,7 +74,7 @@ Wed Oct 13 17:58:55 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* added DEBUG_LOG_STAMP to add timestamps to log entries.
 	
-	* Added malloc_log_stats() to dump stats to a file.
+	* Added malloc_log_stats() to dump stats to log file.
 
 	* Re-added cfree() call.  No reason not to have it.
 
@@ -517,5 +567,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.74 1993/11/23 03:25:38 gray Exp $
+$Id: ChangeLog,v 1.75 1993/11/23 07:40:47 gray Exp $
 -------------------------------------------------------------------------------

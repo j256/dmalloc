@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.25 1993/11/23 03:26:01 gray Exp $
+ * $Id: conf.h.in,v 1.26 1993/11/23 07:41:32 gray Exp $
  */
 
 /*
@@ -89,6 +89,20 @@
 #define WORST_FIT 0
 
 /*
+ * automatically call malloc_shutdown if on_exit or atexit is
+ * available.  See below for whether configure found on_exit or atexit
+ * calls.
+ */
+#define AUTO_SHUTDOWN 1
+
+/*
+ * signal to use when the library needs to terminate the process on
+ * critical error or when the user requests it.  Should be a signal
+ * from signal.h.
+ */
+#define ERROR_SIGNAL SIGABRT
+
+/*
  ************************************************************************
  * CONFIGURE DEFINES: Should not need to tune by hand
  ************************************************************************
@@ -101,9 +115,9 @@
 #define HAVE_SBRK 0
 
 /*
- * does your heap grow up?  Hopefully it does because there is not too
+ * does your heap grow up?  hopefully it does because there is not too
  * much support for growing-down heaps because I do not have a system
- * to test it on.  Please mail me if configure generates a 0 for this
+ * to test it on.  please mail me if configure generates a 0 for this
  * on your system.
  */
 #define HEAP_GROWS_UP 1
@@ -129,12 +143,13 @@
  *
  * NOTE: the value will never be auto-configured to be less than 3
  * bits (where sizeof(long) == 8) because some system (like sparc for
- * instance) report the sizeof(long) == 4 while the register size is
- * 8 bytes.  Because of the register size, certain memory needs to be
- * base 8 (stack frames, code, etc.).
+ * instance) report the sizeof(long) == 4 while the register size is 8
+ * bytes.  certain memory needs to be of the same base as the register
+ * size (stack frames, code, etc.).  any ideas how I can determine the
+ * register size in a better (and portable) fashion?
  *
  * NOTE: larger the number the more memory may be wasted by certain
- *       combinations of requested admin info like fence-post checking.
+ *       debugging settings like fence-post checking.
  */
 #define ALLOCATION_ALIGNMENT 3
 
@@ -143,7 +158,19 @@
  */
 
 /*
- * the Malloc-Debug library provides its own versions of the following
+ * some systems have functions which can register routines to be
+ * called by exit(3) (or when the program returns from main).  this
+ * functionality allows the malloc_shutdown() routine to be called
+ * automatically upon program completion so that the library can log
+ * statistics.  use the AUTO_SHUTDOWN define above to disable this.
+ * please send me mail if this functionality exists on your system but
+ * in another name.
+ */
+#define HAVE_ATEXIT 0
+#define HAVE_ON_EXIT 0
+
+/*
+ * the malloc_dbg library provides its own versions of the following
  * functions, or knows how to work around their absence.
  */
 #define HAVE_BCMP 0

@@ -39,12 +39,12 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.30 1993/09/07 04:50:37 gray Exp $";
+  "$Id: heap.c,v 1.31 1993/11/23 07:41:45 gray Exp $";
 #endif
 
 /* external routines */
 #if HAVE_SBRK
-IMPORT	char		*sbrk(int incr);	/* to extend the heap */
+IMPORT	char		*sbrk(const int incr);	/* to extend the heap */
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
 #endif
 
@@ -70,7 +70,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
   
   /* did we not allocate any heap space? */
   if (ret == HEAP_ALLOC_ERROR) {
-    if (BIT_IS_SET(_malloc_debug, DEBUG_CATCH_NULL)) {
+    if (BIT_IS_SET(_malloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
       (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not allocate %u more bytes from heap\r\n",
 		    size);
@@ -109,7 +109,7 @@ EXPORT	void	*_heap_end(void)
   if (ret == SBRK_ERROR) {
     malloc_errno = ERROR_ALLOC_FAILED;
     _malloc_error("_heap_end");
-    if (BIT_IS_SET(_malloc_debug, DEBUG_CATCH_NULL)) {
+    if (BIT_IS_SET(_malloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
       (void)sprintf(str, "\r\nmalloc_dbg: critical error: could not find the end of the heap\r\n");
       (void)write(STDERR, str, strlen(str));

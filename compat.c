@@ -34,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.23 1993/11/23 03:25:58 gray Exp $";
+  "$Id: compat.c,v 1.24 1993/11/23 07:41:28 gray Exp $";
 #endif
 
 #if HAVE_GETPID == 0
@@ -54,8 +54,8 @@ EXPORT	int	getpid(void)
 EXPORT	long	time(long * timep)
 {
   if (timep != NULL)
-    *timep = 0;
-  return 0;
+    *timep = 0L;
+  return 0L;
 }
 #endif /* HAVE_TIME == 0 */
 

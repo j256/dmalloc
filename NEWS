@@ -1,18 +1,23 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.9 1993/11/23 03:25:42 gray Exp $
+$Id: NEWS,v 1.10 1993/11/23 07:40:58 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 2.0.0:
 
-	* More automatic and comprehensive malloc_t testing facilities.
 	* New heap code with per/block allocations (not	base 2).
 	* Better free list management with block splitting.
 
 Version 1.3.5:
 
+	* More automatic and comprehensive malloc_t testing facilities.
+	* Added -T (list-tokens) to malloc_dbg: for listing of debug tokens.
+	* Added 'never-reuse' token to never reuse free'd memory.
+	* Added on_exit and atexit support to auto-call malloc_shutdown.
+	* Added hooks to all malloc utility functions to malloc_lp.o.
 	* removed debug token log-ra since log-unknown should be enough.
 	* malloc_heap_map() -> malloc_log_heap_map() for consistancy.
 	* Added malloc_log_unfreed() to dump non-free memory to logfile.
+	* Added -m (minus) option to malloc_dbg to allow removing of tokens.
 	* Added -p flag to malloc_dbg to allow adding of tokens to debug value.
 	* added DEBUG_LOG_STAMP to add timestamps to log entries.
 	* Added malloc_log_stats() to dump stats to a file.

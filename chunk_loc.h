@@ -18,13 +18,27 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.19 1993/11/23 03:25:55 gray Exp $
+ * $Id: chunk_loc.h,v 1.20 1993/11/23 07:41:26 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
 #define __CHUNK_LOC_H__
 
 /* defines for the malloc subsystem */
+
+/* checking information */
+#define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
+#define MAX_FILE_LENGTH		   40		/* max __FILE__ length */
+#define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
+
+/* free info */
+#define BLANK_CHAR		'\305'		/* to blank free space with */
+
+/* log-bad-space info */
+#define SPECIAL_CHARS		"e\033^^\"\"''\\\\n\nr\rt\tb\bf\fa\007"
+#define DUMP_OFFSET		2		/* offset back to dump */
+#define DUMP_SPACE		15		/* number of bytes to dump */
+#define DUMP_SPACE_BUF		128		/* space for memory dump */
 
 /*
  * the default smallest allowable allocations in bits.  this is

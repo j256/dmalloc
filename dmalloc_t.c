@@ -31,7 +31,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.27 1993/11/23 03:26:06 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.28 1993/11/23 07:42:11 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -135,7 +135,7 @@ static	int	do_random(const int itern)
   for (iterc = 0; iterc < itern; iterc++) {
     int		which;
     
-    which = rand() % 2;
+    which = (rand() % 20) / 10;
     
     /*
      * < 10 means alloc as long as we have enough memory and there are
@@ -148,7 +148,8 @@ static	int	do_random(const int itern)
 	amount = rand() % (max / 2);
       } while (amount == 0);
       
-      if (rand() % 2 == 0)
+      which = (rand() % 20) / 10;
+      if (which == 0)
 	pntp->pi_pnt = CALLOC(char, amount);
       else
 	pntp->pi_pnt = MALLOC(amount);
@@ -243,16 +244,15 @@ static	void	do_interactive(void)
     
     if (strncmp(line, "?", len) == 0
 	|| strncmp(line, "help", len) == 0) {
-      (void)printf("\n");
-      (void)printf("help      - print this message\n");
-      (void)printf("malloc    - allocate memory\n");
-      (void)printf("free      - deallocate memory\n");
-      (void)printf("realloc   - reallocate memory\n");
-      (void)printf("map       - map the heap to the logfile\n");
-      (void)printf("overwrite - overwrite some memory to test errors\n");
-      (void)printf("random    - randomly execute a number of malloc/frees\n");
-      (void)printf("verify    - check out a memory address\n");
-      (void)printf("quit      - quit this test program\n");
+      (void)printf("\thelp      - print this message\n");
+      (void)printf("\tmalloc    - allocate memory\n");
+      (void)printf("\tfree      - deallocate memory\n");
+      (void)printf("\trealloc   - reallocate memory\n");
+      (void)printf("\tmap       - map the heap to the logfile\n");
+      (void)printf("\toverwrite - overwrite some memory to test errors\n");
+      (void)printf("\trandom    - randomly execute a number of [de] allocs\n");
+      (void)printf("\tverify    - check out a memory address (or all heap)\n");
+      (void)printf("\tquit      - quit this test program\n");
       continue;
     }
     
@@ -291,7 +291,7 @@ static	void	do_interactive(void)
     }
     
     if (strncmp(line, "map", len) == 0) {
-      (void)malloc_log_heap_map();
+      malloc_log_heap_map();
       (void)printf("Done.\n");
       continue;
     }
@@ -327,6 +327,7 @@ static	void	do_interactive(void)
     if (strncmp(line, "verify", len) == 0) {
       int	ret;
       
+      (void)printf("If the address is 0, verify will check the whole heap.\n");
       pnt = get_address();
       ret = malloc_verify((char *)pnt);
       (void)printf("malloc_verify(%#lx) returned: %s\n",
@@ -343,7 +344,7 @@ int	main(int argc, char ** argv)
 {
   argv_process(arg_list, argc, argv);
   
-  (void)srand(time(0));
+  (void)srand(time(0) ^ 0xDEADBEEF);
   
   if (interactive)
     do_interactive();
@@ -358,8 +359,13 @@ int	main(int argc, char ** argv)
       (void)printf("Failed.\n");
   }
   
+  /* you will need to uncomment this if you can't auto-shutdown */
+#if 0
   /* shutdown the alloc routines */
   malloc_shutdown();
+#endif
+  
+  argv_cleanup(arg_list);
   
   (void)printf("final malloc_verify returned: %s\n",
 	       (malloc_verify(NULL) == MALLOC_VERIFY_NOERROR ? "success" :

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.39 1993/10/17 00:39:28 gray Exp $
+@c $Id: dmalloc.texi,v 1.40 1993/11/23 07:41:57 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -48,12 +48,12 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Malloc Debug Library
-@author Gray Watson @samp{<gray.watson@@antaire.com>}
+@author Gray Watson @samp{gray.watson@@antaire.com}
 
 @page
 Copyright @copyright{} 1992 and 1993 by the Antaire Corporation.
 
-Published by Gray Watson @samp{<gray.watson@@antaire.com>}
+Published by Gray Watson @samp{gray.watson@@antaire.com}
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -90,7 +90,7 @@ powerful debugging facilities including very comprehensive heap testing
 and excellent run-time debugging information.  We have found these
 capabilities to be superb development tools.
 
-I can be reached at @samp{<gray.watson@@antaire.com>} with any questions
+I can be reached at @samp{gray.watson@@antaire.com} with any questions
 or general comments.
 
 Gray Watson, Antaire Corporation.
@@ -310,7 +310,7 @@ can provide file and line information of the caller of a malloc function
 for the warning messages and errors it generates.  @xref{Allocation
 Macros}.
 
-@item Return-address information
+@item return-address information
 @cindex return-address
 To debug calls to the library from external sources (i.e. those files
 that did not include @file{malloc_dbg.h}), some facilities have been
@@ -555,7 +555,7 @@ log a time stamp for all messages
 log administrative information (quite verbose)
 
 @item log-blocks
-log detailed block information when malloc_heap_map is called
+log detailed block information when malloc_log_heap_map is called
 
 @item log-unknown
 like log-non-free but logs non-freed memory pointers that did not have
@@ -574,8 +574,8 @@ verify heap administrative structure
 examine internal heap linked-lists
 
 @item check-free
-check to see if free space has been overwritten.  NOTE: this enabled
-free-blank also.
+check to see if free space has been overwritten.  @emph{NOTE}: this
+enabled free-blank also.
 
 @item check-funcs
 check the arguments of some functions (mostly string operations) looking
@@ -585,13 +585,15 @@ for bad pointers
 always copy data to a new pointer when realloc
 
 @item free-blank
-write special values (non-0) into space when it is freed
+write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
+it is freed
 
 @item error-abort
 abort the program (and dump core) on errors
 
 @item alloc-blank
-write special values (non-0) into space when it is alloced
+write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
+it is alloced
 
 @item heap-check-map
 log a heap-map to the logfile every time the heap is checked
@@ -603,6 +605,11 @@ log any errors and messages to the screen via standard-error
 abort the program immediately if the library fails to get more heap
 space from sbrk
 @cindex sbrk
+
+@item never-reuse
+have the heap never use space that has been used before and freed.
+@emph{WARNING}: This should be used with caution since you may run out
+of heap space.
 @end table
 
 @node Argument Checking,  , Debug Tokens, Features
@@ -692,9 +699,8 @@ and no other option-commands used, malloc_dbg will disply the current
 settings of the environmental variables.
 
 To find out the usage for the malloc debug program try @code{malloc_dbg
---usage} or @code{malloc_dbg --usage-long}.  This is one of the many
-features of the argv library included with this package.  See
-@file{argv.info} for more information.
+--usage-long}.  This is one of the many features of the argv library
+included with this package.  See @file{argv.info} for more information.
 
 Here is a detailed list of the flags that can passed to malloc_dbg:
 
@@ -716,8 +722,8 @@ Clear/unset all of the variables not specified with other arguments.
 Use @samp{-d 0} or a tag to @samp{none} to achieve this.
 
 @item -d bitmask
-Set the MALLOC_DEBUG to the bitmask value which should be in hex.  This
-is overridden (and unnecessary) if a tag is specified.
+Set the @samp{MALLOC_DEBUG} variable to the bitmask value which should
+be in hex.  This is overridden (and unnecessary) if a tag is specified.
 
 @item -e errno
 Print the malloc error string that corresponds to errno.
@@ -738,9 +744,15 @@ Set the @samp{MALLOC_LOGFILE} env variable to filename.
 @item -L
 List all of the tags in the rc-file.  Useful with -v.
 
+@item -m token(s)
+Remove (minus) the debug capabilities of token(s) from the current debug
+setting or from the selected tag (or -d value).  Multiple -m's can be
+specified.
+
 @item -p token(s)
-Add the debug capabilities of token(s) to the selected tag (or -d
-value).  Multiple -p's can be specified.
+Add (plus) the debug capabilities of token(s) to the current debug
+setting or to the selected tag (or -d value).  Multiple -p's can be
+specified.
 
 @item -r
 Remove (unset) all variables when setting a tag.  This is useful when
@@ -751,6 +763,10 @@ by default in my malloc alias.
 @item -s number
 Set the @samp{MALLOC_START} env variable to number (alternatively
 @samp{file:line}).
+
+@item -T
+List all of the debug-tokens.  Useful for getting a token to use with -p
+or -m.
 
 @item -v
 Give verbose output.  Especially useful when dumping current settings or
@@ -1074,6 +1090,18 @@ does for the system calls.  It can be passed to @code{malloc_strerror()}
 (see below) to get a string version of the error.  It will have a value
 of zero if the library has not detected any problems.
 
+@item int malloc_address;
+@cindex malloc_address variable
+This variable hold the address to be specifically looked for when
+allocating or freeing by the library.
+
+@item int malloc_address_count;
+@cindex malloc_address_count variable
+This variable hold the argument to the @code{malloc_address} variable.
+If it is set to a greater than 0 value then after the library has seen
+the @code{malloc_address} address this many times, it will call
+@code{_malloc_error()}.
+
 @item void malloc_shutdown(void);
 @cindex malloc_shutdown function
 This routine shuts the library down and logs the final statistics and
@@ -1089,23 +1117,34 @@ right before @code{exit()} or as the last function in @code{main()}.
         @}
 @end example
 
-@item int malloc_heap_map(void);
-@cindex malloc_heap_map function
+@item void malloc_log_heap_map(void);
+@cindex malloc_log_heap_map function
 This routine will log to the logfile (if it is enabled) a graphical
 representation of the current heap space.
 
+@item void malloc_log_stats(void);
+@cindex malloc_log_stats function
+This routine dumps the current malloc statistics to the log file. 
+
+@item void malloc_log_unfreed(void);
+@cindex malloc_log_unfreed function
+This routine dumps the unfreed-memory information to the log file.  This
+is also useful to dump the currently allocated points to the log file to
+be diff'ed against another dump later on.
+
 @item int malloc_verify(char * pnt);
 @cindex malloc_verify function
-Use @code{malloc_verify} to verify individual memory pointers that are
-suspect of memory problems.  To check the entire heap pass in a NULL or
-0 pointer.
+Use this routines to verify individual memory pointers that are suspect
+of memory problems.  To check the entire heap pass in a NULL or 0
+pointer.  The routine returns MALLOC_VERIFY_ERROR or
+MALLOC_VERIFY_NOERROR.
 
-@emph{NOTE}: @samp{malloc_verify} can only check the heap with the
+@emph{NOTE}: @samp{malloc_verify()} can only check the heap with the
 functions that have been enabled.  For example, if fence-post checking
-is not enabled in the @samp{MALLOC_DEBUG} variable, @samp{malloc_verify}
-cannot check the fence-post areas in the heap.
+is not enabled in the @samp{MALLOC_DEBUG} variable,
+@samp{malloc_verify()} cannot check the fence-post areas in the heap.
 
-@item int malloc_debug(long debug);
+@item void malloc_debug(long debug);
 @cindex malloc_debug function
 With this routine, the value in the @samp{MALLOC_DEBUG} variable can be
 overridden and the library debugging features set explicitly.  For
@@ -1114,16 +1153,23 @@ instance, if debugging should never be enabled for a program, a call to
 all the memory debugging from that point on.
 
 One problem however is that some systems make calls to memory allocation
-functions @emph{before} @code{main()} is reached and
-@code{malloc_debug()} called meaning some debugging information may be
-generated regardless.
+functions @emph{before} @code{main()} is reached therefore before
+@code{malloc_debug()} can be called meaning some debugging information
+may be generated regardless.
+
+@item int malloc_debug_current(void);
+@cindex malloc_debug_current function
+This routine returns the current value in the @samp{MALLOC_DEBUG}
+variable.  This allows you to save a copy of the malloc debug settings
+to be changed and then restored later.
 
 @item int malloc_examine(char * pnt, int * size, char ** file, int * line,
 void ** ret_address);
 @cindex malloc_examine function
 This routine provides some very interesting functionality.  It returns
 the size of a pnt's allocation as well as the file and line or the
-return-address from where it was allocated.
+return-address from where it was allocated.  It will return NOERROR or
+ERROR depending on whether pnt is good or not.
 
 @emph{NOTE}: This function is @emph{certainly} not provided by most if
 not all other malloc libraries.
@@ -1172,8 +1218,8 @@ The above functions effectively redirect @code{new} to the more familiar
 @code{malloc} and @code{delete} to the more familiar @code{free}.  They
 also give the known error behavior, too.
 
-I am not a C++ hacker so feedback in the form of other hints and ideas
-for C++ users would be much appreciated.
+@emph{NOTE}: I am not a C++ hacker so feedback in the form of other
+hints and ideas for C++ users would be much appreciated.
 
 @node Disabling the Library,  , C++ and the Library, Programming
 @section Disabling the Library.
@@ -1192,16 +1238,6 @@ process while maintaining the effectiveness of the debugging.
 
 @itemize @bullet
 @item
-If you compiled any of your source modules with @code{MALLOC_FUNC_CHECK}
-defined then you must first recompile all those modules without the flag
-enabled.
-
-@item
-If you are using any of the special functions provided by the
-malloc-debug library (such as @code{malloc_shutdown()}), then you will
-need to @code{#ifdef}, remove, or comment them out of your code.
-
-@item
 If you want to @emph{totally} disable the malloc-debug library then you
 will need to recompile all the C files that include @file{malloc_dbg.h}
 while defining @code{MALLOC_DEBUG_DISABLE}.  This will cause the malloc
@@ -1212,9 +1248,17 @@ leap macros to not be applied @xref{Allocation Macros}.
 @end example
 
 @item
+If you compiled any of your source modules with @code{MALLOC_FUNC_CHECK}
+defined then you must first recompile all those modules without the flag
+enabled.
+
+@item
 Now you are ready to relink with a new library.  If you have not
 compiled all your source with @code{MALLOC_DEBUG_DISABLED} defined then
-you need to include the @file{malloc_lp.o} file on the link line.
+you need to include the @file{malloc_lp.o} file on the link line.  You
+need to keep and eye out for multiple definition errors from your linker
+since @file{malloc_lp.o} has hooks to various functions such as
+@code{malloc_verify()}.
 
 @example
         gcc -O -g main.o malloc_lp.o -L/usr/local/lib -lgmalloc
@@ -1292,6 +1336,12 @@ The library does @emph{not} provide memalign() nor valloc() support as
 of yet, but may in future releases.  I would be interested to know who
 is using these functions, which architectures they are supported on, and
 for what reason they are being used.
+
+@item
+Some systems allow free(0) to not be an error for some (idiotic IMHO)
+reason.  Since 0 is not a valid address returned by the malloc library
+then my library interprets this as an error.  See @file{conf.h} for some
+manual settings to this effect but this may cause problems.
 
 @item
 Aside from possibly being slower than the system's memory allocation
@@ -1389,7 +1439,8 @@ source} for 386 and 486 systems (binary licenses are available).  Along
 with the obvious benefits of full source code come excellent customer
 support/service and system features such as a MS-DOG runtime
 environment, complete tcp/ip networking facilities including nfs, full
-software development utilities, X, etc.  <bsdi-info@@bsdi.com>@end table
+software development utilities, X, etc.  <bsdi-info@@bsdi.com>
+@end table
 
 @node Index of Concepts,  , Plugs, Top
 @unnumbered Concept Index

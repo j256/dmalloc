@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.17 1993/10/17 00:39:34 gray Exp $
+# $Id: dmallocrc,v 1.18 1993/11/23 07:42:13 gray Exp $
 #
 
 #
@@ -50,6 +50,7 @@
 # heap-check-map		log a heap-map every time the heap is checked
 # print-perror			dump errors and messages to STDERR
 # catch-null			abort program if library can't get sbrk space
+# never-reuse			never reuse memory that has been freed
 #
 
 # no debugging (for disabling memory checking)

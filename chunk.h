@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.27 1993/10/17 00:50:22 gray Exp $
+ * $Id: chunk.h,v 1.28 1993/11/23 07:41:24 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -67,7 +67,7 @@ IMPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 /*
  * return some information associated with PNT, returns [NO]ERROR
  */
-IMPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
+IMPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 				 char ** file, unsigned int * line,
 				 void ** ret_attr);
 
@@ -87,7 +87,7 @@ IMPORT	int	_chunk_free(const char * file, const unsigned int line,
  * reallocate a section of memory
  */
 IMPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
-				void * oldp, unsigned int new_size);
+				void * oldp, const unsigned int new_size);
 
 /*
  * log present free and used lists

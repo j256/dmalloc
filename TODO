@@ -1,30 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.8 1993/10/17 00:43:08 gray Exp $
--------------------------------------------------------------------------------
-
-IMPORTANT:
-
-- completely rework the bblock allocation:
-	- need to remove the bit restriction and maintain the free lists
-		as some sort of gradient list:
-		blocks 1-10 have their own bucket
-		blocks 11-100 have buckets for each 10
-		blocks 101+ have 1 bucket for all
-	- maybe but the administration information at the front of the block
-		well buffered with magic numbers and such.
-		- other problems with this however
-		- this would reduce if not remove the need for the block-based
-			administrative information
-	- be able to break up bigger blocks of memory into small ones
-- fix the dblock-admin structures to pack them into the same block as their
-	allocations.  So for 8 byte allocationes in a 4k blocksize there
-	would be 256 user-allocation slots and 256 admin slots.  Yeach but
-	a LOT cleaner than current code.
-	- there is then the possibility of reducing the db-overhead to 6 bytes
-		with some sort of file hash-table.  File-names would hash
-		into some 1 byte value and then will be maintained in a list
-		somewhere.  Maybe??
-
+$Id: TODO,v 1.9 1993/11/23 07:41:08 gray Exp $
 -------------------------------------------------------------------------------
 
 CHECKING:
@@ -35,9 +10,6 @@ CHECKING:
 	- maybe it would slow it down.
 	- a token/option?
 	- \305 is recognizable however
-- another token to have the library never reclaim memory, always extend the
-	heap (i.e. don't use free lists at all)
-	- this would grow into an enormous heap however.
 - maybe add another debug level which stores crc information about internal
 	heap structures and verifies it during run time.  slow, slow!!
 - think of ways we can reorganize the heap and move allocations around
@@ -51,7 +23,7 @@ CHECKING:
 	- maybe some sort of compact heap orientation like ndt organization.
 	- maybe generate some magical value which corresponds to the
 		orientation becasue you want to be able to reproduce
-		the error
+		the error (bsd random?)
 
 -------------------------------------------------------------------------------
 
@@ -81,7 +53,13 @@ MANUALS:
 GENERAL:
 
 - maybe some sort of cheap crc on memory in non-freed memory sections so
-	you can see what portions of memory changed
+	you can see what portions of memory changed (check tripwire)
+- a description field for the debug tokens:
+	- so when you use -T and -v it would dump a description to
+- a -V option to malloc_dbg for very-verbose:
+	- would dump description of tokens in current setting
+	- other verbosity
+	- -V == -v + ... of course
 - maybe provide support for reference counts on allocations:
 	- have a call which increments the reference count of the node
 	- free will decrement the reference count and free if 0
@@ -94,7 +72,7 @@ GENERAL:
 - maybe have a function that summaries the memory usage per file.
 	runs through the unfreed pointers and keeps a table per file.c
 	in terms of number of pointers and bytes per file.
-	- could be a perl script.
+	- could be a perl script
 - for fence underflow, print out the allocation below and for fence
 	overflow the allocation above if possible
 - have either a bunch of free or used bblocks be:

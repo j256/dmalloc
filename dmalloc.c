@@ -39,12 +39,14 @@
 
 #include "compat.h"
 #include "dbg_tokens.h"
+#include "error_str.h"
+#include "error_val.h"
 #include "malloc_loc.h"
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.30 1993/10/17 00:43:16 gray Exp $";
+  "$Id: dmalloc.c,v 1.31 1993/11/23 07:42:04 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -68,8 +70,10 @@ LOCAL	int	errno_to_print	= NO_VALUE;	/* to print the error string */
 LOCAL	char	*inpath		= NULL;		/* for config-file path */
 LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	keep		= FALSE;	/* keep settings override -r */
-LOCAL	char	list		= FALSE;	/* list rc tokens */
+LOCAL	char	list_tags	= FALSE;	/* list rc tags */
+LOCAL	char	list_tokens	= FALSE;	/* list debug tokens */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
+LOCAL	argv_array_t	minus;			/* tokens to remove */
 LOCAL	argv_array_t	plus;			/* tokens to add */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
 LOCAL	char	*start		= NULL;		/* for START settings */
@@ -98,14 +102,18 @@ LOCAL	argv_t	args[] = {
       NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHARP,	&logpath,
       "path",			"file to log messages to" },
-  { 'L',	"list",		ARGV_BOOL,	&list,
-      NULL,			"list tokens in rc file" },
+  { 'L',	"list-tags",	ARGV_BOOL,	&list_tags,
+      NULL,			"list tags in rc file" },
+  { 'm',	"minus",	ARGV_CHARP | ARGV_ARRAY,	&minus,
+      "token(s)",		"del tokens from current debug" },
   { 'p',	"plus",		ARGV_CHARP | ARGV_ARRAY,	&plus,
       "token(s)",		"add tokens to current debug" },
   { 'r',	"remove",	ARGV_BOOL,	&remove_auto,
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHARP,	&start,
       "file:line",		"start check heap after this" },
+  { 'T',	"list-tokens",	ARGV_BOOL,	&list_tokens,
+      NULL,			"list debug tokens" },
   { 'v',	"verbose",	ARGV_BOOL,	&verbose,
       NULL,			"turn on verbose output" },
   { ARGV_MAYBE,	NULL,		ARGV_CHARP,	&tag,
@@ -124,10 +132,10 @@ LOCAL	char	*sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
  */
 LOCAL	void	choose_shell(void)
 {
-  char	*shell, *shellp;
-  int	shellc;
+  const char	*shell, *shellp;
+  int		shellc;
   
-  shell = (char *)getenv(SHELL_ENVIRON);
+  shell = (const char *)getenv(SHELL_ENVIRON);
   if (shell == NULL) {
     cshell = TRUE;
     return;
@@ -151,7 +159,7 @@ LOCAL	void	choose_shell(void)
 /*
  * hexadecimal STR to long translation
  */
-LOCAL	long	hex_to_long(char * str)
+LOCAL	long	hex_to_long(const char * str)
 {
   long		ret;
   
@@ -243,13 +251,14 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
 {
   static char	token[128];
   FILE		*infile = NULL;
-  char		path[1024], buf[1024], *homep;
+  char		path[1024], buf[1024];
+  const char	*homep;
   char		found, cont;
-  long		new_debug = 0;
+  int		new_debug = 0;
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
-    homep = (char *)getenv(HOME_ENVIRON);
+    homep = (const char *)getenv(HOME_ENVIRON);
     if (homep == NULL) {
       (void)fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
@@ -315,7 +324,7 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
     } while (tokp != NULL);
     
-    if (list && ! cont) {
+    if (list_tags && ! cont) {
       if (verbose) {
 	(void)fprintf(stderr, "%s:\n", token);
 	dump_debug(new_debug);
@@ -355,28 +364,29 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
  */
 LOCAL	void	dump_current(void)
 {
-  char		*str;
-  long		num;
+  const char	*str;
+  char		*tokp;
+  int		num;
   
-  str = (char *)getenv(DEBUG_ENVIRON);
+  str = (const char *)getenv(DEBUG_ENVIRON);
   if (str == NULL)
     (void)fprintf(stderr, "%s not set\n", DEBUG_ENVIRON);
   else {
     num = hex_to_long(str);
-    (void)process(num, NULL, &str);
-    (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
+    (void)process(num, NULL, &tokp);
+    (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, tokp);
     
     if (verbose)
       dump_debug(num);
   }
   
-  str = (char *)getenv(ADDRESS_ENVIRON);
+  str = (const char *)getenv(ADDRESS_ENVIRON);
   if (str == NULL)
     (void)fprintf(stderr, "%s not set\n", ADDRESS_ENVIRON);
   else
     (void)fprintf(stderr, "%s == '%s'\n", ADDRESS_ENVIRON, str);
   
-  str = (char *)getenv(INTERVAL_ENVIRON);
+  str = (const char *)getenv(INTERVAL_ENVIRON);
   if (str == NULL)
     (void)fprintf(stderr, "%s not set\n", INTERVAL_ENVIRON);
   else {
@@ -384,13 +394,13 @@ LOCAL	void	dump_current(void)
     (void)fprintf(stderr, "%s == '%d'\n", INTERVAL_ENVIRON, num);
   }
   
-  str = (char *)getenv(LOGFILE_ENVIRON);
+  str = (const char *)getenv(LOGFILE_ENVIRON);
   if (str == NULL)
     (void)fprintf(stderr, "%s not set\n", LOGFILE_ENVIRON);
   else
     (void)fprintf(stderr, "%s == '%s'\n", LOGFILE_ENVIRON, str);
   
-  str = (char *)getenv(START_ENVIRON);
+  str = (const char *)getenv(START_ENVIRON);
   if (str == NULL)
     (void)fprintf(stderr, "%s not set\n", START_ENVIRON);
   else
@@ -435,15 +445,21 @@ LOCAL	void	unset_variable(char * var)
   printed = TRUE;
 }
 
+/*
+ * returns the string for ERRNUM
+ */
+LOCAL	char	*local_strerror(const int errnum)
+{
+  if (! IS_MALLOC_ERRNO(errnum))
+    return malloc_errlist[ERROR_BAD_ERRNO];
+  else
+    return malloc_errlist[errnum];
+}
+
 EXPORT	int	main(int argc, char ** argv)
 {
   char	buf[20];
-  
-  /*
-   * turn off debugging for this program
-   * NOTE: some pre-main function may already have called malloc unfortunately
-   */
-  (void)malloc_debug(0);
+  char	debug_set = FALSE;
   
   argv_help_string = "Sets malloc_dbg library env variables.";
   argv_version_string = malloc_version;
@@ -460,16 +476,41 @@ EXPORT	int	main(int argc, char ** argv)
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
     debug = process(0L, tag, NULL);
+    debug_set = TRUE;
   }
   
   if (plus.aa_entryn > 0) {
-    int	plusc;
+    const char	*str;
+    int		plusc;
+    
+    /* get current debug value and add tokens if possible */
+    if (debug == NO_VALUE) {
+      str = (const char *)getenv(DEBUG_ENVIRON);
+      if (str == NULL)
+	debug = 0;
+      else
+	debug = hex_to_long(str);
+    }
     
     for (plusc = 0; plusc < plus.aa_entryn; plusc++)
-      if (debug == NO_VALUE)
-	debug = token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
+      debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
+  }
+  
+  if (minus.aa_entryn > 0) {
+    const char	*str;
+    int		minusc;
+    
+    /* get current debug value and add tokens if possible */
+    if (debug == NO_VALUE) {
+      str = (const char *)getenv(DEBUG_ENVIRON);
+      if (str == NULL)
+	debug = 0;
       else
-	debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plusc));
+	debug = hex_to_long(str);
+    }
+    
+    for (minusc = 0; minusc < minus.aa_entryn; minusc++)
+      debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minusc));
   }
   
   if (debug != NO_VALUE) {
@@ -477,7 +518,7 @@ EXPORT	int	main(int argc, char ** argv)
     set_variable(DEBUG_ENVIRON, buf);
     
     /* should we clear the rest? */
-    if (remove_auto && ! keep)
+    if (debug_set && remove_auto && ! keep)
       clear = TRUE;
   }
   
@@ -506,14 +547,26 @@ EXPORT	int	main(int argc, char ** argv)
   if (errno_to_print != NO_VALUE) {
     (void)fprintf(stderr, "%s: malloc_errno value '%d' = \n",
 		  argv_program, errno_to_print);
-    (void)fprintf(stderr, "   '%s'\n", malloc_strerror(errno_to_print));
+    (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
     printed = TRUE;
   }
   
-  if (list)
-    process(0L, NULL, NULL);
+  if (list_tags || list_tokens) {
+    if (list_tags) {
+      (void)fprintf(stderr, "Available Tags:\n");
+      process(0L, NULL, NULL);
+    }
+    if (list_tokens) {
+      attr_t	*attrp;
+      (void)fprintf(stderr, "Debug Tokens:\n");
+      for (attrp = attributes; attrp->at_string != NULL; attrp++)
+	(void)fprintf(stderr, "%s\n", attrp->at_string);
+    }
+  }
   else if (! printed)
     dump_current();
+  
+  argv_cleanup(args);
   
   exit(0);
 }

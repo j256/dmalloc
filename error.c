@@ -41,14 +41,14 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.31 1993/10/17 00:39:23 gray Exp $";
+  "$Id: error.c,v 1.32 1993/11/23 07:41:40 gray Exp $";
 #endif
 
 /*
  * exported variables
  */
 /* global debug flags that are set my MALLOC_DEBUG environ variable */
-EXPORT	int		_malloc_debug = 0;
+EXPORT	int		_malloc_flags = 0;
 
 /*
  * message writer with printf like arguments
@@ -63,13 +63,13 @@ EXPORT	void	_malloc_message(const char * format, ...)
   
   /* no logpath and no print then no workie */
   if (malloc_logpath == NULL
-      && ! BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR))
+      && ! BIT_IS_SET(_malloc_flags, DEBUG_PRINT_PERROR))
     return;
   
   /* maybe dump a time stamp */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_STAMP)) {
-    (void)sprintf(str, "%ld: ", time(NULL));
-    strp += strlen(str);
+  if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_STAMP)) {
+    (void)sprintf(strp, "%ld: ", time(NULL));
+    strp += strlen(strp);
   }
   
   /* write the format + info into str */
@@ -111,7 +111,7 @@ EXPORT	void	_malloc_message(const char * format, ...)
   }
   
   /* do we need to print the message? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR))
+  if (BIT_IS_SET(_malloc_flags, DEBUG_PRINT_PERROR))
     (void)write(STDERR, str, len);
 }
 
@@ -121,8 +121,8 @@ EXPORT	void	_malloc_message(const char * format, ...)
 EXPORT	void	_malloc_die(void)
 {
   /* do I need to drop core? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_ERROR_ABORT))
-    (void)kill(0, SIGABRT);
+  if (BIT_IS_SET(_malloc_flags, DEBUG_ERROR_ABORT))
+    (void)kill(0, ERROR_SIGNAL);
   
   /*
    * NOTE: this should not be exit() because fclose will free, etc
@@ -136,8 +136,8 @@ EXPORT	void	_malloc_die(void)
 EXPORT	void	_malloc_error(const char * func)
 {
   /* do we need to log or print the error? */
-  if ((BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR) && malloc_logpath != NULL)
-      || BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR)) {
+  if ((BIT_IS_SET(_malloc_flags, DEBUG_LOG_PERROR) && malloc_logpath != NULL)
+      || BIT_IS_SET(_malloc_flags, DEBUG_PRINT_PERROR)) {
     
     /* default str value */
     if (func == NULL)
@@ -145,10 +145,10 @@ EXPORT	void	_malloc_error(const char * func)
     
     /* print the malloc error message */
     _malloc_message("ERROR: %s: %s(%d)",
-		    func, malloc_strerror(malloc_errno), malloc_errno);
+		    func, _malloc_strerror(malloc_errno), malloc_errno);
   }
   
   /* do I need to abort? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_ERROR_ABORT))
+  if (BIT_IS_SET(_malloc_flags, DEBUG_ERROR_ABORT))
     _malloc_die();
 }

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.29 1993/10/17 00:43:00 gray Exp $
+# $Id: Makefile.all.in,v 1.30 1993/11/23 07:40:54 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -20,7 +20,7 @@ ARGV = argv
 
 DEFS =
 INCS = -I$(srcdir) -I$(srcdir)/$(ARGV)
-LIBS = @LIBS@ -L$(srcdir) -L$(srcdir)/$(ARGV) -l$(ARGV) -lmalloc_dbg
+LIBS = @LIBS@ -L$(srcdir)/$(ARGV) -l$(ARGV)
 
 LIBRARY	= libmalloc_dbg.a
 UTIL = malloc_dbg
@@ -52,10 +52,12 @@ all : $(LIBRARY) $(UTIL)
 # .PHONY : clean
 clean :
 	rm -f a.out core *.o *.t
+	( cd $(ARGV) ; $(MAKE) $@ )
 
 # .PHONY : clobber
 clobber : clean
 	rm -f $(LIBRARY) $(TEST) $(UTIL) malloc_dbg.h
+	( cd $(ARGV) ; $(MAKE) $@ )
 
 # .PHONY : realclean
 realclean : clobber
@@ -63,6 +65,7 @@ realclean : clobber
 # .PHONY : distclean
 distclean : clobber
 	rm -f config.status Makefile conf.h const.h
+	( cd $(ARGV) ; $(MAKE) $@ )
 #	rm -f configure
 
 # .PHONY : installincs
@@ -96,7 +99,10 @@ $(UTIL) : malloc_dbg.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
 
-$(ARGV)/lib$(ARGV).a $(ARGV)/$(ARGV).h :
+$(ARGV)/$(ARGV).h :
+	( cd $(ARGV) ; $(MAKE) $(ARGV).h )
+
+$(ARGV)/lib$(ARGV).a :
 	( cd $(ARGV) ; $(MAKE) )
 
 # .PHONY : tests
@@ -104,7 +110,7 @@ tests : $(TEST)
 
 $(TEST) : $(TEST).o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o $(LIBS)
+	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
 	mv a.out $@
 
 # %.o : %.c

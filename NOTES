@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.21 1993/10/03 02:01:18 gray Exp $
+$Id: NOTES,v 1.22 1993/11/23 07:41:00 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -25,7 +25,7 @@ WARNINGS:
 -	currently, it is assumed that none of the return-addresses
 	that are returned by the assembly hacks in return.h, are on
 	the heap -- in other words that you do not make calls to
-	malloc libraries ffrom code stored on the heap.  this is
+	malloc libraries from code stored on the heap.  this is
 	because the admin structures use this test on the _next
 	arguments which are usually unioned with the file args to see
 	if the slot is on the free list or not.  See the 2 XXX
@@ -57,5 +57,26 @@ GENERAL:
 	looks at the next argument (unioned with the file argument)
 	and sees if it is null or in the heap meaning it is at the end
 	or middle of a free list.
+
+-------------------------------------------------------------------------------
+
+EXIT REGISTRATION FUNCTIONS BY SYSTEM/OS TYPES:
+
+	System/OS   |   atexit()   |  on_exit()  |   others    |
+	------------+--------------+-------------+-------------+
+	AIX 3.2.4   |     yes      |      no     |      no     |
+	------------+--------------+-------------+-------------+
+	Ultrix 4.3  |      no      |      no     |      no     |
+	------------+--------------+-------------+-------------+
+	BSD/386 1.0 |     yes      |      no     |      no     |
+	------------+--------------+-------------+-------------+
+	OSF/1 1.3   |     yes      |      no     |      no     |
+	------------+--------------+-------------+-------------+
+	SunOS 4.1   |      no      |     yes     |      no     |
+	------------+--------------+-------------+-------------+
+	Solaris 1.1 |      no      |     yes     |      no     |
+	------------+--------------+-------------+-------------+
+	Pyramid     |      no      |      no     |      no     |
+	------------+--------------+-------------+-------------+
 
 -------------------------------------------------------------------------------
