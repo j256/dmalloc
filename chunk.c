@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $
+ * $Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $
  */
 
 /*
@@ -62,25 +62,25 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
+#ident "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
+  "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
 #endif
 #endif
 
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
+#ident "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
 #ident "@(#) Dmalloc package Copyright 2000 by Gray Watson";
-#ident "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
+#ident "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
 #ident "@(#) Source for dmalloc available from http://dmalloc.com/";
 #else
 static	char	*copyright =
-  "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
+  "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
 static	char	*copyright_w =
   "@(#) Dmalloc package Copyright 2000 by Gray Watson";
 static	char	*source_url =
-  "$Id: chunk.c,v 1.157 2000/03/24 21:58:18 gray Exp $";
+  "$Id: chunk.c,v 1.158 2000/04/18 19:42:14 gray Exp $";
 static	char	*source_url_w =
   "@(#) Source for dmalloc available from http://dmalloc.com/";
 #endif
@@ -1930,7 +1930,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
     dblock_p = bblock_p->bb_dblock + ((char *)pnt - (char *)bblock_p->bb_mem) /
       (1 << bblock_p->bb_bit_n);
     
-    if (dblock_p->db_bblock == bblock_p) {
+    if (dblock_p->db_flags != DBLOCK_USER) {
       /* NOTE: we should run through free list here */
       dmalloc_errno = ERROR_IS_FREE;
       log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, "pointer-check",

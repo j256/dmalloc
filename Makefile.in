@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.132 2000/03/30 17:45:07 gray Exp $
+# $Id: Makefile.in,v 1.133 2000/04/18 19:42:14 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -48,9 +48,9 @@ FLS	=  conf.h.in configure.in config.help \
 	install-sh mkinstalldirs rpm.spec \
 	configure
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
-	contrib/atexit.c contrib/dec_notes contrib/dmalloc.gdb \
-	contrib/dmalloc_summarize.pl contrib/next_notes contrib/ra_info.pl \
-	contrib/stratus_ftx_notes
+	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
+	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
+	contrib/ra_info.pl contrib/stratus_ftx_notes
 
 DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi texinfo.tex
 
