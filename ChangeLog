@@ -1,5 +1,7 @@
 Tue Nov  7 11:39:26 2000  Gray Watson  <gray@whopper.be.256.com>
 
+	* Removed malloc.h to malloc_funcs.h to avoid system conflicts.
+
 	* Made log-unknown the default and depreciated the token.  Added a
 	log-known token to _only_ report on known (file/line) memory.
 
@@ -1698,5 +1700,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.263 2000/11/07 17:04:40 gray Exp $
+$Id: ChangeLog,v 1.264 2000/11/07 17:33:03 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.148 2000/10/10 23:20:25 gray Exp $
+ * $Id: malloc.c,v 1.149 2000/11/07 17:33:16 gray Exp $
  */
 
 /*
@@ -75,15 +75,15 @@
 #include "heap.h"
 #include "dmalloc_loc.h"
 #include "dmalloc_lp.h"
-#include "malloc.h"
+#include "malloc_funcs.h"
 #include "return.h"
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.148 2000/10/10 23:20:25 gray Exp $";
+#ident "$Id: malloc.c,v 1.149 2000/11/07 17:33:16 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.148 2000/10/10 23:20:25 gray Exp $";
+  "$Id: malloc.c,v 1.149 2000/11/07 17:33:16 gray Exp $";
 #endif
 #endif
 
