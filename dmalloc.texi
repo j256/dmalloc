@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.87 1995/05/12 21:05:12 gray Exp $
+@c $Id: dmalloc.texi,v 1.88 1995/05/13 00:00:44 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -706,7 +706,7 @@ the caller (so to speak) was.
 
 However, there is a way to track down unfreed memory in this
 circumstance.  You need to compile the library with
-@code{STORE_SEEN_COUNT} defined in @file{conf.h>.  The library will then
+@code{STORE_SEEN_COUNT} defined in @file{conf.h}.  The library will then
 record how many times a pointer has been allocated or freed.  It
 will diskplay the unfreed memory as:
 

@@ -1,5 +1,7 @@
 Fri May 12 16:33:44 1995  Gray Watson  (gray@burger.letters.com)
 
+	* Released version 3.0.6-beta.
+
 	* Fixed up logging of time.  Lots of ifdefs.
 
 	* Added a pointer overhead structure.
@@ -962,5 +964,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.143 1995/05/12 21:05:30 gray Exp $
+$Id: ChangeLog,v 1.144 1995/05/13 00:01:37 gray Exp $
 -------------------------------------------------------------------------------

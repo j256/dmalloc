@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.73 1995/05/12 21:05:31 gray Exp $
+# $Id: Makefile.in,v 1.74 1995/05/13 00:00:42 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -37,7 +37,8 @@ FLS	=  conf.h.in configure configure.in config.help \
 	argv.[ch] argv_loc.h dmalloc.cc \
 	dmalloc.texi dmalloc.info \
 	install.sh mkinstalldirs Deansify.pl
-CFGFLS	= contrib/README contrib/atexit.c contrib/dec_notes contrib/ra_info.pl
+CFGFLS	= contrib/README contrib/Xmalloc.c contrib/atexit.c \
+	contrib/dec_notes contrib/next_notes 
 DOCFLS	= dmalloc.ps texinfo.tex
 
 # Shar file maximum size
