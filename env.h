@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.19 2000/05/16 19:46:36 gray Exp $
+ * $Id: env.h,v 1.20 2000/10/04 16:36:33 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -73,8 +73,8 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const unsigned long addr_count,
 			     const unsigned int debug,
 			     const int interval, const int lock_on,
-			     const char *logpath, const char *sfile,
-			     const int sline, const int scount);
+			     const char *logpath, const char *start_file_p,
+			     const int start_line, const int start_count);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

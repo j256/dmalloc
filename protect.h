@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: protect.h,v 1.2 2000/05/15 22:30:46 gray Exp $
+ * $Id: protect.h,v 1.3 2000/10/04 16:36:34 gray Exp $
  */
 
 #ifndef __PROTECT_H__
@@ -39,12 +39,12 @@
  *
  * ARGUMENTS:
  *
- * block_pnt -> Pointer to block that we are protecting.
+ * mem -> Pointer to block that we are protecting.
  *
  * block_n -> Number of blocks that we are protecting.
  */
 extern
-void	protect_set_read_only(void *block_pnt, const int block_n);
+void	protect_set_read_only(void *mem, const int block_n);
 
 /*
  * void protect_set_read_write
@@ -59,12 +59,12 @@ void	protect_set_read_only(void *block_pnt, const int block_n);
  *
  * ARGUMENTS:
  *
- * block_pnt -> Pointer to block that we are protecting.
+ * mem -> Pointer to block that we are protecting.
  *
  * block_n -> Number of blocks that we are protecting.
  */
 extern
-void	protect_set_read_write(void *block_pnt, const int block_n);
+void	protect_set_read_write(void *mem, const int block_n);
 
 /*
  * void protect_set_no_access
@@ -79,12 +79,12 @@ void	protect_set_read_write(void *block_pnt, const int block_n);
  *
  * ARGUMENTS:
  *
- * block_pnt -> Pointer to block that we are protecting.
+ * mem -> Pointer to block that we are protecting.
  *
  * block_n -> Number of blocks that we are protecting.
  */
 extern
-void	protect_set_no_access(void *block_pnt, const int block_n);
+void	protect_set_no_access(void *mem, const int block_n);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.31 2000/05/15 22:30:11 gray Exp $
+ * $Id: malloc.h,v 1.32 2000/10/04 16:36:33 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -183,7 +183,7 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt);
  * checking with this function.
  */
 extern
-void	_dmalloc_debug(const int flags);
+void	_dmalloc_debug(const unsigned int flags);
 
 /*
  * returns the current debug functionality flags.  this allows you to
