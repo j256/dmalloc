@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.35 1995/05/30 15:09:35 gray Exp $
+ * $Id: chunk_loc.h,v 1.36 1995/06/20 02:06:10 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -81,7 +81,16 @@
 #define BB_PER_ADMIN	((BLOCK_SIZE - \
 			  (sizeof(long) + sizeof(int) + \
 			   sizeof(struct bblock_adm_st *) + \
-			   sizeof(long))) / sizeof(bblock_t))
+			   sizeof(long))) \
+			 / sizeof(bblock_t))
+
+/*
+ * number of da_block entries in a dblock_adm_t which must fit in a
+ * basic block
+ */
+#define DB_PER_ADMIN	((BLOCK_SIZE - \
+			  (sizeof(long) + sizeof(long))) \
+			 / sizeof(dblock_t))
 
 /*
  * calculate the number of bits in SIZE and put in ANS
@@ -102,6 +111,8 @@
 #define FENCE_OVERHEAD		(FENCE_BOTTOM + FENCE_TOP)
 #define FENCE_MAGIC_BOTTOM	0xC0C0AB1B
 #define FENCE_MAGIC_TOP		0xFACADE69
+/* type of the fence magic values */
+#define FENCE_MAGIC_TYPE	int
 
 #define FENCE_WRITE(pnt, size)	do { \
 				  bcopy(fence_bottom, (char *)(pnt), \
@@ -109,13 +120,6 @@
 				  bcopy(fence_top, (char *)(pnt) + (size) - \
 					FENCE_TOP, FENCE_TOP); \
 				} while (0)
-
-/*
- * number of da_block entries in a dblock_adm_t which must fit in a
- * basic block
- */
-#define DB_PER_ADMIN	((BLOCK_SIZE - (sizeof(long) + sizeof(long))) \
-			 / sizeof(dblock_t))
 
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
@@ -133,7 +137,10 @@
 #define BBLOCK_STRING		0x0100		/* block is a string (unused)*/
 
 /*
- * some overhead fields for recording information about the pointer
+ * some overhead fields for recording information about the pointer.
+ * this structure is included in both the basic-block and
+ * divided-block admin structures and helps track specific information
+ * about the pointer.
  */
 typedef struct {
 #if STORE_SEEN_COUNT
@@ -158,7 +165,21 @@ typedef struct {
 } overhead_t;
 
 /*
- * single divided-block administrative structure
+ * Below defines a divided-block structure.  This structure is used to
+ * track allocations that are less than half the size of a
+ * basic-block.  If you have a basic-block size of 4k then 2 2k
+ * allocations will be put into 1 basic-block, each getting one of
+ * these admin structures.  Or 4 1k allocations, or 8 512 byte
+ * allocations, etc.
+ * 
+ * In an attempt to keep per-pointer overhead as low as possible I use a
+ * lot of unions in this structure.  This tends to complicate the code
+ * a bit, so to simplify I use define statements.  This in turn
+ * complicates debugging :-) -- a trade-off.  The comments at the end
+ * of the define statements show when the field in the union is used.
+ * For instance, db_size (really db_info.in_nums.nu_size) is in use
+ * when the pointer is Alloc[at]ed.  The db_next field is used when
+ * the admin structure is on the free list.
  */
 struct dblock_st {
   union {
@@ -171,8 +192,8 @@ struct dblock_st {
   } db_info;
   
   /* to reference union and struct elements as db elements */
-#define db_size		db_info.in_nums.nu_size	/* Used */
-#define db_line		db_info.in_nums.nu_line	/* Used */
+#define db_size		db_info.in_nums.nu_size	/* Alloced */
+#define db_line		db_info.in_nums.nu_line	/* Alloced */
 #define db_bblock	db_info.in_bblock	/* Free */
   
   union {
@@ -182,14 +203,25 @@ struct dblock_st {
   
   /* to reference union elements as db elements */
 #define db_next		db_pnt.pn_next		/* Free */
-#define db_file		db_pnt.pn_file		/* Used */
+#define db_file		db_pnt.pn_file		/* Alloced */
   
   overhead_t	db_overhead;			/* configured overhead adds */
 };
 typedef struct dblock_st	dblock_t;
 
 /*
- * single basic-block administrative structure
+ * Below defines a basic-block structure.  This structure is used to
+ * track allocations that fit in one or many basic-blocks.  If you
+ * have a basic-block size of 4k then a 16k allocation will take up 4
+ * basic-blocks and 4 of these admin structures.
+ * 
+ * Like the above divided-block structure, I use unions here to to
+ * simplify the code and the comments at the end show when the field
+ * is used.  For instance, bb_bitn (really bb_nums.nu_bitn) is in use
+ * when the pointer is tracking user divided-block allocations or when
+ * the pointer is free.  The bb_freen field is used when the block is
+ * full of admin structures such as this.  Yes, the library uses this
+ * structure to track another block full of these structures.  Yikes!
  */
 struct bblock_st {
   unsigned short	bb_flags;		/* what it is */
@@ -204,17 +236,18 @@ struct bblock_st {
 #define bb_line		bb_nums.nu_line		/* User-bblock */
   
   union {
-    unsigned int	in_freen;		/* admin count number */
+    unsigned long	in_freen;		/* admin count number */
+    unsigned long	in_blockn;		/* number of blocks */
+    unsigned long	in_size;		/* size of allocation */
+    /* NOTE: this pointer and the longs may be of a different type */
     dblock_t		*in_dblock;		/* pointer to dblock info */
-    unsigned int	in_blockn;		/* number of blocks */
-    unsigned int	in_size;		/* size of allocation */
   } bb_info;
   
   /* to reference union elements as bb elements */
 #define bb_freen	bb_info.in_freen	/* BBlock-admin */
-#define	bb_dblock	bb_info.in_dblock	/* User-dblock */
 #define	bb_blockn	bb_info.in_blockn	/* Free */
 #define	bb_size		bb_info.in_size		/* User-bblock */
+#define	bb_dblock	bb_info.in_dblock	/* User-dblock */
   
   union {
     struct dblock_adm_st	*pn_slotp;	/* pointer to db_admin block */
@@ -236,7 +269,9 @@ struct bblock_st {
 typedef struct bblock_st	bblock_t;
 
 /*
- * collection of bblock admin structures
+ * Below is a definition of a bblock (basic-block) administration
+ * structure.  This structure which fills a basic-block of space in
+ * memory and holds a number of bblock structures.
  */
 struct bblock_adm_st {
   long			ba_magic1;		/* bottom magic number */
@@ -248,7 +283,9 @@ struct bblock_adm_st {
 typedef struct bblock_adm_st	bblock_adm_t;
 
 /*
- * collection of dblock admin structures
+ * Below is a definition of a dblock (divided-block) administration
+ * structure.  This structure fills a basic-block of space in memory
+ * and holds a number of dblock structures.
  */
 struct dblock_adm_st {
   long			da_magic1;		/* bottom magic number */
