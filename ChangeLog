@@ -1,3 +1,13 @@
+Thu Oct 22 00:47:18 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Ran through most of the debug-flag functionality testing and
+	tweaking.  Found some bugs on dblock handling and some messed up
+	logic with the way the LOG flags were working.
+
+	* malloc_debug is looking good.  It now outputs C or Bourne shell
+	code and seems to work in both environments.  What do sh folks use
+	in the place of c-shell aliasing?  I guess use bash.  :-)
+
 Wed Oct 21 03:27:35 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Major changes.  I sort of went overboard tonight.  I integrated

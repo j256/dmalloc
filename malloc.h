@@ -1,13 +1,44 @@
 /*
  * defines for the Malloc module
  *
- * Copyright 1991 by the Antaire Corporation
+ * Copyright 1992 by Gray Watson and the Antaire Corporation
  *
- * $Id: malloc.h,v 1.2 1992/10/22 04:46:28 gray Exp $
+ * This file is part of the malloc-debug package.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * 
+ * The author of the program may be contacted at gray.watson@antaire.com
+ *
+ * $Id: malloc.h,v 1.3 1992/11/06 01:13:54 gray Exp $
  */
 
 #ifndef __MALLOC_H__
 #define __MALLOC_H__
+
+/*
+ * global variable and procedure scoping for code readability
+ */
+#undef	EXPORT
+#define	EXPORT
+
+#undef	IMPORT
+#define	IMPORT		extern
+
+#undef	LOCAL
+#define	LOCAL		static
+
 
 /*
  * malloc function return codes
@@ -21,22 +52,6 @@
 
 #define MALLOC_VERIFY_ERROR	0		/* checks failed, error */
 #define MALLOC_VERIFY_NOERROR	1		/* checks passed, no error */
-
-/*
- * useful defines for all modules
- */
-
-/*
- * global variable and procedure scoping for code readability
- */
-#undef	EXPORT
-#define	EXPORT
-
-#undef	IMPORT
-#define	IMPORT		extern
-
-#undef	LOCAL
-#define	LOCAL		static
 
 /*
  * standard int return codes
@@ -100,70 +115,19 @@
 
 #endif /* ! BIT_FLAG */
 
-/*
- * RCS id define
- */
-#ifndef RCS_ID
-
-#undef RCS_ID
-#define RCS_ID(x)	\
-  static void _rcs_id_() { \
-    char *r = x; \
-    char *s = "Built on: '" __DATE__ ", " __TIME__ "'"; \
-    r++; s++;\
-    _rcs_id_(); \
-  }
-
-#endif /* ! RCS_ID */
-  
 /*****************************************************************************/
 
 /*
- * system function prototypes
+ * system function prototype for memory copy.  needed for below macros.
  */
-IMPORT	char	*strcat(char * dest, char *str);
-
-#ifdef USG
 IMPORT	char	*memcpy(char * to, char * from, int length);
-IMPORT	char	*memset(char * pnt, int length);
-IMPORT	char	*strchr(char * str, char ch);
-#else
-IMPORT	void	bcopy(void * from, void * to, int length);
-IMPORT	void	bzero(void * b, int length);
-IMPORT	char	*index(char * str, char ch);
-#endif
 
 /*
  * memory copy: copy SIZE bytes from pointer FROM to pointer TO
  */
-#ifdef USG
-#  define MEMORY_COPY(from, to, size)		memcpy(to, from, size);
-#else
-#  define MEMORY_COPY(from, to, size)		bcopy(from, to, size)
-#endif
-
-/*
- * memory zero: clear or zero-out SIZE bytes in pointer PNT
- */
-#ifdef USG
-#  define MEMORY_ZERO(pnt, size)		memset(pnt, 0, size);
-#else
-#  define MEMORY_ZERO(pnt, size)		bzero(pnt, size)
-#endif
-
-/*
- * string search: search for char CH in string STR and return a pointer to it
- */
-#ifdef USG
-#  define STRING_SEARCH(str, ch)		strchr(str, ch)
-#else
-#  define STRING_SEARCH(str, ch)		index(str, ch)
-#endif
-
-/*
- * string concatenate: append string STR to the end of string DEST
- */
-#define STRING_CONCAT(dest, str)		strcat(dest, str)
+#define MEMORY_COPY(from, to, size)		(void)memcpy((char *)to, \
+							     (char *)from, \
+							     size)
 
 /*****************************************************************************/
 
@@ -261,6 +225,9 @@ IMPORT	char	*index(char * str, char ch);
 
 /* logfile for dumping malloc info, MALLOC_LOGFILE env. var overrides this */
 IMPORT	char		*malloc_logpath;
+
+/* internal malloc error number for reference purposes only */
+IMPORT	int		malloc_errno;
 
 /*
  * shutdown alloc module, provide statistics

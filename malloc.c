@@ -1,41 +1,53 @@
 /*
  * user-level memory-allocation routines
  *
- * Copyright 1991 by the Antaire Corporation
+ * program that handles the malloc debug variables.
+ *
+ * Copyright 1992 by Gray Watson and the Antaire Corporation
+ *
+ * This file is part of the malloc-debug package.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * The author of the program may be contacted at gray.watson@antaire.com
  */
 
 #define MALLOC_MAIN
 
-#if defined(ANTAIRE)
-#include "useful.h"
-#include "assert.h"
-#include "terminate.h"
-#endif
-
+#include "malloc.h"
 #include "chunk.h"
 #include "error.h"
 #include "heap.h"
-#include "malloc.h"
-#include "malloc_dbg.h"
 #include "malloc_errno.h"
 #include "malloc_errors.h"
 #include "malloc_loc.h"
+#include "proto.h"
 
-RCS_ID("$Id: malloc.c,v 1.2 1992/10/22 04:46:26 gray Exp $");
-
-/*
- * library calls
- */
-IMPORT	char	*getenv();
+LOCAL	char	*rcs_id =
+  "$Id: malloc.c,v 1.3 1992/11/06 01:13:51 gray Exp $";
 
 /*
  * exported variables
  */
 /* logfile for dumping malloc info, MALLOC_LOGFILE env. var overrides this */
 EXPORT	char		*malloc_logpath	= NULL;
+/* internal malloc error number for reference purposes only */
+EXPORT	int		malloc_errno = 0;
 
 /* local routines */
-LOCAL	int		malloc_startup(void);	/* used before defined */
+LOCAL	int		malloc_startup(void);
 EXPORT	void		malloc_shutdown(void);
 
 /* local variables */
@@ -90,7 +102,7 @@ LOCAL	int	check_debug_vars(char * file, int line)
   static int	iterc = 0;
   
   if (in_alloc) {
-    _malloc_errno = MALLOC_IN_TWICE;
+    malloc_errno = MALLOC_IN_TWICE;
     _malloc_perror("check_debug_vars");
     /* malloc_perror may die already */
     _malloc_die();
@@ -106,7 +118,7 @@ LOCAL	int	check_debug_vars(char * file, int line)
   /* check start file/line specifications */
   if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP)
       && start_file[0] != NULLC && file != NULL
-      && strcmp(start_file, file) == 0
+      && STRING_COMPARE(start_file, file) == 0
       && (line == 0 || line == start_line))
     BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
   
@@ -132,22 +144,22 @@ LOCAL	int	check_debug_vars(char * file, int line)
 /*
  * get the values of malloc environ variables
  */
-LOCAL	void	get_environ()
+LOCAL	void	get_environ(void)
 {
   char		*env;
   
   /* get the malloc_debug level */
-  if ((env = getenv(DEBUG_ENVIRON)) != NULL)
+  if ((env = GET_ENV(DEBUG_ENVIRON)) != NULL)
     _malloc_debug = hex_to_int(env);
   
   /* get the malloc debug logfile name into a holding variable */
-  if ((env = getenv(LOGFILE_ENVIRON)) != NULL) {
+  if ((env = GET_ENV(LOGFILE_ENVIRON)) != NULL) {
     (void)strcpy(log_path, env);
     malloc_logpath = log_path;
   }
   
   /* watch for a specific address and die when we get it */
-  if ((env = getenv(ADDRESS_ENVIRON)) != NULL) {
+  if ((env = GET_ENV(ADDRESS_ENVIRON)) != NULL) {
     char	*addp;
     
     if ((addp = STRING_SEARCH(env, ':')) != NULL) {
@@ -161,14 +173,14 @@ LOCAL	void	get_environ()
   }
   
   /* check the heap every X times */
-  if ((env = getenv(INTERVAL_ENVIRON)) != NULL)
+  if ((env = GET_ENV(INTERVAL_ENVIRON)) != NULL)
     check_interval = atoi(env);
   
   /*
    * start checking the heap after X interations OR
    * start at a file:line combination
    */
-  if ((env = getenv(START_ENVIRON)) != NULL) {
+  if ((env = GET_ENV(START_ENVIRON)) != NULL) {
     char	*startp;
     
     BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
@@ -206,14 +218,6 @@ LOCAL	int	malloc_startup(void)
   if (_chunk_startup() == ERROR)
     return ERROR;
   
-#if defined(ANTAIRE)
-  /* check out _malloc_errno when we assert */
-  assert_check(&_malloc_errno, "malloc error code (see malloc_err.h)", 0,
-	       malloc_errlist);
-  
-  terminate_catch(malloc_shutdown);
-#endif
-  
   return NOERROR;
 }
 
@@ -223,11 +227,6 @@ LOCAL	int	malloc_startup(void)
 EXPORT	void	malloc_shutdown(void)
 {
   /* NOTE: do not test for IN_TWICE here */
-  
-#if defined(ANTAIRE)
-  if (! terminating)
-    terminate_uncatch(malloc_shutdown);
-#endif
   
   /* dump some statistics to the logfile */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_STATS))
@@ -270,7 +269,7 @@ EXPORT	char	*_calloc_info(char * file, int line, unsigned int elen,
       address_count--;
   }
   
-  MEMORY_ZERO(newp, len);
+  MEMORY_SET(newp, NULLC, len);
   
   in_alloc = FALSE;
   
@@ -437,7 +436,7 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
 /*
  * call through to _heap_map function, returns [NO]ERROR
  */
-EXPORT	int	malloc_heap_map()
+EXPORT	int	malloc_heap_map(void)
 {
   if (check_debug_vars(NULL, 0) != NOERROR)
     return ERROR;

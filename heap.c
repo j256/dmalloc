@@ -1,7 +1,25 @@
 /*
  * system specific memory routines
  *
- * Copyright 1991 by the Antaire Corporation
+ * Copyright 1992 by Gray Watson and the Antaire Corporation
+ *
+ * This file is part of the malloc-debug package.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * 
+ * The author of the program may be contacted at gray.watson@antaire.com
  */
 
 /*
@@ -15,24 +33,14 @@
 
 #define HEAP_MAIN
 
-#if defined(ANTAIRE)
-#include "useful.h"
-#endif
-
+#include "malloc.h"
 #include "chunk.h"
 #include "error.h"
 #include "heap.h"
 #include "malloc_errno.h"
 
-RCS_ID("$Id: heap.c,v 1.7 1992/10/21 07:34:13 gray Exp $");
-
-/*
- * system functions
- */
-
-#if defined(sparc) || defined(i386) || defined(mips)
-IMPORT	caddr_t		sbrk(/* int incr */);	/* to extend the heap */
-#endif
+LOCAL	char	*rcs_id =
+  "$Id: heap.c,v 1.8 1992/11/06 01:13:48 gray Exp $";
 
 /* exported variables */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */
@@ -47,7 +55,7 @@ EXPORT	char	*_heap_alloc(unsigned int size)
   
 #if defined(sparc) || defined(i386) || defined(mips)
   if ((ret = sbrk(size)) == HEAP_ALLOC_ERROR) {
-    _malloc_errno = MALLOC_ALLOC_FAILED;
+    malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_alloc");
   }
   
@@ -67,7 +75,7 @@ EXPORT	char	*_heap_end(void)
   
 #if defined(sparc) || defined(i386) || defined(mips)
   if ((ret = sbrk(0)) == HEAP_ALLOC_ERROR) {
-    _malloc_errno = MALLOC_ALLOC_FAILED;
+    malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_end");
   }
 #endif

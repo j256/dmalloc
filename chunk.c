@@ -1,7 +1,25 @@
 /*
  * memory chunk low-level allocation routines
  *
- * Copyright 1991 by the Antaire Corporation
+ * Copyright 1992 by Gray Watson and the Antaire Corporation
+ *
+ * This file is part of the malloc-debug package.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * The author of the program may be contacted at gray.watson@antaire.com
  */
 
 /*
@@ -11,21 +29,17 @@
 
 #define CHUNK_MAIN
 
-#if defined(ANTAIRE)
-# include "useful.h"
-# include "logger.h"
-#endif
-
+#include "malloc.h"
 #include "chunk.h"
 #include "chunk_loc.h"
 #include "error.h"
 #include "heap.h"
-#include "malloc.h"
-#include "malloc_dbg.h"
 #include "malloc_errno.h"
 #include "malloc_loc.h"
+#include "proto.h"
 
-RCS_ID("$Id: chunk.c,v 1.9 1992/10/22 04:45:57 gray Exp $");
+LOCAL	char	*rcs_id =
+  "$Id: chunk.c,v 1.10 1992/11/06 01:13:38 gray Exp $";
 
 /* for formating */
 #define FREE_COLUMN		    5		/* for dump_free formating */
@@ -36,15 +50,6 @@ RCS_ID("$Id: chunk.c,v 1.9 1992/10/22 04:45:57 gray Exp $");
 #define MAX_LINE_NUMBER		10000		/* max __LINE__ value */
 
 #define FREE_CHAR		'\305'		/* to blank free space with */
-
-/*
- * exported variables
- *
- * NOTE: these are here so the user won't see them in alloc.h
- */
-/* global debug level number */
-EXPORT	int		_malloc_debug		= 0;
-EXPORT	int		_malloc_errno		= 0;	/* error number */
 
 /* free lists of bblocks and dblocks */
 LOCAL	bblock_t	*free_bblock[LARGEST_BLOCK + 1];
@@ -84,28 +89,6 @@ LOCAL	int		free_count	= 0;	/* count the frees */
 LOCAL	int		malloc_count	= 0;	/* count the mallocs */
 LOCAL	int		realloc_count	= 0;	/* count the reallocs */
 
-/************************** local information logger *************************/
-
-#if !defined(LOGGER)
-
-#define LOGGER_INFO	0			/* info level logger */
-
-/*
- * Internal logger, here for non-Antaire systems (level is ignored)
- * NOTE: this is here so the users will not see it in alloc.h
- */
-LOCAL	void	LOGGER(int level, char * format, ...)
-{
-  va_list	args;
-  
-  /* write the format + info into str */
-  va_start(args, format);
-  _malloc_vmessage(format, args);
-  va_end(args);
-}
-
-#endif /* ! ANTAIRE */
-
 /************************* fence-post error functions ************************/
 
 /*
@@ -126,7 +109,7 @@ LOCAL	int	fence_read(char * pnt, unsigned int size, char * file,
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("under fence on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, file, line);
-      _malloc_errno = MALLOC_UNDER_FENCE;
+      malloc_errno = MALLOC_UNDER_FENCE;
       _malloc_perror("fence_read");
       return ERROR;
     }
@@ -143,7 +126,7 @@ LOCAL	int	fence_read(char * pnt, unsigned int size, char * file,
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("over fence on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, file, line);
-      _malloc_errno = MALLOC_OVER_FENCE;
+      malloc_errno = MALLOC_OVER_FENCE;
       _malloc_perror("fence_read");
       return ERROR;
     }
@@ -182,7 +165,7 @@ EXPORT	int	_chunk_startup(void)
   
   /* align the base pointer */
   if (_heap_align_base(BLOCK_SIZE) == MALLOC_ERROR) {
-    _malloc_errno = MALLOC_BAD_SETUP;
+    malloc_errno = MALLOC_BAD_SETUP;
     _malloc_perror("_chunk_startup");
     return ERROR;
   }
@@ -194,15 +177,15 @@ EXPORT	int	_chunk_startup(void)
     free_dblock[binc] = NULL;
   
   /* verify some conditions */
-  if (BB_PER_ADMIN <= 2 ||
-      sizeof(bblock_adm_t) > BLOCK_SIZE ||
-      DB_PER_ADMIN < (1 << (BASIC_BLOCK - SMALLEST_BLOCK)) ||
-      sizeof(dblock_adm_t) > BLOCK_SIZE) {
-    _malloc_errno = MALLOC_BAD_SETUP;
+  if (BB_PER_ADMIN <= 2
+      || sizeof(bblock_adm_t) > BLOCK_SIZE
+      || DB_PER_ADMIN < (1 << (BASIC_BLOCK - SMALLEST_BLOCK))
+      || sizeof(dblock_adm_t) > BLOCK_SIZE) {
+    malloc_errno = MALLOC_BAD_SETUP;
     _malloc_perror("_chunk_startup");
     return ERROR;
   }
-
+  
   /* assign value to add to pointers when displaying */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
     pnt_below_adm = FENCE_BOTTOM;
@@ -226,7 +209,7 @@ LOCAL	int	num_bits(unsigned int size)
   
 #if defined(MALLOC_NO_ZERO_SIZE)
   if (size == 0) {
-    _malloc_errno = MALLOC_BAD_SIZE;
+    malloc_errno = MALLOC_BAD_SIZE;
     _malloc_perror("num_bits");
     return ERROR;
   }
@@ -305,7 +288,7 @@ LOCAL	bblock_t	*get_bblocks(int bitc)
   bblock_t	*bblockp;
   
   if (bitc < BASIC_BLOCK) {
-    _malloc_errno = MALLOC_BAD_SIZE;
+    malloc_errno = MALLOC_BAD_SIZE;
     _malloc_perror("get_bblocks");
     return NULL;
   }
@@ -488,7 +471,7 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)) {
     freep = mem + (1 << bitc);
-    (void)memset(freep, FREE_CHAR, 1 << bitc);
+    MEMORY_SET(freep, FREE_CHAR, 1 << bitc);
   }
   
   for (; dblockp < *admp + (1 << (BASIC_BLOCK - bitc)) - 1; dblockp++) {
@@ -498,7 +481,7 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
     
     if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)) {
       freep += 1 << bitc;
-      (void)memset(freep, FREE_CHAR, 1 << bitc);
+      MEMORY_SET(freep, FREE_CHAR, 1 << bitc);
     }
   }
   
@@ -522,7 +505,7 @@ LOCAL	bblock_t	*find_bblock(char * pnt, int * block_num,
   if (pnt == NULL) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("referenced NULL pointer");
-    _malloc_errno = MALLOC_POINTER_NULL;
+    malloc_errno = MALLOC_POINTER_NULL;
     _malloc_perror("find_bblock");
     return NULL;
   }
@@ -533,7 +516,7 @@ LOCAL	bblock_t	*find_bblock(char * pnt, int * block_num,
   if (! IS_IN_HEAP(pnt)) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("pointer '%#lx' is not in heap", pnt);
-    _malloc_errno = MALLOC_POINTER_NOT_IN_HEAP;
+    malloc_errno = MALLOC_POINTER_NOT_IN_HEAP;
     _malloc_perror("find_bblock");
     return NULL;
   }
@@ -557,7 +540,7 @@ LOCAL	bblock_t	*find_bblock(char * pnt, int * block_num,
   if (bblock_admp == NULL) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", pnt);
-    _malloc_errno = MALLOC_POINTER_NOT_FOUND;
+    malloc_errno = MALLOC_POINTER_NOT_FOUND;
     _malloc_perror("find_bblock");
     return NULL;
   }
@@ -602,7 +585,7 @@ EXPORT	int	_chunk_heap_check(void)
       for (bblockp = free_bblock[bitc]; bblockp != NULL;
 	   bblockp = bblockp->bb_next, free_bblockc[bitc]++)
 	if (bblockp->bb_next != NULL && ! IS_IN_HEAP(bblockp->bb_next)) {
-	  _malloc_errno = MALLOC_BAD_FREE_LIST;
+	  malloc_errno = MALLOC_BAD_FREE_LIST;
 	  _malloc_perror("_chunk_heap_check");
 	  return ERROR;
 	}
@@ -618,7 +601,7 @@ EXPORT	int	_chunk_heap_check(void)
 	for (dblockp = free_dblock[bitc]; dblockp != NULL;
 	     dblockp = dblockp->db_next, free_dblockc[bitc]++)
 	  if (dblockp->db_next != NULL && ! IS_IN_HEAP(dblockp->db_next)) {
-	    _malloc_errno = MALLOC_BAD_FREE_LIST;
+	    malloc_errno = MALLOC_BAD_FREE_LIST;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
@@ -633,22 +616,22 @@ EXPORT	int	_chunk_heap_check(void)
   
   /* test admin pointer validity */
   if (! IS_IN_HEAP(this)) {
-    _malloc_errno = MALLOC_BAD_ADMINP;
+    malloc_errno = MALLOC_BAD_ADMINP;
     _malloc_perror("_chunk_heap_check");
     return ERROR;
   }
   
   /* test structure validity */
-  if (this->ba_magic1 != CHUNK_MAGIC_BASE ||
-      this->ba_magic2 != CHUNK_MAGIC_TOP) {
-    _malloc_errno = MALLOC_BAD_ADMIN_MAGIC;
+  if (this->ba_magic1 != CHUNK_MAGIC_BASE
+      || this->ba_magic2 != CHUNK_MAGIC_TOP) {
+    malloc_errno = MALLOC_BAD_ADMIN_MAGIC;
     _malloc_perror("_chunk_heap_check");
     return ERROR;
   }
   
   /* verify count value */
   if (this->ba_count != bbc) {
-    _malloc_errno = MALLOC_BAD_ADMIN_COUNT;
+    malloc_errno = MALLOC_BAD_ADMIN_COUNT;
     _malloc_perror("_chunk_heap_check");
     return ERROR;
   }
@@ -667,22 +650,22 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* test admin pointer validity */
       if (! IS_IN_HEAP(this)) {
-	_malloc_errno = MALLOC_BAD_ADMINP;
+	malloc_errno = MALLOC_BAD_ADMINP;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* test structure validity */
-      if (this->ba_magic1 != CHUNK_MAGIC_BASE ||
-	  this->ba_magic2 != CHUNK_MAGIC_TOP) {
-	_malloc_errno = MALLOC_BAD_ADMIN_MAGIC;
+      if (this->ba_magic1 != CHUNK_MAGIC_BASE
+	  || this->ba_magic2 != CHUNK_MAGIC_TOP) {
+	malloc_errno = MALLOC_BAD_ADMIN_MAGIC;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* verify count value */
       if (this->ba_count != bbc) {
-	_malloc_errno = MALLOC_BAD_ADMIN_COUNT;
+	malloc_errno = MALLOC_BAD_ADMIN_COUNT;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -698,7 +681,7 @@ EXPORT	int	_chunk_heap_check(void)
     
     /* we better not have has a no allocation block before */
     if (undef == 1) {
-      _malloc_errno = MALLOC_BAD_BLOCK_ORDER;
+      malloc_errno = MALLOC_BAD_BLOCK_ORDER;
       _malloc_perror("_chunk_heap_check");
       return ERROR;
     }
@@ -715,7 +698,7 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check X blocks in a row */
       if (bblockc != 0) {
-	_malloc_errno = MALLOC_USER_NON_CONTIG;
+	malloc_errno = MALLOC_USER_NON_CONTIG;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -743,27 +726,27 @@ EXPORT	int	_chunk_heap_check(void)
 	if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	  _malloc_message("bad line number on pointer alloced in '%s:%d'",
 			  bblockp->bb_file, bblockp->bb_line);
-	_malloc_errno = MALLOC_BAD_LINE;
+	malloc_errno = MALLOC_BAD_LINE;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take over */
-      if (bblockp->bb_size <= BLOCK_SIZE / 2 ||
-	  bblockp->bb_size > (1 << LARGEST_BLOCK)) {
+      if (bblockp->bb_size <= BLOCK_SIZE / 2
+	  || bblockp->bb_size > (1 << LARGEST_BLOCK)) {
 	if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	  _malloc_message("bad size on pointer alloced in '%s:%d'",
 			  bblockp->bb_file, bblockp->bb_line);
-	_malloc_errno = MALLOC_BAD_SIZE;
+	malloc_errno = MALLOC_BAD_SIZE;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* check file pointer */
       if (bblockp->bb_file == NULL) {
-	len = strlen(bblockp->bb_file);
+	len = STRING_LENGTH(bblockp->bb_file);
 	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
-	  _malloc_errno = MALLOC_BAD_FILEP;
+	  malloc_errno = MALLOC_BAD_FILEP;
 	  _malloc_perror("_chunk_heap_check");
 	  return ERROR;
 	}
@@ -771,19 +754,19 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check X blocks in a row */
       if (bblockc == 0) {
-	_malloc_errno = MALLOC_USER_NON_CONTIG;
+	malloc_errno = MALLOC_USER_NON_CONTIG;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       else
-	if (start == 0 &&
-	    (last_bblockp == NULL ||
-	     (last_bblockp->bb_flags != BBLOCK_START_USER && 
-	      last_bblockp->bb_flags != BBLOCK_USER) ||
-	     bblockp->bb_file != last_bblockp->bb_file ||
-	     bblockp->bb_line != last_bblockp->bb_line ||
-	     bblockp->bb_size != last_bblockp->bb_size)) {
-	  _malloc_errno = MALLOC_USER_NON_CONTIG;
+	if (start == 0
+	    && (last_bblockp == NULL
+		|| (last_bblockp->bb_flags != BBLOCK_START_USER &&
+		    last_bblockp->bb_flags != BBLOCK_USER)
+		|| bblockp->bb_file != last_bblockp->bb_file
+		|| bblockp->bb_line != last_bblockp->bb_line
+		|| bblockp->bb_size != last_bblockp->bb_size)) {
+	  malloc_errno = MALLOC_USER_NON_CONTIG;
 	  _malloc_perror("_chunk_heap_check");
 	  return ERROR;
 	}
@@ -797,9 +780,9 @@ EXPORT	int	_chunk_heap_check(void)
     case BBLOCK_ADMIN:
       
       /* check the bblock_admin linked-list */
-      if ((last_admp == NULL && bblockp->bb_adminp != bblock_adm_head) ||
-	  (last_admp != NULL && last_admp->ba_next != bblockp->bb_adminp)) {
-	_malloc_errno = MALLOC_BAD_BLOCK_ADMINP;
+      if ((last_admp == NULL && bblockp->bb_adminp != bblock_adm_head)
+	  || (last_admp != NULL && last_admp->ba_next != bblockp->bb_adminp)) {
+	malloc_errno = MALLOC_BAD_BLOCK_ADMINP;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -807,7 +790,7 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check count against admin count */
       if (bblockp->bb_count != bblockp->bb_adminp->ba_count) {
-	_malloc_errno = MALLOC_BAD_BLOCK_ADMINC;
+	malloc_errno = MALLOC_BAD_BLOCK_ADMINC;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -817,14 +800,14 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check out bitc */
       if (bblockp->bb_bitc < 0 || bblockp->bb_bitc >= BASIC_BLOCK) {
-	_malloc_errno = MALLOC_BAD_DBLOCK_SIZE;
+	malloc_errno = MALLOC_BAD_DBLOCK_SIZE;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* check out dblock pointer */
       if (! IS_IN_HEAP(bblockp->bb_dblock)) {
-	_malloc_errno = MALLOC_BAD_DBLOCK_POINTER;
+	malloc_errno = MALLOC_BAD_DBLOCK_POINTER;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -832,7 +815,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* verify mem pointer */
       if (bblockp->bb_mem !=
 	  BLOCK_POINTER(this->ba_count + (bblockp - this->ba_block))) {
-	_malloc_errno = MALLOC_BAD_DBLOCK_MEM;
+	malloc_errno = MALLOC_BAD_DBLOCK_MEM;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -858,7 +841,7 @@ EXPORT	int	_chunk_heap_check(void)
 	      
 	      /* did we find it? */
 	      if (dblistp == NULL) {
-		_malloc_errno = MALLOC_BAD_FREE_LIST;
+		malloc_errno = MALLOC_BAD_FREE_LIST;
 		_malloc_perror("_chunk_heap_check");
 		return ERROR;
 	      }
@@ -877,7 +860,7 @@ EXPORT	int	_chunk_heap_check(void)
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad size on pointer alloced in '%s:%d'",
 			      dblockp->db_file, dblockp->db_line);
-	    _malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
@@ -894,15 +877,15 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check out dblock pointer */
       if (! IS_IN_HEAP(bblockp->bb_slotp)) {
-	_malloc_errno = MALLOC_BAD_DBADMIN_POINTER;
+	malloc_errno = MALLOC_BAD_DBADMIN_POINTER;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* verify magic numbers */
-      if (bblockp->bb_slotp->da_magic1 != CHUNK_MAGIC_BASE ||
-	  bblockp->bb_slotp->da_magic2 != CHUNK_MAGIC_TOP) {
-	_malloc_errno = MALLOC_BAD_DBADMIN_MAGIC;
+      if (bblockp->bb_slotp->da_magic1 != CHUNK_MAGIC_BASE
+	  || bblockp->bb_slotp->da_magic2 != CHUNK_MAGIC_TOP) {
+	malloc_errno = MALLOC_BAD_DBADMIN_MAGIC;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -933,7 +916,7 @@ EXPORT	int	_chunk_heap_check(void)
 		if (*bytep != FREE_CHAR) {
 		  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 		    _malloc_message("bad free memory at '%#lx'", bytep);
-		  _malloc_errno = MALLOC_FREE_NON_BLANK;
+		  malloc_errno = MALLOC_FREE_NON_BLANK;
 		  _malloc_perror("_chunk_heap_check");
 		  return ERROR;
 		}
@@ -946,7 +929,7 @@ EXPORT	int	_chunk_heap_check(void)
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad size on pointer alloced in '%s:%d'",
 			      dblockp->db_file, dblockp->db_line);
-	    _malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
@@ -956,14 +939,14 @@ EXPORT	int	_chunk_heap_check(void)
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad line number on pointer alloced in '%s:%d'",
 			      dblockp->db_file, dblockp->db_line);
-	    _malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
 	  
-	  len = strlen(dblockp->db_file);
+	  len = STRING_LENGTH(dblockp->db_file);
 	  if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
-	    _malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+	    malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
@@ -976,16 +959,16 @@ EXPORT	int	_chunk_heap_check(void)
       /* NOTE: check out free_lists, depending on debug level? */
       
       /* check out bitc which is the free-lists size */
-      if (bblockp->bb_bitc < BASIC_BLOCK ||
-	  bblockp->bb_bitc > LARGEST_BLOCK) {
-	_malloc_errno = MALLOC_BAD_SIZE;
+      if (bblockp->bb_bitc < BASIC_BLOCK
+	  || bblockp->bb_bitc > LARGEST_BLOCK) {
+	malloc_errno = MALLOC_BAD_SIZE;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
       
       /* verify linked list pointer */
       if (bblockp->bb_next != NULL && ! IS_IN_HEAP(bblockp->bb_next)) {
-	_malloc_errno = MALLOC_BAD_FREE_LIST;
+	malloc_errno = MALLOC_BAD_FREE_LIST;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -993,7 +976,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* verify mem pointer */
       if (bblockp->bb_mem !=
 	  BLOCK_POINTER(this->ba_count + (bblockp - this->ba_block))) {
-	_malloc_errno = MALLOC_BAD_FREE_MEM;
+	malloc_errno = MALLOC_BAD_FREE_MEM;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -1012,7 +995,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  
 	  /* did we find it? */
 	  if (bblistp == NULL) {
-	    _malloc_errno = MALLOC_BAD_FREE_LIST;
+	    malloc_errno = MALLOC_BAD_FREE_LIST;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
@@ -1021,9 +1004,9 @@ EXPORT	int	_chunk_heap_check(void)
 	}
       }
       else
-	if (last_bblockp == NULL || last_bblockp->bb_flags != BBLOCK_FREE ||
-	    bblockp->bb_bitc != last_bblockp->bb_bitc) {
-	  _malloc_errno = MALLOC_FREE_NON_CONTIG;
+	if (last_bblockp == NULL || last_bblockp->bb_flags != BBLOCK_FREE
+	    || bblockp->bb_bitc != last_bblockp->bb_bitc) {
+	  malloc_errno = MALLOC_FREE_NON_CONTIG;
 	  _malloc_perror("_chunk_heap_check");
 	  return ERROR;
 	}
@@ -1037,14 +1020,14 @@ EXPORT	int	_chunk_heap_check(void)
 	  if (*bytep != FREE_CHAR) {
 	    if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	      _malloc_message("bad free memory at '%#lx'", bytep);
-	    _malloc_errno = MALLOC_FREE_NON_BLANK;
+	    malloc_errno = MALLOC_FREE_NON_BLANK;
 	    _malloc_perror("_chunk_heap_check");
 	    return ERROR;
 	  }
       break;
       
     default:
-      _malloc_errno = MALLOC_BAD_FLAG;
+      malloc_errno = MALLOC_BAD_FLAG;
       _malloc_perror("_chunk_heap_check");
       return ERROR;
       break;
@@ -1055,12 +1038,12 @@ EXPORT	int	_chunk_heap_check(void)
    * any left over contiguous counters?
    */
   if (bblockc > 0) {
-    _malloc_errno = MALLOC_USER_NON_CONTIG;
+    malloc_errno = MALLOC_USER_NON_CONTIG;
     _malloc_perror("_chunk_heap_check");
     return ERROR;
   }
   if (freec > 0) {
-    _malloc_errno = MALLOC_FREE_NON_CONTIG;
+    malloc_errno = MALLOC_FREE_NON_CONTIG;
     _malloc_perror("_chunk_heap_check");
     return ERROR;
   }
@@ -1070,7 +1053,7 @@ EXPORT	int	_chunk_heap_check(void)
     /* any free bblock entries not accounted for? */
     for (bitc = 0; bitc < LARGEST_BLOCK + 1; bitc++)
       if (free_bblockc[bitc] != 0) {
-	_malloc_errno = MALLOC_BAD_FREE_LIST;
+	malloc_errno = MALLOC_BAD_FREE_LIST;
 	_malloc_perror("_chunk_heap_check");
 	return ERROR;
       }
@@ -1079,7 +1062,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* any free dblock entries not accounted for? */
       for (bitc = 0; bitc < BASIC_BLOCK; bitc++)
 	if (free_dblockc[bitc] != 0) {
-	  _malloc_errno = MALLOC_BAD_FREE_LIST;
+	  malloc_errno = MALLOC_BAD_FREE_LIST;
 	  _malloc_perror("_chunk_heap_check");
 	  return ERROR;
 	}
@@ -1114,7 +1097,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
     if ((pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_ON_BLOCK;
+      malloc_errno = MALLOC_NOT_ON_BLOCK;
       _malloc_perror("_chunk_pnt_check");
       return ERROR;
     }
@@ -1127,7 +1110,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
       /* NOTE: we should run through free list here */
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_ALREADY_FREE;
+      malloc_errno = MALLOC_ALREADY_FREE;
       _malloc_perror("_chunk_pnt_check");
       return ERROR;
     }
@@ -1138,7 +1121,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
 	_malloc_message("bad line number on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, dblockp->db_file,
 			dblockp->db_line);
-      _malloc_errno = MALLOC_BAD_LINE;
+      malloc_errno = MALLOC_BAD_LINE;
       _malloc_perror("_chunk_pnt_check");
       return ERROR;
     }
@@ -1149,20 +1132,20 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
 	_malloc_message("bad size on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, dblockp->db_file,
 			dblockp->db_line);
-      _malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
+      malloc_errno = MALLOC_BAD_DBADMIN_SLOT;
       _malloc_perror("_chunk_pnt_check");
       return ERROR;
     }
     
     /* check file pointer */
     if (dblockp->db_file == NULL) {
-      len = strlen(dblockp->db_file);
+      len = STRING_LENGTH(dblockp->db_file);
       if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	  _malloc_message("bad file-name on pointer '%#lx' alloced in '%s:%d'",
 			  pnt + pnt_below_adm, dblockp->db_file,
 			  dblockp->db_line);
-	_malloc_errno = MALLOC_BAD_FILEP;
+	malloc_errno = MALLOC_BAD_FILEP;
 	_malloc_perror("_chunk_pnt_check");
 	return ERROR;
       }
@@ -1181,7 +1164,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
   if (! ON_BLOCK(pnt)) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-    _malloc_errno = MALLOC_NOT_ON_BLOCK;
+    malloc_errno = MALLOC_NOT_ON_BLOCK;
     _malloc_perror("_chunk_pnt_check");
     return ERROR;
   }
@@ -1190,7 +1173,7 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
   if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-    _malloc_errno = MALLOC_NOT_START_USER;
+    malloc_errno = MALLOC_NOT_START_USER;
     _malloc_perror("_chunk_pnt_check");
     return ERROR;
   }
@@ -1200,31 +1183,31 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad line number on pointer '%#lx' alloced in '%s:%d'",
 		      pnt + pnt_below_adm, bblockp->bb_file, bblockp->bb_line);
-    _malloc_errno = MALLOC_BAD_LINE;
+    malloc_errno = MALLOC_BAD_LINE;
     _malloc_perror("_chunk_pnt_check");
     return ERROR;
   }
   
   /* check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take over */
-  if (bblockp->bb_size <= BLOCK_SIZE / 2 ||
-      bblockp->bb_size > (1 << LARGEST_BLOCK)) {
+  if (bblockp->bb_size <= BLOCK_SIZE / 2
+      || bblockp->bb_size > (1 << LARGEST_BLOCK)) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad size on pointer '%#lx' alloced in '%s:%d'",
 		      pnt + pnt_below_adm, bblockp->bb_file, bblockp->bb_line);
-    _malloc_errno = MALLOC_BAD_SIZE;
+    malloc_errno = MALLOC_BAD_SIZE;
     _malloc_perror("_chunk_pnt_check");
     return ERROR;
   }
   
   /* check file pointer */
   if (bblockp->bb_file == NULL) {
-    len = strlen(bblockp->bb_file);
+    len = STRING_LENGTH(bblockp->bb_file);
     if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad file-name on pointer '%#lx' alloced in '%s:%d'",
 			pnt + pnt_below_adm, bblockp->bb_file,
 			bblockp->bb_line);
-      _malloc_errno = MALLOC_BAD_FILEP;
+      malloc_errno = MALLOC_BAD_FILEP;
       _malloc_perror("_chunk_pnt_check");
       return ERROR;
     }
@@ -1244,8 +1227,8 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
 /*
  * return some information associated with PNT, returns [NO]ERROR
  */
-EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
-				unsigned int * line)
+EXPORT	int	chunk_read_info(char * pnt, unsigned int * size,
+				char ** file, unsigned int * line)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
@@ -1269,7 +1252,7 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
     if ((pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_ON_BLOCK;
+      malloc_errno = MALLOC_NOT_ON_BLOCK;
       _malloc_perror("chunk_read_info");
       return ERROR;
     }
@@ -1282,7 +1265,7 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
       /* NOTE: we should run through free list here */
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_ALREADY_FREE;
+      malloc_errno = MALLOC_ALREADY_FREE;
       _malloc_perror("chunk_read_info");
       return ERROR;
     }
@@ -1301,7 +1284,7 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
     if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_USER;
+      malloc_errno = MALLOC_NOT_USER;
       _malloc_perror("chunk_read_info");
       return ERROR;
     }
@@ -1321,8 +1304,8 @@ EXPORT	int	chunk_read_info(char * pnt, unsigned int * size, char ** file,
 /*
  * write new FILE, LINE, SIZE info into PNT
  */
-LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
-				 unsigned int line)
+LOCAL	int	chunk_write_info(char * pnt, unsigned int size,
+				 char * file, unsigned int line)
 {
   int		bitc, bblockc;
   bblock_t	*bblockp;
@@ -1341,7 +1324,7 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
     if ((pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_ON_BLOCK;
+      malloc_errno = MALLOC_NOT_ON_BLOCK;
       _malloc_perror("chunk_write_info");
       return ERROR;
     }
@@ -1354,7 +1337,7 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
       /* NOTE: we should run through free list here */
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_USER;
+      malloc_errno = MALLOC_NOT_USER;
       _malloc_perror("chunk_write_info");
       return ERROR;
     }
@@ -1373,7 +1356,7 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
     if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_USER;
+      malloc_errno = MALLOC_NOT_USER;
       _malloc_perror("chunk_write_info");
       return ERROR;
     }
@@ -1384,7 +1367,7 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
     if (bitc < BASIC_BLOCK) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad size on pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_BAD_SIZE_INFO;
+      malloc_errno = MALLOC_BAD_SIZE_INFO;
       _malloc_perror("chunk_write_info");
       return ERROR;
     }
@@ -1400,7 +1383,7 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size, char * file,
 	if ((bblock_admp = bblock_admp->ba_next) == NULL) {
 	  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	    _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-	  _malloc_errno = MALLOC_BAD_ADMIN_LIST;
+	  malloc_errno = MALLOC_BAD_ADMIN_LIST;
 	  _malloc_perror("chunk_write_info");
 	  return ERROR;
 	}
@@ -1441,14 +1424,14 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   if (size == 0) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad zero byte allocation from '%s:%d'", file, line);
-    _malloc_errno = MALLOC_BAD_SIZE;
+    malloc_errno = MALLOC_BAD_SIZE;
     _malloc_perror("_chunk_malloc");
     return MALLOC_ERROR;
   }
 #endif
   
   if (file == NULL) {
-    _malloc_errno = MALLOC_BAD_FILEP;
+    malloc_errno = MALLOC_BAD_FILEP;
     _malloc_perror("_chunk_malloc");
     return MALLOC_ERROR;
   }
@@ -1479,7 +1462,7 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad allocation of '%d' bytes from '%s:%d'",
 		      size, file, line);
-    _malloc_errno = MALLOC_TOO_BIG;
+    malloc_errno = MALLOC_TOO_BIG;
     _malloc_perror("_chunk_malloc");
     return MALLOC_ERROR;
   }
@@ -1544,7 +1527,7 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   
   /* overwrite to-be-alloced or non-used portion of memory */
   if (BIT_IS_SET(_malloc_debug, DEBUG_ALLOC_BLANK))
-    (void)memset(mem, FREE_CHAR, 1 << bitc);
+    MEMORY_SET(mem, FREE_CHAR, 1 << bitc);
   
   /* write fence post info if needed */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
@@ -1592,7 +1575,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     if ((pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_NOT_ON_BLOCK;
+      malloc_errno = MALLOC_NOT_ON_BLOCK;
       _malloc_perror("_chunk_free");
       return FREE_ERROR;
     }
@@ -1605,7 +1588,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
       /* NOTE: we should run through free list here */
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	_malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-      _malloc_errno = MALLOC_ALREADY_FREE;
+      malloc_errno = MALLOC_ALREADY_FREE;
       _malloc_perror("_chunk_free");
       return FREE_ERROR;
     }
@@ -1639,7 +1622,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     
     /* should we set free memory with FREE_CHAR? */
     if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
-      (void)memset(pnt, FREE_CHAR, 1 << bitc);
+      MEMORY_SET(pnt, FREE_CHAR, 1 << bitc);
     
     return FREE_NOERROR;
   }
@@ -1648,7 +1631,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   if (! ON_BLOCK(pnt)) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-    _malloc_errno = MALLOC_NOT_ON_BLOCK;
+    malloc_errno = MALLOC_NOT_ON_BLOCK;
     _malloc_perror("_chunk_free");
     return FREE_ERROR;
   }
@@ -1657,7 +1640,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-    _malloc_errno = MALLOC_NOT_START_USER;
+    malloc_errno = MALLOC_NOT_START_USER;
     _malloc_perror("_chunk_free");
     return FREE_ERROR;
   }
@@ -1687,7 +1670,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   if (bitc < BASIC_BLOCK) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
-    _malloc_errno = MALLOC_BAD_SIZE_INFO;
+    malloc_errno = MALLOC_BAD_SIZE_INFO;
     _malloc_perror("_chunk_free");
     return FREE_ERROR;
   }
@@ -1708,7 +1691,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     /* do we need to hop to a new bblock_admp header? */
     if (bblockp == &bblock_admp->ba_block[BB_PER_ADMIN]) {
       if ((bblock_admp = bblock_admp->ba_next) == NULL) {
-	_malloc_errno = MALLOC_BAD_ADMIN_LIST;
+	malloc_errno = MALLOC_BAD_ADMIN_LIST;
 	_malloc_perror("_chunk_free");
 	return FREE_ERROR;
       }
@@ -1723,7 +1706,7 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     
     /* should we set free memory with FREE_CHAR? */
     if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK))
-      (void)memset(pnt, FREE_CHAR, BLOCK_SIZE);
+      MEMORY_SET(pnt, FREE_CHAR, BLOCK_SIZE);
   }
   
   return FREE_NOERROR;
@@ -1732,8 +1715,8 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
 /*
  * reallocate a section of memory
  */
-EXPORT	char	*_chunk_realloc(char * file, unsigned int line, char * oldp,
-				unsigned int new_size)
+EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
+				char * oldp, unsigned int new_size)
 {
   char		*newp, *old_file;
   unsigned int	old_size, size, old_line;
@@ -1813,7 +1796,7 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line, char * oldp,
     /* overwrite to-be-alloced or non-used portion of memory */
     if (BIT_IS_SET(_malloc_debug, DEBUG_ALLOC_BLANK)
 	&& (1 << new_bitc) - old_size > 0)
-      (void)memset(newp + old_size, FREE_CHAR, (1 << new_bitc) - old_size);
+      MEMORY_SET(newp + old_size, FREE_CHAR, (1 << new_bitc) - old_size);
     
     /* write in fence-post info and adjust new pointer over fence info */
     if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
@@ -1858,10 +1841,10 @@ EXPORT	void	_chunk_list_count(void)
   info[0] = NULLC;
   for (bitc = SMALLEST_BLOCK; bitc <= LARGEST_BLOCK; bitc++) {
     (void)sprintf(tmp, "%*d", FREE_COLUMN, bitc);
-    (void)STRING_CONCAT(info, tmp);
+    STRING_CONCAT(info, tmp);
   }
   
-  LOGGER(LOGGER_INFO, "bits: %s", info);
+  _malloc_message("bits: %s", info);
   
   /* dump the free (and later used) list counts */
   info[0] = NULLC;
@@ -1874,10 +1857,10 @@ EXPORT	void	_chunk_list_count(void)
 	   count++, bblockp = bblockp->bb_next);
     
     (void)sprintf(tmp, "%*d", FREE_COLUMN, count);
-    (void)STRING_CONCAT(info, tmp);
+    STRING_CONCAT(info, tmp);
   }
   
-  LOGGER(LOGGER_INFO, "free: %s", info);
+  _malloc_message("free: %s", info);
 }
 
 /*
@@ -1891,43 +1874,40 @@ EXPORT	void	_chunk_stats(void)
     _malloc_message("getting chunk statistics");
   
   /* general heap information */
-  LOGGER(LOGGER_INFO, "heap start %#lx, heap end %#lx, heap size %ld bytes",
-	 _heap_base, _heap_last, HEAP_SIZE);
+  _malloc_message("heap start %#lx, heap end %#lx, heap size %ld bytes",
+		  _heap_base, _heap_last, HEAP_SIZE);
   
   /* log user allocation information */
-  LOGGER(LOGGER_INFO,
-	 "alloc calls: malloc %d, realloc %d, calloc %d, free %d",
-	 malloc_count - _calloc_count, realloc_count, _calloc_count,
-	 free_count);
+  _malloc_message("alloc calls: malloc %d, realloc %d, calloc %d, free %d",
+		  malloc_count - _calloc_count, realloc_count, _calloc_count,
+		  free_count);
   
-  LOGGER(LOGGER_INFO,
-	 "total amount of memory allocated:   %ld bytes (%ld pnts)",
-	 alloc_total, alloc_tot_pnts);
+  _malloc_message("total amount of memory allocated:   %ld bytes (%ld pnts)",
+		  alloc_total, alloc_tot_pnts);
   
-  LOGGER(LOGGER_INFO,
-	 "maximum memory in use at one time:  %ld bytes (%ld pnts)",
-	 alloc_maximum, alloc_max_pnts);
+  _malloc_message("maximum memory in use at one time:  %ld bytes (%ld pnts)",
+		  alloc_maximum, alloc_max_pnts);
   
-  LOGGER(LOGGER_INFO, "maximum memory alloced with 1 call: %ld bytes",
-	 alloc_one_max);
+  _malloc_message("maximum memory alloced with 1 call: %ld bytes",
+		  alloc_one_max);
   
-  LOGGER(LOGGER_INFO, "max base 2 allocation loss: %ld bytes (%d%%)",
-	 alloc_max_given - alloc_maximum,
-	 (alloc_max_given == 0 ? 0 :
-	  100 - ((alloc_maximum * 100) / alloc_max_given)));
+  _malloc_message("max base 2 allocation loss: %ld bytes (%d%%)",
+		  alloc_max_given - alloc_maximum,
+		  (alloc_max_given == 0 ? 0 :
+		   100 - ((alloc_maximum * 100) / alloc_max_given)));
   
-  LOGGER(LOGGER_INFO, "final user memory space: %ld bytes",
-	 alloc_current + free_space_count);
+  _malloc_message("final user memory space: %ld bytes",
+		  alloc_current + free_space_count);
   
   /* log administration information */
-  LOGGER(LOGGER_INFO, "final admin: basic-blocks %d, divided blocks %d",
-	 bblock_count, dblock_count);
+  _malloc_message("final admin: basic-blocks %d, divided blocks %d",
+		  bblock_count, dblock_count);
   
   overhead = HEAP_SIZE - (alloc_current + free_space_count);
   
-  LOGGER(LOGGER_INFO, "final heap admin overhead: %ld bytes (%d%%)",
-	 overhead,
-	 (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
+  _malloc_message("final heap admin overhead: %ld bytes (%d%%)",
+		  overhead,
+		  (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
 }
 
 /*
@@ -1983,16 +1963,15 @@ EXPORT	void	_chunk_dump_not_freed(void)
       mem = BLOCK_POINTER(this->ba_count + (bblockp - this->ba_block));
       
       /* unknown pointer? */
-      if (strcmp(DEFAULT_FILE, bblockp->bb_file) == 0 &&
-	  bblockp->bb_line == DEFAULT_LINE) {
+      if (STRING_COMPARE(DEFAULT_FILE, bblockp->bb_file) == 0
+	  && bblockp->bb_line == DEFAULT_LINE) {
 	unknown_bblockc++;
 	unknown_sizec += bblockp->bb_size - pnt_total_adm;
       }
       else
-	LOGGER(LOGGER_INFO,
-	       "bblock: %#9lx (%8d bytes) from '%s:%d' not freed",
-	       mem  + pnt_below_adm, bblockp->bb_size - pnt_total_adm,
-	       bblockp->bb_file, bblockp->bb_line);
+	_malloc_message("bblock: %#9lx (%8d bytes) from '%s:%d' not freed",
+			mem  + pnt_below_adm, bblockp->bb_size - pnt_total_adm,
+			bblockp->bb_file, bblockp->bb_line);
       
       sizec += bblockp->bb_size - pnt_total_adm;
       bblockc++;
@@ -2014,7 +1993,7 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	{
 	  bblock_adm_t	*bbap;
 	  bblock_t	*bbp;
-
+	  
 	  bbap = bblock_adm_head;
 	  
 	  /* check out the basic blocks */
@@ -2034,13 +2013,14 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	    if (bbp->bb_flags != BBLOCK_DBLOCK)
 	      continue;
 	    
-	    if (dblockp >= bbp->bb_dblock &&
-		dblockp < bbp->bb_dblock + (1 << (BASIC_BLOCK - bbp->bb_bitc)))
+	    if (dblockp >= bbp->bb_dblock
+		&& dblockp < bbp->bb_dblock +
+		(1 << (BASIC_BLOCK - bbp->bb_bitc)))
 	      break;
 	  }
 	  
 	  if (bbap == NULL) {
-	    _malloc_errno = MALLOC_BAD_DBLOCK_POINTER;
+	    malloc_errno = MALLOC_BAD_DBLOCK_POINTER;
 	    _malloc_perror("_chunk_dump_not_freed");
 	    return;
 	  }
@@ -2049,16 +2029,16 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	}
 	
 	/* unknown pointer? */
-	if (strcmp(DEFAULT_FILE, dblockp->db_file) == 0 &&
-	    dblockp->db_line == DEFAULT_LINE) {
+	if (STRING_COMPARE(DEFAULT_FILE, dblockp->db_file) == 0
+	    && dblockp->db_line == DEFAULT_LINE) {
 	  unknown_dblockc++;
 	  unknown_sizec += dblockp->db_size - pnt_total_adm;
 	}
 	else
-	  LOGGER(LOGGER_INFO,
-		 "dblock: %#9lx (%8d bytes) from '%s:%d' not freed",
-		 mem  + pnt_below_adm, dblockp->db_size - pnt_total_adm,
-		 dblockp->db_file, dblockp->db_line);
+	  _malloc_message("dblock: %#9lx (%8d bytes) from '%s:%d' not freed",
+			  mem  + pnt_below_adm,
+			  dblockp->db_size - pnt_total_adm,
+			  dblockp->db_file, dblockp->db_line);
 	
 	sizec += dblockp->db_size - pnt_total_adm;
 	dblockc++;
@@ -2069,15 +2049,14 @@ EXPORT	void	_chunk_dump_not_freed(void)
   
   /* copy out size of pointers */
   if (bblockc + dblockc > 0) {
-    LOGGER(LOGGER_INFO,
-	   "known memory not freed: %d bblock, %d dblock, %d byte%s",
-	   bblockc - unknown_bblockc, dblockc - unknown_dblockc,
-	   sizec - unknown_sizec, (sizec == 1 ? "" : "s"));
+    _malloc_message("known memory not freed: %d bblock, %d dblock, %d byte%s",
+		    bblockc - unknown_bblockc, dblockc - unknown_dblockc,
+		    sizec - unknown_sizec, (sizec == 1 ? "" : "s"));
     
-    LOGGER(LOGGER_INFO,
-	   "unknown memory not freed: %d bblock, %d dblock, %d byte%s",
-	   unknown_bblockc, unknown_dblockc, unknown_sizec,
-	   (unknown_sizec == 1 ? "" : "s"));
+    _malloc_message("unknown memory not freed: %d bblock, %d dblock, "
+		    "%d byte%s",
+		    unknown_bblockc, unknown_dblockc, unknown_sizec,
+		    (unknown_sizec == 1 ? "" : "s"));
   }
 }
 
@@ -2097,8 +2076,8 @@ EXPORT	void	_chunk_log_heap_map(void)
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
-  LOGGER(LOGGER_INFO, "heap-base = %#lx, heap-end = %#lx, size = %ld bytes",
-	 _heap_base, _heap_last, HEAP_SIZE);
+  _malloc_message("heap-base = %#lx, heap-end = %#lx, size = %ld bytes",
+		  _heap_base, _heap_last, HEAP_SIZE);
   
   for (bb_adminc = 0, bblock_admp = bblock_adm_head; bblock_admp != NULL;
        bb_adminc++, bblock_admp = bblock_admp->ba_next) {
@@ -2106,7 +2085,7 @@ EXPORT	void	_chunk_log_heap_map(void)
     
     for (bblockc = 0; bblockc < BB_PER_ADMIN; bblockc++) {
       if (! BIT_IS_SET(bblock_admp->ba_block[bblockc].bb_flags,
-			 BBLOCK_ALLOCATED)) {
+		       BBLOCK_ALLOCATED)) {
 	line[linec++] = '_';
 	continue;
       }
@@ -2148,7 +2127,7 @@ EXPORT	void	_chunk_log_heap_map(void)
     /* dumping a line to the logfile */
     if (linec > 0) {
       line[linec] = NULLC;
-      LOGGER(LOGGER_INFO, "S%d:%s", bb_adminc, line);
+      _malloc_message("S%d:%s", bb_adminc, line);
     }
   }
 }

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.6 1992/10/21 07:33:57 gray Exp $
+$Id: NOTES,v 1.7 1992/11/06 01:13:32 gray Exp $
 -------------------------------------------------------------------------------
 
 - dumping core on erros and then continuing does not look 
@@ -20,8 +20,6 @@ WARNING:
 	- watch for bounds checking assuming + or - code.
 
 -------------------------------------------------------------------------------
-
-NOTES:
 
 - administration blocks are relocatable:
 	- any administration blocks are relocatable in the heap which means

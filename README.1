@@ -1,26 +1,22 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.6 1992/10/21 07:33:59 gray Exp $
+$Id: README.1,v 1.7 1992/11/06 01:13:33 gray Exp $
 -------------------------------------------------------------------------------
 
-- The file malloc-tutorial is a gnu-info file having the user-documentation for
-	the malloc subsystem.  It is also suitable for reading as text.
-- The file Manifest contains a list of each of the file and what it does
-- typing 'make' should be enough to build libmalloc.a
-- typing 'make test' should build the malloc_t test program
-- debugging programs using libmalloc relies on the setting of the MALLOC_DEBUG
-	environmental variable (see malloc.txt for more information.
+INSTALLATION:
+
+1) Move Makefile.all to Makefile.
+2) Type 'make' should be enough to build libmalloc.a and malloc_debug program
+3) typing 'make test' should build the malloc_test program
+4) Examine the malloc.info file.  Is is a gnu-info file having the
+	user-documentation for the malloc subsystem.
+	It is also suitable for reading as text.
 
 -------------------------------------------------------------------------------
 
 - I am using gnu-make and gcc which is ansi-prototype compatible.
-- BTW: if you don't have them, you have to get them.  they're hot!!
 - the system is definately dependant on a good ansi-c compiler like gcc.
+- The file Manifest contains a list of each of the file and what it does
 - feel free to send me mail with porting issues.
-
--------------------------------------------------------------------------------
-
-If you are using this library please provide some feedback to me so I can keep
-abreast of problems as well as can inform you of new versions.
 
 thanks,
 gray.watson@antaire.com
