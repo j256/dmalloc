@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.174 2003/09/08 19:19:57 gray Exp $
+# $Id: Makefile.in,v 1.175 2003/09/10 00:09:19 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -136,17 +136,21 @@ installlibs :: installincs $(LIBRARY) $(INSTALL_CXX) $(INSTALL_TH)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installdocs :: $(DOCS)
+installhtml ::
 	-mkdir $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
-	-chmod 755 $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
-	install -Cv -m 444 $(DOCS) $(WWWDIR)/docs/$(VERSION)
-	-cd $(WWWDIR)/docs/$(VERSION)/online ;\
+	-current=`pwd` ;\
+		cd $(WWWDIR)/docs/$(VERSION)/online ;\
 		umask 022 ;\
-		texi2html -menu -number -split_node ../dmalloc.texi ;\
+		texi2html -menu -number -split_node $$current/dmalloc.texi ;\
 		for f in dmalloc*.html ; do \
 			sed -e 's,</BODY>,<p><a href="http://dmalloc.com/">Dmalloc Home Page</a>.  Copyright 2003 <a href="http://256.com/gray/">Gray Watson</a></body>,' $$f > $$f.t ;\
 			mv $$f.t $$f ;\
 		done
+
+installdocs :: $(DOCS) installhtml
+	-mkdir $(WWWDIR)/docs/$(VERSION)
+	-chmod 755 $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
+	install -Cv -m 444 $(DOCS) $(WWWDIR)/docs/$(VERSION)
 	cd $(WWWDIR)/docs/$(VERSION) ; for file in $(DOCS) ;\
 		do gzip -9f $$file ; done
 
