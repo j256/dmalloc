@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.115 1998/11/16 14:33:52 gray Exp $
+# $Id: Makefile.in,v 1.116 1998/11/16 17:01:28 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -51,7 +51,7 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/dmalloc_summarize.pl contrib/next_notes contrib/ra_info.pl \
 	contrib/stratus_ftx_notes
 
-DOCS	= dmalloc.texi $(INFOFILE) $(HTMLFILES) dmalloc.ps
+DOCS	= $(INFOFILE) $(HTMLFILES) dmalloc.ps dmalloc.texi texinfo.tex
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -173,12 +173,6 @@ port :: $(FLS) $(CONTFLS) Makefile.all.in
 	mv $(.TARGET)/Makefile.all.in $(.TARGET)/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
-
-portdocs :: $(DOCS)
-	@ answer 'Is it okay to remove the $(.TARGET) directory? '
-	rm -rf $(.TARGET)
-	mkdir $(.TARGET)
-	cp $(DOCS) $(.TARGET)
 
 dmalloc.ps : dmalloc.texi
 	rm -rf work
