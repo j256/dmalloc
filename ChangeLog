@@ -1,3 +1,7 @@
+Thu Dec 15 10:25:59 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Released version 3.0.4.
+
 Sat Nov 12 18:05:34 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Removed message arg to env-get routine due to various probs.
@@ -902,5 +906,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.136 1994/11/13 00:37:56 gray Exp $
+$Id: ChangeLog,v 1.137 1994/12/15 15:26:29 gray Exp $
 -------------------------------------------------------------------------------
