@@ -1,8 +1,6 @@
 /*
  * user-level memory-allocation routines
  *
- * program that handles the malloc debug variables.
- *
  * Copyright 1992 by Gray Watson and the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
@@ -18,8 +16,8 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -39,7 +37,7 @@
 #include "malloc_leap.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.6 1992/11/10 00:24:56 gray Exp $";
+  "$Id: malloc.c,v 1.7 1992/11/10 23:25:30 gray Exp $";
 
 /*
  * exported variables
@@ -343,10 +341,10 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
 {
   char		*newp;
   
-#ifndef NO_REALLOC_NULL
+#if ALLOW_REALLOC_NULL
   if (old_pnt == NULL)
     return malloc(new_size);
-#endif /* ! NO_REALLOC_NULL */
+#endif
   
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;

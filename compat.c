@@ -16,8 +16,8 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -30,39 +30,83 @@
 #include "conf.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.1 1992/11/10 00:24:47 gray Exp $";
+  "$Id: compat.c,v 1.2 1992/11/10 23:25:11 gray Exp $";
 
-#ifndef HAVE_STRCHR
+#if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
+/*
+ * copy LEN characters from FROM to TO
+ */
+EXPORT	char	*memcpy(char * to, char * from, int len)
+{
+  char	*hold = to;
+  
+  for (; len > 0; len--, to++, from++)
+    *to = *from;
+  
+  return hold;
+}
+#endif /* HAVE_MEMCPY == 0 && HAVE_BCOPY == 0 */
+
+#if HAVE_MEMCMP == 0 && HAVE_BCMP == 0
+/*
+ * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
+ */
+EXPORT	int	memcmp(char * str1, char * str2, int len)
+{
+  for (; len > 0; len--, str1++, str2++)
+    if (*str1 != *str2)
+      return *str1 - *str2;
+  
+  return 0;
+}
+#endif /* HAVE_MEMCMP == 0 && HAVE_BCMP == 0 */
+
+#if HAVE_MEMSET == 0
+/*
+ * set LEN characters in STR to character CH
+ */
+EXPORT	char	*memset(char * str, int ch, int len)
+{
+  char	*hold = str;
+  
+  for (; len > 0; len--, str++)
+    *str = (char)ch;
+  
+  return hold;
+}
+#endif /* HAVE_MEMSET == 0 */
+
+#if HAVE_STRCHR == 0
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*strchr(char * str, char ch)
+EXPORT	char	*strchr(char * str, int ch)
 {
   for (; *str != NULLC; str++)
-    if (*str == ch)
+    if (*str == (char)ch)
       return str;
   
   return NULL;
 }
-#endif /* ! HAVE_STRCHR */
+#endif /* HAVE_STRCHR == 0 */
 
-#ifndef HAVE_STRRCHR
+#if HAVE_STRRCHR == 0
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*strrchr(char * str, char ch)
+EXPORT	char	*strrchr(char * str, int ch)
 {
   char	*pnt = NULL;
   
   for (; *str != NULLC; str++)
-    if (*str == ch)
+    if (*str == (char)ch)
       pnt = str;
   
   return pnt;
 }
-#endif /* ! HAVE_STRRCHR */
+#endif /* HAVE_STRRCHR == 0 */
 
-#ifndef HAVE_STRCAT
+#if HAVE_STRCAT == 0
 /*
  * concatenate STR2 onto the end of STR1
  */
@@ -78,20 +122,20 @@ EXPORT	char	*strcat(char * str1, char * str2)
   
   return hold;
 }
-#endif /* ! HAVE_STRCAT */
+#endif /* HAVE_STRCAT == 0 */
 
-#ifndef HAVE_STRCMP
+#if HAVE_STRCMP == 0
 /*
  * returns -1,0,1 on whether STR1 is <,==,> STR2
  */
-EXPORT	char	*strcmp(char * str1, char * str2)
+EXPORT	int	strcmp(char * str1, char * str2)
 {
   for (; *str1 != NULLC && *str1 == *str2; str1++, str2++);
   return *str1 - *str2;
 }
-#endif /* ! HAVE_STRCMP */
+#endif /* HAVE_STRCMP == 0 */
 
-#ifndef HAVE_STRLEN
+#if HAVE_STRLEN == 0
 /*
  * return the length in characters of STR
  */
@@ -103,9 +147,9 @@ EXPORT	int	strlen(char * str)
   
   return len;
 }
-#endif /* ! HAVE_STRLEN */
+#endif /* HAVE_STRLEN == 0 */
 
-#ifndef HAVE_STRTOK
+#if HAVE_STRTOK == 0
 /*
  * get the next token from STR (pass in NULL on the 2nd, 3rd, etc. calls),
  * tokens are a list of characters deliminated by a character from DELIM.
@@ -115,9 +159,6 @@ EXPORT	char	*strtok(char * str, char * delim)
 {
   static char	*last_str = "";
   char		*start, *delimp;
-  
-  /* str could be NULL, idiot */
-  IS_ARG(delim, !=, NULL, strtok);
   
   /* no new strings to search? */
   if (str != NULL)
@@ -154,4 +195,4 @@ EXPORT	char	*strtok(char * str, char * delim)
   /* reached the end of the string */
   return start;
 }
-#endif /* ! HAVE_STRTOK */
+#endif /* HAVE_STRTOK == 0 */

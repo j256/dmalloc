@@ -1,17 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.7 1992/11/06 01:13:32 gray Exp $
--------------------------------------------------------------------------------
-
-- dumping core on erros and then continuing does not look 
-
--------------------------------------------------------------------------------
-
-IDEAS:
-
-- maybe turn realloc into an intelligent beasty that looks on either side
-	of existing chunk (if expanding) for free space and manages free-lists
-	appropriately
-
+$Id: NOTES,v 1.8 1992/11/10 23:25:00 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNING:
@@ -20,6 +8,11 @@ WARNING:
 	- watch for bounds checking assuming + or - code.
 
 -------------------------------------------------------------------------------
+
+- dumping core on errors and then continuing ddid not look to be a problem to
+	implement but became not recommended as soon as it was discovered that
+	fork (which is needed) calls malloc itself.  If the heap was corrupted
+	or some other error then it would quickly go recursive.
 
 - administration blocks are relocatable:
 	- any administration blocks are relocatable in the heap which means
@@ -56,5 +49,12 @@ DBLOCK METHOD:
 - the bblock tells you of the number of bits in the chunk, etc.
 - have some way to run through the dblock admin slot blocks to verify that
 	crc's have not been overwritten.
+
+-------------------------------------------------------------------------------
+
+OVERHEAD:
+
+- dblock: 8 bytes per pointer
+- bblock: 12 bytes per pointer
 
 -------------------------------------------------------------------------------

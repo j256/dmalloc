@@ -16,8 +16,8 @@
  * Library General Public License for more details.
  * 
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -38,16 +38,22 @@
 
 #include "chunk.h"
 #include "compat.h"
+#include "conf.h"
 #include "error.h"
 #include "heap.h"
 #include "malloc_errno.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.10 1992/11/10 00:24:54 gray Exp $";
+  "$Id: heap.c,v 1.11 1992/11/10 23:25:26 gray Exp $";
 
 /* exported variables */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */
 EXPORT	char		*_heap_last = NULL;	/* end of our heap */
+
+#if HAVE_SBRK
+IMPORT	char		*sbrk(int incr);	/* to extend the heap */
+#define SBRK_ERROR	((char *)-1)
+#endif
 
 /*
  * function to get SIZE memory bytes from the end of the heap
@@ -56,14 +62,16 @@ EXPORT	char	*_heap_alloc(unsigned int size)
 {
   char		*ret = HEAP_ALLOC_ERROR;
   
-#if defined(sparc) || defined(i386) || defined(mips)
-  if ((ret = sbrk(size)) == HEAP_ALLOC_ERROR) {
+#if HAVE_SBRK
+  if ((ret = sbrk(size)) == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_alloc");
+    ret = HEAP_ALLOC_ERROR;
   }
-  
-  /* increment last pointer */
-  _heap_last += size;
+  else {
+    /* increment last pointer */
+    _heap_last += size;
+  }
 #endif
   
   return ret;
@@ -76,10 +84,11 @@ EXPORT	char	*_heap_end(void)
 {
   char		*ret = HEAP_ALLOC_ERROR;
   
-#if defined(sparc) || defined(i386) || defined(mips)
-  if ((ret = sbrk(0)) == HEAP_ALLOC_ERROR) {
+#if HAVE_SBRK
+  if ((ret = sbrk(0)) == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_end");
+    ret = HEAP_ALLOC_ERROR;
   }
 #endif
   

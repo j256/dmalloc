@@ -16,12 +16,12 @@
  * Library General Public License for more details.
  * 
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.11 1992/11/10 00:24:45 gray Exp $
+ * $Id: chunk.h,v 1.12 1992/11/10 23:25:07 gray Exp $
  */
 
 #ifndef __CHUNK_H__

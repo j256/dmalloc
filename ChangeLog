@@ -1,3 +1,9 @@
+Tue Nov 10 17:55:53 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added library functions that may not be defined.  Updated the
+	conf.h.in and configure.in files to improve confiurability.
+	Upgraded the manual which still needs a lot of work (sigh).
+
 Mon Nov  9 19:21:25 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added configure, configure.in, conf.h.in, and Makefile.in to try

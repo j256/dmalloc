@@ -16,8 +16,8 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -42,7 +42,7 @@
 #include "version.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.13 1992/11/10 00:24:42 gray Exp $";
+  "$Id: chunk.c,v 1.14 1992/11/10 23:25:04 gray Exp $";
 
 /* checking information */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
@@ -164,6 +164,17 @@ EXPORT	int	_chunk_startup(void)
 {
   int	binc;
   
+  /* verify some conditions */
+  if (BB_PER_ADMIN <= 2
+      || sizeof(bblock_adm_t) > BLOCK_SIZE
+      || DB_PER_ADMIN < (1 << (BASIC_BLOCK - SMALLEST_BLOCK))
+      || sizeof(dblock_adm_t) > BLOCK_SIZE
+      || SMALLEST_BLOCK < ALLOCATION_ALIGNMENT_IN_BITS) {
+    malloc_errno = MALLOC_BAD_SETUP;
+    _malloc_perror("_chunk_startup");
+    return ERROR;
+  }
+  
   /* align the base pointer */
   if (_heap_align_base(BLOCK_SIZE) == MALLOC_ERROR) {
     malloc_errno = MALLOC_BAD_SETUP;
@@ -176,16 +187,6 @@ EXPORT	int	_chunk_startup(void)
     free_bblock[binc] = NULL;
   for (binc = 0; binc < BASIC_BLOCK; binc++)
     free_dblock[binc] = NULL;
-  
-  /* verify some conditions */
-  if (BB_PER_ADMIN <= 2
-      || sizeof(bblock_adm_t) > BLOCK_SIZE
-      || DB_PER_ADMIN < (1 << (BASIC_BLOCK - SMALLEST_BLOCK))
-      || sizeof(dblock_adm_t) > BLOCK_SIZE) {
-    malloc_errno = MALLOC_BAD_SETUP;
-    _malloc_perror("_chunk_startup");
-    return ERROR;
-  }
   
   /* assign value to add to pointers when displaying */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
@@ -208,7 +209,7 @@ LOCAL	int	num_bits(unsigned int size)
   unsigned int	tmp = size;
   int		bitc;
   
-#if defined(MALLOC_NO_ZERO_SIZE)
+#if ALLOW_ALLOC_ZERO_SIZE == 0
   if (size == 0) {
     malloc_errno = MALLOC_BAD_SIZE;
     _malloc_perror("num_bits");
@@ -1426,7 +1427,7 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
-#if defined(MALLOC_NO_ZERO_SIZE)
+#if ALLOW_ALLOC_ZERO_SIZE == 0
   if (size == 0) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad zero byte allocation from '%s:%d'", file, line);

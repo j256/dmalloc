@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.8 1992/11/06 05:40:51 gray Exp $
+$Id: Manifest,v 1.9 1992/11/10 23:24:58 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -7,7 +7,7 @@ COPYING-LIB		The famous GNU Library Public License.
 
 Changelog		Change log entries detailing major module changes.
 
-Makefile.all		Makefile for the malloc library.
+Makefile.in		Used by configure to create the Makefile.
 
 Manifest		This file.
 
@@ -16,7 +16,7 @@ NOTES			General Notes of the malloc routines and associated
 
 README			Quick startup notes.
 
-TTD			Things To Do list.
+TTD			Things To Do list.  It only gets longer and longer.
 
 chunk.[ch]		Lower level allocation routines.  This is the meat of
 			the allocation algorithms.  Manages and debugs the
@@ -24,17 +24,22 @@ chunk.[ch]		Lower level allocation routines.  This is the meat of
 
 chunk_loc.h		Local defines specific to the chunk routines only.
 
-debug_tokens.h		Tokens that correspond to debug-flags.
+compat.[ch]		System compatibility routines if missing functionality.
+
+conf.h.in		Used by configure to create the conf.h configurations.
+
+configure		Configure script.
+
+configure.in		Used by autoconf to create the configure script.
+
+debug_tokens.h		Tokens that correspond to debugging functionality.
 
 error.[ch]		Debugging routines and others that provide user output.
 
-error_strings.h		Strings that correspond to malloc error codes.
+error_str.h		Strings that correspond to malloc error codes.
 
 heap.[ch]		Possibly machine specific routines for allocating space
 			on and manipulating the heap.
-
-		NOTE:	Heap.h contains a number of macros that may need to be
-			defined for each machine type.
 
 malloc.[ch]		Higher level alloc routines including malloc, free,
 			realloc, etc.  These are the routines to be called
@@ -50,14 +55,16 @@ malloc_debug.c		Program that assists in the setting of the MALLOC_DEBUG
 
 malloc_errno.h		General error codes for the malloc module.
 
+malloc_leap.[ch]	Leap-frog routines to provide file/line info to lib.
+
 malloc_loc.h		Local defines for all of the malloc routines.
 
 malloc_test.c		Meager test program for testing the malloc routines.
 
 mallocrc		Sample RC file that is used to set the debug flags.
 
-proto.h			Some machine specific functions and defines.
-
 sample.c		A sample file to demonstrate the usage of the library.
+
+version.h		Version number for the library.
 
 -------------------------------------------------------------------------------

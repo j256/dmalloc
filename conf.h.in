@@ -16,37 +16,76 @@
  * Library General Public License for more details.
  * 
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.1 1992/11/10 00:24:50 gray Exp $
+ * $Id: conf.h.in,v 1.2 1992/11/10 23:25:14 gray Exp $
  */
 
 /*
- * The following macros indicate what header files you have.  Set the macro to
- * 1 if you have the corresponding header file, or 0 if you do not.
+ ************************************************************************
+ * SPECIAL DEFINES:
+ ************************************************************************
  */
-#define HAVE_STRING_H 1   	/* <string.h> */
-#define HAVE_STRINGS_H 1   	/* <strings.h> */
 
 /*
- * the Malloc-Debug library needs versions of the following functions.
+ * (char *)sbrk(int incr) is the main system memory allocation routine.  this
+ * extends the program's data space by INCR bytes.
  */
-#define HAVE_BCMP 1
-#define HAVE_BCOPY 1
-/* or */
-#define HAVE_MEMCMP 1
-#define HAVE_MEMCPY 1
-/* and */
-#define HAVE_MEMSET 1
-#define HAVE_GETENV 1
+#define HAVE_SBRK 0
+
+/*
+ * does your heap grow up?  Hopefully it does because there is not too much
+ * support for growing-down heaps because I do not have a system to test it on.
+ */
+#define HEAP_GROWS_UP 1
+
+/*
+ * the alignment value of all allocations in number of bits (i.e. 2 ^ X) for
+ * fence-post checking.  it needs to be a base 2 number and 3 (i.e. 2 ^ 3 == 8)
+ * should work.  2 bits may also work on i386/i486 systems (for instance) but
+ * some RISC boxes (sparc for instance) require certain memory to be base 8
+ * (stack frames, code, etc.).
+ *
+ * NOTE: larger the number the more memory will be wasted when fence-checking
+ * NOTE: this is not necessarily the smallest possible allocated memory chunk
+ */
+#define ALLOCATION_ALIGNMENT_IN_BITS 3
+
+/*
+ * should we allow zero length allocations or should be registered as errors.
+ * WARNING: this has not been tested although some code does exist for it.
+ */
+#define ALLOW_ALLOC_ZERO_SIZE 0
+
+/*
+ * should we allow realloc of a NULL pointer.  this is useful when you are
+ * extending an array in a loop and do not want to allocate it specially the
+ * first time.
+ */
+#define ALLOW_REALLOC_NULL 1
+
+/*
+ ************************************************************************
+ * LIBRARY DEFINES:
+ ************************************************************************
+ */
 
 /*
  * the Malloc-Debug library provides its own versions of the following
  * functions,  or knows how to work around their absence.
  */
+#define HAVE_BCMP 0
+#define HAVE_BCOPY 0
+/* or */
+#define HAVE_MEMCMP 0
+#define HAVE_MEMCPY 0
+/* and */
+#define HAVE_MEMSET 0
+#define HAVE_GETENV 0
+
 #define HAVE_STRCHR 0
 #define HAVE_STRRCHR 0
 
@@ -58,10 +97,10 @@
 /*
  * some defines to standardize memory functions
  */
-#if !defined(HAVE_BCMP) && defined(HAVE_MEMCMP)
+#if HAVE_BCMP == 0
 #define bcmp(s1, s2, len)	(void)memcmp((s1), (s2), (len))
 #endif
 
-#if !defined(HAVE_BCOPY) && defined(HAVE_MEMCPY)
+#if HAVE_BCOPY == 0
 #define bcopy(from, to, len)	(void)memcpy((to), (from), len)
 #endif

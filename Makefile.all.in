@@ -1,7 +1,7 @@
 #
 # Makefile for the Malloc library.
 #
-# $Id: Makefile.all.in,v 1.1 1992/11/10 00:24:38 gray Exp $
+# $Id: Makefile.all.in,v 1.2 1992/11/10 23:24:56 gray Exp $
 #
 
 # default root installation directory
@@ -94,8 +94,8 @@ malloc_debug.o : malloc_debug.c malloc.h malloc_leap.h malloc_loc.h compat.h \
   conf.h debug_tokens.h error.h version.h 
 malloc.o : malloc.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h conf.h \
   error.h error_str.h heap.h malloc_errno.h 
-heap.o : heap.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h error.h \
-  heap.h malloc_errno.h 
+heap.o : heap.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h conf.h \
+  error.h heap.h malloc_errno.h 
 error.o : error.c malloc.h malloc_leap.h malloc_loc.h chunk.h compat.h conf.h \
   error.h 
 compat.o : compat.c malloc.h malloc_leap.h malloc_loc.h conf.h 

@@ -16,12 +16,12 @@
  * Library General Public License for more details.
  * 
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * License along with this library (see COPYING-LIB); if not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: error.h,v 1.3 1992/11/06 03:36:34 gray Exp $
+ * $Id: error.h,v 1.4 1992/11/10 23:25:21 gray Exp $
  */
 
 #ifndef __ERROR_H__
