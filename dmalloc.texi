@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.191 2000/07/24 20:04:02 gray Exp $
+@c $Id: dmalloc.texi,v 1.192 2000/07/25 16:06:56 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -55,7 +55,7 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 4.7.0
+@subtitle Version 4.7.1
 @subtitle July 2000
 @author Gray Watson
 
@@ -84,7 +84,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 4.7.0 -- July 2000
+Version 4.7.1 -- July 2000
 @end ifinfo
 
 @cindex introduction
@@ -1982,7 +1982,8 @@ Examine internal heap linked-lists.
 @cindex check-blank
 @item check-blank
 Check to see if space that was blanked by free-blank or alloc-blank has
-been overwritten.
+been overwritten.  If this is enabled then it will enable free-blank and
+alloc-blank automatically.
 
 @cindex check-funcs
 @item check-funcs

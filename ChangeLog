@@ -1,3 +1,10 @@
+Tue Jul 25 11:57:49 2000  Gray Watson  <gray@256.com>
+
+	* Releasing dmalloc version 4.7.1.
+
+	* Fixed problem with check-blank being specified but not
+ 	free-blank or alloc-blank.  I thought I fixed this before.
+
 Mon Jul 24 15:30:04 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.7.0.
@@ -1658,5 +1665,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.258 2000/07/24 20:04:01 gray Exp $
+$Id: ChangeLog,v 1.259 2000/07/25 16:06:53 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $
+ * $Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $
  */
 
 /*
@@ -63,13 +63,13 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
-#ident "@(#) $Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
+#ident "$Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
+#ident "@(#) $Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
+  "$Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
 static	char	*rcs_id_w =
-  "@(#) $Id: chunk.c,v 1.162 2000/05/17 16:23:56 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
 #endif
 #endif
 
@@ -1328,7 +1328,8 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
      * We return the 1st dblock chunk in the block.  Overwrite the
      * rest of the block.
      */ 
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_FREE_BLANK)
+	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
       (void)memset((char *)pnt + (1 << bit_n), BLANK_CHAR,
 		   BLOCK_SIZE - (1 << bit_n));
     }
@@ -2723,7 +2724,8 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     alloc_max_given = MAX(alloc_max_given, alloc_cur_given);
     
     /* overwrite to-be-alloced or non-used portion of memory */
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
+	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
       (void)memset(pnt, BLANK_CHAR, 1 << bit_n);
     }
   }
@@ -2764,7 +2766,8 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     alloc_max_given = MAX(alloc_max_given, alloc_cur_given);
     
     /* overwrite to-be-alloced or non-used portion of memory */
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
+	|| BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
       (void)memset(pnt, BLANK_CHAR, given);
     }
     
@@ -3295,7 +3298,8 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     size = MIN(new_size, old_size);
     
     /* NOTE: using same number of blocks so NUM_BLOCKS works with either */
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
+    if ((BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
+	 || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK))
 	&& alloc_size > size) {
       (void)memset((char *)new_p + size, BLANK_CHAR, alloc_size - size);
     }
