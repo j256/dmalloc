@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.8 1995/09/06 20:16:27 gray Exp $
+ * $Id: settings.dist,v 1.9 1997/01/17 19:24:40 gray Exp $
  */
 
 /*
@@ -131,8 +131,25 @@
 #else
 #define USE_ABORT		0
 #endif
+#if SIGNAL_OKAY
+#define KILL_INCLUDE		<signal.h>
 #define KILL_PROCESS		(void)kill(0,SIGABRT)
-#define SIGNAL_INCLUDE		<signal.h>
+#endif
+
+/*
+ * Define the signals that are to be caught by the catch-signals
+ * token.  When caught, these signals will cause an automatic shutdown
+ * of the library so that the unfreed memory and other statistics will
+ * be displayed.
+ */
+#if SIGNAL_OKAY
+#define SIGNAL1		SIGHUP
+#define SIGNAL2		SIGINT
+#define SIGNAL3		SIGTERM
+#undef SIGNAL4
+#undef SIGNAL5
+#undef SIGNAL6
+#endif
 
 /*
  * Number of bytes to write at the top of allocations (if fence-post
@@ -147,8 +164,8 @@
  * FENCE_TOP setting above or the manual for more information.
  *
  * WARNING: this should changed with caution and should only be
- * increased.  If you need to change it, use (ALLOCATION_ALIGNMENT +
- * 8) or some such.  For more information see ALLOCATION_ALIGNMENT in
+ * increased.  If you need to change it, use (ALLOCATION_ALIGNMENT *
+ * X) or some such.  For more information see ALLOCATION_ALIGNMENT in
  * conf.h.
  */
 #define FENCE_BOTTOM		ALLOCATION_ALIGNMENT

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.56 1995/07/04 00:24:24 gray Exp $
+ * $Id: conf.h.in,v 1.57 1997/01/17 19:24:39 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -92,6 +92,15 @@
  * settings.h if you want the library to be able to dump core.
  */
 #define ABORT_OKAY 0
+
+/*
+ * This checks to see if we can include signal.h and get SIGHUP,
+ * SIGINT, and SIGTERM for the catch-signals token.  With this token,
+ * you can have the library do an automatic shutdown if we see the
+ * above signals.
+ */
+#define SIGNAL_OKAY 0
+#define RETSIGTYPE void
 
 /*
  * LIBRARY DEFINES:
