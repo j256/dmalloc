@@ -1,6 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.93 2000/05/17 15:41:40 gray Exp $
+$Id: NEWS,v 1.94 2000/07/24 20:04:01 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.7.0:
+
+	* Added support for --disable-cxx and --enable-threads to configure.
+	* Added autoconf code to see if the return macros work for an system.
+	* Renamed USE_RET_ADDRESS to USE_RETURN_MACROS in settings.dist/h.
+	* Added threaded C++ library support to Makefile.
+	* Fixed problems with -p and -m not setting the debug flags.
+	* Added 'force-linear' and depreciated the 'allow-nonlinear' token.
 
 Version 4.6.0:
 

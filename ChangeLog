@@ -1,5 +1,7 @@
 Mon Jul 24 15:30:04 2000  Gray Watson  <gray@256.com>
 
+	* Releasing dmalloc version 4.7.0.
+
 	* Added support for --disable-cxx and --enable-threads for turning
  	on or off C++ and thread support.
 
@@ -8,9 +10,9 @@ Fri Jul 21 17:00:25 2000  Gray Watson  <gray@256.com>
 	* Added autoconfiguration code to see if the return macros work
  	for an architecture.
 
-	* Renamed USE_RET_ADDRESS to USE_RETURN_MACROS.
+	* Renamed USE_RET_ADDRESS to USE_RETURN_MACROS in return.h.
 
-	* Added threaded C++ library to Makefile.
+	* Added threaded C++ library support to Makefile.
 
 Tue Jun 20 18:30:55 2000  Gray Watson  <gray@256.com>
 
@@ -1656,5 +1658,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.257 2000/07/24 19:47:04 gray Exp $
+$Id: ChangeLog,v 1.258 2000/07/24 20:04:01 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.10 2000/05/17 15:41:40 gray Exp $ -->
+<!-- $Id: RELEASE.html,v 1.11 2000/07/24 20:04:01 gray Exp $ -->
 <TITLE> Dmalloc Release Notes - 4.6.0 </TITLE>
 </HEAD>
 <BODY>
@@ -8,10 +8,10 @@
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.6.0 <BR>
+Version: Release 4.7.0 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.5.2.html">4.5.2</A> <BR>
-Date: May 17, 2000
+Last-Version: <A HREF="dmalloc-4.6.0.html">4.6.0</A> <BR>
+Date: July 24, 2000
 </H4>
 </CENTER>
 
@@ -20,8 +20,9 @@ Date: May 17, 2000
 <CENTER>
 <A HREF="#overview">Overview</A> |
 <A HREF="#func">New Functionality</A> |
-<A HREF="#dmalloc">Dmalloc Utility</A> <BR>
-<A HREF="#settings.dist">settings.dist</A> |
+<A HREF="#dmalloc">Dmalloc Utility</A> |
+<A HREF="#settings.dist">settings.dist</A> <BR>
+<A HREF="#install">Installation</A> |
 <A HREF="#programming">Programming</A> |
 <A HREF="#env">Environmental Variables</A> <BR>
 <A HREF="#bugs">Bugs Fixed</A> <BR>
@@ -31,29 +32,12 @@ Date: May 17, 2000
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> General feature release with some bug repairs as well.
+<P> General feature release.
 
 <P>
 <HR>
 
 <H3><A NAME="func"> New Functionality </A></H3>
-
-<UL>
-
-<P><LI> Added autoconfiguration of the presence of a C++ compiler so
-the Makefile will attempt to build and install libdmallocxx.a if it
-can.
-
-<P><LI> Added initial mprotect autoconfiguration and stub functions to
-the library.  They don't do anything right now however it is able time
-dmalloc had this functionality.
-
-</UL>
-
-<P>
-<HR>
-
-<H3><A NAME="dmalloc"> Dmalloc Utility Changes </A></H3>
 
 <UL>
 
@@ -64,16 +48,49 @@ dmalloc had this functionality.
 <P>
 <HR>
 
+<H3><A NAME="dmalloc"> Dmalloc Utility Changes </A></H3>
+
+<UL>
+
+<P><LI> Fixed problems with the -p (--plus) and -m (--minus)
+arguments.  They were not updating the debug flag.
+
+<P><LI> Added 'force-linear' and depreciated the 'allow-nonlinear'
+tokens.  Nonlinear heaps support is now the default in the library.
+
+</UL>
+
+<P>
+<HR>
+
 <H3><A NAME="settings.dist"> Changes to the settings.dist File </A></H3>
 
 <UL>
 
-<P><LI> Added PROTECT_BLOCKS setting which defaults to 1 (on).  Set it
-0 if you don't want dmalloc to be using mprotect to restrict accesses
-to memory blocks.  This is a newer part of the library and still may
-have bugs.  Protection will only be on if the auto-configuration
-scripts find the mprotect function and the PROT_NONE, PROT_READ, and
-PROT_WRITE defines.
+<P><LI> Renamed USE_RET_ADDRESS to USE_RETURN_MACROS to make more
+sense and match other configurations.
+
+</UL>
+
+<HR>
+
+<P>
+<H3><A NAME="install"> Installation Changes </A></H3>
+
+<UL>
+
+<P><LI> Added C++ library support to the Makefile.  Now configure will
+check for the C++ library (and the lack of a --disable-cxx) and will
+automatically build the C++ version of the library.
+
+<P><LI> Added autoconf code to make sure that the return-address
+macros in return.h work for a specific architecture.
+
+<P><LI> Added the --disable-cxx argument to configure with which you
+can disable C++ dmalloc support.
+
+<P><LI> Added the --enable-threads argument to configure with which
+you enable thread support in the library.
 
 </UL>
 
@@ -84,14 +101,8 @@ PROT_WRITE defines.
 
 <UL>
 
-<P><LI> The dmalloc_examine function now returns DMALLOC_[NO]ERROR not
-[NO]ERROR which was not exported.
-
-<P><LI> The dmalloc_verify function now returns DMALLOC_[NO]ERROR
-instead of DMALLOC_VERIFY_[NO]ERROR.
-
-<P><LI> Moved to 'make cxx' and 'make installcxx' for building and
-installing the C++ version of the library.
+<P><LI> Replaced the DEBUG_ALLOW_NONLINEAR token with
+DEBUG_FORCE_LINEAR.  Nonlinear heap support is now the default.
 
 </UL>
 
@@ -113,11 +124,12 @@ installing the C++ version of the library.
 
 <UL>
 
-<P><LI> Fixed a bug found by Mcvey where the 1st dblock allocation in
-a block would not have been found in non-freed memory lists.  Yuck.
+<P><LI> Fixed problems with the -p (--plus) and -m (--minus) arguments
+to the dmalloc utility.  They were not updating the debug flag.
 
-<P><LI> Fixed some portability problems with the environmental
-variable initialization values.
+<P><LI> The library now checks to see if the return.h macros work on a
+system.  This was causing problems for people using different
+compilers.
 
 </UL>
 
