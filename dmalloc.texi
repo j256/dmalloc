@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.207 2001/07/11 21:21:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.208 2001/07/12 23:11:57 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1871,9 +1871,10 @@ dmalloc -tv
 An @dfn{environment variable} is a variable that is part of the user's
 working environment and is shared by all the programs.  The
 @samp{DMALLOC_OPTIONS} variable is used by the dmalloc library to enable
-or disable the memory debugging features, at runtime.  It can be set
-either by hand or with the help of the dmalloc program.  @xref{Dmalloc
-Program}.
+or disable the memory debugging features, at runtime.  @emph{NOTE:} you
+can also use the dmalloc_debug_setup function to set the option string.
+It can be set either by hand or with the help of the dmalloc program.
+@xref{Dmalloc Program}.
 
 @cindex shell usage
 
