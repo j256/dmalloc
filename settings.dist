@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.22 1998/09/17 15:22:55 gray Exp $
+ * $Id: settings.dist,v 1.23 1998/09/29 13:27:19 gray Exp $
  */
 
 /*
@@ -176,7 +176,7 @@
  * up but better protection against fence overruns.  See the manual
  * for more information.
  */
-#define FENCE_TOP 4
+#define FENCE_TOP_SIZE 4
 
 /*
  * Number of bytes to write at the bottom of allocations. See the
@@ -187,12 +187,12 @@
  * X) or some such.  For more information see ALLOCATION_ALIGNMENT in
  * conf.h.
  */
-#define FENCE_BOTTOM ALLOCATION_ALIGNMENT
+#define FENCE_BOTTOM_SIZE ALLOCATION_ALIGNMENT
 
 /*
  * Amount of space that we are to display whenever we need to dump a
  * pointer's contents to a log file or stream.  This should be more
- * than FENCE_BOTTOM and FENCE_TOP.
+ * than FENCE_BOTTOM_SIZE and FENCE_TOP_SIZE.
  */
 #define DUMP_SPACE 20
 
