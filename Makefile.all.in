@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.33 1994/02/18 03:56:38 gray Exp $
+# $Id: Makefile.all.in,v 1.34 1994/02/18 07:34:06 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -37,7 +37,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = malloc_dbg.h
-OBJS = arg_check.o argv.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
+OBJS = arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN = malloc_lp.o
 
 CFLAGS = $(CCFLAGS)
@@ -88,9 +88,9 @@ $(LIBRARY) : $(OBJS)
 	@RANLIB@ $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o argv.o
+$(UTIL) : $(UTIL).o argv.o compat.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $@.o argv.o $(LIBS)
+	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o $(LIBS)
 	mv a.out $@
 
 # .PHONY : noansi
@@ -100,9 +100,9 @@ noansi : Deansify.pl
 # .PHONY : tests
 tests : $(TEST)
 
-$(TEST) : $(TEST).o $(LIBRARY)
+$(TEST) : $(TEST).o argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
+	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
 	mv a.out $@
 
 #.PHONY : light

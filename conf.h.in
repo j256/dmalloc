@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.29 1993/12/20 04:37:57 gray Exp $
+ * $Id: conf.h.in,v 1.30 1994/02/18 07:34:13 gray Exp $
  */
 
 /*
@@ -201,6 +201,9 @@
 
 #define HAVE_GETPID 0
 #define HAVE_TIME 0
+
+/* for argv files */
+#define HAVE_STRDUP 0
 
 /*
  * the below functions are here to provide function argument checking

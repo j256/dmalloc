@@ -1,12 +1,11 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.42 1994/02/18 03:56:41 gray Exp $
+# $Id: Makefile.in,v 1.43 1994/02/18 07:34:09 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
-OBJS	= arg_check.o argv.o chunk.o compat.o error.o heap.o malloc.o \
-	malloc_lp.o
+OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_INST= malloc_lp.o
 FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
 
@@ -52,8 +51,8 @@ SHAR4	= malloc_lp.h malloc_loc.h return.h \
 	version.h malloc_t.c malloc.info
 SHAR5	= malloc_dbg.c malloc_dbg.[12] \
 	malloc.texi
-SHAR6	= contrib contrib/README contrib/dec_notes contrib/ra_info.pl \
-	malloc.c \
+SHAR6	= Deansify.pl contrib contrib/README contrib/dec_notes \
+	contrib/ra_info.pl malloc.c \
 	argv.c argv.h argv_loc.h
 
 .PHONY : all
@@ -105,9 +104,9 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o argv.o
+$(UTIL) : malloc_dbg.o argv.o compat.o 
 	rm -f $@
-	$(CC) $(LDFLAGS) $@.o argv.o $(LIBS)
+	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o $(LIBS)
 	mv a.out $@
 
 .PHONY : port
@@ -131,9 +130,9 @@ fill : $(FILLFLS)
 
 tests : $(TEST)
 
-$(TEST) : $(TEST).o $(LIBRARY)
+$(TEST) : $(TEST).o argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o $(LIBS) $(LIBRARY)
+	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
 	mv a.out $@
 
 .PHONY : light

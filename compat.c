@@ -34,7 +34,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.24 1993/11/23 07:41:28 gray Exp $";
+  "$Id: compat.c,v 1.25 1994/02/18 07:34:11 gray Exp $";
 #endif
 
 #if HAVE_GETPID == 0
@@ -170,6 +170,24 @@ EXPORT	char	*strcat(char * str1, const char * str2)
   return hold;
 }
 #endif /* HAVE_STRCAT == 0 */
+
+#if HAVE_STRDUP == 0
+/*
+ * alloc space for PTR (with NULL) and copy it to new space, user must free
+ */
+EXPORT	char	*strdup(const char * ptr)
+{
+  char	*ret;
+  int	len;
+  
+  len = strlen(ptr);
+  ret = (char *)malloc(len + 1);
+  if (ret != NULL)
+    (void)strcpy(ret, ptr);
+  
+  return ret;
+}
+#endif
 
 #if HAVE_STRCMP == 0
 /*
