@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.94 1997/03/21 21:23:51 gray Exp $
+# $Id: Makefile.in,v 1.95 1997/07/07 07:13:37 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -17,7 +17,9 @@ OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
 FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c heap.c malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
-DEFS	= -DSTDC_HEADERS=@STDC_HEADERS@ $(DEFINES)
+DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
+	-DHAVE_STRING_H=@HAVE_STRING_H@ \
+	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ $(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
 

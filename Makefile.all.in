@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.63 1997/03/20 20:45:47 gray Exp $
+# $Id: Makefile.all.in,v 1.64 1997/07/07 07:13:36 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -19,7 +19,9 @@ infodir = $(prefix)/info
 # default c-compiler
 CC = @CC@
 
-DEFS = -DSTDC_HEADERS=@STDC_HEADERS@
+DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
+	-DHAVE_STRING_H=@HAVE_STRING_H@ \
+	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@
 INCS = -I. -I$(srcdir)
 LIBS = -L. @LIBS@
 
