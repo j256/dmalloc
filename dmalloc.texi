@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.116 1997/01/17 20:41:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.117 1997/01/17 22:26:20 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -194,7 +194,7 @@ For ``site'' licenses (at significant discount) or any other reasonable
 agreements, please contact me directly.  It should be noted that a
 ``site'' can be defined as anything you'd like.  It can be a physical
 location (a room, building, etc.), an organizational grouping (a
-workgroup, department, etc.) or any other logical grouping (``the folks
+workgroups, department, etc.) or any other logical grouping (``the folks
 working on the widget project'', etc.).
 
 @node Printed Manuals, Registration Information, Commercial License, Copying
@@ -235,8 +235,8 @@ email to:
 
 @example
 Gray Watson
-330 Harmar St.
-Pittsburgh, PA  15219-3748
+826 Savannah Ave.
+Pittsburgh, PA  15221-3446
 USA
 @end example
 
@@ -303,6 +303,11 @@ void foo()
         float total;
         @dots{}
 @}
+
+main()
+@{
+        foo();
+@}
 @end example
 
 @cindex heap memory
@@ -318,13 +323,13 @@ main()
         @dots{}
 
         /*
-         * allocate a string of 10 bytes on the heap, store the
-         * address in string which is on the stack
+         * Allocate a string of 10 bytes on the heap.  Store the
+         * address in string which is on the stack.
          */
         string = (char *)malloc(10);
         @dots{}
 
-        /* de-allocate the heap memory now that I'm done with it */
+        /* de-allocate the heap memory now that we're done with it */
         (void)free(string);
         @dots{}
 @}
@@ -367,7 +372,8 @@ pages -- in unix, do a @code{man 3 malloc}.
 Usage: @code{pnt = (type *)malloc(size)}
 
 The malloc routine is the basic memory allocation routine.  It allocates
-an area of size bytes.  It will return a pointer to the space requested.
+an area of @code{size} bytes.  It will return a pointer to the space
+requested.
 
 @end deftypefun
 @deftypefun void * calloc ( unsigned int @var{number}, unsigned int
@@ -377,9 +383,9 @@ an area of size bytes.  It will return a pointer to the space requested.
 
 Usage: @code{pnt = (type *)calloc(number, size)}
 
-The calloc routine allocates a certain number of items, each of size
-bytes, and returns a pointer to the space.  It is appropriate to pass in
-a @code{sizeof(type)} value as the size argument.
+The calloc routine allocates a certain @code{number} of items, each of
+@code{size} bytes, and returns a pointer to the space.  It is
+appropriate to pass in a @code{sizeof(type)} value as the size argument.
 
 Also, calloc nulls the space that it returns, assuring that the memory
 is all zeros.
@@ -391,9 +397,10 @@ is all zeros.
 
 Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
 
-The realloc function expands or shrinks the memory allocation in old_pnt
-to new_size number of bytes.  Realloc copies as much of the information
-in old_pnt as it can into the new_pnt space up to new_size bytes.
+The realloc function expands or shrinks the memory allocation in
+@code{old_pnt} to @code{new_size} number of bytes.  Realloc copies as
+much of the information from @code{old_pnt} as it can into the
+@code{new_pnt} space it returns, up to @code{new_size} bytes.
 
 @end deftypefun
 @deftypefun void free ( void * @var{pnt} )
@@ -401,11 +408,11 @@ in old_pnt as it can into the new_pnt space up to new_size bytes.
 
 Usage: @code{free(pnt)}
 
-The free routine releases an allocation returned by malloc, calloc, or
-realloc back to the heap.  This allows other parts of the program to
-re-use memory that is not needed anymore.  It guarantees that the
-process does not grow too big and swallow a large portion of the system
-resources.
+The free routine releases allocation in @code{pnt} which was returned by
+malloc, calloc, or realloc back to the heap.  This allows other parts of
+the program to re-use memory that is not needed anymore.  It guarantees
+that the process does not grow too big and swallow a large portion of
+the system resources.
 
 @end deftypefun
 
@@ -415,7 +422,7 @@ appropriate pointer type for the variable being assigned.
 
 @emph{WARNING}: there is a quite common myth that all of the space that
 is returned by malloc libraries has already been cleared.  @emph{Only}
-the calloc routine will zero the memory space it returns.
+the @code{calloc} routine will zero the memory space it returns.
 
 @node Features, How To Get, Allocation Basics, Overview
 @section Features of the Library
@@ -626,19 +633,17 @@ arguments to malloc routines.  Comments on this please.
 @file{libdmalloclp.a}, and @file{dmalloc} program.  If it does not work,
 please see if there are any notes in the contrib directory about your
 system-type.  If not and you figure your problem out, please send me
-some notes so future users can profit from your experiences.  In general
-64 bit systems usually have lots of warnings about int to pointer
-promotion.
+some notes so future users can profit from your experiences.
 
 @cindex ANSI-C compiler
 @cindex Deansify.pl script
 
-@emph{NOTE}: The code is pretty dependent on a good ANSI-C compiler like
-gcc.  If the configure script gives the @samp{WARNING} that you do not
-have an ANSI-C compiler, you may still be able to add some sort of
-option to your compiler to make it ANSI.  If there such is an option,
-please send it to the author so it can be added to the configure script.
-Otherwise, you will have to try @kbd{make noansi}.  This will run the
+@emph{NOTE}: The code is pretty dependent on a good ANSI-C compiler.  If
+the configure script gives the @samp{WARNING} that you do not have an
+ANSI-C compiler, you may still be able to add some sort of option to
+your compiler to make it ANSI.  If there such is an option, please send
+it to the author so it can be added to the configure script.  Otherwise,
+you will have to try @kbd{make noansi}.  This will run the
 @file{Deansify.pl} perl script on the code which:
 
 @itemize @bullet
@@ -670,7 +675,7 @@ and @file{libdmalloc_lp.a} library files in @file{/usr/local/lib}, the
 @file{dmalloc.info} documentation file in @file{/usr/local/info}.
 
 You may have specified a @samp{--prefix=PATH} option to configure in
-which can @samp{/usr/local} will have been replaced with @samp{PATH}.
+which case @samp{/usr/local} will have been replaced with @samp{PATH}.
 
 @end enumerate
 
@@ -1164,7 +1169,7 @@ defining @code{DMALLOC_DISABLE}.  This will cause the dmalloc leap
 macros to not be applied.  @xref{Allocation Macros}.
 
 @example
-cc -g -DMALLOC_DISABLE main.c
+cc -g -DDMALLOC_DISABLE main.c
 @end example
 
 @item
