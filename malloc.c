@@ -25,6 +25,13 @@
  * chunk.c which is the real heap manager.
  */
 
+/* for timeval type -- see conf.h */
+#if STORE_TIMEVAL
+#ifdef TIMEVAL_INCLUDE
+#include TIMEVAL_INCLUDE
+#endif
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
@@ -44,7 +51,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.74 1995/05/05 15:41:13 gray Exp $";
+  "$Id: malloc.c,v 1.75 1995/05/12 20:34:35 gray Exp $";
 #endif
 
 /*
@@ -200,10 +207,11 @@ LOCAL	int	dmalloc_startup(void)
   /* set this here so if an error occurs below, it will not try again */
   enabled = TRUE;
   
-#if HAVE_TIME
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
   _dmalloc_start = time(NULL);
 #endif
+#if STORE_TIMEVAL
+  GET_TIMEVAL(_dmalloc_start);
 #endif
   
   /* process the environmental variable(s) */
@@ -285,14 +293,21 @@ EXPORT	void	_dmalloc_shutdown(void)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE))
     _chunk_dump_unfreed();
   
-#if HAVE_TIME
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
   {
     long	now = time(NULL);
-    _dmalloc_message("ending time = %ld, elapsed since start = %ld",
-		     now, now - _dmalloc_start);
+    _dmalloc_message("ending time = %ld, elapsed since start = %s",
+		     now, _dmalloc_ptime(&now, TRUE));
   }
 #endif
+  
+#if STORE_TIMEVAL
+  {
+    struct timeval	now;
+    GET_TIMEVAL(now);
+    _dmalloc_message("ending time = %ld.%ld, elapsed since start = %s",
+		     now.tv_sec, now.tv_usec, _dmalloc_ptime(&now, TRUE));
+  }
 #endif
   /* NOTE: do not set enabled to false here */
 }

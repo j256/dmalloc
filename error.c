@@ -28,6 +28,13 @@
 #include <signal.h>				/* for kill signals */
 #include <stdarg.h>				/* for message vsprintf */
 
+/* for timeval type -- see conf.h */
+#if STORE_TIMEVAL
+#ifdef TIMEVAL_INCLUDE
+#include TIMEVAL_INCLUDE
+#endif
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
@@ -42,8 +49,11 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.54 1995/05/05 15:41:53 gray Exp $";
+  "$Id: error.c,v 1.55 1995/05/12 20:34:34 gray Exp $";
 #endif
+
+#define SECS_IN_HOUR	(60 * SECS_IN_MIN)
+#define SECS_IN_MIN	60
 
 /* external routines */
 IMPORT	char		*_dmalloc_strerror(const int errnum);
@@ -57,8 +67,70 @@ EXPORT	long		_dmalloc_flags = 0;
 /* global iteration counter for activities */
 EXPORT	unsigned long	_dmalloc_iterc = 0;
 
-/* time the library started up for elapsed time calculations */
+/* overhead information storing when the library started up for elapsed time */
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
 EXPORT	long		_dmalloc_start = 0;
+#endif
+#if STORE_TIMEVAL
+EXPORT	struct timeval	_dmalloc_start;
+#endif
+
+/*
+ * print the time into local buffer which is returned
+ */
+EXPORT	char	*_dmalloc_ptime(
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
+				const long * timep,
+#endif
+#if STORE_TIMEVAL
+				const struct timeval * timevalp,
+#endif
+				const char elapsed
+				)
+{
+  static char	buf[64];
+  long		hrs, mins, secs;
+#if STORE_TIMEVAL
+  long		usecs;
+#endif
+  
+  buf[0] = NULLC;
+  
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
+  secs = *timep;
+#endif
+#if STORE_TIMEVAL
+  secs = timevalp->tv_sec;
+  usecs = timevalp->tv_usec;
+#endif
+  
+  if (elapsed || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
+    secs -= _dmalloc_start;
+#endif
+#if STORE_TIMEVAL
+    usecs -= _dmalloc_start.tv_usec;
+    if (usecs < 0) {
+      secs--;
+      usecs = - usecs;
+    }
+    secs -= _dmalloc_start.tv_sec;
+#endif
+  }
+  
+  hrs = secs / SECS_IN_HOUR;
+  mins = (secs / SECS_IN_MIN) % SECS_IN_HOUR;
+  secs %= SECS_IN_MIN;
+  
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
+  (void)sprintf(buf, "%ld:%ld:%ld", hrs, mins, secs);
+#endif
+#if STORE_TIMEVAL
+  (void)sprintf(buf, "%ld:%ld:%ld.%ld", hrs, mins, secs, usecs);
+#endif
+  
+  return buf;
+}
 
 /*
  * message writer with printf like arguments
@@ -137,10 +209,12 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
       _dmalloc_message("dmalloc_logfile '%s': flags = %#lx, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags, dmalloc_address);
       
-#if HAVE_TIME
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+#if HAVE_TIME /* NOT STORE_TIME */ && STORE_TIMEVAL == 0
       _dmalloc_message("starting time = %ld", _dmalloc_start);
 #endif
+#if STORE_TIMEVAL
+      _dmalloc_message("starting time = %ld.%ld",
+		       _dmalloc_start.tv_sec, _dmalloc_start.tv_usec);
 #endif
     }
     
