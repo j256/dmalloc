@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.253 2004/06/29 21:49:14 gray Exp $
+@c $Id: dmalloc.texi,v 1.254 2004/07/01 15:36:45 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -396,7 +396,7 @@ did not work.
 in your C files and recompile.  This will allow the library to report
 the file/line numbers of calls that generate problems.  @xref{Allocation
 Macros}.  It should be inserted at the @emph{bottom} of your include
-files as to not conflict with other includes.  You may want to ifdef it
+files as to not conflict with wother includes.  You may want to ifdef it
 as well and compile with @kbd{cc -DDMALLOC @dots{}}:
 
 @example
@@ -1176,10 +1176,6 @@ areas in the heap.
 @cindex dmalloc_debug function
 @cindex override debug settings
 @cindex set debug functionality flags
-@cindex server usage of dmalloc
-@cindex cgi-bin usage of dmalloc
-@cindex usage of dmalloc in a server
-@cindex usage of dmalloc with cgi-bin
 
 @deftypefun
 unsigned int dmalloc_debug ( const unsigned int @var{flags} )
@@ -1217,10 +1213,6 @@ and then restored later.
 @cindex dmalloc_debug_setup
 @cindex override debug settings
 @cindex set debug functionality flags
-@cindex server usage of dmalloc
-@cindex cgi-bin usage of dmalloc
-@cindex usage of dmalloc in a server
-@cindex usage of dmalloc with cgi-bin
 @cindex setup debug flags
 @cindex string of debug tokens
 
@@ -1239,8 +1231,8 @@ Some examples:
 /* debug tokens high, threaded lock-on at 20, log to dmalloc.%p (pid) */
 dmalloc_debug_setup("debug=0x4f46d03,lockon=20,log=dmalloc.%p");
 
-/* turn on some debug tokens directly and log to the file malloc */
-dmalloc_debug_setup("log-stats,log-non-free,check-fence,log=malloc");
+/* turn on some debug tokens directly and log to the file 'logfile' */
+dmalloc_debug_setup("log-stats,log-non-free,check-fence,log=logfile");
 @end example
 
 @end deftypefun
@@ -1289,8 +1281,6 @@ dmalloc.h.
 @cindex dmalloc_mark function
 @cindex memory position marker
 @cindex mark memory position
-@cindex using with servers
-@cindex servers, using with
 @cindex LOG_ITERATION
 @cindex interaction count
 @cindex transaction count
@@ -1366,7 +1356,7 @@ not leaking memory.
 
 @example
 unsigned long mark = dmalloc_mark() ;
-...
+@dots{}
 assert(dmalloc_count_changed(mark, 1, 0) == 0) ;
 @end example
 
@@ -1899,11 +1889,11 @@ cc -g -DDMALLOC_DISABLE main.c
 @end example
 
 An alternative is to surround the @code{dmalloc.h} inclusion or any
-direct dmalloc references with an @code{#ifdef dmalloc} and then just
-remove the -Ddmalloc.
+direct dmalloc references with an @code{#ifdef DMALLOC} and then just
+remove the -DDMALLOC.
 
 @example
-#ifdef dmalloc
+#ifdef DMALLOC
 #include "dmalloc.h"
 #endif
 
@@ -1911,7 +1901,7 @@ main()
 @{
   @dots{}
 
-#ifdef dmalloc
+#ifdef DMALLOC
   dmalloc_verify(0L);
 #endif
   return 0;
@@ -2351,7 +2341,7 @@ main(int argc, char **argv)
 #endif
 
   /* rest of code in main starts here */
-  ...
+  @dots{}
 @}
 @end example
 
@@ -2377,6 +2367,9 @@ do this.
 @cindex debugging cgi-bin processes
 @cindex child process debugging
 @cindex debugging child processes
+@cindex cgi-bin usage of dmalloc
+@cindex usage of dmalloc in a server
+@cindex usage of dmalloc with cgi-bin
 
 There are some specified challenges when trying to debug allocations in
 processes which do not startup, run, and then shutdown.  Daemon
@@ -2385,51 +2378,150 @@ perpetually.  Other processes which are difficult to debug are CGI
 programs which are spawned by web servers or when you want to start
 debugging inside of a child process.
 
-The first issue is how to enable the library's flags to perform certain
-checks.  Since these programs often do not run from the command line,
-you cannot use the dmalloc utility program and modify the process
-environment.  @xref{Dmalloc Program}.  The library provides a couple of
-functions to set the debugging flags when a program is running.  The
-@code{dmalloc_debug} function allows you to set the library flags
-directly.  For example, if @code{dmalloc -v} shows that the debug flags
-you want are @code{0x4f47d03} then you can pass this number to the
-@code{dmalloc_debug} function and get the same library behavior if you'd
-have used the environmental variable.
+@enumerate
+
+@item First you need to build your daemon or cgi-bin program with the
+dmalloc library like any other program.  @xref{Getting Started}.
+
+@item Next you need to add code into your program to enable the library
+flags to perform the memory checks that you require.  Since these
+programs often do not run from the command line, you cannot use the
+dmalloc utility program and modify the process environment.
+@xref{Dmalloc Program}.  The library provides a couple of functions to
+set the debugging flags when a program is running.
 
 @cindex dmalloc_debug_setup function
 
-In version 5 and above of the library, you can also use the
+@item In version 5 and above of the library, you use the
 @code{dmalloc_debug_setup} function which takes a string in the same
-format of the @samp{DMALLOC_OPTIONS}.  @xref{Environment Variable}.  So,
-for example, if you want to turn on high debugging and log to the file
-@file{malloc} then you would call
-@code{dmalloc_debug_setup("debug=0x4f47d03,log=malloc");}.  Even if you
-get the settings enabled, you may have problems getting the logfile to
-be written if your program is running as @samp{nobody} or another user
-without permissions for security reasons.  In this case you should
-specify a full path to your malloc logfile in a world writable directory
-(ex. @file{/var/tmp/malloc}).  Watch for programs which change into
-other directories and which may cause logfiles specified as relative or
-local paths to be dropped in other locations.  You may always want to
-use a full path logfile.
+format of the @samp{DMALLOC_OPTIONS} environmental variable.
+@xref{Environment Variable}.  Use the dmalloc utility with the
+@code{-n} no-changes argument to see the appropriate settings for the
+@samp{DMALLOC_OPTIONS} environmental variable.
 
-Once you have your settings being enabled and your log is being
+@example
+> dmalloc -n -l logfile high
+Outputed:
+DMALLOC_OPTIONS=debug=0x4f4ed03,log=logfile
+export DMALLOC_OPTIONS
+@end example
+
+So if you want to turn on @kbd{high} debugging and log to the file
+@file{logfile} then you would copy the above @samp{DMALLOC_OPTIONS}
+value into a call to @code{dmalloc_debug_setup}.  Notice that I have
+surrounded the dmalloc code with an @code{#ifdef DMALLOC} so you'll
+have to compile using the @code{-DDMALLOC} flag.
+
+@example
+main()
+@{
+#ifdef DMALLOC
+  /* set the 'high' flags */
+  dmalloc_debug_setup("debug=0x4f47d03,log=logfile");
+#endif
+  @dots{}
+@}
+@end example
+
+@emph{Please note} that the @code{dmalloc_debug_setup} function does
+not know about @code{high}, @code{low}, or other debug tokens but
+needs the actual flag values.
+
+@item For earlier versions of the library without 
+@code{dmalloc_debug_setup}, the @code{dmalloc_debug} function is
+available to set the flags directly, but it cannot adjust the logfile
+name and the other environment settings.  You can use the dmalloc
+utility program to see what the numerical equivalent of the @kbd{high}
+token.
+
+@example
+> dmalloc -n high
+Outputed:
+DMALLOC_OPTIONS=debug=0x4f4ed03
+export DMALLOC_OPTIONS
+@end example
+
+You can then take the @code{0x4f4ed03} hexadecimal number and call
+@code{dmalloc_debug} with that number.
+
+@example
+main()
+@{
+#ifdef DMALLOC
+  /* set the 'high' flags */
+  dmalloc_debug(0x4f4ed03);
+#endif
+  @dots{}
+@}
+@end example
+
+@item Even with the settings enabled, you may have problems getting
+the logfile to be written if your program is running as @samp{nobody}
+or another user without permissions for security reasons.  This is
+especially true for cgi-bin programs.  In this case you should specify
+a full path to your malloc logfile in a world writable directory
+(ex. @code{dmalloc_debug_setup("debug=0x4f47d03,log=/var/tmp/malloc");}).
+Watch for programs which change into other directories and which may
+cause logfiles specified as relative or local paths to be dropped in
+other locations.  You may always want to use a full path logfile.
+
+@item Once you have your settings enabled and your log is being
 generated, you may now want to check out how your process is doing in
 terms of unfreed memory.  Since it is not shutting down, the automatic
-unfreed log entries are not being dropped to the logfile.  By using the
-@code{dmalloc_mark} and @code{dmalloc_log_changed} functions, you can
-set a mark point at a certain place inside of your program, and then
-later see whether there are any unfreed pointers since the mark.
-Usually you would set the mark after the initializations are complete
-and before the transactions are processed.  Then for each transaction
-you can use @code{dmalloc_log_changed} to show the unfreed memory.
+unfreed log entries are not being dropped to the logfile.  By using
+the @code{dmalloc_mark} and @code{dmalloc_log_changed} functions, you
+can set a mark point at a certain place inside of your program, and
+then later see whether there are any unfreed pointers since the mark.
+
+@example
+main()
+@{
+#ifdef DMALLOC
+  /* set the 'high' flags */
+  dmalloc_debug_setup("debug=0x4f47d03,log=logfile");
+#endif
+
+  while (1) @{
+    /* accept a connection from a client */
+    accept_connection();
+
+    while (1) @{
+#ifdef DMALLOC
+      unsigned long mark;
+      /* get the current dmalloc position */
+      mark = dmalloc_mark() ;
+#endif
+      /* process the connection */
+      if (process_connection() != PROCESS_OK) @{
+        break;
+      @}
+#ifdef DMALLOC
+      /* log unfreed pointers that have been added to the heap since mark */
+      dmalloc_log_changed(mark,
+                          1 /* log unfreed pointers */,
+                          0 /* do not log freed pointers */,
+                          1 /* log individual pointers otherwise a summary */);
+#endif
+    @}
+    /* close the connection with the client */
+    close_connection();
+  @}
+  @dots{}
+@}
+@end example
+
+Usually you would set the mark after the initializations and before
+each transaction is processed.  Then for each transaction you can use
+@code{dmalloc_log_changed} to show the unfreed memory.
 @xref{Extensions}.
 
-You can also use the @code{dmalloc_log_stats} and
+@item You can also use the @code{dmalloc_log_stats} and
 @code{dmalloc_log_heap_map} functions to dump general information about
 the heap.  Also, remember that you can use the @code{dmalloc_message}
 and @code{dmalloc_vmessage} routines to annotate the dmalloc logfile
 with details to help you debug memory problems.  @xref{Extensions}.
+
+@end enumerate
 
 @c ----------------------------------------------------------------------------
 
@@ -2512,7 +2604,7 @@ don't have command functions will need to send the output to a temporary
 file and the read it back in with the ``.'' command:
 
 @example
-$  dmalloc -b arguments... > /tmp/out
+$  dmalloc -b arguments @dots{} > /tmp/out
 $  . /tmp/out
 @end example
 
@@ -2952,16 +3044,16 @@ routine or file has been reached in the program.
 Some examples are:
 
 @example
-# turn on transaction and stats logging and set 'malloc' as the log-file
-setenv DMALLOC_OPTIONS log-trans,log-stats,log=malloc
+# turn on transaction and stats logging and set 'logfile' as the log-file
+setenv DMALLOC_OPTIONS log-trans,log-stats,log=logfile
 
 # enable debug flags 0x1f as well as heap-checking and set the interval
 # to be 100
 setenv DMALLOC_OPTIONS debug=0x1f,check-heap,inter=100
 
-# enable 'malloc' as the log-file, watch for address '0x1234', and start
+# enable 'logfile' as the log-file, watch for address '0x1234', and start
 # checking when we see file.c line 123
-setenv DMALLOC_OPTIONS log=malloc,addr=0x1234,start=file.c:123
+setenv DMALLOC_OPTIONS log=logfile,addr=0x1234,start=file.c:123
 @end example
 
 @c --------------------------------
