@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.1 1995/06/13 21:34:44 gray Exp $
+ * $Id: settings.dist,v 1.2 1995/06/20 01:31:36 gray Exp $
  */
 
 #ifndef __SETTINGS_H__
@@ -99,10 +99,10 @@
 
 /*
  * automatically call dmalloc_shutdown if on_exit or atexit is
- * available.  See below for whether configure found on_exit or atexit
- * calls.  If neither is available, take a look at atexit.c in the
- * contrib directory which may provide this useful functionality for
- * your system.
+ * available.  See conf.h for whether configure found on_exit or
+ * atexit calls.  If neither is available, take a look at atexit.c in
+ * the contrib directory which may provide this useful functionality
+ * for your system.
  */
 #define AUTO_SHUTDOWN 1
 
