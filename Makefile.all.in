@@ -1,7 +1,7 @@
 #
 # Makefile for the Malloc library.
 #
-# $Id: Makefile.all.in,v 1.6 1992/12/17 23:30:18 gray Exp $
+# $Id: Makefile.all.in,v 1.7 1992/12/22 04:55:14 gray Exp $
 #
 
 # default root installation directory
@@ -55,7 +55,7 @@ realclean : clobber
 
 distclean : clobber
 	rm -f Makefile conf.h config.status
-#	rm -f malloc.info configure
+#	rm -f configure
 
 install : $(HFLS) $(LIBRARY) $(UTIL) $(INFOFILES)
 	$(INSTALL_DATA) $(HFLS) $(incdir)

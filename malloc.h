@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.10 1992/12/17 23:30:42 gray Exp $
+ * $Id: malloc.h,v 1.11 1992/12/22 04:55:32 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -64,7 +64,7 @@
 /*
  * prototype for memory copy.  needed for below macros.
  */
-IMPORT	char	*memcpy(char * to, const char * from, int length);
+IMPORT	char	*memcpy(char * to, char * from, int length);
 #endif
 
 /*
@@ -78,31 +78,31 @@ IMPORT	char	*memcpy(char * to, const char * from, int length);
  */
 #undef ALLOC
 #define ALLOC(type, count) \
-  (type *)_malloc_lp(__FILE__, __LINE__, \
+  (type *)_malloc_leap(__FILE__, __LINE__, \
 		       (unsigned int)(sizeof(type) * (count)))
 
 /* WARNING: notice that the arguments are REVERSED from normal calloc() */
 #undef CALLOC
 #define CALLOC(type, count) \
-  (type *)_calloc_lp(__FILE__, __LINE__, (unsigned int)(count), \
+  (type *)_calloc_leap(__FILE__, __LINE__, (unsigned int)(count), \
 		       (unsigned int)sizeof(type))
 
 #undef  FREE
 #define FREE(ptr) \
-  _free_lp(__FILE__, __LINE__, (char *)(ptr))
+  _free_leap(__FILE__, __LINE__, (char *)(ptr))
 
 #undef  MALLOC
 #define MALLOC(size) \
-  (char *)_malloc_lp(__FILE__, __LINE__, (unsigned int)(size))
+  (char *)_malloc_leap(__FILE__, __LINE__, (unsigned int)(size))
 
 #undef REALLOC
 #define REALLOC(ptr, type, count) \
-  (type *)_realloc_lp(__FILE__, __LINE__, (char *)(ptr), \
-		       (unsigned int)(sizeof(type) * (count)))
+  (type *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
+			(unsigned int)(sizeof(type) * (count)))
 
 #undef REMALLOC
 #define REMALLOC(ptr, size) \
-  (char *)_realloc_lp(__FILE__, __LINE__, (char *)(ptr), \
+  (char *)_realloc_leap(__FILE__, __LINE__, (char *)(ptr), \
 			(unsigned int)(size))
 
 /*
@@ -223,8 +223,8 @@ IMPORT	int	malloc_debug(long debug);
  * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-IMPORT	int	malloc_examine(char * pnt, int * size, char ** file,
-			       int * line);
+IMPORT	int	malloc_examine(char * pnt, unsigned int * size, char ** file,
+			       unsigned int * line);
 
 /*
  * malloc version of strerror to return the string version of ERRNUM

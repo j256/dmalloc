@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.5 1992/12/21 20:33:48 gray Exp $
+# $Id: Makefile.in,v 1.6 1992/12/22 04:55:17 gray Exp $
 #
 
 HFLS	= malloc.h malloc_lp.h
@@ -33,6 +33,11 @@ all : $(LIBRARY) $(UTIL)
 .PHONY : clobber
 clobber :
 	rm -f $(LIBRARY) $(TESTS) $(UTIL) part.?
+
+.PHONY : distclean
+distclean : clobber
+	rm -f configure config.status Makefile conf.h malloc.info
+	rm -rf port
 
 .PHONY : install
 install : $(LIBRARY) $(UTIL) $(HFLS) $(MANFILE)

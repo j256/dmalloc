@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.12 1992/12/17 23:30:40 gray Exp $";
+  "$Id: malloc.c,v 1.13 1992/12/22 04:55:30 gray Exp $";
 #endif
 
 /*
@@ -452,8 +452,8 @@ EXPORT	int	malloc_debug(long debug)
  * if any of the pointers are not NULL.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-EXPORT	int	malloc_examine(char * pnt, int * size, char ** file,
-			       int * line)
+EXPORT	int	malloc_examine(char * pnt, unsigned int * size, char ** file,
+			       unsigned int * line)
 {
   int		ret;
   

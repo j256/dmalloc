@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.5 1992/11/14 21:45:24 gray Exp $
+ * $Id: conf.h.in,v 1.6 1992/12/22 04:55:25 gray Exp $
  */
 
 /*
@@ -103,19 +103,6 @@
 #define HAVE_STRCMP 0
 #define HAVE_STRLEN 0
 #define HAVE_STRTOK 0
-
-/*
- * it does *not*, however, know how to replace the below functionality.
- */
-#define HAVE_ATOI 0
-#define HAVE_EXIT 0
-#define HAVE_GETENV 0
-#define HAVE_GETPID 0
-#define HAVE_KILL 0
-#define HAVE_OPEN 0
-#define HAVE_SPRINTF 0
-#define HAVE_VSPRINTF 0
-#define HAVE_WRITE 0
 
 /*
  * some defines to standardize memory functions
