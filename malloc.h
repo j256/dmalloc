@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.h,v 1.25 1999/10/13 22:46:42 gray Exp $
+ * $Id: malloc.h,v 1.26 1999/10/14 14:18:06 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -74,57 +74,74 @@ extern
 int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt);
 
 /*
- * no comments found for this procedure
+ * allocate and return a SIZE block of bytes.  returns 0L on error.
  */
 extern
 DMALLOC_PNT	malloc(DMALLOC_SIZE size);
 
 /*
- * no comments found for this procedure
+ * allocate and return a block of _zeroed_ bytes able to hold
+ * NUM_ELEMENTS, each element contains SIZE bytes.  returns 0L on
+ * error.
  */
 extern
 DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size);
 
 /*
- * no comments found for this procedure
+ * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
+ * either copying all of OLD_PNT to the new area or truncating.  If
+ * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
+ * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
+ * equivalent of free(OLD_PNT) and will return 0L.  Returns 0L on
+ * error.
  */
 extern
 DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size);
 
 /*
- * no comments found for this procedure
+ * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
+ * either copying all of OLD_PNT to the new area or truncating.  If
+ * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
+ * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
+ * equivalent of free(OLD_PNT) and will return 0L.  Any extended
+ * memory space will be zeroed like calloc.  Returns 0L on error.
  */
 extern
 DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size);
 
 /*
- * no comments found for this procedure
+ * Allocate and return a SIZE block of bytes that has been aligned to
+ * ALIGNMENT bytes.  ALIGNMENT must be a power of two and must be less
+ * than or equal to the block-size.  Returns 0L on error.
  */
 extern
 DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size);
 
 /*
- * no comments found for this procedure
+ * Allocate and return a SIZE block of bytes that has been aligned to
+ * a page-size.  Returns 0L on error.
  */
 extern
 DMALLOC_PNT	valloc(DMALLOC_SIZE size);
 
 #ifndef DMALLOC_STRDUP_MACRO
 /*
- * no comments found for this procedure
+ * Allocate and return a block of bytes that contains the string STR
+ * including the \0.  Returns 0L on error.
  */
 extern
 char	*strdup(const char *str);
 #endif /* ifndef DMALLOC_STRDUP_MACRO */
 
 /*
- * no comments found for this procedure
+ * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
+ * depending on whether STDC is defined by your compiler.
  */
 extern
 DMALLOC_FREE_RET	free(DMALLOC_PNT pnt);
 
 /*
- * no comments found for this procedure
+ * same as free PNT
  */
 extern
 DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt);
