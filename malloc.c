@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.73 1995/03/03 17:38:19 gray Exp $";
+  "$Id: malloc.c,v 1.74 1995/05/05 15:41:13 gray Exp $";
 #endif
 
 /*
@@ -153,7 +153,7 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
   
   addc++;
   _dmalloc_message("address '%#lx' found in '%s' at pass %d from '%s'",
-		  pnt, label, addc, _chunk_display_pnt(file, line));
+		   pnt, label, addc, _chunk_display_where(file, line));
   
   /* NOTE: if dmalloc_address_count == 0 then never quit */
   if (dmalloc_address_count == ADDRESS_COUNT_INIT
@@ -199,6 +199,12 @@ LOCAL	int	dmalloc_startup(void)
   
   /* set this here so if an error occurs below, it will not try again */
   enabled = TRUE;
+  
+#if HAVE_TIME
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+  _dmalloc_start = time(NULL);
+#endif
+#endif
   
   /* process the environmental variable(s) */
   process_environ();
@@ -279,6 +285,15 @@ EXPORT	void	_dmalloc_shutdown(void)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE))
     _chunk_dump_unfreed();
   
+#if HAVE_TIME
+#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
+  {
+    long	now = time(NULL);
+    _dmalloc_message("ending time = %ld, elapsed since start = %ld",
+		     now, now - _dmalloc_start);
+  }
+#endif
+#endif
   /* NOTE: do not set enabled to false here */
 }
 
@@ -583,7 +598,7 @@ EXPORT	int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
   
   /* NOTE: we do not need the alloc-size info */
   ret = _chunk_read_info(pnt, size, NULL, file, line, ret_attr,
-			 "dmalloc_examine");
+			 "dmalloc_examine", NULL);
   
   in_alloc = FALSE;
   
