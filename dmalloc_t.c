@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.48 1995/08/18 18:31:44 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.49 1995/08/18 18:43:21 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -577,7 +577,7 @@ int	main(int argc, char ** argv)
     
     ret = do_random(default_itern);
     if (! silent)
-      (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
+      (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   }
   
   if (! no_special) {
@@ -585,7 +585,7 @@ int	main(int argc, char ** argv)
       (void)printf("Running special tests...\n");
     ret = check_special();
     if (! silent)
-      (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
+      (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   }
   
   /* you will need to uncomment this if you can't auto-shutdown */
