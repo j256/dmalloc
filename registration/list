@@ -1,14 +1,14 @@
 #
 # Registration information
 #
-# $Id: list,v 1.2 1995/12/29 04:09:15 gray Exp $
+# $Id: list,v 1.3 1997/01/16 15:21:06 gray Exp $
 #
 
 Number:		1011
 Name:		Matt Kirk
 Organization:	Exa Corporation
 Amount:		$35.00
-What:		License
+What:		1 License
 Type:		check (Exa Corporation # 12792)
 From:		mail
 Position:
@@ -18,13 +18,19 @@ State:		MA
 Zip:		02140-2314
 Country:	USA
 Email:		kirk@exa.com
-Date:		12/19/95
+Phone:		unknown
+Fax:		unknown
+Arrival Date:	12/19/95
+Letter Sent:	12/28/96
+Email Sent:	12/19/95
+Other Sent:	none
+Status:		done
 
 Number:		1012
 Name:		Kenneth Crain
 Organization:	JS Communications
 Amount:		$65.00
-What:		License + Docs + Floppy
+What:		1 License + Docs + Floppy
 Type:		check (JS Communications # 12792)
 From:		mail
 Position:	President
@@ -34,4 +40,53 @@ State:		NY
 Zip:		11004-1043
 Country:	USA
 Email:		kcrain@panix.com
-Date:		11/11/95
+Phone:		1-718-347-4657
+Fax:		1-718-347-4716
+Arrival Date:	11/11/95
+Letter Sent:	1/25/96
+Email Sent:	1/25/96
+Other Sent:	Docs + Floppy prepared 1/20/96
+Status:		need to mail docs+floppy
+
+Number:		1013
+Name:		David Jevans
+Organization:	Digital Commerce Corporation
+Amount:		$35.00
+What:		1 License
+Type:		check (no-name + number)
+From:		mail
+Position:	President
+Street Address:	17755 Big Basin Way
+City:		Boulder Creek
+State:		CA
+Zip:		95006-9124
+Country:	USA
+Email:		jevans@jevans.com
+Phone:		1-408-338-2616
+Arrival Date:	12/17/95
+Letter Sent:	1/25/96
+Email Sent:	1/25/96
+Other Sent:	none
+Status:		done
+
+Number:		1014
+Name:		Chip Rosenthal
+Organization:	DejaNews
+Amount:		$175
+What:		5 Licenses
+Type:		check (DejaNews # 1075)
+From:		mail
+Position:	System Administrator
+Street Address:	820 Brentwood St
+City:		Austin
+State:		TX
+Zip:		78757-3031
+Country:	USA
+Email:		chip@dejanews.com
+Phone:		1-512-451-0426
+Fax:		
+Arrival Date:	12/16/95
+Letter Sent:	1/25/96
+Email Sent:	1/25/96
+Other Sent:	none
+Status:		done
