@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.187 2000/06/20 22:42:15 gray Exp $
+@c $Id: dmalloc.texi,v 1.188 2000/07/21 21:00:39 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1539,23 +1539,34 @@ make the changes on its own so the output from dmalloc should be sent
 through the @code{eval} shell command which will do the commands.
 
 With shells that have aliasing or macro capabilities: csh, bash, ksh,
-tcsh, zsh, etc., setting up an alias to dmalloc to do the eval call
-is recommended.  Csh/tcsh users (for example) should put the following
-in their @file{.cshrc} file:
+tcsh, zsh, etc., setting up an alias to dmalloc to do the eval call is
+recommended.  Bash, ksh, and zsh users should add the following to their
+@file{.bashrc}, @file{.profile}, or @file{.zshrc} file respectively
+(notice the @kbd{-b} option for bourne shell output):
+
+@example
+function dmalloc @{ eval `command dmalloc -b $*`; @}
+@end example
+
+If you are @emph{still} using csh or tcsh, you should add the following
+to your @file{.cshrc} file (notice the @kbd{-C} option for c-shell
+output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
 @end example
 
-Bash and Zsh users on the other hand should put the following in their
-@file{.zshrc} file:
-
-@example
-function dmalloc @{ eval `command dmalloc -b $*` @}
-@end example
-
 This allows the user to execute the dmalloc command as @samp{dmalloc
 arguments}.
+
+Users of versions of the Bourne shell (usually known as /bin/sh) that
+don't have command functions will need to send the output to a temporary
+file and the read it back in with the ``.'' command:
+
+@example
+$  dmalloc -b arguments... > /tmp/out
+$  . /tmp/out
+@end example
 
 @node Utility Usage, Environment Variable, Shell Alias, Dmalloc Program
 @section How to Use the Dmalloc Program
@@ -1757,25 +1768,25 @@ or disable the memory debugging features, at runtime.  It can be set
 either by hand or with the help of the dmalloc program.  @xref{Dmalloc
 Program}.
 
-@cindex C shell usage
-@cindex csh usage
-@cindex tcsh usage
-To set it by hand, C shell (csh or tcsh) users need to invoke:
-
-@example
-setenv DMALLOC_OPTIONS value
-@end example
-
 @cindex Bourne shell usage
 @cindex sh usage
 @cindex bash usage
 @cindex ksh usage
 @cindex zsh usage
-Bourne shell (sh, bash, ksh, or zsh) users should use:
+To set it by hand, Bourne shell (sh, bash, ksh, or zsh) users should use:
 
 @example
 DMALLOC_OPTIONS=value
 export DMALLOC_OPTIONS
+@end example
+
+@cindex C shell usage
+@cindex csh usage
+@cindex tcsh usage
+C shell (csh or tcsh) users need to invoke:
+
+@example
+setenv DMALLOC_OPTIONS value
 @end example
 
 The value in the above examples is a comma separated list of tokens each

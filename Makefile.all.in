@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.93 2000/05/17 16:25:02 gray Exp $
+# $Id: Makefile.all.in,v 1.94 2000/07/21 21:00:38 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -44,6 +44,10 @@ LIB_CXX	= lib$(MODULE)xx.a
 SHLIB_CXX = lib$(MODULE)xx.so
 @CXX_ON@BUILD_CXX = $(LIB_CXX)
 @CXX_ON@INSTALL_CXX = installcxx
+@CXX_ON@BUILD_TH_CXX = $(LIB_TH_CXX)
+
+# threads + C++
+LIB_TH_CXX = lib$(MODULE)thcxx.a
 
 # library with dmalloc disabled
 LIB_DIS	= lib$(MODULE)lp.a
@@ -160,11 +164,15 @@ $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
+$(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
+	ar cr $@ $?
+	ranlib $@
+
 $(LIB_DIS) : dmalloc_lp.o
 	ar cr $@ $?
 	@RANLIB@ $@
 
-threads : $(LIB_TH)
+threads : $(LIB_TH) $(BUILD_TH_CXX)
 
 cxx : $(LIB_CXX)
 

@@ -1,3 +1,7 @@
+Fri Jul 21 17:00:25 2000  Gray Watson  <gray@256.com>
+
+	* Added threaded C++ library to Makefile.
+
 Tue Jun 20 18:30:55 2000  Gray Watson  <gray@256.com>
 
 	* Fixed problems with -p and -m not setting the debug flags.
@@ -1642,5 +1646,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.254 2000/06/20 22:42:38 gray Exp $
+$Id: ChangeLog,v 1.255 2000/07/21 21:00:38 gray Exp $
 -------------------------------------------------------------------------------
