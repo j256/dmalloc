@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.112 2004/01/31 16:26:10 gray Exp $
+ * $Id: error.c,v 1.113 2004/08/13 16:52:14 gray Exp $
  */
 
 /*
@@ -197,8 +197,8 @@ static	void	build_logfile_path(char *buf, const int buf_len)
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-thread-id");
 #endif
     }
-    /* dump the pid */
-    if (*path_p == 'p') {
+    /* dump the pid -- also support backwards compatibility with %d */
+    if (*path_p == 'p' || *path_p == 'd') {
 #if HAVE_GETPID
       /* we make it long in case it's big and we hope it will promote if not */
       long	our_pid = getpid();
