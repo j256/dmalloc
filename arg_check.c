@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: arg_check.c,v 1.21 1999/03/09 20:51:14 gray Exp $
+ * $Id: arg_check.c,v 1.22 1999/11/08 20:40:29 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.21 1999/03/09 20:51:14 gray Exp $";
+#ident "$Id: arg_check.c,v 1.22 1999/11/08 20:40:29 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.21 1999/03/09 20:51:14 gray Exp $";
+  "$Id: arg_check.c,v 1.22 1999/11/08 20:40:29 gray Exp $";
 #endif
 #endif
 
@@ -100,14 +100,14 @@ int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memcpy's arguments.
  */
-char	*_dmalloc_memcpy(char *to, const char *from, const DMALLOC_SIZE len)
+void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memcpy", to, CHUNK_PNT_LOOSE, len) != NOERROR
 	|| _chunk_pnt_check("memcpy", from, CHUNK_PNT_LOOSE, len) != NOERROR)
       _dmalloc_message("bad pointer argument found in memcpy");
   }
-  return (char *)memcpy(to, from, len);
+  return (void *)memcpy(to, from, len);
 }
 #endif
 
@@ -115,13 +115,13 @@ char	*_dmalloc_memcpy(char *to, const char *from, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memset's arguments.
  */
-char	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len)
+void	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memset", buf, CHUNK_PNT_LOOSE, len) != NOERROR)
       _dmalloc_message("bad pointer argument found in memset");
   }
-  return (char *)memset(buf, ch, len);
+  return (void *)memset(buf, ch, len);
 }
 #endif
 
@@ -240,7 +240,7 @@ void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memccpy's arguments.
  */
-char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
+void	*_dmalloc_memccpy(void *s1, const void *s2, const char ch,
 			  const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
@@ -249,7 +249,7 @@ char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
 	|| _chunk_pnt_check("memccpy", s2, CHUNK_PNT_LOOSE, 0) != NOERROR)
       _dmalloc_message("bad pointer argument found in memccpy");
   }
-  return (char *)memccpy(s1, s2, ch, len);
+  return (void *)memccpy(s1, s2, ch, len);
 }
 #endif
 
@@ -257,13 +257,13 @@ char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
 /*
  * Dummy function for checking memchr's arguments.
  */
-char	*_dmalloc_memchr(const char *s1, const char ch, const DMALLOC_SIZE len)
+void	*_dmalloc_memchr(const void *s1, const char ch, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("memchr", s1, CHUNK_PNT_LOOSE, len) != NOERROR)
       _dmalloc_message("bad pointer argument found in memchr");
   }
-  return (char *)memchr(s1, ch, len);
+  return (void *)memchr(s1, ch, len);
 }
 #endif
 

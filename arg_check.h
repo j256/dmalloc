@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: arg_check.h,v 1.16 1999/03/09 20:51:15 gray Exp $
+ * $Id: arg_check.h,v 1.17 1999/11/08 20:40:29 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -58,7 +58,7 @@ int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
  * Dummy function for checking memcpy's arguments.
  */
 extern
-char	*_dmalloc_memcpy(char *to, const char *from, const DMALLOC_SIZE len);
+void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCPY */
 
 #if HAVE_MEMSET
@@ -66,7 +66,7 @@ char	*_dmalloc_memcpy(char *to, const char *from, const DMALLOC_SIZE len);
  * Dummy function for checking memset's arguments.
  */
 extern
-char	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len);
+void	*_dmalloc_memset(void *buf, const char ch, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMSET */
 
 #if HAVE_INDEX
@@ -130,7 +130,7 @@ void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
  * Dummy function for checking memccpy's arguments.
  */
 extern
-char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
+void	*_dmalloc_memccpy(void *s1, const void *s2, const char ch,
 			  const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCCPY */
 
@@ -139,7 +139,7 @@ char	*_dmalloc_memccpy(char *s1, const char *s2, const char ch,
  * Dummy function for checking memchr's arguments.
  */
 extern
-char	*_dmalloc_memchr(const char *s1, const char ch, const DMALLOC_SIZE len);
+void	*_dmalloc_memchr(const void *s1, const char ch, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCHR */
 
 #if HAVE_STRCHR
