@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.106 1995/08/18 19:14:48 gray Exp $
+@c $Id: dmalloc.texi,v 1.107 1995/09/02 20:05:36 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -48,8 +48,8 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@subtitle Version 3.1.1
-@subtitle August 1995
+@subtitle Version 3.1.2
+@subtitle September 1995
 @author Gray Watson <gray@@letters.com>
 
 @page
@@ -77,7 +77,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-Version 3.1.1 -- August 1995
+Version 3.1.2 -- September 1995
 @end ifinfo
 
 @cindex introduction
@@ -98,7 +98,7 @@ Linux, MS-DOG, OSF, Solaris, SunOS, and Ultrix.
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
 texi, info, and ps).  Documentation is available online at URL
-@code{http://www.letters.com/~gray/dmalloc}.
+@code{http://www.letters.com/dmalloc/}.
 
 The library is available via ftp from @samp{ftp.letters.com} in the
 @file{/src/dmalloc} directory.  @xref{How To Get}.  I can be reached at
@@ -580,6 +580,13 @@ carefully.
 the library in a commercial setting, please consider paying for a
 licensed copy of the software.
 
+@cindex settings.dist file
+
+@item You probably will want to edit the settings in
+@file{settings.dist} to tune specific features of the library.  The
+below @file{configure} script will copy this file to @file{settings.h}
+which is where you should be adding per-architecture settings.
+
 @cindex configure script
 @cindex conf.h file
 
@@ -598,15 +605,18 @@ created by configure to make sure it did its job correctly.
 
 @cindex settings.h file
 
-@item You probably will want to Examine the manual settings in
-@file{settings.h} to tune specific features of the library.
+@item You might want to tune the settings in @file{settings.h} file to
+tune the library to the local architecture -- for instance handling
+local thread library features.  The @file{configure} script created this
+file from the @file{settings.dist} file.
 
 @cindex DMALLOC_SIZE variable
 
-@item I was unable to auto-configure to my satisfaction the
-@code{DMALLOC_SIZE} variable in @file{dmalloc.h.3}.  You may have to
-edit this line to get things to stop complaining when you go to compile
-about the size arguments to malloc routines.
+@item I am auto-configuring the @code{DMALLOC_SIZE} variable in
+@file{dmalloc.h.2} but I am not sure it is doing what it should.  You
+may have to alter the definitions in this file to get things to stop
+complaining when you go to compile about the size arguments to malloc
+routines.  Comments on this please.
 
 @item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
 @file{libdmalloclp.a}, and @file{dmalloc} program.  If it does not work,
