@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.68 1998/10/15 16:55:48 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.69 1998/10/15 20:17:33 gray Exp $";
 #endif
 
 /* external routines */
@@ -638,6 +638,23 @@ static	void	do_interactive(void)
       
       (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
 		   (long)pnt, size, (long)realloc(pnt, size));
+      
+      continue;
+    }
+    
+    if (strncmp(line, "recalloc", len) == 0) {
+      int	size;
+      
+      pnt = get_address();
+      
+      (void)printf("How much to recalloc: ");
+      if (fgets(line, sizeof(line), stdin) == NULL) {
+	break;
+      }
+      size = atoi(line);
+      
+      (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
+		   (long)pnt, size, (long)recalloc(pnt, size));
       
       continue;
     }
