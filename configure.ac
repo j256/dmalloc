@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.15 2003/09/08 21:37:08 gray Exp $
+# $Id: configure.ac,v 1.16 2003/09/10 15:28:40 gray Exp $
 #
-AC_REVISION($Revision: 1.15 $)
+AC_REVISION($Revision: 1.16 $)
 AC_INIT(dmalloc, 5.2.2, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -438,6 +438,28 @@ if test x$getenv_safe != xyes; then
   AC_MSG_WARN([See the CYGWIN section in the documentation for details.])
 fi
 
+############
+
+#
+# check for constructor support
+#
+AC_MSG_CHECKING([constructor attribute])
+AC_RUN_IFELSE([[
+/*
+ * if the before flag is enabled by the time we get to main() then
+ * loc_init must have been called already meaning that the constructor
+ * attribute works
+ */
+static int before_b = 0;
+static void loc_init() __attribute__((constructor));
+static void loc_init() { before_b = 1; }
+int main() { if (before_b) return 0; else return 1; }
+]],
+[ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ],
+[ AC_DEFINE(CONSTRUCTOR_WORKS, 0) AC_MSG_RESULT([no]) ],
+[ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ]
+)
+
 ##############################################################################
 
 #
@@ -476,7 +498,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.15 2003/09/08 21:37:08 gray Exp $"
+#ident "$Id: configure.ac,v 1.16 2003/09/10 15:28:40 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

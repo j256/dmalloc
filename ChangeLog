@@ -1,3 +1,7 @@
+2003-09-10  Gray Watson  <gray@outside.256.com>
+
+	* Added quick checks for the constructor attribute.
+
 2003-09-09  Gray Watson  <gray@outside.256.com>
 
 	* Removed find_slot function in chunk.c since it was only used
@@ -2064,5 +2068,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.307 2003/09/09 23:18:09 gray Exp $
+$Id: ChangeLog,v 1.308 2003/09/10 15:29:05 gray Exp $
 -------------------------------------------------------------------------------
