@@ -42,8 +42,11 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.51 1994/11/11 01:26:47 gray Exp $";
+  "$Id: error.c,v 1.52 1994/12/27 16:39:21 gray Exp $";
 #endif
+
+/* external routines */
+IMPORT	char		*_dmalloc_strerror(const int errnum);
 
 /*
  * exported variables
