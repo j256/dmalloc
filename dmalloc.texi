@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.239 2003/10/04 19:23:13 gray Exp $
+@c $Id: dmalloc.texi,v 1.240 2003/10/04 19:44:23 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -330,10 +330,16 @@ This causes the memory statistics and unfreed information to be dumped
 to the log file.  However, if your system has neither, you will need to
 call @code{dmalloc_shutdown} yourself before your program exits.
 
+@cindex alias, shell
+@cindex bash shell
+@cindex ksh shell
+@cindex zsh shell
+
 @item Add an alias for dmalloc to your shell's rc file if supported.
-Bash, ksh, and zsh users should add the following to their
-@file{.bashrc}, @file{.profile}, or @file{.zshrc} file respectively
-(notice the @kbd{-b} option for bourne shell output):
+The idea is to have the shell capture the dmalloc program's output and
+adjust the environment.  Bash, ksh, and zsh users should add the
+following to their @file{.bashrc}, @file{.profile}, or @file{.zshrc}
+file respectively (notice the @kbd{-b} option for bourne shell output):
 
 @example
 function dmalloc @{ eval `command dmalloc -b $*`; @}
@@ -349,20 +355,27 @@ or
 function dmalloc @{ eval `/usr/local/bin/dmalloc -b $*`; @}
 @end example
 
-After you add the alias you need to log out and log back in to have it
-take effect, or you can execute the above appropriate command on the
-command line.
+@cindex csh shell
+@cindex tcsh shell
 
-By the way, if you are looking for a shell, I heartily recommend trying
-out zsh at URL @uref{http://www.zsh.org/}.  It is a bourne shell
-written from scratch with much the same features as tcsh without the csh
-crap.  If you are @emph{still} using csh or tcsh, you should add the
-following to your @file{.cshrc} file (notice the @kbd{-C} option for
-c-shell output):
+If you are @emph{still} using csh or tcsh, you should add the following
+to your @file{.cshrc} file (notice the @kbd{-C} option for c-shell
+output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
 @end example
+
+By the way, if you are looking for a shell, I heartily recommend trying
+out zsh at URL @uref{http://www.zsh.org/}.  It is a bourne shell
+written from scratch with much the same features as tcsh without the csh
+crap.
+
+@emph{NOTE}: After you add the alias to the file you need to log out and
+log back in to have it take effect, or you can execute the above
+appropriate command on the command line.  If you enter @kbd{dmalloc
+runtime} and see any output with DMALLOC_OPTIONS in it then the alias
+did not work.
 
 @item Although not necessary, you may want to include @file{dmalloc.h}
 in your C files and recompile.  This will allow the library to report
@@ -2192,9 +2205,11 @@ the appropriate changes to the environment.  Unfortunately, it cannot
 make the changes on its own so the output from dmalloc should be sent
 through the @code{eval} shell command which will do the commands.
 
-@cindex bash alias
-@cindex ksh alias
-@cindex zsh alias
+@cindex alias, shell
+@cindex bash shell
+@cindex ksh shell
+@cindex zsh shell
+
 With shells that have aliasing or macro capabilities: csh, bash, ksh,
 tcsh, zsh, etc., setting up an alias to dmalloc to do the eval call is
 recommended.  Bash, ksh, and zsh users should add the following to their
@@ -2215,13 +2230,12 @@ or
 function dmalloc @{ eval `/usr/local/bin/dmalloc -b $*`; @}
 @end example
 
-@cindex tcsh alias
-@cindex csh alias
-By the way, if you are looking for a shell, I heartily recommend trying
-out zsh.  It is a bourne shell written from scratch with much the same
-features as tcsh without the csh crap.  If you are @emph{still} using
-csh or tcsh, you should add the following to your @file{.cshrc} file
-(notice the @kbd{-C} option for c-shell output):
+@cindex tcsh shell
+@cindex csh shell
+
+If you are @emph{still} using csh or tcsh, you should add the following
+to your @file{.cshrc} file (notice the @kbd{-C} option for c-shell
+output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
@@ -2238,6 +2252,16 @@ file and the read it back in with the ``.'' command:
 $  dmalloc -b arguments... > /tmp/out
 $  . /tmp/out
 @end example
+
+By the way, if you are looking for a shell, I heartily recommend trying
+out zsh.  It is a bourne shell written from scratch with much the same
+features as tcsh without the csh crap.
+
+@emph{NOTE}: After you add the alias to the file you need to log out and
+log back in to have it take effect, or you can execute the above
+appropriate command on the command line.  If you enter @kbd{dmalloc
+runtime} and see any output with DMALLOC_OPTIONS in it then the alias
+did not work.
 
 @node Utility Usage, Environment Variable, Shell Alias, Dmalloc Program
 @section How to Use the Dmalloc Program
