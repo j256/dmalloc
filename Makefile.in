@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.149 2000/11/14 23:57:07 gray Exp $
+# $Id: Makefile.in,v 1.150 2000/11/15 00:37:23 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -82,7 +82,7 @@ FLS	=  conf.h.in configure.in config.help \
 	protect.[ch] return.h version.h \
 	settings.dist dmalloc_argv.[ch] dmalloc_argv_loc.h dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
-	configure Makefile.bsd.ports
+	$(srcdir)/configure Makefile.bsd.ports
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
