@@ -1,3 +1,13 @@
+2003-06-20  Gray Watson  <gray@outside.256.com>
+
+	* Fixed problems with macro arguments not in () thanks to Paul
+	Hurtley.
+
+2003-06-18  Gray Watson  <gray@outside.256.com>
+
+	* Fixed a problem with strdup not returning char *.  Thanks to Dan
+	Nelson, Juhani Rautiainen, and Paul Hurtley.
+
 2003-06-10  Gray Watson  <gray@outside.256.com>
 
 	* Releasing version 5.2.0.
@@ -1999,5 +2009,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.299 2003/06/10 19:44:48 gray Exp $
+$Id: ChangeLog,v 1.300 2003/07/08 18:01:34 gray Exp $
 -------------------------------------------------------------------------------
