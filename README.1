@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.20 1993/05/24 17:00:21 gray Exp $
+$Id: README.1,v 1.21 1993/06/03 20:02:19 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
@@ -8,20 +8,19 @@ INSTALLATION:
 	Makefile and conf.h.  Examine conf.h (especially) as well as
 	Makefile to make sure configure set things up correctly.
 
+	NOTE: It seems that some versions of tr (especially from
+	HP-UX) don't understand "tr '[a-z]' '[A-Z]'". You may need to
+	either get gnu's tr or generate the conf.h and Makefile by
+	hand.
+
 2) Typing 'make' should be enough to build libmalloc.a and
 	malloc_dbg program.
 
 3) Typing 'make tests' should build the malloc_t test program
 	(more automated test facilities are needed!!)
 
--------------------------------------------------------------------------------
-
-CONFIGURE:
-
-It seems that some versions of tr (especially from HP-UX) are
-completely incompatible and don't understand "tr '[a-z]' '[A-Z]'".  I'd
-complain to HP about it and either get gnu's tr or try and generate
-the conf.h and Makefile by hand.
+See the 'Quick Start' section below or examine the malloc.info file to
+get up and running with the library.
 
 -------------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.15 1993/04/15 21:57:51 gray Exp $
+# $Id: Makefile.in,v 1.16 1993/06/03 20:02:15 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -11,9 +11,6 @@ FILLFLS	= chunk.c error.c heap.c malloc_dbg.c malloc_lp.c malloc_str.c \
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
 LIBS	= -L. -lmalloc_dbg $(LIBRARIES)
-
-PARTS	= 1 2 3 4 5
-MAXPART	= 5
 
 CFLAGS	= -g -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
@@ -32,6 +29,17 @@ PORTFILES=  conf.h.in Makefile.all.in configure configure.in \
 	malloc.info malloc.texi malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h \
 	malloc_str.[ch] malloc_t.c sample.c version.h
 
+PARTS	= 1 2 3 4 5
+MAXPART	= 5
+SHAR1	= COPYING-LIB ChangeLog Makefile.in Manifest NOTES README TTD malloc.c
+SHAR2	= chunk.c
+SHAR3	= configure error.c error.h error_str.h error_val.h malloc.info
+SHAR4	= chunk.h chunk_loc.h compat.c compat.h conf.h.in malloc.texi \
+	malloc_t.c mallocrc
+SHAR5	= configure.in dbg_tokens.h dbg_values.h heap.c heap.h malloc_dbg.c \
+	malloc_dbg.h malloc_loc.h malloc_lp.c malloc_lp.h malloc_str.c \
+	malloc_str.h sample.c version.h
+
 .PHONY : all
 all : $(LIBRARY) $(UTIL)
 
@@ -44,17 +52,19 @@ distclean : clobber
 	rm -f configure config.status Makefile conf.h
 	rm -rf port
 
-.PHONY : install
-install : $(LIBRARY) $(OBJS_IN) $(UTIL) $(HFLS) $(MANFILE)
-	install -ce -m 444 $(HFLS) $(DESTDIR)/inc
-	install -ce $(UTIL) $(DESTDIR)/bin
-	install -cer -m 644 $(LIBRARY) $(DESTDIR)/lib
-	install -ce -m 444 $(OBJS_IN) $(DESTDIR)/lib
-	install -ce -m 444 $(MANFILE) $(DESTDIR)/info
-
 .PHONY : installincs
 installincs : $(HFLS)
-	install -ce -m 444 $(HFLS) $(DESTDIR)/inc
+	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
+
+.PHONY : installlib
+installlib : installincs $(LIBRARY) $(OBJS_IN) $(MANFILE)
+	install -cev -m 644 $(LIBRARY) $(DESTDIR)/lib
+	install -cev -m 444 $(OBJS_IN) $(DESTDIR)/lib
+	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
+
+.PHONY : install
+install : installlib $(UTIL)
+	install -cev $(UTIL) $(DESTDIR)/bin
 
 # put situation specific lines here
 $(LIBRARY) : $(OBJS)
@@ -63,6 +73,7 @@ $(LIBRARY) : $(OBJS)
 	- chmod 660 $@
 
 $(UTIL) : malloc_dbg.o $(LIBRARY) /usr/antaire/lib
+	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
 
@@ -93,12 +104,11 @@ malloc.head : malloc.info
 .PHONY : shar
 shar : malloc.info malloc.head
 	rm -f part.? part.tmp
-	$(foreach part, $(PARTS), \
-		shar -b -n${part} -e${MAXPART} -opart.${part} -t \
+	cd port ; $(foreach part, $(PARTS), \
+		shar -b -n${part} -e${MAXPART} -o../part.${part} -t \
 			"Do a 'sh ./configure' to configure the library" \
-			`cat shar.${part}` ; \
+			${SHAR${part}} ; \
 		)
-
 	cat malloc.head > part.tmp
 	echo '' >> part.tmp
 	echo ---------------------------------------------------------------- \

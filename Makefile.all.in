@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.15 1993/05/24 17:00:16 gray Exp $
+# $Id: Makefile.all.in,v 1.16 1993/06/03 20:02:13 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -38,9 +38,10 @@ SHELL = /bin/sh
 
 HFLS = malloc_dbg.h
 OBJS = chunk.o compat.o error.o heap.o malloc.o malloc_lp.o malloc_str.o
+OBJS_IN = malloc_lp.o
 
 CFLAGS = $(CCFLAGS)
-TESTS = malloc_t
+TEST = malloc_t
 
 # .PHONY : all
 all : $(LIBRARY) $(UTIL)
@@ -51,7 +52,7 @@ clean :
 
 # .PHONY : clobber
 clobber : clean
-	rm -f $(LIBRARY) $(TESTS) $(UTIL)
+	rm -f $(LIBRARY) $(TEST) $(UTIL)
 
 # .PHONY : realclean
 realclean : clobber
@@ -61,13 +62,21 @@ distclean : clobber
 	rm -f Makefile conf.h config.status
 #	rm -f configure
 
-# .PHONY : install
-install : $(HFLS) $(UTIL) $(LIBRARY) $(INFOFILES)
+# .PHONY : installincs
+installincs : $(HFLS)
 	$(INSTALL_DATA) $(HFLS) $(incdir)
-	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
+
+# .PHONY : installlib
+installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
-#	$(INSTALL_DATA) $(INFOFILES) $(infodir)
+	@ echo 'Please install $(OBJS_IN) and $(INFOFILE) by hand if needed.'
+#	$(INSTALL_DATA) $(OBJS_IN) $(libdir)
+#	$(INSTALL_DATA) $(INFOFILE) $(infodir)
+
+# .PHONY : install
+install : installlib $(UTIL)
+	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 
 $(LIBRARY) : $(OBJS)
 	ar cr $(LIBRARY) $?
@@ -80,13 +89,14 @@ $(UTIL) : malloc_dbg.o $(LIBRARY)
 	mv a.out $@
 
 # .PHONY : tests
-tests : $(TESTS)
+tests : $(TEST)
 
-malloc_t : malloc_t.o $(LIBRARY)
+$(TEST) : $(TEST).o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) malloc_t.o $(LIBS)
+	$(CC) $(LDFLAGS) $(TEST).o $(LIBS)
 	mv a.out $@
 
+# %.o : %.c
 .c.o :
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o $@
@@ -99,19 +109,19 @@ malloc_t : malloc_t.o $(LIBRARY)
 # These dependencies are automatically generated.  Do not edit by hand.
 #
 
-chunk.o : chunk.c malloc_dbg.h malloc_loc.h chunk.h chunk_loc.h compat.h conf.h \
-  dbg_values.h error.h error_val.h heap.h version.h
-compat.o : compat.c malloc_dbg.h malloc_loc.h compat.h conf.h
-error.o : error.c malloc_dbg.h malloc_loc.h chunk.h compat.h conf.h dbg_values.h \
-  error.h
-heap.o : heap.c malloc_dbg.h malloc_loc.h chunk.h compat.h conf.h error.h error_val.h \
-  heap.h
-malloc.o : malloc.c malloc_dbg.h malloc_loc.h chunk.h compat.h conf.h dbg_values.h \
-  error.h error_str.h error_val.h heap.h malloc_lp.h
-malloc_dbg.o : malloc_dbg.c malloc_dbg.h malloc_loc.h compat.h conf.h dbg_tokens.h \
-  dbg_values.h version.h
-malloc_lp.o : malloc_lp.c malloc_dbg.h
-malloc_str.o : malloc_str.c malloc_dbg.h malloc_loc.h conf.h chunk.h dbg_values.h \
-  error.h malloc_str.h
-malloc_t.o : malloc_t.c malloc_dbg.h
-sample.o : sample.c malloc_dbg.h
+chunk.o : chunk.c malloc_dbg.h conf.h chunk.h malloc_loc.h chunk_loc.h compat.h \
+  dbg_values.h error.h error_val.h heap.h version.h 
+compat.o : compat.c malloc_dbg.h conf.h compat.h malloc_loc.h 
+error.o : error.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
+  error.h 
+heap.o : heap.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h error.h error_val.h \
+  heap.h 
+malloc.o : malloc.c malloc_dbg.h conf.h chunk.h malloc_loc.h compat.h dbg_values.h \
+  error.h error_str.h error_val.h heap.h malloc_lp.h 
+malloc_dbg.o : malloc_dbg.c malloc_dbg.h conf.h compat.h malloc_loc.h dbg_tokens.h \
+  dbg_values.h version.h 
+malloc_lp.o : malloc_lp.c malloc_dbg.h conf.h malloc_loc.h 
+malloc_str.o : malloc_str.c malloc_dbg.h conf.h chunk.h malloc_loc.h dbg_values.h \
+  error.h malloc_str.h 
+malloc_t.o : malloc_t.c malloc_dbg.h 
+sample.o : sample.c malloc_dbg.h 

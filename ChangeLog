@@ -1,3 +1,8 @@
+Thu Jun  3 16:01:14 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added index to manual, removed shar files in place of Makefile
+	variables.
+
 Mon May 24 12:58:06 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added -r and -k options for auto-unseting of variables or
