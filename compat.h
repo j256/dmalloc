@@ -18,11 +18,15 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: compat.h,v 1.34 1999/03/05 00:29:40 gray Exp $
+ * $Id: compat.h,v 1.35 1999/03/08 15:51:28 gray Exp $
  */
 
 #ifndef __COMPAT_H__
 #define __COMPAT_H__
+
+#if HAVE_STDARG_H
+# include <stdarg.h>				/* for ... */
+#endif
 
 #include "conf.h"				/* for HAVE... */
 

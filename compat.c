@@ -18,13 +18,17 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: compat.c,v 1.43 1999/03/05 00:29:38 gray Exp $
+ * $Id: compat.c,v 1.44 1999/03/08 15:51:28 gray Exp $
  */
 
 /*
  * This file holds the compatibility routines necessary for the library to
  * function just in case your system does not have them.
  */
+
+#if HAVE_STDARG_H
+# include <stdarg.h>				/* for ... */
+#endif
 
 #define DMALLOC_DISABLE
 
@@ -36,10 +40,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.43 1999/03/05 00:29:38 gray Exp $";
+#ident "$Id: compat.c,v 1.44 1999/03/08 15:51:28 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.43 1999/03/05 00:29:38 gray Exp $";
+  "$Id: compat.c,v 1.44 1999/03/08 15:51:28 gray Exp $";
 #endif
 #endif
 
