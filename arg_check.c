@@ -25,7 +25,7 @@
  * heap-based strings (such as fence errors) much closer to the error.
  */
 
-#define DMALLOC_DEBUG_DISABLE
+#define DMALLOC_DISABLE
 
 #include "dmalloc.h"
 #include "conf.h"
@@ -38,7 +38,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: arg_check.c,v 1.8 1994/09/10 23:26:52 gray Exp $";
+  "$Id: arg_check.c,v 1.9 1994/09/12 17:13:11 gray Exp $";
 #endif
 
 #if HAVE_BCMP

@@ -24,7 +24,7 @@
  * heap as well as reporting the current position of the heap.
  */
 
-#define DMALLOC_DEBUG_DISABLE
+#define DMALLOC_DISABLE
 
 #include "dmalloc.h"
 #include "conf.h"
@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.36 1994/09/10 23:27:53 gray Exp $";
+  "$Id: heap.c,v 1.37 1994/09/12 17:13:41 gray Exp $";
 #endif
 
 /* external routines */
@@ -68,7 +68,7 @@ EXPORT	int	_heap_check(void)
     if (ret < _heap_last
 	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
       dmalloc_errno = ERROR_ALLOC_NONLINEAR;
-      _dmalloc_error("_heap_alloc");
+      dmalloc_error("_heap_alloc");
       return ERROR;
     }
     
@@ -101,7 +101,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
   ret = sbrk(size);
   if (ret == SBRK_ERROR) {
     dmalloc_errno = ERROR_ALLOC_FAILED;
-    _dmalloc_error("_heap_alloc");
+    dmalloc_error("_heap_alloc");
     ret = HEAP_ALLOC_ERROR;
   }
 #endif
@@ -121,7 +121,7 @@ EXPORT	void	*_heap_alloc(const unsigned int size)
 #if HAVE_SBRK
   if (ret != _heap_last) {
     dmalloc_errno = ERROR_ALLOC_NONLINEAR;
-    _dmalloc_error("_heap_alloc");
+    dmalloc_error("_heap_alloc");
     return HEAP_ALLOC_ERROR;
   }
   
@@ -143,7 +143,7 @@ EXPORT	void	*_heap_end(void)
   ret = sbrk(0);
   if (ret == SBRK_ERROR) {
     dmalloc_errno = ERROR_ALLOC_FAILED;
-    _dmalloc_error("_heap_end");
+    dmalloc_error("_heap_end");
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
       char	str[128];
       (void)sprintf(str, "\r\ndmalloc_dbg: critical error: could not find the end of the heap\r\n");

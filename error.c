@@ -28,7 +28,7 @@
 #include <signal.h>				/* for kill signals */
 #include <stdarg.h>				/* for message vsprintf */
 
-#define DMALLOC_DEBUG_DISABLE
+#define DMALLOC_DISABLE
 
 #include "dmalloc.h"
 #include "conf.h"
@@ -40,7 +40,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.42 1994/09/10 23:27:42 gray Exp $";
+  "$Id: error.c,v 1.43 1994/09/12 17:13:39 gray Exp $";
 #endif
 
 /*
@@ -68,11 +68,13 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR))
     return;
   
+#if HAVE_TIME
   /* maybe dump a time stamp */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STAMP)) {
     (void)sprintf(strp, "%ld: ", time(NULL));
     for (; *strp != NULLC; strp++);
   }
+#endif
   
 #if LOG_ITERATION_COUNT
   /* add the iteration number */
@@ -151,7 +153,7 @@ EXPORT	void	_dmalloc_die(void)
  * handler of error codes from procedure FUNC.  the procedure should
  * have set the errno already.
  */
-EXPORT	void	_dmalloc_error(const char * func)
+EXPORT	void	dmalloc_error(const char * func)
 {
   /* do we need to log or print the error? */
   if ((BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ERROR) && dmalloc_logpath != NULL)

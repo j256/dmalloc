@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: error.h,v 1.17 1994/09/10 23:27:45 gray Exp $
+ * $Id: error.h,v 1.18 1994/09/12 17:14:23 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -49,7 +49,7 @@ IMPORT	void	_dmalloc_die(void);
  * handler of error codes from procedure FUNC.  the procedure should
  * have set the errno already.
  */
-IMPORT	void	_dmalloc_error(const char * func);
+IMPORT	void	dmalloc_error(const char * func);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
