@@ -26,7 +26,7 @@ and run tests.
    in the ports/ subdirectory.
 
 9) Install the tgz file and html file in the repository
-10) Ftp the new version files over to download.sourforge.net/incoming
+10) Ftp the new version files over to upload.sourceforge.net/incoming
 11) Edit releases/index.html to include the new version
 12) Copy the .tgz file to /usr/ports/distfiles
 
@@ -49,12 +49,15 @@ and run tests.
 	12) tar up the /usr/ports/devel/dmalloc directory
 	13) Copy the resulting tarball to the repository as -ports.tgz
 
-15) Copy to RPM and build the package.
+15) Copy to Linux and build the RPM.
 
 	1) Update the dmalloc.spec file
-	2) rpm -ba dmalloc.spec
-	3) Try to rpm -U dmalloc-X.X.X-1.i386.rpm
-	4) Copy the resulting RPM and SRPM to the repository
+        2) cp dmalloc-X.X.X.tgz /usr/src/redhat/SOURCES/
+	3) rpm -ba dmalloc.spec
+	4) Try to rpm -U dmalloc-X.X.X-1.i386.rpm
+	5) Copy the resulting RPM and SRPM to the repository
+		/usr/src/redhat/SRPMS/dmalloc-X.X.X-1.src.rpm
+		/usr/src/redhat/RPMS/i386/dmalloc-X.X.X-1.i386.rpm
 
 16) Possibly announce on freshmeat
 17) Announce on egroups.
