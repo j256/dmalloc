@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.273 2005/01/11 19:41:43 gray Exp $
+@c $Id: dmalloc.texi,v 1.274 2005/03/10 21:25:27 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1758,7 +1758,29 @@ overflow, or some other corruption.
 @node Disabling the Library, Using With C++, Error Codes, Programming
 @section How to Disable the library
 
+@cindex disabling library checking
 @cindex disabling the library
+@cindex dmalloc_debug
+@cindex restoring library flags
+@cindex turning off library flags
+
+If you would like to disable the library's detailed checking features
+during a particularly allocation intensive section of code, you can do
+something like the following:
+
+@example
+        unsigned int dmalloc_flags;
+        @dots{}
+        /* turn off all debug flags and save a copy of old value */
+        dmalloc_flags = dmalloc_debug(0);
+
+        /* section of a lot of allocations */
+        @dots{}
+        /* end of section */
+
+        /* restore the dmalloc flag setting */
+        dmalloc_debug(dmalloc_flags);
+@end example
 
 When you are finished with the development and debugging sessions, you
 may want to disable the dmalloc library and put in its place either the
