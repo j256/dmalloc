@@ -1,3 +1,7 @@
+Tue Sep 13 11:36:10 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added mkinstalldirs to distribution per feedback from Francois.
+
 Mon Sep 12 13:12:38 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Fixed zsh and [t]csh alias messages in documentation.
@@ -797,5 +801,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.115 1994/09/12 17:19:59 gray Exp $
+$Id: ChangeLog,v 1.116 1994/09/13 15:36:36 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.45 1994/09/12 17:17:42 gray Exp $
+# $Id: Makefile.all.in,v 1.46 1994/09/13 15:36:40 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -24,7 +24,8 @@ UTIL = dmalloc
 INFOFILE = dmalloc.info
 
 CCFLAGS = -g
-LDFLAGS = -g
+#LDFLAGS = -g
+LDFLAGS =
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -62,20 +63,23 @@ distclean : clobber
 	rm -f config.status Makefile conf.h dmalloc.h.2
 #	rm -f configure
 
+# .PHONY : installdirs
+installdirs :
+	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(infodir) $(bindir)
+
 # .PHONY : installincs
-installincs : $(HFLS)
+installincs : $(HFLS) 
 	$(INSTALL_DATA) $(HFLS) $(incdir)
 
 # .PHONY : installlib
 installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
-	@ echo 'Please install $(OBJS_IN) and $(INFOFILE) by hand if needed.'
 	$(INSTALL_DATA) $(OBJS_IN) $(libdir)
 	$(INSTALL_DATA) $(INFOFILE) $(infodir)
 
 # .PHONY : install
-install : installlib $(UTIL)
+install : installdirs installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 
 dmalloc.h.2 : configure
