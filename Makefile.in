@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.29 1993/08/25 18:24:13 gray Exp $
+# $Id: Makefile.in,v 1.30 1993/08/25 21:30:14 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -25,7 +25,7 @@ UTIL	= malloc_dbg
 MANFILE	= malloc.info
 
 PORTFLS	=  conf.h.in Makefile.all.in configure configure.in \
-	ChangeLog Manifest NOTES README TODO mallocrc \
+	ChangeLog Manifest NEWS NOTES README TODO mallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] dbg_tokens.h \
 	dbg_values.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
 	malloc_dbg.[ch] malloc_lp.[ch] malloc_loc.h return.h \
@@ -35,7 +35,7 @@ PORTCFG	= contrib/README contrib/dec_notes
 
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
-SHAR1	= ChangeLog Makefile.in Manifest NOTES README TODO malloc.c
+SHAR1	= ChangeLog Makefile.in Manifest NEWS NOTES README TODO malloc.c
 SHAR2	= chunk.c
 SHAR3	= configure error.c error.h error_str.h error_val.h malloc.info
 SHAR4	= chunk.h chunk_loc.h compat.c compat.h conf.h.in malloc.texi \

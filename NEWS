@@ -1,0 +1,46 @@
+Version 1.3.1:
+
+	* Added 'log-ra' token to log info on non-freed return-address memory
+	* Added the beginnings of return-address handling
+	* Added -L or --list to malloc_dbg to list all the rc-file tags.
+
+Version 1.3.0:
+
+	* Added MALLOC_TRACE variable and malloc_dbg -t functionality.
+	* Added some C++ from Peter Miller to the manual.
+	* Removed LGPL and replaced it with fully free software notices.
+	* _malloc_perror renamed to _malloc_error
+	* Made malloc_address exported so it can be setable by debugger.
+	* Added auto-sensing of shell by malloc_dbg and -C option.
+	* Removed the dblock checking tokens CHECK_DBLOCK and CHECK_DB_FENCE.
+
+Version 1.2.6:
+
+	* Added 'catch-null' token for quiting as soon as we get sbrk failure.
+
+Version 1.2.5:
+
+	* Added -r and -k options for auto-unseting or keeping of variables.
+	* Added 'log-bad-space' token and added expand_buf into chunk.c.
+	* Create log_bad_pnt in chunk.
+
+Version 1.2.4:
+
+	* Added -v option to malloc_dbg to provide verbose output.
+
+Version 1.2.3:
+
+	* Renamed malloc.h to malloc_dbg.h and libmalloc.a to libmalloc_dbg.a.
+
+Version 1.2.2:
+
+	* Added some more point checking tests to malloc_str.
+
+Version 1.2.1:
+
+	* Changed to void * internally, put STDC defines in malloc.h for ANSI.
+	* Made a number of changes per suggestions from the net.
+
+Version 1.2.0:
+
+	* Uploaded to comp.sources.unix

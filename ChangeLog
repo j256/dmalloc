@@ -42,17 +42,17 @@ Fri Jul 23 01:36:09 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Thu Jul 22 17:35:23 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* _malloc_perror -> _malloc_error and made some other minor
-	changes.
+	* _malloc_perror renamed to _malloc_error and made some other
+	minor changes.
 
 Tue Jul 20 01:52:02 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Added smallest_block runtime calculations and now export
-	malloc_address to be setable by debugger at runtime.
+	* Added smallest_block runtime calculations.
 
 Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Made malloc_address exported per Dave Hill's comments.
+	* Made malloc_address exported per Dave Hill's comments so it
+	can be setable by debugger at runtime.
 
 	* Added Dave Hill's idea of auto-sensing of shell by malloc_dbg.
 	Also added -C option to malloc_dbg to force cshell output.

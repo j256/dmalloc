@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.21 1993/08/25 18:24:15 gray Exp $
+$Id: Manifest,v 1.22 1993/08/25 21:30:16 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the malloc package.
 
@@ -9,6 +9,9 @@ Changelog		Change log entries detailing major module
 Makefile.in		Used by configure to create the Makefile.
 
 Manifest		This file.
+
+NEWS			File with a condenced view of the module's
+			ChangeLog entries.
 
 NOTES			General Notes of the malloc routines and
 			associated algorithms.
