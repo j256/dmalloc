@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.64 1994/08/29 15:11:24 gray Exp $";
+  "$Id: malloc.c,v 1.65 1994/09/02 21:34:45 gray Exp $";
 #endif
 
 /*
@@ -347,7 +347,11 @@ LOCAL	int	dmalloc_startup(void)
  */
 EXPORT	void	_dmalloc_shutdown(void)
 {
-  /* NOTE: do not test for IN_TWICE here */
+  /* NOTE: do not generate errors for IN_TWICE here */
+  
+  /* if we've died in malloc somewhere then leave fast and quietly */
+  if (in_alloc)
+    return;
   
   /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
