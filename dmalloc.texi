@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.208 2001/07/12 23:11:57 gray Exp $
+@c $Id: dmalloc.texi,v 1.209 2001/11/30 16:04:22 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -99,11 +99,11 @@ detection, file/line number reporting, and general logging of
 statistics.
 
 The library is reasonably portable having been run successfully on at
-least the following operating systems: AIX, BSD/OS, DG/UX, Free/OpenBSD,
-HPUX, Irix, Linux, MS-DOG, NeXT, OSF, SCO, Solaris, SunOS, Ultrix,
-Unixware, Windoze, and even Unicos on a Cray Y-MP.  It also provides
-support for the debugging of threaded programs.  @xref{Using With
-Threads}.
+least the following operating systems: AIX, BSD/OS, DG/UX,
+Free/Net/OpenBSD, HPUX, Irix, Linux, MS-DOG, NeXT, OSF, SCO, Solaris,
+SunOS, Ultrix, Unixware, Windoze, and even Unicos on a Cray T3E.  It
+also provides support for the debugging of threaded programs.
+@xref{Using With Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and documentation.  Online documentation as
@@ -727,10 +727,10 @@ heap structures and include walking all of the known allocated pointers
 to verify each one in turn.  You need this level of checking to find
 random pointers in your program which got corrupted but that won't be
 freed for a while.  To turn on these checks, you will need to enable the
-'check-heap' debug token.  @xref{Environment Variable}.  By default this
-will cause the heap to be fully checked each and every time dmalloc is
-called whether it is a malloc, free, realloc, or another dmalloc
-overloaded function.
+'check-heap' debug token.  @xref{Debug Tokens}.  By default this will
+cause the heap to be fully checked each and every time dmalloc is called
+whether it is a malloc, free, realloc, or another dmalloc overloaded
+function.
 
 Performing a full heap check can take a good bit of CPU and it may be
 that you will want to run it sporadically.  This can be accomplished in
@@ -821,6 +821,25 @@ was not linked into your program.
 dmalloc log-file somewhere else in the filesystem.  You will need to
 check both where the program was started and to where it might change
 directory.
+
+@item The logfile is only producted when @code{dmalloc_shutdown()} is
+called.  By default it will be called when @code{exit()} gets called.
+If you are running your program and press @kbd{Control-C} under Unix the
+program will stop immediately and @code{dmalloc_shutdown()} will not get
+called.  You can either setup a signal handler for @code{SIGINTR} and
+call exit yourself, or you can enable the @kbd{catch-signals} token.
+@xref{Debug Tokens}.
+
+@item If your program is segfaulting or otherwise crashing when it exits, the
+@code{exit()} routine may not being called.  You will have to resolve
+these issues so the dmalloc library can gracefully exit and write it's
+log file.
+
+@item You may want to call @code{dmalloc_log_stats()} and
+@code{dmalloc_log_unfreed()} (or @code{dmalloc_log_changed()}) directly
+to have the library write its log file.  Some system modules may not
+have shutdown if you call this before @code{exit()} so extra unfreed
+memory may be reported.
 
 @end enumerate
 
@@ -1227,10 +1246,17 @@ unsigned long dmalloc_mark ( void )
 @cindex dmalloc_mark function
 @cindex memory position marker
 @cindex mark memory position
+@cindex using with servers
+@cindex servers, using with
 
 Return to the caller the current "mark" which can be used later to
 dmalloc_log_changed pointers since this point.  Multiple marks can be
 saved and used.
+
+This is very useful when using the library with a server which does not
+exit.  You can then save a mark before a transaction or event happens
+and then check to see what has changed using the
+@code{dmalloc_log_changed()} function below.
 @end deftypefun
 
 @deftypefun
@@ -1240,13 +1266,17 @@ int @var{not_freed_b}, int @var{freed_b}, int @var{details_b} )
 @cindex dmalloc_log_changed function
 @cindex changed memory
 @cindex checkpoint memory usage
-@cindex log memory changed
+@cindex log memory changes
 
 Dump the pointers that have changed since the mark which was returned by
 dmalloc_mark.  If not_freed_b is set to non-0 then log the new pointers
 that are non-freed.  If free_b is set to non-0 then log the new pointers
 that are freed.  If details_b set to non-0 then dump the individual
 pointers that have changed otherwise just dump the summaries.
+
+This can be used in conjunction with the @code{dmalloc_mark()} function
+to help servers which never exit find transactions or events which are
+leaking memory.
 @end deftypefun
 
 @deftypefun
