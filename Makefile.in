@@ -1,5 +1,7 @@
 #
-# $Id: Makefile.in,v 1.161 2003/05/20 04:05:58 gray Exp $
+# @configure_input@
+#
+# $Id: Makefile.in,v 1.162 2003/05/21 03:07:55 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -70,7 +72,7 @@ INFOFILE= $(MODULE).info
 # WARNING: be careful about the order of this list some files are at
 # the end on purpose
 #
-FLS	=  conf.h.in configure.in config.help \
+FLS	=  conf.h.in configure.ac config.help \
 	ChangeLog.1 Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
 	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
@@ -343,7 +345,7 @@ conf.h : $(srcdir)/conf.h.in config.status
 config.status : $(srcdir)/configure
 	$(SHELL) config.status --recheck
 
-$(srcdir)/configure : $(srcdir)/configure.in
+$(srcdir)/configure : $(srcdir)/configure.ac
 	cd $(srcdir); autoconf
 
 #

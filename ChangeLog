@@ -2,6 +2,8 @@
 
 	* Releasing dmalloc version 5.0.1.
 
+	* Updated configure.ac script.
+
 2003-05-19  Gray Watson  <gray@outside.256.com>
 
 	* Added dmalloc_page_size() function.
@@ -1890,5 +1892,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.287 2003/05/20 04:14:08 gray Exp $
+$Id: ChangeLog,v 1.288 2003/05/21 03:07:54 gray Exp $
 -------------------------------------------------------------------------------

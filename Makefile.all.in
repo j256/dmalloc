@@ -1,6 +1,7 @@
 ###############################################################################
+# @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.113 2003/05/16 18:33:31 gray Exp $
+# $Id: Makefile.all.in,v 1.114 2003/05/21 03:07:55 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -13,8 +14,8 @@ VPATH = @srcdir@
 bindir = @bindir@
 libdir = @libdir@
 shlibdir = @shlibdir@
-incdir = $(prefix)/include
-infodir = $(prefix)/info
+includedir = @includedir@
+infodir = @infodir@
 docdir = $(prefix)/share/doc/$(MODULE)
 
 # default c-compiler
@@ -166,11 +167,11 @@ distclean : clean
 #	rm -f configure
 
 installdirs :
-	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(bindir)
+	$(srcdir)/mkinstalldirs $(includedir) $(libdir) $(bindir)
 
 installincs : $(HFLS)
-	$(srcdir)/mkinstalldirs $(incdir)
-	$(INSTALL_DATA) $(HFLS) $(incdir)
+	$(srcdir)/mkinstalldirs $(includedir)
+	$(INSTALL_DATA) $(HFLS) $(includedir)
 
 installthsl : $(LIB_TH_SL)
 	$(srcdir)/mkinstalldirs $(libdir)
@@ -244,7 +245,7 @@ shlib : $(BUILD_SL)
 @TH_OFF@	@echo "To make the thread version of the library type 'make threads'"
 @CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
 
-# NOTE: you may have to edit the configure.in script to get this to
+# NOTE: you may have to edit the configure.ac script to get this to
 # work on your operation system.  Please send feedback to the author
 # via: http://256.com/gray/email.html
 $(LIB_SL) : $(LIBRARY)
@@ -373,7 +374,7 @@ dmallocc.o : $(srcdir)/dmallocc.cc
 #config.status : $(srcdir)/configure
 #	$(SHELL) config.status --recheck
 
-# $(srcdir)/configure : $(srcdir)/configure.in
+# $(srcdir)/configure : $(srcdir)/configure.ac
 #	cd $(srcdir); autoconf
 
 ###############################################################################

@@ -21,3 +21,5 @@ dmalloc_toc.html
 dmalloc.html
 dmalloc.h.3
 ChangeLog.1
+configure.lineno
+autom4te.cache
