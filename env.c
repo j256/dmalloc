@@ -35,7 +35,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.1 1994/09/20 17:59:42 gray Exp $";
+  "$Id: env.c,v 1.2 1994/09/26 16:01:17 gray Exp $";
 #endif
 
 /* local variables */
@@ -270,31 +270,43 @@ EXPORT	void	_dmalloc_environ_set(char * buf, const unsigned long address,
 {
   char	*bufp = buf;
   
-  if (debug != DEBUG_INIT)
-    bufp += sprintf(bufp, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
+  if (debug != DEBUG_INIT) {
+    (void)sprintf(bufp, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
+    for (; *bufp != NULLC; bufp++);
+  }
   if (address != ADDRESS_INIT) {
     if (addr_count != ADDRESS_COUNT_INIT)
-      bufp += sprintf(bufp, "%s%c%#lx:%d,",
-		      ADDRESS_LABEL, ASSIGNMENT_CHAR, address, addr_count);
+      (void)sprintf(bufp, "%s%c%#lx:%d,",
+		    ADDRESS_LABEL, ASSIGNMENT_CHAR, address, addr_count);
     else
-      bufp += sprintf(bufp, "%s%c%#lx,",
-		      ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
+      (void)sprintf(bufp, "%s%c%#lx,",
+		    ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
+    for (; *bufp != NULLC; bufp++);
   }
-  if (interval != INTERVAL_INIT)
-    bufp += sprintf(bufp, "%s%c%d,",
-		    INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
-  if (logpath != LOGPATH_INIT)
-    bufp += sprintf(bufp, "%s%c%s,", LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
+  if (interval != INTERVAL_INIT) {
+    (void)sprintf(bufp, "%s%c%d,", INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
+    for (; *bufp != NULLC; bufp++);
+  }
+  if (logpath != LOGPATH_INIT) {
+    (void)sprintf(bufp, "%s%c%s,", LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
+    for (; *bufp != NULLC; bufp++);
+  }
   if (sfile != START_FILE_INIT) {
     if (sline != START_LINE_INIT)
-      bufp += sprintf(bufp, "%s%c%s:%d,",
-		      START_LABEL, ASSIGNMENT_CHAR, sfile, sline);
+      (void)sprintf(bufp, "%s%c%s:%d,",
+		    START_LABEL, ASSIGNMENT_CHAR, sfile, sline);
     else
-      bufp += sprintf(bufp, "%s%c%s,", START_LABEL, ASSIGNMENT_CHAR, sfile);
+      (void)sprintf(bufp, "%s%c%s,", START_LABEL, ASSIGNMENT_CHAR, sfile);
+    for (; *bufp != NULLC; bufp++);
   }
-  else if (scount != START_COUNT_INIT)
-    bufp += sprintf(bufp, "%s%c%d,", START_LABEL, ASSIGNMENT_CHAR, scount);
+  else if (scount != START_COUNT_INIT) {
+    (void)sprintf(bufp, "%s%c%d,", START_LABEL, ASSIGNMENT_CHAR, scount);
+    for (; *bufp != NULLC; bufp++);
+  }
   
   /* cut off the last comma */
-  (*--bufp) = NULLC;
+  if (bufp > buf)
+    bufp--;
+  
+  *bufp = NULLC;
 }
