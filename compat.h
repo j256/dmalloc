@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: compat.h,v 1.26 1997/01/16 15:25:05 gray Exp $
+ * $Id: compat.h,v 1.27 1997/01/16 21:02:52 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -34,15 +34,15 @@
 /*
  * copy LEN characters from SRC to DEST
  */
-#if HAVE_BCOPY == 0
-extern	void	bcopy(const char * src, char * dest, DMALLOC_SIZE len);
+#if HAVE_MEMCPY == 0
+extern	void	memcpy(char * dest, const char * src, DMALLOC_SIZE len);
 #endif
 
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-#if HAVE_BCMP == 0
-extern	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len);
+#if HAVE_MEMCMP == 0
+extern	int	memcmp(const char * str1, const char * str2, DMALLOC_SIZE len);
 #endif
 
 /*

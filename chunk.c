@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.101 1995/09/06 20:44:37 gray Exp $";
+  "$Id: chunk.c,v 1.102 1997/01/16 21:02:54 gray Exp $";
 #endif
 
 /*
@@ -157,18 +157,18 @@ EXPORT	int	_chunk_startup(void)
     maxp = fence_bottom + FENCE_BOTTOM;
     for (posp = fence_bottom; posp < maxp; posp += sizeof(FENCE_MAGIC_TYPE)) {
       if (posp + sizeof(FENCE_MAGIC_TYPE) <= maxp)
-	bcopy((char *)&value, posp, sizeof(FENCE_MAGIC_TYPE));
+	memcpy(posp, (char *)&value, sizeof(FENCE_MAGIC_TYPE));
       else
-	bcopy((char *)&value, posp, maxp - posp);
+	memcpy(posp, (char *)&value, maxp - posp);
     }
     
     value = FENCE_MAGIC_TOP;
     maxp = fence_top + FENCE_TOP;
     for (posp = fence_top; posp < maxp; posp += sizeof(FENCE_MAGIC_TYPE)) {
       if (posp + sizeof(FENCE_MAGIC_TYPE) <= maxp)
-	bcopy((char *)&value, posp, sizeof(FENCE_MAGIC_TYPE));
+	memcpy(posp, (char *)&value, sizeof(FENCE_MAGIC_TYPE));
       else
-	bcopy((char *)&value, posp, maxp - posp);
+	memcpy(posp, (char *)&value, maxp - posp);
     }
   }
   
@@ -361,7 +361,7 @@ LOCAL	int	fence_read(const char * file, const unsigned int line,
 			   const char * where)
 {
   /* check magic numbers in bottom of allocation block */
-  if (bcmp(fence_bottom, (char *)pnt, FENCE_BOTTOM) != 0) {
+  if (memcmp(fence_bottom, (char *)pnt, FENCE_BOTTOM) != 0) {
     dmalloc_errno = ERROR_UNDER_FENCE;
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt),
 		   NULL, where, TRUE);
@@ -370,7 +370,7 @@ LOCAL	int	fence_read(const char * file, const unsigned int line,
   }
   
   /* check numbers at top of allocation block */
-  if (bcmp(fence_top, (char *)pnt + size - FENCE_TOP, FENCE_TOP) != 0) {
+  if (memcmp(fence_top, (char *)pnt + size - FENCE_TOP, FENCE_TOP) != 0) {
     dmalloc_errno = ERROR_OVER_FENCE;
     log_error_info(file, line, TRUE, CHUNK_TO_USER(pnt),
 		   NULL, where, TRUE);
@@ -2586,7 +2586,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     /* copy stuff into new section of memory */
     size = MIN(new_size, old_size);
     if (size > 0)
-      bcopy((char *)oldp, (char *)newp, size);
+      memcpy((char *)newp, (char *)oldp, size);
     
     /* free old pointer */
     if (_chunk_free(file, line, oldp) != FREE_NOERROR)

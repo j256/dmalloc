@@ -2,6 +2,8 @@ Thu Jan 16 15:22:06 1997  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.2.0.
 
+	* Moved to memcpy and memcmp from the b routines.
+
 	* Fixed the locking for pthread programs.  Dumb errors.
 
 	* Ran new fillproto on h-files.  IMPORT -> extern.
@@ -1144,5 +1146,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.169 1997/01/16 20:26:30 gray Exp $
+$Id: ChangeLog,v 1.170 1997/01/16 21:03:11 gray Exp $
 -------------------------------------------------------------------------------

@@ -37,14 +37,14 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.34 1995/07/04 00:21:28 gray Exp $";
+  "$Id: compat.c,v 1.35 1997/01/16 21:02:51 gray Exp $";
 #endif
 
-#if HAVE_BCOPY == 0
+#if HAVE_MEMCPY == 0
 /*
  * copy LEN characters from DEST to SRC
  */
-EXPORT	void	bcopy(const char * src, char * dest, DMALLOC_SIZE len)
+EXPORT	void	memcpy(char * dest, const char * src, DMALLOC_SIZE len)
 {
   char		*destp;
   const	char	*srcp;
@@ -66,13 +66,13 @@ EXPORT	void	bcopy(const char * src, char * dest, DMALLOC_SIZE len)
     for (bytec = 0; bytec < len; bytec++)
       *destp++ = *srcp++;
 }
-#endif /* HAVE_BCOPY == 0 */
+#endif /* HAVE_MEMCPY == 0 */
 
-#if HAVE_BCMP == 0
+#if HAVE_MEMCMP == 0
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-EXPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
+EXPORT	int	memcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
 {
   for (; len > 0; len--, str1++, str2++)
     if (*str1 != *str2)
@@ -80,7 +80,7 @@ EXPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
   
   return 0;
 }
-#endif /* HAVE_BCMP == 0 */
+#endif /* HAVE_MEMCMP == 0 */
 
 #if HAVE_MEMSET == 0
 /*
