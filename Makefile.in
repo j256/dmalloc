@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.46 1994/03/03 04:01:51 gray Exp $
+# $Id: Makefile.in,v 1.47 1994/03/20 17:13:28 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -83,17 +83,6 @@ install : installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
 
 # put situation specific lines here
-config.status :
-	sh ./configure
-
-const.h : const.h.in
-	rm -f $@
-	sh ./config.status
-
-conf.h : conf.h.in
-	rm -f $@
-	sh ./config.status
-
 malloc_dbg.h : malloc_dbg.1 const.h malloc_dbg.2
 	rm -f $@ $@.t
 	cat malloc_dbg.1 const.h malloc_dbg.2 > $@.t
@@ -153,7 +142,8 @@ malloc.ps : malloc.texi
 	@ answer 'Is it okay to remove the work directory? '
 	rm -rf work
 	mkdir work
-	( cd work ; texi2dvi ../malloc.texi ; dvips -o ../$@ malloc.dvi )
+	( cd work ; texi2dvi ../malloc.texi ; texi2dvi ../malloc.texi ; \
+	  dvips -o ../$@ malloc.dvi )
 	rm -rf work
 
 malloc.head : malloc.info
@@ -175,6 +165,21 @@ shar : malloc.head
 		)
 	cat malloc.head part.1 > part.t
 	mv part.t part.1
+
+#
+# auto configure settings
+#
+conf.h : conf.h.in config.status
+	$(SHELL) config.status
+
+const.h : const.h.in config.status
+	$(SHELL) config.status
+
+config.status : configure
+	$(SHELL) config.status --recheck
+
+configure : configure.in
+	cd $(srcdir); autoconf
 
 include /usr/antaire/Default.make
 include Makefile.dep

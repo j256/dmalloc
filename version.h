@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.32 1994/02/27 22:55:19 gray Exp $
+ * $Id: version.h,v 1.33 1994/03/20 17:13:50 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -27,12 +27,15 @@
 #include "malloc_loc.h"				/* for LOCAL */
 
 /*
- * NOTE to gray: whenever this is changed, a corresponding Changlog
- * entry *must* be entered and a NEWS entry probably needs to be
- * added.
+ * NOTE to gray: whenever this is changed, a corresponding entry
+ * should be entered in:
+ *
+ *	Changlog
+ *	News
+ *	malloc.texi
  */
-LOCAL	char	*malloc_version = "2.0.1";
+LOCAL	char	*malloc_version = "2.0.2b";
 
-/* Version Date: $Date: 1994/02/27 22:55:19 $ */
+/* Version Date: $Date: 1994/03/20 17:13:50 $ */
 
 #endif /* ! __VERSION_H__ */

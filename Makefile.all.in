@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.36 1994/02/28 02:34:37 gray Exp $
+# $Id: Makefile.all.in,v 1.37 1994/03/20 17:13:25 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -105,19 +105,19 @@ $(TEST) : $(TEST).o argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) $(LIBRARY)
 	mv a.out $@
 
-#.PHONY : light
-light : $(TEST)
-	$(TEST) -s -t 10000
-	$(TEST) -s -t 10000
-	$(TEST) -s -t 10000
-	$(TEST) -s -t 10000
-	$(TEST) -s -t 10000
+#.PHONY : check light
+check light : $(TEST)
+	./$(TEST) -s -t 10000
+	./$(TEST) -s -t 10000
+	./$(TEST) -s -t 10000
+	./$(TEST) -s -t 10000
+	./$(TEST) -s -t 10000
 
 #.PHONY : heavy
 heavy : $(TEST) light
-	$(TEST) -s -t 100000
-	$(TEST) -s -t 100000
-	$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
 
 # %.o : %.c
 .c.o :
@@ -126,6 +126,24 @@ heavy : $(TEST) light
 
 .texi.info :
 	makeinfo $<
+
+Makefile : Makefile.in config.status
+	$(SHELL) config.status
+
+#
+# auto configure settings
+#
+conf.h : conf.h.in config.status
+	$(SHELL) config.status
+
+const.h : const.h.in config.status
+	$(SHELL) config.status
+
+config.status : configure
+	$(SHELL) config.status --recheck
+
+configure : configure.in
+	cd $(srcdir); autoconf
 
 ###############################################################################
 #

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: NOTES,v 1.24 1994/01/20 01:46:33 gray Exp $
+$Id: NOTES,v 1.25 1994/03/20 17:13:31 gray Exp $
 -------------------------------------------------------------------------------
 
 WARNINGS:
@@ -10,10 +10,10 @@ WARNINGS:
 	you.  Please send me mail.
 
 -	do not be surprised if the library catches problems with your
-	system's library routines.  It took me 6 hours once to finally
-	come to the conclusion that the localtime call, included in
-	SunOS release 4.1 (and maybe before/after), was overwriting
-	one of its fence-post markers.
+	system's library routines.  It took me hours to finally come
+	to the conclusion that the localtime call, included in SunOS
+	release 4.1 (and maybe before/after), was overwriting one of
+	its fence-post markers.
 
 -	some systems' sbrk calls seem to round to the page size or to
 	some other anonymous value.  Malloc-dbg will complain if it

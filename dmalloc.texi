@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.45 1994/01/20 01:47:04 gray Exp $
+@c $Id: dmalloc.texi,v 1.46 1994/03/20 17:13:42 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -78,7 +78,8 @@ translation approved by the author instead of in the original English.
 @cindex author
 
 This file documents the general-usage and the inner-workings of the
-memory allocation or @dfn{malloc} library it accompanies.
+memory allocation or @dfn{malloc} library (version 2.0.2) it
+accompanies.
 
 The library has been designed as a drop in replacement for the system's
 malloc, realloc, calloc, free and other memory management routines while
@@ -398,9 +399,9 @@ would cause the library to go recursive.
 
 @cindex system memory problems
 @emph{NOTE}: do not be surprised if the library catches problems with
-your system's library routines.  It took me four hours once to finally
-come to the conclusion that the localtime call, included in SunOS
-release 4.1, overwrites one of its fence-post markers.
+your system's library routines.  It took me hours to finally come to the
+conclusion that the localtime call, included in SunOS release 4.1,
+overwrites one of its fence-post markers.
 
 @node Environment Variables, Debug Tokens, Overview, Features
 @section Environment Variables - Their Names and Features.
@@ -532,7 +533,7 @@ called
 log non-freed memory pointers when malloc_shutdown or malloc_log_unfreed
 is called
 
-@item log-perror
+@item log-error
 log heap error-messages
 
 @item log-trans
@@ -588,7 +589,7 @@ it is alloced
 @item heap-check-map
 log a heap-map to the logfile every time the heap is checked
 
-@item print-perror
+@item print-error
 log any errors and messages to the screen via standard-error
 
 @item catch-null
@@ -1162,7 +1163,7 @@ settings in a verbose manner.  For example:
 
 @example
 MALLOC_DEBUG == '0x4000417' (unknown)
-        log-stats, log-non-free, log-perror,
+        log-stats, log-non-free, log-error,
         check-fence, catch-null
 MALLOC_ADDRESS not set
 MALLOC_INTERVAL == '100'
@@ -1236,14 +1237,14 @@ Here is an example of a @file{.mallocrc} file:
 none    none
 
 # basic debugging
-debug1	log-stats, log-non-free, log-perror, check-fence
+debug1	log-stats, log-non-free, log-error, check-fence
 
 # more logging and some heap checking
-debug2	log-stats, log-non-free, log-perror, log-trans, \
+debug2	log-stats, log-non-free, log-error, log-trans, \
         check-fence, check-heap, check-lists, error-abort
 
 # good utilities
-debug3	log-stats, log-non-free, log-perror, log-trans, \
+debug3	log-stats, log-non-free, log-error, log-trans, \
         log-admin, check-fence, check-heap, check-lists, realloc-copy, \
         free-blank, error-abort
 
@@ -1265,10 +1266,14 @@ Here are a number of possible scenarios for using the malloc_dbg library
 to track down problems with your program.
 
 In all cases, you should first have @samp{MALLOC_LOGFILE} defined to a
-filename (I use @file{malloc}).  Also, you should at least enable the
-following tokens: @samp{log-stats}, @samp{log-non-free},
-@samp{log-perror}, and @samp{log-bad-space}.  This way, the library can
-log some helpful diagnostic information to the log-file.
+filename (I use @file{malloc}).  You can use @samp{malloc_dbg -l malloc}
+to accomplish this.  If you are interested in have the error messages be
+printed to stderr instead, enable the @samp{print-error} token.
+
+You should at least enable the following tokens: @samp{log-stats},
+@samp{log-non-free}, @samp{log-error}, and @samp{log-bad-space}.  This
+way, the library can log some helpful diagnostic information to the
+log-file.
 
 When running your program in a debugger (I use the @emph{excellent} GNU
 debugger gdb), put a break-point in @code{_malloc_error()} which is the
