@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.104 2000/11/14 23:57:07 gray Exp $
+# $Id: Makefile.all.in,v 1.105 2000/11/15 01:34:00 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -206,7 +206,7 @@ installcxx : $(INSTALL_CXX)
 
 installsl : $(LIB_SL)
 	$(srcdir)/mkinstalldirs $(shlibdir)
-	$(INSTALL_DATA) $(srcdir)/$(LIB_SL) $(shlibdir)
+	$(INSTALL_DATA) $(LIB_SL) $(shlibdir)
 @CXX_OFF@	@echo "Enter 'make installcxxsl' to install the C++ shared-library"
 @TH_OFF@	@echo "Enter 'make installthsl' to install thread shared-library"
 
