@@ -49,7 +49,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.114 1998/09/17 13:36:11 gray Exp $";
+  "$Id: chunk.c,v 1.115 1998/09/18 19:07:54 gray Exp $";
 #endif
 
 /* local routines */
@@ -95,10 +95,12 @@ static	long		extern_count = 0;	/* count of external blocks */
 static	long		check_count = 0;	/* count of heap-checks */
 
 /* alloc counts */
-long			_calloc_count = 0;	/* # callocs, done in alloc */
-static	long		free_count = 0;		/* count the frees */
 static	long		malloc_count = 0;	/* count the mallocs */
+static	long		calloc_count = 0;	/* # callocs, done in alloc */
 static	long		realloc_count = 0;	/* count the reallocs */
+static	long		recalloc_count = 0;	/* count the reallocs */
+static	long		valloc_count = 0;	/* count the veallocs */
+static	long		free_count = 0;		/* count the frees */
 
 /******************************* misc routines *******************************/
 
@@ -403,8 +405,7 @@ static	void	log_error_info(const char *file, const unsigned int line,
   if (dmalloc_errno == ERROR_UNDER_FENCE) {
     /* NOTE: only dump out the proper fence-post area once */
     if (! dump_bottom_b) {
-      out_len = expand_chars(fence_bottom, pnt_fence_bottom,
-			     out, sizeof(out));
+      out_len = expand_chars(fence_bottom, pnt_fence_bottom, out, sizeof(out));
       _dmalloc_message("Dump of proper fence-bottom bytes: '%.*s'",
 		       out_len, out);
       dump_bottom_b = 1;
@@ -510,6 +511,20 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
       }
       else {
 	bblock_p->bb_flags = BBLOCK_USER;
+      }
+      
+      bblock_p->bb_line = (unsigned short)num;
+      bblock_p->bb_size = (unsigned int)info;
+      bblock_p->bb_file = (char *)pnt;
+      break;
+      
+      /* same as START_USER with the VALLOC flag added */ 
+    case BBLOCK_VALLOC:
+      if (bblock_c == 0) {
+	bblock_p->bb_flags = BBLOCK_START_USER | BBLOCK_VALLOC;
+      }
+      else {
+	bblock_p->bb_flags = BBLOCK_USER | BBLOCK_VALLOC;
       }
       
       bblock_p->bb_line = (unsigned short)num;
@@ -644,7 +659,8 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
   block_n = bblock_p->bb_block_n - many;
   NUM_BITS(block_n * BLOCK_SIZE, bit_n);
   
-  set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, bit_n, 0, free_bblock[bit_n]);
+  set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, bit_n, 0,
+		   free_bblock[bit_n]);
   free_bblock[bit_n] = bblock_p;
   
   *ret_p = best_p;
@@ -776,7 +792,8 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
     }
     
     /* initialize the bblocks in the bblock_admin */
-    for (bblock_p = adm_p->ba_blocks; bblock_p < adm_p->ba_blocks + BB_PER_ADMIN;
+    for (bblock_p = adm_p->ba_blocks;
+	 bblock_p < adm_p->ba_blocks + BB_PER_ADMIN;
 	 bblock_p++) {
       bblock_p->bb_flags = 0;
 #if STORE_SEEN_COUNT
@@ -1315,7 +1332,7 @@ int	_chunk_check(void)
     /*
      * check for different types
      */
-    switch (bblock_p->bb_flags) {
+    switch (BBLOCK_FLAG_TYPE(bblock_p->bb_flags)) {
       
       /* check a starting user-block */
     case BBLOCK_START_USER:
@@ -1353,11 +1370,14 @@ int	_chunk_check(void)
 	return ERROR;
       }
       
-      /* check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take over */
-      if (bblock_p->bb_size <= BLOCK_SIZE / 2
+      /*
+       * Check out size, BLOCK_SIZE / 2 == 512 when dblock allocs take
+       * over.  If we have a valloc then the size might be small.
+       */
+      if (((! BIT_IS_SET(bblock_p->bb_flags, BBLOCK_VALLOC))
+	   && bblock_p->bb_size <= BLOCK_SIZE / 2)
 	  || bblock_p->bb_size > (1 << LARGEST_BLOCK)) {
 	dmalloc_errno = ERROR_BAD_SIZE;
-	log_error_info(NULL, 0, NULL, 0, NULL, "heap-check", FALSE);
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
@@ -1382,8 +1402,8 @@ int	_chunk_check(void)
       else {
 	if (start == 0
 	    && (last_bblock_p == NULL
-		|| (last_bblock_p->bb_flags != BBLOCK_START_USER &&
-		    last_bblock_p->bb_flags != BBLOCK_USER)
+		|| ((! BIT_IS_SET(last_bblock_p->bb_flags, BBLOCK_START_USER))
+		    && (! BIT_IS_SET(last_bblock_p->bb_flags, BBLOCK_USER)))
 		|| bblock_p->bb_file != last_bblock_p->bb_file
 		|| bblock_p->bb_line != last_bblock_p->bb_line
 		|| bblock_p->bb_size != last_bblock_p->bb_size)) {
@@ -2306,10 +2326,14 @@ void	_chunk_log_heap_map(void)
 /************************** low-level user functions *************************/
 
 /*
- * Get a SIZE chunk of memory for FILE at LINE
+ * Get a SIZE chunk of memory for FILE at LINE.  If CALLOC_B then
+ * count this as a calloc not a malloc call.  If REALLOC_B then don't
+ * count it as a malloc call.  If valloc_b then count it as a valloc_b
+ * and force a basic block to be returned.
  */
 void	*_chunk_malloc(const char *file, const unsigned int line,
-		       const unsigned int size)
+		       const unsigned int size, const int calloc_b,
+		       const int realloc_b, const int valloc_b)
 {
   unsigned int	bit_n, byte_n = size;
   bblock_t	*bblock_p;
@@ -2317,7 +2341,15 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   void		*pnt;
   
   /* counts calls to malloc */
-  malloc_count++;
+  if (calloc_b) {
+    calloc_count++;
+  }
+  else if (valloc_b) {
+    valloc_count++;
+  }
+  else if (! realloc_b) {
+    malloc_count++;
+  }
   
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (byte_n == 0) {
@@ -2362,7 +2394,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   alloc_tot_pnts++;
   
   /* allocate divided block if small */
-  if (bit_n < BASIC_BLOCK) {
+  if (bit_n < BASIC_BLOCK && (! valloc_b)) {
     pnt = get_dblock(bit_n, byte_n, file, line, &over_p);
     if (pnt == NULL) {
       return MALLOC_ERROR;
@@ -2391,7 +2423,13 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     }
     
     /* initialize the bblocks */
-    set_bblock_admin(block_n, bblock_p, BBLOCK_START_USER, line, byte_n, file);
+    if (valloc_b) {
+      set_bblock_admin(block_n, bblock_p, BBLOCK_VALLOC, line, byte_n, file);
+    }
+    else {
+      set_bblock_admin(block_n, bblock_p, BBLOCK_START_USER, line, byte_n,
+		       file);
+    }
     
     given = block_n * BLOCK_SIZE;
     alloc_cur_given += given;
@@ -2434,10 +2472,14 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   
   pnt = CHUNK_TO_USER(pnt);
   
+  if (calloc_b) {
+    (void)memset(pnt, 0, size);
+  }
+  
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     _dmalloc_message("*** alloc: at '%s' for %d bytes, got '%s'",
-		     _chunk_display_where(file, line), byte_n - pnt_fence_overhead,
+		     _chunk_display_where(file, line), size,
 		     display_pnt(pnt, over_p));
   }
   
@@ -2445,16 +2487,23 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 }
 
 /*
- * Frees PNT from the heap, returns FREE_ERROR or FREE_NOERROR
+ * Frees PNT from the heap.  REALLOC_B set if realloc is freeing a
+ * pointer so doing count it as a free.  Returns FREE_ERROR or
+ * FREE_NOERROR.
+ *
+ * NOTE: should be above _chunk_realloc which calls it.
  */
-int	_chunk_free(const char *file, const unsigned int line, void *pnt)
+int	_chunk_free(const char *file, const unsigned int line, void *pnt,
+		    const int realloc_b)
 {
   unsigned int	bit_n, block_n, given;
   bblock_t	*bblock_p, *last, *next, *prev_p, *tmp;
   dblock_t	*dblock_p;
   
   /* counts calls to free */
-  free_count++;
+  if (! realloc_b) {
+    free_count++;
+  }
   
   if (pnt == NULL) {
     dmalloc_errno = ERROR_IS_NULL;
@@ -2686,16 +2735,22 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt)
  * Reallocate a section of memory
  */
 void	*_chunk_realloc(const char *file, const unsigned int line,
-			void *old_p, unsigned int new_size)
+			void *old_p, unsigned int new_size,
+			const int recalloc_b)
 {
-  void		*newp, *ret_addr;
+  void		*new_p, *ret_addr;
   char		*old_file;
   int		*seen_cp;
   unsigned int	old_size, size, old_line, alloc_size;
   unsigned int	old_bit_n, new_bit_n;
   
   /* counts calls to realloc */
-  realloc_count++;
+  if (recalloc_b) {
+    recalloc_count++;
+  }
+  else {
+    realloc_count++;
+  }
   
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (new_size == 0) {
@@ -2758,30 +2813,27 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     old_size -= pnt_fence_overhead;
     new_size -= pnt_fence_overhead;
     
-    /* allocate space for new chunk */
-    newp = _chunk_malloc(file, line, new_size);
-    if (newp == MALLOC_ERROR) {
+    /* allocate space for new chunk -- this will */
+    new_p = _chunk_malloc(file, line, new_size, recalloc_b, 1, 0);
+    if (new_p == MALLOC_ERROR) {
       return REALLOC_ERROR;
     }
     
-    malloc_count--;
-    
     /*
-     * NOTE: _chunk_malloc() already took care of the fence stuff...
+     * NOTE: _chunk_malloc() already took care of the fence stuff and
+     * an zeroing of memory.
      */
     
     /* copy stuff into new section of memory */
     size = MIN(new_size, old_size);
     if (size > 0) {
-      memcpy((char *)newp, (char *)old_p, size);
+      memcpy((char *)new_p, (char *)old_p, size);
     }
     
     /* free old pointer */
-    if (_chunk_free(file, line, old_p) != FREE_NOERROR) {
+    if (_chunk_free(file, line, old_p, 1) != FREE_NOERROR) {
       return REALLOC_ERROR;
     }
-    
-    free_count--;
   }
   else {
     /*
@@ -2799,10 +2851,10 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     alloc_tot_pnts++;
     
     /* reuse the old-pointer */
-    newp = old_p;
+    new_p = old_p;
     
     /* rewrite size information */
-    if (chunk_write_info(file, line, newp, new_size, "realloc") != NOERROR) {
+    if (chunk_write_info(file, line, new_p, new_size, "realloc") != NOERROR) {
       return REALLOC_ERROR;
     }
     
@@ -2811,25 +2863,31 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     
     /* NOTE: using same number of blocks so NUM_BLOCKS works with either */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK)
-	&& alloc_size - size > 0) {
-      (void)memset((char *)newp + size, BLANK_CHAR, alloc_size - size);
+	&& alloc_size > size) {
+      (void)memset((char *)new_p + size, BLANK_CHAR, alloc_size - size);
     }
     
     /* write in fence-post info and adjust new pointer over fence info */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE)) {
-      FENCE_WRITE(newp, new_size);
+      FENCE_WRITE(new_p, new_size);
     }
     
-    newp = CHUNK_TO_USER(newp);
+    new_p = CHUNK_TO_USER(new_p);
     old_p = CHUNK_TO_USER(old_p);
     old_size -= pnt_fence_overhead;
     new_size -= pnt_fence_overhead;
+    
+    if (recalloc_b && new_size > old_size) {
+      (void)memset((char *)new_p + old_size, 0, new_size - old_size);
+    }
     
 #if STORE_SEEN_COUNT
     /* we see in inbound and outbound so we need to increment by 2 */
     *seen_cp += 2;
 #endif
   }
+  
+  /* new_p is already user-level real */
   
   /*
    * do we need to print transaction info?
@@ -2840,11 +2898,10 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     _dmalloc_message("*** realloc: at '%s' from '%#lx' (%u bytes) file '%s' to '%#lx' (%u bytes)",
 		    _chunk_display_where(file, line),
 		    old_p, old_size, chunk_display_where2(old_file, old_line),
-		    newp, new_size);
+		    new_p, new_size);
   }
   
-  /* newp is already user-level real */
-  return newp;
+  return new_p;
 }
 
 /***************************** diagnostic routines ***************************/
@@ -2909,9 +2966,9 @@ void	_chunk_stats(void)
 		   check_count);
   
   /* log user allocation information */
-  _dmalloc_message("alloc calls: malloc %ld, realloc %ld, calloc %ld, free %ld"
-		   , malloc_count - _calloc_count, realloc_count,
-		   _calloc_count, free_count);
+  _dmalloc_message("alloc calls: malloc %ld, calloc %ld, realloc %ld, recalloc %ld, valloc %ld, free %ld",
+		   malloc_count, calloc_count, realloc_count, recalloc_count,
+		   valloc_count, free_count);
   _dmalloc_message(" total memory allocated: %ld bytes (%ld pnts)",
 		  alloc_total, alloc_tot_pnts);
   
@@ -2989,7 +3046,7 @@ void	_chunk_dump_unfreed(void)
     /*
      * check for different types
      */
-    switch (bblock_p->bb_flags) {
+    switch (BBLOCK_FLAG_TYPE(bblock_p->bb_flags)) {
       
     case BBLOCK_START_USER:
       /* find pointer to memory chunk */
