@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.128 1997/12/07 23:17:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.129 1997/12/18 13:15:56 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -367,7 +367,7 @@ more information about their capabilities, check your system's manual
 pages -- in unix, do a @code{man 3 malloc}.
 
 @deftypefun
-void * malloc ( unsigned int @var{size} )
+void *malloc ( unsigned int @var{size} )
 @cindex malloc
 
 Usage: @code{pnt = (type *)malloc(size)}
@@ -378,7 +378,7 @@ requested.
 
 @end deftypefun
 @deftypefun
-void * calloc ( unsigned int @var{number}, unsigned int
+void *calloc ( unsigned int @var{number}, unsigned int
 @var{size} )
 @cindex calloc
 @cindex Allocation of zeros
@@ -394,7 +394,7 @@ is all zeros.
 
 @end deftypefun
 @deftypefun
-void * realloc ( void * @var{old_pnt}, unsigned int
+void *realloc ( void *@var{old_pnt}, unsigned int
 @var{new_size} )
 @cindex realloc
 
@@ -403,11 +403,17 @@ Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
 The realloc function expands or shrinks the memory allocation in
 @code{old_pnt} to @code{new_size} number of bytes.  Realloc copies as
 much of the information from @code{old_pnt} as it can into the
-@code{new_pnt} space it returns, up to @code{new_size} bytes.
+@code{new_pnt} space it returns, up to @code{new_size} bytes.  If there
+is a problem allocating this memory, 0L will be returned.
+
+If the @code{old_pnt} is 0L then realloc will do the equivalent of a
+@code{malloc(new_size)}.  If @code{new_size} is 0 and @code{old_pnt} is
+not 0L, then it will do the equivalent of @code{free(old_pnt)} and will
+return 0L.
 
 @end deftypefun
 @deftypefun
-void free ( void * @var{pnt} )
+void free ( void *@var{pnt} )
 @cindex free
 
 Usage: @code{free(pnt)}
@@ -839,58 +845,6 @@ not freed: '0x38410' (22 bytes) from 'dmalloc_t.c:92'
 
 This line from a log file shows that memory was not freed from file
 @file{dmalloc_t.c} line 92.  @xref{Memory Leaks}.
-
-Along with the above leap functionality, @file{dmalloc.h} also adds the
-following macros which take care of all the type-casting and make the
-code look much cleaner (IMHO).
-
-@deftypefun
-void * ALLOC(@var{type}, int @var{count})
-
-Usage: @code{long_pnt = ALLOC(long, 30)}.  This means allocate space
-for 30 longs.
-@end deftypefun
-
-@deftypefun
-void * MALLOC ( int @var{size} )
-
-Usage: @code{char_pnt = MALLOC(1000)}.  This is like ALLOC but for
-characters only.  It means allocate space for 1000 characters.
-@end deftypefun
-
-@deftypefun
-void * CALLOC ( @var{type}, int @var{count} )
-
-Usage: @code{info_pnt = CALLOC(struct info_st, 100)}.  This means
-allocate space for 100 info_st structures and zero them all.
-
-@emph{NOTE}: the arguments for the CALLOC macro are sort of reversed
-from calloc(unsigned int count, unsigned int size).
-@end deftypefun
-
-@deftypefun
-void * REALLOC ( void * @var{pnt}, @var{type}, int @var{count} )
-
-Usage: @code{long_pnt = REALLOC(old_pnt, long, 10)}.  This takes
-old_pnt and and changes its size to accommodate 10 longs.
-
-@emph{NOTE}: the arguments for the REALLOC macro are different from the
-realloc function.
-@end deftypefun
-
-@deftypefun
-void * REMALLOC ( void * @var{pnt}, int @var{size} )
-
-Usage: @code{char_pnt = REMALLOC(char_pnt, 100)}.  This is like REALLOC
-but for characters only.  It takes char_pnt and changes its size to 100
-characters.
-@end deftypefun
-
-@deftypefun
-void FREE ( void * @var{pnt} )
-
-Usage: @code{FREE(pnt)}.  This frees memory pointers.
-@end deftypefun
 
 @node Return Address, Argument Checking, Allocation Macros, Programming
 @subsection Return Address Information
