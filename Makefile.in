@@ -1,9 +1,10 @@
 #
-# $Id: Makefile.in,v 1.11 1993/03/31 00:35:27 gray Exp $
+# $Id: Makefile.in,v 1.12 1993/04/02 10:50:41 gray Exp $
 #
 
 HFLS	= malloc.h
 OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_lp.o malloc_str.o
+OBJS_IN	= malloc_lp.o 
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
@@ -40,10 +41,11 @@ distclean : clobber
 	rm -rf port
 
 .PHONY : install
-install : $(LIBRARY) $(UTIL) $(HFLS) $(MANFILE)
+install : $(LIBRARY) $(OBJS_IN) $(UTIL) $(HFLS) $(MANFILE)
 	install -ce -m 444 $(HFLS) $(DESTDIR)/inc
 	install -ce $(UTIL) $(DESTDIR)/bin
 	install -cer -m 644 $(LIBRARY) $(DESTDIR)/lib
+	install -ce -m 444 $(OBJS_IN) $(DESTDIR)/lib
 	install -ce -m 444 $(MANFILE) $(DESTDIR)/info
 
 .PHONY : installincs
