@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.141 1999/03/08 15:54:04 gray Exp $
+ * $Id: chunk.c,v 1.142 1999/03/08 16:19:14 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.141 1999/03/08 15:54:04 gray Exp $";
+#ident "$Id: chunk.c,v 1.142 1999/03/08 16:19:14 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.141 1999/03/08 15:54:04 gray Exp $";
+  "$Id: chunk.c,v 1.142 1999/03/08 16:19:14 gray Exp $";
 #endif
 #endif
 
@@ -2609,7 +2609,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   
   pnt = CHUNK_TO_USER(pnt);
   
-  if (func_id == DMALLOC_FUNC_CALLOC) {
+  if (func_id == DMALLOC_FUNC_CALLOC || func_id == DMALLOC_FUNC_RECALLOC) {
     (void)memset(pnt, 0, size);
   }
   
