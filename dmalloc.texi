@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.160 1999/03/03 16:17:51 gray Exp $
+@c $Id: dmalloc.texi,v 1.161 1999/03/04 16:48:09 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -102,16 +102,14 @@ Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
-texi, info, and ps).  The library and associated documentation is
-available online at URL @code{http://www.dmalloc.com/}.  A new mailing
-list for the library has been created recently and is available as a
-resource for posting questions and problems.  See the home page for more
-details.
+texi, info, and ps).  Online documentation as well as the full source is
+available at URL @code{http://www.dmalloc.com/}.  Details on the
+library's mailing list are available there as well.
 
-I can be reached via my web page @samp{http://www.256.com/~gray/} with
-any questions or feedback.  Please include the version number of the
-library that you are using as well as your machine and operating system
-types.
+My contact information is available on the web page.  I can be reached
+with any questions or feedback.  Please include the version number of
+the library that you are using as well as your machine and operating
+system types.
 
 Gray Watson.
 
@@ -1694,9 +1692,9 @@ this.
 To find out the usage for the debug malloc program try @samp{dmalloc
 --usage-long}.  The standardized usage message that will be displayed is
 one of the many features of the argv library included with this package.
-It is available via ftp from @samp{ftp.256.com} in the
-@file{/src/argv} directory.  See @file{argv.info} there for more
-information.
+
+It is available via ftp from @samp{ftp.256.com} in the @file{/src/argv}
+directory.  See @file{argv.info} there for more information.
 
 Here is a detailed list of the flags that can passed to dmalloc:
 
