@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.14 1993/04/30 20:02:41 gray Exp $
+@c $Id: dmalloc.texi,v 1.15 1993/04/30 22:34:52 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -328,13 +328,13 @@ couple basic classifications:
 One of the nice things about a good debugger is its ability to provide
 the file and line number of an offending piece of code.  This library
 attempts to give this functionality with the help of @dfn{cpp}, the C
-preprocessor.  If the file @file{malloc.h} is included, the library can
-provide file and line information for the warning messages and errors it
-generates.
+preprocessor.  If the file @file{malloc_dbg.h} is included, the library
+can provide file and line information for the warning messages and
+errors it generates.
 
 @item fence-post (i.e. bounds) checking
 @dfn{Fence-post} memory is the area immediately above or below memory
-allocations.  I have found it all to easy to write code that accesses
+allocations.  I have found it all too easy to write code that accesses
 above or below an allocation (especially when dealing with arrays or
 strings).  The library can write special values in the areas around
 every allocation so it will notice when these areas have been
@@ -428,13 +428,13 @@ debugging features, at runtime.
 They can be set either by hand or with the help of the malloc_dbg
 program.  @xref{malloc_dbg program}.
 
-To set them by hand, C shell (or tcsh) users need to invoke:
+To set them by hand, C shell (csh or tcsh) users need to invoke:
 
 @example
         setenv variable value;
 @end example
 
-Bourne shell (or bash, ksh) users should use:
+Bourne shell (sh, bash, or ksh) users should use:
 
 @example
         variable=value;
@@ -444,13 +444,15 @@ Bourne shell (or bash, ksh) users should use:
 @table @samp
 @item MALLOC_DEBUG
 This env variable should be set to a value in hexadecimal which
-corresponds to a set of functionality tokens.  @xref{Debug tokens}.  For
-instance, if the user wanted to enabled logging of memory transactions
-(value @samp{0x008}) and wanted to check fence-post memory (value
-@samp{0x400}) then @samp{MALLOC_DEBUG} should be set to @samp{0x408}.
+corresponds to the functionality token values added together.
+@xref{Debug tokens}.  For instance, if the user wanted to enable the
+logging of memory transactions (value @samp{0x008}) and wanted to check
+fence-post memory (value @samp{0x400}) then @samp{MALLOC_DEBUG} should
+be set to @samp{0x408} (@samp{0x008} + @samp{0x400}).
 
-Don't worry about remembering all the hex values of the tokens, the
-malloc_dbg program automates the setting of this variable especially.
+However, you don't have to worry about remembering all the hex values of
+the tokens, the malloc_dbg program automates the setting of this
+variable especially.
 
 @item MALLOC_LOGFILE
 Set this variable to a filename so that if @samp{MALLOC_DEBUG} has
@@ -518,7 +520,7 @@ their @file{.cshrc} file:
 This allows the user to execute @code{malloc args}.
 
 The most basic usage for the program is @code{malloc_dbg [-b] tag}.  The
--b flag is for generating Bourne-shell type commands (C-shell type are
+-b flag is for generating Bourne shell type commands (C shell type are
 the default).  The tag argument should match a line from the user's
 run-time configuration file.  @xref{RC file}.
 
@@ -530,7 +532,7 @@ Set the @samp{MALLOC_ADDRESS} variable with the string address (or
 alternatively address:number).
 
 @item -b
-Output Bourne-shell type commands.  (C-shell type output is the
+Output Bourne shell type commands.  (C shell type output is the
 default).
 
 @item -c
@@ -561,7 +563,7 @@ Set the @samp{MALLOC_START} env variable to number (alternatively
 file:line).
 
 @item -v
-Give verbose output.  Especially useful when dumping currect settings.
+Give verbose output.  Especially useful when dumping current settings.
 @end table
 
 If no arguments are specified, malloc_dbg dumps out the current settings
@@ -709,7 +711,7 @@ log any errors and messages to the screen via standard-error
 
 One potential problem with the library and its multitude of checks and
 diagnoses is that they only get performed when a malloc function is
-called.  One solution this is to include @file{malloc.h} and compile
+called.  One solution this is to include @file{malloc_dbg.h} and compile
 your source code with the @code{MALLOC_FUNC_CHECK} flag defined and
 enable the @code{check-funcs} token @xref{Debug tokens}.
 
@@ -722,10 +724,10 @@ have to recompile with it off to disconnect the library @xref{Disabling
 the Library}.
 
 When this is defined malloc will override a number of functions and will
-insert a routine which knowns how to check its own arguments and then
+insert a routine which knows how to check its own arguments and then
 call the real function.  Malloc can check such functions as bcopy,
 index, strcat, and strcasecmp (for the full list see the end of
-@file{malloc.h}).
+@file{malloc_dbg.h}).
 
 When you call strlen, for instance, malloc will make sure the string
 argument's fence-post areas have not been overwritten, its file and line
@@ -734,7 +736,7 @@ the destination string has enough space to store the number of bytes
 specified.
 
 For all of the arguments checked, if the pointer is not in the heap then
-it is ignored since malloc does know anything about it.
+it is ignored since malloc does not know anything about it.
 
 @emph{NOTE}: this is one of the newest parts of the library so problems
 may still be lurking.
@@ -751,7 +753,7 @@ may still be lurking.
 @node Allocation macros, Extensions,  , Usage
 @section Allocation macros.
 
-By including @file{malloc.h} in your C files, your calls to calloc,
+By including @file{malloc_dbg.h} in your C files, your calls to calloc,
 free, malloc, or realloc are replaced with calls to _calloc_leap,
 _free_leap, _malloc_leap, and _realloc_leap.
 
@@ -771,7 +773,7 @@ One at address 0x38410 of size 22 bytes in source file @file{malloc_t.c}
 at line 92 and another at address 0x38600 of size 10232 bytes at line
 104 of @file{malloc_t.c}.
 
-Along with the above leap macros, @file{malloc.h} also contains the
+Along with the above leap macros, @file{malloc_dbg.h} also contains the
 following macros which I have been using for all our memory allocation
 needs for some time now.  They take care of all the type-casting and
 make the code look much cleaner (IMHO).
@@ -941,7 +943,7 @@ need to @code{#ifdef}, remove, or comment them out of your code.
 
 @item
 If you want to @emph{totally} disable the malloc-debug library then you
-will need to recompile all the C files that include @file{malloc.h}
+will need to recompile all the C files that include @file{malloc_dbg.h}
 while defining @code{MALLOC_DEBUG_DISABLE}.  This will cause the malloc
 leap macros to not be applied @xref{Allocation macros}.
 
@@ -959,8 +961,8 @@ you need to include the @file{malloc_lp.o} file on the link line.
 @end example
 
 If you have disabled malloc with the @code{MALLOC_DEBUG_DISABLED} flag
-or never included @file{malloc.h} in any of your C files, then you will
-not need to include the @file{malloc_lp.o} file on the link line.
+or never included @file{malloc_dbg.h} in any of your C files, then you
+will not need to include the @file{malloc_lp.o} file on the link line.
 
 @example
         gcc -O -g main.o -L/usr/local/lib -lgmalloc
