@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.106 2003/06/09 23:15:56 gray Exp $
+ * $Id: error.c,v 1.107 2003/06/10 00:39:55 gray Exp $
  */
 
 /*
@@ -34,9 +34,6 @@
 #endif
 #if HAVE_STDLIB_H
 # include <stdlib.h>				/* for abort */
-#endif
-#if HAVE_STRING_H
-# include <string.h>				/* for strlen */
 #endif
 #if HAVE_UNISTD_H
 # include <unistd.h>				/* for write */
@@ -84,9 +81,9 @@ static char *information = "@(#) $Information: lock-threads is enabled $"
 #endif
 #endif
 
-#define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
 #define MINS_IN_HOUR	60
 #define SECS_IN_MIN	60
+#define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
 
 /* external routines */
 extern	const char	*dmalloc_strerror(const int errnum);
@@ -128,7 +125,111 @@ int		_dmalloc_lock_on = 0;
 int		_dmalloc_aborting_b = 0;
 
 /* local variables */
-static int	outfile_fd = -1;		/* output file descriptor */
+static	int	outfile_fd = -1;		/* output file descriptor */
+/* the following are here to reduce stack overhead */
+static	char	error_str[1024];		/* error string buffer */
+static	char	message_str[1024];		/* message string buffer */
+
+/*
+ * void _dmalloc_open_log
+ *
+ * DESCRIPTION:
+ *
+ * Open up our log file and write some version of settings
+ * information.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+static	void	build_logfile_path(char *buf, const int buf_len)
+{
+  char	*bounds_p;
+  char	*path_p, *buf_p, *start_p;
+  int	len;
+  
+  if (dmalloc_logpath == NULL) {
+    buf[0] = '\0';
+    return;
+  }
+  
+  buf_p = buf;
+  bounds_p = buf + buf_len;
+  
+  start_p = dmalloc_logpath;
+  for (path_p = dmalloc_logpath; *path_p != '\0'; path_p++) {
+    
+    /* if we don't have to do anything special then just continue */
+    if (*path_p != '%' || *(path_p + 1) == '\0') {
+      if (buf_p < bounds_p) {
+	*buf_p++ = *path_p;
+      }
+      continue;
+    }
+    
+    /* skip over the % */
+    path_p++;
+    
+    /* dump the time value */
+    if (*path_p == 't') {
+#if HAVE_TIME
+      /* we make time a long here so it will promote */
+      long	now;
+      now = time(NULL);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", now);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-time");
+#endif
+    }
+    /* dump the pid */
+    if (*path_p == 'p') {
+#if HAVE_GETPID
+      /* we make it long in case it's big and we hope it will promote if not */
+      long	our_pid = getpid();
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", our_pid);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-getpid");
+#endif
+    }
+    /* dump the hostname */
+    if (*path_p == 'h') {
+#if HAVE_GETHOSTNAME
+      char	our_host[128];
+      gethostname(our_host, sizeof(our_host));
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", our_host);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "not-gethostname");
+#endif
+    }
+    /* dump the thread-id */
+    if (*path_p == 'i') {
+#if LOG_PNT_THREAD_ID
+      char		id_str[256];
+      THREAD_TYPE	id;
+      
+      id = THREAD_GET_ID();
+      THREAD_ID_TO_STRING(id_str, sizeof(id_str), id);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", id_str);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-thread-id");
+#endif
+    }
+  }
+  
+  if (buf_p >= bounds_p - 1) {
+    /* NOTE: we can't use dmalloc_message of course so do it the hard way */
+    len = loc_snprintf(error_str, sizeof(error_str),
+		       "debug-malloc library: logfile path too large '%s'\r\n",
+		       dmalloc_logpath);
+    (void)write(STDERR, error_str, len);
+  }
+  
+  *buf_p = '\0';
+}
 
 /*
  * void _dmalloc_open_log
@@ -148,7 +249,8 @@ static int	outfile_fd = -1;		/* output file descriptor */
  */
 void	_dmalloc_open_log(void)
 {
-  char	str[1024];
+  char	log_path[1024];
+  int	len;
   
   /* if it's already open or if we don't have a log file configured */
   if (outfile_fd >= 0
@@ -156,13 +258,16 @@ void	_dmalloc_open_log(void)
     return;
   }
   
+  build_logfile_path(log_path, sizeof(log_path));
+  
   /* open our logfile */
-  outfile_fd = open(dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  outfile_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if (outfile_fd < 0) {
-    (void)loc_snprintf(str, sizeof(str),
+    /* NOTE: we can't use dmalloc_message of course so do it the hardway */
+    len = loc_snprintf(error_str, sizeof(error_str),
 		       "debug-malloc library: could not open '%s'\r\n",
-		       dmalloc_logpath);
-    (void)write(STDERR, str, strlen(str));
+		       log_path);
+    (void)write(STDERR, error_str, len);
     /* disable log_path */
     dmalloc_logpath = NULL;
     return;
@@ -175,8 +280,7 @@ void	_dmalloc_open_log(void)
   
   dmalloc_message("Dmalloc version '%s' from '%s'",
 		  dmalloc_version, DMALLOC_HOME);
-  dmalloc_message("flags = %#x, logfile '%s'",
-		  _dmalloc_flags, dmalloc_logpath);
+  dmalloc_message("flags = %#x, logfile '%s'", _dmalloc_flags, log_path);
   dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld, limit = %ld",
 		  _dmalloc_check_interval, (unsigned long)_dmalloc_address,
 		  _dmalloc_address_seen_n, _dmalloc_memory_limit);
@@ -201,6 +305,15 @@ void	_dmalloc_open_log(void)
 				    sizeof(time_buf), 0));
   }
 #endif
+#endif
+  
+#if HAVE_GETPID
+  {
+    /* we make it long in case it's big and we hope it will promote if not */
+    long	our_pid = getpid();
+    
+    dmalloc_message("process pid = %ld", our_pid);
+  }
 #endif
 }
 
@@ -364,17 +477,39 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  */
 void	_dmalloc_vmessage(const char *format, va_list args)
 {
-  char		str[1024], *str_p, *bounds_p;
-  int		len;
+  char	*str_p, *bounds_p;
+  int	len;
   
-  str_p = str;
-  bounds_p = str_p + sizeof(str);
+  str_p = message_str;
+  bounds_p = str_p + sizeof(message_str);
   
   /* no logpath and no print then no workie */
   if (dmalloc_logpath == NULL
       && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     return;
   }
+  
+#if HAVE_GETPID && LOG_REOPEN
+  {
+    /*
+     * This static pid will be checked to make sure it doesn't change.
+     * We make it long in case it's big and we hope it will promote if
+     * not.
+     */
+    static long		current_pid = -1;
+    long		new_pid;
+    
+    new_pid = getpid();
+    if (new_pid != current_pid) {
+      /* NOTE: we need to do this _before_ the reopen otherwise we recurse */
+      current_pid = new_pid;
+      if (current_pid >= 0) {
+	/* if the new pid doesn't match the old one then reopen it */
+	_dmalloc_reopen_log();
+      }
+    }
+  }
+#endif
   
   /* do we need to open the logfile? */
   if (dmalloc_logpath != NULL && outfile_fd < 0) {
@@ -383,8 +518,11 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   
 #if HAVE_TIME
 #if LOG_TIME_NUMBER
-  str_p += loc_snprintf(str_p, bounds_p - str_p, "%lu: ",
-			(unsigned long)time(NULL));
+  {
+    long	now;
+    now = time(NULL);
+    str_p += loc_snprintf(str_p, bounds_p - str_p, "%ld: ", now);
+  }
 #endif /* LOG_TIME_NUMBER */
 #if HAVE_CTIME
 #if LOG_CTIME_STRING
@@ -400,6 +538,15 @@ void	_dmalloc_vmessage(const char *format, va_list args)
 #if LOG_ITERATION
   /* add the iteration number */
   str_p += loc_snprintf(str_p, bounds_p - str_p, "%lu: ", _dmalloc_iter_c);
+#endif
+#if LOG_PID && HAVE_GETPID
+  {
+    /* we make it long in case it's big and we hope it will promote if not */
+    long	our_pid = getpid();
+    
+    /* add the pid to the log file */
+    str_p += loc_snprintf(str_p, bounds_p - str_p, "p%ld: ", our_pid);
+  }
 #endif
   
   /*
@@ -422,16 +569,16 @@ void	_dmalloc_vmessage(const char *format, va_list args)
     *str_p++ = '\n';
     *str_p = '\0';
   }
-  len = str_p - str;
+  len = str_p - message_str;
   
   /* do we need to write the message to the logfile */
   if (dmalloc_logpath != NULL) {
-    (void)write(outfile_fd, str, len);
+    (void)write(outfile_fd, message_str, len);
   }
   
   /* do we need to print the message? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
-    (void)write(STDERR, str, len);
+    (void)write(STDERR, message_str, len);
   }
 }
 
@@ -452,7 +599,8 @@ void	_dmalloc_vmessage(const char *format, va_list args)
  */
 void	_dmalloc_die(const int silent_b)
 {
-  char	str[1024], *stop_str;
+  char	*stop_str;
+  int	len;
   
   if (! silent_b) {
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)) {
@@ -463,14 +611,15 @@ void	_dmalloc_die(const int silent_b)
     }
     
     /* print a message that we are going down */
-    (void)loc_snprintf(str, sizeof(str),
+    len = loc_snprintf(error_str, sizeof(error_str),
 		       "debug-malloc library: %s program, fatal error\r\n",
 		       stop_str);
-    (void)write(STDERR, str, strlen(str));
+    (void)write(STDERR, error_str, len);
     if (dmalloc_errno != ERROR_NONE) {
-      (void)loc_snprintf(str, sizeof(str), "   Error: %s (err %d)\r\n",
+      len = loc_snprintf(error_str, sizeof(error_str),
+			 "   Error: %s (err %d)\r\n",
 			 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
-      (void)write(STDERR, str, strlen(str));
+      (void)write(STDERR, error_str, len);
     }
   }
   
