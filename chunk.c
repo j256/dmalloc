@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.69 1994/02/18 04:09:48 gray Exp $";
+  "$Id: chunk.c,v 1.70 1994/03/30 19:37:17 gray Exp $";
 #endif
 
 /*
@@ -393,7 +393,7 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
 LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
 {
   bblock_t	*bblockp, *prevp;
-  bblock_t	*bestp = NULL, *best_prevp;
+  bblock_t	*bestp = NULL, *best_prevp = NULL;
   int		bitc, pos, bitn, best = 0;
   bblock_adm_t	*admp;
   
