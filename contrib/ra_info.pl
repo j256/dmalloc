@@ -20,7 +20,7 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: ra_info.pl,v 1.6 2000/03/21 20:13:02 gray Exp $
+# $Id: ra_info.pl,v 1.7 2000/11/20 17:44:06 gray Exp $
 #
 
 #
@@ -55,6 +55,7 @@ printf (gdb "echo \\n\n");
 
 # load in the shared libraries
 printf (gdb "sharedlibrary\n");
+printf (gdb "add-shared-symbol-files\n");
 
 while ( <malloc> ) {
   $count = 0;
