@@ -1,19 +1,16 @@
 /*
  * program that handles the dmalloc variables.
  *
- * Copyright 1995 by Gray Watson
+ * Copyright 1999 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * NON-COMMERCIAL purpose and without fee is hereby granted, provided
- * that the above copyright notice and this permission notice appear
- * in all copies, and that the name of Gray Watson not be used in
- * advertising or publicity pertaining to distribution of the document
- * or software without specific, written prior permission.
- *
- * Please see the PERMISSIONS file or contact the author for information
- * about commercial licenses.
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -21,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.84 1999/03/04 16:32:40 gray Exp $
+ * $Id: dmalloc.c,v 1.85 1999/03/04 19:13:09 gray Exp $
  */
 
 /*
@@ -62,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.84 1999/03/04 16:32:40 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.85 1999/03/04 19:13:09 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.84 1999/03/04 16:32:40 gray Exp $";
+  "$Id: dmalloc.c,v 1.85 1999/03/04 19:13:09 gray Exp $";
 #endif
 #endif
 
