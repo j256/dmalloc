@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.64 1998/09/17 13:18:28 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.65 1998/09/18 19:23:55 gray Exp $";
 #endif
 
 /* external routines */
@@ -166,6 +166,7 @@ static	void	*get_address(void)
 static	int	do_random(const int iter_n)
 {
   int		iter_c, last, amount, max = max_alloc, flags, free_c;
+  char		*chunk_p;
   pnt_info_t	*free_p, *used_p = NULL;
   pnt_info_t	*pnt_p, *last_p, *this_p;
   
@@ -237,26 +238,15 @@ static	int	do_random(const int iter_n)
 #endif
       
       if (flags & DEBUG_ALLOW_NONLINEAR) {
-	which = RANDOM_VALUE(10);
+	which = RANDOM_VALUE(16);
       }
       else {
-	which = RANDOM_VALUE(9);
+	which = RANDOM_VALUE(15);
       }
       
       switch (which) {
-
-      case 0: case 1: case 2:
-	pnt_p = free_p;
-	pnt_p->pi_pnt = calloc(amount, sizeof(char));
 	
-	if (verbose_b) {
-	  (void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
-		       iter_c + 1, amount, max, pnt_p - pointer_grid,
-		       (long)pnt_p->pi_pnt);
-	}
-	break;
-
-      case 3: case 4: case 5:
+      case 0: case 1: case 2:
 	pnt_p = free_p;
 	pnt_p->pi_pnt = malloc(amount);
 	
@@ -267,6 +257,32 @@ static	int	do_random(const int iter_n)
 	}
 	break;
 	
+      case 3: case 4: case 5:
+	pnt_p = free_p;
+	pnt_p->pi_pnt = calloc(amount, sizeof(char));
+	
+	if (verbose_b) {
+	  (void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
+		       iter_c + 1, amount, max, pnt_p - pointer_grid,
+		       (long)pnt_p->pi_pnt);
+	}
+	
+	/* test the returned block to make sure that is has been cleared */
+	if (pnt_p->pi_pnt != NULL) {
+	  for (chunk_p = pnt_p->pi_pnt;
+	       chunk_p < (char *)pnt_p->pi_pnt + amount;
+	       chunk_p++) {
+	    if (*chunk_p != '\0') {
+	      if (! silent_b) {
+		(void)printf("calloc of %d was not fully zeroed on iteration #%d\n",
+			     amount, iter_c + 1);
+	      }
+	      break;
+	    }
+	  }
+	}
+	break;
+
       case 6: case 7: case 8:
 	if (free_c == max_pointers) {
 	  continue;
@@ -282,12 +298,58 @@ static	int	do_random(const int iter_n)
 	
 	if (verbose_b) {
 	  (void)printf("%d: realloc %d from %d of max %d slot %d.  got %#lx\n",
-		       iter_c + 1, pnt_p->pi_size, amount, max,
+		       iter_c + 1, amount, pnt_p->pi_size, max,
 		       pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
 	}
 	break;
 	
-      default:
+      case 9: case 10: case 11:
+	if (free_c == max_pointers) {
+	  continue;
+	}
+	
+	which = RANDOM_VALUE(max_pointers - free_c);
+	for (pnt_p = used_p; which > 0; which--) {
+	  pnt_p = pnt_p->pi_next;
+	}
+	
+	pnt_p->pi_pnt = recalloc(pnt_p->pi_pnt, amount);
+	max += pnt_p->pi_size;
+	
+	if (verbose_b) {
+	  (void)printf("%d: recalloc %d from %d of max %d slot %d.  got %#lx\n",
+		       iter_c + 1, pnt_p->pi_size, amount, max,
+		       pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
+	}
+	
+	/* test the returned block to make sure that is has been cleared */
+	if (pnt_p->pi_pnt != NULL && amount > pnt_p->pi_size) {
+	  for (chunk_p = (char *)pnt_p->pi_pnt + pnt_p->pi_size;
+	       chunk_p < (char *)pnt_p->pi_pnt + amount;
+	       chunk_p++) {
+	    if (*chunk_p != '\0') {
+	      if (! silent_b) {
+		(void)printf("recalloc %d from %d was not fully zeroed on iteration #%d\n",
+			     amount, pnt_p->pi_size, iter_c + 1);
+	      }
+	      break;
+	    }
+	  }
+	}
+	break;
+	
+      case 12: case 13: case 14:
+	pnt_p = free_p;
+	pnt_p->pi_pnt = valloc(amount);
+	
+	if (verbose_b) {
+	  (void)printf("%d: valloc %d of max %d into slot %d.  got %#lx\n",
+		       iter_c + 1, amount, max, pnt_p - pointer_grid,
+		       (long)pnt_p->pi_pnt);
+	}
+	break;
+	
+      case 15:
 #if HAVE_SBRK
 	{
 	  void	*mem;
@@ -300,10 +362,10 @@ static	int	do_random(const int iter_n)
 	  pnt_p = NULL;
 	}
 	break;
-#else
-	iter_c++;
-	continue;
 #endif
+	
+      default:
+	break;
       }
       
       if (pnt_p != NULL) {
@@ -351,7 +413,8 @@ static	int	do_random(const int iter_n)
     pnt_p->pi_pnt = NULL;
     
     /* find pnt in the used list */
-    for (this_p = used_p, last_p = NULL; this_p != NULL;
+    for (this_p = used_p, last_p = NULL;
+	 this_p != NULL;
 	 last_p = this_p, this_p = this_p->pi_next) {
       if (this_p == pnt_p) {
 	break;
@@ -401,6 +464,8 @@ static	int	check_special(void)
     (void)printf("The following tests will generate errors:\n");
   }
   
+  /********************/
+
   if (! silent_b) {
     (void)printf("  Trying to realloc a 0L pointer.\n");
   }
@@ -426,6 +491,8 @@ static	int	check_special(void)
   }
 #endif
   
+  /********************/
+
   if (! silent_b) {
     (void)printf("  Trying to free 0L pointer.\n");
   }
@@ -443,6 +510,8 @@ static	int	check_special(void)
   }
 #endif
   
+  /********************/
+
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
   }
@@ -456,6 +525,8 @@ static	int	check_special(void)
     }
     free(pnt);
   }
+  
+  /********************/
   
   if (dmalloc_errno == ERROR_NONE) {
     ret = 1;
@@ -504,9 +575,8 @@ static	void	do_interactive(void)
       (void)printf("\tmalloc    - allocate memory\n");
       (void)printf("\tcalloc    - allocate/clear memory\n");
       (void)printf("\trealloc   - reallocate memory\n");
-#if HAVE_STRDUP
+      (void)printf("\tvalloc    - allocate page-aligned memory\n");
       (void)printf("\tstrdup    - allocate a string\n");
-#endif
       (void)printf("\tfree      - deallocate memory\n\n");
       
       (void)printf("\tmap       - map the heap to the logfile\n");
@@ -572,7 +642,18 @@ static	void	do_interactive(void)
       continue;
     }
     
-#if HAVE_STRDUP
+    if (strncmp(line, "valloc", len) == 0) {
+      int	size;
+      
+      (void)printf("How much to valloc: ");
+      if (fgets(line, sizeof(line), stdin) == NULL) {
+	break;
+      }
+      size = atoi(line);
+      (void)printf("valloc(%d) returned '%#lx'\n", size, (long)valloc(size));
+      continue;
+    }
+    
     if (strncmp(line, "strdup", len) == 0) {
       (void)printf("Enter a string to strdup: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
@@ -581,7 +662,6 @@ static	void	do_interactive(void)
       (void)printf("strdup returned '%#lx'\n", (long)strdup(line));
       continue;
     }
-#endif
     
     if (strncmp(line, "free", len) == 0) {
       pnt = get_address();
@@ -734,8 +814,9 @@ int	main(int argc, char **argv)
   }
   
   /* don't allow silent dumps */
-  if (! no_special_b
-      && (! (silent_b && (dmalloc_debug_current() & DEBUG_ERROR_ABORT)))) {
+  if ((! no_special_b)
+      && (! (silent_b
+	     && (dmalloc_debug_current() & DEBUG_ERROR_ABORT)))) {
     if (! silent_b) {
       (void)printf("Running special tests...\n");
     }
