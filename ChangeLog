@@ -1,3 +1,13 @@
+Fri Mar 31 16:51:52 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Added some messages about upcoming errors in dmalloc_t.
+
+Thu Mar 23 10:34:33 1995  Gray Watson  (gray@burger.letters.com)
+
+	* Improved the manual a bit.  Phased in some alpha changes.
+
+	* Added some Next notes to the contrib directory.  Need more.
+
 Fri Mar 10 13:29:49 1995  Gray Watson  (gray@burger.letters.com)
 
 	* Added allow-zero token for not minding malloc(0) and free(0L).
@@ -926,5 +936,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.140 1995/03/10 19:43:15 gray Exp $
+$Id: ChangeLog,v 1.141 1995/03/31 21:52:25 gray Exp $
 -------------------------------------------------------------------------------

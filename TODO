@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.26 1995/03/03 17:37:43 gray Exp $
+$Id: TODO,v 1.27 1995/03/31 21:52:28 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -14,32 +14,34 @@ HEAP OPERATIONS:
 - when the last element in a dblock is freed, the block should be freed.
 	- presents problems with maintaining the dblock-admin slots
 	- probably requires a new pointer admin tree
+- have the ability of limiting the size of the heap
+	- simulate heap boundary
+	- do number of bytes (maybe take k,K,m,M extensions)
+	- have start do number of bytes also?
 
 -------------------------------------------------------------------------------
 
 NEW HEAP ADMIN:
-	- need skip-list module to maintain 2 trees:
-		- bblocks: stores block info, allows free-joining
-			- key: pnt
-			- data:
-				- flag (free/dblock/bblock)
-				- size:
-					- free: # bblocks
-					- dblocks: # bits / # used in block
-					- bblock: # bytes allocated
-				- next-> (can we combine with something else?)
-		- allocations: file, line, size
-			- key: pnt
-			- data:
-				- (char *)file/ret-addr (or next->)
-				- (short)line-number (0 if ret-addr)
-				- (short)size: # dblock-bytes/bblocks
-				- [pointer to bblock to go faster, ifdef]
-				- [iteration # when allocated]
-				- [iteration # when last touched]
-				- [time when allocated]
-				- [time when last touched]
-				- [memory crc to track changes, need ~MD5]
+	- need a list of block-ids:
+		- flag/size (bblock/free/dblock/external/unused)
+			- combine with size?
+			- 1... = bblock # bytes allocated (max alloc = 2gb)
+			- 01... = free # bblocks till used block
+			- 00... = where ... > 1 = dblock # bits/# used
+			- external == 00...1 (all zeros then a 1)
+			- unused == 00...0 (all zeros)
+	- need to search on pnt to find allocations: file, line, size
+		- key: pnt
+		- data:
+			- (char *)file/ret-addr (or next->)
+			- (short)line-number (0 if ret-addr)
+			- (short)size: # dblock-bytes/bblocks
+			- [pointer to bblock to go faster, ifdef]
+			- [iteration # when allocated]
+			- [iteration # when last touched]
+			- [time when allocated]
+			- [time when last touched]
+			- [memory crc to track changes, need ~MD5]
 
 	- time could be global or elapsed
 		- always save start-time and dump it on shutdown if LOG_STAMP
