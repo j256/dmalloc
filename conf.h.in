@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.42 1995/05/05 15:42:27 gray Exp $
+ * $Id: conf.h.in,v 1.43 1995/05/05 16:51:35 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -139,29 +139,44 @@
 #define LOG_ITERATION_COUNT 1
 
 /*
- * Store the number of times a pointer is allocated or freed.  NOTE:
- * This creates a certain amount of memory overhead.
+ * Store the number of times a pointer is seen being allocated or
+ * freed -- it shows up as a s# (for seen) in the logfile.  NOTE: This
+ * creates a certain amount of memory overhead.
  */
 #define STORE_POINTER_COUNT 1
 
 /*
- * Store the interation count or when a pointer is allocated [or
- * freed].  This is to give you some idea when during program
- * execution, a pointer was allocated but not freed.  NOTE: This
- * creates a certain amount of memory overhead.
+ * Store the interation count or when a pointer is allocated -- it
+ * shows up as a i# (for iteration) in the logfile.  This is to give
+ * you some idea when during program execution, a pointer was
+ * allocated but not freed.  NOTE: This creates a certain amount of
+ * memory overhead.
  */
 #define STORE_ITERATION_COUNT 1
 
 /*
  * Store the current OR elapsed time (only one of them should be
  * activated) in seconds (from the time() routine) when a pointer is
- * allocated [or freed].  This is to give you some idea when a pointer
- * was allocated but not freed.  The library will log the starting and
- * the ending time if either of these flags is set.  NOTE: This
- * creates a certain amount of memory overhead.
+ * allocated -- it shows up as a w# (for when) in the logfile.  This
+ * is to give you some idea when a pointer was allocated but not
+ * freed.  The library will log the starting and the ending time if
+ * either of these flags is set.  NOTE: This creates a certain amount
+ * of memory overhead.
  */
 #define STORE_CURRENT_TIME 1
 #define STORE_ELAPSED_TIME 0
+
+/*
+ * For those systems that have threaded programs, this logs the thread
+ * ID that allocated the pointer -- it shows up as a t# (for
+ * thread-id) in the logfile.
+ *
+ * NOTE: You may have to change the GET_THREAD_ID macro which is
+ * supposed to return the thread-id integer to be stored in the
+ * pointer structures.
+ */
+#define STORE_THREAD_ID 0
+#define GET_THREAD_ID		gettid()
 
 /*
  ************************************************************************
