@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.47 1998/09/18 19:10:50 gray Exp $
+ * $Id: chunk_loc.h,v 1.48 1998/09/28 21:36:38 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -140,7 +140,7 @@
 #define BBLOCK_DBLOCK_ADMIN	0x0010		/* pointing to dblock admin */
 #define BBLOCK_FREE		0x0020		/* block is free */
 #define BBLOCK_EXTERNAL		0x0040		/* externally used block */
-#define BBLOCK_ADMIN_FREE	0x0080		/* ba_freen pnt to free slot */
+#define BBLOCK_ADMIN_FREE	0x0080		/* ba_free_n pnt to free slot */
 #define BBLOCK_STRING		0x0100		/* block is a string (unused)*/
 #define BBLOCK_VALLOC		0x0200		/* block is aligned alloc */
 
@@ -229,7 +229,7 @@ typedef struct dblock_st	dblock_t;
  * simplify the code and the comments at the end show when the field
  * is used.  For instance, bb_bit_n (really bb_nums.nu_bit_n) is in use
  * when the pointer is tracking user divided-block allocations or when
- * the pointer is free.  The bb_freen field is used when the block is
+ * the pointer is free.  The bb_free_n field is used when the block is
  * full of admin structures such as this.  Yes, the library uses this
  * structure to track another block full of these structures.  Yikes!
  */
@@ -246,8 +246,8 @@ struct bblock_st {
 #define bb_line		bb_nums.nu_line		/* User-bblock */
   
   union {
-    unsigned long	in_freen;		/* admin free number */
-    unsigned long	in_posn;		/* admin block position */
+    unsigned long	in_free_n;		/* admin free number */
+    unsigned long	in_pos_n;		/* admin block position */
     unsigned long	in_block_n;		/* number of blocks */
     unsigned long	in_size;		/* size of allocation */
     /* NOTE: this pointer and the longs may be of a different type */
@@ -255,8 +255,8 @@ struct bblock_st {
   } bb_info;
   
   /* to reference union elements as bb elements */
-#define bb_freen	bb_info.in_freen	/* BBlock-admin-free */
-#define	bb_posn		bb_info.in_posn		/* BBlock-admin */
+#define bb_free_n	bb_info.in_free_n	/* BBlock-admin-free */
+#define	bb_pos_n		bb_info.in_pos_n		/* BBlock-admin */
 #define	bb_block_n	bb_info.in_block_n	/* Free */
 #define	bb_size		bb_info.in_size		/* User-bblock */
 #define	bb_dblock	bb_info.in_dblock	/* User-dblock */
@@ -287,7 +287,7 @@ typedef struct bblock_st	bblock_t;
  */
 struct bblock_adm_st {
   long			ba_magic1;		/* bottom magic number */
-  unsigned int		ba_posn;		/* position in bblock array */
+  unsigned int		ba_pos_n;		/* position in bblock array */
   bblock_t		ba_blocks[BB_PER_ADMIN]; /* bblock admin info */
   struct bblock_adm_st	*ba_next;		/* next bblock adm struct */
   long			ba_magic2;		/* top magic number */
