@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.63 1997/12/22 00:32:00 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.64 1998/09/17 13:18:28 gray Exp $";
 #endif
 
 /* external routines */
@@ -170,7 +170,7 @@ static	int	do_random(const int iter_n)
   pnt_info_t	*pnt_p, *last_p, *this_p;
   
   dmalloc_errno = ERROR_NONE;
-  last = 0;
+  last = ERROR_NONE;
   flags = dmalloc_debug_current();
   
   pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
@@ -696,7 +696,20 @@ int	main(int argc, char **argv)
   
   /* repeat until we get a non 0 seed */
   while (seed_random == 0) {
-    seed_random = time(0) ^ 0xDEABEEF;
+#ifdef HAVE_TIME
+#ifdef HAVE_GETPID
+    seed_random = time(0) ^ getpid();
+#else /* ! HAVE_GETPID */
+    seed_random = time(0) ^ 0xDEADBEEF;
+#endif /* ! HAVE_GETPID */
+#else /* ! HAVE_TIME */
+#ifdef HAVE_GETPID
+    seed_random = getpid();
+#else /* ! HAVE_GETPID */
+    /* okay, I give up */
+    seed_random = 0xDEADBEEF;
+#endif /* ! HAVE_GETPID */
+#endif /* ! HAVE_TIME */
   }
   (void)srand(seed_random);
   
