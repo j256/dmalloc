@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.35 1994/02/20 05:40:33 gray Exp $
+# $Id: Makefile.all.in,v 1.36 1994/02/28 02:34:37 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -23,7 +23,7 @@ LIBRARY	= libmalloc_dbg.a
 UTIL = malloc_dbg
 INFOFILE = malloc.info
 
-CCFLAGS = -g @CCDEFS@
+CCFLAGS = -g
 LDFLAGS = -g
 
 INSTALL = @INSTALL@
