@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.94 2003/10/01 16:00:10 gray Exp $
+ * $Id: conf.h.in,v 1.95 2004/01/31 16:20:40 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -221,45 +221,37 @@
 #define HAVE_MEMALIGN 0
 #define HAVE_VALLOC 0
 
-#define HAVE_MEMCMP 0
-#define HAVE_MEMCPY 0
-#define HAVE_MEMSET 0
+/* various functions for arg checking and/or internal use */
 
-#define HAVE_STRCHR 0
-#define HAVE_STRRCHR 0
-
-#define HAVE_STRLEN 0
-#define HAVE_STRCMP 0
-#define HAVE_STRCPY 0
-#define HAVE_STRSEP 0
-
-/* for argv files */
-#define HAVE_STRNCMP 0
-#define HAVE_STRNCPY 0
-
-/*
- * The below functions are here to provide function argument checking
- * only.  The library only has stubs for these and does not use them
- * internally.
- */
+#define HAVE_ATOI 0
+#define HAVE_ATOL 0
 #define HAVE_BCMP 0
 #define HAVE_BCOPY 0
 #define HAVE_BZERO 0
-
+#define HAVE_INDEX 0
 #define HAVE_MEMCCPY 0
 #define HAVE_MEMCHR 0
-
-#define HAVE_INDEX 0
+#define HAVE_MEMCMP 0
+#define HAVE_MEMCPY 0
+#define HAVE_MEMMOVE 0
+#define HAVE_MEMSET 0
 #define HAVE_RINDEX 0
 #define HAVE_STRCASECMP 0
-#define HAVE_STRNCASECMP 0
-
 #define HAVE_STRCAT 0
-#define HAVE_STRDUP 0
-#define HAVE_STRSPN 0
+#define HAVE_STRCHR 0
+#define HAVE_STRCMP 0
+#define HAVE_STRCPY 0
 #define HAVE_STRCSPN 0
+#define HAVE_STRDUP 0
+#define HAVE_STRLEN 0
+#define HAVE_STRNCASECMP 0
 #define HAVE_STRNCAT 0
+#define HAVE_STRNCMP 0
+#define HAVE_STRNCPY 0
 #define HAVE_STRPBRK 0
+#define HAVE_STRRCHR 0
+#define HAVE_STRSEP 0
+#define HAVE_STRSPN 0
 #define HAVE_STRSTR 0
 #define HAVE_STRTOK 0
 

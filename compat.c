@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.54 2003/05/15 02:42:15 gray Exp $
+ * $Id: compat.c,v 1.55 2004/01/31 16:19:47 gray Exp $
  */
 
 /*
@@ -39,6 +39,78 @@
 
 #include "compat.h"
 #include "dmalloc_loc.h"
+
+#if HAVE_ATOI == 0
+/*
+ * Turn a ascii-string into an integer which is returned
+ */
+int	atoi(const char *str)
+{
+  const char	*str_p;
+  int		sign = 1, result = 0;
+  
+  /* skip opening white space */
+  for (str_p = str; *str_p == ' ' || *str_p == '\t'; str_p++) {
+  }
+  
+  /* handle sign */
+  if (*str_p == '-') {
+    sign = -1;
+    str_p++;
+  }
+  else if (*str_p == '+') {
+    /* sign is already 1 */
+    str_p++;
+  }
+  
+  /* skip more white space */
+  for (; *str_p == ' ' || *str_p == '\t'; str_p++) {
+  }
+  
+  /* now add up all digits */
+  for (; *str_p >= '0' && *str_p <= '9'; str_p++) {
+    result = result * 10 + *str_p - '0';
+  }
+  
+  return result * sign;
+}
+#endif /* HAVE_ATOI == 0 */
+
+#if HAVE_ATOL == 0
+/*
+ * Turn a ascii-string into an integer which is returned
+ */
+long	atol(const char *str)
+{
+  const char	*str_p;
+  long		sign = 1, result = 0;
+  
+  /* skip opening white space */
+  for (str_p = str; *str_p == ' ' || *str_p == '\t'; str_p++) {
+  }
+  
+  /* handle sign */
+  if (*str_p == '-') {
+    sign = -1;
+    str_p++;
+  }
+  else if (*str_p == '+') {
+    /* sign is already 1 */
+    str_p++;
+  }
+  
+  /* skip more white space */
+  for (; *str_p == ' ' || *str_p == '\t'; str_p++) {
+  }
+  
+  /* now add up all digits */
+  for (; *str_p >= '0' && *str_p <= '9'; str_p++) {
+    result = result * (long)10 + (long)(*str_p - '0');
+  }
+  
+  return result * sign;
+}
+#endif /* HAVE_ATOL == 0 */
 
 /*
  * Local vsnprintf which handles the buffer-size or not.  Returns the
@@ -84,11 +156,69 @@ int	loc_snprintf(char *buf, const int buf_size, const char *format, ...)
   return len;
 }
 
+#if HAVE_MEMCMP == 0
+/*
+ * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
+ */
+int	memcmp(const void *str1, const void *str2, DMALLOC_SIZE len)
+{
+  const unsigned char	*str1_p, *str2_p;
+  
+  for (str1_p = str1, str2_p = str2; len > 0; len--, str1_p++, str2_p++) {
+    if (*str1_p != *str2_p) {
+      return *str1_p - *str2_p;
+    }
+  }
+  
+  return 0;
+}
+#endif /* HAVE_MEMCMP == 0 */
+
 #if HAVE_MEMCPY == 0
 /*
  * Copy LEN characters from SRC to DEST
  */
 void	*memcpy(void *dest, const void *src, DMALLOC_SIZE len)
+{
+  unsigned char		*dest_p;
+  const	unsigned char	*src_p;
+  int			byte_c;
+  
+  if (len <= 0) {
+    return;
+  }
+  
+  /*
+   * NOTE: should we check to make sure that it's not overlapped but
+   * there may be times where people want this, albeit bizarre,
+   * behavior.
+   */
+  
+  src_p = src;
+  dest_p = dest;
+  
+  if (src_p <= dest_p && src_p + (len - 1) >= dest_p) {
+    /* overlap, must copy right-to-left. */
+    src_p += len - 1;
+    dest_p += len - 1;
+    for (byte_c = 0; byte_c < len; byte_c++) {
+      *dest_p-- = *src_p--;
+    }
+  } else {
+    for (byte_c = 0; byte_c < len; byte_c++) {
+      *dest_p++ = *src_p++;
+    }
+  }
+  
+  return dest;
+}
+#endif /* HAVE_MEMCPY == 0 */
+
+#if HAVE_MEMMOVE == 0
+/*
+ * Copy LEN characters from SRC to DEST
+ */
+void	*memmove(void *dest, const void *src, DMALLOC_SIZE len)
 {
   unsigned char		*dest_p;
   const	unsigned char	*src_p;
@@ -116,25 +246,7 @@ void	*memcpy(void *dest, const void *src, DMALLOC_SIZE len)
   
   return dest;
 }
-#endif /* HAVE_MEMCPY == 0 */
-
-#if HAVE_MEMCMP == 0
-/*
- * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
- */
-int	memcmp(const void *str1, const void *str2, DMALLOC_SIZE len)
-{
-  const unsigned char	*str1_p, *str2_p;
-  
-  for (str1_p = str1, str2_p = str2; len > 0; len--, str1_p++, str2_p++) {
-    if (*str1_p != *str2_p) {
-      return *str1_p - *str2_p;
-    }
-  }
-  
-  return 0;
-}
-#endif /* HAVE_MEMCMP == 0 */
+#endif /* HAVE_MEMMOVE == 0 */
 
 #if HAVE_MEMSET == 0
 /*
@@ -175,28 +287,34 @@ char	*strchr(const char *str, const int ch)
 }
 #endif /* HAVE_STRCHR == 0 */
 
-#if HAVE_STRRCHR == 0
+#if HAVE_STRCMP == 0
 /*
- * Find CH in STR by searching backwards through the string
+ * Returns -1,0,1 on whether STR1 is <,==,> STR2
  */
-char	*strrchr(const char *str, const int ch)
+int	strcmp(const char *str1, const char *str2)
 {
-  const char	*str_p, *pnt = NULL;
-  
-  for (str_p = str; *str_p != '\0'; str_p++) {
-    if (*str_p == (char)ch) {
-      pnt = str_p;
-    }
+  for (; *str1 != '\0' && *str1 == *str2; str1++, str2++) {
   }
-  
-  if (ch == '\0') {
-    return (char *)str_p;
-  }
-  else {
-    return (char *)pnt_p;
-  }
+  return *str1 - *str2;
 }
-#endif /* HAVE_STRRCHR == 0 */
+#endif /* HAVE_STRCMP == 0 */
+
+#if HAVE_STRCPY == 0
+/*
+ * Copies STR2 to STR1.  Returns STR1.
+ */
+char	*strcpy(char *str1, const char *str2)
+{
+  char	*str_p;
+  
+  for (str_p = str1; *str2 != '\0'; str_p++, str2++) {
+    *str_p = *str2;
+  }
+  *str_p = '\0';
+  
+  return str1;
+}
+#endif /* HAVE_STRCPY == 0 */
 
 #if HAVE_STRLEN == 0
 /*
@@ -212,18 +330,6 @@ int	strlen(const char *str)
   return len;
 }
 #endif /* HAVE_STRLEN == 0 */
-
-#if HAVE_STRCMP == 0
-/*
- * Returns -1,0,1 on whether STR1 is <,==,> STR2
- */
-int	strcmp(const char *str1, const char *str2)
-{
-  for (; *str1 != '\0' && *str1 == *str2; str1++, str2++) {
-  }
-  return *str1 - *str2;
-}
-#endif /* HAVE_STRCMP == 0 */
 
 #if HAVE_STRNCMP == 0
 /*
@@ -243,23 +349,6 @@ int	strncmp(const char *str1, const char *str2, const int len)
   return 0;
 }
 #endif /* HAVE_STRNCMP == 0 */
-
-#if HAVE_STRCPY == 0
-/*
- * Copies STR2 to STR1.  Returns STR1.
- */
-char	*strcpy(char *str1, const char *str2)
-{
-  char	*str_p;
-  
-  for (str_p = str1; *str2 != '\0'; str_p++, str2++) {
-    *str_p = *str2;
-  }
-  *str_p = '\0';
-  
-  return str1;
-}
-#endif /* HAVE_STRCPY == 0 */
 
 #if HAVE_STRNCPY == 0
 /*
@@ -283,6 +372,29 @@ char	*strncpy(char *str1, const char *str2, const int len)
   return str1;
 }
 #endif /* HAVE_STRNCPY == 0 */
+
+#if HAVE_STRRCHR == 0
+/*
+ * Find CH in STR by searching backwards through the string
+ */
+char	*strrchr(const char *str, const int ch)
+{
+  const char	*str_p, *pnt = NULL;
+  
+  for (str_p = str; *str_p != '\0'; str_p++) {
+    if (*str_p == (char)ch) {
+      pnt = str_p;
+    }
+  }
+  
+  if (ch == '\0') {
+    return (char *)str_p;
+  }
+  else {
+    return (char *)pnt_p;
+  }
+}
+#endif /* HAVE_STRRCHR == 0 */
 
 #if HAVE_STRSEP == 0
 /*
