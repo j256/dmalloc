@@ -1,3 +1,15 @@
+Wed May 11 12:02:31 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed problem with never-reuse going on/off and check-lists.
+
+	* Added -r (random-debug) option to malloc_t which causes it to
+	constantly change the malloc-debug flags while testing.
+
+	* Fixed VERY nasty bug in realloc with alloc-blank and no
+	realloc-copy token.
+
+	* Fixed problem with ANSI-C configure on AIX systems.
+
 Fri Apr  8 13:51:39 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Fixed some race conditions with sbrk failure.
@@ -696,5 +708,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.102 1994/04/08 17:53:07 gray Exp $
+$Id: ChangeLog,v 1.103 1994/05/11 19:32:38 gray Exp $
 -------------------------------------------------------------------------------

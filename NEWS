@@ -1,9 +1,13 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.25 1994/04/08 17:53:12 gray Exp $
+$Id: NEWS,v 1.26 1994/05/11 19:32:41 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 2.0.2:
+Version 2.1.0:
 
+	* Fixed problem with never-reuse going on/off and check-lists.
+	* Added -r (random-debug) option to malloc_t.
+	* Fixed nasty bug in realloc with alloc-blank + no realloc-copy token.
+	* Fixed problem with ANSI-C configure on AIX systems.
 	* Fixed some race conditions with sbrk failure.
 	* Added -p max-pointers argument to malloc_t.
 	* Added 'log-nonfree-space' token for logging unfreed memory space.
