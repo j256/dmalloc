@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: settings.dist,v 1.24 1998/09/29 13:43:23 gray Exp $
+ * $Id: settings.dist,v 1.25 1998/10/08 15:06:03 gray Exp $
  */
 
 /*
@@ -269,6 +269,15 @@
 #endif
 
 #if LOCK_THREADS
+
+/*
+ * Which threads library header to include when needed.  It is assumed
+ * that the types and functions in the THREAD_TYPE and THREAD_GET_ID
+ * macros below are defined in this include file.  In addition, the
+ * thread mutex init, lock, and unlock functions in malloc.c should
+ * also be prototyped here.
+ */
+#define THREAD_INCLUDE			<pthread.h>
 
 /*
  * As we approach the time when we start mutex locking the library, we
