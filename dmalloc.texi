@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.54 1994/09/08 14:07:02 gray Exp $
+@c $Id: dmalloc.texi,v 1.55 1994/09/12 17:14:59 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -863,7 +863,7 @@ allocating or freeing by the library.
 This variable hold the argument to the @code{dmalloc_address} variable.
 If it is set to a greater than 0 value then after the library has seen
 the @code{dmalloc_address} address this many times, it will call
-@code{_dmalloc_error()}.
+@code{dmalloc_error()}.
 
 @item void dmalloc_shutdown(void);
 @cindex dmalloc_shutdown function
@@ -1006,11 +1006,11 @@ process while maintaining the effectiveness of the debugging.
 @item
 If you want to @emph{totally} disable the dmalloc library then you will
 need to recompile all the C files that include @file{dmalloc.h} while
-defining @code{DMALLOC_DEBUG_DISABLE}.  This will cause the dmalloc leap
+defining @code{DMALLOC_DISABLE}.  This will cause the dmalloc leap
 macros to not be applied @xref{Allocation Macros}.
 
 @example
-gcc -O -g -DMALLOC_DEBUG_DISABLE main.c
+gcc -O -g -DMALLOC_DISABLE main.c
 @end example
 
 @item
@@ -1020,9 +1020,9 @@ enabled.
 
 @item
 Now you are ready to relink with a new library.  If you have not
-compiled all your source with @code{DMALLOC_DEBUG_DISABLED} defined then
-you need to include the @file{dmalloc_lp.o} file on the link line.  You
-need to keep and eye out for multiple definition errors from your linker
+compiled all your source with @code{DMALLOC_DISABLED} defined then you
+need to include the @file{dmalloc_lp.o} file on the link line.  You need
+to keep and eye out for multiple definition errors from your linker
 since @file{dmalloc_lp.o} has hooks to various functions such as
 @code{dmalloc_verify()}.
 
@@ -1030,8 +1030,8 @@ since @file{dmalloc_lp.o} has hooks to various functions such as
 gcc -O -g main.o dmalloc_lp.o -L/usr/local/lib -lgmalloc
 @end example
 
-If you have disabled dmalloc with the @code{DMALLOC_DEBUG_DISABLED} flag
-or never included
+If you have disabled dmalloc with the @code{DMALLOC_DISABLED} flag or
+never included
 @iftex
 @*
 @end iftex
@@ -1076,14 +1076,14 @@ is recommended.  Csh/tcsh users (for example) should put the following
 in their @file{.cshrc} file:
 
 @example
-alias dmalloc 'eval `dmalloc \!*`'
+alias dmalloc 'eval `\dmalloc -C \!*`'
 @end example
 
 Zsh users on the other hand should put the following in their
 @file{.zshrc} file:
 
 @example
-dmalloc() @{ eval `dmalloc -b $*` @}
+dmalloc() @{ eval `command dmalloc -b $*` @}
 @end example
 
 This allows the user to execute @code{dmalloc args}.
@@ -1309,7 +1309,7 @@ way, the library can log some helpful diagnostic information to the
 log-file.
 
 When running your program in a debugger (I use the @emph{excellent} GNU
-debugger gdb), put a break-point in @code{_dmalloc_error()} which is the
+debugger gdb), put a break-point in @code{dmalloc_error()} which is the
 internal error routine for the library.  The program will then stop
 there as soon as a memory problem is detected.
 
@@ -1325,9 +1325,9 @@ there as soon as a memory problem is detected.
 @cindex diagnosing errors
 
 Load your program (which should have the dmalloc library in it) with a
-debugger and set a break-point at _dmalloc_error.  Run the program.  If
-the program stops in the _dmalloc_error() function, this indicates that
-there was a problem.
+debugger and set a break-point at @code{dmalloc_error()}.  Run the
+program.  If the program stops in the @code{dmalloc_error()} function,
+this indicates that there was a problem.
 
 There could be a problem with the arguments of the malloc call (asking
 for negative number of bytes, trying to realloc a non-heap pointer,
