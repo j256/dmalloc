@@ -38,7 +38,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.1 1997/11/05 16:27:18 gray Exp $";
+  "$Id: dmalloc_argv.c,v 1.2 1997/12/07 23:20:10 gray Exp $";
 #endif
 
 /* internal routines */
@@ -93,13 +93,15 @@ static	int	global_lasttog	= GLOBAL_LASTTOG_DISABLE; /*last-arg toggling*/
  */
 static	void	argv_startup(void)
 {
-  if (enabled)
+  if (enabled) {
     return;
+  }
   enabled = ARGV_TRUE;
   
   /* ANSI says we cannot predefine this above */
-  if (argv_error_stream == ERROR_STREAM_INIT)
+  if (argv_error_stream == ERROR_STREAM_INIT) {
     argv_error_stream = stderr;
+  }
 }
 
 /***************************** general utilities *****************************/
@@ -151,19 +153,23 @@ static	int	htoi(const char *str)
   for (; isspace(*str); str++);
   
   /* skip a leading 0[xX] */
-  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X'))
+  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) {
     str += 2;
+  }
   
   for (; isdigit(*str) ||
        (*str >= 'a' && *str <= 'f') || (*str >= 'A' && *str <= 'F');
        str++) {
     ret *= 16;
-    if (*str >= 'a' && *str <= 'f')
+    if (*str >= 'a' && *str <= 'f') {
       ret += *str - 'a' + 10;
-    else if (*str >= 'A' && *str <= 'F')
+    }
+    else if (*str >= 'A' && *str <= 'F') {
       ret += *str - 'A' + 10;
-    else
+    }
+    else {
       ret += *str - '0';
+    }
   }
   
   return ret;
@@ -181,17 +187,20 @@ static	char	*string_copy(const char *ptr)
   len = strlen(ptr);
   ret = (char *)malloc(len + 1);
   if (ret == NULL) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: memory error during argument processing\n",
 		    argv_program);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return NULL;
   }
   
-  for (ptr_p = ptr, ret_p = ret; *ptr_p != '\0';)
+  for (ptr_p = ptr, ret_p = ret; *ptr_p != '\0';) {
     *ret_p++ = *ptr_p++;
+  }
   *ret_p = '\0';
   
   return ret;
@@ -212,36 +221,42 @@ static	char	**vectorize(char *str, const char *tok, int *tokn)
   
   /* count the tokens */
   tmp = string_copy(str);
-  if (tmp == NULL)
+  if (tmp == NULL) {
     return NULL;
+  }
   
   tok_p = strtok(tmp, tok);
-  for (tok_c = 0; tok_p != NULL; tok_c++)
+  for (tok_c = 0; tok_p != NULL; tok_c++) {
     tok_p = strtok(NULL, tok);
+  }
   free(tmp);
   
   *tokn = tok_c;
   
-  if (tok_c == 0)
+  if (tok_c == 0) {
     return NULL;
+  }
   
   /* allocate the pointer grid */
   vect_p = (char **)malloc(sizeof(char *) * tok_c);
   if (vect_p == NULL) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: memory error during argument processing\n",
 		    argv_program);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return NULL;
   }
   
   /* load the tokens into the list */
   vect_p[0] = strtok(str, tok);
   
-  for (tok_c = 1; tok_c < *tokn; tok_c++)
+  for (tok_c = 1; tok_c < *tokn; tok_c++) {
     vect_p[tok_c] = strtok(NULL, tok);
+  }
   
   return vect_p;
 }
@@ -261,32 +276,38 @@ static	char	*expand_buf(const void *buf, const int size)
     char	*spec_p;
     
     /* handle special chars */
-    if (out_p + 2 >= out + sizeof(out))
+    if (out_p + 2 >= out + sizeof(out)) {
       break;
+    }
     
     /* search for special characters */
-    for (spec_p = SPECIAL_CHARS + 1; *(spec_p - 1) != '\0'; spec_p += 2)
-      if (*spec_p == *(char *)buf_p)
+    for (spec_p = SPECIAL_CHARS + 1; *(spec_p - 1) != '\0'; spec_p += 2) {
+      if (*spec_p == *(char *)buf_p) {
 	break;
+      }
+    }
     
     /* did we find one? */
     if (*(spec_p - 1) != '\0') {
-      if (out_p + 2 >= out + sizeof(out))
+      if (out_p + 2 >= out + sizeof(out)) {
 	break;
+      }
       (void)sprintf(out_p, "\\%c", *(spec_p - 1));
       out_p += 2;
       continue;
     }
     
     if (*(unsigned char *)buf_p < 128 && isprint(*(char *)buf_p)) {
-      if (out_p + 1 >= out + sizeof(out))
+      if (out_p + 1 >= out + sizeof(out)) {
 	break;
+      }
       *out_p = *(char *)buf_p;
       out_p += 1;
     }
     else {
-      if (out_p + 4 >= out + sizeof(out))
+      if (out_p + 4 >= out + sizeof(out)) {
 	break;
+      }
       (void)sprintf(out_p, "\\%03o", *(unsigned char *)buf_p);
       out_p += 4;
     }
@@ -307,8 +328,9 @@ static	void	usage_short(const argv_t *args, const int flag)
   int		len, col_c = 0;
   char		mark = ARGV_FALSE, *prefix;
   
-  if (argv_error_stream == NULL)
+  if (argv_error_stream == NULL) {
     return;
+  }
   
   /* print the usage message header */
   (void)fprintf(argv_error_stream, "%s%s", USAGE_LABEL, argv_program);
@@ -322,16 +344,19 @@ static	void	usage_short(const argv_t *args, const int flag)
     
     /* skip or-specifiers */
     if (arg_p->ar_short_arg == ARGV_OR
-	|| arg_p->ar_short_arg == ARGV_XOR)
+	|| arg_p->ar_short_arg == ARGV_XOR) {
       continue;
+    }
     
     /* skip non booleans */
-    if (HAS_ARG(arg_p->ar_type))
+    if (HAS_ARG(arg_p->ar_type)) {
       continue;
+    }
     
     /* skip args with no short component */
-    if (arg_p->ar_short_arg == '\0')
+    if (arg_p->ar_short_arg == '\0') {
       continue;
+    }
     
     if (! mark) {
       len = 2 + SHORT_PREFIX_LENGTH;
@@ -383,12 +408,14 @@ static	void	usage_short(const argv_t *args, const int flag)
     
     /* skip or-specifiers */
     if (arg_p->ar_short_arg == ARGV_OR
-	|| arg_p->ar_short_arg == ARGV_XOR)
+	|| arg_p->ar_short_arg == ARGV_XOR) {
       continue;
+    }
     
     /* skip booleans types */
-    if (! HAS_ARG(arg_p->ar_type))
+    if (! HAS_ARG(arg_p->ar_type)) {
       continue;
+    }
     
     if (arg_p->ar_var_label == NULL) {
       if (ARGV_TYPE(arg_p->ar_type) == ARGV_BOOL_ARG) {
@@ -463,11 +490,12 @@ static	void	usage_short(const argv_t *args, const int flag)
   
   (void)fprintf(argv_error_stream, "\n");
   
-  if (flag == GLOBAL_USAGE_SHORTREM)
+  if (flag == GLOBAL_USAGE_SHORTREM) {
     (void)fprintf(argv_error_stream,
 		  "%*.*sUse the '%s%s' argument for more assistance.\n",
 		  (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
 		  LONG_PREFIX, USAGE_ARG);
+  }
 }
 
 /*
@@ -478,10 +506,12 @@ static	void	display_arg(FILE *stream, const argv_t *arg_p, const int max,
 {
   int	var_len, len;
   
-  if (arg_p->ar_var_label == NULL)
+  if (arg_p->ar_var_label == NULL) {
     var_len = 0;
-  else
+  }
+  else {
     var_len = strlen(arg_p->ar_var_label);
+  }
   
   switch (ARGV_TYPE(arg_p->ar_type)) {
     
@@ -529,8 +559,9 @@ static	void	display_arg(FILE *stream, const argv_t *arg_p, const int max,
  */
 static	void	display_option(FILE *stream, const argv_t *arg_p, int *col_c)
 {
-  if (stream == NULL)
+  if (stream == NULL) {
     return;
+  }
   
   (void)fputc('[', stream);
   (*col_c)++;
@@ -561,8 +592,9 @@ static	void	usage_long(const argv_t *args)
   const argv_t	*arg_p;
   int		col_c, len;
   
-  if (argv_error_stream == NULL)
+  if (argv_error_stream == NULL) {
     return;
+  }
   
   /* print the usage message header */
   (void)fprintf(argv_error_stream, "%s%s\n", USAGE_LABEL, argv_program);
@@ -571,8 +603,9 @@ static	void	usage_long(const argv_t *args)
   for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
     
     /* skip or specifiers */
-    if (arg_p->ar_short_arg == ARGV_OR || arg_p->ar_short_arg == ARGV_XOR)
+    if (arg_p->ar_short_arg == ARGV_OR || arg_p->ar_short_arg == ARGV_XOR) {
       continue;
+    }
     
     /* indent to the short-option col_c */
     (void)fprintf(argv_error_stream, "%*.*s", SHORT_COLUMN, SHORT_COLUMN, "");
@@ -586,12 +619,16 @@ static	void	usage_long(const argv_t *args)
       col_c++;
     }
     else {
-      if (arg_p->ar_short_arg == '\0')
+      if (arg_p->ar_short_arg == '\0') {
 	;
-      else if (arg_p->ar_short_arg == ARGV_MAND)
+      }
+      else if (arg_p->ar_short_arg == ARGV_MAND) {
 	display_arg(argv_error_stream, arg_p, COMMENT_COLUMN, &col_c);
-      else /* ARGV_MAYBE handled here */
+      }
+      else {
+	/* ARGV_MAYBE handled here */
 	display_option(argv_error_stream, arg_p, &col_c);
+      }
       
       /* put the long-option message on the correct column */
       if (col_c < LONG_COLUMN) {
@@ -651,18 +688,22 @@ static	void	usage_long(const argv_t *args)
  */
 static	void	do_usage(const argv_t *args, const int flag)
 {
-  if (argv_error_stream == NULL)
+  if (argv_error_stream == NULL) {
     return;
+  }
   
-  if (flag == GLOBAL_USAGE_SEE)
+  if (flag == GLOBAL_USAGE_SEE) {
     (void)fprintf(argv_error_stream,
 		  "%*.*sUse the '%s%s' argument for assistance.\n",
 		  (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
 		  LONG_PREFIX, USAGE_ARG);
-  else if (flag == GLOBAL_USAGE_SHORT || flag == GLOBAL_USAGE_SHORTREM)
+  }
+  else if (flag == GLOBAL_USAGE_SHORT || flag == GLOBAL_USAGE_SHORTREM) {
     usage_short(args, flag);
-  else if (flag == GLOBAL_USAGE_LONG || flag == GLOBAL_USAGE_ALL)
+  }
+  else if (flag == GLOBAL_USAGE_LONG || flag == GLOBAL_USAGE_ALL) {
     usage_long(args);
+  }
   
   if (flag == GLOBAL_USAGE_ALL) {
     (void)fprintf(argv_error_stream, "\n");
@@ -717,77 +758,91 @@ static	int	preprocess_array(argv_t *args, const int num_args)
     /* do we have a mandatory-array? */
     if (arg_p->ar_short_arg == ARGV_MAND) {
       if (mand_array) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, no ARGV_MAND's can follow a MAND or MAYBE array\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       if (maybe_field) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, no ARGV_MAND's can follow a ARGV_MAYBE\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       
 #if 0
       if (arg_p->ar_long_arg != NULL) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, ARGV_MAND's should not have long-options\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
 #endif
       
-      if (arg_p->ar_type & ARGV_ARRAY)
+      if (arg_p->ar_type & ARGV_FLAG_ARRAY) {
 	mand_array = ARGV_TRUE;
+      }
     }
     
     /* do we have a maybe field? */
     if (arg_p->ar_short_arg == ARGV_MAYBE) {
       if (mand_array) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, no ARGV_MAYBE's can follow a MAND or MAYBE array\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       
       maybe_field = ARGV_TRUE;
-      if (arg_p->ar_type & ARGV_ARRAY)
+      if (arg_p->ar_type & ARGV_FLAG_ARRAY) {
 	mand_array = ARGV_TRUE;
+      }
     }
     
     /* handle initializing the argument array */
-    if (arg_p->ar_type & ARGV_ARRAY) {
+    if (arg_p->ar_type & ARGV_FLAG_ARRAY) {
       argv_array_t	*arrp = (argv_array_t *)arg_p->ar_variable;
       
       if (! HAS_ARG(arg_p->ar_type)) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, cannot have an array of boolean values\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       if (ARGV_TYPE(arg_p->ar_type) == ARGV_INCR) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, cannot have an array of incremental values\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       arrp->aa_entry_n = 0;
@@ -796,12 +851,14 @@ static	int	preprocess_array(argv_t *args, const int num_args)
 #if 0
     /* must have a valid ar_short_arg */
     if (arg_p->ar_short_arg == '\0') {
-      if (argv_error_stream != NULL)
+      if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: %s, short-option character is '\\0'\n",
 		      argv_program, INTERNAL_ERROR_NAME);
-      if (argv_interactive)
+      }
+      if (argv_interactive) {
 	(void)exit(EXIT_CODE);
+      }
       return ERROR;
     }
 #endif
@@ -810,12 +867,14 @@ static	int	preprocess_array(argv_t *args, const int num_args)
     if (arg_p->ar_variable == NULL
 	&& arg_p->ar_short_arg != ARGV_OR
 	&& arg_p->ar_short_arg != ARGV_XOR) {
-      if (argv_error_stream != NULL)
+      if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: %s, NULL variable specified in arg array\n",
 		      argv_program, INTERNAL_ERROR_NAME);
-      if (argv_interactive)
+      }
+      if (argv_interactive) {
 	(void)exit(EXIT_CODE);
+      }
       return ERROR;
     }
     
@@ -825,24 +884,28 @@ static	int	preprocess_array(argv_t *args, const int num_args)
       
       /* that they are not at the start or end of list */
       if (arg_p == args || arg_p >= (args + num_args - 1)) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, ARGV_[X]OR entries cannot be at start or end of array\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       
       /* that two aren't next to each other */
       if ((arg_p - 1)->ar_short_arg == ARGV_OR
 	  || (arg_p - 1)->ar_short_arg == ARGV_XOR) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, two ARGV_[X]OR entries cannot be next to each other\n",
 			argv_program, INTERNAL_ERROR_NAME);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
     }
@@ -856,11 +919,11 @@ static	int	preprocess_array(argv_t *args, const int num_args)
  * Returns [NO]ERROR.
  */
 static	int	translate_value(const char *arg, ARGV_PNT var,
-				const short type)
+				const unsigned int type)
 {
   argv_array_t	*arr_p;
   argv_type_t	*type_p;
-  int		val_type = ARGV_TYPE(type), size = 0;
+  unsigned int	val_type = ARGV_TYPE(type), size = 0;
   
   /* find the type and the size for array */
   for (type_p = argv_types; type_p->at_value != 0; type_p++) {
@@ -871,29 +934,34 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
   }
   
   if (type_p->at_value == 0) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream, "%s: illegal variable type %d\n",
 		    __FILE__, val_type);
+    }
     return ERROR;
   }
   
-  if (type & ARGV_ARRAY) {
+  if (type & ARGV_FLAG_ARRAY) {
     arr_p = (argv_array_t *)var;
     
-    if (arr_p->aa_entry_n == 0)
+    if (arr_p->aa_entry_n == 0) {
       arr_p->aa_entries = (char *)malloc(ARRAY_INCR *size);
-    else if (arr_p->aa_entry_n % ARRAY_INCR == 0)
+    }
+    else if (arr_p->aa_entry_n % ARRAY_INCR == 0) {
       arr_p->aa_entries =
 	(char *)realloc(arr_p->aa_entries, (arr_p->aa_entry_n + ARRAY_INCR) *
 			size);
+    }
     
     if (arr_p->aa_entries == NULL) {
-      if (argv_error_stream != NULL)
+      if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: memory error during argument processing\n",
 		      argv_program);
-      if (argv_interactive)
+      }
+      if (argv_interactive) {
 	(void)exit(EXIT_CODE);
+      }
       return ERROR;
     }
     
@@ -906,8 +974,9 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
     
   case ARGV_BOOL:
     /* if no close argument, set to true */
-    if (arg == NULL)
+    if (arg == NULL) {
       *(char *)var = ARGV_TRUE;
+    }
     else if (*(char *)arg == 't' || *(char *)arg == 'T'
 	     || *(char *)arg == 'y' || *(char *)arg == 'Y'
 	     || *(char *)arg == '1') {
@@ -920,8 +989,9 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
     
   case ARGV_BOOL_NEG:
     /* if no close argument, set to false */
-    if (arg == NULL)
+    if (arg == NULL) {
       *(char *)var = ARGV_FALSE;
+    }
     else if (*(char *)arg == 't' || *(char *)arg == 'T'
 	     || *(char *)arg == 'y' || *(char *)arg == 'Y'
 	     || *(char *)arg == '1') {
@@ -949,8 +1019,9 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
     
   case ARGV_CHAR_P:
     *(char **)var = string_copy((char *)arg);
-    if (*(char **)var == NULL)
+    if (*(char **)var == NULL) {
       return ERROR;
+    }
     break;
     
   case ARGV_SHORT:
@@ -999,10 +1070,12 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
     
   case ARGV_INCR:
     /* if no close argument then increment else set the value */
-    if (arg == NULL)
+    if (arg == NULL) {
       (*(int *)var)++;
-    else
+    }
+    else {
       *(int *)var = atoi(arg);
+    }
     break;
     
   case ARGV_SIZE:
@@ -1016,14 +1089,18 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
 	   *arg_p == ' ' || *arg_p == '-' || *arg_p == '+'
 	     || (*arg_p >= '0' && *arg_p <= '9');
 	   arg_p++);
-      if (*arg_p == 'b' || *arg_p == 'B')
+      if (*arg_p == 'b' || *arg_p == 'B') {
 	val *= 1;
-      else if (*arg_p == 'k' || *arg_p == 'B')
+      }
+      else if (*arg_p == 'k' || *arg_p == 'B') {
 	val *= 1024;
-      else if (*arg_p == 'm' || *arg_p == 'M')
+      }
+      else if (*arg_p == 'm' || *arg_p == 'M') {
 	val *= 1024 * 1024;
-      else if (*arg_p == 'g' || *arg_p == 'G')
+      }
+      else if (*arg_p == 'g' || *arg_p == 'G') {
 	val *= 1024 * 1024 * 1024;
+      }
       *(long *)var = val;
     }
     break;
@@ -1039,14 +1116,18 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
 	   *arg_p == ' ' || *arg_p == '-' || *arg_p == '+'
 	     || (*arg_p >= '0' && *arg_p <= '9');
 	   arg_p++);
-      if (*arg_p == 'b' || *arg_p == 'B')
+      if (*arg_p == 'b' || *arg_p == 'B') {
 	val *= 1;
-      else if (*arg_p == 'k' || *arg_p == 'B')
+      }
+      else if (*arg_p == 'k' || *arg_p == 'B') {
 	val *= 1024;
-      else if (*arg_p == 'm' || *arg_p == 'M')
+      }
+      else if (*arg_p == 'm' || *arg_p == 'M') {
 	val *= 1024 * 1024;
-      else if (*arg_p == 'g' || *arg_p == 'G')
+      }
+      else if (*arg_p == 'g' || *arg_p == 'G') {
 	val *= 1024 * 1024 * 1024;
+      }
       *(unsigned long *)var = val;
     }
     break;
@@ -1058,7 +1139,7 @@ static	int	translate_value(const char *arg, ARGV_PNT var,
 /*
  * Translate value from VAR into string STR depending on its TYPE.
  */
-static	void	display_value(const ARGV_PNT var, const short type)
+static	void	display_value(const ARGV_PNT var, const unsigned int type)
 {
   int	val_type = ARGV_TYPE(type);
   
@@ -1068,10 +1149,12 @@ static	void	display_value(const ARGV_PNT var, const short type)
   case ARGV_BOOL:
   case ARGV_BOOL_NEG:
   case ARGV_BOOL_ARG:
-    if (*(char *)var)
+    if (*(char *)var) {
       (void)fprintf(argv_error_stream, "ARGV_TRUE");
-    else
+    }
+    else {
       (void)fprintf(argv_error_stream, "ARGV_FALSE");
+    }
     break;
     
   case ARGV_CHAR:
@@ -1081,8 +1164,9 @@ static	void	display_value(const ARGV_PNT var, const short type)
   case ARGV_CHAR_P:
     {
       int	len;
-      if (*(char **)var == NULL)
+      if (*(char **)var == NULL) {
 	(void)fprintf(argv_error_stream, "(null)");
+      }
       else {
 	len = strlen(*(char **)var);
 	(void)fprintf(argv_error_stream, "\"%s\"",
@@ -1139,8 +1223,9 @@ static	void	display_value(const ARGV_PNT var, const short type)
 	  int	bit = *(int *)var & (1 << bit_c);
 	  
 	  if (bit == 0) {
-	    if (first)
+	    if (first) {
 	      (void)fputc('0', argv_error_stream);
+	    }
 	  }
 	  else {
 	    (void)fputc('1', argv_error_stream);
@@ -1225,8 +1310,9 @@ static	void	display_variables(const argv_t *args)
     int		col_c, val_type = ARGV_TYPE(arg_p->ar_type);
     
     /* skip or specifiers */
-    if (arg_p->ar_short_arg == ARGV_OR || arg_p->ar_short_arg == ARGV_XOR)
+    if (arg_p->ar_short_arg == ARGV_OR || arg_p->ar_short_arg == ARGV_XOR) {
       continue;
+    }
     
     col_c = 0;
     if (arg_p->ar_short_arg == '\0') {
@@ -1243,8 +1329,9 @@ static	void	display_variables(const argv_t *args)
 					  (int)strlen(arg_p->ar_long_arg));
       }
     }
-    else if (arg_p->ar_short_arg == ARGV_MAND)
+    else if (arg_p->ar_short_arg == ARGV_MAND) {
       display_arg(argv_error_stream, arg_p, COMMENT_COLUMN, &col_c);
+    }
     else /* ARGV_MAYBE handled here */
       display_option(argv_error_stream, arg_p, &col_c);
     
@@ -1265,7 +1352,7 @@ static	void	display_variables(const argv_t *args)
 	tlen = strlen(type_p->at_name);
 	(void)fprintf(argv_error_stream, " %-.*s", len, type_p->at_name);
 	col_c += MIN(len, tlen);
-	if (arg_p->ar_type & ARGV_ARRAY) {
+	if (arg_p->ar_type & ARGV_FLAG_ARRAY) {
 	  (void)fprintf(argv_error_stream, "%s", ARRAY_LABEL);
 	  col_c += sizeof(ARRAY_LABEL) - 1;
 	}
@@ -1279,7 +1366,7 @@ static	void	display_variables(const argv_t *args)
       col_c = COMMENT_COLUMN;
     }
     
-    if (arg_p->ar_type & ARGV_ARRAY) {
+    if (arg_p->ar_type & ARGV_FLAG_ARRAY) {
       argv_array_t	*arr_p;
       int		entry_c, size = 0;
       
@@ -1292,13 +1379,15 @@ static	void	display_variables(const argv_t *args)
       size = type_p->at_size;
       arr_p = (argv_array_t *)arg_p->ar_variable;
       
-      if (arr_p->aa_entry_n == 0)
+      if (arr_p->aa_entry_n == 0) {
 	(void)fprintf(argv_error_stream, "no entries");
+      }
       else {
 	for (entry_c = 0; entry_c < arr_p->aa_entry_n; entry_c++) {
 	  ARGV_PNT	var;
-	  if (entry_c > 0)
+	  if (entry_c > 0) {
 	    (void)fputc(',', argv_error_stream);
+	  }
 	  var = (char *)(arr_p->aa_entries) + entry_c * size;
 	  display_value(var, val_type);
 	}
@@ -1324,8 +1413,9 @@ static	int	check_or(const argv_t *args, const argv_t *which)
   /* check ORs below */
   for (arg_p = which - 2; arg_p >= args; arg_p -= 2) {
     if ((arg_p + 1)->ar_short_arg != ARGV_OR
-	&& (arg_p + 1)->ar_short_arg != ARGV_XOR)
+	&& (arg_p + 1)->ar_short_arg != ARGV_XOR) {
       break;
+    }
     if (arg_p->ar_type & ARGV_FLAG_USED) {
       match_p = arg_p;
       break;
@@ -1340,8 +1430,9 @@ static	int	check_or(const argv_t *args, const argv_t *which)
 	 && (arg_p - 1)->ar_short_arg != ARGV_LAST;
 	 arg_p += 2) {
       if ((arg_p - 1)->ar_short_arg != ARGV_OR
-	  && (arg_p - 1)->ar_short_arg != ARGV_XOR)
+	  && (arg_p - 1)->ar_short_arg != ARGV_XOR) {
 	break;
+      }
       if (arg_p->ar_type & ARGV_FLAG_USED) {
 	match_p = arg_p;
 	break;
@@ -1350,11 +1441,13 @@ static	int	check_or(const argv_t *args, const argv_t *which)
   }
   
   /* did we not find a problem? */
-  if (match_p == NULL)
+  if (match_p == NULL) {
     return NOERROR;
+  }
   
-  if (argv_error_stream == NULL)
+  if (argv_error_stream == NULL) {
     return ERROR;
+  }
   
   (void)fprintf(argv_error_stream,
 		"%s: %s, specify only one of the following:\n",
@@ -1363,17 +1456,20 @@ static	int	check_or(const argv_t *args, const argv_t *which)
   /* little hack to print the one that matched and the one we were checking */
   for (;;) {
     if (match_p->ar_long_arg == NULL) {
-      (void)fprintf(argv_error_stream, "     %s%c\n",
+      (void)fprintf(argv_error_stream, "%*.*s%s%c\n",
+		    (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
 		    SHORT_PREFIX, match_p->ar_short_arg);
     }
     else {
-      (void)fprintf(argv_error_stream, "     %s%c (%s%s)\n",
+      (void)fprintf(argv_error_stream, "%*.*s%s%c (%s%s)\n",
+		    (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
 		    SHORT_PREFIX, match_p->ar_short_arg,
 		    LONG_PREFIX, match_p->ar_long_arg);
     }
     
-    if (match_p == which)
+    if (match_p == which) {
       break;
+    }
     match_p = which;
   }
   
@@ -1392,8 +1488,9 @@ static	int	check_xor(const argv_t *args)
   for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
     
     /* only check the XORs */
-    if (arg_p->ar_short_arg != ARGV_XOR)
+    if (arg_p->ar_short_arg != ARGV_XOR) {
       continue;
+    }
     
     start_p = arg_p;
     
@@ -1401,31 +1498,37 @@ static	int	check_xor(const argv_t *args)
      * NOTE: we are guaranteed that we are on a XOR so there is
      * something below and above...
      */
-    if ((arg_p - 1)->ar_type & ARGV_FLAG_USED)
+    if ((arg_p - 1)->ar_type & ARGV_FLAG_USED) {
       start_p = NULL;
+    }
     
     /* run through all XORs */
     for (;;) {
       arg_p++;
-      if (arg_p->ar_type & ARGV_FLAG_USED)
+      if (arg_p->ar_type & ARGV_FLAG_USED) {
 	start_p = NULL;
-      if ((arg_p + 1)->ar_short_arg != ARGV_XOR)
+      }
+      if ((arg_p + 1)->ar_short_arg != ARGV_XOR) {
 	break;
+      }
       arg_p++;
     }
     
     /* were none of the xor's filled? */
-    if (start_p != NULL)
+    if (start_p != NULL) {
       break;
+    }
   }
   
   /* did we not find a problem? */
-  if (start_p == NULL)
+  if (start_p == NULL) {
     return NOERROR;
+  }
   
   /* arg_p points to the first XOR which failed */
-  if (argv_error_stream == NULL)
+  if (argv_error_stream == NULL) {
     return ERROR;
+  }
   
   (void)fprintf(argv_error_stream, "%s: %s, must specify one of:\n",
 		argv_program, USAGE_ERROR_NAME);
@@ -1435,15 +1538,18 @@ static	int	check_xor(const argv_t *args)
      * NOTE: we are guaranteed that we are on a XOR so there is
      * something below and above...
      */
-    (void)fprintf(argv_error_stream, "     %s%c",
+    (void)fprintf(argv_error_stream, "%*.*s%s%c",
+		  (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
 		  SHORT_PREFIX, (arg_p - 1)->ar_short_arg);
-    if ((arg_p - 1)->ar_long_arg != NULL)
+    if ((arg_p - 1)->ar_long_arg != NULL) {
       (void)fprintf(argv_error_stream, " (%s%s)",
 		    LONG_PREFIX, (arg_p - 1)->ar_long_arg);
+    }
     (void)fprintf(argv_error_stream, "\n");
     
-    if (arg_p->ar_short_arg != ARGV_XOR)
+    if (arg_p->ar_short_arg != ARGV_XOR) {
       break;
+    }
   }
   
   return ERROR;
@@ -1455,24 +1561,48 @@ static	int	check_xor(const argv_t *args)
 static	int	check_mand(const argv_t *args)
 {
   const argv_t	*arg_p;
-  int		slot_c = 0;
+  int		mand_c = 0, flag_c = 0;
   
   /* see if there are any mandatory args left */
-  for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++)
+  for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
     if (arg_p->ar_short_arg == ARGV_MAND
-	&& (! (arg_p->ar_type & ARGV_FLAG_USED)))
-      slot_c++;
-  
-  if (slot_c > 0) {
-    if (argv_error_stream != NULL)
-      (void)fprintf(argv_error_stream,
-		    "%s: %s, %d more mandatory argument%s must be specified\n",
-		    argv_program, USAGE_ERROR_NAME,
-		    slot_c, (slot_c == 1 ? "" : "s"));
-    return ERROR;
+	&& (! (arg_p->ar_type & ARGV_FLAG_USED))) {
+      mand_c++;
+    }
+    if (arg_p->ar_type & ARGV_FLAG_MAND
+	&& (! (arg_p->ar_type & ARGV_FLAG_USED))) {
+      flag_c++;
+      if (argv_error_stream != NULL) {
+	if (flag_c == 1) {
+	  (void)fprintf(argv_error_stream,
+			"%s: %s, these mandatory flags must be specified:\n",
+			argv_program, USAGE_ERROR_NAME);
+	}
+	(void)fprintf(argv_error_stream, "%*.*s%s%c",
+		      (int)USAGE_LABEL_LENGTH, (int)USAGE_LABEL_LENGTH, "",
+		      SHORT_PREFIX, arg_p->ar_short_arg);
+	if ((arg_p - 1)->ar_long_arg != NULL) {
+	  (void)fprintf(argv_error_stream, " (%s%s)",
+			LONG_PREFIX, arg_p->ar_long_arg);
+	}
+	(void)fprintf(argv_error_stream, "\n");
+      }
+    }
   }
   
-  return NOERROR;
+  if (mand_c > 0 && argv_error_stream != NULL) {
+    (void)fprintf(argv_error_stream,
+		  "%s: %s, %d more mandatory argument%s must be specified\n",
+		  argv_program, USAGE_ERROR_NAME,
+		  mand_c, (mand_c == 1 ? "" : "s"));
+  }
+  
+  if (mand_c > 0 || flag_c > 0) {
+    return ERROR;
+  }
+  else {
+    return NOERROR;
+  }
 }
 
 /*
@@ -1484,11 +1614,12 @@ static	int	check_opt(void)
   
   queue_c = QUEUE_COUNT();
   if (queue_c > 0) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: %s, %d more option-argument%s must be specified\n",
 		    argv_program, USAGE_ERROR_NAME,
 		    queue_c, (queue_c == 1 ? "" : "s"));
+    }
     return ERROR;
   }
   
@@ -1512,12 +1643,14 @@ static	void	file_args(const char *path, argv_t *grid, char *okay_p)
   infile = fopen(path, "r");
   if (infile == NULL) {
     *okay_p = ARGV_FALSE;
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: could not load command-line arguments from: %s\n",
 		    argv_program, path);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return;
   }
   
@@ -1528,12 +1661,14 @@ static	void	file_args(const char *path, argv_t *grid, char *okay_p)
   if (argv == NULL) {
     *okay_p = ARGV_FALSE;
     (void)fclose(infile);
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: memory error during argument processing\n",
 		    argv_program);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return;
   }
   argv_p = argv;
@@ -1558,12 +1693,14 @@ static	void	file_args(const char *path, argv_t *grid, char *okay_p)
       if (argv == NULL) {
 	*okay_p = ARGV_FALSE;
 	(void)fclose(infile);
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: memory error during argument processing\n",
 			argv_program);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return;
       }
       argv_p = argv + argc;
@@ -1574,8 +1711,9 @@ static	void	file_args(const char *path, argv_t *grid, char *okay_p)
   do_list(grid, argc, argv, okay_p);
   
   /* now free up the list */
-  for (argv_p = argv; argv_p < argv + argc; argv_p++)
+  for (argv_p = argv; argv_p < argv + argc; argv_p++) {
     free(*argv_p);
+  }
   free(argv);
   
   (void)fclose(infile);
@@ -1594,13 +1732,14 @@ static	void	do_arg(argv_t *grid, argv_t *match_p, const char *close_p,
      * NOTE: should this be a warning or a non-error altogether?
      */
     if (match_p->ar_type & ARGV_FLAG_USED
-	&& (! (match_p->ar_type & ARGV_ARRAY))
+	&& (! (match_p->ar_type & ARGV_FLAG_ARRAY))
 	&& ARGV_TYPE(match_p->ar_type) != ARGV_INCR) {
-      if (argv_error_stream != NULL)
+      if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: %s, you've already specified the '%c' argument\n",
 		      argv_program, USAGE_ERROR_NAME,
 		      match_p->ar_short_arg);
+      }
       *okay_p = ARGV_FALSE;
     }
   }
@@ -1624,18 +1763,21 @@ static	void	do_arg(argv_t *grid, argv_t *match_p, const char *close_p,
    */
   if (global_close == GLOBAL_CLOSE_ENABLE && close_p != NULL) {
     if (translate_value(close_p, match_p->ar_variable,
-			match_p->ar_type) != NOERROR)
+			match_p->ar_type) != NOERROR) {
       *okay_p = ARGV_FALSE;
+    }
   }
   else if (! HAS_ARG(match_p->ar_type)) {
     if (translate_value(NULL, match_p->ar_variable,
-			match_p->ar_type) != NOERROR)
+			match_p->ar_type) != NOERROR) {
       *okay_p = ARGV_FALSE;
+    }
   }
   else if (global_close == GLOBAL_CLOSE_ENABLE && close_p != NULL) {
     if (translate_value(close_p, match_p->ar_variable,
-			match_p->ar_type) != NOERROR)
+			match_p->ar_type) != NOERROR) {
       *okay_p = ARGV_FALSE;
+    }
   }
   else {
     QUEUE_ENQUEUE(match_p);
@@ -1695,10 +1837,11 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
       
       /* we need more than the prefix */
       if (len <= 0) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, empty long-option prefix '%s'\n",
 			argv_program, USAGE_ERROR_NAME, *arg_p);
+	}
 	*okay_p = ARGV_FALSE;
 	continue;
       }
@@ -1707,17 +1850,19 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
       
       /* run though long options looking for a match */
       for (grid_p = grid; grid_p->ar_short_arg != ARGV_LAST; grid_p++) {
-	if (grid_p->ar_long_arg == NULL)
+	if (grid_p->ar_long_arg == NULL) {
 	  continue;
+	}
 	
 	if (strncmp(*arg_p + LONG_PREFIX_LENGTH,
 		    grid_p->ar_long_arg, len) == 0) {
 	  if (match_p != NULL) {
-	    if (argv_error_stream != NULL)
+	    if (argv_error_stream != NULL) {
 	      (void)fprintf(argv_error_stream,
 			    "%s: %s, '%s' might be '%s' or '%s'\n",
 			    argv_program, USAGE_ERROR_NAME, *arg_p,
 			    grid_p->ar_long_arg, match_p->ar_long_arg);
+	    }
 	    *okay_p = ARGV_FALSE;
 	    break;
 	  }
@@ -1730,8 +1875,9 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
       }
       
       /* if we found a match but quit then we must have found two matches */
-      if (match_p != NULL && grid_p->ar_short_arg != ARGV_LAST)
+      if (match_p != NULL && grid_p->ar_short_arg != ARGV_LAST) {
 	continue;
+      }
       
       if (match_p != NULL) {
 	(void)do_arg(grid, match_p, close_p, okay_p);
@@ -1832,17 +1978,19 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
       /* check for display arguments value */
       if (strncmp(DISPLAY_ARG, *arg_p + LONG_PREFIX_LENGTH, len) == 0) {
 	if (argv_interactive) {
-	  if (argv_error_stream != NULL)
+	  if (argv_error_stream != NULL) {
 	    display_variables(grid);
+	  }
 	  (void)exit(0);
 	}
 	continue;
       }
       
-      if (argv_error_stream != NULL)
+      if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: %s, unknown long option '%s'.\n",
 		      argv_program, USAGE_ERROR_NAME, *arg_p);
+      }
       *okay_p = ARGV_FALSE;
       continue;
     }
@@ -1871,10 +2019,11 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
       
       /* we need more than the prefix */
       if (len <= 0) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: %s, empty short-option prefix '%s'\n",
 			argv_program, USAGE_ERROR_NAME, *arg_p);
+	}
 	*okay_p = ARGV_FALSE;
 	continue;
       }
@@ -1883,9 +2032,12 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
       for (char_c = 0; char_c < len; char_c++) {
 	
 	/* run through the arg list looking for a match */
-	for (match_p = grid; match_p->ar_short_arg != ARGV_LAST; match_p++)
-	  if (match_p->ar_short_arg == (*arg_p)[SHORT_PREFIX_LENGTH + char_c])
+	for (match_p = grid; match_p->ar_short_arg != ARGV_LAST; match_p++) {
+	  if (match_p->ar_short_arg ==
+	      (*arg_p)[SHORT_PREFIX_LENGTH + char_c]) {
 	    break;
+	  }
+	}
 	
 	/* did we not find argument? */
 	if (match_p->ar_short_arg == ARGV_LAST) {
@@ -1900,11 +2052,12 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
 	  }
 	  
 	  /* create an error string */
-	  if (argv_error_stream != NULL)
+	  if (argv_error_stream != NULL) {
 	    (void)fprintf(argv_error_stream,
 			  "%s: %s, unknown short option '%s%c'.\n",
 			  argv_program, USAGE_ERROR_NAME, SHORT_PREFIX,
 			  (*arg_p)[SHORT_PREFIX_LENGTH + char_c]);
+	  }
 	  *okay_p = ARGV_FALSE;
 	  continue;
 	}
@@ -1919,42 +2072,50 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
     if (grid->ar_short_arg != ARGV_LAST && QUEUE_COUNT() > 0) {
       QUEUE_DEQUEUE(match_p);
       /* HACK: is this the file argument */
-      if (match_p == NULL)
-	file_args(close_p, grid, okay_p);
+      if (match_p == NULL) {
+	file_args(*arg_p, grid, okay_p);
+      }
       else {
 	if (translate_value(*arg_p, match_p->ar_variable,
-			    match_p->ar_type) != NOERROR)
+			    match_p->ar_type) != NOERROR) {
 	  *okay_p = ARGV_FALSE;
+	}
       }
       continue;
     }
     
     /* process mandatory args if some left to process */
-    for (grid_p = grid; grid_p->ar_short_arg != ARGV_LAST; grid_p++)
+    for (grid_p = grid; grid_p->ar_short_arg != ARGV_LAST; grid_p++) {
       if (grid_p->ar_short_arg == ARGV_MAND
 	  && ((! (grid_p->ar_type & ARGV_FLAG_USED))
-	      || grid_p->ar_type & ARGV_ARRAY))
+	      || grid_p->ar_type & ARGV_FLAG_ARRAY)) {
 	break;
+      }
+    }
     if  (grid_p->ar_short_arg != ARGV_LAST) {
       /* absorb another mand. arg */
       if (translate_value(*arg_p, grid_p->ar_variable,
-			  grid_p->ar_type) != NOERROR)
+			  grid_p->ar_type) != NOERROR) {
 	*okay_p = ARGV_FALSE;
+      }
       grid_p->ar_type |= ARGV_FLAG_USED;
       continue;
     }
     
     /* process maybe args if some left to process */
-    for (grid_p = grid; grid_p->ar_short_arg != ARGV_LAST; grid_p++)
+    for (grid_p = grid; grid_p->ar_short_arg != ARGV_LAST; grid_p++) {
       if (grid_p->ar_short_arg == ARGV_MAYBE
 	  && ((! (grid_p->ar_type & ARGV_FLAG_USED))
-	      || grid_p->ar_type & ARGV_ARRAY))
+	      || grid_p->ar_type & ARGV_FLAG_ARRAY)) {
 	break;
+      }
+    }
     if  (grid_p->ar_short_arg != ARGV_LAST) {
       /* absorb another maybe arg */
       if (translate_value(*arg_p, grid_p->ar_variable,
-			  grid_p->ar_type) != NOERROR)
+			  grid_p->ar_type) != NOERROR) {
 	*okay_p = ARGV_FALSE;
+      }
       grid_p->ar_type |= ARGV_FLAG_USED;
       continue;
     }
@@ -1964,11 +2125,12 @@ static	void	do_list(argv_t *grid, const int argc, char **argv,
     *okay_p = ARGV_FALSE;
   }
   
-  if (unwant_c > 0 && argv_error_stream != NULL)
+  if (unwant_c > 0 && argv_error_stream != NULL) {
     (void)fprintf(argv_error_stream,
 		  "%s: %s, %d unwanted additional argument%s\n",
 		  argv_program, USAGE_ERROR_NAME,
 		  unwant_c, (unwant_c == 1 ? "" : "s"));
+  }
 }
 
 /****************************** env processing *******************************/
@@ -1985,26 +2147,31 @@ static	int	do_env_args(argv_t *args, char *okay_p)
   (void)sprintf(env_name, ENVIRON_FORMAT, argv_program);
   
   /* NOTE: by default the env name is all uppercase */
-  for (environ_p = env_name; *environ_p != '\0'; environ_p++)
-    if (islower(*environ_p))
+  for (environ_p = env_name; *environ_p != '\0'; environ_p++) {
+    if (islower(*environ_p)) {
       *environ_p = toupper(*environ_p);
+    }
+  }
   
   environ_p = getenv(env_name);
-  if (environ_p == NULL)
+  if (environ_p == NULL) {
     return NOERROR;
+  }
   
   /* break the list into tokens and do the list */
   environ_p = string_copy(environ_p);
-  if (environ_p == NULL)
+  if (environ_p == NULL) {
     return ERROR;
+  }
   
   vect_p = vectorize(environ_p, " \t", &env_n);
   if (vect_p != NULL) {
     do_list(args, env_n, vect_p, okay_p);
     
     /* free token list */
-    for (env_c = 0; env_c < env_n; env_c++)
+    for (env_c = 0; env_c < env_n; env_c++) {
       free(vect_p[env_c]);
+    }
     free(vect_p);
   }
   free(environ_p);
@@ -2022,27 +2189,31 @@ static	int	process_env(void)
   int		len;
   
   /* make sure we only do this once */
-  if (done)
+  if (done) {
     return NOERROR;
+  }
   
   done = ARGV_TRUE;
   
   /* get the argv information */
   environ_p = getenv(GLOBAL_NAME);
-  if (environ_p == NULL)
+  if (environ_p == NULL) {
     return NOERROR;
+  }
   
   /* save a copy of it */
   environ_p = string_copy(environ_p);
-  if (environ_p == NULL)
+  if (environ_p == NULL) {
     return ERROR;
+  }
   
   arg = environ_p;
   
   for (;;) {
     env_p = strtok(arg, " \t,:");
-    if (env_p == NULL)
+    if (env_p == NULL) {
       break;
+    }
     arg = NULL;
     
     len = strlen(GLOBAL_CLOSE);
@@ -2051,18 +2222,21 @@ static	int	process_env(void)
       if (strcmp(env_p, "disable") == 0
 	  || strcmp(env_p, "off") == 0
 	  || strcmp(env_p, "no") == 0
-	  || strcmp(env_p, "0") == 0)
+	  || strcmp(env_p, "0") == 0) {
 	global_close = GLOBAL_CLOSE_DISABLE;
+      }
       else if (strcmp(env_p, "enable") == 0
 	       || strcmp(env_p, "on") == 0
 	       || strcmp(env_p, "yes") == 0
-	       || strcmp(env_p, "1") == 0)
+	       || strcmp(env_p, "1") == 0) {
 	global_close = GLOBAL_CLOSE_ENABLE;
+      }
       else {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: illegal env variable '%s' '%s' argument '%s'\n",
 			__FILE__, GLOBAL_NAME, GLOBAL_CLOSE, env_p);
+	}
       }
       continue;
     }
@@ -2073,18 +2247,21 @@ static	int	process_env(void)
       if (strcmp(env_p, "disable") == 0
 	  || strcmp(env_p, "off") == 0
 	  || strcmp(env_p, "no") == 0
-	  || strcmp(env_p, "0") == 0)
+	  || strcmp(env_p, "0") == 0) {
 	global_lasttog = GLOBAL_LASTTOG_DISABLE;
+      }
       else if (strcmp(env_p, "enable") == 0
 	       || strcmp(env_p, "on") == 0
 	       || strcmp(env_p, "yes") == 0
-	       || strcmp(env_p, "1") == 0)
+	       || strcmp(env_p, "1") == 0) {
 	global_lasttog = GLOBAL_LASTTOG_ENABLE;
+      }
       else {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: illegal env variable '%s' '%s' argument '%s'\n",
 			__FILE__, GLOBAL_NAME, GLOBAL_LASTTOG, env_p);
+	}
       }
       continue;
     }
@@ -2092,17 +2269,21 @@ static	int	process_env(void)
     len = strlen(GLOBAL_ENV);
     if (strncmp(GLOBAL_ENV, env_p, len) == 0) {
       env_p += len;
-      if (strcmp(env_p, "none") == 0)
+      if (strcmp(env_p, "none") == 0) {
 	global_env = GLOBAL_ENV_NONE;
-      else if (strcmp(env_p, "before") == 0)
+      }
+      else if (strcmp(env_p, "before") == 0) {
 	global_env = GLOBAL_ENV_BEFORE;
-      else if (strcmp(env_p, "after") == 0)
+      }
+      else if (strcmp(env_p, "after") == 0) {
 	global_env = GLOBAL_ENV_AFTER;
+      }
       else {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: illegal env variable '%s' '%s' argument '%s'\n",
 			__FILE__, GLOBAL_NAME, GLOBAL_ENV, env_p);
+	}
       }
       continue;
     }
@@ -2110,23 +2291,30 @@ static	int	process_env(void)
     len = strlen(GLOBAL_ERROR);
     if (strncmp(GLOBAL_ERROR, env_p, len) == 0) {
       env_p += len;
-      if (strcmp(env_p, "none") == 0)
+      if (strcmp(env_p, "none") == 0) {
 	global_error = GLOBAL_ERROR_NONE;
-      else if (strcmp(env_p, "see") == 0)
+      }
+      else if (strcmp(env_p, "see") == 0) {
 	global_error = GLOBAL_ERROR_SEE;
-      else if (strcmp(env_p, "short") == 0)
+      }
+      else if (strcmp(env_p, "short") == 0) {
 	global_error = GLOBAL_ERROR_SHORT;
-      else if (strcmp(env_p, "shortrem") == 0)
+      }
+      else if (strcmp(env_p, "shortrem") == 0) {
 	global_error = GLOBAL_ERROR_SHORTREM;
-      else if (strcmp(env_p, "long") == 0)
+      }
+      else if (strcmp(env_p, "long") == 0) {
 	global_error = GLOBAL_ERROR_LONG;
-      else if (strcmp(env_p, "all") == 0)
+      }
+      else if (strcmp(env_p, "all") == 0) {
 	global_error = GLOBAL_ERROR_ALL;
+      }
       else {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: illegal env variable '%s' '%s' argument '%s'\n",
 			__FILE__, GLOBAL_NAME, GLOBAL_ERROR, env_p);
+	}
       }
       continue;
     }
@@ -2134,15 +2322,18 @@ static	int	process_env(void)
     len = strlen(GLOBAL_MULTI);
     if (strncmp(GLOBAL_MULTI, env_p, len) == 0) {
       env_p += len;
-      if (strcmp(env_p, "reject") == 0)
+      if (strcmp(env_p, "reject") == 0) {
 	global_multi = GLOBAL_MULTI_REJECT;
-      else if (strcmp(env_p, "accept") == 0)
+      }
+      else if (strcmp(env_p, "accept") == 0) {
 	global_multi = GLOBAL_MULTI_ACCEPT;
+      }
       else {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: illegal env variable '%s' '%s' argument '%s'\n",
 			__FILE__, GLOBAL_NAME, GLOBAL_MULTI, env_p);
+	}
       }
       continue;
     }
@@ -2150,27 +2341,33 @@ static	int	process_env(void)
     len = strlen(GLOBAL_USAGE);
     if (strncmp(GLOBAL_USAGE, env_p, len) == 0) {
       env_p += len;
-      if (strcmp(env_p, "short") == 0)
+      if (strcmp(env_p, "short") == 0) {
 	global_usage = GLOBAL_USAGE_SHORT;
-      else if (strcmp(env_p, "shortrem") == 0)
+      }
+      else if (strcmp(env_p, "shortrem") == 0) {
 	global_usage = GLOBAL_USAGE_SHORTREM;
-      else if (strcmp(env_p, "long") == 0)
+      }
+      else if (strcmp(env_p, "long") == 0) {
 	global_usage = GLOBAL_USAGE_LONG;
-      else if (strcmp(env_p, "all") == 0)
+      }
+      else if (strcmp(env_p, "all") == 0) {
 	global_usage = GLOBAL_USAGE_ALL;
+      }
       else {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: illegal env variable '%s' '%s' argument '%s'\n",
 			__FILE__, GLOBAL_NAME, GLOBAL_USAGE, env_p);
+	}
       }
       continue;
     }
     
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: illegal env variable '%s' setting '%s'\n",
 		    __FILE__, GLOBAL_NAME, env_p);
+    }
   }
   
   free(environ_p);
@@ -2187,29 +2384,35 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
   char		okay = ARGV_TRUE;
   argv_t	*arg_p;
   
-  if (process_env() != NOERROR)
+  if (process_env() != NOERROR) {
     return ERROR;
+  }
   
-  if (args == NULL)
+  if (args == NULL) {
     args = empty;
+  }
   
   if (argc < 0) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: %s, argc argument to argv_process is %d\n",
 		    __FILE__, INTERNAL_ERROR_NAME, argc);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return ERROR;
   }
   
   if (argv == NULL) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: %s, argv argument to argv_process is NULL\n",
 		    __FILE__, INTERNAL_ERROR_NAME);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return ERROR;
   }
   
@@ -2222,9 +2425,11 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
     const char	*tmp_p;
     
     prog_p = *argv;
-    for (tmp_p = *argv; *tmp_p != '\0'; tmp_p++)
-      if (*tmp_p == '/')
+    for (tmp_p = *argv; *tmp_p != '\0'; tmp_p++) {
+      if (*tmp_p == '/') {
 	prog_p = tmp_p + 1;
+      }
+    }
   }
   
   /* so we can step on the environmental space */
@@ -2232,21 +2437,25 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
   
   /* count the args */
   num_args = 0;
-  for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++)
+  for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
     num_args++;
+  }
   
   /* verify the argument array */
-  if (preprocess_array(args, num_args) != NOERROR)
+  if (preprocess_array(args, num_args) != NOERROR) {
     return ERROR;
+  }
   
   /* allocate our value queue */
-  if (num_args > 0)
+  if (num_args > 0) {
     QUEUE_ALLOC(argv_t *, num_args);
+  }
   
   /* do the env args before? */
   if (global_env == GLOBAL_ENV_BEFORE) {
-    if (do_env_args(args, &okay) != NOERROR)
+    if (do_env_args(args, &okay) != NOERROR) {
       return ERROR;
+    }
   }
   
   /* do the external args */
@@ -2255,28 +2464,35 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
   /* do the env args after? */
   if (global_env == GLOBAL_ENV_AFTER) {
     do_env_args(args, &okay);
-    if (do_env_args(args, &okay) != NOERROR)
+    if (do_env_args(args, &okay) != NOERROR) {
       return ERROR;
+    }
   }
   
   /* make sure the XOR and MAND args and argument-options are okay */
-  if (check_mand(args) != NOERROR)
+  if (check_mand(args) != NOERROR) {
     okay = ARGV_FALSE;
-  if (check_opt() != NOERROR)
+  }
+  if (check_opt() != NOERROR) {
     okay = ARGV_FALSE;
-  if (check_xor(args) != NOERROR)
+  }
+  if (check_xor(args) != NOERROR) {
     okay = ARGV_FALSE;
+  }
   
   /* if we allocated the space then free it */
-  if (num_args > 0)
+  if (num_args > 0) {
     QUEUE_FREE();
+  }
   
   /* was there an error? */
   if (! okay) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       do_usage(args, global_error);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return ERROR;
   }
   
@@ -2295,13 +2511,16 @@ static	int	process_args(argv_t *args, const int argc, char **argv)
  */
 int	argv_process(argv_t *args, const int argc, char **argv)
 {
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
-  if (process_args(args, argc, argv) == NOERROR)
+  if (process_args(args, argc, argv) == NOERROR) {
     return NOERROR;
-  else
+  }
+  else {
     return ERROR;
+  }
 }
 
 /*
@@ -2322,23 +2541,28 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
   char		*copy, *copy_p, **argv;
   int		argc, ret, alloced;
   
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
-  if (delim == NULL)
+  if (delim == NULL) {
     delim_str = "";
-  else
+  }
+  else {
     delim_str = delim;
+  }
   
   /* copy incoming string so we can punch nulls */
   copy = malloc(strlen(string) + 1);
    if (copy == NULL) {
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: memory error during argument processing\n",
 		    argv_program);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return ERROR;
   }
   
@@ -2347,12 +2571,14 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
   argv = (char **)malloc(sizeof(char *) * alloced);
   if (argv == NULL) {
     free(copy);
-    if (argv_error_stream != NULL)
+    if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: memory error during argument processing\n",
 		    argv_program);
-    if (argv_interactive)
+    }
+    if (argv_interactive) {
       (void)exit(EXIT_CODE);
+    }
     return ERROR;
   }
   
@@ -2361,11 +2587,14 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
   str_p = string;
   /*  skip starting multiple arg delimiters */
   for (; *str_p != '\0'; str_p++) {
-    for (delim_p = delim_str; *delim_p != '\0'; delim_p++)
-      if (*str_p == *delim_p)
+    for (delim_p = delim_str; *delim_p != '\0'; delim_p++) {
+      if (*str_p == *delim_p) {
 	break;
-    if (*delim_p == '\0')
+      }
+    }
+    if (*delim_p == '\0') {
       break;
+    }
   }
   
   /* start of the string is argv[1] */
@@ -2375,12 +2604,14 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
       argv = (char **)realloc(argv, sizeof(char *) * alloced);
       if (argv == NULL) {
 	free(copy);
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: memory error during argument processing\n",
 			argv_program);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
     }
@@ -2397,9 +2628,11 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
     }
     
     /* is this a argument seperator? */
-    for (delim_p = delim_str; *delim_p != '\0'; delim_p++)
-      if (*str_p == *delim_p)
+    for (delim_p = delim_str; *delim_p != '\0'; delim_p++) {
+      if (*str_p == *delim_p) {
 	break;
+      }
+    }
     if (*delim_p != '\0') {
       *copy_p++ = '\0';
       
@@ -2410,11 +2643,14 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
        */
       if (*str_p != '=') {
 	for (;; str_p++) {
-	  for (delim_p = delim_str; *delim_p != '\0'; delim_p++)
-	    if (*(str_p + 1) == *delim_p)
+	  for (delim_p = delim_str; *delim_p != '\0'; delim_p++) {
+	    if (*(str_p + 1) == *delim_p) {
 	      break;
-	  if (*delim_p == '\0')
+	    }
+	  }
+	  if (*delim_p == '\0') {
 	    break;
+	  }
 	}
       }
       
@@ -2424,12 +2660,14 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
 	  alloced += ARG_MALLOC_INCR;
 	  argv = (char **)realloc(argv, sizeof(char *) * alloced);
 	  if (argv == NULL) {
-	    if (argv_error_stream != NULL)
+	    if (argv_error_stream != NULL) {
 	      (void)fprintf(argv_error_stream,
 			    "%s: memory error during argument processing\n",
 			    argv_program);
-	    if (argv_interactive)
+	    }
+	    if (argv_interactive) {
 	      (void)exit(EXIT_CODE);
+	    }
 	    return ERROR;
 	  }
 	}
@@ -2452,25 +2690,33 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
     
     str_p++;
     
-    if (*str_p >= 'a' && *str_p <= 'f')
+    if (*str_p >= 'a' && *str_p <= 'f') {
       val = 10 + *str_p - 'a';
-    else if (*str_p >= 'A' && *str_p <= 'F')
+    }
+    else if (*str_p >= 'A' && *str_p <= 'F') {
       val = 10 + *str_p - 'A';
-    else if (*str_p >= '0' && *str_p <= '9')
+    }
+    else if (*str_p >= '0' && *str_p <= '9') {
       val = *str_p - '0';
-    else
+    }
+    else {
       continue;
+    }
     
     str_p++;
     
-    if (*str_p >= 'a' && *str_p <= 'f')
+    if (*str_p >= 'a' && *str_p <= 'f') {
       val = val * 16 + (10 + *str_p - 'a');
-    else if (*str_p >= 'A' && *str_p <= 'F')
+    }
+    else if (*str_p >= 'A' && *str_p <= 'F') {
       val = val * 16 + (10 + *str_p - 'A');
-    else if (*str_p >= '0' && *str_p <= '9')
+    }
+    else if (*str_p >= '0' && *str_p <= '9') {
       val = val * 16 + (*str_p - '0');
-    else
+    }
+    else {
       str_p--;
+    }
     
     *copy_p++ = (char)val;
   }
@@ -2480,10 +2726,12 @@ int	argv_web_process_string(argv_t *args, const char *arg0,
   free(copy);
   free(argv);
   
-  if (ret == NOERROR)
+  if (ret == NOERROR) {
     return NOERROR;
-  else
+  }
+  else {
     return ERROR;
+  }
 }
 
 /*
@@ -2496,8 +2744,9 @@ int	argv_web_process(argv_t *args, const char *arg0)
   char	*env, *work = NULL;
   int	ret, len;
   
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
   env = getenv("REQUEST_METHOD");
   if (env != NULL && strcmp(env, "POST") == 0) {
@@ -2507,12 +2756,14 @@ int	argv_web_process(argv_t *args, const char *arg0)
       if (len > 0) {
 	work = (char *)malloc(len + 1);
 	if (work == NULL) {
-	  if (argv_error_stream != NULL)
+	  if (argv_error_stream != NULL) {
 	    (void)fprintf(argv_error_stream,
 			  "%s: memory error during argument processing\n",
 			  argv_program);
-	  if (argv_interactive)
+	  }
+	  if (argv_interactive) {
 	    (void)exit(EXIT_CODE);
+	  }
 	  return ERROR;
 	}
 	(void)read(STDIN, work, len);
@@ -2528,30 +2779,35 @@ int	argv_web_process(argv_t *args, const char *arg0)
     if (env == NULL || *env == '\0') {
       work = (char *)malloc(1);
       if (work == NULL) {
-	if (argv_error_stream != NULL)
+	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: memory error during argument processing\n",
 			argv_program);
-	if (argv_interactive)
+	}
+	if (argv_interactive) {
 	  (void)exit(EXIT_CODE);
+	}
 	return ERROR;
       }
       work[0] = '\0';
     }
     else {
       work = string_copy(env);
-      if (work == NULL)
+      if (work == NULL) {
 	return ERROR;
+      }
     }
   }
   
   ret = argv_web_process_string(args, arg0, work, "&=");
   free(work);
   
-  if (ret == NOERROR)
+  if (ret == NOERROR) {
     return NOERROR;
-  else
+  }
+  else {
     return ERROR;
+  }
 }
 
 /*
@@ -2564,19 +2820,24 @@ int	argv_web_process(argv_t *args, const char *arg0)
  */
 int	argv_usage(const argv_t *args, const int which)
 {
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
-  if (process_env() != NOERROR)
+  if (process_env() != NOERROR) {
     return ERROR;
+  }
   
-  if (args == NULL)
+  if (args == NULL) {
     args = empty;
+  }
   
-  if (which == ARGV_USAGE_SHORT)
+  if (which == ARGV_USAGE_SHORT) {
     usage_short(args, 0);
-  else if (which == ARGV_USAGE_LONG)
+  }
+  else if (which == ARGV_USAGE_LONG) {
     usage_long(args);
+  }
   else {
     /* default/env settings */
     do_usage(args, global_usage);
@@ -2593,16 +2854,20 @@ int	argv_was_used(const argv_t *args, const char arg)
 {
   const argv_t	*arg_p;
   
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
-  for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++)
+  for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
     if (arg_p->ar_short_arg == arg) {
-      if (arg_p->ar_type & ARGV_FLAG_USED)
+      if (arg_p->ar_type & ARGV_FLAG_USED) {
 	return 1;
-      else
+      }
+      else {
 	return 0;
+      }
     }
+  }
   
   return 0;
 }
@@ -2617,23 +2882,26 @@ void	argv_cleanup(const argv_t *args)
   const argv_t	*arg_p;
   int		entry_c;
   
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
-  if (args == NULL)
+  if (args == NULL) {
     return;
+  }
   
   /* run through the argument structure */
   for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
     /* handle any arrays */
-    if (arg_p->ar_type & ARGV_ARRAY) {
+    if (arg_p->ar_type & ARGV_FLAG_ARRAY) {
       argv_array_t	*arr_p = (argv_array_t *)arg_p->ar_variable;
       
       /* free any entries */
       if (arr_p->aa_entry_n > 0) {
 	if (ARGV_TYPE(arg_p->ar_type) == ARGV_CHAR_P) {
-	  for (entry_c = 0; entry_c < arr_p->aa_entry_n; entry_c++)
+	  for (entry_c = 0; entry_c < arr_p->aa_entry_n; entry_c++) {
 	    free(ARGV_ARRAY_ENTRY(*arr_p, char *, entry_c));
+	  }
 	}
 	free(arr_p->aa_entries);
       }
@@ -2662,32 +2930,38 @@ int	argv_copy_args(char *buf, const int max_size)
   char	**argv_p, *buf_p = buf, *arg_p;
   int	argc, size_c = max_size;
   
-  if (! enabled)
+  if (! enabled) {
     argv_startup();
+  }
   
-  if (process_env() != NOERROR)
+  if (process_env() != NOERROR) {
     return ERROR;
+  }
   
-  if (max_size == 0)
+  if (max_size == 0) {
     return NOERROR;
+  }
   
   *buf_p = '\0';
   
-  if (argv_argv == NULL || max_size == 1)
+  if (argv_argv == NULL || max_size == 1) {
     return NOERROR;
+  }
   
   for (argv_p = argv_argv + 1, argc = 1; argc < argv_argc; argv_p++, argc++) {
     
-    if (size_c < 2)
+    if (size_c < 2) {
       break;
+    }
     
     if (argv_p > argv_argv + 1) {
       *buf_p++ = ' ';
       size_c--;
     }
     
-    for (arg_p = *argv_p; *arg_p != '\0' && size_c >= 2; size_c--)
+    for (arg_p = *argv_p; *arg_p != '\0' && size_c >= 2; size_c--) {
       *buf_p++ = *arg_p++;
+    }
   }
   
   *buf_p = '\0';

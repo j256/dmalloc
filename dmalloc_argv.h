@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv.h,v 1.1 1997/11/05 16:27:19 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.3 1998/10/05 03:28:26 gray Exp $
  */
 
 #ifndef __ARGV_H__
@@ -31,14 +31,14 @@
  * NEWS entries *must* be entered and 2 entries in argv.texi must be
  * updated.
  *
- * ARGV LIBRARY VERSION -- 2.3.0
+ * ARGV LIBRARY VERSION -- 2.3.1
  */
 
 /* produced by configure, inserted into argv.h */
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.1 1997/11/05 16:27:19 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.3 1998/10/05 03:28:26 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments
@@ -68,7 +68,7 @@
 typedef struct {
   char		ar_short_arg;		/* the char of the arg, 'd' if '-d' */
   char		*ar_long_arg;		/* long version of arg, 'delete' */
-  short		ar_type;		/* type of option, see values below */
+  unsigned int	ar_type;		/* type of option, see values below */
   ARGV_PNT	ar_variable;		/* address of variable that is arg */
   char		*ar_var_label;		/* label for variable descriptions */
   char		*ar_comment;		/* comment for usage message */
@@ -158,7 +158,9 @@ typedef struct {
 #define ARGV_U_SIZE	19		/* u_long arg which knows mMbBkKgG */
 
 #define ARGV_TYPE(t)	((t) & 0x3F)	/* strip off all but the var type */
-#define ARGV_ARRAY	(1 << 14)	/* OR with type to indicate array */
+#define ARGV_FLAG_ARRAY	(1 << 14)	/* OR with type to indicate array */
+#define ARGV_FLAG_MAND	(1 << 13)	/* OR with type to mark mandatory */
+/* NOTE: other internal flags defined in argv_loc.h */
 
 /* argv_usage which argument values */
 #define ARGV_USAGE_SHORT	1	/* print short usage messages */

@@ -18,13 +18,13 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_argv_loc.h,v 1.1 1997/11/05 16:27:19 gray Exp $
+ * $Id: dmalloc_argv_loc.h,v 1.2 1997/12/07 23:20:12 gray Exp $
  */
 
 #ifndef __ARGV_LOC_H__
 #define __ARGV_LOC_H__
 
-#include "dmalloc_argv.h"		/* to get the types */
+#include "dmalloc_argv.h"			/* to get the types */
 
 /*
  * some compilation options
@@ -70,8 +70,8 @@
 #define FILE_LINE_SIZE		1024		/* max size of file lines */
 
 /* internal flags set in the ar_type field */
-/* ARGV_ARRAY is defined in argv.h */
-#define ARGV_FLAG_USED		(1 << 13)	/* if arg has been specified */
+/* NOTE: other external flags defined in argv.h */
+#define ARGV_FLAG_USED		(1 << 12)	/* if arg has been specified */
 
 /* error messages */
 #define USAGE_ERROR_NAME	"usage problem"
@@ -173,9 +173,9 @@
 
 /* strcture defining argv types */
 typedef struct {
-  int		at_value;		/* value of the type */
+  unsigned int	at_value;		/* value of the type */
   char		*at_name;		/* name of the type */
-  int		at_size;		/* size of type */
+  unsigned int	at_size;		/* size of type */
   char		*at_desc;		/* description of the type */
 } argv_type_t;
 
