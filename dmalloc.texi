@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.13 1993/04/08 21:46:44 gray Exp $
+@c $Id: dmalloc.texi,v 1.14 1993/04/30 20:02:41 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -559,6 +559,9 @@ Set the @samp{MALLOC_LOGFILE} env variable to filename.
 @item -s number
 Set the @samp{MALLOC_START} env variable to number (alternatively
 file:line).
+
+@item -v
+Give verbose output.  Especially useful when dumping currect settings.
 @end table
 
 If no arguments are specified, malloc_dbg dumps out the current settings

@@ -30,14 +30,14 @@
 #define MALLOC_DEBUG_DISABLE
 
 #include "malloc_dbg.h"
-#include "malloc_loc.h"
 
 #include "compat.h"
 #include "conf.h"
+#include "malloc_loc.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.11 1993/04/19 20:13:59 gray Exp $";
+  "$Id: compat.c,v 1.12 1993/04/30 20:02:24 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0

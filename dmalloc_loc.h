@@ -21,11 +21,13 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.17 1993/04/09 06:34:45 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.18 1993/04/30 20:02:48 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
 #define __MALLOC_LOC_H__
+
+#include "conf.h"				/* for HAVE_BCMP */
 
 /* fence post checking defines */
 #define FENCE_BOTTOM		(1 << ALLOCATION_ALIGNMENT_IN_BITS)
@@ -44,6 +46,18 @@
 #define START_ENVIRON		"MALLOC_START"
 
 /******************************* useful defines ******************************/
+
+/*
+ * global variable and procedure scoping for code readability
+ */
+#undef	EXPORT
+#define	EXPORT
+
+#undef	IMPORT
+#define	IMPORT		extern
+
+#undef	LOCAL
+#define	LOCAL		static
 
 /*
  * standard int return codes
@@ -102,5 +116,16 @@
 #define BIT_CLEAR(v,f)		(v) &= ~(f)
 #undef BIT_IS_SET
 #define BIT_IS_SET(v,f)		((v) & (f))
+
+/*
+ * some defines to standardize memory functions
+ */
+#if HAVE_BCMP == 0
+#define bcmp(s1, s2, len)	memcmp((char *)(s1), (char *)(s2), (len))
+#endif
+
+#if HAVE_BCOPY == 0
+#define bcopy(from, to, len)	(void)memcpy((char *)(to), (char *)(from), len)
+#endif
 
 #endif /* ! __MALLOC_LOC_H__ */

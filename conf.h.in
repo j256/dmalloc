@@ -1,5 +1,5 @@
 /*
- * machine configuration flags
+ * manual and automatic configuration flags
  *
  * Copyright 1992 by Gray Watson and the Antaire Corporation
  *
@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.10 1993/04/15 21:58:04 gray Exp $
+ * $Id: conf.h.in,v 1.11 1993/04/30 20:02:27 gray Exp $
  */
 
 /*
@@ -121,14 +121,3 @@
 #define HAVE_STRNCMP 0
 #define HAVE_STRPBRK 0
 #define HAVE_STRSTR 0
-
-/*
- * some defines to standardize memory functions
- */
-#if HAVE_BCMP == 0
-#define bcmp(s1, s2, len)	(void)memcmp((char *)(s1), (char *)(s2), (len))
-#endif
-
-#if HAVE_BCOPY == 0
-#define bcopy(from, to, len)	(void)memcpy((char *)(to), (char *)(from), len)
-#endif

@@ -1,3 +1,11 @@
+Fri Apr 30 15:26:12 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Moved around some defines and changes include ordering.
+
+	* Added -v option to malloc_dbg to provide verbose output
+	especially for dumping currently set debug tokens from
+	MALLOC_DEBUG variable.
+
 Mon Apr 19 16:04:17 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Released version 1.2.3.

@@ -36,16 +36,16 @@
 #define MALLOC_DEBUG_DISABLE
 
 #include "malloc_dbg.h"
-#include "malloc_loc.h"
 
 #include "compat.h"
 #include "conf.h"
 #include "dbg_tokens.h"
+#include "malloc_loc.h"
 #include "version.h"
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.11 1993/04/19 20:14:02 gray Exp $";
+  "$Id: dmalloc.c,v 1.12 1993/04/30 20:02:44 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -55,6 +55,7 @@ LOCAL	char	*rcs_id =
 #define USAGE_STRING	"--usage"		/* show the usage message */
 #define VERSION_STRING	"--version"		/* show the version message */
 #define NO_VALUE	(-1)			/* no value ... value */
+#define TOKENS_PER_LINE	4			/* num debug toks per line */
 
 /* local variables */
 LOCAL	char	printed		= FALSE;	/* did we outputed anything? */
@@ -71,6 +72,7 @@ LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	*tag		= NULL;		/* the debug tag */
+LOCAL	char	verbose		= FALSE;	/* verbose flag */
 
 /*
  * hexadecimal STR to long translation
@@ -123,8 +125,13 @@ LOCAL	void	usage(void)
   (void)fprintf(stderr,	"  [-l file]         = file to log messages to %%s\n");
   (void)fprintf(stderr, "  [-s file:line]    = start checking heap after ");
   (void)fprintf(stderr,    "seeing file [and line] %%s\n");
+  (void)fprintf(stderr, "  [-v]              = turn on verbose output\n");
   (void)fprintf(stderr, "  [tag]             = debug token to find in ");
   (void)fprintf(stderr,    "mallocrc\n");
+  (void)fprintf(stderr, "\n");
+  (void)fprintf(stderr, "--usage             = print this usage message\n");
+  (void)fprintf(stderr, "--version           = print version number\n");
+  (void)fprintf(stderr, "\n");
   (void)fprintf(stderr, "if no arguments are specified then it dumps the ");
   (void)fprintf(stderr,    "current env setings.\n");
 }
@@ -135,6 +142,8 @@ LOCAL	void	usage(void)
  */
 LOCAL	void	process_arguments(int argc, char ** argv)
 {
+  char	missing = FALSE, wrong = FALSE;
+  
   program = (char *)rindex(*argv, '/');
   if (program == NULL)
     program = *argv;
@@ -180,13 +189,12 @@ LOCAL	void	process_arguments(int argc, char ** argv)
     switch ((*argv)[1]) {
       
     case 'a':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -a\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	address = *argv;
       }
-      address = *argv;
       break;
       
     case 'b':
@@ -198,70 +206,77 @@ LOCAL	void	process_arguments(int argc, char ** argv)
       break;
       
     case 'd':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -d\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	debug = hex_to_int(*argv);
       }
-      debug = hex_to_int(*argv);
       break;
       
     case 'e':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -e\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	errno_to_print = atoi(*argv);
       }
-      errno_to_print = atoi(*argv);
       break;
       
     case 'f':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -f\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	inpath = *argv;
       }
-      inpath = *argv;
       break;
       
     case 'i':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -i\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	interval = atoi(*argv);
       }
-      interval = atoi(*argv);
       break;
       
     case 'l':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -l\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	logpath = *argv;
       }
-      logpath = *argv;
       break;
       
     case 's':
-      argc--, argv++;
-      if (argc == 0) {
-	(void)fprintf(stderr, "Usage problem: missing argument to -s\n");
-	usage();
-	exit(1);
+      if (argc <= 1)
+	missing = TRUE;
+      else {
+	argc--, argv++;
+	start = *argv;
       }
-      start = *argv;
+      break;
+      
+    case 'v':
+      verbose = TRUE;
       break;
       
     default:
-      (void)fprintf(stderr, "Usage problem: unknown argument '%s'\n", *argv);
-      usage();
-      exit(1);
+      wrong = TRUE;
       break;
+    }
+    
+    if (wrong || missing) {
+      if (missing)
+	(void)fprintf(stderr, "%s: usage problem, missing argument to -%c\n",
+		      program, (*argv)[1]);
+      else
+	(void)fprintf(stderr, "%s: usage problem, unknown argument '%s'\n",
+		      program, *argv);
+      (void)fprintf(stderr, "   For usage type: %s --usage\n", program);
+      exit(1);
     }
   }
 }
@@ -385,6 +400,30 @@ LOCAL	int	process(int debug_value, char ** strp)
 }
 
 /*
+ * dump the current flags set in the debug variable VAL
+ */
+LOCAL	void	dump_debug(const int val)
+{
+  attr_t	*attrp;
+  int		tokc = 0;
+  
+  for (attrp = attributes; attrp->at_string != NULL; attrp++) {
+    if (attrp->at_value != 0 && (val & attrp->at_value) == attrp->at_value) {
+      if (tokc == 0)
+	(void)fprintf(stderr, "   %s", attrp->at_string);
+      else if (tokc == TOKENS_PER_LINE - 1)
+	(void)fprintf(stderr, ", %s\n", attrp->at_string);
+      else
+	(void)fprintf(stderr, ", %s", attrp->at_string);
+      tokc = (tokc + 1) % TOKENS_PER_LINE;
+    }
+  }
+  
+  if (tokc != 0)
+    (void)fprintf(stderr, "\n");
+}
+
+/*
  * dump the current settings of the malloc variables
  */
 LOCAL	void	dump_current(void)
@@ -399,6 +438,9 @@ LOCAL	void	dump_current(void)
     num = hex_to_int(str);
     (void)process(num, &str);
     (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
+    
+    if (verbose)
+      dump_debug(num);
   }
   
   str = (char *)getenv(ADDRESS_ENVIRON);
@@ -433,10 +475,16 @@ LOCAL	void	dump_current(void)
  */
 LOCAL	void	set_variable(char * var, char * value)
 {
-  if (bourne)
+  if (bourne) {
     (void)printf("%s=%s; export %s;\n", var, value, var);
-  else
+    if (verbose)
+      (void)fprintf(stderr, "Outputed: %s=%s; export %s;\n", var, value, var);
+  }
+  else {
     (void)printf("setenv %s %s;\n", var, value);
+    if (verbose)
+      (void)fprintf(stderr, "Outputed: setenv %s %s;\n", var, value);
+  }
   
   printed = TRUE;
 }
@@ -446,10 +494,16 @@ LOCAL	void	set_variable(char * var, char * value)
  */
 LOCAL	void	unset_variable(char * var)
 {
-  if (bourne)
+  if (bourne) {
     (void)printf("unset %s;\n", var);
-  else
+    if (verbose)
+      (void)fprintf(stderr, "Outputed: unset %s;\n", var);
+  }
+  else {
     (void)printf("unsetenv %s;\n", var);
+    if (verbose)
+      (void)fprintf(stderr, "Outputed: unsetenv %s;\n", var);
+  }
   
   printed = TRUE;
 }
@@ -502,8 +556,10 @@ EXPORT	int	main(int argc, char ** argv)
     (void)fprintf(stderr, "%s: malloc_errno value '%d' = \n",
 		  program, errno_to_print);
     (void)fprintf(stderr, "   '%s'\n", malloc_strerror(errno_to_print));
+    printed = TRUE;
   }
-  else if (! printed)
+  
+  if (! printed)
     dump_current();
   
   exit(0);
