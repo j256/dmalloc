@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.84 2000/10/10 23:06:24 gray Exp $
+ * $Id: conf.h.in,v 1.85 2001/03/29 00:22:09 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -181,6 +181,7 @@
 #define HAVE_TIME 0
 #define HAVE_CTIME 0
 #define HAVE_RANDOM 0
+
 #define HAVE_VPRINTF 0
 #define HAVE_SNPRINTF 0
 #define HAVE_VSNPRINTF 0
@@ -189,14 +190,13 @@
 #define HAVE_MEMALIGN 0
 #define HAVE_VALLOC 0
 
-#define HAVE_BCMP 0
-#define HAVE_BCOPY 0
+#define HAVE_MEMCMP 0
+#define HAVE_MEMCPY 0
 #define HAVE_MEMSET 0
 
 #define HAVE_STRCHR 0
 #define HAVE_STRRCHR 0
 
-#define HAVE_STRCAT 0
 #define HAVE_STRLEN 0
 #define HAVE_STRCMP 0
 #define HAVE_STRCPY 0
@@ -211,17 +211,19 @@
  * only.  The library only has stubs for these and does not use them
  * internally.
  */
+#define HAVE_BCMP 0
+#define HAVE_BCOPY 0
 #define HAVE_BZERO 0
 
-#define HAVE_MEMCPY 0
 #define HAVE_MEMCCPY 0
 #define HAVE_MEMCHR 0
-#define HAVE_MEMCMP 0
 
 #define HAVE_INDEX 0
 #define HAVE_RINDEX 0
 #define HAVE_STRCASECMP 0
 #define HAVE_STRNCASECMP 0
+
+#define HAVE_STRCAT 0
 #define HAVE_STRDUP 0
 #define HAVE_STRSPN 0
 #define HAVE_STRCSPN 0
