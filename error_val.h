@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error_val.h,v 1.21 1999/03/04 19:08:31 gray Exp $
+ * $Id: error_val.h,v 1.22 1999/03/07 23:01:53 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -86,7 +86,13 @@
 #define ERROR_BAD_BLOCK_ORDER		100	/* block allocation bad */
 #define ERROR_BAD_FLAG			101	/* bad basic-block flag */
 
+/* memory table errors */
+#define ERROR_TABLE_CORRUPT		102	/* memory table corruption */
+
+/*
+ * NOTE: you must update the IS_MALLOC_ERRNO below if you add errors
+ */
 #define IS_MALLOC_ERRNO(e)	((e) >= ERROR_NONE && \
-				 (e) <= ERROR_BAD_FLAG)
+				 (e) <= ERROR_TABLE_CORRUPT)
 
 #endif /* ! __ERROR_VAL_H__ */
