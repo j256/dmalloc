@@ -1,3 +1,27 @@
+2003-11-17  Gray Watson  <gray@outside.256.com>
+
+	* Added support for rc shell.  Thanks to 
+
+	* Fixed a logfile NULL pointer printf.  Thanks to John
+	Hetherington.
+
+2003-10-17  Gray Watson  <gray@outside.256.com>
+
+	* Fleshed out the error code documentation.
+
+2003-10-06  Gray Watson  <gray@outside.256.com>
+
+	* Fixed Makefile.in to properly refer to the documents directory.
+	Whoops.  Thanks to Mike Castle.
+
+2003-10-04  Gray Watson  <gray@outside.256.com>
+
+	* Improved the docs about alias creation and usage.
+
+2003-10-01  Gray Watson  <gray@outside.256.com>
+
+	* Added testing for destructors.
+
 2003-09-29  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.2.3.
@@ -2077,5 +2101,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.310 2003/09/29 23:13:33 gray Exp $
+$Id: ChangeLog,v 1.311 2003/11/17 22:25:48 gray Exp $
 -------------------------------------------------------------------------------
