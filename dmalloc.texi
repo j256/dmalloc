@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.53 1994/08/29 15:10:48 gray Exp $
+@c $Id: dmalloc.texi,v 1.54 1994/09/08 14:07:02 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -48,12 +48,12 @@ translation approved by the author instead of in the original English.
 
 @titlepage
 @title Debug Malloc Library
-@author Gray Watson @samp{gray.watson@@antaire.com}
+@author Gray Watson <gray@@antaire.com>
 
 @page
 Copyright @copyright{} 1992 and 1993 by the Antaire Corporation.
 
-Published by Gray Watson @samp{gray.watson@@antaire.com}
+Published by Gray Watson @samp{<gray.watson@@antaire.com>}
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -88,7 +88,10 @@ having been successfully run on the following operating systems: BSDI,
 SunOS, Solaris, AIX, Ultrix, OSF, Irix, HPUX, and probably a couple
 others.
 
-I can be reached at @samp{gray.watson@@antaire.com} with any questions,
+The library is available from ftp.antaire.com in the
+@file{antaire/src/dmalloc} directory (URL
+@samp{ftp://ftp.antaire.com/antaire/src/dmalloc/dmalloc.tar.gz}).  I can
+be reached at @samp{gray.watson@@antaire.com} with any questions,
 feedback, or general comments.  Gray Watson, Antaire Corporation.
 
 @menu
@@ -100,7 +103,9 @@ feedback, or general comments.  Gray Watson, Antaire Corporation.
 * Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 * Index of Concepts::           Index of concepts in the manual.
+@ifinfo
 * Detailed Node Listing::       Listing of all the nodes in the manual.
+@end ifinfo
 @end menu
 
 @node Copying, Allocation Basics, Top, Top
