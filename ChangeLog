@@ -1,6 +1,10 @@
-Wed Mar 10 11:18:13 1999  Gray Watson  <gray@burger.letters.com>
+Thu Mar 11 17:31:00 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.2.0.
+
+	* Completely reworked the qsort code.
+
+Wed Mar 10 11:18:13 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Improved the autoconfig of abort and qsort safety.
 
@@ -1443,5 +1447,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.217 1999/03/11 05:37:55 gray Exp $
+$Id: ChangeLog,v 1.218 1999/03/11 22:40:10 gray Exp $
 -------------------------------------------------------------------------------
