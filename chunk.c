@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.98 1995/09/05 16:38:45 gray Exp $";
+  "$Id: chunk.c,v 1.99 1995/09/06 18:06:45 gray Exp $";
 #endif
 
 /*
@@ -94,6 +94,7 @@ LOCAL	long		bblock_adm_count = 0;	/* count of bblock_admin */
 LOCAL	long		dblock_adm_count = 0;	/* count of dblock_admin */
 LOCAL	long		bblock_count	 = 0;	/* count of basic-blocks */
 LOCAL	long		dblock_count	 = 0;	/* count of divided-blocks */
+LOCAL	long		extern_count	 = 0;	/* count of external blocks */
 LOCAL	long		check_count	 = 0;	/* count of heap-checks */
 
 /* alloc counts */
@@ -431,11 +432,6 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
 	bblockp->bb_next	= (struct bblock_st *)NULL;
       break;
       
-    case BBLOCK_EXTERNAL:
-      bblockp->bb_flags		= BBLOCK_EXTERNAL;
-      bblockp->bb_mem		= (void *)pnt;
-      break;
-      
     default:
       dmalloc_errno = ERROR_BAD_FLAG;
       dmalloc_error("set_bblock_admin");
@@ -561,20 +557,21 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
  * if EXTEND then extend block list and don't allocate.
  * returns the blocks or NULL on error.
  */
-LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
+LOCAL	bblock_t	*get_bblocks(const int many, void ** memp)
 {
   static bblock_adm_t	*freep = NULL;	/* pointer to block with free slots */
   static int		freec = 0;	/* count of free slots */
-  bblock_adm_t		*admp;
-  bblock_t		*bblockp;
-  int			bblockc;
+  bblock_adm_t		*admp, *adm_store[MAX_ADMIN_STORE];
+  bblock_t		*bblockp, *retp = NULL;
+  void			*mem = NULL, *extern_mem = NULL;
+  int			bblockc, count, admc = 0, externc = 0;
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
     _dmalloc_message("need %d bblocks (%d bytes)", many, many * BLOCK_SIZE);
   
   /* is there anything on the user-free list(s)? */
-  if (! extend && ! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
     
     if (find_free_bblocks(many, &bblockp) != NOERROR)
       return NULL;
@@ -591,36 +588,81 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
       }
       
       admp = (bblock_adm_t *)BLOCK_NUM_TO_PNT(bblockp);
-      bblockp->bb_mem = BLOCK_POINTER(admp->ba_posn +
-				      (bblockp - admp->ba_blocks));
+      if (memp != NULL)
+	*memp = BLOCK_POINTER(admp->ba_posn + (bblockp - admp->ba_blocks));
       return bblockp;
     }
   }
   
-  /* next check the admin free list */
-  while (many > freec) {
+  /*
+   * immediately allocate the memory necessary for the new blocks
+   * because we need to know if external blocks we sbrk'd so we can
+   * account for them in terms of admin slots
+   */
+  mem = _heap_alloc(many * BLOCK_SIZE, &extern_mem, &externc);
+  if (mem == HEAP_ALLOC_ERROR)
+    return NULL;
+  
+  /* account for allocated and any external blocks */
+  bblock_count += many + externc;
+  
+  /*
+   * do we have enough bblock-admin slots for the blocks we need, the
+   * bblock-admin blocks themselves, and any external blocks found?
+   */
+  while (many + admc + externc > freec) {
+    
     /* get some more space for a bblock_admin structure */
-    admp = (bblock_adm_t *)_heap_alloc(BLOCK_SIZE);
+    admp = (bblock_adm_t *)_heap_alloc(BLOCK_SIZE, NULL, &count);
     if (admp == (bblock_adm_t *)HEAP_ALLOC_ERROR)
       return NULL;
     
-    bblock_adm_count++;
     bblock_count++;
+    /* NOTE: bblock_adm_count handled below */
+    
+    /* this means that someone ran sbrk while we were in here */
+    if (count > 0) {
+      dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+      dmalloc_error("get_bblocks");
+      return NULL;
+    }
+    
+    /*
+     * really we are taking it from mem since we want the admin blocks
+     * to come ahead of the user allocation on the stack
+     */
+    admp = mem;
+    mem = (char *)mem + BLOCK_SIZE;
+    
+    /*
+     * Since we are just allocating some more slots here, we need to
+     * account for the admin block space later.  We save the admin
+     * block pointer in a little queue which cannot overflow.  If it
+     * does, it means that someone sbrk+alloced some enormous chunk
+     * equivalent to (BLOCK_SIZE * (BB_PER_ADMIN - 1) *
+     * MAX_ADMIN_STORE) bytes.
+     */
+    if (admc == MAX_ADMIN_STORE) {
+      dmalloc_errno = ERROR_EXTERNAL_HUGE;
+      dmalloc_error("get_bblocks");
+      return NULL;
+    }
+    
+    /* store new admin block in queue */
+    adm_store[admc] = admp;
+    admc++;
     
     /* do we need to print admin info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
-      _dmalloc_message("new bblock-admin alloced for %d - 1 more admin slots",
+      _dmalloc_message("new bblock-admin alloced for %d more admin slots",
 		       BB_PER_ADMIN);
     
-    /*
-     * initialize the new admin block and maintain the linked list
-     */
+    /* initialize the new admin block and maintain the linked list */
     admp->ba_magic1 = CHUNK_MAGIC_BOTTOM;
     if (bblock_adm_tail == NULL) {
       admp->ba_posn = 0;
       bblock_adm_head = admp;
       bblock_adm_tail = admp;
-      freep = admp;
     }
     else {
       admp->ba_posn = bblock_adm_tail->ba_posn + BB_PER_ADMIN;
@@ -649,72 +691,92 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
     if (freep == NULL)
       freep = admp;
     
-    /*
-     * now that we allocated a new block of slots, use up one of our
-     * free slots (which is not necessarily in the bunch we just
-     * allocated) to mark the new block.  If it is not the bunch we just
-     * alloced, it may not even be in the tail slot.  That's why we have
-     * freep.
-     */
-    
-    /* we assume the freep always points to a bunch we has a free slot */
-    bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
-    bblockc = bblockp->bb_freen;
-    
-    /* increment free slot counter although it may be overwritten shortly */
-    bblockp->bb_freen++;
-    
-    /* this block will hold the info for this admin block */
-    bblockp = freep->ba_blocks + bblockc;
-    
-    bblockp->bb_flags	= BBLOCK_ADMIN;
-    bblockp->bb_adminp	= freep;
-    bblockp->bb_freen	= freep->ba_posn + bblockc;
-    
-    /* did we just fill up?  we know we have more */
-    if (bblockc + 1 >= BB_PER_ADMIN)
-      freep = freep->ba_next;
-    
-    /* we add more slots less the one we just alloc to hold them */
-    freec += BB_PER_ADMIN - 1;
+    /* we add more slots less the one we just allocated to hold them */
+    freec += BB_PER_ADMIN;
   }
   
-  /* get the block pointer to the one we got */
-  bblockc = (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_freen;
+  /* get the block pointer to the first free slot we have */
+  bblockp = admp->ba_blocks + (BB_PER_ADMIN - 1);
+  bblockc = bblockp->bb_freen;
   bblockp = freep->ba_blocks + bblockc;
   
-  /*
-   * alloc the space if needed.
-   * NOTE: we do this here in case of failure
-   */
-  if (extend)
-    bblockp->bb_mem = NULL;
-  else {
-    bblockp->bb_mem = _heap_alloc(many * BLOCK_SIZE);
-    if (bblockp->bb_mem == HEAP_ALLOC_ERROR)
-      return NULL;
+  /* first off, handle external referenced blocks */
+  for (count = 0; count < externc; count++) {
+    bblockp->bb_flags = BBLOCK_EXTERNAL;
+    bblockp->bb_mem = extern_mem;
+    
+    bblockp++;
+    bblockc++;
+    extern_count++;
+    freec--;
+    
+    if (bblockp >= freep->ba_blocks + BB_PER_ADMIN) {
+      freep = freep->ba_next;
+      bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
+      bblockc = bblockp->bb_freen;
+      bblockp = freep->ba_blocks + bblockc;
+    }
   }
   
-  /* adjust for the number of slots we want */
-  freec -= many;
-  bblock_count += many;
-  bblockc += many;
+  /* handle accounting for the admin-block(s) that we allocated above */
+  for (count = 0; count < admc; count++) {
+    admp = adm_store[count];
+    bblockp->bb_flags = BBLOCK_ADMIN;
+    bblockp->bb_adminp = admp;
+    bblockp->bb_posn = admp->ba_posn;
+    
+    bblockp++;
+    bblockc++;
+    bblock_adm_count++;
+    freec--;
+    
+    if (bblockp >= freep->ba_blocks + BB_PER_ADMIN) {
+      freep = freep->ba_next;
+      bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
+      bblockc = bblockp->bb_freen;
+      bblockp = freep->ba_blocks + bblockc;
+    }
+  }
   
-  /* adjust freep past used slots */
+  /*
+   * finally, handle the admin slots for the needed blocks
+   */
+  
+  /* set up return values */
+  retp = freep->ba_blocks + bblockc;
+  if (memp != NULL)
+    *memp = mem;
+  
+  /* now skip over those slots, set_bblock_admin will be done after return */
+  bblockc += many;
   while (bblockc >= BB_PER_ADMIN) {
     freep = freep->ba_next;
     bblockc -= BB_PER_ADMIN;
   }
+  freec -= many;
   
   /*
-   * write the last free count
-   * NOTE: freep can be NULL here in which case it will be set to admp
-   * next time
+   * do some error checking and write the last free count.  if freep
+   * is NULL then next time will have to allocate another bbadmin-block
    */
-  if (freep != NULL && freec > 0)
-    (freep->ba_blocks + (BB_PER_ADMIN - 1))->bb_freen = BB_PER_ADMIN - freec;
+  if (freep == NULL) {
+    if (freec != 0) {
+      dmalloc_errno = ERROR_BAD_ADMIN_LIST;
+      dmalloc_error("get_bblocks");
+      return NULL;
+    }
+  }
+  else {
+    if (freec <= 0 || freec >= BB_PER_ADMIN) {
+      dmalloc_errno = ERROR_BAD_ADMIN_LIST;
+      dmalloc_error("get_bblocks");
+      return NULL;
+    }
+    bblockp = freep->ba_blocks + (BB_PER_ADMIN - 1);
+    bblockp->bb_freen = bblockc;
+  }
   
-  return bblockp;
+  return retp;
 }
 
 /*
@@ -809,13 +871,9 @@ LOCAL	bblock_t	*find_bblock(const void * pnt, bblock_t ** lastp,
 }
 
 /*
- * get MANY of contiguous dblock administrative slots and get the next
- * basic-block for NEXTP.
- *
- * NOTE: the NEXTP is required in case the 2nd get_bblocks fails, we
- * want it to fail here
+ * get MANY of contiguous dblock administrative slots.
  */
-LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
+LOCAL	dblock_t	*get_dblock_admin(const int many)
 {
   static int		free_slots = 0;
   static dblock_adm_t	*dblock_admp = NULL;
@@ -829,12 +887,6 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
   /* do we have enough right now? */
   if (free_slots >= many) {
     dblockp = dblock_admp->da_block + (DB_PER_ADMIN - free_slots);
-    
-    /* get a bblock from free list */
-    *nextp = get_bblocks(1, FALSE);
-    if (*nextp == NULL)
-      return NULL;
-    
     free_slots -= many;
     return dblockp;
   }
@@ -842,15 +894,12 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
   /*
    * allocate a new bblock of dblock admin slots, should use free list
    */
-  bblockp = get_bblocks(1, FALSE);
+  bblockp = get_bblocks(1, (void **)&dblock_admp);
   if (bblockp == NULL)
     return NULL;
   
   dblock_adm_count++;
-  dblock_count++;
   free_slots = DB_PER_ADMIN;
-  
-  dblock_admp = (dblock_adm_t *)bblockp->bb_mem;
   
   bblockp->bb_flags = BBLOCK_DBLOCK_ADMIN;
   bblockp->bb_slotp = dblock_admp;
@@ -869,14 +918,6 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
   }
   
   dblock_admp->da_magic2 = CHUNK_MAGIC_TOP;
-  
-  /*
-   * get a bblock from free list
-   * NOTE: this should be here in case it fails
-   */
-  *nextp = get_bblocks(1, FALSE);
-  if (*nextp == NULL)
-    return NULL;
   
   free_slots -= many;
   
@@ -906,7 +947,8 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
     
     /* do we need to print admin info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN))
-      _dmalloc_message("found a free %d byte dblock entry", 1 << bitn);
+      _dmalloc_message("dblock entry for %d bytes found on free list",
+		       1 << bitn);
   }
   else {
     /* do we need to print admin info? */
@@ -915,18 +957,22 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
 		       1 << (BASIC_BLOCK - bitn), 1 << bitn);
     
     /* get some dblock admin slots and the bblock space */
-    dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn), &bblockp);
+    dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn));
     if (dblockp == NULL)
       return NULL;
     
     dblock_count++;
     
-    pnt = bblockp->bb_mem;
+    /* get a bblock from free list */
+    bblockp = get_bblocks(1, &pnt);
+    if (bblockp == NULL)
+      return NULL;
     
     /* setup bblock information */
     bblockp->bb_flags	= BBLOCK_DBLOCK;
     bblockp->bb_bitn	= bitn;
     bblockp->bb_dblock	= dblockp;
+    bblockp->bb_mem	= pnt;
     
     /* add the rest to the free list (has to be at least 1 other dblock) */
     firstp = dblockp;
@@ -999,7 +1045,7 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
  */
 EXPORT	int	_chunk_check(void)
 {
-  bblock_adm_t	*this_admp;
+  bblock_adm_t	*this_admp, *aheadp;
   bblock_t	*bblockp, *bblistp, *last_bblockp;
   dblock_t	*dblockp;
   int		undef = 0, start = 0;
@@ -1063,6 +1109,7 @@ EXPORT	int	_chunk_check(void)
   
   /* start pointers */
   this_admp = bblock_adm_head;
+  aheadp = this_admp;
   last_bblockp = NULL;
   
   /* test admin pointer validity */
@@ -1230,19 +1277,20 @@ EXPORT	int	_chunk_check(void)
     case BBLOCK_ADMIN:
       
       /* check the bblock_admin linked-list */
-      if (bblockp->bb_adminp != this_admp) {
+      if (bblockp->bb_adminp != aheadp) {
 	dmalloc_errno = ERROR_BAD_BLOCK_ADMINP;
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
       /* check count against admin count */
-      if (bblockp->bb_freen !=
-	  this_admp->ba_posn + (bblockp - this_admp->ba_blocks)) {
+      if (bblockp->bb_posn != aheadp->ba_posn) {
 	dmalloc_errno = ERROR_BAD_BLOCK_ADMINC;
 	dmalloc_error("_chunk_check");
 	return ERROR;
       }
+      
+      aheadp = aheadp->ba_next;
       break;
       
     case BBLOCK_DBLOCK:
@@ -1753,24 +1801,6 @@ EXPORT	int	_chunk_pnt_check(const char * func, const void * pnt,
 /**************************** information routines ***************************/
 
 /*
- * note in the chunk-level admin structures that BLOCKN blocks were
- * sbrk'ed externally by someone else up to MEM
- * returns [NO]ERROR
- */
-EXPORT	int	_chunk_note_external(const int blockn, const void * mem)
-{
-  bblock_t	*bblockp;
-  
-  bblockp = get_bblocks(blockn, TRUE);
-  if (bblockp == NULL
-      || set_bblock_admin(blockn, bblockp, BBLOCK_EXTERNAL, 0, 0, mem) !=
-      NOERROR)
-    return ERROR;
-  else
-    return NOERROR;
-}
-
-/*
  * return some information associated with PNT, returns [NO]ERROR
  */
 EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
@@ -2191,11 +2221,9 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     
     /* handle blocks */
     blockn = NUM_BLOCKS(byten);
-    bblockp = get_bblocks(blockn, FALSE);
+    bblockp = get_bblocks(blockn, &pnt);
     if (bblockp == NULL)
       return MALLOC_ERROR;
-    
-    pnt = bblockp->bb_mem;
     
     /* initialize the bblocks */
     set_bblock_admin(blockn, bblockp, BBLOCK_START_USER, line, byten, file);
@@ -2668,7 +2696,7 @@ EXPORT	void	_chunk_stats(void)
     _dmalloc_message("dumping chunk statistics");
   
   tot_space = alloc_current + free_space_count;
-  overhead = HEAP_SIZE - tot_space;
+  overhead = (bblock_adm_count + dblock_adm_count) * BLOCK_SIZE;
   wasted = tot_space - alloc_max_given;
   
   /* version information */
@@ -2677,8 +2705,9 @@ EXPORT	void	_chunk_stats(void)
 		   (HEAP_GROWS_UP ? "up" : "down"));
   
   /* general heap information */
-  _dmalloc_message("heap: start %#lx, end %#lx, size %ld bytes, checked %ld",
-		  _heap_base, _heap_last, HEAP_SIZE, check_count);
+  _dmalloc_message("heap: %#lx to %#lx, size %ld bytes (%ld blocks), checked %ld",
+		  _heap_base, _heap_last, HEAP_SIZE, bblock_count,
+		   check_count);
   
   /* log user allocation information */
   _dmalloc_message("alloc calls: malloc %ld, realloc %ld, calloc %ld, free %ld"
@@ -2706,12 +2735,15 @@ EXPORT	void	_chunk_stats(void)
 		    (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   
   /* final stats */
-  _dmalloc_message("final user memory space: basic %ld, divided %ld, %ld bytes"
-		   , bblock_count - bblock_adm_count - dblock_count,
-		   dblock_count - dblock_adm_count, tot_space);
+  _dmalloc_message("final user memory space: basic %ld, divided %ld, %ld bytes",
+		   bblock_count - bblock_adm_count - dblock_count -
+		   dblock_adm_count - extern_count, dblock_count,
+		   tot_space);
   _dmalloc_message("   final admin overhead: basic %ld, divided %ld, %ld bytes (%d%%)",
 		   bblock_adm_count, dblock_adm_count, overhead,
 		   (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
+  _dmalloc_message("   final external space: %ld bytes (%ld blocks)",
+		   extern_count * BLOCK_SIZE, extern_count);
 }
 
 /*
