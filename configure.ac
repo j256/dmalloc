@@ -18,10 +18,10 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.26 2004/07/10 03:49:52 gray Exp $
+# $Id: configure.ac,v 1.27 2004/07/11 03:08:38 gray Exp $
 #
-AC_REVISION($Revision: 1.26 $)
-AC_INIT(dmalloc, 5.3.0, [http://dmalloc.com/])
+AC_REVISION($Revision: 1.27 $)
+AC_INIT(dmalloc, 5.4.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
@@ -274,6 +274,8 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #  include <sys/mman.h>
 #endif
 main() {
+  /* so we know here that we could open /dev/zero and map to that but I 
+     did not want the library to open another file-descriptor */
   void *ret = mmap(0L, 10, PROT_READ | PROT_WRITE | PROT_EXEC,
 	           MAP_PRIVATE | MAP_ANON, -1 /* no fd */, 0 /* no offset */);
   if (ret == MAP_FAILED) { exit(1); }
@@ -569,7 +571,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.26 2004/07/10 03:49:52 gray Exp $"
+#ident "$Id: configure.ac,v 1.27 2004/07/11 03:08:38 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

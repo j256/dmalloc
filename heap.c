@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: heap.c,v 1.65 2004/07/10 03:49:52 gray Exp $
+ * $Id: heap.c,v 1.66 2004/07/11 03:08:38 gray Exp $
  */
 
 /*
@@ -99,9 +99,12 @@ static	void	*heap_extend(const int incr)
   }
 #else
 #if HAVE_MMAP && USE_MMAP
+#if MAP_ANON
   /* if we have and can use mmap, then do so */
   ret = mmap(0L, incr, PROT_READ | PROT_WRITE | PROT_EXEC,
 	     MAP_PRIVATE | MAP_ANON, -1 /* no fd */, 0 /* no offset */);
+#else
+#endif
   if (ret == MAP_FAILED) {
     ret = SBRK_ERROR;
   }

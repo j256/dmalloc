@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.64 2004/01/14 16:18:00 gray Exp $
+ * $Id: settings.dist,v 1.65 2004/07/11 03:08:39 gray Exp $
  */
 
 /*
@@ -123,7 +123,7 @@
  */
 #define MIN_FILE_LENGTH		    3
 #define MAX_FILE_LENGTH		  100
-#define MAX_LINE_NUMBER		10000
+#define MAX_LINE_NUMBER		30000
 
 /*
  * The largest allowable allocation size.  This is only for
