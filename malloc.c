@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.124 1999/03/05 00:31:00 gray Exp $
+ * $Id: malloc.c,v 1.125 1999/03/07 23:02:14 gray Exp $
  */
 
 /*
@@ -78,10 +78,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.124 1999/03/05 00:31:00 gray Exp $";
+#ident "$Id: malloc.c,v 1.125 1999/03/07 23:02:14 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.124 1999/03/05 00:31:00 gray Exp $";
+  "$Id: malloc.c,v 1.125 1999/03/07 23:02:14 gray Exp $";
 #endif
 #endif
 
@@ -299,8 +299,7 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   addr_c++;
   _dmalloc_message("address '%#lx' found in '%s' at pass %ld from '%s'",
 		   (unsigned long)pnt, label, addr_c,
-		   _chunk_display_where(file, line, where_buf,
-					sizeof(where_buf)));
+		   _chunk_desc_pnt(where_buf, sizeof(where_buf), file, line));
   
   /* NOTE: if address_seen_n == 0 then never quit */
   if (_dmalloc_address_seen_n == ADDRESS_COUNT_INIT
@@ -1035,7 +1034,7 @@ int	_dmalloc_examine(const char *file, const int line,
   
   /* NOTE: we do not need the alloc-size info */
   ret = _chunk_read_info(pnt, &size_map, NULL, file_p, line_p, ret_attr_p,
-			 "dmalloc_examine", NULL);
+			 "dmalloc_examine", NULL, NULL);
   in_alloc_b = FALSE;
   
 #if LOCK_THREADS
