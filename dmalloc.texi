@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.99 1995/07/01 01:09:10 gray Exp $
+@c $Id: dmalloc.texi,v 1.100 1995/07/01 01:25:14 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -258,7 +258,7 @@ USA
 @node Basic Definitions, Malloc Functions, Allocation Basics, Allocation Basics
 @subsection Basic Concept Definitions
 
-@cindex basic defintions
+@cindex basic definitions
 @cindex memory definitions
 
 Any program can be divided into 2 logical parts: text and data.  Text is
@@ -595,7 +595,7 @@ created by configure to make sure it did its job correctly.
 
 @cindex settings.h file
 
-@item You may also want ot Examine the manual settings in
+@item You probably will want to Examine the manual settings in
 @file{settings.h} to tune specific features of the library.
 
 @cindex DMALLOC_SIZE variable
@@ -610,7 +610,7 @@ about the size arguments to malloc routines.
 please see if there are any notes in the contrib directory about your
 system-type.  If not and you figure your problem out, please send me
 some notes so future users can profit from your experiences.  In general
-64 bit systems usally have lots of warnings about int to pointer
+64 bit systems usually have lots of warnings about int to pointer
 promotion.
 
 @cindex ANSI-C compiler
@@ -1276,7 +1276,7 @@ information) and unknown (the rest).
 Often, you may allocate memory in via @code{strdup()} or another
 routine, so the logfile listing where in the @code{strdup} routine the
 memory was allocated does not help locate the true source of the memory
-leak -- the routined that called @code{strdup}.  Without a mechanism to
+leak -- the routine that called @code{strdup}.  Without a mechanism to
 trace the calling stack, there is no way for the library to see who the
 caller of the caller (so to speak) was.
 
@@ -1287,7 +1287,7 @@ However, there is a way to track down unfreed memory in this
 circumstance.  You need to compile the library with
 @code{STORE_SEEN_COUNT} defined in @file{conf.h}.  The library will then
 record how many times a pointer has been allocated or freed.  It will
-diskplay the unfreed memory as:
+display the unfreed memory as:
 
 @example
 not freed: '0x45008|s3' (12 bytes) from 'ra=0x1f8f4'
