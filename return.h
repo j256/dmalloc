@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.17 1998/09/17 12:41:41 gray Exp $
+ * $Id: return.h,v 1.18 1998/09/17 12:43:49 gray Exp $
  */
 
 /*
@@ -137,7 +137,7 @@
 /*************************************/
 
 /*
- * for Data General workstations running DG/UX 5.4R3.00 from Joerg
+ * For Data General workstations running DG/UX 5.4R3.00 from Joerg
  * Wunsch <joerg_wunsch@julia.tcd-dresden.de>.
  */
 #ifdef __m88k__
@@ -187,11 +187,9 @@
  * "dmalloc.h.3" in such a way that the malloc/calloc/realloc/free
  * definitions would no longer cause the compiler to bark with
  * 'identifier redeclared' (I just put an #ifdef _STDLIB_H ... #endif
- * around those functions).
- *
- * -- Wim_van_Duuren@stratus.com
+ * around those functions).  -- Wim_van_Duuren@stratus.com
  */
-#if defined(_FTX) & defined(i860)
+#if defined(_FTX) && defined(i860)
 
 /*
  * we first have the define the little assembly code function
@@ -209,7 +207,7 @@ asm void ASM_GET_RET_ADDR(file)
 }
 #define GET_RET_ADDR(file, line)	ASM_GET_RET_ADDR(file)
 
-#endif
+#endif /* _FTX & i860 */
 
 /********************************** default **********************************/
 
