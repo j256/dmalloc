@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: version.h,v 1.107 2003/05/15 20:09:32 gray Exp $
+ * $Id: version.h,v 1.108 2003/05/16 17:00:52 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -36,10 +36,10 @@
  *	dmalloc.texi (2 places)
  *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
  *
- * Make sure to also cvs tag the release.  dmalloc_release_X_X_X[_bX]
+ * Make sure to also cvs tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.0.0-b1" ;
+static	char	*dmalloc_version = "5.0.0" ;
 
-/* Version Date: $Date: 2003/05/15 20:09:32 $ */
+/* Version Date: $Date: 2003/05/16 17:00:52 $ */
 
 #endif /* ! __VERSION_H__ */
