@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.66 1994/11/12 23:37:08 gray Exp $
+# $Id: Makefile.in,v 1.67 1994/11/12 23:41:17 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -63,6 +63,7 @@ all : $(LIBRARY) $(LIB_DIS) $(UTIL)
 clobber :
 	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f part.? dmalloc.head dmalloc.info dmalloc.h
+	rm -f INSTALL README README_ftp
 
 .PHONY : distclean
 distclean : clobber
