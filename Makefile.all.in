@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.53 1995/03/23 15:35:33 gray Exp $
+# $Id: Makefile.all.in,v 1.54 1995/05/05 16:53:31 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -49,34 +49,26 @@ OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o malloc.o
 CFLAGS = $(CCFLAGS)
 TEST = dmalloc_t
 
-# .PHONY : all
 all : $(LIBRARY) $(LIB_DIS) $(UTIL)
 
-# .PHONY : clean
 clean :
 	rm -f a.out core *.o *.t
 	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL) dmalloc.h
 
-# .PHONY : clobber
 clobber : clean
 
-# .PHONY : realclean
 realclean : clobber
 
-# .PHONY : distclean
 distclean : clobber
 	rm -f Makefile config.status config.cache config.log conf.h dmalloc.h.2
 #	rm -f configure
 
-# .PHONY : installdirs
 installdirs :
 	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(infodir) $(bindir)
 
-# .PHONY : installincs
 installincs : $(HFLS)
 	$(INSTALL_DATA) $(HFLS) $(incdir)
 
-# .PHONY : installlib
 installlib : installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
@@ -84,7 +76,6 @@ installlib : installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
 	@RANLIB@ $(libdir)/$(LIB_DIS)
 	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
 
-# .PHONY : install
 install : installdirs installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 
@@ -109,11 +100,9 @@ $(UTIL) : $(UTIL).o argv.o compat.o env.o
 	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
 	mv a.out $@
 
-# .PHONY : noansi
 noansi : dmalloc.h Deansify.pl
 	perl $(srcdir)/Deansify.pl *.[ch]
 
-# .PHONY : tests
 tests : $(TEST)
 
 $(TEST) : $(TEST).o argv.o $(LIBRARY)
@@ -121,7 +110,6 @@ $(TEST) : $(TEST).o argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) $(TEST).o argv.o $(LIBS) -l$(LIBNAME)
 	mv a.out $@
 
-#.PHONY : check light
 check light : $(TEST)
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
@@ -129,7 +117,6 @@ check light : $(TEST)
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
 
-#.PHONY : heavy
 heavy : $(TEST) light
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000

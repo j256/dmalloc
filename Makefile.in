@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.71 1995/03/10 19:43:18 gray Exp $
+# $Id: Makefile.in,v 1.72 1995/05/05 16:53:33 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -17,7 +17,7 @@ DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
 LIBS	= $(LIBRARIES)
 
-CFLAGS	= -g $(CCFLS) -pipe -W -Wreturn-type -Wunused -Wpointer-arith \
+CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith \
 	-Wshadow -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
 LDFLAGS	= $(LLDFLAGS)
@@ -136,7 +136,7 @@ heavy :: $(TEST) light
 continuous :: $(TEST)
 	while test 1 ;\
 		do  (\
-			$(TEST) -n -t 10000 ;\
+			$(TEST) -n -t 100000 ;\
 			sleep 1 ;\
 		); done
 
