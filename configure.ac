@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.19 2003/09/29 23:13:34 gray Exp $
+# $Id: configure.ac,v 1.20 2003/09/29 23:29:38 gray Exp $
 #
-AC_REVISION($Revision: 1.19 $)
+AC_REVISION($Revision: 1.20 $)
 AC_INIT(dmalloc, 5.2.3, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -434,10 +434,10 @@ AC_CHECK_HEADER([sys/cygwin.h],
 		[AC_SUBST([HAVE_SYS_CYGWIN_H],0)])
 AC_CHECK_HEADER([w32api/windef.h],
 		[AC_SUBST([HAVE_W32API_WINDEF_H],1)],
-		[AC_SUBST([HAVE_W32API_WINDEF_h],0)])
+		[AC_SUBST([HAVE_W32API_WINDEF_H],0)])
 AC_CHECK_HEADER([w32api/winbase.h],
 		[AC_SUBST([HAVE_W32API_WINBASE_H],1)],
-		[AC_SUBST([HAVE_W32API_WINBASE_h],0)],
+		[AC_SUBST([HAVE_W32API_WINBASE_H],0)],
 		[[#if HAVE_W32API_WINDEF_H
 # include <w32api/windef.h>
 #endif]])
@@ -540,7 +540,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.19 2003/09/29 23:13:34 gray Exp $"
+#ident "$Id: configure.ac,v 1.20 2003/09/29 23:29:38 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
