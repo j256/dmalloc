@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.93 2001/07/12 23:10:00 gray Exp $
+ * $Id: dmalloc_t.c,v 1.94 2002/01/28 18:21:09 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_t.c,v 1.93 2001/07/12 23:10:00 gray Exp $"
+#ident "$Id: dmalloc_t.c,v 1.94 2002/01/28 18:21:09 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.93 2001/07/12 23:10:00 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.94 2002/01/28 18:21:09 gray Exp $";
 #endif
 #endif
 
@@ -991,7 +991,7 @@ int	main(int argc, char **argv)
 		    dmalloc_errno);
     }
     else {
-      (void)fprintf(stderr, "Final malloc error: %s (%d)\n",
+      (void)fprintf(stderr, "Final error: %s (%d)\n",
 		    dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     exit(1);
