@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.45 1994/09/26 16:09:23 gray Exp $";
+  "$Id: error.c,v 1.46 1994/10/15 17:01:52 gray Exp $";
 #endif
 
 /*
@@ -109,7 +109,7 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
   len = strp - str;
   
   /* do we need to log the message? */
-  if (dmalloc_logpath != NULL) {
+  if (dmalloc_logpath != LOGPATH_INIT) {
     /*
      * do we need to open the outfile?
      * it will be closed by _exit().  yeach.
@@ -121,7 +121,7 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
 		      __FILE__, __LINE__, dmalloc_logpath);
 	(void)write(STDERR, str, strlen(str));
 	/* disable log_path */
-	dmalloc_logpath = NULL;
+	dmalloc_logpath = LOGPATH_INIT;
 	return;
       }
     }
