@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.263 2004/09/27 20:18:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.264 2004/10/12 13:23:05 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -125,6 +125,7 @@ Gray Watson.
 * Programming::                 How to program with the library.
 * Dmalloc Program::             How to use the library's utility.
 * Source Code::                 Information on the source code.
+* Troubleshooting::             Some solutions to common problems.
 * Index of Concepts::           Index of concepts in the manual.
 @end menu
 
@@ -164,7 +165,6 @@ without express or implied warranty.
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    General features of the library.
 * How It Works::                How the library checks your program.
-* Troubleshooting::             Some solutions to common problems.
 @end menu
 
 @c --------------------------------
@@ -740,7 +740,7 @@ overwrites one of its fence-post markers.
 
 @c --------------------------------
 
-@node How It Works, Troubleshooting, Features, Overview
+@node How It Works,, Features, Overview
 @section How the Library Checks Your Program
 
 This is one of the newer sections of the library implying that it is
@@ -803,126 +803,6 @@ checking the heap after it sees a dmalloc call from the
 @samp{dmalloc_t.c:0}, with a 0 line number, then dmalloc will start
 checking the heap after it sees a call from anywhere in the
 @file{dmalloc_t.c} file.
-
-@c --------------------------------
-
-@node Troubleshooting,, How It Works, Overview
-@section Some Solutions to Common Problems
-
-@cindex troubleshooting
-@cindex common problems
-@cindex help 
-@cindex how do i...
-@cindex faq
-@cindex questions
-@cindex problems
-
-This section provides some answers to some common problems and
-questions.  Please send me mail with any additions to
-this list -- either problems you are still having or tips that you would
-like to pass on.
-
-When diagnosing a problem, if possible, always make sure you are running
-the most up to date version of Dmalloc available from the home page at
-URL @uref{http://dmalloc.com/}.  Problems are often fixed and a new
-release can be published before people encounter them.
-
-@table @samp
-
-@item Why does my program run so slow?
-
-@cindex check-heap
-This library has never been (and maybe never will be) optimized for
-space nor speed.  Some of its features make it unable to use some of
-the organizational methods of other more efficient heap libraries.  If
-you have the @code{check-heap} token enabled, see the @kbd{-i} option
-to the dmalloc utility to have the library check itself less
-frequently.  @xref{Dmalloc Program}.
-
-@cindex logfile not produced
-@cindex no logfile produced
-@item Why was a log-file not produced after I ran my program?
-
-This could be caused by a number of different problems.
-
-@enumerate
-
-@item Are you sure you followed all of the items in the ``Getting Started''
-section?  Please review them if there is any doubt.  @xref{Getting
-Started}.
-
-@cindex env
-@cindex printenv
-@cindex DMALLOC_OPTIONS
-
-@item Use the @kbd{env} or @kbd{printenv} commands to make sure that
-the @samp{DMALLOC_OPTIONS} variable is set in your exported environment.
-@xref{Environment Variable}.
-
-@cindex ident
-@cindex strings
-
-@item Make sure that your program has been compiled correctly with the
-dmalloc library.  The @kbd{ident} program should show chunk.c and other
-dmalloc files compiled into your program.  You can also do @kbd{strings
--a your-program | grep chunk.c} and look for something like @samp{$Id:
-chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $} with different versions
-and date information.  If this doesn't show up then chances are dmalloc
-was not linked into your program.
-
-@item If your program changes its working directory, it may write the
-dmalloc log-file somewhere else in the filesystem.  You will need to
-check both where the program was started and to where it might change
-directory.
-
-@item The logfile is only produced when @code{dmalloc_shutdown()} is
-called.  By default it will be called when @code{exit()} gets called.
-If you are running your program and press @kbd{Control-C} under Unix the
-program will stop immediately and @code{dmalloc_shutdown()} will not get
-called.  You can either setup a signal handler for @code{SIGINTR} and
-call exit yourself, or you can enable the @kbd{catch-signals} token.
-@xref{Debug Tokens}.
-
-@item If your program is segfaulting or otherwise crashing when it exits, the
-@code{exit()} routine may not being called.  You will have to resolve
-these issues so the dmalloc library can gracefully exit and write its
-log file.
-
-@item You may want to call @code{dmalloc_log_stats()} and
-@code{dmalloc_log_unfreed()} (or @code{dmalloc_log_changed()}) directly
-to have the library write its log file.  Some system modules may not
-have shutdown if you call this before @code{exit()} so extra unfreed
-memory may be reported.
-
-@end enumerate
-
-@item I don't see any information about my non-freed (leaked) memory?
-
-The library will not (by default) report on ``unknown'' non-freed
-memory.  Unknown means memory that does not have associated file and
-line information.
-
-This will be necessary if you are @emph{not}
-including @file{dmalloc.h} in all of your C files or if you are
-interested in tracking leaks in system functions.
-
-@item Dmalloc is returning the error "malloc library has gone recursive"
-
-This most likely indicates that you are using the Dmalloc library within
-a threaded application and two threads are trying to use the dmalloc
-library at once.  Please see the section of the manual about threads for
-more information about properly configuring the library.  @xref{Using
-With Threads}.
-
-If you are not using threads, then your program could have caught a
-signal while within Dmalloc, which then in turn called a memory
-allocation routine.  It is unwise to allocate memory on the heap in most
-signal handlers.  Lastly, some functions called by the library may call
-memory routines that it does not anticipate.  If you think this the
-case, please report the problem and include a stack trace, operating
-system version/type, and the version of Dmalloc you are using.
-
-@end table
 
 @c ----------------------------------------------------------------------------
 
@@ -3277,17 +3157,33 @@ tags to combinations of debug tokens.  @xref{Debug Tokens}.
 tags built into it so it is not necessary for you to setup a RC file:
 
 @table @code
+@cindex runtime token
+@cindex token runtime
 @item runtime
-enables basic runtime tests
+Enables basic runtime tests including fence-post checking, null handling,
+and logging of any errors.
 
+@cindex low token
+@cindex token low
 @item low
-turns on minimal checking of heap structures
+Runtime settings plus minimal checking of heap structures and
+overwriting of allocated and freed space.
 
+@cindex medium token
+@cindex token medium
 @item medium
-significant checking of heap areas
+Low settings plus checking of all heap structures on each memory call,
+always relocates block on realloc, and aborts on errors.  You may want
+to use @kbd{-i} option to the dmalloc utility.  @xref{Dmalloc
+Program}.
 
+@cindex high token
+@cindex token high
 @item high
-extensive checking of heap areas
+Medium settings plus checking of overwritten freed and allocated
+memory and checking of arguments to a number of common functions. You
+may want to use @kbd{-i} option to the dmalloc utility.  @xref{Dmalloc
+Program}.
 
 @end table
 
@@ -3344,7 +3240,7 @@ Enter @code{dmalloc none} to disable all memory debugging features.
 
 @c ----------------------------------------------------------------------------
 
-@node Source Code, Index of Concepts, Dmalloc Program, Top
+@node Source Code, Troubleshooting, Dmalloc Program, Top
 @chapter Information on the Source Code
 
 @cindex source code
@@ -3421,7 +3317,7 @@ my attention.
 
 @c --------------------------------
 
-@node Portability,  , Compatibility, Source Code
+@node Portability,, Compatibility, Source Code
 @section Issues Important for Porting the Library
 
 @cindex portability
@@ -3469,7 +3365,132 @@ main()
 
 @c --------------------------------
 
-@node Index of Concepts, , Source Code, Top
+@node Troubleshooting, Index of Concepts, Source Code, Top
+@chapter Some Solutions to Common Problems
+
+@cindex troubleshooting
+@cindex common problems
+@cindex help 
+@cindex how do i...
+@cindex faq
+@cindex questions
+@cindex problems
+
+This section provides some answers to some common problems and
+questions.  Please send me mail with any additions to
+this list -- either problems you are still having or tips that you would
+like to pass on.
+
+When diagnosing a problem, if possible, always make sure you are running
+the most up to date version of Dmalloc available from the home page at
+URL @uref{http://dmalloc.com/}.  Problems are often fixed and a new
+release can be published before people encounter them.
+
+@table @samp
+
+@item Why does my program run so slow?
+
+@cindex check-heap
+This library has never been (and maybe never will be) optimized for
+space nor speed.  Some of its features make it unable to use some of
+the organizational methods of other more efficient heap libraries.
+
+If you have the @code{check-heap} token enabled, you can have the
+library check itself less frequently by using the @kbd{-i} option to
+the dmalloc utility.  @xref{Dmalloc Program}.  If you are using the
+@kbd{high} token and you need your program to run faster, try the
+@kbd{medium} or @kbd{low} tokens which don't check as many heap
+features and so run faster although they will not catch as many
+problems. @xref{RC File}.
+
+@cindex logfile not produced
+@cindex no logfile produced
+@item Why was a log-file not produced after I ran my program?
+
+This could be caused by a number of different problems.
+
+@enumerate
+
+@item Are you sure you followed all of the items in the ``Getting Started''
+section?  Please review them if there is any doubt.  @xref{Getting
+Started}.
+
+@cindex env
+@cindex printenv
+@cindex DMALLOC_OPTIONS
+
+@item Use the @kbd{env} or @kbd{printenv} commands to make sure that
+the @samp{DMALLOC_OPTIONS} variable is set in your exported environment.
+@xref{Environment Variable}.
+
+@cindex ident
+@cindex strings
+
+@item Make sure that your program has been compiled correctly with the
+dmalloc library.  The @kbd{ident} program should show chunk.c and other
+dmalloc files compiled into your program.  You can also do @kbd{strings
+-a your-program | grep chunk.c} and look for something like @samp{$Id:
+chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $} with different versions
+and date information.  If this doesn't show up then chances are dmalloc
+was not linked into your program.
+
+@item If your program changes its working directory, it may write the
+dmalloc log-file somewhere else in the filesystem.  You will need to
+check both where the program was started and to where it might change
+directory.
+
+@item The logfile is only produced when @code{dmalloc_shutdown()} is
+called.  By default it will be called when @code{exit()} gets called.
+If you are running your program and press @kbd{Control-C} under Unix the
+program will stop immediately and @code{dmalloc_shutdown()} will not get
+called.  You can either setup a signal handler for @code{SIGINTR} and
+call exit yourself, or you can enable the @kbd{catch-signals} token.
+@xref{Debug Tokens}.
+
+@item If your program is segfaulting or otherwise crashing when it exits, the
+@code{exit()} routine may not being called.  You will have to resolve
+these issues so the dmalloc library can gracefully exit and write its
+log file.
+
+@item You may want to call @code{dmalloc_log_stats()} and
+@code{dmalloc_log_unfreed()} (or @code{dmalloc_log_changed()}) directly
+to have the library write its log file.  Some system modules may not
+have shutdown if you call this before @code{exit()} so extra unfreed
+memory may be reported.
+
+@end enumerate
+
+@item I don't see any information about my non-freed (leaked) memory?
+
+The library will not (by default) report on ``unknown'' non-freed
+memory.  Unknown means memory that does not have associated file and
+line information.
+
+This will be necessary if you are @emph{not}
+including @file{dmalloc.h} in all of your C files or if you are
+interested in tracking leaks in system functions.
+
+@item Dmalloc is returning the error "malloc library has gone recursive"
+
+This most likely indicates that you are using the Dmalloc library within
+a threaded application and two threads are trying to use the dmalloc
+library at once.  Please see the section of the manual about threads for
+more information about properly configuring the library.  @xref{Using
+With Threads}.
+
+If you are not using threads, then your program could have caught a
+signal while within Dmalloc, which then in turn called a memory
+allocation routine.  It is unwise to allocate memory on the heap in most
+signal handlers.  Lastly, some functions called by the library may call
+memory routines that it does not anticipate.  If you think this the
+case, please report the problem and include a stack trace, operating
+system version/type, and the version of Dmalloc you are using.
+
+@end table
+
+@c --------------------------------
+
+@node Index of Concepts,, Troubleshooting, Top
 @unnumbered Index of Concepts
 
 @printindex cp
