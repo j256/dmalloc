@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.152 2002/01/28 19:08:21 gray Exp $
+# $Id: Makefile.in,v 1.153 2003/05/13 14:58:41 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -16,8 +16,7 @@ CC = @CC@
 CXX = @CXX@
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o \
-	protect.o
+OBJS	= arg_check.o compat.o dmalloc_tab.o env.o heap.o protect.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o
@@ -57,10 +56,6 @@ LIB_SH = lib$(MODULE).so
 # threads + C++
 LIB_TH_CXX = lib$(MODULE)thcxx.a
 
-# library with dmalloc disabled
-LIB_DIS	= lib$(MODULE)lp.a
-SHLIB_DIS = lib$(MODULE)lp.so
-
 CFLAGS	= -g $(CCFLS) -Wall -Wpointer-arith -Wshadow -Waggregate-return \
 	-Wmissing-prototypes
 
@@ -76,11 +71,11 @@ INFOFILE= $(MODULE).info
 # the end on purpose
 #
 FLS	=  conf.h.in configure.in config.help \
-	ChangeLog Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
+	ChangeLog.1 Manifest INSTALL NEWS NOTES README RELEASE.html TODO \
 	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
-	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
+	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h \
 	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc_funcs.h \
 	protect.[ch] return.h version.h \
 	settings.dist dmalloc_argv.[ch] dmalloc_argv_loc.h dmallocc.cc \
@@ -97,15 +92,16 @@ DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi texinfo.tex
 # NOTE: the wc level should be below 90k due to shar overhead
 SHARSIZE= 85k
 
-all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
+all :: dmalloc.h $(LIBRARY) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
 @CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
 @TH_OFF@	@echo "To make the thread version of the library type 'make threads'"
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(LIB_DIS) $(TEST)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
 	rm -f $(UTIL) dmalloc.h
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
+	rm -f ChangeLog.1
 
 distclean :: clean
 	rm -f confdefs.h configure config.status config.log config.cache conf.h
@@ -113,45 +109,43 @@ distclean :: clean
 	rm -rf port
 
 installincs :: $(HFLS)
-	install -cev -m 444 $(HFLS) $(DESTDIR)/include
+	install -Cv -m 444 $(HFLS) $(DESTDIR)/include
 
 installcxx :: $(LIB_CXX)
-	install -cevr -m 644 $(LIB_CXX) $(DESTDIR)/lib
+	install -Cv -m 644 $(LIB_CXX) $(DESTDIR)/lib
 
 installthcxx :: $(LIB_THCXX)
-	install -cevr -m 644 $(LIB_THCXX) $(DESTDIR)/lib
+	install -Cv -m 644 $(LIB_THCXX) $(DESTDIR)/lib
 
 installth :: $(LIB_TH) $(INSTALL_TH_CXX)
-	install -cevr -m 644 $(LIB_TH) $(DESTDIR)/lib
+	install -Cv -m 644 $(LIB_TH) $(DESTDIR)/lib
 @CXX_OFF@	@echo "Enter 'make installthcxx' to install the C++ library"
 
-installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
-	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
-	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
+installlibs :: installincs $(LIBRARY) $(INSTALL_CXX) $(INSTALL_TH)
+	install -Cv -m 644 $(LIBRARY) $(DESTDIR)/lib
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
 installdocs :: $(DOCS)
-	install -cev -m 444 $(DOCS) $(WWWDIR)/docs
+	install -Cv -m 444 $(DOCS) $(WWWDIR)/docs
 	cd $(WWWDIR)/docs ; for file in $(DOCS) ;\
 		do gzip -9fc $$file > $$file.gz.t ;\
-		install -cev -m 444 $$file.gz.t $$file.gz ;\
+		install -Cv -m 444 $$file.gz.t $$file.gz ;\
 		rm -f $$file.gz.t ; done
 	-cd $(WWWDIR)/docs/online ;\
 		umask 022 ;\
-		texi2html -menu -glossary -number -split_node \
-			../dmalloc.texi ;\
+		texi2html -menu -number -split_node ../dmalloc.texi ;\
 		for f in dmalloc*.html ; do \
 			sed -e 's,</BODY>,<P><A HREF="http://dmalloc.com/">Dmalloc Home Page</A>.  Copyright 2001 by <A HREF="http://256.com/gray/">Gray Watson</A></BODY>,' $$f > $$f.t ;\
 			mv $$f.t $$f ;\
 		done
 
 installshlib : $(SHLIBRARY)
-	install -cevr -m 644 $(srcdir)/$(SHLIBRARY) $(shlibdir)
+	install -Cv -m 644 $(srcdir)/$(SHLIBRARY) $(shlibdir)
 
 install :: installlibs $(UTIL) $(INFOFILE)
-	install -cev $(UTIL) $(DESTDIR)/bin
-	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
+	install -Cv $(UTIL) $(DESTDIR)/bin
+	install -Cv -m 444 $(INFOFILE) $(DESTDIR)/info
 
 # put situation specific lines here
 dmalloc.h.2 : config.status
@@ -177,23 +171,19 @@ $(SHLIBRARY) : $(LIBRARY)
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
 	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
-	ranlib $@
-
-$(LIB_DIS) : dmalloc_lp.o
-	ar cr $@ $?
-	ranlib $@
+	@RANLIB@ $@
 
 $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 	rm -f $@
@@ -273,6 +263,11 @@ port :: $(FLS) $(CONTFLS) Makefile.all.in
 	rm -f dmalloc-$(VERSION).tgz dmalloc-$(VERSION).tgz.t
 	tar -czf dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION)
 	mv dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION).tgz
+
+ChangeLog.1 : ChangeLog
+	rm -f $@ $@.t
+	perl -n -e 's/[\w\.+-]+@[\w.+-]+//; print $$_;' < ChangeLog > $@.t
+	mv $@.t $@
 
 dmalloc.ps : $(srcdir)/dmalloc.texi
 	rm -rf work
