@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.37 1994/09/10 23:27:18 gray Exp $
+ * $Id: conf.h.in,v 1.38 1994/09/12 17:19:14 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -68,17 +68,18 @@
  * specific macros designed to return the return-address for logging
  * callers (i.e. possible offenders) of malloc routines.  You should
  * only want to disable them if you are storing code which makes calls
- * to the malloc function *from* the heap.  This is unlikely but will
- * confuse the library.  Please mail me if you have any questions or
- * if you indeed have this problem.
+ * to the dmalloc functions *from* the heap.  This is unlikely but
+ * will confuse the library.  Please mail me if you have any questions
+ * or if you indeed have this problem.
  */
 #define USE_RET_ADDRESS 1
 
 /*
  * the largest allowable allocations in bits.  This is only for
  * verification purposes.  Any allocation larger than this (in bits)
- * will generate a MALLOC_TOO_BIG error.  the default (24) indicates
- * that an allocation of more than 16mb (2^24) will generate an error.
+ * will generate a ERROR_TOO_BIG error (#15).  the default (24)
+ * indicates that an allocation of more than 16mb (2^24) will generate
+ * an error.
  */
 #define LARGEST_BLOCK 24
 
@@ -98,7 +99,7 @@
 #define WORST_FIT 0
 
 /*
- * automatically call malloc_shutdown if on_exit or atexit is
+ * automatically call dmalloc_shutdown if on_exit or atexit is
  * available.  See below for whether configure found on_exit or atexit
  * calls.
  */
@@ -119,21 +120,21 @@
 /*
  * number of bytes to write at the top of allocations (if fence-post
  * checking is enabled).  A larger number means more memory space used
- * up but better protection about fence overruns.  See the manual for
- * more information.
+ * up but better protection against fence overruns.  See the manual
+ * for more information.
  */
 #define FENCE_TOP 4
 
 /*
  * write the iteration count at the start of every log entry.  This is
- * handy when you are using the MALLOC_START variable and want to
+ * handy when you are using the DMALLOC_START variable and want to
  * begin the tough debugging at a certain point.
  */
 #define LOG_ITERATION_COUNT 1
 
 /*
  ************************************************************************
- * CONFIGURE DEFINES: Should not need to tune by hand
+ * CONFIGURE DEFINES: Should not need to be tuned by hand
  ************************************************************************
  */
 
@@ -161,9 +162,9 @@
  *
  * NOTE: some sbrk functions round to the correct page-size.  If this
  * value is too low, the dmalloc library may think someone is using
- * sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR error.  No
- * problems aside from a possible small increase in the administration
- * overhead should happen if this value is too high.
+ * sbrk behind its back and return a ERROR_ALLOC_NONLINEAR error
+ * (#18).  No problems aside from a possible small increase in the
+ * administration overhead should happen if this value is too high.
  */
 #define BASIC_BLOCK 12
 
@@ -192,7 +193,7 @@
 /*
  * some systems have functions which can register routines to be
  * called by exit(3) (or when the program returns from main).  this
- * functionality allows the malloc_shutdown() routine to be called
+ * functionality allows the dmalloc_shutdown() routine to be called
  * automatically upon program completion so that the library can log
  * statistics.  use the AUTO_SHUTDOWN define above to disable this.
  * please send me mail if this functionality exists on your system but
