@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.42 1994/09/12 17:26:03 gray Exp $
+ * $Id: version.h,v 1.43 1994/09/20 19:07:57 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -33,8 +33,8 @@
  *	Changlog
  *	News
  */
-LOCAL	char	*malloc_version = "3.0.1b";
+LOCAL	char	*malloc_version = "3.0.1";
 
-/* Version Date: $Date: 1994/09/12 17:26:03 $ */
+/* Version Date: $Date: 1994/09/20 19:07:57 $ */
 
 #endif /* ! __VERSION_H__ */

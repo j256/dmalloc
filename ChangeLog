@@ -1,5 +1,7 @@
 Tue Sep 20 13:58:08 1994  Gray Watson  (gray@blender.antaire.com)
 
+	* Releasing version 3.0.1.
+
 	* Combined all env variables into DMALLOC_OPTIONS.  Lots of
 	changes to dmalloc program.
 
@@ -814,5 +816,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.117 1994/09/20 18:23:56 gray Exp $
+$Id: ChangeLog,v 1.118 1994/09/20 19:07:54 gray Exp $
 -------------------------------------------------------------------------------
