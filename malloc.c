@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.171 2003/06/18 21:57:39 gray Exp $
+ * $Id: malloc.c,v 1.172 2003/09/05 21:45:40 gray Exp $
  */
 
 /*
@@ -554,12 +554,20 @@ void	dmalloc_shutdown(void)
    */
   _dmalloc_open_log();
   
+  /* if we've died in dmalloc somewhere then leave fast and quietly */
+  if (in_alloc_b) {
+    return;
+  }
+  
 #if LOCK_THREADS
   lock_thread();
 #endif
   
-  /* if we've died in dmalloc somewhere then leave fast and quietly */
+  /* we do it again in case the lock synced the flag to true now */
   if (in_alloc_b) {
+#if LOCK_THREADS
+    unlock_thread();
+#endif
     return;
   }
   
