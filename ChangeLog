@@ -1,3 +1,14 @@
+2003-09-08  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.2.2.
+
+	* Added a Cygwin section to the manual.
+
+	* Added GETENV_SAFE testing for Cygwin environments.
+
+	* Worked a bit more on the function pnt checking code after some
+	more feedback from Richard Colley.
+
 2003-09-06  Gray Watson  <gray@outside.256.com>
 
 	* Improved the pnt checking code to properly check free space
@@ -8,8 +19,8 @@
 	* Fixed possible lock leak in the shutdown code.  Thanks to TJ
 	Saunders.
 
-	* Fixed bug in function checking code.  Not sure when this broke.
-	Thanks to Philippe Roger.
+	* Fixed bug in function pnt checking code.  Not sure when this
+	broke.  Thanks to Philippe Roger.
 
 2003-08-04  Gray Watson  <gray@outside.256.com>
 
@@ -2034,5 +2045,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.303 2003/09/06 15:01:15 gray Exp $
+$Id: ChangeLog,v 1.304 2003/09/08 14:52:26 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.110 2003/09/08 14:50:42 gray Exp $
+$Id: NEWS,v 1.111 2003/09/08 14:52:26 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 5.2.2:
 
+	* Added a Cygwin section to the manual.
 	* Added GETENV_SAFE testing for Cygwin environments.  Feedback needed.
 	* Fixed bug in function args pnt checking.  Thanks TJ and Philippe.
 	* Improved pnt checking code to properly check free space above alloc.
