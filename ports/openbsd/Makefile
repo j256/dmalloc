@@ -1,11 +1,11 @@
 #
 # BSD /usr/ports Makefile
 #
-# $Id: Makefile,v 1.2 2003/06/04 23:54:08 gray Exp $
+# $Id: Makefile,v 1.3 2003/06/08 21:26:20 gray Exp $
 # Original from: Gray Watson http://256.com/gray/email.html
 #
 
-DISTNAME=		dmalloc-5.0.2
+DISTNAME=		dmalloc-5.1.0
 #PKGNAME=		???
 CATEGORIES=     	devel
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.59 2003/06/06 21:02:31 gray Exp $
+ * $Id: settings.dist,v 1.60 2003/06/08 21:26:18 gray Exp $
  */
 
 /*
@@ -73,7 +73,7 @@
  * s/he is freeing a possibly random pointer.  I recommend at least
  * logging a message with the ALLOW_FREE_NULL_MESSAGE set to 1.
  *
- * Even with ALLOW_FREE_NULL set to 0, you can enable the
+ * Even with ALLOW_FREE_NULL set to 1, you can enable the
  * 'error-free-null' token at runtime for a specific program to
  * generate an exception when it sees a free(0L).
  */
@@ -349,15 +349,6 @@
  * tracked down.
  */
 #define DUMP_UNFREED_SUMMARY_ONLY 0
-
-/*
- * Set to 0 if you don't want dmalloc to be using mprotect to restrict
- * accesses to memory blocks.  This is a newer part of the library and
- * still may have bugs.  Protection will only be on if the
- * auto-configuration scripts find the mprotect function and the
- * PROT_NONE, PROT_READ, and PROT_WRITE defines.
- */
-#define PROTECT_BLOCKS 1
 
 /*
  * If (and _only_ if) your system does not have sbrk(), you can have

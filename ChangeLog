@@ -1,16 +1,29 @@
 2003-06-08  Gray Watson  <gray@outside.256.com>
 
+	* Releasing version 5.1.0.
+
+	* Fixed the FREED_POINTER_DELAY functionality.
+
+	* Removed PROTECT_BLOCKS from settings.dist because was unused.
+
+	* Added the tsecs perl script to convert epoch seconds time to
+	ctime output.
+
 	* Removed the check-lists debug token which was not being used
 	with the new heap organizations.
 
-	* Fixed the realloc-copy and never-reuse functionality and added
-	checks to dmalloc_t for them.
+	* Fixed the never-reuse functionality and added checks to
+	dmalloc_t for it.
 
-	* Fixed a number of problems with the table data.
+	* Added checks to dmalloc_t for the realloc-copy functionality.
+
+	* Fixed a problem where a call to dmalloc_log_changed would wipe
+	out allocate table information.  Improved other table functions.
 
 	* Improved the stats output a bit.
 
-	* Added additional checks for wierd realloc and free problems.
+	* Added additional checks to dmalloc_t for wierd realloc and free
+	problems.
 
 2003-06-06  Gray Watson  <gray@outside.256.com>
 
@@ -51,7 +64,7 @@
 	* Updated configure.ac script.
 
 	* New texinfo.tex macros.
-	
+
 2003-05-19  Gray Watson  <gray@outside.256.com>
 
 	* Added dmalloc_page_size() function.
@@ -142,7 +155,7 @@
 
 	* Finally got the main line compiling again.  Ugh.  Chunk code
 	looks a lot better however.
-	
+
 	* Before this time I've changed significantly the way the chunk
 	routines account for pointers.  Now every pointer has a flags
 	field which says whether fence post checking should be applied to
@@ -1940,5 +1953,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.293 2003/06/08 19:39:36 gray Exp $
+$Id: ChangeLog,v 1.294 2003/06/08 21:26:16 gray Exp $
 -------------------------------------------------------------------------------

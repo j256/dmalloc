@@ -1,8 +1,22 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.106 2003/06/04 23:54:06 gray Exp $
+$Id: NEWS,v 1.107 2003/06/08 21:26:17 gray Exp $
 -------------------------------------------------------------------------------
 
+Version 5.1.0:
+
+	* Fixed the FREED_POINTER_DELAY functionality.
+	* Removed PROTECT_BLOCKS from settings.dist because was unused.
+	* Added contrib/tsecs perl script which converts epoch secs to ctime.
+	* Removed the unused check-lists debug token.
+	* Fixed the realloc-copy and never-reuse functionality.
+	* Improved the stats output.
+	* Added many automatic tests to dmalloc_t.
+	* Expanded the arguments to dmalloc_examine to return more information.
+	* Found/fixed problem where last-used mark was not set right properly.
+	* Found/fixed bad problem where leaked memory was not being reported.
+
 Version 5.0.2:
+
 	* Fixed some problems and improved code in the test utility dmalloc_t.
 	* Integrated an internal random number generator to stop recursion.
 	* Improved some of the configure script internals.

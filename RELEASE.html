@@ -7,10 +7,10 @@
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.0.2 <br />
+Version: Release 5.1.0 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.0.1.html">5.0.1</a> <br />
-Date: June 4, 2003
+Last-Version: <a href="dmalloc-5.0.2.html">5.0.2</a> <br />
+Date: June 8, 2003
 </h4>
 
 <p>
@@ -26,73 +26,91 @@ Date: June 4, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Bug fix release after the big 5.0.0 last month.  Couple of bug
-fixes and improvements. </p>
+<p> Mostly a bug fix release but I made some changes to the
+dmalloc_examine arguments so a minor release it is. </p>
 
 <h3><a name="func"> New Functionality </a></h3>
 
 <ul>
 
-<li> Integrated an internal random number generator to stop recursion
-with the <tt>random()</tt> function under some operating
-systems. </li>
+<li> Expanded the dmalloc_examine function to be able to return more
+information about a pointer.  This breaks the API for this function
+unfortunately. </li>
 
-<li> Added build support for a.exe and other cc output forms for
-Windoze. </li>
+<li> Improved the statistics output to the logfile. </li>
+
+<li> Added the tsecs perl script to the contrib/ subdirectory.  The
+tsecs script converts time in epoch-seconds (which is by default
+written into the logfile) into a readable time/date string. </li>
 
 </ul>
 
 <h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> The check-lists debug token has been removed since it is no
+longer valid with the new memory admin structures. </li>
+
+</ul>
 
 <h3><a name="settings.dist"> Changes to the settings.dist File </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> Removed the PROTECT_BLOCKS entry because it was unused and
+unimplemented. </li>
+
+</ul>
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<ul>
-<li> Improved some of the configure script internals. </li>
-<li> Added support for a.exe and other cc output forms for Windoze. </li>
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
 <ul>
 
-<li> The <tt>random()</tt> function on some architectures was calling
-malloc() causing some recursion.  I stuck in an old random
-implementation that I had lying around as a replacement.  Feel free to
-point me to a good implementation online if the one I chose is
-lacking. </li>
+<li> The arguments to dmalloc_examine were changed to allow this
+function to return more information about a pointer.  This was done to
+help the test program probe various information about a pointer. </li>
+
+<li> Greatly expanded the dmalloc_t program to test specific bugs as
+they were found.  Hope this will become a good regression test
+utility. </li>
 
 </ul>
 
 <h3><a name="env"> Environmental Variable Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> The check-lists debug token has been removed since it is no
+longer valid with the new memory admin structures. </li>
+
+</ul>
 
 <h3><a name="bugs"> Bugs Fixed </a></h3>
 
 <ul>
 
-<li> Fixed some problems and improved code in the test utility
-dmalloc_t.  Dmalloc_t was not propagating error codes correctly and
-some of the tests were giving false errors. </li>
+<li> Fixed the FREED_POINTER_DELAY functionality where pointers that
+have just been freed can not be reused until a certain number of
+malloc calls have been made. </li>
 
-<li> Integrated an internal random number generator to stop recursion
-with the <tt>random()</tt> function under some operating
-systems. </li>
+<li> Fixed the never-reuse feature where pointers will never be reused
+once freed. </li>
 
-<li> To facilitate building under Windoze, added support for a.exe and
-other cc output forms. </li>
+<li> Fixed a problem where a call to dmalloc_log_changed would wipe
+out allocate table information. </li>
+
+<li> Found and fixed a problem where the last-used mark was not being
+set properly. </li>
+
+<li> Found and fixed a bad problem where the leaked memory was not
+being reported correctly.  Very bad. </li>
 
 </ul>
 
