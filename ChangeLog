@@ -1,3 +1,9 @@
+Tue Nov 10 12:43:00 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added Jens' cool gdb script and -g flag to dmalloc.
+
+	* Added missing delete[] function to the C++ code.  Thanks Jens.
+
 Mon Nov  9 11:48:29 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.1.0 beta.
@@ -1349,5 +1355,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.200 1998/11/09 19:36:24 gray Exp $
+$Id: ChangeLog,v 1.201 1998/11/10 17:48:03 gray Exp $
 -------------------------------------------------------------------------------

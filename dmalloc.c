@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: dmalloc.c,v 1.79 1998/10/26 14:24:30 gray Exp $
+ * $Id: dmalloc.c,v 1.80 1998/11/10 17:48:04 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.79 1998/10/26 14:24:30 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.80 1998/11/10 17:48:04 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.79 1998/10/26 14:24:30 gray Exp $";
+  "$Id: dmalloc.c,v 1.80 1998/11/10 17:48:04 gray Exp $";
 #endif
 #endif
 
@@ -122,6 +122,7 @@ static	char	cshell_b	= FALSE;	/* set c-shell output */
 static	char	clear_b		= FALSE;	/* clear variables */
 static	int	debug		= NO_VALUE;	/* for DEBUG */
 static	int	errno_to_print	= NO_VALUE;	/* to print the error string */
+static	char	gdb_b		= FALSE;	/* set gdb output */
 static	char	*inpath		= NULL;		/* for config-file path */
 static	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 static	int	thread_lock_on	= NO_VALUE;	/* for setting LOCK_ON */
@@ -131,7 +132,7 @@ static	char	debug_tokens_b	= FALSE;	/* list debug tokens */
 static	char	*logpath	= NULL;		/* for LOGFILE setting */
 static	char	long_tokens_b	= FALSE;	/* long-tok output */
 static	argv_array_t	minus;			/* tokens to remove */
-static	char	no_changes_b	= FALSE;	/* make no changes to env */
+static	char	make_changes_b	= TRUE;		/* make no changes to env */
 static	argv_array_t	plus;			/* tokens to add */
 static	char	remove_auto_b	= FALSE;	/* auto-remove settings */
 static	char	short_tokens_b	= FALSE;	/* short-tok output */
@@ -146,11 +147,16 @@ static	argv_t	args[] = {
   { ARGV_OR },
   { 'C',	"c-shell",	ARGV_BOOL,	&cshell_b,
       NULL,			"set output for C-type shells" },
+  { ARGV_OR },
+  { 'g',	"gdb",		ARGV_BOOL,	&gdb_b,
+      NULL,			"set output for gdb parsing" },
+  
   { 'L',	"long-tokens",	ARGV_BOOL,	&long_tokens_b,
       NULL,			"output long-tokens not 0x..." },
   { ARGV_OR },
   { 'S',	"short-tokens",	ARGV_BOOL,	&short_tokens_b,
       NULL,			"output short-tokens not 0x..." },
+  
   { 'a',	"address",	ARGV_CHAR_P,	&address,
       "address:#",		"stop when malloc sees address" },
   { 'c',	"clear",	ARGV_BOOL,	&clear_b,
@@ -171,7 +177,7 @@ static	argv_t	args[] = {
       "path",			"file to log messages to" },
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
       "token(s)",		"del tokens from current debug" },
-  { 'n',	"no-changes",	ARGV_BOOL,	&no_changes_b,
+  { 'n',	"no-changes",	ARGV_BOOL_NEG,	&make_changes_b,
       NULL,			"make no changes to the env" },
   { 'o',	"lock-on",	ARGV_INT,	&thread_lock_on,
       "number",			"number of times to not lock" },
@@ -566,14 +572,17 @@ static	void    set_variable(const char *var, const char *value)
   if (bourne_b) {
     (void)sprintf(comm, "%s=%s;\nexport %s;\n", var, value, var);
   }
+  else if (gdb_b) {
+    (void)sprintf(comm, "set env %s %s;\n", var, value);
+  }
   else {
     (void)sprintf(comm, "setenv %s %s;\n", var, value);
   }
   
-  if (! no_changes_b) {
+  if (make_changes_b) {
     (void)printf("%s", comm);
   }
-  if (no_changes_b || verbose_b) {
+  if ((! make_changes_b) || verbose_b) {
     (void)fprintf(stderr, "Outputed:\n");
     (void)fprintf(stderr, "%s", comm);
   }
@@ -616,7 +625,7 @@ int	main(int argc, char **argv)
   }
   
   /* try to figure out the shell we are using */
-  if (! bourne_b && ! cshell_b) {
+  if ((! bourne_b) && (! cshell_b) && (! gdb_b)) {
     choose_shell();
   }
   
