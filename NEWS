@@ -1,6 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.37 1994/09/20 18:24:04 gray Exp $
+$Id: NEWS,v 1.38 1994/09/26 16:13:58 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.0.2:
+
+	* Fixed problems with env code when sprintf doesn't returns int.
+	* Library now dumps the proper fence-bottom bytes on 1st pointer error.
 
 Version 3.0.1:
 

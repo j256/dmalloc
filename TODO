@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.21 1994/09/20 18:24:07 gray Exp $
+$Id: TODO,v 1.22 1994/09/26 16:14:00 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -147,6 +147,8 @@ TESTING / STATISTICS:
 
 GENERAL:
 
+- maybe show the upper-end of a pointer if it is over fence post
+	- need to pass size into log_error_info
 - maybe with no 'log-unknown' token, don't print ANY info about
 	non-file-line pnts
 - maybe have some sort etext support for systems that don't have it?
