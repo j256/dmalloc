@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.23 1994/10/15 17:55:15 gray Exp $
+$Id: TODO,v 1.24 1994/12/12 21:27:16 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -137,6 +137,8 @@ DOCUMENTATION:
 	- use of MALLOC_START because a failure is found at some point
 		to find the last malloc call
 	- use of MALLOC_FUNC_CHECK by inserting dmalloc.h and FUNC_CHECK on
+- maybe re-write manual with a eye to the new user
+- need an overview early on about its purpose (at a very high level)
 
 -------------------------------------------------------------------------------
 
