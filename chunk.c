@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.52 1993/09/25 18:10:46 gray Exp $";
+  "$Id: chunk.c,v 1.53 1993/09/25 20:37:53 gray Exp $";
 #endif
 
 /* checking information */
@@ -415,14 +415,14 @@ LOCAL	bblock_adm_t	*get_bblock_admin(void)
 /*
  * get MANY of bblocks, return a pointer to the first one
  */
-LOCAL	bblock_t	*get_bblocks(const int bitc)
+LOCAL	bblock_t	*get_bblocks(const int bitn)
 {
   static int	free_slots = 0;		/* free slots in last bb_admin */
   int		newc, mark;
   bblock_adm_t	*bblock_admp;
   bblock_t	*bblockp;
   
-  if (bitc < BASIC_BLOCK) {
+  if (bitn < BASIC_BLOCK) {
     malloc_errno = ERROR_BAD_SIZE;
     _malloc_error("get_bblocks");
     return NULL;
@@ -430,24 +430,24 @@ LOCAL	bblock_t	*get_bblocks(const int bitc)
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
-    _malloc_message("need bblocks for %d bytes or %d bits", 1 << bitc, bitc);
+    _malloc_message("need bblocks for %d bytes or %d bits", 1 << bitn, bitn);
   
   /* is there anything on the free list? */
-  bblockp = free_bblock[bitc];
+  bblockp = free_bblock[bitn];
   if (bblockp != NULL) {
-    free_bblock[bitc] = bblockp->bb_next;
-    free_space_count -= 1 << bitc;
+    free_bblock[bitn] = bblockp->bb_next;
+    free_space_count -= 1 << bitn;
     return bblockp;
   }
   
-  bblock_count += 1 << (bitc - BASIC_BLOCK);
+  bblock_count += 1 << (bitn - BASIC_BLOCK);
   
   /* point at first free bblock entry (may be out of range) */
   bblock_admp = bblock_adm_tail;
   mark = BB_PER_ADMIN - free_slots;
   
   /* loop until we have enough slots */
-  for (newc = 0; free_slots < 1 << (bitc - BASIC_BLOCK); newc++) {
+  for (newc = 0; free_slots < 1 << (bitn - BASIC_BLOCK); newc++) {
     if (get_bblock_admin() == NULL)
       return NULL;
     
@@ -481,7 +481,7 @@ LOCAL	bblock_t	*get_bblocks(const int bitc)
   }
   
   /* adjust free_slot count for the allocation */
-  free_slots -= 1 << (bitc - BASIC_BLOCK);
+  free_slots -= 1 << (bitn - BASIC_BLOCK);
   
   return &bblock_admp->ba_block[mark];
 }
@@ -549,29 +549,29 @@ LOCAL	dblock_t	*get_dblock_admin(const int many)
 }
 
 /*
- * get a dblock of 1<<BITC sized chunks, also asked for the slot memory
+ * get a dblock of 1<<BITN sized chunks, also asked for the slot memory
  */
-LOCAL	void	*get_dblock(const int bitc, dblock_t ** admp)
+LOCAL	void	*get_dblock(const int bitn, dblock_t ** admp)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   void		*pnt;
   
   /* is there anything on the dblock free list? */
-  dblockp = free_dblock[bitc];
+  dblockp = free_dblock[bitn];
   if (dblockp != NULL) {
-    free_dblock[bitc] = dblockp->db_next;
-    free_space_count -= 1 << bitc;
+    free_dblock[bitn] = dblockp->db_next;
+    free_space_count -= 1 << bitn;
     
     *admp = dblockp;
     
     /* find pointer to memory chunk */
     pnt = dblockp->db_bblock->bb_mem +
-      (dblockp - dblockp->db_bblock->bb_dblock) * (1 << bitc);
+      (dblockp - dblockp->db_bblock->bb_dblock) * (1 << bitn);
     
     /* do we need to print admin info? */
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
-      _malloc_message("found a %d byte dblock entry", 1 << bitc);
+      _malloc_message("found a %d byte dblock entry", 1 << bitn);
     
     return pnt;
   }
@@ -579,10 +579,10 @@ LOCAL	void	*get_dblock(const int bitc, dblock_t ** admp)
   /* do we need to print admin info? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("need to create a dblock for %dx %d byte blocks",
-		    1 << (BASIC_BLOCK - bitc), 1 << bitc);
+		    1 << (BASIC_BLOCK - bitn), 1 << bitn);
   
   /* get some dblock admin slots */
-  dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitc));
+  dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn));
   if (dblockp == NULL)
     return NULL;
   *admp = dblockp;
@@ -606,23 +606,23 @@ LOCAL	void	*get_dblock(const int bitc, dblock_t ** admp)
   
   /* setup bblock information */
   bblockp->bb_flags	= BBLOCK_DBLOCK;
-  bblockp->bb_bitc	= bitc;
+  bblockp->bb_bitn	= bitn;
   bblockp->bb_dblock	= dblockp;
   
   /* add the rest to the free list (has to be at least 1 other dblock) */
-  free_dblock[bitc] = ++dblockp;
-  free_space_count += 1 << bitc;
+  free_dblock[bitn] = ++dblockp;
+  free_space_count += 1 << bitn;
   
-  for (; dblockp < *admp + (1 << (BASIC_BLOCK - bitc)) - 1; dblockp++) {
+  for (; dblockp < *admp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
     dblockp->db_next	= dblockp + 1;
     dblockp->db_bblock	= bblockp;
-    free_space_count	+= 1 << bitc;
+    free_space_count	+= 1 << bitn;
   }
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_FREE_BLANK)
       || BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE))
-    (void)memset((char *)pnt + (1 << bitc), FREE_CHAR,
-		 BLOCK_SIZE - (1 << bitc));
+    (void)memset((char *)pnt + (1 << bitn), FREE_CHAR,
+		 BLOCK_SIZE - (1 << bitn));
   
   /* last one points to NULL */
   dblockp->db_next	= NULL;
@@ -1064,7 +1064,7 @@ EXPORT	int	_chunk_heap_check(void)
     case BBLOCK_DBLOCK:
       
       /* check out bitc */
-      if (bblockp->bb_bitc >= BASIC_BLOCK) {
+      if (bblockp->bb_bitn >= BASIC_BLOCK) {
 	malloc_errno = ERROR_BAD_DBLOCK_SIZE;
 	_malloc_error("_chunk_heap_check");
 	return ERROR;
@@ -1088,7 +1088,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* check dblock entry very closely if necessary */
       for (dblockc = 0, dblockp = bblockp->bb_dblock;
 	   dblockp < bblockp->bb_dblock +
-	   (1 << (BASIC_BLOCK - bblockp->bb_bitc));
+	   (1 << (BASIC_BLOCK - bblockp->bb_bitn));
 	   dblockc++, dblockp++) {
 	
 	/* check out dblock entry to see if it is not free */
@@ -1104,7 +1104,7 @@ EXPORT	int	_chunk_heap_check(void)
 	    dblock_t	*dblistp;
 	    
 	    /* find the free block in the free list */
-	    for (dblistp = free_dblock[bblockp->bb_bitc]; dblistp != NULL;
+	    for (dblistp = free_dblock[bblockp->bb_bitn]; dblistp != NULL;
 		 dblistp = dblistp->db_next)
 	      if (dblistp == dblockp)
 		break;
@@ -1116,7 +1116,7 @@ EXPORT	int	_chunk_heap_check(void)
 	      return ERROR;
 	    }
 	    
-	    free_dblockc[bblockp->bb_bitc]--;
+	    free_dblockc[bblockp->bb_bitn]--;
 	  }
 	  
 	  continue;
@@ -1135,7 +1135,7 @@ EXPORT	int	_chunk_heap_check(void)
 	}
 	
 	if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE)) {
-	  pnt = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitc);
+	  pnt = bblockp->bb_mem + dblockc * (1 << bblockp->bb_bitn);
 	  if (fence_read(dblockp->db_file, dblockp->db_line,
 			 pnt, dblockp->db_size) != NOERROR)
 	    return ERROR;
@@ -1180,12 +1180,12 @@ EXPORT	int	_chunk_heap_check(void)
 	  /* find pointer to memory chunk */
 	  pnt = dblockp->db_bblock->bb_mem +
 	    (dblockp - dblockp->db_bblock->bb_dblock) *
-	      (1 << dblockp->db_bblock->bb_bitc);
+	      (1 << dblockp->db_bblock->bb_bitn);
 	  
 	  /* should we verify that we have a block of FREE_CHAR? */
 	  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FREE)) {
 	    for (bytep = (char *)pnt;
-		 bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitc);
+		 bytep < (char *)pnt + (1 << dblockp->db_bblock->bb_bitn);
 		 bytep++)
 	      if (*bytep != FREE_CHAR) {
 		log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, bytep,
@@ -1234,8 +1234,8 @@ EXPORT	int	_chunk_heap_check(void)
       /* NOTE: check out free_lists, depending on debug value? */
       
       /* check out bitc which is the free-lists size */
-      if (bblockp->bb_bitc < BASIC_BLOCK
-	  || bblockp->bb_bitc > LARGEST_BLOCK) {
+      if (bblockp->bb_bitn < BASIC_BLOCK
+	  || bblockp->bb_bitn > LARGEST_BLOCK) {
 	malloc_errno = ERROR_BAD_SIZE;
 	_malloc_error("_chunk_heap_check");
 	return ERROR;
@@ -1262,12 +1262,12 @@ EXPORT	int	_chunk_heap_check(void)
       
       /* check X blocks in a row */
       if (freec == 0) {
-	freec = 1 << (bblockp->bb_bitc - BASIC_BLOCK);
+	freec = 1 << (bblockp->bb_bitn - BASIC_BLOCK);
 	
 	if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_LISTS)) {
 	  
 	  /* find the free block in the free list */
-	  for (bblistp = free_bblock[bblockp->bb_bitc]; bblistp != NULL;
+	  for (bblistp = free_bblock[bblockp->bb_bitn]; bblistp != NULL;
 	       bblistp = bblistp->bb_next)
 	    if (bblistp == bblockp)
 	      break;
@@ -1279,12 +1279,12 @@ EXPORT	int	_chunk_heap_check(void)
 	    return ERROR;
 	  }
 	  
-	  free_bblockc[bblockp->bb_bitc]--;
+	  free_bblockc[bblockp->bb_bitn]--;
 	}
       }
       else
 	if (last_bblockp == NULL || last_bblockp->bb_flags != BBLOCK_FREE
-	    || bblockp->bb_bitc != last_bblockp->bb_bitc) {
+	    || bblockp->bb_bitn != last_bblockp->bb_bitn) {
 	  malloc_errno = ERROR_FREE_NON_CONTIG;
 	  _malloc_error("_chunk_heap_check");
 	  return ERROR;
@@ -1400,7 +1400,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
   
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
     /* on a mini-block boundary? */
-    diff = ((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc);
+    diff = ((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitn);
     if (diff != 0) {
       if (BIT_IS_SET(check, CHUNK_PNT_LOOSE)) {
 	if (min != 0)
@@ -1418,7 +1418,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
     
     /* find correct dblockp */
     dblockp = bblockp->bb_dblock + ((char *)pnt - bblockp->bb_mem) /
-      (1 << bblockp->bb_bitc);
+      (1 << bblockp->bb_bitn);
     
     if (dblockp->db_bblock == bblockp) {
       /* NOTE: we should run through free list here */
@@ -1592,7 +1592,7 @@ EXPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
   /* are we looking in a DBLOCK */
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
     /* on a mini-block boundary? */
-    if (((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
+    if (((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitn) != 0) {
       log_bad_pnt(MALLOC_DEFAULT_FILE, MALLOC_DEFAULT_LINE, CHUNK_TO_USER(pnt),
 		  "not on block boundary", FALSE);
       malloc_errno = ERROR_NOT_ON_BLOCK;
@@ -1602,7 +1602,7 @@ EXPORT	int	_chunk_read_info(void * pnt, unsigned int * size,
     
     /* find correct dblockp */
     dblockp = bblockp->bb_dblock + ((char *)pnt - bblockp->bb_mem) /
-      (1 << bblockp->bb_bitc);
+      (1 << bblockp->bb_bitn);
     
     if (dblockp->db_bblock == bblockp) {
       /* NOTE: we should run through free list here */
@@ -1686,7 +1686,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
   /* are we looking in a DBLOCK */
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
     /* on a mini-block boundary? */
-    if (((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
+    if (((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitn) != 0) {
       log_bad_pnt(file, line, CHUNK_TO_USER(pnt), "not on block boundary",
 		  FALSE);
       malloc_errno = ERROR_NOT_ON_BLOCK;
@@ -1696,7 +1696,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
     
     /* find correct dblockp */
     dblockp = bblockp->bb_dblock + ((char *)pnt - bblockp->bb_mem) /
-      (1 << bblockp->bb_bitc);
+      (1 << bblockp->bb_bitn);
     
     if (dblockp->db_bblock == bblockp) {
       /* NOTE: we should run through free list here */
@@ -1936,7 +1936,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
     
     /* on a mini-block boundary? */
-    if (((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc) != 0) {
+    if (((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitn) != 0) {
       log_bad_pnt(file, line, CHUNK_TO_USER(pnt), "not on block boundary",
 		  FALSE);
       malloc_errno = ERROR_NOT_ON_BLOCK;
@@ -1946,7 +1946,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     
     /* find correct dblockp */
     dblockp = bblockp->bb_dblock + ((char *)pnt - bblockp->bb_mem) /
-      (1 << bblockp->bb_bitc);
+      (1 << bblockp->bb_bitn);
     
     if (dblockp->db_bblock == bblockp) {
       /* NOTE: we should run through free list here? */
@@ -1971,7 +1971,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
 	return FREE_ERROR;
     
     /* count the bits */
-    bitc = bblockp->bb_bitc;
+    bitc = bblockp->bb_bitn;
     
     /* monitor current allocation level */
     alloc_current -= dblockp->db_size;
@@ -2064,7 +2064,7 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     
     /* set bblock info */
     bblockp->bb_flags	= BBLOCK_FREE;
-    bblockp->bb_bitc	= bitc;			/* num bblocks in this chunk */
+    bblockp->bb_bitn	= bitc;			/* num bblocks in this chunk */
     bblockp->bb_mem	= pnt;			/* pointer to real memory */
     bblockp->bb_next	= first;
     
@@ -2260,19 +2260,19 @@ EXPORT	void	_chunk_stats(void)
   _malloc_message("  max base 2 alloc loss: %ld bytes (%d%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
-		   100 - ((alloc_maximum * 100) / alloc_max_given)));
+		   100 - ((alloc_max_given - alloc_maximum) * 100) /
+		   alloc_max_given));
   
   _malloc_message("max memory space wasted: %ld bytes (%d%%)",
 		  tot_space - alloc_maximum,
 		  (tot_space == 0 ? 0 :
-		   100 - ((alloc_maximum * 100) / tot_space)));
+		   100 - (((tot_space - alloc_maximum) * 100) / tot_space)));
   
   /* final stats */
-  _malloc_message("final user memory space: basic %d, divided %d, %ld bytes"
-		  , bblock_count - bblock_adm_count - dblock_count,
+  _malloc_message("final user memory space: basic %d, divided %d, %ld bytes",
+		  bblock_count - bblock_adm_count - dblock_count,
 		  dblock_count - dblock_adm_count, tot_space);
-  _malloc_message("   final admin overhead: basic %d, divided %d, %ld bytes"
-		  " (%d%%)",
+  _malloc_message("   final admin overhead: basic %d, divided %d, %ld bytes (%d%%)",
 		  bblock_adm_count, dblock_adm_count, overhead,
 		  (HEAP_SIZE == 0 ? 0 : (overhead * 100) / HEAP_SIZE));
 }
@@ -2399,7 +2399,7 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	    
 	    if (dblockp >= bbp->bb_dblock
 		&& dblockp < bbp->bb_dblock +
-		(1 << (BASIC_BLOCK - bbp->bb_bitc)))
+		(1 << (BASIC_BLOCK - bbp->bb_bitn)))
 	      break;
 	  }
 	  
@@ -2409,7 +2409,7 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	    return;
 	  }
 	  
-	  pnt = bbp->bb_mem + (dblockp - bbp->bb_dblock) * (1 << bbp->bb_bitc);
+	  pnt = bbp->bb_mem + (dblockp - bbp->bb_dblock) * (1 << bbp->bb_bitn);
 	}
 	
 	unknown = 0;

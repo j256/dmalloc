@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.15 1993/08/30 20:14:11 gray Exp $
+ * $Id: chunk_loc.h,v 1.16 1993/09/25 20:38:06 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -100,12 +100,12 @@ struct bblock_st {
   unsigned short	bb_flags;		/* what it is */
   
   union {
-    unsigned short	nu_bitc;		/* chunk size */
+    unsigned short	nu_bitn;		/* chunk size */
     unsigned short	nu_line;		/* line where it was alloced */
   } bb_num;
   
   /* to reference union elements as bb elements */
-#define bb_bitc		bb_num.nu_bitc		/* DF */
+#define bb_bitn		bb_num.nu_bitn		/* DF */
 #define bb_line		bb_num.nu_line		/* U */
   
   union {
