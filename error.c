@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: error.c,v 1.71 1998/09/28 21:36:08 gray Exp $";
+  "$Id: error.c,v 1.72 1998/10/08 15:06:21 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -251,6 +251,9 @@ void	_dmalloc_message(const char *format, ...)
       _dmalloc_message("dmalloc_logfile '%s': flags = %#x, addr = %#lx",
 		       dmalloc_logpath, _dmalloc_flags,
 		       (unsigned long)dmalloc_address);
+#if LOCK_THREADS
+      _dmalloc_message("threads enabled, lock-init = %d", THREAD_INIT_LOCK);
+#endif
       
 #if STORE_TIMEVAL
       _dmalloc_message("starting time = %ld.%ld",
