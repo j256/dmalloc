@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.97 1995/08/18 18:31:43 gray Exp $";
+  "$Id: chunk.c,v 1.98 1995/09/05 16:38:45 gray Exp $";
 #endif
 
 /*
@@ -122,13 +122,6 @@ EXPORT	int	_chunk_startup(void)
       || DB_PER_ADMIN < (BLOCK_SIZE / (1 << smallest_block))
       || sizeof(dblock_adm_t) > BLOCK_SIZE
       || (1 << smallest_block) < ALLOCATION_ALIGNMENT) {
-    dmalloc_errno = ERROR_BAD_SETUP;
-    dmalloc_error("_chunk_startup");
-    return ERROR;
-  }
-  
-  /* align the base pointer */
-  if (_heap_align_base() == MALLOC_ERROR) {
     dmalloc_errno = ERROR_BAD_SETUP;
     dmalloc_error("_chunk_startup");
     return ERROR;
@@ -447,6 +440,7 @@ LOCAL	int	set_bblock_admin(const int blockn, bblock_t * bblockp,
       dmalloc_errno = ERROR_BAD_FLAG;
       dmalloc_error("set_bblock_admin");
       return ERROR;
+      /* NOTREACHED */
       break;
     }
   }
@@ -1501,6 +1495,7 @@ EXPORT	int	_chunk_check(void)
 	dmalloc_errno = ERROR_BAD_FLAG;
 	dmalloc_error("_chunk_check");
 	return ERROR;
+	/* NOTREACHED */
 	break;
       }
     }
