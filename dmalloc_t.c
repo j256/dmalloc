@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.118 2004/11/11 15:37:31 gray Exp $
+ * $Id: dmalloc_t.c,v 1.119 2004/12/03 13:44:33 gray Exp $
  */
 
 /*
@@ -61,7 +61,13 @@
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
 #define MAX_POINTERS		1024
+#if HAVE_SBRK == 0 && HAVE_MMAP == 0
+/* if we have a small memory area then just take 1/10 of the internal space */
+#define MAX_ALLOC		(INTERNAL_MEMORY_SPACE / 10)
+#else
+/* otherwise allocate a megabyte */
 #define MAX_ALLOC		(1024 * 1024)
+#endif
 #define MIN_AVAIL		10
 
 /* pointer tracking structure */
