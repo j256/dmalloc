@@ -16,7 +16,7 @@
  *
  * The author of dmalloc may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_rand.c,v 1.2 2003/07/24 00:25:05 gray Exp $
+ * $Id: dmalloc_rand.c,v 1.3 2004/07/08 04:53:27 gray Exp $
  */
 
 /*
@@ -33,18 +33,6 @@
  * Auto-seeding random number generator.  Just start to call random
  * and it will take care of seeding, etc.
  */
-
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-
-#include "conf.h"
-
-#if HAVE_TIME
-# ifdef TIME_INCLUDE
-#  include TIME_INCLUDE
-# endif
-#endif
 
 #include "dmalloc_rand.h"
 
@@ -73,23 +61,8 @@ static long	value = 0;			/* our random value */
  */
 static	void	auto_seed(void)
 {
-  /* auto seed the algorithm */
-  while (value == 0) {
-#ifdef HAVE_TIME
-#ifdef HAVE_GETPID
-    value = time(0) ^ getpid() ^ 0xDEADBEEF;
-#else /* ! HAVE_GETPID */
-    value = time(0) ^ 0xDEADBEEF;
-#endif /* ! HAVE_GETPID */
-#else /* ! HAVE_TIME */
-#ifdef HAVE_GETPID
-    value = getpid() ^ 0xDEADBEEF;
-#else /* ! HAVE_GETPID */
-    /* okay, I give up */
-    value = 0xDEADBEEF;
-#endif /* ! HAVE_GETPID */
-#endif /* ! HAVE_TIME */
-  }
+  /* set the seed to a constant so we don't produce random addresses */
+  value = 0xDEADBEEF;
 }
 
 /*
