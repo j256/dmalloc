@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.115 2004/10/20 13:16:00 gray Exp $
+ * $Id: dmalloc.c,v 1.116 2005/01/11 19:29:22 gray Exp $
  */
 
 /*
@@ -36,8 +36,6 @@
 
 #define DMALLOC_DISABLE
 
-#include "dmalloc_argv.h"			/* for argument processing */
-
 #if HAVE_STRING_H
 # include <string.h>
 #endif
@@ -46,6 +44,7 @@
 #endif
 
 #include "conf.h"
+#include "dmalloc_argv.h"			/* for argument processing */
 #include "dmalloc.h"
 
 #include "compat.h"
