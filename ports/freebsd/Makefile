@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/06/08 21:26:19 gray Exp $
+# $Id: Makefile,v 1.4 2003/06/08 23:03:40 gray Exp $
 #
 
 PORTNAME=	dmalloc
@@ -11,6 +11,7 @@ EXTRACT_SUFX=	.tgz
 
 # Thanks much to Jeremy Shaffner <jeremy@external.org>
 MAINTAINER=	http://256.com/gray/email.html
+COMMENT=	Portable heap memory debugging library.
 
 INSTALLS_SHLIB=	YES
 GNU_CONFIGURE=	YES
