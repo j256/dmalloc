@@ -18,15 +18,13 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab_loc.h,v 1.8 2000/03/21 18:19:12 gray Exp $
+ * $Id: dmalloc_tab_loc.h,v 1.9 2003/06/08 05:53:52 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_LOC_H__
 #define __DMALLOC_TAB_LOC_H__
 
 #include "conf.h"
-
-#define MEM_ENTRIES_N	(MEMORY_TABLE_SIZE * 2)
 
 /*
  * Maximum number of splits.  This should mean that these routines can
@@ -44,18 +42,6 @@
 
 /* comparison function */
 typedef int	(*compare_t)(const void *element1_p, const void *element2_p);
-
-/* entry in our memory table */
-typedef struct mem_table_st {
-  const char		*mt_file;		/* filename of alloc or ra */
-  unsigned int		mt_line;		/* line number of alloc */
-  unsigned long		mt_total_size;		/* size bytes alloced */
-  unsigned long		mt_total_c;		/* total pointers allocated */
-  unsigned long		mt_in_use_size;		/* size currently alloced */
-  unsigned long		mt_in_use_c;		/* pointers currently in use */
-  /* we use this so we can easily un-sort the list */
-  struct mem_table_st	*mt_entry_pos_p;	/* pos of entry in table */
-} mem_table_t;
 
 /*
  * void HASH_MIX

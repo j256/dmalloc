@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.68 2003/06/04 23:44:16 gray Exp $
+ * $Id: chunk_loc.h,v 1.69 2003/06/08 05:54:30 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -55,6 +55,10 @@
  * store 2^32 entries optimally.  Needless to say this is plenty.
  */
 #define MAX_SKIP_LEVEL		32
+
+/* memory table settings */
+#define MEM_ALLOC_ENTRIES	(MEMORY_TABLE_SIZE * 2)
+#define MEM_CHANGED_ENTRIES	(MEMORY_TABLE_SIZE * 2)
 
 /* NOTE: FENCE_BOTTOM_SIZE and FENCE_TOP_SIZE defined in settings.h */
 #define FENCE_OVERHEAD_SIZE	(FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE)
