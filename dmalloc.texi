@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.131 1998/09/18 23:32:51 gray Exp $
+@c $Id: dmalloc.texi,v 1.132 1998/09/19 00:13:23 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -427,17 +427,6 @@ that the process does not grow too big and swallow a large portion of
 the system resources.
 
 @end deftypefun
-@deftypefun
-void *valloc ( unsigned int @var{size} )
-@cindex valloc
-
-Usage: @code{pnt = (type *)valloc(size)}
-
-The valloc routine is the same as malloc however memory that is returned
-is specially aligned.  This is used usually only for system routines
-that need alignment for stack frames or some such.
-
-@end deftypefun
 
 @emph{NOTE}: the returned address from the memory
 allocation/reallocation functions should @emph{always} be cast to the
@@ -658,6 +647,12 @@ arguments to malloc routines.  Comments on this please.
 please see if there are any notes in the contrib directory about your
 system-type.  If not and you figure your problem out, please send me
 some notes so future users can profit from your experiences.
+
+@emph{NOTE}: You may experience some errors compiling some of the
+return.h assembly macros which attempt to determine the callers address
+for logging purposes.  You may want to first try disabling any compiler
+optimization flags.  If this doesn't work then you may need to disable
+the @samp{USE_RET_ADDRESS} variable in the @file{settings.h} file.
 
 @cindex ANSI-C compiler
 @cindex Deansify.pl script
@@ -911,11 +906,33 @@ thread programmers only please.
 @cindex dmalloc.h file
 
 By including @file{dmalloc.h} in your C files, your calls to malloc,
-calloc, realloc, valloc, strdup, and free are replaced with calls to
-_malloc_leap, _calloc_leap, _realloc_leap, _valloc_leap, _strdup_leap,
-and _free_leap.  Additionally the library replaces calls to xmalloc,
-xcalloc, xrealloc, xvalloc, xstrdup, and xfree with associated _leap
-calls.
+calloc, realloc, recalloc, valloc, strdup, and free are replaced with
+calls to _malloc_leap, _calloc_leap, _realloc_leap, _recalloc_leap,
+_valloc_leap, _strdup_leap, and _free_leap.  Additionally the library
+replaces calls to xmalloc, xcalloc, xrealloc, xrecalloc, xvalloc,
+xstrdup, and xfree with associated _leap calls.
+
+@cindex valloc
+@cindex strdup
+@cindex recalloc
+
+Valloc is like malloc by insures that the returned pointer will be
+aligned to a page boundary.  This may or may not be supported natively
+by your operating system.  It also may require the disabling of the
+@samp{check-fence} debug token to work correctly.  Future versions will
+not require this.  Strdup is a string duplicating routine which takes in
+a null terminated string pointer and returns an allocated copy of the
+string that will need to be passed to free later to deallocate.
+Recalloc is a routine like realloc that reallocates previously allocated
+memory to a new size.  If the new memory size is larger than the old,
+recalloc initializes the new space to all zeros.  This may or may not be
+supported natively by your operating system.
+
+The X versions of the standard memory functions (xmalloc, xfree, etc.)
+will print out an error message to standard error and will stop if the
+library is unable to allocate any additional memory.  It is useful to
+use these routines instead of checking everywhere in your program for
+allocation routines returning NULL pointers.
 
 @emph{WARNING}: You should be sure to have @file{dmalloc.h} included at
 the end of your include file list because dmalloc uses macros and may
