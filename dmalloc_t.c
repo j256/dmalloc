@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.61 1997/12/08 09:32:56 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.62 1997/12/22 00:25:30 gray Exp $";
 #endif
 
 /* external routines */
@@ -168,7 +168,8 @@ static	int	do_random(const int iter_n)
   pnt_info_t	*free_p, *used_p = NULL;
   pnt_info_t	*pnt_p, *last_p, *this_p;
   
-  dmalloc_errno = last = 0;
+  dmalloc_errno = ERROR_NONE;
+  last = 0;
   flags = dmalloc_debug_current();
   
   pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
@@ -379,7 +380,7 @@ static	int	do_random(const int iter_n)
   
   FREE(pointer_grid);
   
-  if (dmalloc_errno == 0) {
+  if (dmalloc_errno == ERROR_NONE) {
     return 1;
   }
   else {
@@ -414,7 +415,7 @@ static	int	check_special(void)
   }
 #else
   if (pnt == NULL) {
-    dmalloc_errno = 0;
+    dmalloc_errno = ERROR_NONE;
   }
   else {
     if (! silent_b) {
@@ -429,15 +430,15 @@ static	int	check_special(void)
   }
   FREE(NULL);
 #if ALLOW_FREE_NULL
-  if (dmalloc_errno != 0 && ! silent_b) {
+  if (dmalloc_errno != ERROR_NONE && ! silent_b) {
     (void)printf("   ERROR: free of 0L returned error.\n");
   }
 #else
-  if (dmalloc_errno == 0 && ! silent_b) {
+  if (dmalloc_errno == ERROR_NONE && (! silent_b)) {
     (void)printf("   ERROR: free of 0L did not return error.\n");
   }
   else {
-    dmalloc_errno = 0;
+    dmalloc_errno = ERROR_NONE;
   }
 #endif
   
@@ -446,7 +447,7 @@ static	int	check_special(void)
   }
   pnt = malloc((1 << LARGEST_BLOCK) + 1);
   if (pnt == NULL) {
-    dmalloc_errno = 0;
+    dmalloc_errno = ERROR_NONE;
   }
   else {
     if (! silent_b) {
@@ -455,7 +456,7 @@ static	int	check_special(void)
     FREE(pnt);
   }
   
-  if (dmalloc_errno == 0) {
+  if (dmalloc_errno == ERROR_NONE) {
     ret = 1;
   }
   else {
@@ -744,7 +745,7 @@ int	main(int argc, char **argv)
 		 (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
   }
   
-  if (dmalloc_errno == 0) {
+  if (dmalloc_errno == ERROR_NONE) {
     exit(0);
   }
   else {
