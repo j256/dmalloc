@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.242 2003/11/17 22:25:32 gray Exp $
+@c $Id: dmalloc.texi,v 1.243 2003/11/18 15:20:55 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -369,7 +369,7 @@ alias dmalloc 'eval `\dmalloc -C \!*`'
 @cindex rc shell
 
 If you are using rc shell, you should add the following to your
-@file{.cshrc} file (notice the @kbd{-C} option for c-shell output):
+@file{.rcrc} file (notice the @kbd{-R} option for rc-shell output):
 
 @example
 fn dmalloc {eval `{/usr/local/bin/dmalloc $*}}
