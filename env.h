@@ -21,13 +21,11 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: env.h,v 1.7 1995/06/21 18:19:05 gray Exp $
+ * $Id: env.h,v 1.8 1997/01/16 15:25:06 gray Exp $
  */
 
 #ifndef __ENV_H__
 #define __ENV_H__
-
-#include "dmalloc_loc.h"		/* for IMPORT */
 
 /* init values for arguments */
 #define ADDRESS_INIT		0L
@@ -53,14 +51,14 @@
 /*
  * break up ADDR_ALL into ADDRP and ADDR_COUNTP
  */
-IMPORT	void	_dmalloc_address_break(const char * addr_all,
+extern	void	_dmalloc_address_break(const char * addr_all,
 				       unsigned long * addrp,
 				       int * addr_countp);
 
 /*
  * break up START_ALL into SFILEP, SLINEP, and SCOUNTP
  */
-IMPORT	void	_dmalloc_start_break(const char * start_all,
+extern	void	_dmalloc_start_break(const char * start_all,
 				     char ** sfilep, int * slinep,
 				     int * scountp);
 
@@ -68,7 +66,7 @@ IMPORT	void	_dmalloc_start_break(const char * start_all,
  * process the values of dmalloc environ variable(s) from ENVIRON
  * string.
  */
-IMPORT	void	_dmalloc_environ_get(const char * environ,
+extern	void	_dmalloc_environ_get(const char * environ,
 				     unsigned long * addrp,
 				     int * addr_countp,
 				     long * debugp, int * intervalp,
@@ -80,7 +78,7 @@ IMPORT	void	_dmalloc_environ_get(const char * environ,
  * set dmalloc environ variable(s) with the values (maybe SHORT debug
  * info) into BUF
  */
-IMPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
+extern	void	_dmalloc_environ_set(char * buf, const char long_tokens,
 				     const char short_tokens,
 				     const unsigned long address,
 				     const int addr_count, const long debug,
