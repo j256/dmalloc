@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.37 2003/05/20 04:03:56 gray Exp $
+ * $Id: debug_tok.h,v 1.38 2003/06/08 19:30:56 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -50,7 +50,7 @@
 /* checking */
 #define DEBUG_CHECK_FENCE	BIT_FLAG(10)	/* check fence-post errors  */
 #define DEBUG_CHECK_HEAP	BIT_FLAG(11)	/* examine heap adm structs */
-#define DEBUG_CHECK_LISTS	BIT_FLAG(12)	/* check the free lists */
+/* 12 available - 20030608 */
 #define DEBUG_CHECK_BLANK	BIT_FLAG(13)	/* check blank sections */
 #define DEBUG_CHECK_FUNCS	BIT_FLAG(14)	/* check functions */
 /* 15 available - 20001107 */
@@ -94,8 +94,6 @@ __attribute__ ((unused))
   { "log-known",	DEBUG_LOG_KNOWN,	"log only known non-freed" },
   { "log-trans",	DEBUG_LOG_TRANS,	"log memory transactions" },
   { "log-admin",	DEBUG_LOG_ADMIN,	"log administrative info" },
-  { "log-blocks",	0,
-    "Disabled because of new heap organization" },
   { "log-bad-space",	DEBUG_LOG_BAD_SPACE,	"dump space from bad pnt" },
   { "log-nonfree-space",DEBUG_LOG_NONFREE_SPACE,
     "dump space from non-freed pointers" },
@@ -107,7 +105,6 @@ __attribute__ ((unused))
   
   { "check-fence",	DEBUG_CHECK_FENCE,	"check fence-post errors" },
   { "check-heap",	DEBUG_CHECK_HEAP,	"check heap adm structs" },
-  { "check-lists",	DEBUG_CHECK_LISTS,	"check free lists" },
   { "check-blank",	DEBUG_CHECK_BLANK,
     "check mem overwritten by alloc-blank, free-blank" },
   { "check-funcs",	DEBUG_CHECK_FUNCS,	"check functions" },
@@ -118,12 +115,10 @@ __attribute__ ((unused))
     "shutdown program on SIGHUP, SIGINT, SIGTERM" },
   { "realloc-copy",	DEBUG_REALLOC_COPY,	"copy all re-allocations" },
   { "free-blank",	DEBUG_FREE_BLANK,
-    "overwrite freed memory space with BLANK_CHAR" },
+    "overwrite freed memory with \\0337 byte (0xdf)" },
   { "error-abort",	DEBUG_ERROR_ABORT,	"abort immediately on error" },
   { "alloc-blank",	DEBUG_ALLOC_BLANK,
-    "overwrite newly alloced memory with BLANK_CHAR" },
-  { "heap-check-map",	0,
-    "Disbaled because of new heap organization" },
+    "overwrite allocated memory with \\0332 byte (0xda)" },
   { "print-messages",	DEBUG_PRINT_MESSAGES,	"write messages to stderr" },
   { "catch-null",	DEBUG_CATCH_NULL,      "abort if no memory available"},
   { "never-reuse",	DEBUG_NEVER_REUSE,	"never re-use freed memory" },
@@ -139,13 +134,19 @@ __attribute__ ((unused))
   /* this is the default now and log-known is the opposite */
   { "log-unknown",	0,
     "Disabled -- this is the default now, log-known is opposite" },
+  { "log-blocks",	0,
+    "Disabled because of new heap organization" },
   /* this is the default and force-linear is opposite */
   { "allow-nonlinear",	0,
     "Disabled -- this is the default now, force-linear is opposite" },
   /* this is the default and error-free-null opposite */
   { "allow-free-null",	0,
     "Disabled -- this is the default now, error-free-null is opposite" },
-
+  { "heap-check-map",	0,
+    "Disbaled because of new heap organization" },
+  { "check-lists",	0,
+    "Disabled -- removed with new heap organization" },
+  
   { NULL }
 };
 
