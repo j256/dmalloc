@@ -1,3 +1,30 @@
+2004-07-08  Gray Watson  <gray@outside.256.com>
+
+	* Removed auto-seeding of internal random with variable seed.
+
+2004-07-01  Gray Watson  <gray@outside.256.com>
+
+	* Added bigger and better debugging server section to the manual.
+
+	* Added header/footer to online manual.
+
+2004-06-29  Gray Watson  <gray@outside.256.com>
+
+	* Really improved the logging of error information about pointers.
+	Better formats, added prev/next for fence post errors, etc..
+
+2004-06-07  Gray Watson  <gray@outside.256.com>
+
+	* Added return.h support for ia64 machine type from Didier Remy.
+
+2004-04-09  Gray Watson  <gray@outside.256.com>
+
+	* NOTE: next release I should increase the maximum source file
+	length from 10k to 30k or something.
+
+	* Fixed some typos in the docs and created a new gdb translate
+	return-address section.  Thanks Luk.
+
 2004-02-18  Gray Watson  <gray@outside.256.com>
 
 	* Fixed info install with feedback from Matt Fuller.  Thanks.
@@ -2162,5 +2189,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.318 2004/02/18 14:58:57 gray Exp $
+$Id: ChangeLog,v 1.319 2004/07/08 05:14:34 gray Exp $
 -------------------------------------------------------------------------------
