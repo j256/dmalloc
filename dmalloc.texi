@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.66 1994/11/03 22:26:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.67 1994/11/03 22:34:25 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -243,7 +243,6 @@ an area of size bytes.  It will return a pointer to the space requested.
 @end deftypefun
 @deftypefun void * calloc ( unsigned int @var{number}, unsigned int
 @var{size} )
-@item calloc
 @cindex calloc
 @cindex Allocation of zeros
 
@@ -259,7 +258,6 @@ is all zeros.
 @end deftypefun
 @deftypefun void * realloc ( void * @var{old_pnt}, unsigned int
 @var{new_size} )
-@item realloc
 @cindex realloc
 
 Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
