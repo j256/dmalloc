@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: return.h,v 1.6 1993/10/03 01:59:49 gray Exp $
+ * $Id: return.h,v 1.7 1994/07/21 19:04:50 gray Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #define SET_RET_ADDR(file, line)	\
   do { \
-    if (line == 0) \
+    if (file == MALLOC_DEFAULT_FILE) \
       file = (char *)asm("bis %ra,%ra,%v0"); \
   } while(0)
 
@@ -70,7 +70,7 @@
  */
 #define SET_RET_ADDR(file, line)	\
   do { \
-    if (line == 0) \
+    if (file == MALLOC_DEFAULT_FILE) \
       asm("st %%i7,%0" : \
 	  "=g" (file) : \
 	  /* no inputs */ ); \
@@ -90,7 +90,7 @@
 
 #define SET_RET_ADDR(file, line)	\
   do { \
-    if (line == 0) \
+    if (file == MALLOC_DEFAULT_FILE) \
       asm("movl 4(%%ebp),%%eax ; movl %%eax,%0" : \
 	  "=g" (file) : \
 	  /* no inputs */ : \
