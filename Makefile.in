@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.142 2000/11/07 16:42:22 gray Exp $
+# $Id: Makefile.in,v 1.143 2000/11/07 17:33:28 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -92,8 +92,8 @@ all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_DIS) $(TEST) $(UTIL)
-	rm -f dmalloc.h
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(LIB_DIS) $(TEST)
+	rm -f $(UTIL) dmalloc.h
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
 
 distclean :: clean
