@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.46 1994/10/14 01:53:24 gray Exp $";
+  "$Id: dmalloc.c,v 1.47 1994/10/14 01:59:52 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -67,12 +67,12 @@ typedef struct {
   long		de_flags;			/* default settings */
 } default_t;
 
-#define DEFAULT_FLAGS	(DEBUG_LOG_STATS | DEBUG_LOG_NONFREE | \
+#define RUNTIME_FLAGS	(DEBUG_LOG_STATS | DEBUG_LOG_NONFREE | \
 			 DEBUG_LOG_ERROR | DEBUG_LOG_BAD_SPACE | \
 			 DEBUG_LOG_UNKNOWN | \
 			 DEBUG_CHECK_FENCE | \
 			 DEBUG_CATCH_NULL)
-#define LOW_FLAGS	(DEFAULT_FLAGS | \
+#define LOW_FLAGS	(RUNTIME_FLAGS | \
 			 DEBUG_FREE_BLANK | DEBUG_ERROR_ABORT | \
 			 DEBUG_ALLOC_BLANK)
 #define MEDIUM_FLAGS	(LOW_FLAGS | \
@@ -87,8 +87,8 @@ typedef struct {
 /* NOTE: print-error is not in this list because it is special */
 
 LOCAL	default_t	defaults[] = {
-  { "default",		DEFAULT_FLAGS },
-  { "def",		DEFAULT_FLAGS },
+  { "runtime",		RUNTIME_FLAGS },
+  { "run",		RUNTIME_FLAGS },
   { "low",		LOW_FLAGS },
   { "med",		MEDIUM_FLAGS },
   { "medium",		MEDIUM_FLAGS },
