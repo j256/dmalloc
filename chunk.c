@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.92 1995/05/13 00:34:45 gray Exp $";
+  "$Id: chunk.c,v 1.93 1995/06/20 02:10:15 gray Exp $";
 #endif
 
 /*
@@ -107,8 +107,7 @@ LOCAL	long		realloc_count	= 0;	/* count the reallocs */
  */
 EXPORT	int	_chunk_startup(void)
 {
-  unsigned int	binc;
-  unsigned long	value;
+  unsigned int	binc, num;
   
   /* calculate the smallest possible block */
   for (smallest_block = DEFAULT_SMALLEST_BLOCK;
@@ -141,8 +140,8 @@ EXPORT	int	_chunk_startup(void)
   
   /* make array for NUM_BITS calculation */
   bits[0] = 1;
-  for (binc = 1, value = 2; binc < MAX_SLOTS; binc++, value *= 2)
-    bits[binc] = value;
+  for (binc = 1, num = 2; binc < MAX_SLOTS; binc++, num *= 2)
+    bits[binc] = num;
   
   /* assign value to add to pointers when displaying */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FENCE)) {
@@ -155,24 +154,25 @@ EXPORT	int	_chunk_startup(void)
   }
   
   {
-    char	*posp, *topp;
+    unsigned FENCE_MAGIC_TYPE	value;
+    char			*posp, *maxp;
     
     value = FENCE_MAGIC_BOTTOM;
-    topp = fence_bottom + FENCE_BOTTOM;
-    for (posp = fence_bottom; posp < topp; posp += sizeof(long)) {
-      if (posp + sizeof(long) < topp)
-	bcopy((char *)&value, posp, sizeof(long));
+    maxp = fence_bottom + FENCE_BOTTOM;
+    for (posp = fence_bottom; posp < maxp; posp += sizeof(FENCE_MAGIC_TYPE)) {
+      if (posp + sizeof(FENCE_MAGIC_TYPE) <= maxp)
+	bcopy((char *)&value, posp, sizeof(FENCE_MAGIC_TYPE));
       else
-	bcopy((char *)&value, posp, topp - posp);
+	bcopy((char *)&value, posp, maxp - posp);
     }
     
     value = FENCE_MAGIC_TOP;
-    topp = fence_top + FENCE_TOP;
-    for (posp = fence_top; posp < topp; posp += sizeof(long)) {
-      if (posp + sizeof(long) < topp)
-	bcopy((char *)&value, posp, sizeof(long));
+    maxp = fence_top + FENCE_TOP;
+    for (posp = fence_top; posp < maxp; posp += sizeof(FENCE_MAGIC_TYPE)) {
+      if (posp + sizeof(FENCE_MAGIC_TYPE) <= maxp)
+	bcopy((char *)&value, posp, sizeof(FENCE_MAGIC_TYPE));
       else
-	bcopy((char *)&value, posp, topp - posp);
+	bcopy((char *)&value, posp, maxp - posp);
     }
   }
   
@@ -186,10 +186,10 @@ LOCAL	char	*expand_buf(const void * buf, const int size)
 {
   static char	out[DUMP_SPACE_BUF];
   int		sizec;
-  void		*bufp;
+  const void	*bufp;
   char	 	*outp;
   
-  for (sizec = 0, outp = out, bufp = (void *)buf; sizec < size;
+  for (sizec = 0, outp = out, bufp = buf; sizec < size;
        sizec++, bufp = (char *)bufp + 1) {
     char	*specp;
     
