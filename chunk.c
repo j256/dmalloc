@@ -49,14 +49,8 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.113 1998/09/17 12:36:28 gray Exp $";
+  "$Id: chunk.c,v 1.114 1998/09/17 13:36:11 gray Exp $";
 #endif
-
-/*
- * the unknown file pointer.  did not use DMALLOC_UNKNOWN_FILE everywhere else
- * the pointers would be different.
- */
-char		*_dmalloc_unknown_file = DMALLOC_UNKNOWN_FILE;
 
 /* local routines */
 void		_chunk_log_heap_map(void);
@@ -287,9 +281,8 @@ static	int	expand_chars(const void *buf, const int buf_size,
 static	void	desc_pnt(char *buf, const char *file,
 			 const unsigned int line)
 {
-  if ((file == DMALLOC_DEFAULT_FILE || file == _dmalloc_unknown_file)
-      && line == DMALLOC_DEFAULT_LINE) {
-    (void)sprintf(buf, "%s", _dmalloc_unknown_file);
+  if (file == DMALLOC_DEFAULT_FILE && line == DMALLOC_DEFAULT_LINE) {
+    (void)sprintf(buf, "unknown");
   }
   else if (line == DMALLOC_DEFAULT_LINE) {
     (void)sprintf(buf, "ra=%#lx", (long)file);
@@ -1370,7 +1363,7 @@ int	_chunk_check(void)
       }
       
       /* check file pointer */
-      if (bblock_p->bb_file != NULL
+      if (bblock_p->bb_file != DMALLOC_DEFAULT_FILE
 	  && bblock_p->bb_line != DMALLOC_DEFAULT_LINE) {
 	len = strlen(bblock_p->bb_file);
 	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
@@ -1583,7 +1576,7 @@ int	_chunk_check(void)
 	  return ERROR;
 	}
 	
-	if (dblock_p->db_file != NULL
+	if (dblock_p->db_file != DMALLOC_DEFAULT_FILE
 	    && dblock_p->db_line != DMALLOC_DEFAULT_LINE) {
 	  len = strlen(dblock_p->db_file);
 	  if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
@@ -1838,7 +1831,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
     }
     
     /* check file pointer */
-    if (dblock_p->db_file != NULL
+    if (dblock_p->db_file != DMALLOC_DEFAULT_FILE
 	&& dblock_p->db_line != DMALLOC_DEFAULT_LINE) {
       len = strlen(dblock_p->db_file);
       if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
@@ -1924,7 +1917,7 @@ int	_chunk_pnt_check(const char *func, const void *pnt,
   }
   
   /* check file pointer */
-  if (bblock_p->bb_file != NULL
+  if (bblock_p->bb_file != DMALLOC_DEFAULT_FILE
       && bblock_p->bb_line != DMALLOC_DEFAULT_LINE) {
     len = strlen(bblock_p->bb_file);
     if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
@@ -2012,7 +2005,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       *alloc_size_p = 1 << bblock_p->bb_bit_n;
     }
     if (file_p != NULL) {
-      if (dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
+      if (dblock_p->db_file == DMALLOC_DEFAULT_FILE) {
 	*file_p = NULL;
       }
       else {
@@ -2023,6 +2016,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       *line_p = dblock_p->db_line;
     }
     if (ret_attr_p != NULL) {
+      /* if the line is blank then the file will be 0 or the return address */
       if (dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
 	*ret_attr_p = (char *)dblock_p->db_file;
       }
@@ -2054,7 +2048,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       *alloc_size_p = NUM_BLOCKS(bblock_p->bb_size) * BLOCK_SIZE;
     }
     if (file_p != NULL) {
-      if (bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
+      if (bblock_p->bb_file == DMALLOC_DEFAULT_FILE) {
 	*file_p = NULL;
       }
       else {
@@ -2065,6 +2059,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
       *line_p = bblock_p->bb_line;
     }
     if (ret_attr_p != NULL) {
+      /* if the line is blank then the file will be 0 or the return address */
       if (bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
 	*ret_attr_p = (char *)bblock_p->bb_file;
       }
@@ -2335,10 +2330,6 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     return MALLOC_ERROR;
   }
 #endif
-  
-  if (file == NULL) {
-    file = _dmalloc_unknown_file;
-  }
   
   /* adjust the size */
   byte_n += pnt_fence_overhead;
@@ -3008,8 +2999,7 @@ void	_chunk_dump_unfreed(void)
       unknown_b = 0;
       
       /* unknown pointer? */
-      if (bblock_p->bb_file == _dmalloc_unknown_file
-	  || bblock_p->bb_file == NULL
+      if (bblock_p->bb_file == DMALLOC_DEFAULT_FILE
 	  || bblock_p->bb_line == DMALLOC_DEFAULT_LINE) {
 	unknown_block_c++;
 	unknown_size_c += bblock_p->bb_size - pnt_fence_overhead;
@@ -3101,8 +3091,7 @@ void	_chunk_dump_unfreed(void)
 	unknown_b = 0;
 	
 	/* unknown pointer? */
-	if (dblock_p->db_file == _dmalloc_unknown_file
-	    || dblock_p->db_file == NULL
+	if (dblock_p->db_file == DMALLOC_DEFAULT_FILE
 	    || dblock_p->db_line == DMALLOC_DEFAULT_LINE) {
 	  unknown_block_c++;
 	  unknown_size_c += dblock_p->db_size - pnt_fence_overhead;
