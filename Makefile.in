@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.111 1998/10/15 15:31:01 gray Exp $
+# $Id: Makefile.in,v 1.112 1998/10/21 22:58:36 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -12,11 +12,6 @@ OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 
-# NOTE:
-# not argv.c because from argv module
-# not compat.c because of HAVE_...,
-# not dmalloc.c cause no associated .h file dmalloc.h
-FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c env.c heap.c malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
@@ -143,9 +138,6 @@ malloc_th.o : malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
 		-c malloc.c -o $(.TARGET)
-
-fill :: $(FILLFLS)
-	fillproto $(FILLFLS)
 
 tests :: $(TEST)
 
