@@ -22,7 +22,7 @@
  * The author of the program may be contacted at gray.watson@antaire.com
  */
 
-#include <fcntl.h>				/* for O_WRONLY */
+#include <fcntl.h>				/* for O_WRONLY, etc. */
 #include <signal.h>				/* for kill signals */
 #include <stdarg.h>				/* for message vsprintf */
 
@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.10 1992/11/14 21:45:26 gray Exp $";
+  "$Id: error.c,v 1.11 1992/11/15 00:17:31 gray Exp $";
 #endif
 
 /*
@@ -69,7 +69,8 @@ EXPORT	void	_malloc_message(char * format, ...)
   va_end(args);
   
   /* find the length of str, if empty then return */
-  if ((len = strlen(str)) == 0)
+  len = strlen(str);
+  if (len == 0)
     return;
   
   /* tack on a '\n' if necessary */

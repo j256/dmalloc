@@ -24,9 +24,7 @@
 
 /*
  * These are the system/machine specific routines for allocating space on the
- * heap as well as reporting the current position of the heap.  This file at
- * some point should be full of #ifdef's and the like to describe all the
- * machine type's differences.
+ * heap as well as reporting the current position of the heap.
  */
 
 #define HEAP_MAIN
@@ -43,17 +41,18 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.13 1992/11/14 21:45:28 gray Exp $";
+  "$Id: heap.c,v 1.14 1992/11/15 00:17:33 gray Exp $";
+#endif
+
+/* external routines */
+#if HAVE_SBRK
+IMPORT	char		*sbrk(int incr);	/* to extend the heap */
+#define SBRK_ERROR	((char *)-1)		/* sbrk error code */
 #endif
 
 /* exported variables */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */
 EXPORT	char		*_heap_last = NULL;	/* end of our heap */
-
-#if HAVE_SBRK
-IMPORT	char		*sbrk(int incr);	/* to extend the heap */
-#define SBRK_ERROR	((char *)-1)
-#endif
 
 /*
  * function to get SIZE memory bytes from the end of the heap
@@ -63,7 +62,8 @@ EXPORT	char	*_heap_alloc(unsigned int size)
   char		*ret = HEAP_ALLOC_ERROR;
   
 #if HAVE_SBRK
-  if ((ret = sbrk(size)) == SBRK_ERROR) {
+  ret = sbrk(size);
+  if (ret == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_alloc");
     ret = HEAP_ALLOC_ERROR;
@@ -85,7 +85,8 @@ EXPORT	char	*_heap_end(void)
   char		*ret = HEAP_ALLOC_ERROR;
   
 #if HAVE_SBRK
-  if ((ret = sbrk(0)) == SBRK_ERROR) {
+  ret = sbrk(0);
+  if (ret == SBRK_ERROR) {
     malloc_errno = MALLOC_ALLOC_FAILED;
     _malloc_perror("_heap_end");
     ret = HEAP_ALLOC_ERROR;

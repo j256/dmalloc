@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.10 1992/11/14 21:45:30 gray Exp $";
+  "$Id: malloc.c,v 1.11 1992/11/15 00:17:35 gray Exp $";
 #endif
 
 /*
@@ -157,20 +157,24 @@ LOCAL	void	get_environ(void)
   char		*env;
   
   /* get the malloc_debug value */
-  if ((env = (char *)getenv(DEBUG_ENVIRON)) != NULL)
+  env = (char *)getenv(DEBUG_ENVIRON);
+  if (env != NULL)
     _malloc_debug = hex_to_int(env);
   
   /* get the malloc debug logfile name into a holding variable */
-  if ((env = (char *)getenv(LOGFILE_ENVIRON)) != NULL) {
+  env = (char *)getenv(LOGFILE_ENVIRON);
+  if (env != NULL) {
     (void)strcpy(log_path, env);
     malloc_logpath = log_path;
   }
   
   /* watch for a specific address and die when we get it */
-  if ((env = (char *)getenv(ADDRESS_ENVIRON)) != NULL) {
+  env = (char *)getenv(ADDRESS_ENVIRON);
+  if (env != NULL) {
     char	*addp;
     
-    if ((addp = strchr(env, ':')) != NULL) {
+    addp = strchr(env, ':');
+    if (addp != NULL) {
       *addp = NULLC;
       address_count = atoi(addp + 1);
     }
@@ -181,19 +185,22 @@ LOCAL	void	get_environ(void)
   }
   
   /* check the heap every X times */
-  if ((env = (char *)getenv(INTERVAL_ENVIRON)) != NULL)
+  env = (char *)getenv(INTERVAL_ENVIRON);
+  if (env != NULL)
     check_interval = atoi(env);
   
   /*
    * start checking the heap after X iterations OR
    * start at a file:line combination
    */
-  if ((env = (char *)getenv(START_ENVIRON)) != NULL) {
+  env = (char *)getenv(START_ENVIRON);
+  if (env != NULL) {
     char	*startp;
     
     BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
     
-    if ((startp = strchr(env, ':')) != NULL) {
+    startp = strchr(env, ':');
+    if (startp != NULL) {
       *startp = NULLC;
       (void)strcpy(start_file, env);
       start_line = atoi(startp + 1);

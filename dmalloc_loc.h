@@ -21,15 +21,11 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.13 1992/11/14 21:45:37 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.14 1992/11/15 00:17:42 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
 #define __MALLOC_LOC_H__
-
-/* defaults if _alloc_line and _alloc_file could not be set */
-#define DEFAULT_FILE		"unknown"
-#define DEFAULT_LINE		0
 
 /* fence post checking defines */
 #define FENCE_BOTTOM		(1 << ALLOCATION_ALIGNMENT_IN_BITS)
@@ -48,18 +44,6 @@
 #define START_ENVIRON		"MALLOC_START"
 
 /******************************* useful defines ******************************/
-
-/*
- * global variable and procedure scoping for code readability
- */
-#undef	EXPORT
-#define	EXPORT
-
-#undef	IMPORT
-#define	IMPORT		extern
-
-#undef	LOCAL
-#define	LOCAL		static
 
 /*
  * standard int return codes

@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.17 1992/11/14 21:45:19 gray Exp $";
+  "$Id: chunk.c,v 1.18 1992/11/15 00:17:28 gray Exp $";
 #endif
 
 /* checking information */
@@ -244,8 +244,8 @@ LOCAL	bblock_adm_t	*get_bblock_admin(void)
   bblock_count++;
   
   /* get some more space for a bblock_admin structure */
-  if ((new = (bblock_adm_t *)_heap_alloc(BLOCK_SIZE)) ==
-      (bblock_adm_t *)HEAP_ALLOC_ERROR)
+  new = (bblock_adm_t *)_heap_alloc(BLOCK_SIZE);
+  if (new == (bblock_adm_t *)HEAP_ALLOC_ERROR)
     return NULL;
   
   /* do we need to print admin info? */
@@ -303,7 +303,8 @@ LOCAL	bblock_t	*get_bblocks(int bitc)
     _malloc_message("need bblocks for %d bytes or %d bits", 1 << bitc, bitc);
   
   /* is there anything on the free list? */
-  if ((bblockp = free_bblock[bitc]) != NULL) {
+  bblockp = free_bblock[bitc];
+  if (bblockp != NULL) {
     free_bblock[bitc] = bblockp->bb_next;
     free_space_count -= 1 << bitc;
     return bblockp;
@@ -378,7 +379,8 @@ LOCAL	dblock_t	*get_dblock_admin(int many)
   /*
    * allocate a new bblock of dblock admin slots, should use free list
    */
-  if ((bblockp = get_bblocks(BASIC_BLOCK)) == NULL)
+  bblockp = get_bblocks(BASIC_BLOCK);
+  if (bblockp == NULL)
     return NULL;
   
   dblock_adm_count++;
@@ -387,8 +389,8 @@ LOCAL	dblock_t	*get_dblock_admin(int many)
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_ALLOCATED))
     dblock_admp = (dblock_adm_t *)bblockp->bb_mem;
   else
-    if ((dblock_admp = (dblock_adm_t *)_heap_alloc(BLOCK_SIZE)) ==
-	(dblock_adm_t *)HEAP_ALLOC_ERROR)
+    dblock_admp = (dblock_adm_t *)_heap_alloc(BLOCK_SIZE);
+    if (dblock_admp == (dblock_adm_t *)HEAP_ALLOC_ERROR)
       return NULL;
   
   bblockp->bb_flags = BBLOCK_DBLOCK_ADMIN;
@@ -424,7 +426,8 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
   char		*mem, *freep;
   
   /* is there anything on the dblock free list? */
-  if ((dblockp = free_dblock[bitc]) != NULL) {
+  dblockp = free_dblock[bitc];
+  if (dblockp != NULL) {
     free_dblock[bitc] = dblockp->db_next;
     free_space_count -= 1 << bitc;
     
@@ -447,22 +450,26 @@ LOCAL	char	*get_dblock(int bitc, dblock_t ** admp)
 		    1 << (BASIC_BLOCK - bitc), 1 << bitc);
   
   /* get some dblock admin slots */
-  if ((dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitc))) == NULL)
+  dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitc));
+  if (dblockp == NULL)
     return NULL;
   *admp = dblockp;
   
   dblock_count++;
   
   /* get a bblock from free list */
-  if ((bblockp = get_bblocks(BASIC_BLOCK)) == NULL)
+  bblockp = get_bblocks(BASIC_BLOCK);
+  if (bblockp == NULL)
     return NULL;
   
   /* allocate the block if needed */
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_ALLOCATED))
     mem = bblockp->bb_mem;
-  else
-    if ((mem = _heap_alloc(BLOCK_SIZE)) == HEAP_ALLOC_ERROR)
+  else {
+    mem = _heap_alloc(BLOCK_SIZE);
+    if (mem == HEAP_ALLOC_ERROR)
       return NULL;
+  }
   
   /* setup bblock information */
   bblockp->bb_flags	= BBLOCK_DBLOCK;
@@ -832,7 +839,8 @@ EXPORT	int	_chunk_heap_check(void)
       }
       
       /* mark the size in bits */
-      if ((bitc = num_bits(bblockp->bb_size)) == ERROR)
+      bitc = num_bits(bblockp->bb_size);
+      if (bitc == ERROR)
 	return ERROR;
       bblockc = 1 << (bitc - BASIC_BLOCK);
       start = 1;
@@ -1220,7 +1228,8 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
     pnt -= FENCE_BOTTOM;
   
   /* find which block it is in */
-  if ((bblockp = find_bblock(pnt, NULL, NULL)) == NULL)
+  bblockp = find_bblock(pnt, NULL, NULL);
+  if (bblockp == NULL)
     return ERROR;
   
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
@@ -1372,7 +1381,8 @@ EXPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
     pnt -= FENCE_BOTTOM;
   
   /* find which block it is in */
-  if ((bblockp = find_bblock(pnt, NULL, NULL)) == NULL) {
+  bblockp = find_bblock(pnt, NULL, NULL);
+  if (bblockp == NULL) {
     /* find block already set error */
     return ERROR;
   }
@@ -1444,7 +1454,8 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size,
   bblock_adm_t	*bblock_admp;
   
   /* find which block it is in */
-  if ((bblockp = find_bblock(pnt, NULL, &bblock_admp)) == NULL) {
+  bblockp = find_bblock(pnt, NULL, &bblock_admp);
+  if (bblockp == NULL) {
     /* find block already set error */
     return ERROR;
   }
@@ -1493,7 +1504,8 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size,
     }
     
     /* count the bits */
-    if ((bitc = num_bits(bblockp->bb_size)) == ERROR)
+    bitc = num_bits(bblockp->bb_size);
+    if (bitc == ERROR)
       return ERROR;
     if (bitc < BASIC_BLOCK) {
       if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
@@ -1511,7 +1523,8 @@ LOCAL	int	chunk_write_info(char * pnt, unsigned int size,
       
       /* do we need to hop to a new bblock_admp header? */
       if (bblockp == &bblock_admp->ba_block[BB_PER_ADMIN]) {
-	if ((bblock_admp = bblock_admp->ba_next) == NULL) {
+	bblock_admp = bblock_admp->ba_next;
+	if (bblock_admp == NULL) {
 	  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
 	    _malloc_message("bad pointer '%#lx'", pnt + pnt_below_adm);
 	  malloc_errno = MALLOC_BAD_ADMIN_LIST;
@@ -1547,11 +1560,6 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   
   malloc_count++;				/* counts calls to malloc */
   
-  if (file == NULL) {
-    file = DEFAULT_FILE;
-    line = DEFAULT_LINE;
-  }
-  
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (size == 0) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
@@ -1573,7 +1581,8 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
     size += FENCE_OVERHEAD;
   
   /* count the bits */
-  if ((bitc = num_bits(size)) == ERROR)
+  bitc = num_bits(size);
+  if (bitc == ERROR)
     return MALLOC_ERROR;
   
   /* monitor current allocation level */
@@ -1605,7 +1614,8 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
   
   /* allocate divided block if small */
   if (bitc < BASIC_BLOCK) {
-    if ((mem = get_dblock(bitc, &dblockp)) == NULL)
+    mem = get_dblock(bitc, &dblockp);
+    if (mem == NULL)
       return MALLOC_ERROR;
     
     dblockp->db_line = (unsigned short)line;
@@ -1619,7 +1629,8 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
      */
     
     /* handle blocks */
-    if ((bblockp = get_bblocks(bitc)) == NULL)
+    bblockp = get_bblocks(bitc);
+    if (bblockp == NULL)
       return MALLOC_ERROR;
     
     /* calculate current bblock admin pointer and memory pointer */
@@ -1635,7 +1646,8 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
       
       /* do we need to hop to a new bblock admin header? */
       if (bblockp == &bblock_admp->ba_block[BB_PER_ADMIN]) {
-	if ((bblock_admp = bblock_admp->ba_next) == NULL)
+	bblock_admp = bblock_admp->ba_next;
+	if (bblock_admp == NULL)
 	  return MALLOC_ERROR;
 	
 	bblockp = bblock_admp->ba_block;
@@ -1687,11 +1699,6 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   
   free_count++;					/* counts calls to free */
   
-  if (file == NULL) {
-    file = DEFAULT_FILE;
-    line = DEFAULT_LINE;
-  }
-  
   alloc_cur_pnts--;
   
   /* adjust the pointer down if fence-posting */
@@ -1699,7 +1706,8 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     pnt -= FENCE_BOTTOM;
   
   /* find which block it is in */
-  if ((bblockp = find_bblock(pnt, NULL, &bblock_admp)) == NULL)
+  bblockp = find_bblock(pnt, NULL, &bblock_admp);
+  if (bblockp == NULL)
     return FREE_ERROR;
   
   /* are we free'ing a dblock entry? */
@@ -1794,7 +1802,8 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
       return FREE_ERROR;
   
   /* count the bits */
-  if ((bitc = num_bits(bblockp->bb_size)) == ERROR)
+  bitc = num_bits(bblockp->bb_size);
+  if (bitc == ERROR)
     return FREE_ERROR;
   
   /* monitor current allocation level */
@@ -1824,7 +1833,8 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
     
     /* do we need to hop to a new bblock_admp header? */
     if (bblockp == &bblock_admp->ba_block[BB_PER_ADMIN]) {
-      if ((bblock_admp = bblock_admp->ba_next) == NULL) {
+      bblock_admp = bblock_admp->ba_next;
+      if (bblock_admp == NULL) {
 	malloc_errno = MALLOC_BAD_ADMIN_LIST;
 	_malloc_perror("_chunk_free");
 	return FREE_ERROR;
@@ -1858,11 +1868,6 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
   
   realloc_count++;				/* counts calls to realloc */
   
-  if (file == NULL) {
-    file = DEFAULT_FILE;
-    line = DEFAULT_LINE;
-  }
-  
   /* get info about old pointer */
   if (_chunk_read_info(oldp, &old_size, &old_file, &old_line) != NOERROR)
     return REALLOC_ERROR;
@@ -1879,9 +1884,12 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
       return REALLOC_ERROR;
   
   /* get the old and new bit sizes */
-  if ((old_bitc = num_bits(old_size)) == ERROR)
+  old_bitc = num_bits(old_size);
+  if (old_bitc == ERROR)
     return REALLOC_ERROR;
-  if ((new_bitc = num_bits(new_size)) == ERROR)
+  
+  new_bitc = num_bits(new_size);
+  if (new_bitc == ERROR)
     return REALLOC_ERROR;
   
   /* if we are not realloc copying and the size is the same */
@@ -1895,7 +1903,8 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
     }
     
     /* allocate space for new chunk */
-    if ((newp = _chunk_malloc(file, line, new_size)) == MALLOC_ERROR)
+    newp = _chunk_malloc(file, line, new_size);
+    if (newp == MALLOC_ERROR)
       return REALLOC_ERROR;
     
     /*
@@ -2064,7 +2073,8 @@ EXPORT	void	_chunk_dump_not_freed(void)
     _malloc_message("dumping the unfreed pointers");
   
   /* has anything been alloced yet? */
-  if ((this = bblock_adm_head) == NULL)
+  this = bblock_adm_head;
+  if (this == NULL)
     return;
   
   /* check out the basic blocks */
@@ -2097,8 +2107,8 @@ EXPORT	void	_chunk_dump_not_freed(void)
       mem = BLOCK_POINTER(this->ba_count + (bblockp - this->ba_block));
       
       /* unknown pointer? */
-      if (strcmp(DEFAULT_FILE, bblockp->bb_file) == 0
-	  && bblockp->bb_line == DEFAULT_LINE) {
+      if (strcmp(MALLOC_DEFAULT_FILE, bblockp->bb_file) == 0
+	  && bblockp->bb_line == MALLOC_DEFAULT_LINE) {
 	unknown_bblockc++;
 	unknown_sizec += bblockp->bb_size - pnt_total_adm;
       }
@@ -2163,8 +2173,8 @@ EXPORT	void	_chunk_dump_not_freed(void)
 	}
 	
 	/* unknown pointer? */
-	if (strcmp(DEFAULT_FILE, dblockp->db_file) == 0
-	    && dblockp->db_line == DEFAULT_LINE) {
+	if (strcmp(MALLOC_DEFAULT_FILE, dblockp->db_file) == 0
+	    && dblockp->db_line == MALLOC_DEFAULT_LINE) {
 	  unknown_dblockc++;
 	  unknown_sizec += dblockp->db_size - pnt_total_adm;
 	}
