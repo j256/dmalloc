@@ -1,3 +1,13 @@
+Tue Jun 20 13:56:02 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Released version 3.0.7.
+
+Mon Jun 19 22:06:12 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Fixed problem with fence handling and 64 bit longs.
+
+	* Added lots of comments about internal chunk structures.
+
 Tue Jun 13 17:34:02 1995  Gray Watson  <gray@burger.letters.com>
 
 	* pulled manual settings out of conf.h to settings.h.
@@ -986,5 +996,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.149 1995/06/13 21:34:46 gray Exp $
+$Id: ChangeLog,v 1.150 1995/06/20 17:57:44 gray Exp $
 -------------------------------------------------------------------------------

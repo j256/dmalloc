@@ -1,10 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.58 1995/05/16 02:17:13 gray Exp $
+$Id: NEWS,v 1.59 1995/06/20 17:57:46 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.0.7:
+
+	* pulled manual settings out of conf.h to settings.h.
+	* Added error-dump token for dumping-core and continuing on errors.
 
 Version 3.0.6:
 
-	* Added error-dump token for dumping-core and continuing on errors.
 	* Added Web pointers to online documentation.
 	* Added abort() auto-configuration for KILL_PROCESS.
 	* Fixed problem with NEVER_REUSE and realloc same block-size.
