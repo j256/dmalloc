@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.53 2003/05/13 16:40:37 gray Exp $
+ * $Id: settings.dist,v 1.54 2003/05/13 18:16:19 gray Exp $
  */
 
 /*
@@ -128,7 +128,7 @@
  * verification purposes.  Any allocation larger than this
  * will generate a ERROR_TOO_BIG error.
  */
-#define LARGEST_BLOCK 268435456UL /* 256mb */
+#define LARGEST_ALLOCATION	268435456UL	/* 256mb */
 
 /*
  * Automatically call dmalloc_shutdown if on_exit or atexit is
@@ -362,13 +362,15 @@
  * WARNING: this should only be used if HAVE_SBRK is 0.  Please send
  * me email with any problems or comments on this feature.
  */
+#if HAVE_SBRK == 0
 #define INTERNAL_MEMORY_SPACE (1024 * 1024)
+#endif
 
 /*
- * The default smallest allowable allocations in bytes.  This means
-than
+ * The default smallest allowable allocations in bytes.  Any blocks asked 
+ * for that are smaller will be rounded up to this size.
  */
-#define DEFAULT_SMALLEST_BLOCK	8
+#define DEFAULT_SMALLEST_ALLOCATION	8
 
 /****************************** thread settings ******************************/
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.65 2003/05/13 16:38:08 gray Exp $
+ * $Id: chunk_loc.h,v 1.66 2003/05/13 18:16:33 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -75,7 +75,8 @@
 /* type of the fence magic values */
 #define FENCE_MAGIC_TYPE	int
 /* smallest allocated block */
-#define CHUNK_SMALLEST_BLOCK	(FENCE_BOTTOM_SIZE + 8)
+#define CHUNK_SMALLEST_BLOCK	\
+   (FENCE_BOTTOM_SIZE + DEFAULT_SMALLEST_ALLOCATION)
 
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */

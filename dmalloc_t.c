@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.95 2003/05/13 16:40:05 gray Exp $
+ * $Id: dmalloc_t.c,v 1.96 2003/05/13 18:16:18 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc_t.c,v 1.95 2003/05/13 16:40:05 gray Exp $"
+#ident "$Id: dmalloc_t.c,v 1.96 2003/05/13 18:16:18 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.95 2003/05/13 16:40:05 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.96 2003/05/13 18:16:18 gray Exp $";
 #endif
 #endif
 
@@ -549,7 +549,7 @@ static	int	check_special(void)
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
   }
-  pnt = malloc(LARGEST_BLOCK + 1);
+  pnt = malloc(LARGEST_ALLOCATION + 1);
   if (pnt == NULL) {
     dmalloc_errno = ERROR_NONE;
   }
