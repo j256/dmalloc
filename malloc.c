@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.154 2001/03/29 18:11:41 gray Exp $
+ * $Id: malloc.c,v 1.155 2001/07/12 23:09:42 gray Exp $
  */
 
 /*
@@ -80,10 +80,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: malloc.c,v 1.154 2001/03/29 18:11:41 gray Exp $"
+#ident "$Id: malloc.c,v 1.155 2001/07/12 23:09:42 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.154 2001/03/29 18:11:41 gray Exp $";
+  "$Id: malloc.c,v 1.155 2001/07/12 23:09:42 gray Exp $";
 #endif
 #endif
 
@@ -248,13 +248,17 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
 /*
  * process the values of dmalloc environ variables
  */
-static	void	process_environ(void)
+static	void	process_environ(const char *option_str)
 {
-  _dmalloc_environ_get(OPTIONS_ENVIRON, &_dmalloc_address,
-		       &_dmalloc_address_seen_n, &_dmalloc_flags,
-		       &_dmalloc_check_interval, &_dmalloc_lock_on,
-		       &_dmalloc_logpath, &start_file, &start_line,
-		       &start_count);
+  
+  /* process the options flag */
+  if (option_str != NULL) {
+    _dmalloc_environ_process(option_str, &_dmalloc_address,
+			     (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
+			     &_dmalloc_check_interval, &_dmalloc_lock_on,
+			     &dmalloc_logpath, &start_file, &start_line,
+			     &start_count);
+  }
   thread_lock_c = _dmalloc_lock_on;
   
   /* if we set the start stuff, then check-heap comes on later */
@@ -301,6 +305,7 @@ static	RETSIGTYPE	signal_handler(const int sig)
 static	int	dmalloc_startup(void)
 {
   static int	some_up_b = 0;
+  const char	*env_str;
   
   /* have we started already? */
   if (enabled_b) {
@@ -319,8 +324,11 @@ static	int	dmalloc_startup(void)
 #endif
 #endif
     
+    /* get the options flag */
+    env_str = getenv(OPTIONS_ENVIRON);
+    
     /* process the environmental variable(s) */
-    process_environ();
+    process_environ(env_str);
     
     /*
      * Tune the environment here.  If we have a start-file,
@@ -355,6 +363,7 @@ static	int	dmalloc_startup(void)
     _dmalloc_verify_func = _dmalloc_verify;
     _dmalloc_debug_func = _dmalloc_debug;
     _dmalloc_debug_current_func = _dmalloc_debug_current;
+    _dmalloc_debug_setup_func = _dmalloc_debug_setup;
     _dmalloc_examine_func = _dmalloc_examine;
     _dmalloc_vmessage_func = _dmalloc_vmessage;
     _dmalloc_track_func = _dmalloc_track;
@@ -1079,8 +1088,8 @@ int	malloc_verify(const DMALLOC_PNT pnt)
  *
  * NOTE: you cannot remove certain flags such as signal handlers since
  * they are setup at initialization time only.  Also you cannot add
- * certain flags such as fence-post or free-space checking since they
- * must be on from the start.
+ * certain flags such as free-space checking since they must be on
+ * from the start.
  *
  * Returns the old debug flag value.
  */
@@ -1104,8 +1113,20 @@ unsigned int	_dmalloc_debug(const unsigned int flags)
 }
 
 /*
+ * unsigned int _dmalloc_debug_current
+ *
+ * DESCRIPTION:
+ *
  * Returns the current debug functionality flags.  This allows you to
  * save a dmalloc library state to be restored later.
+ *
+ * RETURNS:
+ *
+ * Current debug flags.
+ *
+ * ARGUMENTS:
+ *
+ * None.
  */
 unsigned int	_dmalloc_debug_current(void)
 {
@@ -1115,6 +1136,33 @@ unsigned int	_dmalloc_debug_current(void)
   
   /* should not check the heap here since we are dumping the debug variable */
   return _dmalloc_flags;
+}
+
+/*
+ * void _dmalloc_debug_setup
+ *
+ * DESCRIPTION:
+ *
+ * Set the global debugging functionality as an option string.
+ * Normally this would be pased in in the DMALLOC_OPTIONS
+ * environmental variable.  This is here to override the env or for
+ * circumstances where it does not apply.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * options_str -> Options string to set the library flags.
+ */
+void	_dmalloc_debug_setup(const char *options_str)
+{
+  if (! enabled_b) {
+    (void)dmalloc_startup();
+  }
+  
+  process_environ(options_str);
 }
 
 /*
@@ -1168,7 +1216,7 @@ int	_dmalloc_examine(const char *file, const int line,
   
   /* NOTE: we do not need the alloc-size info */
   ret = _chunk_read_info(pnt, "dmalloc_examine", &size_map, NULL, file_p,
-			 line_p, ret_attr_p, NULL, NULL);
+			 line_p, ret_attr_p, NULL, NULL, NULL);
   
   dmalloc_out();
   
