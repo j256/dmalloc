@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.32 1997/12/22 00:32:03 gray Exp $
+ * $Id: error.h,v 1.33 1998/09/17 12:42:11 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -43,10 +43,6 @@
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 extern
 char		*dmalloc_logpath;
-
-/* internal dmalloc error number for reference purposes only */
-extern
-int		dmalloc_errno;
 
 /* address to look for.  when discovered call dmalloc_error() */
 extern

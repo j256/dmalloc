@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: error.c,v 1.68 1997/12/22 00:32:02 gray Exp $";
+  "$Id: error.c,v 1.69 1998/09/17 12:42:10 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -75,8 +75,6 @@ extern	char		*_dmalloc_strerror(const int errnum);
  */
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 char		*dmalloc_logpath = LOGPATH_INIT;
-/* internal dmalloc error number for reference purposes only */
-int		dmalloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call dmalloc_error() */
 DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
 
