@@ -1,14 +1,17 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.47 1994/09/20 18:24:00 gray Exp $
+# $Id: Makefile.all.in,v 1.48 1994/10/14 01:29:44 gray Exp $
 ###############################################################################
 
 # default root installation directory
-prefix = /usr/local
+prefix = @prefix@
+exec_prefix = @exec_prefix@
 
 srcdir = @srcdir@
-bindir = $(prefix)/bin
-libdir = $(prefix)/lib
+VPATH = @srcdir@
+
+bindir = $(exec_prefix)/bin
+libdir = $(exec_prefix)/lib
 incdir = $(prefix)/include
 infodir = $(prefix)/info
 
@@ -16,7 +19,7 @@ infodir = $(prefix)/info
 CC = @CC@
 
 DEFS =
-INCS = -I$(srcdir)
+INCS = -I. -I$(srcdir)
 LIBS = @LIBS@
 
 LIBRARY	= libdmalloc.a
@@ -50,10 +53,10 @@ all : $(LIBRARY) $(UTIL)
 # .PHONY : clean
 clean :
 	rm -f a.out core *.o *.t
+	rm -f $(LIBRARY) $(TEST) $(UTIL) dmalloc.h
 
 # .PHONY : clobber
 clobber : clean
-	rm -f $(LIBRARY) $(TEST) $(UTIL) dmalloc.h
 
 # .PHONY : realclean
 realclean : clobber
@@ -76,7 +79,7 @@ installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
 	$(INSTALL_DATA) $(OBJS_IN) $(libdir)
-	$(INSTALL_DATA) $(INFOFILE) $(infodir)
+	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
 
 # .PHONY : install
 install : installdirs installlib $(UTIL)
@@ -87,7 +90,7 @@ dmalloc.h.2 : configure
 
 dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
-	cat dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > $@.t
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS)
@@ -102,7 +105,7 @@ $(UTIL) : $(UTIL).o argv.o compat.o env.o
 
 # .PHONY : noansi
 noansi : dmalloc.h Deansify.pl
-	perl ./Deansify.pl *.[ch]
+	perl $(srcdir)/Deansify.pl *.[ch]
 
 # .PHONY : tests
 tests : $(TEST)
