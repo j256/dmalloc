@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.48 1993/10/03 02:03:00 gray Exp $";
+  "$Id: malloc.c,v 1.49 1993/10/07 05:54:43 gray Exp $";
 #endif
 
 /*
@@ -434,6 +434,22 @@ EXPORT	int	free(void * pnt)
   
 #ifndef __STDC__
   return ret;
+#endif
+}
+
+/*
+ * same as free(PNT)
+ */
+#ifdef __STDC__
+EXPORT	void	cfree(void * pnt)
+#else
+EXPORT	int	cfree(void * pnt)
+#endif
+{
+#ifdef __STDC__
+  free(pnt);
+#else
+  return free(pnt);
 #endif
 }
 

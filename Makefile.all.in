@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.27 1993/10/05 05:05:27 gray Exp $
+# $Id: Makefile.all.in,v 1.28 1993/10/07 05:54:41 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -102,7 +102,7 @@ $(ARGV)/lib$(ARGV).a $(ARGV)/$(ARGV).h :
 # .PHONY : tests
 tests : $(TEST)
 
-$(TEST) : $(TEST).o $(LIBRARY)
+$(TEST) : $(TEST).o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	rm -f $@
 	$(CC) $(LDFLAGS) $(TEST).o $(LIBS)
 	mv a.out $@
