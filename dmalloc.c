@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.14 1993/05/25 00:50:15 gray Exp $";
+  "$Id: dmalloc.c,v 1.15 1993/06/15 14:30:48 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -347,7 +347,10 @@ LOCAL	int	process(int debug_value, char ** strp)
     if (endp != NULL)
       *endp = NULLC;
     
+    /* get the first token on the line */
     tokp = (char *)strtok(buf, TOKENIZE_CHARS);
+    if (tokp == NULL)
+      continue;
     
     /* if we're not continuing then we need to process a tag */
     if (! cont) {

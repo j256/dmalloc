@@ -14,14 +14,15 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.18 1993/06/03 20:02:21 gray Exp $
+@c $Id: dmalloc.texi,v 1.19 1993/06/15 14:30:45 gray Exp $
 @c ================================================================
 
 @ifinfo
 This file is an introduction to the Malloc library which handles general
 memory heap management.
  
-Copyright @copyright{} 1992 by Gray Watson and the Antaire Corporation.
+Copyright @copyright{} 1992 and 1993 by Gray Watson and the Antaire
+Corporation.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -51,7 +52,8 @@ translation approved by the author instead of in the original English.
 @author Gray Watson @samp{<gray.watson@@antaire.com>}
 
 @page
-Copyright @copyright{} 1992 by Gray Watson and the Antaire Corporation.
+Copyright @copyright{} 1992 and 1993 by Gray Watson and the Antaire
+Corporation.
 
 Published by Gray Watson @samp{<gray.watson@@antaire.com>}
 
@@ -100,9 +102,9 @@ Gray Watson, Antaire Corporation.
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    Description of the benefits of the library.
 * Usage::                       How to run programs with the library.
-* Code::                        Information on the source and general concerns.
+* Source Code::                 Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
-* Concept Index::               Index of concepts in the manual.
+* Index of Concepts::           Index of concepts in the manual.
 @end menu
 
 @node Copying, Allocation Basics, Top, Top
@@ -125,8 +127,8 @@ information.
 
 The rest of this section contains some messages from the Free Software
 Foundation.  If you find this stuff offensive or annoying, remember that
-you probably did not spend any money to get this library so feel free to
-heave it into the bit bucket.
+you probably did not spend any money to get this library and feel free
+to heave it into the bit bucket.
 
 The licenses for most software are designed to take away your freedom to
 share and change it.  By contrast, the GNU General Public Licenses are
@@ -397,7 +399,7 @@ the user of problems in a graceful manner.
 @cindex statistics
 @cindex memory leaks
 One of the initial reasons why I personally wanted malloc-debug
-capabilities is to track my programs' memory usage; specifically to
+capabilities is to track my programs' memory usage -- specifically to
 locate @dfn{memory leaks} which are places where allocated memory is
 never getting freed.
 
@@ -450,7 +452,7 @@ would cause the library to go recursive.
 @emph{NOTE}: do not be surprised if the library catches problems with
 your system's library routines.  It took me four hours once to finally
 come to the conclusion that the localtime call, included in SunOS
-release 4.1, was overwriting one of its fence-post markers.
+release 4.1, overwrites one of its fence-post markers.
 
 @node Environment Variables, Malloc_dbg Program, Overview, Features
 @section Environment Variables - Their Names and Features.
@@ -556,7 +558,7 @@ will do the commands.
 
 With shells that have aliasing or macro capabilities: csh, bash, ksh,
 tcsh, zsh, etc., setting up an alias to malloc_dbg to do the eval call
-is recommended.  csh/tcsh users (for example) should put the following
+is recommended.  Csh/tcsh users (for example) should put the following
 in their @file{.cshrc} file:
 
 @example
@@ -614,7 +616,7 @@ address, and interval variables to be cleared automatically.
 
 @item -s number
 Set the @samp{MALLOC_START} env variable to number (alternatively
-file:line).
+@samp{file:line}).
 
 @item -v
 Give verbose output.  Especially useful when dumping current settings.
@@ -713,13 +715,13 @@ log non-freed memory pointers when malloc_shutdown is called
 log internal error-messages
 
 @item log-trans
-log general memory transactions
+log general memory transactions (quite verbose)
 
 @item log-bad-pnt
 log information about bad-pointers
 
 @item log-admin
-log full administrative information
+log full administrative information (quite verbose)
 
 @item log-blocks
 log detailed block information when malloc_heap_map is called
@@ -727,8 +729,8 @@ log detailed block information when malloc_heap_map is called
 @item log-unknown
 like log-non-free but logs unknown non-freed memory pointers
 
-@item log-unknown
-log actual bytes in around bad pointers
+@item log-bad-space
+log actual bytes in and around bad pointers
 
 @item check-fence
 check fence-post memory areas
@@ -787,9 +789,9 @@ enable the @code{check-funcs} token @xref{Debug Tokens}.
         gcc -DMALLOC_FUNC_CHECK file.c
 @end example
 
-Once you have compiled your source with MALLOC_FUNC_CHECK enabled, you
-will have to recompile with it off to disconnect the library
-@xref{Disabling the Library}.
+@emph{NOTE}: Once you have compiled your source with MALLOC_FUNC_CHECK
+enabled, you will have to recompile with it off to disconnect the
+library @xref{Disabling the Library}.
 
 When this is defined malloc will override a number of functions and will
 insert a routine which knows how to check its own arguments and then
@@ -809,7 +811,7 @@ it is ignored since malloc does not know anything about it.
 @emph{NOTE}: this is one of the newest parts of the library so problems
 may still be lurking.
 
-@node Usage, Code, Features, Top
+@node Usage, Source Code, Features, Top
 @chapter How to Run Programs With the Library.
 
 @cindex usage
@@ -840,7 +842,7 @@ able to produce verbose reports on memory not freed:
 
 @example
 	not freed: 0x38410 ( 22 bytes) from 'malloc_t.c:92'
-        not freed: 0x38600 ( 10232 bytes) from 'malloc_t.c:104'
+	not freed: 0x38600 ( 10232 bytes) from 'malloc_t.c:104'
 @end example
 
 These lines from a log file shows that two allocations were not freed.
@@ -879,7 +881,7 @@ but for characters only.  It takes char_pnt and changes its size to 100
 characters.
 
 @item FREE(pnt)
-Usage: @code{(void)FREE(pnt);}.  This frees memory pointers.
+Usage: @code{FREE(pnt);}.  This frees memory pointers.
 
 @item STRDUP(string)
 Usage: @code{char_pnt = STRDUP("hello");}.  This macro duplicates the
@@ -897,12 +899,12 @@ new_item_pnt is the variable which will be assigned the pointer to the
 copy of item.
 @end table
 
-In the above macro list, I have also included a STRDUP and a BDUP macro.
-STRDUP, for those who are not familiar with the strdup function, takes a
-string, allocates enough information to store the string (along with its
-null character), and then copies the string into the new space.  This
-macro does not actually call strdup but provides the same functionality
-and provides file and line memory information to the library.
+STRDUP, for those who are not familiar with the strdup(3) function,
+takes a string, allocates enough information to store the string (along
+with its null character), and then copies the string into the new space.
+This macro does not actually call strdup but provides the same
+functionality while giving file and line memory information to the
+library.
 
 BDUP is a function that I invented.  I use it to duplicate structures or
 other elements that are not strings.  A pointer to an element and its
@@ -915,8 +917,8 @@ return-values from macros.  I have included a gcc form of these 2 macros
 (which makes them a lot more functional) as well as a non-gcc version.
 
 @emph{NOTE}: I would like to strongly recommend the usage of gcc.  It is
-a superior compiler and future releases of this library may require its
-use.
+a superior compiler and future releases of this library may even require
+its use.
 
 @node Extensions, Disabling the Library, Allocation Macros, Usage
 @section Extensions: Non-Standard Malloc Routines.
@@ -957,8 +959,7 @@ right before @code{exit()} or as the last function in @code{main()}.
 @item int malloc_heap_map(void);
 @cindex malloc_heap_map function
 This routine will log to the logfile (if it is enabled) a graphical
-representation of the current heap space.  It needs some work but should
-provide some good information.
+representation of the current heap space.
 
 @item int malloc_verify(char * pnt);
 @cindex malloc_verify function
@@ -991,7 +992,7 @@ the size of a pnt's allocation as well as the file and line from which
 it was allocated.
 
 @emph{NOTE}: This function is @emph{certainly} not portable and is not
-provided by other malloc libraries.
+provided by most if not all other malloc libraries.
 
 @item char * malloc_strerror(int errnum);
 @cindex malloc_strerror function
@@ -1062,7 +1063,7 @@ If you get unresolved references like @code{_malloc_leap} or
 been.
 @end itemize
 
-@node Code, Plugs, Usage, Top
+@node Source Code, Plugs, Usage, Top
 @chapter Information on the Source and General Concerns.
 
 @cindex coding concerns
@@ -1073,7 +1074,7 @@ been.
 * Portability::                 Issues important for porting the library.
 @end menu
 
-@node Definitions, Compatibility,  , Code
+@node Definitions, Compatibility,  , Source Code
 @section Definitions of Terms and Other Information.
 
 @cindex definitions
@@ -1101,7 +1102,7 @@ administration for a set of divided blocks
 some anonymous amount of memory
 @end table
 
-@node Compatibility, Portability, Definitions, Code
+@node Compatibility, Portability, Definitions, Source Code
 @section General Compatibility Concerns.
 
 @cindex compatibility
@@ -1113,8 +1114,8 @@ last freed block is @emph{not} supported.
 
 @item
 Realloc() of a NULL pointer is supported in which case the library will
-just make a call to malloc().  This is a compilation option in the
-@file{conf.h} file.
+just make a call to malloc().  This can be disabled with the help of a
+compilation option in the @file{conf.h} file.
 
 @item
 The library does @emph{not} provide memalign() nor valloc() support as
@@ -1129,7 +1130,7 @@ memory routines.  If this is @emph{not} the case please bring this to my
 attention.
 @end itemize
 
-@node Portability,  , Compatibility, Code
+@node Portability,  , Compatibility, Source Code
 @section Portability Issues.
 
 @cindex portability
@@ -1149,7 +1150,7 @@ towards low memory.  If you are trying to run the library on such a
 system I would be interested in talking with you.
 @end itemize
 
-@node Plugs, Concept Index, Code, Top
+@node Plugs, Index of Concepts, Source Code, Top
 @chapter Soapbox Comments.
 
 @cindex plugs
@@ -1175,7 +1176,7 @@ benefited from the movement.  Please consider supporting it.
 @cindex BSD/386
 @cindex Berkeley Software Design, Inc.
 We at the Antaire Corporation are the proud and enthusiastic owners,
-users, and distributers of the BSD/386 operating system.  For $1k you
+users, and distributers of the BSD/386 operating system.  For $1+k you
 get a @emph{complete} BSD-flavor operating system with @emph{full
 source} for 386 and 486 systems (binary licenses are available).  Along
 with the obvious benefits of full source code come excellent customer
@@ -1184,13 +1185,10 @@ environment, complete tcp/ip networking facilities including nfs, full
 software development utilities, X, etc.
 @end table
 
-@node Concept Index,  , Plugs, Top
+@node Index of Concepts,  , Plugs, Top
 @unnumbered Concept Index
 
 @printindex cp
-
-@shortcontents
 @contents
 
-@contents
 @bye
