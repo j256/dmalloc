@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.112 2004/01/28 14:30:59 gray Exp $
+ * $Id: dmalloc_t.c,v 1.113 2004/01/31 16:26:22 gray Exp $
  */
 
 /*
@@ -1176,8 +1176,8 @@ static	int	check_special(void)
 	 * build and enable an options string turning on checking at
 	 * the above allocation
 	 */
-	(void)sprintf(setup, "debug=%#x,start=%s:%d",
-		      DEBUG_CHECK_FENCE, loc_file, loc_line);
+	(void)loc_snprintf(setup, sizeof(setup), "debug=%#x,start=%s:%d",
+			   DEBUG_CHECK_FENCE, loc_file, loc_line);
 	dmalloc_debug_setup(setup);	
 	continue;
       }
@@ -1269,7 +1269,8 @@ static	int	check_special(void)
      * build and enable an options string turning on checking at the
      * next transaction
      */
-    (void)sprintf(setup, "debug=%#x,start=c1", DEBUG_CHECK_FENCE);
+    (void)loc_snprintf(setup, sizeof(setup), "debug=%#x,start=c1",
+		       DEBUG_CHECK_FENCE);
     dmalloc_debug_setup(setup);	
     
     /*
@@ -1360,8 +1361,8 @@ static	int	check_special(void)
      * build and enable an options string turning on checking at the
      * next transaction
      */
-    (void)sprintf(setup, "debug=%#x,start=s%lu",
-		  DEBUG_CHECK_FENCE, dmalloc_memory_allocated());
+    (void)loc_snprintf(setup, sizeof(setup), "debug=%#x,start=s%lu",
+		       DEBUG_CHECK_FENCE, dmalloc_memory_allocated());
     dmalloc_debug_setup(setup);	
     
     /*
@@ -2284,10 +2285,10 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
     strcpy(file_line, "unknown");
   }
   else if (line == 0) {
-    (void)sprintf(file_line, "ra=%#lx", (long)file);
+    (void)loc_snprintf(file_line, sizeof(file_line), "ra=%#lx", (long)file);
   }
   else {
-    (void)sprintf(file_line, "%s:%d", file, line);
+    (void)loc_snprintf(file_line, sizeof(file_line), "%s:%d", file, line);
   }
   
   switch (func_id) {
