@@ -2,6 +2,14 @@ Wed May 17 11:29:55 2000  Gray Watson  <gray@256.com>
 
 	* Releasing dmalloc version 4.6.0 beta 1.
 
+	* Fixed an incompatibility with the dmalloc_t -r, sbrk, and the
+ 	DEBUG_ALLOW_NONLINEAR flag.
+
+	* Improved the implementation of the NEVER_REUSE flag.  Found
+ 	problems with the dmalloc_t -r random debug flag.
+
+	* Added BUILD.txt instructions to the repository.
+
 Tue May 16 14:34:14 2000  Gray Watson  <gray@256.com>
 
 	* Added BLOCK_ROUND macros to heap.h.
@@ -1625,5 +1633,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.251 2000/05/17 15:41:40 gray Exp $
+$Id: ChangeLog,v 1.252 2000/05/17 16:25:12 gray Exp $
 -------------------------------------------------------------------------------

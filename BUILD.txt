@@ -12,4 +12,22 @@ dmalloc.h.3.
 
 4) cvs tag the release with dmalloc_release_X_X_X[_bX]
 
+5) make port
+
+6) Rename the port directory to be dmalloc-X.X.X[-betaX]
+
+7) Tarzip the dmalloc-X.X.X[-betaX] directory.
+
+8) Copy down to Linux, OSF, FreeBSD, other operation systems and run
+tests.
+
+	- [ maybe mkdir x ; cd x ]
+	- ./configure or ../configure
+	- make all heavy
+	- maybe install the new dmalloc utility to test
+	- dmalloc -l malloc high
+	- make heavy
+	- examine the log file, check version, look for exceptions
+	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
+
 -------------------------------------------------------------------------------
