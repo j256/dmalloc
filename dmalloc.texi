@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.212 2002/07/24 19:03:57 gray Exp $
+@c $Id: dmalloc.texi,v 1.213 2003/05/13 14:56:07 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -330,6 +330,16 @@ Bash, ksh, and zsh users should add the following to their
 
 @example
 function dmalloc @{ eval `command dmalloc -b $*`; @}
+@end example
+
+If your shell does not support the @code{command} function then try:
+
+@example
+function dmalloc @{ eval `\dmalloc -b $*`; @}
+@end example
+or
+@example
+function dmalloc @{ eval `/usr/local/bin/dmalloc -b $*`; @}
 @end example
 
 By the way, if you are looking for a shell, I heartily recommend trying
@@ -777,6 +787,8 @@ organizational methods of other more efficient heap libraries.  If you
 have the @code{check-heap} token enabled, see the @kbd{-i} option to the
 dmalloc utility.  @xref{Dmalloc Program}.
 
+@cindex logfile not produced
+@cindex no logfile produced
 @item Why was a log-file not produced after I ran my program?
 
 This could be caused by a number of different problems.
@@ -977,6 +989,10 @@ identified.  I've provided a @file{ra_info.pl} perl script in the
 well with gdb.  You can also use the manual methods below for gdb.
 
 @example
+# you may need to add the following commands to load in shared libraries
+(gdb) sharedlibrary
+(gdb) add-shared-symbol-files
+
 (gdb) x 0x10234d
 0x10234d <_findbuf+132>: 0x7fffceb7
 
@@ -1291,15 +1307,20 @@ call to the @file{dmalloc} program with a @samp{-e #} option.
 @cindex c++ usage
 @cindex dmallocc.cc file
 
-For those people using the C++ language, some special things need to be
-done to get the library to work.  The problem exists with the fact that
-the dynamic memory routines in C++ are @code{new()} and @code{delete()}
-as opposed to @code{malloc()} and @code{free()}.
+@cindex libdmallocxx.a
+For those people using the C++ language, the library tries to configure
+and build @file{libdmallocxx.a} library.  This library should be linked
+into your C++ programs instead of @file{libdmalloc.a}.
 
-The file @file{dmallocc.cc} is provided in the distribution which
+@cindex dmallocc.cc
+Dmalloc is not as good with C++ as C because the dynamic memory routines
+in C++ are @code{new()} and @code{delete()} as opposed to
+@code{malloc()} and @code{free()}.  Since new and delete are usually not
+used as functions but rather as @code{x = new type}, there is no easy
+way for dmalloc to pass in file and line information unfortunately.  The
+@file{libdmallocxx.a} library provides the file @file{dmallocc.cc} which
 effectively redirects @code{new} to the more familiar @code{malloc} and
-@code{delete} to the more familiar @code{free}.  Compile and link this
-file in with the C++ program you want to debug.
+@code{delete} to the more familiar @code{free}.
 
 @emph{NOTE}: The author is not a C++ hacker so feedback in the form of
 other hints and ideas for C++ users would be much appreciated.
@@ -1389,6 +1410,16 @@ If you are using GDB, I would recommend adding the contents of
 @code{dmalloc} command which will prompt you for the arguments to the
 dmalloc command and will set a break point in @code{dmalloc_error()}
 automatically.
+
+@cindex shared libraries with gdb
+@cindex gdb with shared libraries
+If you are using shared libraries, you may want to execute the following
+commands initially to load in dmalloc and other library symbols:
+
+@example
+(gdb) sharedlibrary
+(gdb) add-shared-symbol-files
+@end example
 
 @menu
 * General Errors::              Diagnosing general problems with a debugger.
@@ -1741,6 +1772,9 @@ the appropriate changes to the environment.  Unfortunately, it cannot
 make the changes on its own so the output from dmalloc should be sent
 through the @code{eval} shell command which will do the commands.
 
+@cindex bash alias
+@cindex ksh alias
+@cindex zsh alias
 With shells that have aliasing or macro capabilities: csh, bash, ksh,
 tcsh, zsh, etc., setting up an alias to dmalloc to do the eval call is
 recommended.  Bash, ksh, and zsh users should add the following to their
@@ -1751,9 +1785,23 @@ recommended.  Bash, ksh, and zsh users should add the following to their
 function dmalloc @{ eval `command dmalloc -b $*`; @}
 @end example
 
-If you are @emph{still} using csh or tcsh, you should add the following
-to your @file{.cshrc} file (notice the @kbd{-C} option for c-shell
-output):
+If your shell does not support the @code{command} function then try:
+
+@example
+function dmalloc @{ eval `\dmalloc -b $*`; @}
+@end example
+or
+@example
+function dmalloc @{ eval `/usr/local/bin/dmalloc -b $*`; @}
+@end example
+
+@cindex tcsh alias
+@cindex csh alias
+By the way, if you are looking for a shell, I heartily recommend trying
+out zsh.  It is a bourne shell written from scratch with much the same
+features as tcsh without the csh crap.  If you are @emph{still} using
+csh or tcsh, you should add the following to your @file{.cshrc} file
+(notice the @kbd{-C} option for c-shell output):
 
 @example
 alias dmalloc 'eval `\dmalloc -C \!*`'
