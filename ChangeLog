@@ -1,3 +1,8 @@
+Wed Oct 26 21:13:11 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Removed the log-error tag.  Pretty worthless.  If you had
+	logpath set then it should log errors.
+
 Tue Oct 18 19:54:21 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Fixed problem with new args clearing all old ones.
@@ -870,5 +875,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.127 1994/10/18 23:55:04 gray Exp $
+$Id: ChangeLog,v 1.128 1994/10/27 01:24:01 gray Exp $
 -------------------------------------------------------------------------------

@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.47 1994/10/15 17:55:21 gray Exp $";
+  "$Id: error.c,v 1.48 1994/10/27 01:24:10 gray Exp $";
 #endif
 
 /*
@@ -163,7 +163,7 @@ EXPORT	void	_dmalloc_die(void)
 EXPORT	void	dmalloc_error(const char * func)
 {
   /* do we need to log or print the error? */
-  if ((BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ERROR) && dmalloc_logpath != NULL)
+  if (dmalloc_logpath != NULL
       || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
     
     /* default str value */

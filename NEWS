@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.45 1994/10/18 23:55:11 gray Exp $
+$Id: NEWS,v 1.46 1994/10/27 01:24:04 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.3:
 
+	* Removed the log-error tag.  If logfile set then errors are logged.
 	* Fixed problem with new args clearing all old ones.
 	* Added dmalloc.h.2 creation to config.status file.
 	* Added a startup message with the debug flags used to logfile.
