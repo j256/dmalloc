@@ -20,12 +20,14 @@
  */
 
 /*
- * This is the dmalloc program which is designed to enable the user
- * to easily set the environmental variables that control the dmalloc
+ * This is the dmalloc program which is designed to enable the user to
+ * easily set the environmental variables that control the dmalloc
  * library capabilities.
- *
- * NOTE: all stdout output from this program is designed to be run through
- * eval by default.  Any messages for the user should be fprintf to stderr.
+ */
+/*
+ * NOTE: all standard-output from this program is designed to be run
+ * through a shell evaluation command by default.  Any messages for
+ * the user should therefore be send to stderr.
  */
 
 #include <stdio.h>				/* for stderr */
@@ -48,7 +50,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.56 1995/05/16 00:12:23 gray Exp $";
+  "$Id: dmalloc.c,v 1.57 1995/06/20 01:32:07 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
