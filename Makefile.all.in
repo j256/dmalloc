@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.55 1995/06/28 23:51:28 gray Exp $
+# $Id: Makefile.all.in,v 1.56 1995/07/03 23:57:27 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -55,11 +55,9 @@ clean :
 	rm -f a.out core *.o *.t
 	rm -f $(LIBRARY) $(LIB_DIS) $(TEST) $(UTIL) dmalloc.h
 
-clobber : clean
+realclean : clean
 
-realclean : clobber
-
-distclean : clobber
+distclean : clean
 	rm -f Makefile config.status config.cache config.log conf.h dmalloc.h.2
 #	rm -f configure
 
@@ -95,13 +93,15 @@ $(LIB_DIS) : dmalloc_lp.o
 	ar cr $(LIB_DIS) $?
 	@RANLIB@ $@
 
+noansi : dmalloc.h Deansify.pl
+	perl $(srcdir)/Deansify.pl *.[ch]
+
+utils : $(UTIL)
+
 $(UTIL) : $(UTIL).o argv.o compat.o env.o
 	rm -f $@
 	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
 	mv a.out $@
-
-noansi : dmalloc.h Deansify.pl
-	perl $(srcdir)/Deansify.pl *.[ch]
 
 tests : $(TEST)
 
@@ -122,10 +122,9 @@ heavy : $(TEST) light
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
 
-# %.o : %.c
 .c.o :
 	rm -f $@
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o $@
 
 .texi.info :
 	makeinfo --no-split $<

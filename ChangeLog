@@ -1,6 +1,8 @@
-Wed Jun 28 19:48:47 1995  Gray Watson  <gray@burger.letters.com>
+Mon Jul  3 19:57:05 1995  Gray Watson  <gray@burger.letters.com>
 
-	* Encorporated new configed argv files.
+	* Encorporated new configed argv files from version 2.0.1.
+
+Wed Jun 28 19:48:47 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Improved header file configurations immensely.  Removed all
         casts and other dumb coding assumptions for 64 bit machines.
@@ -1007,5 +1009,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.153 1995/06/28 23:58:22 gray Exp $
+$Id: ChangeLog,v 1.154 1995/07/03 23:57:25 gray Exp $
 -------------------------------------------------------------------------------

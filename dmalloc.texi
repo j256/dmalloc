@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.100 1995/07/01 01:25:14 gray Exp $
+@c $Id: dmalloc.texi,v 1.101 1995/07/03 23:57:33 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -525,9 +525,8 @@ overwrites one of its fence-post markers.
 @table @asis
 @item Standard Repository:
 
-The newest version(s) of the dmalloc library are available via anonymous
-ftp from @samp{ftp.letters.com} in the @file{/src/dmalloc}
-directory.
+The newest versions of the dmalloc library are available via anonymous
+ftp from @samp{ftp.letters.com} in the @file{/src/dmalloc} directory.
 
 @cindex anonymous ftp
 @cindex ftp
@@ -582,8 +581,8 @@ licensed copy of the software.
 
 @item Type @kbd{sh ./configure} to configure the library.  You may want
 to first examine the @file{config.help} file for some information about
-configure.  Configure should generate the @file{Makefile} and
-@file{conf.h} files automatically.
+configure.  Configure should generate the @file{Makefile} and some
+configuration files automatically.
 
 @emph{NOTE}: It seems that some versions of tr (especially from HP-UX)
 don't understand @code{tr '[a-z]' '[A-Z]'}.  Since configure uses tr
@@ -616,13 +615,13 @@ promotion.
 @cindex ANSI-C compiler
 @cindex Deansify.pl script
 
-@emph{NOTE}: The dmalloc code is pretty dependent on a good ANSI-C
-compiler like gcc.  If the configure script gives the @samp{WARNING}
-that you do not have an ANSI-C compiler, you may still be able to add
-some sort of option to your compiler to make it ANSI.  If there is an
-option, let me know and I will add it to the configure script.
-Otherwise, you will have to try @kbd{make noansi}.  This will run the
-@file{Deansify.pl} perl script on the code which:
+@emph{NOTE}: The code is pretty dependent on a good ANSI-C compiler like
+gcc.  If the configure script gives the @samp{WARNING} that you do not
+have an ANSI-C compiler, you may still be able to add some sort of
+option to your compiler to make it ANSI.  If there is an option, let me
+know and I will add it to the configure script.  Otherwise, you will
+have to try @kbd{make noansi}.  This will run the @file{Deansify.pl}
+perl script on the code which:
 
 @itemize
 @item @emph{WARNING}: modifies the source code in place
@@ -646,6 +645,14 @@ program through a set of light trials.  By default this will execute
 operations in a very random manner.  Anal folks can type @kbd{make
 heavy} to up the ante.  Use @kbd{dmalloc_t --usage} for the list of all
 @file{dmalloc_t} options.
+
+@item Typing @kbd{make install} should install the @file{libdmalloc.a} 
+and @file{libdmalloc_lp.a} library files in @file{/usr/local/lib}, the
+@file{dmalloc} utility in @file{/usr/local/bin}, and the
+@file{dmalloc.info} documentation file in @file{/usr/local/info}.
+
+You may have specified a @samp{--prefix=PATH} option to configure in
+which can @samp{/usr/local} will have been replaced with @samp{PATH}.
 
 @end enumerate
 
@@ -1375,9 +1382,8 @@ DMALLOC_OPTIONS=value
 export DMALLOC_OPTIONS
 @end example
 
-The @samp{DMALLOC_OPTIONS} variable should be set to a comma separated
-list of tokens with a corresponding value.  Each of the tokens is
-described below:
+The value in the above examples is a comma separated list of tokens each
+having a corresponding value.  The tokens are described below:
 
 @table @code
 @item debug

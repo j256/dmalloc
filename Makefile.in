@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.82 1995/07/01 01:09:12 gray Exp $
+# $Id: Makefile.in,v 1.83 1995/07/03 23:57:28 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -159,12 +159,13 @@ dmalloc.dvi : dmalloc.texi
 INSTALL : INSTALL.1 dmalloc.info
 	rm -f $(.TARGET) $(.TARGET).t
 	cp INSTALL.1 $(.TARGET).t
-	sed -e '1,/,  Node: Installation/d' -e '/,  Prev: Installation/,$$d' \
+	sed -e '1,/,  Node: Installation/d' \
+		-e '/,  Node: Getting Started/,$$d' \
 		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: Getting Started/d' \
-		-e '/,  Prev: Getting Started/,$$d' \
+		-e '/,  Node: Details/,$$d' \
 		< dmalloc.info | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
