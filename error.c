@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.49 1994/11/09 00:51:48 gray Exp $";
+  "$Id: error.c,v 1.50 1994/11/09 17:45:45 gray Exp $";
 #endif
 
 /*
@@ -117,8 +117,7 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
     if (outfile < 0) {
       outfile = open(dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
       if (outfile < 0) {
-	(void)sprintf(str, "%s:%d: could not open '%s'\n",
-		      __FILE__, __LINE__, dmalloc_logpath);
+	(void)sprintf(str, "dmalloc: could not open '%s'\n", dmalloc_logpath);
 	(void)write(STDERR, str, strlen(str));
 	/* disable log_path */
 	dmalloc_logpath = LOGPATH_INIT;
