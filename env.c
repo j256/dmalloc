@@ -29,9 +29,11 @@
 
 #define DMALLOC_DISABLE
 
-#if STDC_HEADERS
-# include <string.h>
+#if HAVE_STDLIB_H
 # include <stdlib.h>
+#endif
+#if HAVE_STRING_H
+# include <string.h>
 #endif
 
 #include "conf.h"
@@ -44,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.8 1995/06/28 23:50:52 gray Exp $";
+  "$Id: env.c,v 1.9 1997/06/03 16:20:04 gray Exp $";
 #endif
 
 /* local variables */

@@ -39,8 +39,10 @@
 
 #include "argv.h"				/* for argument processing */
 
-#if STDC_HEADERS
+#if HAVE_STRING_H
 # include <string.h>
+#endif
+#if HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
 
@@ -58,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.66 1997/03/21 14:32:30 gray Exp $";
+  "$Id: dmalloc.c,v 1.67 1997/06/03 16:20:34 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */

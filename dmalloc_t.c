@@ -29,7 +29,7 @@
 
 #include <stdio.h>				/* for stdin */
 
-#if STDC_HEADERS
+#if HAVE_STRING_H
 # include <string.h>
 #endif
 
@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.54 1997/03/21 17:19:42 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.55 1997/06/03 16:20:22 gray Exp $";
 #endif
 
 /* external routines */
