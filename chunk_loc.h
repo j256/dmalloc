@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.64 2003/05/13 14:53:12 gray Exp $
+ * $Id: chunk_loc.h,v 1.65 2003/05/13 16:38:08 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -68,33 +68,23 @@
 /* get the number of blocks to hold SIZE */
 #define NUM_BLOCKS(size)	(((size) + (BLOCK_SIZE - 1)) / BLOCK_SIZE)
 
-/*
- * calculate the number of bits in SIZE and put in ANS
- */
-#define NUM_BITS(size, ans)	do { \
-				  unsigned int	_amt = (size), _b; \
-				   \
-				  for (_b = 0; _b <= LARGEST_BLOCK; _b++) \
-				    if (_amt <= bits[_b]) \
-				      break; \
-				   \
-				  (ans) = _b; \
-				} while (0)
-  
-/* NOTE: FENCE_BOTTOM_SIZE and TOP_SIZE defined in settings.h */
+/* NOTE: FENCE_BOTTOM_SIZE and FENCE_TOP_SIZE defined in settings.h */
 #define FENCE_OVERHEAD_SIZE	(FENCE_BOTTOM_SIZE + FENCE_TOP_SIZE)
 #define FENCE_MAGIC_BOTTOM	0xC0C0AB1B
 #define FENCE_MAGIC_TOP		0xFACADE69
 /* type of the fence magic values */
 #define FENCE_MAGIC_TYPE	int
+/* smallest allocated block */
+#define CHUNK_SMALLEST_BLOCK	(FENCE_BOTTOM_SIZE + 8)
 
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
 /* flags associated with the skip_alloc_t type */
-#define ALLOC_FLAG_EXTERN	BIT_FLAG(0)	/* slot allocated externally */
-#define ALLOC_FLAG_USER		BIT_FLAG(1)	/* slot is user allocated */
-#define ALLOC_FLAG_FREE		BIT_FLAG(2)	/* slot is free */
+#define ALLOC_FLAG_USER		BIT_FLAG(0)	/* slot is user allocated */
+#define ALLOC_FLAG_FREE		BIT_FLAG(1)	/* slot is free */
+#define ALLOC_FLAG_EXTERN	BIT_FLAG(2)	/* slot allocated externally */
+#define ALLOC_FLAG_ADMIN	BIT_FLAG(3)	/* administrative space */
 
 #define ALLOC_FLAG_FENCE	BIT_FLAG(10)	/* slot is fence posted */
 #define ALLOC_FLAG_VALLOC	BIT_FLAG(11)	/* slot is block aligned */
@@ -108,8 +98,8 @@
 typedef struct skip_alloc_st {
   
   unsigned int		sa_flags;	/* what it is */
-  unsigned int		sa_user_size;	/* user size of allocated area */
-  unsigned int		sa_total_size;	/* total size given to user */
+  unsigned int		sa_user_size;	/* size requested by user (wo fence) */
+  unsigned int		sa_total_size;	/* total size of the block */
   
   void			*sa_mem;	/* pointer to the memory in question */
   const char		*sa_file;	/* .c filename where alloced */
@@ -137,18 +127,19 @@ typedef struct skip_alloc_st {
    * Array of next pointers.  This may extend past the end of the
    * function if we allocate for space larger than the structure.
    */
+  unsigned int		sa_level_n;
   struct skip_alloc_st	*sa_next_p[1];
   
 } skip_alloc_t;
 
 /*
  * This macro helps us determine how much memory we need to store to
- * hold all of the next pointers in the skip-list entry.  We do a -1
- * on the next_n because there is 1 next pointer in the skip_alloc
- * structure already.
+ * hold all of the next pointers in the skip-list entry.  So if we are
+ * at level 0 then this will have no extra next pointers since there
+ * already is one inside of skip_alloc_t.
  */
 #define SKIP_SLOT_SIZE(next_n)	\
-	(sizeof(skip_alloc_t) + sizeof(struct skip_alloc_st *) * ((next_n)-1))
+	(sizeof(skip_alloc_t) + sizeof(skip_alloc_t *) * (next_n))
 
 /* entry block magic numbers */
 #define ENTRY_BLOCK_MAGIC1	0xEBEB1111	/* for the eb_magic1 field */
@@ -166,12 +157,32 @@ typedef struct entry_block_st {
   unsigned int		eb_magic2;	/* magic number */
   
   skip_alloc_t		eb_first_slot;	/* first slot in the block */
+  
   /*
-   * the rest are after this one but we don't really knowthere size
-   * because it is based on the skip-level
+   * the rest are after this one but we don't really know the size
+   * because it is based on the skip-level.
    */
   
-  /* at the end of the block is the MAGIC3 value */
+  /*
+   * At the end of the block is the MAGIC3 value but we can't define
+   * it in a structure.
+   */
 } entry_block_t;
+
+/*
+ * The following structure is used to figure out a number of bits of
+ * information about a user allocation.
+ */
+typedef struct {
+  int		pi_fence_b;		/* fence-posts are on for pointer */
+  int		pi_valloc_b;		/* pointer is valloc-aligned */
+  void		*pi_alloc_start;	/* pnt to start of allocation */
+  void		*pi_fence_bottom;	/* pnt to the bottom fence area */
+  void		*pi_user_start;		/* pnt to start of user allocation */
+  void		*pi_user_bounds;	/* pnt past end of user allocation */
+  void		*pi_fence_top;		/* pnt to the top fence area */
+  void		*pi_upper_bounds;	/* pnt to highest available user area*/
+  void		*pi_alloc_bounds;	/* pnt past end of total allocation */
+} pnt_info_t;
 
 #endif /* ! __CHUNK_LOC_H__ */
