@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: settings.dist,v 1.31 1998/11/12 23:20:54 gray Exp $
+ * $Id: settings.dist,v 1.32 1998/11/13 00:41:35 gray Exp $
  */
 
 /*
@@ -320,7 +320,7 @@
  * memory.  This may significantly expand the memory requirements of
  * your system however.
  */
-#define FREED_POINTER_DELAY 100
+#define FREED_POINTER_DELAY 20
 
 /****************************** thread settings ******************************/
 
