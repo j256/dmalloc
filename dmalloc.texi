@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.236 2003/09/10 00:09:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.237 2003/09/29 22:57:28 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -114,10 +114,12 @@ application, test program, and documentation.  Online documentation as
 well as the full source is available at URL @uref{http://dmalloc.com/}.
 Details on the library's mailing list are available there as well.
 
-My contact information is available on the web page.  I can be reached
-with any questions or feedback.  Please include the version number of
-the library that you are using, your machine and operating system types,
-and the value of the DMALLOC_OPTIONS environment variable.
+Please use the forums (@uref{http://dmalloc.com/forums/}) to discuss any
+problems or to request features.  If you are still having problems, the
+author can be reached via his home page (@uerf{http://256.com/gray/})
+with questions or feedback.  Please include the version number of the
+library that you are using, your machine and operating system types, and
+the value of the DMALLOC_OPTIONS environment variable.
 
 Gray Watson.
 
