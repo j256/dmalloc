@@ -1,3 +1,9 @@
+Mon Oct 11 12:37:13 1999  Gray Watson  <gray@burger.256.com>
+
+	* Releasing dmalloc version 4.3.0 beta 1.
+
+	* Fixed problems on Linux with the strdup macro.
+
 Wed Aug 25 08:33:39 1999  Gray Watson  <gray@burger.256.com>
 
 	* Added copyright and url info for ident and what.
@@ -7,16 +13,16 @@ Wed Aug 25 08:33:39 1999  Gray Watson  <gray@burger.256.com>
 Tue Jul 20 12:47:14 1999  Gray Watson  <gray@burger.256.com>
 
 	* Added USE_DMALLOC_LEAP define in the settings.dist file with
- 	which you can enable the leap functionality which previously was
- 	the default.
+	which you can enable the leap functionality which previously was
+	the default.
 
 Thu Apr 15 10:21:55 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Dmalloc now looks in the current directory for .dmallocrc before
- 	checking your $HOME directory.
+	checking your $HOME directory.
 
 	* Rewrote a significant piece of the dmalloc utility.  Much better
- 	code with regards to processing configuration files.
+	code with regards to processing configuration files.
 
 Fri Mar 26 17:57:54 1999  Gray Watson  <gray@burger.letters.com>
 
@@ -183,7 +189,7 @@ Sun Oct  4 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
 
 Tue Sep 29 09:26:50 1998  Gray Watson  <gray@burger.letters.com>
 
-	* Releasing dmalloc version 4.0.0 beta2. 
+	* Releasing dmalloc version 4.0.0 beta2.
 
 	* Aligned valloc to block alignment as it should have been with
 	fence post checking installed.
@@ -1471,5 +1477,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.222 1999/08/25 12:37:48 gray Exp $
+$Id: ChangeLog,v 1.223 1999/10/11 23:59:39 gray Exp $
 -------------------------------------------------------------------------------

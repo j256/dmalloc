@@ -1,0 +1,185 @@
+<HTML>
+<HEAD>
+<!-- $Id: RELEASE.html,v 1.1 1999/10/11 23:59:40 gray Exp $ -->
+<TITLE> Dmalloc Release Notes - 4.3.0 </TITLE>
+</HEAD>
+<BODY>
+
+<CENTER>
+<H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
+<H4>
+Version: Release 4.3.0 <BR>
+<!-- Fix the TITLE ^^^above^^^ too -->
+Last-Version: <A HREF="dmalloc-4.2.0.html">4.2.0</A> <BR>
+Date: October 11, 1999
+</H4>
+</CENTER>
+
+<HR>
+
+<CENTER>
+<A HREF="#overview">Overview</A> |
+<A HREF="#func">New Functionality</A> |
+<A HREF="#dmalloc">Dmalloc Utility</A> <BR>
+<A HREF="#settings.dist">settings.dist</A> |
+<A HREF="#programming">Programming</A> |
+<A HREF="#env">Environmental Variables</A> <BR>
+<A HREF="#bugs">Bugs Fixed</A> <BR>
+</CENTER>
+
+<HR>
+
+<H3><A NAME="overview"> Overview </A></H3>
+
+<P> Small feature and bug fix release.  Fixed the Linux strdup problem
+and also rewrote the dmalloc utility internals a good bit.
+
+<P>
+<HR>
+
+<H3><A NAME="func"> New Functionality </A></H3>
+
+<UL>
+
+<P><LI> The dmalloc utility will now look in the current directory for
+.dmallocrc before checking your $HOME directory.
+
+<P><LI> Increased the internal storage of C filename sizes from 40 to
+100 characters.
+
+</UL>
+
+<P>
+<HR>
+
+<H3><A NAME="dmalloc"> Dmalloc Utility Changes </A></H3>
+
+<UL>
+
+<P><LI> The dmalloc utility will now look in the current directory for
+.dmallocrc before checking your $HOME directory.  This helps
+programmers have per-module specific dmalloc settings and controls.
+
+<P><LI> Rewrote a significant portion of the internals of the dmalloc
+utility.  It's processing of the RC files has been much improved.
+
+</UL>
+
+<P>
+<HR>
+
+<H3><A NAME="settings.dist"> Changes to the settings.dist File </A></H3>
+
+<UL>
+
+<P><LI> Added USE_DMALLOC_LEAP variable which enables the library's
+leap functionality.  The leap stuff allows you to disable the library
+by just linking in the libdmalloc_lp.a library instead of having to
+recompile your source files which included dmalloc.h.  This was
+removed as a default feature since a poll on the dmalloc mailing list
+found few people aware of the feature and only one developer actually
+used it.
+
+</UL>
+
+<HR>
+
+<P>
+<H3><A NAME="programming"> Programming Notes </A></H3>
+
+<UL>
+
+<P><LI> Added support for the PTHREAD_MUTEX_INITIALIZER define which
+is defined on some systems.
+
+</UL>
+
+<P>
+<HR>
+
+<H3><A NAME="env"> Environmental Variable Changes </A></H3>
+
+<UL>
+
+<P> None.
+
+</UL>
+
+<P>
+<HR>
+
+<H3><A NAME="bugs"> Bugs Fixed </A></H3>
+
+<UL>
+
+<P><LI> Newer versions of Linux (6.X?) define strdup as a macro which
+was confusing prototypes in dmalloc.h.  I added some specific
+autoconfiguration to handle this problem.
+
+<P><LI> Increased the internal storage of C filename sizes from 40 to
+100 characters.
+
+<P><LI> In moving away from the leap substrate with the addition of
+the USE_DMALLOC_LEAP variable in the settings.dist file, this fixes a
+long standing bug with improperly tracking the first memory
+transaction -- usually an allocation.  There was a chicken and egg
+problem with the way the library bootstrapped which has been resolved.
+
+</UL>
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+
+</BODY>
+</HTML>

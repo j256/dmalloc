@@ -1,6 +1,16 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.86 1999/03/11 05:37:50 gray Exp $
+$Id: NEWS,v 1.87 1999/10/11 23:59:40 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.3.0:
+
+	* Fixed problems on Linux with the strdup macro. 
+	* Added copyright and url info for ident and what.
+	* Added support for PTHREAD_MUTEX_INITIALIZER.
+	* Added USE_DMALLOC_LEAP define in the settings.dist file.
+	* Dmalloc now looks in the current directory for .dmallocrc before ~.
+	* Rewrote a significant piece of the dmalloc utility.
+	* Increased the filename size from 40 to 100 characters.
 
 Version 4.2.0:
 
