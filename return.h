@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.19 1998/09/17 13:30:34 gray Exp $
+ * $Id: return.h,v 1.20 1998/09/17 15:46:19 gray Exp $
  */
 
 /*
@@ -60,6 +60,9 @@
  * it may be better -- less prone to be erased.  However, it produces
  * some bogus data -- it seems to return the last return-address or
  * something like that.
+ *
+ * This does't seem to work with optimizations turned on for some
+ * reason.  Anyone know why?
  */
 #define GET_RET_ADDR(file)	asm("st %%i7,%0" : \
 				    "=g" (file) : \
