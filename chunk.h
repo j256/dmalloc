@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.12 1992/11/10 23:25:07 gray Exp $
+ * $Id: chunk.h,v 1.13 1992/11/14 21:19:24 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -87,7 +87,7 @@ IMPORT	void	_chunk_stats(void);
 IMPORT	void	_chunk_dump_not_freed(void);
 
 /*
- * log an entry for the heap structure
+ * log the heap structure plus information on the blocks if necessary
  */
 IMPORT	void	_chunk_log_heap_map(void);
 

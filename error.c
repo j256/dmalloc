@@ -24,7 +24,6 @@
 
 #include <fcntl.h>				/* for O_WRONLY */
 #include <signal.h>				/* for kill signals */
-#include <stdio.h>				/* for STDERR */
 #include <stdarg.h>				/* for message vsprintf */
 
 #define ERROR_MAIN
@@ -39,7 +38,7 @@
 #include "error.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.8 1992/11/11 23:14:50 gray Exp $";
+  "$Id: error.c,v 1.9 1992/11/14 21:19:33 gray Exp $";
 
 /*
  * exported variables
@@ -58,21 +57,9 @@ EXPORT	void	_malloc_message(char * format, ...)
   va_list	args;
   
   /* no logpath then no workie */
-  if (malloc_logpath == NULL)
+  if (malloc_logpath == NULL
+      && ! BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR))
     return;
-  
-  /*
-   * do we need to open the outfile?
-   * this will be closed by exit(0).  yeach.
-   */
-  if (outfile < 0
-      && (outfile = open(malloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666)) <
-      0) {
-    (void)fprintf(stderr, "%s:%d: could not open '%s': ",
-		  __FILE__, __LINE__, malloc_logpath);
-    (void)perror("");
-    exit(1);
-  }
   
   /* write the format + info into str */
   va_start(args, format);
@@ -85,12 +72,34 @@ EXPORT	void	_malloc_message(char * format, ...)
   
   /* tack on a '\n' if necessary */
   if (str[len - 1] != '\n') {
-    str[len] = '\n';
-    str[++len] = '\0';
+    str[len++] = '\n';
+    str[len] = '\0';
   }
   
-  /* write str to the outfile */
-  (void)write(outfile, str, len);
+  /* do we need to log the message? */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR)) {
+    /*
+     * do we need to open the outfile?
+     * it will be closed by exit(0).  yeach.
+     */
+    if (outfile < 0) {
+      outfile = open(malloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+      if (outfile < 0) {
+	(void)sprintf(str, "%s:%d: could not open '%s'\n",
+		      __FILE__, __LINE__, malloc_logpath);
+	(void)write(STDERR, str, strlen(str));
+	exit(1);
+      }
+    }
+    
+    /* write str to the outfile */
+    (void)write(outfile, str, len);
+  }
+  
+  /* do we need to print the message? */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR)) {
+    (void)write(STDERR, str, strlen(str));
+  }
 }
 
 /*
@@ -111,8 +120,9 @@ EXPORT	void	_malloc_die(void)
  */
 EXPORT	void	_malloc_perror(char * str)
 {
-  /* if debug level is not high enough, return */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR)) {
+  /* do we need to log or print the error? */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_PERROR)
+      || BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR)) {
     
     /* default str value */
     if (str == NULL)

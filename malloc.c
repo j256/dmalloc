@@ -38,7 +38,7 @@
 #include "malloc_leap.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.8 1992/11/11 23:14:53 gray Exp $";
+  "$Id: malloc.c,v 1.9 1992/11/14 21:19:36 gray Exp $";
 
 /*
  * exported variables
@@ -138,6 +138,10 @@ LOCAL	int	check_debug_vars(char * file, int line)
       BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
   }
   
+  /* do we need to check the heap? */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
+    (void)_chunk_heap_check();
+  
   return NOERROR;
 }
 
@@ -150,7 +154,7 @@ LOCAL	void	get_environ(void)
 {
   char		*env;
   
-  /* get the malloc_debug level */
+  /* get the malloc_debug value */
   if ((env = (char *)getenv(DEBUG_ENVIRON)) != NULL)
     _malloc_debug = hex_to_int(env);
   
@@ -229,6 +233,10 @@ LOCAL	int	malloc_startup(void)
 EXPORT	void	malloc_shutdown(void)
 {
   /* NOTE: do not test for IN_TWICE here */
+  
+  /* do we need to check the heap? */
+  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
+    (void)_chunk_heap_check();
   
   /* dump some statistics to the logfile */
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_STATS))

@@ -1,4 +1,25 @@
+Sat Nov 14 15:59:53 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added all external functions to configure and conf.h even though
+	the library assumes that some functions will be resolved.  Also
+	upgraded the version number to 1.01gamma (oooooh).
+
+	* Added print-perror debug token for logging messages to STDERR as
+	well as log-files.  Removed stdio from the malloc library to make
+	sure it does not go recursive (alloc for stderr) at a bad time.
+
+Wed Nov 11 18:19:49 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Moved the heap_check calls from chunk.c over to malloc so we can
+	be guaranteed that it gets called only once per user call.
+	chunk's routines often cross-call each other meaning that
+	heap-check was being run 5 times be realloc.  YEACH!!
+
 Tue Nov 10 17:55:53 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added two new debug-tokens: log-blocks and heap-check-map.  Also
+	made sure that heap_check was being called from everywhere.
+	Updated the manual and corresponding files.
 
 	* Added library functions that may not be defined.  Updated the
 	conf.h.in and configure.in files to improve confiurability.

@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.11 1992/11/10 23:25:44 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.12 1992/11/14 21:19:44 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
@@ -72,6 +72,18 @@
 
 #undef	TRUE
 #define TRUE		(! FALSE)
+
+/*
+ * standard i/o file descriptors
+ */
+#undef	STDIN
+#define	STDIN		0		/* fileno(stdin) */
+
+#undef	STDOUT
+#define	STDOUT		1		/* fileno(stdout) */
+
+#undef	STDERR
+#define	STDERR		2		/* fileno(stderr) */
 
 /*
  * min/max macros

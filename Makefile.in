@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.1 1992/11/11 23:14:36 gray Exp $
+# $Id: Makefile.in,v 1.2 1992/11/14 21:19:14 gray Exp $
 #
 
 HFLS	= malloc.h malloc_leap.h
@@ -61,12 +61,6 @@ port : malloc.info
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'
-
-conf.h : conf.h.in configure
-	configure
-
-Makefile : Makefile.in configure
-	configure
 
 tests : $(TESTS)
 

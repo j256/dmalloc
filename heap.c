@@ -29,8 +29,6 @@
  * machine type's differences.
  */
 
-#include <sys/types.h>				/* for caddr_t */
-
 #define HEAP_MAIN
 
 #include "malloc.h"
@@ -44,7 +42,7 @@
 #include "malloc_errno.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.11 1992/11/10 23:25:26 gray Exp $";
+  "$Id: heap.c,v 1.12 1992/11/14 21:19:34 gray Exp $";
 
 /* exported variables */
 EXPORT	char		*_heap_base = NULL;	/* base of our heap */

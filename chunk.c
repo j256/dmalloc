@@ -43,7 +43,7 @@
 #include "version.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.15 1992/11/11 23:14:39 gray Exp $";
+  "$Id: chunk.c,v 1.16 1992/11/14 21:19:21 gray Exp $";
 
 /* checking information */
 #define MIN_FILE_LENGTH		    3		/* min "[a-zA-Z].c" length */
@@ -1082,7 +1082,7 @@ EXPORT	int	_chunk_heap_check(void)
       
     case BBLOCK_FREE:
       
-      /* NOTE: check out free_lists, depending on debug level? */
+      /* NOTE: check out free_lists, depending on debug value? */
       
       /* check out bitc which is the free-lists size */
       if (bblockp->bb_bitc < BASIC_BLOCK
@@ -1209,10 +1209,6 @@ EXPORT	int	_chunk_pnt_check(char * pnt)
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   int		len;
-  
-  /* do we need to check the heap */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("checking pointer '%#lx'", pnt);
@@ -1365,10 +1361,6 @@ EXPORT	int	_chunk_read_info(char * pnt, unsigned int * size,
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp;
-  
-  /* check the heap? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("reading info about pointer '%#lx'", pnt);
@@ -1558,10 +1550,6 @@ EXPORT	char	*_chunk_malloc(char * file, unsigned int line,
     line = DEFAULT_LINE;
   }
   
-  /* do we need to check the heap */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
-  
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (size == 0) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
@@ -1703,10 +1691,6 @@ EXPORT	int	_chunk_free(char * file, unsigned int line, char * pnt)
   }
   
   alloc_cur_pnts--;
-  
-  /* do we need to check the heap */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
   
   /* adjust the pointer down if fence-posting */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_FENCE))
@@ -1877,10 +1861,6 @@ EXPORT	char	*_chunk_realloc(char * file, unsigned int line,
     line = DEFAULT_LINE;
   }
   
-  /* do we need to check the heap */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
-  
   /* get info about old pointer */
   if (_chunk_read_info(oldp, &old_size, &old_file, &old_line) != NOERROR)
     return REALLOC_ERROR;
@@ -1990,10 +1970,6 @@ EXPORT	void	_chunk_list_count(void)
   bblock_t	*bblockp;
   dblock_t	*dblockp;
   
-  /* do we need to check the heap */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
-  
   /* print header bit-counts */
   info[0] = NULLC;
   for (bitc = SMALLEST_BLOCK; bitc <= LARGEST_BLOCK; bitc++) {
@@ -2026,10 +2002,6 @@ EXPORT	void	_chunk_list_count(void)
 EXPORT	void	_chunk_stats(void)
 {
   long		overhead;
-  
-  /* do we need to check the heap */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("getting chunk statistics");
@@ -2085,10 +2057,6 @@ EXPORT	void	_chunk_dump_not_freed(void)
   char		*mem;
   int		unknown_sizec = 0, unknown_dblockc = 0, unknown_bblockc = 0;
   int		sizec = 0, dblockc = 0, bblockc = 0;
-  
-  /* check the heap? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_ADMIN))
     _malloc_message("dumping the unfreed pointers");
@@ -2229,10 +2197,6 @@ EXPORT	void	_chunk_dump_not_freed(void)
  */
 EXPORT	void	_chunk_log_heap_map(void)
 {
-  /* do we need to check the heap? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
-  
   /* did we map the heap second ago? */
   if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP) ||
       ! BIT_IS_SET(_malloc_debug, DEBUG_HEAP_CHECK_MAP))
