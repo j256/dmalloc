@@ -1,6 +1,7 @@
 2005-01-11  Gray Watson  <gray@outside.256.com>
 
-	* Added some fixes for Compaq's C compiler.  Thanks Burl.
+	* Added some fixes for Compaq's C compiler, some include ordering
+	fixes, and some C++ compiler defines.  Thanks Burl.
 
 2004-12-03  Gray Watson  <gray@outside.256.com>
 
@@ -2258,5 +2259,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.328 2005/01/11 18:27:04 gray Exp $
+$Id: ChangeLog,v 1.329 2005/01/11 19:31:09 gray Exp $
 -------------------------------------------------------------------------------
