@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $
+ * $Id: chunk.c,v 1.164 2000/09/13 18:22:02 gray Exp $
  */
 
 /*
@@ -63,13 +63,13 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
-#ident "@(#) $Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
+#ident "$Id: chunk.c,v 1.164 2000/09/13 18:22:02 gray Exp $";
+#ident "@(#) $Id: chunk.c,v 1.164 2000/09/13 18:22:02 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
+  "$Id: chunk.c,v 1.164 2000/09/13 18:22:02 gray Exp $";
 static	char	*rcs_id_w =
-  "@(#) $Id: chunk.c,v 1.163 2000/07/25 16:06:55 gray Exp $";
+  "@(#) $Id: chunk.c,v 1.164 2000/09/13 18:22:02 gray Exp $";
 #endif
 #endif
 
@@ -1238,7 +1238,9 @@ static	dblock_t	*find_free_dblock(const int bit_n)
   }
 #else /* FREED_POINTER_DELAY == 0 */
   dblock_p = free_dblock[bit_n];
-  free_dblock[bit_n] = dblock_p->db_next;
+  if (dblock_p != NULL) {
+    free_dblock[bit_n] = dblock_p->db_next;
+  }
 #endif /* FREED_POINTER_DELAY == 0 */
   
   return dblock_p;
