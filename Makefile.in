@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.157 2003/05/15 20:10:19 gray Exp $
+# $Id: Makefile.in,v 1.158 2003/05/16 19:20:06 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -127,18 +127,18 @@ installlibs :: installincs $(LIBRARY) $(INSTALL_CXX) $(INSTALL_TH)
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
 installdocs :: $(DOCS)
-	install -Cv -m 444 $(DOCS) $(WWWDIR)/docs
-	cd $(WWWDIR)/docs ; for file in $(DOCS) ;\
-		do gzip -9fc $$file > $$file.gz.t ;\
-		install -Cv -m 444 $$file.gz.t $$file.gz ;\
-		rm -f $$file.gz.t ; done
-	-cd $(WWWDIR)/docs/online ;\
+	-mkdir $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
+	-chmod 755 $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
+	install -Cv -m 444 $(DOCS) $(WWWDIR)/docs/$(VERSION)
+	-cd $(WWWDIR)/docs/$(VERSION)/online ;\
 		umask 022 ;\
 		texi2html -menu -number -split_node ../dmalloc.texi ;\
 		for f in dmalloc*.html ; do \
 			sed -e 's,</BODY>,<P><A HREF="http://dmalloc.com/">Dmalloc Home Page</A>.  Copyright 2001 by <A HREF="http://256.com/gray/">Gray Watson</A></BODY>,' $$f > $$f.t ;\
 			mv $$f.t $$f ;\
 		done
+	cd $(WWWDIR)/docs/$(VERSION) ; for file in $(DOCS) ;\
+		do gzip -9f $$file ; done
 
 installshlib : $(SHLIBRARY)
 	install -Cv -m 644 $(srcdir)/$(SHLIBRARY) $(shlibdir)
