@@ -25,8 +25,14 @@
  */
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
-#include <signal.h>				/* for kill signals */
 #include <stdarg.h>				/* for message vsprintf */
+
+/* for KILL_PROCESS define */
+#if USE_ABORT == 0
+#ifdef SIGNAL_INCLUDE
+#include SIGNAL_INCLUDE				/* for kill signals */
+#endif
+#endif
 
 /* for timeval type -- see conf.h */
 #if STORE_TIMEVAL
@@ -49,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.56 1995/05/13 00:34:23 gray Exp $";
+  "$Id: error.c,v 1.57 1995/05/16 01:59:37 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(60 * SECS_IN_MIN)
@@ -189,7 +195,8 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
     if (outfile < 0) {
       outfile = open(dmalloc_logpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
       if (outfile < 0) {
-	(void)sprintf(str, "dmalloc: could not open '%s'\n", dmalloc_logpath);
+	(void)sprintf(str, "debug-malloc library: could not open '%s'\n",
+		      dmalloc_logpath);
 	(void)write(STDERR, str, strlen(str));
 	/* disable log_path */
 	dmalloc_logpath = LOGPATH_INIT;
@@ -225,27 +232,41 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
 /*
  * kill the program because of an internal malloc error
  */
-EXPORT	void	_dmalloc_die(void)
+EXPORT	void	_dmalloc_die(const char silent)
 {
   char	str[1024], *stop_str;
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
-    stop_str = "dumping";
-  else
-    stop_str = "halting";
-  
-  /* print a message that we are going down */
-  (void)sprintf(str, "dmalloc: %s program, fatal error\n", stop_str);
-  (void)write(STDERR, str, strlen(str));
-  if (dmalloc_errno != ERROR_NONE) {
-    (void)sprintf(str, "   Error: %s (err %d)\n",
-		  _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+  if (! silent) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
+      stop_str = "dumping";
+    else
+      stop_str = "halting";
+    
+    /* print a message that we are going down */
+    (void)sprintf(str, "debug-malloc library: %s program, fatal error\n",
+		  stop_str);
     (void)write(STDERR, str, strlen(str));
+    if (dmalloc_errno != ERROR_NONE) {
+      (void)sprintf(str, "   Error: %s (err %d)\n",
+		    _dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      (void)write(STDERR, str, strlen(str));
+    }
   }
   
   /* do I need to drop core? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
-    KILL_PROCESS();
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)
+#if DUMP_CONTINUE
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)
+#endif
+      ) {
+#if USE_ABORT
+    abort();
+#else
+#ifdef KILL_PROCESS
+    KILL_PROCESS;
+#endif
+#endif
+  }
   
   /*
    * NOTE: this should not be exit() because fclose will free, etc
@@ -274,5 +295,13 @@ EXPORT	void	dmalloc_error(const char * func)
   
   /* do I need to abort? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
-    _dmalloc_die();
+    _dmalloc_die(FALSE);
+  
+#if DUMP_CONTINUE
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
+    int		pid = fork();
+    if (pid == 0)
+      _dmalloc_die(TRUE);
+  }
+#endif
 }

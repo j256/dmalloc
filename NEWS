@@ -1,10 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.56 1995/05/13 00:34:54 gray Exp $
+$Id: NEWS,v 1.57 1995/05/16 01:59:37 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.6:
 
-	* Fixed problem with NEVER_REUSER and realloc same block-size.
+	* Added error-dump token for dumping-core and continuing on errors.
+	* Added Web pointers to online documentation.
+	* Added abort() auto-configuration for KILL_PROCESS.
+	* Added DUMP_CONTINUE conf.h define which enable error-dump token.
+	* Fixed problem with NEVER_REUSE and realloc same block-size.
 	* Logged starting/ending time in logfile.
 	* Added thread-id tracking with conf.h option.
 	* Added pointer-count tracking with conf.h option.
