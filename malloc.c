@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: malloc.c,v 1.113 1998/10/28 15:18:27 gray Exp $
+ * $Id: malloc.c,v 1.114 1998/11/09 15:57:18 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.113 1998/10/28 15:18:27 gray Exp $";
+#ident "$Id: malloc.c,v 1.114 1998/11/09 15:57:18 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.113 1998/10/28 15:18:27 gray Exp $";
+  "$Id: malloc.c,v 1.114 1998/11/09 15:57:18 gray Exp $";
 #endif
 #endif
 
@@ -646,20 +646,7 @@ int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt)
   
   check_pnt(file, line, pnt, "free");
   
-#if ALLOW_FREE_NULL
-  if (pnt == NULL) {
-#if ALLOW_FREE_NULL_MESSAGE
-    _dmalloc_message("WARNING: tried to free(0) from '%s'",
-		     _chunk_display_where(file, line));
-#endif
-    ret = FREE_NOERROR;
-  }
-  else {
-    ret = _chunk_free(file, line, pnt, 0);
-  }
-#else /* ! ALLOW_FREE_NULL */
   ret = _chunk_free(file, line, pnt, 0);
-#endif
   
   in_alloc_b = FALSE;
   

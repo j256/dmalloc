@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.123 1998/10/26 14:24:26 gray Exp $
+ * $Id: chunk.c,v 1.124 1998/11/09 15:57:15 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.123 1998/10/26 14:24:26 gray Exp $";
+#ident "$Id: chunk.c,v 1.124 1998/11/09 15:57:15 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.123 1998/10/26 14:24:26 gray Exp $";
+  "$Id: chunk.c,v 1.124 1998/11/09 15:57:15 gray Exp $";
 #endif
 #endif
 
@@ -2413,9 +2413,9 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (byte_n == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
-		   "malloc", FALSE);
     if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO)) {
+      log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
+		     "malloc", FALSE);
       dmalloc_error("_chunk_malloc");
     }
     return MALLOC_ERROR;
@@ -2588,12 +2588,20 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   }
   
   if (pnt == NULL) {
+#if ALLOW_FREE_NULL_MESSAGE
+    _dmalloc_message("WARNING: tried to free(0) from '%s'",
+		     _chunk_display_where(file, line));
+#endif
+#if ALLOW_FREE_NULL
+    return FREE_NOERROR;
+#else
     dmalloc_errno = ERROR_IS_NULL;
-    log_error_info(file, line, pnt, 0, "invalid pointer", "free", FALSE);
     if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO)) {
+      log_error_info(file, line, pnt, 0, "invalid pointer", "free", FALSE);
       dmalloc_error("_chunk_free");
     }
     return FREE_ERROR;
+#endif
   }
   
   /* adjust the pointer down if fence-posting */
@@ -2864,9 +2872,9 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
 #if ALLOW_ALLOC_ZERO_SIZE == 0
   if (new_size == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
-    log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
-		   "realloc", FALSE);
     if (! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_ZERO)) {
+      log_error_info(file, line, NULL, 0, "bad zero byte allocation request",
+		     "realloc", FALSE);
       dmalloc_error("_chunk_realloc");
     }
     return REALLOC_ERROR;

@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.147 1998/10/28 15:18:49 gray Exp $
+@c $Id: dmalloc.texi,v 1.148 1998/11/09 15:57:17 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1648,108 +1648,108 @@ Program}.
 
 @table @code
 @item none
-no debugging functionality
+No debugging functionality
 
 @item log-stats
-log general statistics when dmalloc_shutdown or dmalloc_log_stats is
-called
+Log general statistics when dmalloc_shutdown or dmalloc_log_stats is
+called.
 
 @item log-non-free
-log non-freed memory pointers when dmalloc_shutdown or dmalloc_log_unfreed
-is called
+Log non-freed memory pointers when dmalloc_shutdown or dmalloc_log_unfreed
+is called.
 
 @item log-thread-id
-for systems that have multi-threaded programs (don't worry if this does
+For systems that have multi-threaded programs (don't worry if this does
 not make sense to you), log thread-id for allocated pointer (see
-@file{conf.h})
+@file{conf.h}).
 
 @item log-trans
-log general memory transactions (quite verbose)
+Log general memory transactions (quite verbose).
 
 @item log-stamp
-log a time stamp for all messages
+Log a time stamp for all messages.
 
 @item log-admin
-log administrative information (quite verbose)
+Log administrative information (quite verbose).
 
 @item log-blocks
-log detailed block information when dmalloc_log_heap_map is called
+Log detailed block information when dmalloc_log_heap_map is called.
 
 @item log-unknown
-like log-non-free but logs non-freed memory pointers that did not have
-file/line information associated with them
+Like log-non-free but logs non-freed memory pointers that did not have
+file/line information associated with them.
 
 @item log-bad-space
-log actual bytes in and around bad pointers
+Log actual bytes in and around bad pointers.
 
 @item log-nonfree-space
-log actual bytes in non-freed pointers
+Log actual bytes in non-freed pointers.
 
 @item log-elapsed-time
-log elapsed-time for allocated pointers (see @file{conf.h})
+Log elapsed-time for allocated pointers (see @file{conf.h}).
 
 @item log-current-time
-log current-time for allocated pointers (see @file{conf.h})
+Log current-time for allocated pointers (see @file{conf.h}).
 
 @item check-fence
-check fence-post memory areas
+Check fence-post memory areas.
 
 @item check-heap
-verify heap administrative structure
+Verify heap administrative structure.
 
 @item check-lists
-examine internal heap linked-lists
+Examine internal heap linked-lists.
 
 @item check-blank
-check to see if space that was blanked by free-blank or alloc-blank has
-been overwritten
+Check to see if space that was blanked by free-blank or alloc-blank has
+been overwritten.
 
 @item check-funcs
-check the arguments of some functions (mostly string operations) looking
-for bad pointers
+Check the arguments of some functions (mostly string operations) looking
+for bad pointers.
 
 @item realloc-copy
-always copy data to a new pointer when realloc
+Always copy data to a new pointer when realloc.
 
 @cindex blank space
 @cindex decimal 197
 @cindex octal 305
 @cindex hex 0xc5
 @item free-blank
-write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is freed
+Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
+it is freed.
 
 @cindex dump core
 @cindex core dump
 @item error-abort
-abort the program (and dump core) on errors.  See @code{error-dump} below.
+Abort the program (and dump core) on errors.  See @code{error-dump} below.
 
 @cindex blank space
 @cindex decimal 197
 @cindex octal 305
 @cindex hex 0xc5
 @item alloc-blank
-write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
-it is allocated
+Write special bytes (decimal 197, octal 0305, hex 0xc5) into space when
+it is allocated.
 
 @item heap-check-map
-log a heap-map to the logfile every time the heap is checked
+Log a heap-map to the logfile every time the heap is checked.
 
 @item print-error
-log any errors and messages to the screen via standard-error
+Log any errors and messages to the screen via standard-error.
 
-@item catch-null
-abort the program immediately if the library fails to get more heap
-space from sbrk
 @cindex sbrk
+@item catch-null
+Abort the program immediately if the library fails to get more heap
+space from sbrk.
 
 @item never-reuse
-have the heap never use space that has been used before and freed.
+Have the heap never use space that has been used before and freed.
 @xref{Memory Leaks}.  @emph{WARNING}: This should be used with caution
 since you may run out of heap space.
 
 @item allow-nonlinear
-have the heap not complain when additional program functionality seems
+Have the heap not complain when additional program functionality seems
 to have made use of the system's heap-allocation routine @code{sbrk}
 directly.  This is now enabled by default since an increasing number of
 operating system functions seem to be doing this -- one example is the
@@ -1759,8 +1759,10 @@ pthreads package.
 certain heap problems.
 
 @item allow-zero
-the library will not generate errors when a program asks for a 0 byte
-allocation or when someone tries to free a NULL pointer.
+The library will not generate an error when a program tries to free a
+NULL pointer.  Also, if the ALLOW_ALLOC_ZERO_SIZE variable is @emph{not}
+set to 1 in @file{settings.h}, then the library will not generate an
+error when a program asks for a 0 byte allocation.
 
 @emph{NOTE}: This does not impact the ALLOW_REALLOC_NULL compilation
 options which can be adjusted in @file{conf.h}.
@@ -1768,7 +1770,7 @@ options which can be adjusted in @file{conf.h}.
 @cindex dump core
 @cindex core dump
 @item error-dump
-dump core on error and then continue.  Later core dumps overwrite
+Dump core on error and then continue.  Later core dumps overwrite
 earlier ones if the program encounters more than one error.  See
 @code{error-abort} above.
 
