@@ -1,8 +1,9 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.104 2003/05/20 04:14:09 gray Exp $
+$Id: NEWS,v 1.105 2003/05/21 04:33:41 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 5.0.1:
+	* Updated configure.ac script.
 	* Added dmalloc_page_size() function.
 	* Improved the auto-testing in dmalloc_t.
 	* Found a [bad] problem with putting pointers back on the free list.
