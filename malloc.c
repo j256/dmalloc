@@ -61,7 +61,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.88 1995/10/21 00:23:51 gray Exp $";
+  "$Id: malloc.c,v 1.89 1997/01/16 15:20:14 gray Exp $";
 #endif
 
 /*
@@ -87,7 +87,7 @@ EXPORT	void		_dmalloc_log_stats(void);
 EXPORT	void		_dmalloc_log_unfreed(void);
 EXPORT	int		_dmalloc_verify(const DMALLOC_PNT pnt);
 EXPORT	int		_malloc_verify(const DMALLOC_PNT pnt);
-EXPORT	void		_dmalloc_debug(const int debug);
+EXPORT	void		_dmalloc_debug(const int flags);
 EXPORT	int		_dmalloc_debug_current(void);
 EXPORT	int		_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
 					 char ** file, unsigned int * line,
@@ -627,23 +627,23 @@ EXPORT	int	_malloc_verify(const DMALLOC_PNT pnt)
 }
 
 /*
- * set the global debug functionality flags to DEBUG (0 to disable all
+ * set the global debug functionality FLAGS to debug (0 to disable all
  * debugging).  NOTE: after this module has started up, you cannot set
  * certain flags such as fence-post or free-space checking.
  */
-EXPORT	void	_dmalloc_debug(const int debug)
+EXPORT	void	_dmalloc_debug(const int flags)
 {
   /* should not check the heap here since we are setting the debug variable */
   
   /* if we've not started up then set the variable */
   if (! enabled)
-    _dmalloc_flags = debug;
+    _dmalloc_flags = flags;
   else {
     /* make sure that the not-changeable flag values are preserved */
     _dmalloc_flags &= DEBUG_NOT_CHANGEABLE;
     
     /* add the new flags - the not-addable ones */
-    _dmalloc_flags |= debug & ~DEBUG_NOT_ADDABLE;
+    _dmalloc_flags |= flags & ~DEBUG_NOT_ADDABLE;
   }
 }
 
