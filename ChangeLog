@@ -1,3 +1,8 @@
+Mon Sep 28 23:24:36 1992  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added MALLOC_ADDRESS support for free.  MALLOC_ADDRESS counts
+	now also apply to frees also.
+
 Mon Sep 21 20:39:38 1992  Gray Watson  (gray at toaster)
 
 	* Fixed some size problems with bounds checking enabled.
