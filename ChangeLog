@@ -1,3 +1,7 @@
+Wed Oct  7 14:52:14 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Fixed possible sbrk race condition.
+
 Sun Oct  4 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Released dmalloc version 4.0.0.
@@ -1297,5 +1301,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.191 1998/10/05 03:01:09 gray Exp $
+$Id: ChangeLog,v 1.192 1998/10/07 18:52:25 gray Exp $
 -------------------------------------------------------------------------------

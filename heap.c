@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: heap.c,v 1.46 1998/09/19 00:11:38 gray Exp $";
+  "$Id: heap.c,v 1.47 1998/10/07 18:52:26 gray Exp $";
 #endif
 
 #define SBRK_ERROR	((char *)-1)		/* sbrk error code */
@@ -65,6 +65,10 @@ void	*_heap_last = NULL;			/* end of our heap */
 static	void	*heap_extend(const int incr)
 {
   void	*ret = SBRK_ERROR;
+  
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
+    _dmalloc_message("extending heap space by %d bytes", incr);
+  }
   
 #if HAVE_SBRK
   ret = sbrk(incr);
@@ -93,17 +97,20 @@ int	_heap_startup(void)
   long		diff;
   
   _heap_base = heap_extend(0);
-  if (_heap_base == SBRK_ERROR)
+  if (_heap_base == SBRK_ERROR) {
     return ERROR;
+  }
   
   /* align the heap-base */
   diff = BLOCK_SIZE - ((long)_heap_base % BLOCK_SIZE);
-  if (diff == BLOCK_SIZE)
+  if (diff == BLOCK_SIZE) {
     diff = 0;
+  }
   
   if (diff > 0) {
-    if (heap_extend(diff) == SBRK_ERROR)
+    if (heap_extend(diff) == SBRK_ERROR) {
       return ERROR;
+    }
     _heap_base = (char *)HEAP_INCR(_heap_base, diff);
   }
   
@@ -120,61 +127,94 @@ int	_heap_startup(void)
 void	*_heap_alloc(const unsigned int size, void **extern_p,
 		     int *extern_cp)
 {
-  void		*ret;
+  void		*heap_new, *heap_diff;
   long		diff;
-  int		blockn;
+  int		block_n = 0;
   
-  ret = heap_extend(size);
-  if (ret == SBRK_ERROR)
-    return HEAP_ALLOC_ERROR;
-  
-  /* is the heap linear? */
-  if (ret == _heap_last) {
-    _heap_last = HEAP_INCR(ret, size);
-    if (extern_p != NULL)
-      *extern_p = NULL;
-    if (extern_cp != NULL)
-      *extern_cp = 0;
-    return ret;
-  }
-  
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
-    _dmalloc_message("correcting non-linear heap");
-  
-  /* if we went down then this is a real error! */
-  if (! IS_GROWTH(ret, _heap_last)
-      || ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
-    dmalloc_errno = ERROR_ALLOC_NONLINEAR;
-    dmalloc_error("_heap_alloc");
-    return HEAP_ALLOC_ERROR;
-  }
-  
-  /* adjust chunk admin information to align to blocksize */
-  blockn = ((char *)ret - (char *)_heap_last) / BLOCK_SIZE;
-  
-  /* align back to correct values */
-  diff = BLOCK_SIZE - ((long)ret % BLOCK_SIZE);
-  if (diff == BLOCK_SIZE)
-    diff = 0;
-  
-  /* do we need to correct non-linear space with sbrk */
-  if (diff > 0) {
-    if (heap_extend(diff) == SBRK_ERROR) {
-      return HEAP_ALLOC_ERROR;
-    }
-    
-    ret = HEAP_INCR(ret, diff);
-    blockn++;
-  }
-  
+  /* set our external memory pointer to where the heap should be */ 
   if (extern_p != NULL) {
     *extern_p = _heap_last;
   }
-  if (extern_cp != NULL) {
-    *extern_cp = blockn;
+  
+  while (1) {
+    
+    /* extend the heap by our size */
+    heap_new = heap_extend(size);
+    if (heap_new == SBRK_ERROR) {
+      return HEAP_ALLOC_ERROR;
+    }
+    
+    /* is the heap linear? */
+    if (heap_new == _heap_last) {
+      _heap_last = HEAP_INCR(heap_new, size);
+      if (extern_cp != NULL) {
+	*extern_cp = 0;
+      }
+      return heap_new;
+    }
+    
+    /* if we went down then this is a real error! */
+    if ((! IS_GROWTH(heap_new, _heap_last))
+	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
+      dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+      dmalloc_error("_heap_alloc");
+      return HEAP_ALLOC_ERROR;
+    }
+    
+    /* adjust chunk admin information to align to blocksize */
+    block_n += BLOCKS_BETWEEN(heap_new, _heap_last);
+    
+    /* move heap last forward */
+    _heap_last = HEAP_INCR(heap_new, size);
+    
+    /* calculate bytes needed to align to block boundary */
+    diff = BLOCK_SIZE - ((long)heap_new % BLOCK_SIZE);
+    if (diff == BLOCK_SIZE) {
+      if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
+	_dmalloc_message("corrected non-linear heap for %d blocks", block_n);
+      }
+      /* if external sbrk asked for full block(s) then no need to correct */
+      break;
+    }
+    
+    /* account for the partial block that we need to fill */
+    block_n++;
+    
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
+      _dmalloc_message("corrected non-linear non-aligned heap for %d blocks",
+		       block_n);
+    }
+    
+    /* shift the heap a bit to account for non block alignment */
+    heap_diff = heap_extend(diff);
+    if (heap_diff == SBRK_ERROR) {
+      return HEAP_ALLOC_ERROR;
+    }
+    
+    /* if we got what we expected, then we are done */
+    if (heap_diff == _heap_last) {
+      /* shift the new pointer up to align it */
+      heap_new = HEAP_INCR(heap_new, diff);
+      /* move the heap last pointer past the diff section */
+      _heap_last = HEAP_INCR(heap_diff, diff);
+      break;
+    }
+    
+    /*
+     * We may have a wierd sbrk race condition here.  We hope that we
+     * are not just majorly confused which may mean that we sbrk till
+     * the cows come home -- or we die from lack of memory.
+     */
+    
+    /* move the heap last pointer past the diff section */
+    _heap_last = HEAP_INCR(heap_diff, diff);
+    
+    /* start over again */
   }
   
-  _heap_last = HEAP_INCR(ret, size);
+  if (extern_cp != NULL) {
+    *extern_cp = block_n;
+  }
   
-  return ret;
+  return heap_new;
 }

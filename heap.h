@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: heap.h,v 1.31 1997/12/05 21:09:50 gray Exp $
+ * $Id: heap.h,v 1.32 1998/10/07 18:52:27 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -57,6 +57,10 @@
 /* calculate the size of heap */
 #define HEAP_SIZE	((char *)_heap_last - (char *)_heap_base)
 
+/* how many blocks between the BEFORE pointer and the NOW pointer */
+#define BLOCKS_BETWEEN(now, before)	(((char *)now - (char *)before) / \
+					 BLOCK_SIZE)
+
 /* is the heap growing?  is the NEW pointer ahead of the OLD */
 #define IS_GROWTH(new, old)	((char *)(new) > (char *)(old))
 
@@ -82,6 +86,10 @@
 
 /* is the heap growing?  is the NEW pointer ahead of the OLD */
 #define HEAP_SIZE	((char *)_heap_base - (char *)_heap_last)
+
+/* how many blocks between the BEFORE pointer and the NOW pointer */
+#define BLOCKS_BETWEEN(now, before)	(((char *)before - (char *)now) / \
+					 BLOCK_SIZE)
 
 /* is the heap growing? */
 #define IS_GROWTH(new, old)	((char *)(new) < (char *)(old))
