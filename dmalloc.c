@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.87 1999/03/08 19:07:52 gray Exp $
+ * $Id: dmalloc.c,v 1.88 1999/05/06 15:11:46 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.87 1999/03/08 19:07:52 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.88 1999/05/06 15:11:46 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.87 1999/03/08 19:07:52 gray Exp $";
+  "$Id: dmalloc.c,v 1.88 1999/05/06 15:11:46 gray Exp $";
 #endif
 #endif
 
@@ -317,47 +317,18 @@ static	long	token_to_value(const char *tok)
 }
 
 /*
- * process the user configuration looking for the TAG_FIND.  if it is
- * null then look for DEBUG_VALUE in the file and return the token for
- * it in STR_P.  routine returns the new debug value matching tag.
+ * Read in the next token from INFILE.  It passes back the returned
+ * debug value in DEBUG_P.  Passes back the matching TOKEN of
+ * TOKEN_SIZE.  Returns 1 if there was a next else 0.
  */
-static	long	process(const long debug_value, const char *tag_find,
-			char **str_p)
+static	int	read_next_token(FILE *infile, long *debug_p,
+				char *token, const int token_size)
 {
-  static char	token[128];
-  FILE		*infile = NULL;
-  char		path[1024], buf[1024], *buf_p;
-  default_t	*def_p;
-  const char	*home_p;
-  int		found_b, cont_b;
-  long		new_debug = 0;
+  int	cont_b = FALSE, found_b = FALSE;
+  long	new_debug = 0;
+  char	buf[1024], *tok_p, *buf_p;
   
-  /* do we need to have a home variable? */
-  if (inpath == NULL) {
-    home_p = getenv(HOME_ENVIRON);
-    if (home_p == NULL) {
-      (void)fprintf(stderr, "%s: could not find variable '%s'\n",
-		    argv_program, HOME_ENVIRON);
-      exit(1);
-    }
-    
-    (void)loc_snprintf(path, sizeof(path), "%s/%s", home_p, DEFAULT_CONFIG);
-    inpath = path;
-  }
-  
-  infile = fopen(inpath, "r");
-  /* do not test for error here */
-  
-  if (list_tags_b && infile != NULL) {
-    (void)fprintf(stderr, "Tags available from '%s':\n", inpath);
-  }
-  
-  /* read each of the lines looking for the tag */
-  found_b = FALSE;
-  cont_b = FALSE;
-  
-  while (infile != NULL && fgets(buf, sizeof(buf), infile) != NULL) {
-    char	*tok_p, *end_p;
+  while (fgets(buf, sizeof(buf), infile) != NULL) {
     
     /* ignore comments and empty lines */
     if (buf[0] == '#' || buf[0] == '\n') {
@@ -365,9 +336,9 @@ static	long	process(const long debug_value, const char *tag_find,
     }
     
     /* chop off the ending \n */
-    end_p = strrchr(buf, '\n');
-    if (end_p != NULL) {
-      *end_p = '\0';
+    buf_p = strrchr(buf, '\n');
+    if (buf_p != NULL) {
+      *buf_p = '\0';
     }
     
     buf_p = buf;
@@ -385,12 +356,12 @@ static	long	process(const long debug_value, const char *tag_find,
 	continue;
       }
       
-      (void)strcpy(token, tok_p);
-      new_debug = 0;
-      
-      if (tag_find != NULL && strcmp(tag_find, tok_p) == 0) {
-	found_b = TRUE;
+      /* save the token */
+      if (token != NULL) {
+	(void)strncpy(token, tok_p, token_size);
+	token[token_size - 1] = '\0';
       }
+      found_b = 1;
     }
     
     cont_b = FALSE;
@@ -405,98 +376,192 @@ static	long	process(const long debug_value, const char *tag_find,
 	continue;
       }
       
-      /* do we have a continuation character */
+      /* do we have a continuation character? */
       if (strcmp(tok_p, "\\") == 0) {
 	cont_b = TRUE;
 	break;
       }
       
-      /* are we processing the tag of choice? */
-      if (found_b || tag_find == NULL) {
-	new_debug |= token_to_value(tok_p);
-      }
-    }
-    
-    if (list_tags_b && (! cont_b)) {
-      if (verbose_b) {
-	(void)fprintf(stderr, "%s (%#lx):\n", token, new_debug);
-	dump_debug(new_debug);
-      }
-      else
-	(void)fprintf(stderr, "%s\n", token);
-    }
-    else if (tag_find == NULL && (! cont_b) && new_debug == debug_value) {
-      found_b = TRUE;
-      if (str_p != NULL) {
-	*str_p = token;
-      }
+      new_debug |= token_to_value(tok_p);
     }
     
     /* are we done? */
-    if (found_b && (! cont_b)) {
+    if (! cont_b) {
       break;
     }
   }
   
-  if (infile != NULL) {
-    (void)fclose(infile);
+  if (debug_p != NULL) {
+    *debug_p = new_debug;
   }
   
-  /* did we find the correct value in the file? */
   if (found_b) {
-    return new_debug;
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+/*
+ * Read in a rc file from PATH and process it looking for the
+ * specified DEBUG_VALUE or TAG_FIND token.  It passes back the
+ * returned debug value in DEBUG_P.  Passes back the matching TOKEN of
+ * TOKEN_SIZE.  Returns 0 if the file was not found.  Returns 1 if the
+ * file was found, 2 if the file and the token was found.
+ */
+static	int	read_rc_file(const char *path, const long debug_value,
+			     const char *tag_find, long *debug_p,
+			     char *token, const int token_size)
+{
+  FILE	*infile;
+  int	found_b = FALSE;
+  char	next_token[64];
+  long	new_debug;
+  
+  /* open the path */
+  infile = fopen(path, "r");
+  if (infile == NULL) {
+    return 0;
   }
   
-  if ((! list_tags_b) && tag_find == NULL) {
+  /* run through the tokens, looking for a match */
+  while (read_next_token(infile, &new_debug, next_token,
+			 sizeof(next_token)) == 1) {
     
-    /* check the default list to see if we have a match there */
-    if (str_p != NULL) {
+    /* are we looking for a tag? */
+    if (tag_find != NULL && strcmp(tag_find, next_token) == 0) {
+      found_b = 1;
+      break;
+    }
+    
+    /* are we looking for a debug-value? */
+    if (debug_value > 0 && debug_value == new_debug) {
+      found_b = 1;
+      break;
+    }
+  }
+  
+  (void)fclose(infile);
+  
+  if (debug_p != NULL) {
+    *debug_p = new_debug;
+  }
+  if (token != NULL) {
+    strncpy(token, next_token, token_size);
+    token[token_size - 1] = '\0';
+  }
+  
+  if (found_b) {
+    return 2;
+  }
+  else {
+    return 1;
+  }
+}
+
+/*
+ * Process the user configuration looking for the TAG_FIND.  If it is
+ * null then look for DEBUG_VALUE in the file and copy the token found
+ * into TOKEN of TOKEN_SIZE.  Routine returns the new debug value
+ * matching tag.
+ */
+static	long	process(const long debug_value, const char *tag_find,
+			char *token, const int token_size)
+{
+  char		path[1024], *path_p;
+  default_t	*def_p;
+  const char	*home_p;
+  int		ret;
+  long		new_debug = 0;
+  
+  /* do we need to have a home variable? */
+  if (inpath == NULL) {
+    
+    /* first we try to read the RC file from the current directory */
+    ret = read_rc_file(DEFAULT_CONFIG, debug_value, tag_find, &new_debug,
+		       token, token_size);
+    /* did we find the correct value in the file? */
+    if (ret == 2) {
+      return new_debug;
+    }
+    path_p = DEFAULT_CONFIG;
+    
+    /* if we did not find the file, check the home directory */
+    if (ret == 0) {
+      /* find our home directory */
+      home_p = getenv(HOME_ENVIRON);
+      if (home_p == NULL) {
+	(void)fprintf(stderr, "%s: could not find variable '%s'\n",
+		      argv_program, HOME_ENVIRON);
+	exit(1);
+      }
+      
+      (void)loc_snprintf(path, sizeof(path), "%s/%s", home_p, DEFAULT_CONFIG);
+      
+      /* read in the file from our home directory */
+      ret = read_rc_file(path, debug_value, tag_find, &new_debug,
+			 token, token_size);
+      /* did we find the correct value in the file? */
+      if (ret == 2) {
+	return new_debug;
+      }
+      path_p = path;
+    }
+  }
+  else {
+    /* read in the specified file */
+    ret = read_rc_file(inpath, debug_value, tag_find, &new_debug,
+		       token, token_size);
+    /* did we find the correct value in the file? */
+    if (ret == 2) {
+      return new_debug;
+    }
+    /* if the specified was not found, return error */
+    if (ret == 0) {
+      (void)fprintf(stderr, "%s: could not read '%s': ",
+		    argv_program, inpath);
+      perror("");
+      exit(1);
+    }
+    path_p = inpath;
+  }
+  
+  /* if tag-find is NULL we assume we are looking for a debug-value */
+  if (tag_find == NULL) {
+    
+    /* now look for the value in the default token list */
+    if (token != NULL) {
       for (def_p = defaults; def_p->de_string != NULL; def_p++) {
 	if (def_p->de_flags == debug_value) {
-	  *str_p = def_p->de_string;
+	  strncpy(token, def_p->de_string, token_size);
+	  token[token_size - 1] = '\0';
+	  new_debug = def_p->de_flags;
 	  break;
 	}
       }
       if (def_p->de_string == NULL) {
-	*str_p = "unknown";
+	strncpy(token, "unknown", token_size);
+	token[token_size - 1] = '\0';
+	new_debug = 0;
       }
     }
   }
   else {
     
-    if (list_tags_b) {
-      (void)fprintf(stderr, "\n");
-      (void)fprintf(stderr, "Tags available by default:\n");
-    }
-    
+    /* now look for the token in the default token list */
     for (def_p = defaults; def_p->de_string != NULL; def_p++) {
-      if (list_tags_b) {
-	if (verbose_b) {
-	  (void)fprintf(stderr, "%s (%#lx):\n",
-			def_p->de_string, def_p->de_flags);
-	  dump_debug(def_p->de_flags);
-	}
-	else
-	  (void)fprintf(stderr, "%s\n", def_p->de_string);
-      }
-      if (tag_find != NULL && strcmp(tag_find, def_p->de_string) == 0) {
+      if (strcmp(tag_find, def_p->de_string) == 0) {
+	new_debug = def_p->de_flags;
 	break;
       }
     }
-    if (! list_tags_b) {
-      if (def_p->de_string == NULL) {
-	if (infile == NULL) {
-	  (void)fprintf(stderr, "%s: could not read '%s': ",
-			argv_program, inpath);
-	  perror("");
-	}
-	else {
-	  (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-			argv_program, tag_find, inpath);
-	}
-	exit(1);
-      }
-      new_debug = def_p->de_flags;
+    
+    /* did we not find the token? */
+    if (def_p->de_string == NULL) {
+      (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
+		    argv_program, tag_find, path_p);
+      exit(1);
     }
   }
   
@@ -504,16 +569,101 @@ static	long	process(const long debug_value, const char *tag_find,
 }
 
 /*
+ * List the tags that in the files.
+ */
+static	void	list_tags(void)
+{
+  char		path[1024], *path_p, token[64];
+  default_t	*def_p;
+  const char	*home_p;
+  long		new_debug = 0;
+  FILE		*rc_file;
+  
+  /* do we need to have a home variable? */
+  if (inpath == NULL) {
+    
+    /* first we try to read the RC file from the current directory */
+    rc_file = fopen(DEFAULT_CONFIG, "r");
+    if (rc_file == NULL) {
+      
+      /* if no file in current directory, try home directory */
+      home_p = getenv(HOME_ENVIRON);
+      if (home_p == NULL) {
+	(void)fprintf(stderr, "%s: could not find variable '%s'\n",
+		      argv_program, HOME_ENVIRON);
+	exit(1);
+      }
+      
+      (void)loc_snprintf(path, sizeof(path), "%s/%s", home_p, DEFAULT_CONFIG);
+      path_p = path;
+      
+      rc_file = fopen(path, "r");
+      /* we don't check for error right here */
+    }
+    else {
+      path_p = DEFAULT_CONFIG;
+    }
+  }
+  else {
+    
+    /* open the specified file */
+    rc_file = fopen(inpath, "r");
+    /* we assume that if the file was specified, it must be there */
+    if (rc_file == NULL) {
+      (void)fprintf(stderr, "%s: could not read '%s': ",
+		    argv_program, inpath);
+      perror("");
+      exit(1);
+    }
+    path_p = inpath;
+  }
+  
+  if (rc_file != NULL) {
+    (void)fprintf(stderr, "Tags available from '%s':\n", path_p);
+    
+    while (read_next_token(rc_file, &new_debug, token, sizeof(token)) == 1) {
+      if (verbose_b) {
+	(void)fprintf(stderr, "%s (%#lx):\n", token, new_debug);
+	dump_debug(new_debug);
+      }
+      else {
+	(void)fprintf(stderr, "%s\n", token);
+      }
+    }
+    
+    (void)fclose(rc_file);
+  }
+  
+  (void)fprintf(stderr, "\n");
+  (void)fprintf(stderr, "Tags available by default:\n");
+  
+  for (def_p = defaults; def_p->de_string != NULL; def_p++) {
+    if (verbose_b) {
+      (void)fprintf(stderr, "%s (%#lx):\n",
+		    def_p->de_string, def_p->de_flags);
+      dump_debug(def_p->de_flags);
+    }
+    else {
+      (void)fprintf(stderr, "%s\n", def_p->de_string);
+    }
+  }
+}
+
+/*
  * dump the current settings of the malloc variables
  */
 static	void	dump_current(void)
 {
-  char		*tok_p;
-  char		*lpath, *start_file;
+  char		*lpath, *start_file, token[64];
   unsigned long	addr, inter;
   long		addr_count;
   int		lock_on, start_line, start_count;
   unsigned int	flags;
+  
+  (void)fprintf(stderr, "Debug Malloc Utility: http://www.dmalloc.com/\n");
+  (void)fprintf(stderr,
+		"  For a list of the command-line options enter: %s --usage\n",
+		argv_argv[0]);
   
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags,
 		       &inter, &lock_on, &lpath,
@@ -523,8 +673,9 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
   }
   else {
-    (void)process(flags, NULL, &tok_p);
-    (void)fprintf(stderr, "Debug-Flags %#x (%u) (%s)\n", flags, flags, tok_p);
+    (void)process(flags, NULL, token, sizeof(token));
+    (void)fprintf(stderr, "Debug-Flags %#x (%u) (%s)\n",
+		  flags, flags, token);
     if (verbose_b) {
       dump_debug(flags);
     }
@@ -654,7 +805,7 @@ int	main(int argc, char **argv)
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
     }
-    debug = process(0L, tag, NULL);
+    debug = process(0L, tag, NULL, 0);
     debug_set_b = TRUE;
   }
   
@@ -783,7 +934,7 @@ int	main(int argc, char **argv)
   }
   
   if (list_tags_b) {
-    process(0L, NULL, NULL);
+    list_tags();
   }
   
   if (debug_tokens_b) {

@@ -1,3 +1,11 @@
+Thu Apr 15 10:21:55 1999  Gray Watson  <gray@burger.letters.com>
+
+	* Dmalloc now looks in the current directory for .dmallocrc before
+ 	checking your $HOME directory.
+
+	* Rewrote a significant piece of the dmalloc utility.  Much better
+ 	code with regards to processing configuration files.
+
 Fri Mar 26 17:57:54 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Increased the filename size from 40 to 100 characters.
@@ -1451,5 +1459,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.219 1999/04/15 12:55:39 gray Exp $
+$Id: ChangeLog,v 1.220 1999/05/06 15:11:46 gray Exp $
 -------------------------------------------------------------------------------
