@@ -1,3 +1,9 @@
+Sat Nov 12 18:05:34 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* New STDC definitions of DMALLOC_PNT and DMALLOC_FREE_RET.
+
+	* Removed all STRDUP and BDUP macros.  Was anyone using them?
+
 Wed Nov  9 15:43:45 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Upgraded to autoconf 2.1.  New configure script.
@@ -894,5 +900,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.134 1994/11/10 00:11:19 gray Exp $
+$Id: ChangeLog,v 1.135 1994/11/12 23:37:05 gray Exp $
 -------------------------------------------------------------------------------

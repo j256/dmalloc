@@ -1,13 +1,18 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.65 1994/11/10 00:11:29 gray Exp $
+# $Id: Makefile.in,v 1.66 1994/11/12 23:37:08 gray Exp $
 #
 
 HFLS	= dmalloc.h
 OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
 	malloc.o
-FILLFLS	= arg_check.c chunk.c error.c heap.c dmalloc_t.c
+# NOTE:
+# not argv.c because from argv module
+# not compat.c because of HAVE_...,
+# not dmalloc.c cause no associated .h file dmalloc.h
+# not env.h because fillproto broke with ()
+FILLFLS	= arg_check.c chunk.c dmalloc_lp.c dmalloc_t.c error.c heap.c malloc.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
 
 DEFS	= $(DEFINES)
@@ -73,7 +78,6 @@ installincs : $(HFLS)
 installlibs : installincs $(LIBRARY) $(LIB_DIS) $(MANFILE)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
-	install -cev -m 444 $(OBJS_INST) $(DESTDIR)/lib
 	install -cev -m 444 $(MANFILE) $(DESTDIR)/info
 
 .PHONY : install
@@ -180,6 +184,32 @@ INSTALL : INSTALL.1 dmalloc.info
 		< dmalloc.info | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- \
 		>> $@.t
+	mv $@.t $@
+
+README : README.1 dmalloc.info
+	rm -f $@ $@.t
+	echo ------------------------------------------------------------------------------- \
+		> $@.t
+	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $@.t
+	cat README.1 >> $@.t
+	mv $@.t $@
+
+README_ftp : README_ftp.1 dmalloc.info
+	rm -f $@ $@.t
+	echo ------------------------------------------------------------------------------- \
+		> $@.t
+	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
+		< dmalloc.info | tr -d '\037'  >> $@.t
+	cat README_ftp.1 >> $@.t
 	mv $@.t $@
 
 dmalloc.head : dmalloc.info

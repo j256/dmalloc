@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.49 1994/11/09 16:14:43 gray Exp $
+$Id: NEWS,v 1.50 1994/11/12 23:37:10 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.4:
 
+	* Definitions for DMALLOC_PNT and DMALLOC_FREE_RET.
+	* Removed all STRDUP and BDUP macros.  Was anyone using them?
 	* Added a "dying" message when _malloc_die is called.
 	* Reworked the manual a ton.  Added Quick-Start+Installation sections.
 

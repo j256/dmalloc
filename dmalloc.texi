@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.75 1994/11/12 23:13:12 gray Exp $
+@c $Id: dmalloc.texi,v 1.76 1994/11/12 23:37:17 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -83,20 +83,23 @@ Version 3.0.4 -- November 1994
 @cindex introduction
 @cindex author
 
-This file documents the general-usage and the inner-workings of the
-debug memory allocation or @dfn{dmalloc} library it accompanies.
+The debug memory allocation or @dfn{dmalloc} library has been designed
+as a drop in replacement for the system's @code{malloc}, @code{realloc},
+@code{calloc}, @code{free} and other memory management routines while
+providing powerful debugging facilities.
 
-The library has been designed as a drop in replacement for the system's
-malloc, realloc, calloc, free and other memory management routines while
-providing powerful debugging facilities.  It is reasonably portable
-having been run successfully on at least the following operating
-systems: AIX, BSDI, DG/UX, HPUX, Irix, MS-DOG, OSF, Solaris, SunOS, and
-Ultrix.
+The library is reasonably portable having been run successfully on at
+least the following operating systems: AIX, BSDI, DG/UX, HPUX, Irix,
+MS-DOG, OSF, Solaris, SunOS, and Ultrix.
 
-The library is available via ftp from ftp.antaire.com in the
-@file{antaire/src/dmalloc} directory.  I can be reached at
-@samp{gray@@antaire.com} with any questions, feedback, or general
-comments.
+The package includes the library, configuration scripts, debug utility
+application, test program, and extensive documentation (formats: text,
+texi, info, and ps).
+
+The library is available via ftp from @samp{ftp.antaire.com} in the
+@file{antaire/src/dmalloc} directory.  @xref{How To Get}.  I can be
+reached at @samp{gray@@antaire.com} with any questions, feedback, or
+general comments.
 
 Gray Watson, Antaire Corporation.
 
@@ -136,6 +139,7 @@ is" without express or implied warranty.
 @menu
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    The general features of the library.
+* How To Get::			How to get the library.
 * Installation::                How to install the library.
 * Quick Start::                 How to start using the library.
 * Using a Debugger::            Using a debugger with the library.
@@ -302,7 +306,7 @@ appropriate pointer type for the variable being assigned.
 is returned by malloc libraries has already been cleared.  @emph{Only}
 the calloc routine will zero the memory space it returns.
 
-@node Features, Installation, Allocation Basics, Overview
+@node Features, How To Get, Allocation Basics, Overview
 @section Library Features
 
 @cindex features
@@ -411,7 +415,33 @@ your system's routines.  It took me hours to finally come to the
 conclusion that the localtime call, included in SunOS release 4.1,
 overwrites one of its fence-post markers.
 
-@node Installation, Quick Start, Features, Overview
+@node How To Get, Installation, Features, Overview
+@section How to get the library.
+
+@table @asis
+@item Standard Repository:
+
+The newest version(s) of the dmalloc library are available via anonymous
+ftp from @samp{ftp.antaire.com} in the @file{/antaire/src/dmalloc}
+directory.
+
+The versions in this repository also include such files as a
+postscript version of the manual and other large files which may not
+have been included in the distribution you received.
+
+@item Other Repositories:
+
+You can also get a recent version from anonymous ftp via
+@samp{gatekeeper.dec.com} in the @file{/pub/misc/dmalloc} directory.
+This repository has been made available through the generosity of the
+Digital Equipment Corporation with special help from Dave Hill and the
+gatekeepers.
+
+Thanks much to them all.
+
+@end table
+
+@node Installation, Quick Start, How To Get, Overview
 @section Installing the Library
 
 @cindex installing the library
@@ -1790,6 +1820,7 @@ Overview.
 
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    The general features of the library.
+* How To Get::			Where to find and how to get the library.
 * Installation::                How to install the library.
 * Quick Start::                 How to start using the library.
 * Using a Debugger::            Using a debugger with the library.
