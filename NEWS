@@ -1,10 +1,13 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.36 1994/09/12 17:20:03 gray Exp $
+$Id: NEWS,v 1.37 1994/09/20 18:24:04 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.1:
 
+	* Combined all env variables into DMALLOC_OPTIONS.
+	* Added -n flag to dmalloc program for printing/not-doing actions.
 	* Fixed zsh and [t]csh alias messages in documentation.
+	# Added mkinstalldirs and install.sh to distribution.
 	* Renamed _dmalloc_error to dmalloc_error.
 	* Removed time() and getpid() from compat functions.
 	* Changed DMALLOC_DEBUG_DISABLE flag to DMALLOC_DISABLE.

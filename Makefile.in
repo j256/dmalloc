@@ -1,11 +1,12 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.57 1994/09/13 15:36:44 gray Exp $
+# $Id: Makefile.in,v 1.58 1994/09/20 18:24:02 gray Exp $
 #
 
 HFLS	= dmalloc.h
-OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o error.o heap.o malloc.o
+OBJS	= arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o \
+	malloc.o
 OBJS_INST= dmalloc_lp.o
 FILLFLS	= arg_check.c chunk.c error.c heap.c dmalloc_t.c
 DOCS	= dmalloc.texi dmalloc.info dmalloc.ps
@@ -28,9 +29,9 @@ MANFILE	= dmalloc.info
 PORTFLS	=  conf.h.in Makefile.all.in configure configure.in config.help \
 	ChangeLog Manifest INSTALL NEWS NOTES README TODO dmallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
-	debug_val.h error.[ch] error_str.h error_val.h heap.[ch] malloc.c \
-	dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] dmalloc_t.c \
-	return.h version.h \
+	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
+	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
+	dmalloc_t.c return.h version.h \
 	argv.[ch] argv_loc.h \
 	dmalloc.texi dmalloc.info dmalloc.ps texinfo.tex \
 	install.sh mkinstalldirs Deansify.pl
@@ -84,7 +85,7 @@ installftp : README_ftp $(DOCS)
 
 # put situation specific lines here
 dmalloc.h.2 : configure
-	$(SHELL) configure
+	$(SHELL) configure -v
 
 dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
@@ -96,9 +97,9 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : dmalloc.o argv.o compat.o 
+$(UTIL) : dmalloc.o argv.o compat.o env.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o $(LIBS)
+	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
 	mv a.out $@
 
 .PHONY : port

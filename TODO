@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.20 1994/09/10 23:26:50 gray Exp $
+$Id: TODO,v 1.21 1994/09/20 18:24:07 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -66,6 +66,27 @@ SKIP LISTS:
 	- maybe if ask for 3-pointer block, give 4-pointer and turn back
 		into a 4-pointer after done, put ifdef for both and
 		test for fragmentmentation
+
+-------------------------------------------------------------------------------
+
+ENVIRONMENT VARIABLES:
+
+- comma separated tokens
+
+	debug=0x40005c7
+	addr=0x23412ab
+	log=malloc
+	inter=100
+	start=file.c:100
+
+- also have:
+	- long and short options:
+			log-stats,log-non-free,log-error,...
+		or:
+			lst,lnf,ler,...
+
+- the dmalloc program would not change although you would have the
+option of having it generate one of the three above formats.
 
 -------------------------------------------------------------------------------
 

@@ -1,4 +1,15 @@
-Tue Sep 13 11:36:10 1994  Gray Watson  (gray at toaster.antaire.com)
+Tue Sep 20 13:58:08 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Combined all env variables into DMALLOC_OPTIONS.  Lots of
+	changes to dmalloc program.
+
+Fri Sep 16 14:50:26 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Added short token strings and values to -T very-verbose output.
+
+	* Added -n flag to dmalloc program for printing/not-doing actions.
+
+Tue Sep 13 11:36:10 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added mkinstalldirs to distribution per feedback from Francois.
 
@@ -8,7 +19,7 @@ Mon Sep 12 13:12:38 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Added install.sh to distribution per feedback from Francois.
 
-Mon Sep 12 10:07:29 1994  Gray Watson  (gray at toaster.antaire.com)
+Mon Sep 12 10:07:29 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Renamed _dmalloc_error to dmalloc_error since it is used
 	externally so often.  Sorry folks.
@@ -46,7 +57,7 @@ Mon Aug  8 22:43:44 1994  Gray Watson  (gray@mixer.antaire.com)
 
 	* Releasing version 2.2.0.
 
-Mon Aug  8 22:29:11 1994  Gray Watson  (gray at toaster.antaire.com)
+Mon Aug  8 22:29:11 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added no-special test option to malloc_t.
 
@@ -114,7 +125,7 @@ Thu Apr  7 17:13:31 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Added -p max-pointers argument to malloc_t.
 
-Wed Apr  6 23:02:07 1994  Gray Watson  (gray at toaster.antaire.com)
+Wed Apr  6 23:02:07 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added 'log-nonfree-space' token for logging unfreed memory
 	space.
@@ -123,11 +134,11 @@ Wed Mar 30 01:03:56 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* Added iteration count label to all logfile output.
 
-Fri Mar 25 01:18:55 1994  Gray Watson  (gray at toaster.antaire.com)
+Fri Mar 25 01:18:55 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed small recursive problem messing up malloc #2 info.
 
-Mon Mar 21 09:58:21 1994  Gray Watson  (gray at toaster.antaire.com)
+Mon Mar 21 09:58:21 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added xmalloc,xrealloc,etc. override functions.
 
@@ -135,11 +146,11 @@ Sun Mar 20 14:48:25 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* Added better mechanisms for const definition.
 
-Sun Mar 20 11:57:34 1994  Gray Watson  (gray at toaster.antaire.com)
+Sun Mar 20 11:57:34 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Renamed token 'log-perror' and 'print-perror' to '...-error'.
 
-Wed Mar  2 22:49:18 1994  Gray Watson  (gray at toaster.antaire.com)
+Wed Mar  2 22:49:18 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed some spelling and other misc problems.
 
@@ -149,7 +160,7 @@ Sun Feb 27 17:53:35 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* Released version 2.0.1.
 
-Sun Feb 20 00:39:37 1994  Gray Watson  (gray at toaster.antaire.com)
+Sun Feb 20 00:39:37 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Cleaned up a number of configure/compat functions.
 
@@ -178,7 +189,7 @@ Fri Jan 21 23:45:26 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* added missing checks for ADMIN_FREE in heap_check
 
-Wed Jan 19 20:43:05 1994  Gray Watson  (gray at toaster.antaire.com)
+Wed Jan 19 20:43:05 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added a new texinfo.tex macro file.
 
@@ -192,18 +203,18 @@ Mon Dec 20 14:14:08 1993  Gray Watson  (gray@fridge.antaire.com)
 
 	* Renamed dbg_tokens.h -> debug_tok.h and dbg_values.h -> debug_val.h
 
-Mon Dec 20 02:24:02 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Dec 20 02:24:02 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added -V option to malloc_dbg and desc field for debug-token list.
 
-Sun Dec 19 23:35:53 1993  Gray Watson  (gray at toaster.antaire.com)
+Sun Dec 19 23:35:53 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* moved the NULLs in malloc_dbg.h to 0L.
 
 	* added a debugging section to the manual and moved some stuff
 	around.
 
-Fri Dec 17 15:02:29 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Dec 17 15:02:29 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* fixed some compilation errors with non-STDC systems re
 	Charles Campbell.
@@ -222,7 +233,7 @@ Mon Nov 29 21:39:54 1993  Gray Watson  (gray@fridge.antaire.com)
 	* turned num_bits into a macro and condensed log_heap_map.  added
 	MAX_SLOTS to chunk.
 
-Tue Nov 23 02:39:44 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Nov 23 02:39:44 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* fixed heap_check error with free blocks.
 
@@ -236,7 +247,7 @@ Tue Nov 23 02:39:44 1993  Gray Watson  (gray at toaster.antaire.com)
 	* phased in the version 1.3.5 branch changes into the 2.0.0
 	version.  looks like it was reasonably painless.
 
-Mon Nov 22 22:21:56 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Nov 22 22:21:56 1993  Gray Watson  (gray@toaster.antaire.com)
 
   	* Integrated tons of new heap code with per/block allocations (not
   	base 2) and better free list management with block splitting.
@@ -258,15 +269,15 @@ Mon Nov 15 00:39:51 1993  Gray Watson  (gray@fridge.antaire.com)
 	* added ERROR_SIGNAL configure entry.  defaults to SIGABRT.
 	(NOTE: later removed).
 
-Sun Nov 14 23:08:03 1993  Gray Watson  (gray at toaster.antaire.com)
+Sun Nov 14 23:08:03 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added 'never-reuse' token to never reuse free'd memory.
 
-Mon Nov  8 05:44:58 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Nov  8 05:44:58 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* added ra_info to the contrib directory.  Big wow.
 
-Wed Nov  3 00:56:19 1993  Gray Watson  (gray at toaster.antaire.com)
+Wed Nov  3 00:56:19 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added check for pre-main calls to malloc.  HACK!
 
@@ -276,11 +287,11 @@ Wed Nov  3 00:56:19 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Added -m (minus) option to malloc_dbg.  Why didn't I think of
 	this before?
 
-Tue Nov  2 16:45:32 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Nov  2 16:45:32 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed problem with getenv processing.
 
-Wed Oct 20 19:30:34 1993  Gray Watson  (gray at toaster.antaire.com)
+Wed Oct 20 19:30:34 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Renamed malloc_debug to malloc_flags.
 
@@ -290,15 +301,15 @@ Wed Oct 20 19:30:34 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	base 2) and better free list management with block splitting.
 
-Sat Oct 16 19:18:53 1993  Gray Watson  (gray at toaster.antaire.com)
+Sat Oct 16 19:18:53 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* removed debug token log-ra, log-unknown should be enough.
 
-Thu Oct 14 19:48:42 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Oct 14 19:48:42 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* malloc_heap_map() -> malloc_log_heap_map() for consistency.
 
-Wed Oct 13 17:58:55 1993  Gray Watson  (gray at toaster.antaire.com)
+Wed Oct 13 17:58:55 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added malloc_log_unfreed() to dump non-free memory to
 	logfile.  Good for comparing heaps to see differences.
@@ -328,35 +339,35 @@ Sun Sep 26 14:36:54 1993  Gray Watson  (gray@fridge.antaire.com)
 	* Added malloc_debug_current() and #ifdef STDC instead of
 	#if, via feedback from Scott.
 
-Wed Sep 22 00:43:54 1993  Gray Watson  (gray at toaster.antaire.com)
+Wed Sep 22 00:43:54 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Removed log-bad-pnt.  What a dumb token!  Unnecessary!
 
-Mon Sep 20 20:36:23 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Sep 20 20:36:23 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Releasing version 1.3.3.
 
 	* Added ALLOW_FREE_NULL defines because of some systems allowing
 	free(0).  Yeach!  Via feedback from Dave.
 
-Fri Sep 10 17:10:45 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Sep 10 17:10:45 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed debug value changes in mid-stream.  Repaired configuration
 	error with memcpy/bcopy and memcmp/bcmp via feedback from Marc
 	Evans (?).
 
-Tue Sep  7 00:49:50 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Sep  7 00:49:50 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Renamed all error codes to ERROR_*.  Added ERROR_IS_FREE and
 	changed some of the already-free errors to this.  Reworded some
 	error messages and added free's file/line into to log_bad_pnt.
 
-Mon Aug 30 17:23:47 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Aug 30 17:23:47 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added prototypes for _malloc_strcpy, etc. functions to
 	malloc_dbg.h per Scott's comments.
 
-Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Aug 26 19:06:45 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.3.2.  Uploaded to the ftp site.
 
@@ -373,7 +384,7 @@ Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Fixed some problems with compat.h defines.
 
-Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Aug 24 00:35:49 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Releasing version 1.3.1.
 
@@ -390,42 +401,42 @@ Tue Aug 24 00:35:49 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Fixed some problems in chunk.c via Dave's feedback and
 	renamed malloc_str.[ch] to be arg_check.[ch].
 
-Tue Aug 17 16:22:20 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Aug 17 16:22:20 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Releasing version 1.3.0.
 
 	* Fixed some ansi compiler problems via patch from Manfred
 	Hauswirth.
 
-Thu Aug 12 18:11:01 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Aug 12 18:11:01 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added MALLOC_TRACE variable and malloc_dbg -t functionality for
 	tracing an address and logging messages about it.  NOTE: this
 	was later removed -- replaced by MALLOC_ADDRESS:0.
 
-Tue Aug 10 16:43:07 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Aug 10 16:43:07 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Made some minor fixes via feedback from Marc Evans.
 
-Mon Jul 26 05:50:27 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Jul 26 05:50:27 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added some C++ from Peter Miller to the manual.
 
-Fri Jul 23 01:36:09 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Jul 23 01:36:09 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Removed LGPL copyright and put in its place fully free
 	software notices.
 
-Thu Jul 22 17:35:23 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Jul 22 17:35:23 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* _malloc_perror renamed to _malloc_error and made some other
 	minor changes.
 
-Tue Jul 20 01:52:02 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Jul 20 01:52:02 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added smallest_block runtime calculations.
 
-Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Jul 19 12:20:58 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Made malloc_address exported per Dave's comments so it
 	can be setable by debugger at runtime.
@@ -445,7 +456,7 @@ Mon Jul 19 12:20:58 1993  Gray Watson  (gray at toaster.antaire.com)
 	Dave's comments.  Added BASIC_BLOCK and ALLOCATION_ALIGNMENT
 	to the auto-config stuff.
 
-Fri Jul 16 00:01:31 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Jul 16 00:01:31 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Changed malloc_dbg per new ARGV_MAYBE.  Made some various
 	changes from ints to longs per some useful comments from Dave
@@ -457,36 +468,36 @@ Tue Jul 13 01:53:32 1993  Gray Watson  (gray@fridge.antaire.com)
 
 	* Posting to bsdi.  Last minute porting changes.
 
-Mon Jul 12 02:03:25 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Jul 12 02:03:25 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Finished new catch-null token.
 
-Tue Jul  6 16:04:17 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Jul  6 16:04:17 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added 'catch-null' token for quitting as soon as we get a sbrk
 	failure (i.e. the swap is full or something) as opposed to
 	returning NULL.
 
-Sat Jun 19 14:49:42 1993  Gray Watson  (gray at toaster.antaire.com)
+Sat Jun 19 14:49:42 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Minor changes to configuration and notes files.
 
-Tue Jun 15 10:29:13 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Jun 15 10:29:13 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.2.5.
 
 	* Made some last minute changes to the manual.
 
-Wed Jun  9 15:12:21 1993  Gray Watson  (gray at toaster.antaire.com)
+Wed Jun  9 15:12:21 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed small malloc_dbg token bug from Peter Miller.
 
-Thu Jun  3 16:01:14 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Jun  3 16:01:14 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added index to manual, removed shar files in place of Makefile
 	variables.
 
-Mon May 24 12:58:06 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon May 24 12:58:06 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added -r and -k options for auto-unsetting of variables or
 	keeping of variables with malloc_dbg when setting a tag.
@@ -494,7 +505,7 @@ Mon May 24 12:58:06 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Added const checking to configure and reordered some include
 	files to put conf.h on top.
 
-Tue May 18 20:07:41 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue May 18 20:07:41 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added log-bad-space token and added expand_buf into chunk.c.
 
@@ -503,19 +514,19 @@ Tue May 18 20:07:41 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Updated README and started ftp site thanks to Doug Balog.
 
-Thu May 13 00:56:39 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu May 13 00:56:39 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.2.4.
 
 	* Pretty stable now for a while.  Trying to get access to a ftp
 	for distribution ease.
 
-Thu May  6 11:26:03 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu May  6 11:26:03 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added new fix-patch script for myself.  Fixed malloc_t by
 	removing LOCAL/EXPORT, etc.
 
-Fri Apr 30 15:26:12 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Apr 30 15:26:12 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Removed some heap checks in malloc.c from Bali Jatinder's
 	comments and fixed some of the error strings.
@@ -526,14 +537,14 @@ Fri Apr 30 15:26:12 1993  Gray Watson  (gray at toaster.antaire.com)
 	especially for dumping currently set debug tokens from
 	MALLOC_DEBUG variable.
 
-Mon Apr 19 16:04:17 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Apr 19 16:04:17 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.2.3.
 
 	* Made some changes to a lot of comments, notes files, and ttd
 	file.
 
-Thu Apr 15 17:44:41 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Apr 15 17:44:41 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Renamed malloc.h to malloc_dbg.h and libmalloc.a to
 	libmalloc_dbg.a.  Added heap-extension checking and verification
@@ -541,7 +552,7 @@ Thu Apr 15 17:44:41 1993  Gray Watson  (gray at toaster.antaire.com)
 	Fixed calloc to have the number of elements be a size_t to (WHY??
 	It's not a size!!).  Fixed malloc_t free problems.
 
-Wed Apr 14 18:11:00 1993  Gray Watson  (gray at toaster.antaire.com)
+Wed Apr 14 18:11:00 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.2.2.
 
@@ -550,14 +561,14 @@ Wed Apr 14 18:11:00 1993  Gray Watson  (gray at toaster.antaire.com)
 	If cannot open logfile, now it complains and continues.  Removed
 	stdarg from malloc_dbg.
 
-Fri Apr  9 01:50:17 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Apr  9 01:50:17 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.2.1.
 
 	* Made various other changes.  Backed out some printf changes.
 	Added SIZE_T defines and fixed up STDC defines.
 
-Thu Apr  8 17:41:59 1993  Gray Watson  (gray at toaster.antaire.com)
+Thu Apr  8 17:41:59 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Changed to void * internally from char * and put STDC defines in
 	malloc.h for ANSI folks.  Why did the ANSI idiots drop the return
@@ -568,20 +579,20 @@ Thu Apr  8 17:41:59 1993  Gray Watson  (gray at toaster.antaire.com)
 	down on the continuation strings, fixed some README and mallocrc
 	goofs, etc.  Thanks to all.
 
-Tue Apr  6 00:46:45 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Apr  6 00:46:45 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.2.0 to comp.sources.unix.
 
 	* Upgraded to version 1.2.0.  Ready for 2nd release to
 	comp.sources.unix.  Lots of work on the manual.
 
-Mon Apr  5 18:28:05 1993  Gray Watson  (gray at toaster.antaire.com)
+Mon Apr  5 18:28:05 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Finished adding token "check-funcs" to check the arguments of
 	some common string functions to see whether they are in the heap.
 	if so it tries to verify that the pointers are good.
 
-Sun Apr  4 21:24:45 1993  Gray Watson  (gray at toaster.antaire.com)
+Sun Apr  4 21:24:45 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added token "log-unknown" to dump non-free unknown pointers as
 	well as known ones.  Also cleaned up the displaying of the
@@ -592,7 +603,7 @@ Sun Apr  4 21:24:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Started integration of function argument checking.
 
-Tue Mar 30 19:36:27 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Mar 30 19:36:27 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Changed malloc.h defines so malloc routines are handled as well
 	as the ALLOC macros.
@@ -605,7 +616,7 @@ Tue Mar 30 19:36:27 1993  Gray Watson  (gray at toaster.antaire.com)
 	Scott's help, combined malloc_lp.h into malloc.h, cleaned most .h
 	and .c files.
 
-Fri Mar 26 04:00:14 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Mar 26 04:00:14 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed post 1.1.6 problem with chunk.c.  Boy do I need some
 	automated testing tools.  Discovered the illusive localtime
@@ -622,16 +633,16 @@ Fri Mar 26 04:00:14 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Added some better comments to all files and cleaned up most
 	files too.
 
-Fri Mar 12 18:35:02 1993  Gray Watson  (gray at toaster.antaire.com)
+Fri Mar 12 18:35:02 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.1.5.
 
-Sat Feb 13 17:25:43 1993  Gray Watson  (gray at toaster.antaire.com)
+Sat Feb 13 17:25:43 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Finished add a number of const operators to improve coding per
 	scott's recommendations.
 
-Sat Jan 30 12:33:43 1993  Gray Watson  (gray at toaster.antaire.com)
+Sat Jan 30 12:33:43 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.1.4
 
@@ -639,16 +650,16 @@ Sat Jan 30 12:33:43 1993  Gray Watson  (gray at toaster.antaire.com)
 	_malloc_perror calls malloc_strerror which would go quickly
 	recursive.  Thanks scott.
 
-Tue Jan  5 00:00:00 1993  Gray Watson  (gray at toaster.antaire.com)
+Tue Jan  5 00:00:00 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Posted version 1.1.3 shar files to comp.sources.unix.
 
-Sat Jan  2 00:16:58 1993  Gray Watson  (gray at toaster.antaire.com)
+Sat Jan  2 00:16:58 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Made last minute changes to solve some gcc/ansi errors and
 	to the manual to get things ready for the post.
 
-Sun Dec 27 20:28:19 1992  Gray Watson  (gray at toaster.antaire.com)
+Sun Dec 27 20:28:19 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed problem with some external functions in malloc.c not
 	resetting the in_alloc flag.  Also removed some testing of unsigned
@@ -656,18 +667,18 @@ Sun Dec 27 20:28:19 1992  Gray Watson  (gray at toaster.antaire.com)
 
 	* Released version 1.1.3.
 
-Mon Dec 21 15:31:50 1992  Gray Watson  (gray at toaster.antaire.com)
+Mon Dec 21 15:31:50 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Created the series of shar files in preparation to posting to
 	comp.unix.sources.  Looking good.
 
-Thu Dec 17 18:33:38 1992  Gray Watson  (gray at toaster.antaire.com)
+Thu Dec 17 18:33:38 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Renamed a number of files to comply with the Sys5 12 character
 	restrictions (14 - 2 for RCS/CVS/SCCS).  Yeach.  malloc_debug ->
 	malloc_dbg.
 
-Sat Nov 14 15:59:53 1992  Gray Watson  (gray at toaster.antaire.com)
+Sat Nov 14 15:59:53 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added all external functions to configure and conf.h even though
 	the library assumes that some functions will be resolved.  Also
@@ -677,14 +688,14 @@ Sat Nov 14 15:59:53 1992  Gray Watson  (gray at toaster.antaire.com)
 	well as log-files.  Removed stdio from the malloc library to make
 	sure it does not go recursive (alloc for stderr) at a bad time.
 
-Wed Nov 11 18:19:49 1992  Gray Watson  (gray at toaster.antaire.com)
+Wed Nov 11 18:19:49 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Moved the heap_check calls from chunk.c over to malloc so we can
 	be guaranteed that it gets called only once per user call.
 	chunk's routines often cross-call each other meaning that
-	heap-check was being run 5 times be realloc.  YEACH!!
+	heap-check was being run 5 times in realloc.  YEACH!!
 
-Tue Nov 10 17:55:53 1992  Gray Watson  (gray at toaster.antaire.com)
+Tue Nov 10 17:55:53 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added two new debug-tokens: log-blocks and heap-check-map.  Also
 	made sure that heap_check was being called from everywhere.
@@ -694,14 +705,14 @@ Tue Nov 10 17:55:53 1992  Gray Watson  (gray at toaster.antaire.com)
 	conf.h.in and configure.in files to improve confiurability.
 	Upgraded the manual which still needs a lot of work (sigh).
 
-Mon Nov  9 19:21:25 1992  Gray Watson  (gray at toaster.antaire.com)
+Mon Nov  9 19:21:25 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added configure, configure.in, conf.h.in, and Makefile.in to try
 	and conform with autoconf specs.  What a bear.  The documentation
 	for autoconf needs a whole bunch more examples, etc.  Sigh.
 	Removed all the MEMORY and STRING defines, etc.
 
-Thu Nov  5 22:13:18 1992  Gray Watson  (gray at toaster.antaire.com)
+Thu Nov  5 22:13:18 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 1.01b.  Sending it off to some folks.
 
@@ -710,7 +721,7 @@ Thu Nov  5 22:13:18 1992  Gray Watson  (gray at toaster.antaire.com)
 	with my macros.  :-)  Took out all (and I mean all) Antaire
 	dependencies and defines.
 
-Thu Oct 22 00:47:18 1992  Gray Watson  (gray at toaster.antaire.com)
+Thu Oct 22 00:47:18 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Ran through most of the debug-flag functionality testing and
 	tweaking.  Found some bugs on dblock handling and some messed up
@@ -720,7 +731,7 @@ Thu Oct 22 00:47:18 1992  Gray Watson  (gray at toaster.antaire.com)
 	code and seems to work in both environments.  What do sh folks use
 	in the place of c-shell aliasing?  I guess use bash.  :-)
 
-Wed Oct 21 03:27:35 1992  Gray Watson  (gray at toaster.antaire.com)
+Wed Oct 21 03:27:35 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Major changes.  I sort of went overboard tonight.  I integrated
 	the new malloc_debug program which sets all the debug variables
@@ -730,7 +741,7 @@ Wed Oct 21 03:27:35 1992  Gray Watson  (gray at toaster.antaire.com)
 	* Did some renaming of files, cleaned up some other things,
 	had to rework a number of items to get new debug flags working.
 
-Tue Oct 20 18:06:36 1992  Gray Watson  (gray at toaster.antaire.com)
+Tue Oct 20 18:06:36 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Removed useful.h requirements and integrated necessary
 	definitions into malloc.h.
@@ -742,7 +753,7 @@ Tue Oct 20 18:06:36 1992  Gray Watson  (gray at toaster.antaire.com)
 	malloc_mach.h.  Moved alloc.[ch] to malloc.[ch] for sanity
 	reasons.
 
-Tue Oct 13 16:14:17 1992  Gray Watson  (gray at toaster.antaire.com)
+Tue Oct 13 16:14:17 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Made various cosmetic changes.  Fixed realloc inbound pointer
 	checking per MALLOC_ADDRESS.  Fixed problem with MALLOC_ADDRESS
@@ -752,12 +763,12 @@ Tue Oct 13 16:14:17 1992  Gray Watson  (gray at toaster.antaire.com)
 	(by default) all memory errors are logged at level 1 and above and
 	malloc kills itself at level 2 and above.
 
-Mon Sep 28 23:24:36 1992  Gray Watson  (gray at toaster.antaire.com)
+Mon Sep 28 23:24:36 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added MALLOC_ADDRESS support for free.  MALLOC_ADDRESS counts
 	now also apply to frees also.
 
-Mon Sep 21 20:39:38 1992  Gray Watson  (gray at toaster)
+Mon Sep 21 20:39:38 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed some size problems with bounds checking enabled.
 
@@ -765,13 +776,13 @@ Mon Sep 21 20:39:38 1992  Gray Watson  (gray at toaster)
 	why this wasn't caught before.  free wasn't even using its
 	file/line arguments.
 
-Thu Sep  3 03:23:39 1992  Gray Watson  (gray at toaster)
+Thu Sep  3 03:23:39 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added ability to realloc a NULL pointer with an ifdef to
 	disable.  Useful in realloc loops where the first time you don't
 	have to alloc it.
 
-Fri Aug 14 15:54:03 1992  Gray Watson  (gray at toaster)
+Fri Aug 14 15:54:03 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Added a bunch of new environmental variables features:
 	MALLOC_ADDRESS now can have a :# argument.  MALLOC_START now has
@@ -783,23 +794,25 @@ Fri Aug 14 15:54:03 1992  Gray Watson  (gray at toaster)
 	* Moved most of the debug variables into alloc.c from chunk.c and
 	added a standardized check_debug_vars() checking routine.
 
-Tue Jul 21 16:06:13 1992  Gray Watson  (gray at toaster)
+Tue Jul 21 16:06:13 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed malloc count statistics.  Removed duplicate malloc_count
 	variable from a number of places.
 
-Mon Mar 23 10:49:25 1992  Gray Watson  (gray at toaster)
+Mon Mar 23 10:49:25 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Released version 0.04
 
 	* New env variable features.
 
-Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
+Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed a large problem with chunk.c not reporting the correct
 	memory address when listing unfreed memory.  This was discovered
 	when MALLOC_ADDRESS was not working correctly.
 
+	* Started ChangeLog.
+
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.116 1994/09/13 15:36:36 gray Exp $
+$Id: ChangeLog,v 1.117 1994/09/20 18:23:56 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.46 1994/09/13 15:36:40 gray Exp $
+# $Id: Makefile.all.in,v 1.47 1994/09/20 18:24:00 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -38,7 +38,7 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 
 HFLS = dmalloc.h
-OBJS = arg_check.o chunk.o compat.o error.o heap.o malloc.o dmalloc_lp.o
+OBJS = arg_check.o chunk.o compat.o dmalloc_lp.o env.o error.o heap.o malloc.o
 OBJS_IN = dmalloc_lp.o
 
 CFLAGS = $(CCFLAGS)
@@ -95,9 +95,9 @@ $(LIBRARY) : $(OBJS)
 	@RANLIB@ $@
 	- chmod 660 $@
 
-$(UTIL) : $(UTIL).o argv.o compat.o
+$(UTIL) : $(UTIL).o argv.o compat.o env.o
 	rm -f $@
-	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o $(LIBS)
+	$(CC) $(LDFLAGS) $(UTIL).o argv.o compat.o env.o $(LIBS)
 	mv a.out $@
 
 # .PHONY : noansi
@@ -161,11 +161,13 @@ chunk.o : chunk.c dmalloc.h conf.h chunk.h dmalloc_loc.h chunk_loc.h compat.h \
   debug_val.h error.h error_val.h heap.h version.h 
 compat.o : compat.c dmalloc.h conf.h compat.h dmalloc_loc.h 
 dmalloc.o : dmalloc.c argv.h dmalloc.h conf.h compat.h dmalloc_loc.h debug_tok.h \
-  debug_val.h error_str.h error_val.h version.h 
+  debug_val.h env.h error_str.h error_val.h version.h 
 dmalloc_lp.o : dmalloc_lp.c dmalloc.h conf.h dmalloc_loc.h dmalloc_lp.h 
 dmalloc_t.o : dmalloc_t.c argv.h dmalloc.h conf.h 
-error.o : error.c dmalloc.h conf.h compat.h dmalloc_loc.h debug_val.h error.h 
+env.o : env.c dmalloc.h dmalloc_loc.h conf.h debug_tok.h debug_val.h env.h error.h 
+error.o : error.c dmalloc.h conf.h compat.h dmalloc_loc.h debug_val.h env.h \
+  error.h 
 heap.o : heap.c dmalloc.h conf.h chunk.h dmalloc_loc.h compat.h debug_val.h \
   error.h error_val.h heap.h 
 malloc.o : malloc.c dmalloc.h conf.h chunk.h dmalloc_loc.h compat.h debug_val.h \
-  error.h error_str.h error_val.h heap.h dmalloc_lp.h return.h 
+  env.h error.h error_str.h error_val.h heap.h dmalloc_lp.h return.h 
