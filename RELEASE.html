@@ -58,9 +58,10 @@ None.
 <li> Just to make clear, when a pointer is allocated (or reallocated)
 with the 'alloc-blank' or 'check-blank' tokens enabled, the library
 clears various parts of the allocation block with the allocation-blank
-character (ALLOC_BLANK_CHAR in settings.h).  When a pointer is freed,
-the library clears all of the space with the free-blank character
-(FREE_BLANK_CHAR in settings.h). </li>
+character (ALLOC_BLANK_CHAR in settings.h).  If the 'free-blank or
+'check-blank' tokens are enabled, when a pointer is freed, the library
+clears all of the space with the free-blank character (FREE_BLANK_CHAR
+in settings.h). </li>
 
 </ul>
 
