@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.147 2000/11/14 20:10:47 gray Exp $
+# $Id: Makefile.in,v 1.148 2000/11/14 20:34:48 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -224,13 +224,13 @@ check light :: $(TEST)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
-	@echo tests have passed
+	@echo light tests have passed
 
 heavy :: $(TEST) light
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
 	$(TEST) -s -t 100000
-	@echo tests have passed
+	@echo heavy tests have passed
 
 continuous :: $(TEST)
 	while $(TEST) -n -t 100000 ;\

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.101 2000/11/14 20:10:46 gray Exp $
+# $Id: Makefile.all.in,v 1.102 2000/11/14 20:34:48 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -260,7 +260,7 @@ heavy : $(TEST) light
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
-	@echo tests have passed
+	@echo heavy tests have passed
 
 .c.o :
 	rm -f $@
