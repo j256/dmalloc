@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.58 1993/11/23 07:41:18 gray Exp $";
+  "$Id: chunk.c,v 1.59 1993/11/23 09:03:47 gray Exp $";
 #endif
 
 /*
@@ -521,13 +521,11 @@ LOCAL	bblock_t	*get_bblocks(const int many)
   static int		freec = 0;	/* count of free slots */
   bblock_adm_t		*admp;
   bblock_t		*bblockp;
-  int			bblockc, bitn;
+  int			bblockc;
   
   /* do we need to print admin info? */
   if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
     _malloc_message("need %d bblocks or %d bytes", many, many * BLOCK_SIZE);
-  
-  bitn = num_bits(many * BLOCK_SIZE);
   
   /* is there anything on the user-free list(s)? */
   if (! BIT_IS_SET(_malloc_flags, DEBUG_NEVER_REUSE)) {
@@ -760,10 +758,11 @@ LOCAL	dblock_t	*get_dblock_admin(const int many)
 /*
  * get a dblock of 1<<BITN sized chunks, also asked for the slot memory
  */
-LOCAL	void	*get_dblock(const int bitn, dblock_t ** admp)
+LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
+			    const char * file, const unsigned short line)
 {
   bblock_t	*bblockp;
-  dblock_t	*dblockp;
+  dblock_t	*dblockp, *firstp;
   void		*pnt;
   
   /* is there anything on the dblock free list? */
@@ -773,11 +772,13 @@ LOCAL	void	*get_dblock(const int bitn, dblock_t ** admp)
       free_dblock[bitn] = dblockp->db_next;
       free_space_count -= 1 << bitn;
       
-      *admp = dblockp;
-      
       /* find pointer to memory chunk */
       pnt = (char *)dblockp->db_bblock->bb_mem +
 	(dblockp - dblockp->db_bblock->bb_dblock) * (1 << bitn);
+      
+      dblockp->db_line = (unsigned short)line;
+      dblockp->db_size = (unsigned short)byten;
+      dblockp->db_file = (char *)file;
       
       /* do we need to print admin info? */
       if (BIT_IS_SET(_malloc_flags, DEBUG_LOG_ADMIN))
@@ -796,7 +797,6 @@ LOCAL	void	*get_dblock(const int bitn, dblock_t ** admp)
   dblockp = get_dblock_admin(1 << (BASIC_BLOCK - bitn));
   if (dblockp == NULL)
     return NULL;
-  *admp = dblockp;
   
   dblock_count++;
   
@@ -813,23 +813,29 @@ LOCAL	void	*get_dblock(const int bitn, dblock_t ** admp)
   bblockp->bb_dblock	= dblockp;
   
   /* add the rest to the free list (has to be at least 1 other dblock) */
-  free_dblock[bitn] = ++dblockp;
-  free_space_count += 1 << bitn;
+  firstp = dblockp;
+  dblockp++;
+  free_dblock[bitn] = dblockp;
   
-  for (; dblockp < *admp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
+  for (; dblockp < firstp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
     dblockp->db_next	= dblockp + 1;
     dblockp->db_bblock	= bblockp;
     free_space_count	+= 1 << bitn;
   }
+  
+  /* last one points to NULL */
+  dblockp->db_next	= NULL;
+  dblockp->db_bblock	= bblockp;
+  free_space_count += 1 << bitn;
   
   if (BIT_IS_SET(_malloc_flags, DEBUG_FREE_BLANK)
       || BIT_IS_SET(_malloc_flags, DEBUG_CHECK_FREE))
     (void)memset((char *)pnt + (1 << bitn), BLANK_CHAR,
 		 BLOCK_SIZE - (1 << bitn));
   
-  /* last one points to NULL */
-  dblockp->db_next	= NULL;
-  dblockp->db_bblock	= bblockp;
+  firstp->db_line = line;
+  firstp->db_size = byten;
+  firstp->db_file = file;
   
   return pnt;
 }
@@ -1634,13 +1640,13 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
       if (dblockp->db_line == MALLOC_DEFAULT_LINE)
 	*file = NULL;
       else
-	*file = dblockp->db_file;
+	*file = (char *)dblockp->db_file;
     }
     if (line != NULL)
       *line = dblockp->db_line;
     if (ret_attr != NULL) {
       if (dblockp->db_line == MALLOC_DEFAULT_LINE)
-	*ret_attr = dblockp->db_file;
+	*ret_attr = (char *)dblockp->db_file;
       else
 	*ret_attr = NULL;
     }
@@ -1663,13 +1669,13 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
       if (bblockp->bb_line == MALLOC_DEFAULT_LINE)
 	*file = NULL;
       else
-	*file = bblockp->bb_file;
+	*file = (char *)bblockp->bb_file;
     }
     if (line != NULL)
       *line = bblockp->bb_line;
     if (ret_attr != NULL) {
       if (bblockp->bb_line == MALLOC_DEFAULT_LINE)
-	*ret_attr = bblockp->bb_file;
+	*ret_attr = (char *)bblockp->bb_file;
       else
 	*ret_attr = NULL;
     }
@@ -1742,7 +1748,7 @@ LOCAL	int	chunk_write_info(const char * file, const unsigned int line,
     }
     
     /* reset values in the bblocks */
-    set_bblock_admin(bblockp->bb_blockn, bblockp, BBLOCK_START_USER, line,
+    set_bblock_admin(NUM_BLOCKS(size), bblockp, BBLOCK_START_USER, line,
 		     size, file);
   }
   
@@ -1887,7 +1893,6 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 {
   int		bitn, byten = size;
   bblock_t	*bblockp;
-  dblock_t	*dblockp;
   void		*pnt;
   
   /* counts calls to malloc */
@@ -1939,13 +1944,9 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
   /* allocate divided block if small */
   if (bitn < BASIC_BLOCK) {
-    pnt = get_dblock(bitn, &dblockp);
+    pnt = get_dblock(bitn, byten, file, line);
     if (pnt == NULL)
       return MALLOC_ERROR;
-    
-    dblockp->db_line = (unsigned short)line;
-    dblockp->db_size = (unsigned short)byten;
-    dblockp->db_file = (char *)file;
     
     alloc_cur_given += 1 << bitn;
     alloc_max_given = MAX(alloc_max_given, alloc_cur_given);

@@ -1,5 +1,8 @@
 Tue Nov 23 02:39:44 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* added realloc test code to malloc_t and immediately had to fix a
+	pretty nasty realloc bug with the new code.
+
 	* phased in the version 1.3.5 branch changes into the 2.0.0
 	version.  looks like it was reasonably painless.
 
@@ -567,5 +570,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.75 1993/11/23 07:40:47 gray Exp $
+$Id: ChangeLog,v 1.76 1993/11/23 09:03:33 gray Exp $
 -------------------------------------------------------------------------------

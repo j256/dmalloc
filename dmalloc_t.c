@@ -31,7 +31,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.28 1993/11/23 07:42:11 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.29 1993/11/23 09:04:05 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -112,14 +112,14 @@ static	void	*get_address(void)
   return pnt;
 }
 
-/* 
+/*
  * try ITERN random program iterations, returns 1 on success else 0
  */
 static	int	do_random(const int itern)
 {
   int		iterc, amount, max = MAX_AMOUNT;
   pnt_info_t	*freep = pointer_grid, *usedp = NULL;
-  pnt_info_t	*pntp;
+  pnt_info_t	*pntp, *lastp, *thisp;
   
   malloc_errno = 0;
   
@@ -132,7 +132,7 @@ static	int	do_random(const int itern)
   /* redo the last next pointer */
   (pntp - 1)->pi_next = NULL;
   
-  for (iterc = 0; iterc < itern; iterc++) {
+  for (iterc = 0; iterc < itern;) {
     int		which;
     
     which = (rand() % 20) / 10;
@@ -142,37 +142,60 @@ static	int	do_random(const int itern)
      * free slots else we free
      */
     if (which == 0 && max > 10 && freep != NULL) {
-      pntp = freep;
-      
       do {
 	amount = rand() % (max / 2);
       } while (amount == 0);
       
-      which = (rand() % 20) / 10;
-      if (which == 0)
+      which = (rand() % 30) / 10;
+      if (which == 0) {
+	pntp = freep;
 	pntp->pi_pnt = CALLOC(char, amount);
-      else
+	
+	if (verbose)
+	  (void)printf("%d: calloc %d of max %d into slot %d.  got %#lx\n",
+		       iterc + 1, amount, max, pntp - pointer_grid,
+		       (long)pntp->pi_pnt);
+      }
+      else if (which == 1) {
+	pntp = freep;
 	pntp->pi_pnt = MALLOC(amount);
+	
+	if (verbose)
+	  (void)printf("%d: malloc %d of max %d into slot %d.  got %#lx\n",
+		       iterc + 1, amount, max, pntp - pointer_grid,
+		       (long)pntp->pi_pnt);
+      }
+      else {
+	pntp = pointer_grid + (rand() % MAX_POINTERS);
+	if (pntp->pi_pnt == NULL)
+	  continue;
+	pntp->pi_pnt = REMALLOC(pntp->pi_pnt, amount);
+	max += pntp->pi_size;
+	
+	if (verbose)
+	  (void)printf("%d: realloc %d from %d of max %d slot %d.  got %#lx\n",
+		       iterc + 1, pntp->pi_size, amount, max,
+		       pntp - pointer_grid, (long)pntp->pi_pnt);
+      }
       
       if (pntp->pi_pnt == NULL) {
 	(void)printf("allocation of %d returned error on iteration #%d\n",
 		     amount, iterc + 1);
+	iterc++;
 	continue;
       }
-      
-      if (verbose)
-	(void)printf("%d: alloced %d of max %d into slot %d.  got %#lx\n",
-		     iterc + 1, amount, max, pntp - pointer_grid,
-		     (long)pntp->pi_pnt);
       
       /* set the size and take it off the free-list and put on used list */
       pntp->pi_size = amount;
       
-      freep = pntp->pi_next;
-      pntp->pi_next = usedp;
-      usedp = pntp;
+      if (pntp == freep) {
+	freep = pntp->pi_next;
+	pntp->pi_next = usedp;
+	usedp = pntp;
+      }
       
       max -= amount;
+      iterc++;
       continue;
     }
     
@@ -180,33 +203,33 @@ static	int	do_random(const int itern)
      * choose a rand slot to free and make sure it is not a free-slot
      */
     pntp = pointer_grid + (rand() % MAX_POINTERS);
-    if (pntp->pi_pnt != NULL) {
-      pnt_info_t	*lastp, *thisp;
-      
-      FREE(pntp->pi_pnt);
-      
-      if (verbose)
-	(void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
-		     iterc + 1, pntp->pi_size, pntp - pointer_grid,
-		     (long)pntp->pi_pnt);
-      
-      pntp->pi_pnt = NULL;
-      
-      /* find pnt in the used list */
-      for (thisp = usedp, lastp = NULL; lastp != NULL;
-	   lastp = thisp, thisp = thisp->pi_next)
-	if (thisp == pntp)
-	  break;
-      if (lastp == NULL)
-	usedp = pntp->pi_next;
-      else
-	lastp->pi_next = pntp->pi_next;
-      
-      pntp->pi_next = freep;
-      freep = pntp;
-      
-      max += pntp->pi_size;
-    }
+    if (pntp->pi_pnt == NULL)
+      continue;
+    
+    FREE(pntp->pi_pnt);
+    
+    if (verbose)
+      (void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
+		   iterc + 1, pntp->pi_size, pntp - pointer_grid,
+		   (long)pntp->pi_pnt);
+    
+    pntp->pi_pnt = NULL;
+    
+    /* find pnt in the used list */
+    for (thisp = usedp, lastp = NULL; lastp != NULL;
+	 lastp = thisp, thisp = thisp->pi_next)
+      if (thisp == pntp)
+	break;
+    if (lastp == NULL)
+      usedp = pntp->pi_next;
+    else
+      lastp->pi_next = pntp->pi_next;
+    
+    pntp->pi_next = freep;
+    freep = pntp;
+    
+    max += pntp->pi_size;
+    iterc++;
   }
   
   /* free used pointers */

@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.20 1993/11/23 07:41:26 gray Exp $
+ * $Id: chunk_loc.h,v 1.21 1993/11/23 09:04:00 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -107,7 +107,7 @@ struct dblock_st {
   
   union {
     struct dblock_st	*pn_next;		/* next in the free list */
-    char		*pn_file;		/* .c filename where alloced */
+    const char		*pn_file;		/* .c filename where alloced */
   } db_pnt;
   
   /* to reference union elements as db elements */
@@ -150,7 +150,7 @@ struct bblock_st {
     struct bblock_adm_st	*pn_adminp;	/* pointer to bb_admin block */
     void			*pn_mem;	/* memory associated to it */
     struct bblock_st		*pn_next;	/* next in free list */
-    char			*pn_file;	/* .c filename where alloced */
+    const char			*pn_file;	/* .c filename where alloced */
   } bb_pnt;
   
   /* to reference union elements as bb elements */
