@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.169 2003/06/04 23:58:45 gray Exp $
+# $Id: Makefile.in,v 1.170 2003/06/06 19:04:32 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -224,7 +224,10 @@ malloc_th.o : malloc.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
 		-c $(srcdir)/malloc.c -o $@
 
-tests :: $(TEST) compile_test
+tests :: $(TEST)
+	@echo "To run compile tests type 'make testsall'"
+
+testsall :: $(TEST) compile_test
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
