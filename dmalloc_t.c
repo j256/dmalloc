@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.41 1995/03/03 17:38:09 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.42 1995/03/31 21:52:10 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -305,6 +305,11 @@ static	int	check_special(void)
 {
   void	*pnt;
   
+  if (! silent)
+    (void)printf("The following tests will generate errors:\n");
+  
+  if (! silent)
+    (void)printf("  Trying to realloc a 0L pointer.\n");
 #if ALLOW_REALLOC_NULL
   pnt = REMALLOC(NULL, 10);
   if (pnt == NULL) {
@@ -322,6 +327,8 @@ static	int	check_special(void)
   }
 #endif
   
+  if (! silent)
+    (void)printf("  Trying to free 0L pointer.\n");
 #if ALLOW_FREE_NULL
   {
     int		hold = dmalloc_errno;
@@ -347,6 +354,8 @@ static	int	check_special(void)
   }
 #endif
   
+  if (! silent)
+    (void)printf("  Allocating a block of too-many bytes.\n");
   {
     int		hold = dmalloc_errno;
     dmalloc_errno = 0;
