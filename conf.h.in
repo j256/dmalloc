@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.28 1993/12/06 06:19:27 gray Exp $
+ * $Id: conf.h.in,v 1.29 1993/12/20 04:37:57 gray Exp $
  */
 
 /*
@@ -52,9 +52,9 @@
  * should we allow the free of a NULL pointer and if it happens,
  * should a message be generated to that effect?  I don't see how this
  * would be useful but some systems can, and I guess require this.  I
- * would recommend using the message to point out the offenders
- * because I would guess that this is not a portable feature of most
- * malloc libraries.
+ * would recommend at least using the message to point out the
+ * offenders because I would guess that this is not a portable feature
+ * of most malloc libraries.
  */
 #define ALLOW_FREE_NULL 0
 #define ALLOW_FREE_NULL_MESSAGE 1
@@ -62,10 +62,11 @@
 /*
  * should we use the ra-address macros in return.h.  These are system
  * specific macros designed to return the return-address for logging
- * purposes.  You should only want to disable them if you are storing
- * code which makes calls to the malloc function *in* the heap.  This
- * is unlikely but will confuse the library.  Please mail me if you
- * have any questions or if you indeed have this problem.
+ * callers (i.e. possible offenders) of malloc routines.  You should
+ * only want to disable them if you are storing code which makes calls
+ * to the malloc function *from* the heap.  This is unlikely but will
+ * confuse the library.  Please mail me if you have any questions or
+ * if you indeed have this problem.
  */
 #define USE_RET_ADDRESS 1
 
@@ -119,8 +120,10 @@
  */
 
 /*
- * (char *)sbrk(int incr) is the main system memory allocation
- * routine.  this extends the program's data space by INCR bytes.
+ * (char *)sbrk(const int incr) is the main heap-memory allocation
+ * routine that most systems define/employ.  this extends the
+ * program's data space by INCR number of bytes.  please mail me if
+ * your system does not have this function.
  */
 #define HAVE_SBRK 0
 
@@ -136,12 +139,13 @@
  * this is the basic block size in bits.  if possible, the configure
  * script will set this to be the value returned by the getpagesize()
  * function.  if not then some sort of best guess will be necessary.
- * 12 or 13 (meaning basic block size of 4 or 8k) will probably be
- * good.  * NOTE: some sbrk functions round to the correct page-size.
- * If this value is too low, the malloc-dbg library may think someone
- * is using sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR
- * error.  No problems aside from a possible increase in the
- * administration overhead should happen if this value is too high.
+ * 14 (meaning basic block size of 16k) will probably be good.
+ *
+ * NOTE: some sbrk functions round to the correct page-size.  If this
+ * value is too low, the malloc-dbg library may think someone is using
+ * sbrk behind its back and return a MALLOC_ALLOC_NONLINEAR error.  No
+ * problems aside from a possible small increase in the administration
+ * overhead should happen if this value is too high.
  */
 #define BASIC_BLOCK 12
 

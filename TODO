@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.9 1993/11/23 07:41:08 gray Exp $
+$Id: TODO,v 1.10 1993/12/20 04:37:56 gray Exp $
 -------------------------------------------------------------------------------
 
 CHECKING:
@@ -24,29 +24,6 @@ CHECKING:
 	- maybe generate some magical value which corresponds to the
 		orientation becasue you want to be able to reproduce
 		the error (bsd random?)
-
--------------------------------------------------------------------------------
-
-MANUALS:
-
--  add to the documentation a STRATEGY file, for example:
-
-	I turned a programmer loose with your package yesterday. He
-	read the docs, linked the lib in, ran the program with all
-	checking on, got a fence overrun and was stumped. I had to
-	explain to him:
-
-	- set a breakpoint at _malloc_perror()
-	- run the program until it stops there indicating that before this
-		malloc call, the heap got messed up somehow
-	- check the error code to determine what went specifically
-		went wrong
-		- print malloc_errno
-		- malloc_dbg -e value-returned-from-print
-	- look at the code between the last good call and the current
-		call to find the problem
-		- there's always the chance that some other code caused the
-			problem of course.
 
 -------------------------------------------------------------------------------
 

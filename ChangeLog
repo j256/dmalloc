@@ -1,3 +1,10 @@
+Sun Dec 19 23:35:53 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* moved the NULLs in malloc_dbg.h to 0L.
+
+	* added a debugging section to the manual and moved some stuff
+	around.
+
 Fri Dec 17 15:02:29 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* fixed some compilation errors with non-STDC systems re
@@ -595,5 +602,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.82 1993/12/17 20:04:07 gray Exp $
+$Id: ChangeLog,v 1.83 1993/12/20 04:37:52 gray Exp $
 -------------------------------------------------------------------------------

@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.53 1993/12/17 20:04:17 gray Exp $";
+  "$Id: malloc.c,v 1.54 1993/12/20 04:38:03 gray Exp $";
 #endif
 
 /*
@@ -358,7 +358,7 @@ EXPORT	void	_malloc_shutdown(void)
 /******************************* memory calls ********************************/
 
 /*
- * allocate and return a SIZE block of bytes.  returns NULL on error.
+ * allocate and return a SIZE block of bytes.  returns 0L on error.
  */
 #ifdef __STDC__
 EXPORT	void	*malloc(MALLOC_SIZE size)
@@ -386,7 +386,7 @@ EXPORT	char	*malloc(MALLOC_SIZE size)
 
 /*
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
- * of SIZE bytes and zero the block.  returns NULL on error.
+ * of SIZE bytes and zero the block.  returns 0L on error.
  */
 #ifdef __STDC__
 EXPORT	void	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
@@ -421,7 +421,7 @@ EXPORT	char	*calloc(MALLOC_SIZE num_elements, MALLOC_SIZE size)
 
 /*
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
- * all of OLD_PNT to the new area or truncating.  returns NULL on error.
+ * all of OLD_PNT to the new area or truncating.  returns 0L on error.
  */
 #ifdef __STDC__
 EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
@@ -649,8 +649,8 @@ EXPORT	int	_malloc_debug_current(void)
 
 /*
  * examine pointer PNT and returns SIZE, and FILE / LINE info on it,
- * or return-address RET_ADDR if any of the pointers are not NULL.
- * if FILE returns NULL then RET_ATTR may have a value and vice versa.
+ * or return-address RET_ADDR if any of the pointers are not 0L.
+ * if FILE returns 0L then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
 #ifdef __STDC__
