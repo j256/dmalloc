@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.254 2004/07/01 15:36:45 gray Exp $
+@c $Id: dmalloc.texi,v 1.255 2004/07/08 04:57:01 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -939,7 +939,7 @@ system version/type, and the version of Dmalloc you are using.
 * Using With a Debugger::       Using a debugger with the library.
 * Using With Threads::          Using the library with a thread package.
 * Using With Cygwin::           Using the library with Cygwin environment.
-* Debugging A Daemon::          Debugging allocations in a daemon process.
+* Debugging A Daemon::          Debugging memory in a daemon process.
 @end menu
 
 @c --------------------------------
@@ -2357,7 +2357,7 @@ do this.
 @c --------------------------------
 
 @node Debugging A Daemon,, Using With Cygwin, Programming
-@section Debugging Allocations in a Daemon Process
+@section Debugging Memory in a Daemon Process
 
 @cindex daemon process debugging
 @cindex debugging daemon processes
@@ -2371,28 +2371,28 @@ do this.
 @cindex usage of dmalloc in a server
 @cindex usage of dmalloc with cgi-bin
 
-There are some specified challenges when trying to debug allocations in
-processes which do not startup, run, and then shutdown.  Daemon
-processes are those that are spawned (often at system boot time) and run
-perpetually.  Other processes which are difficult to debug are CGI
+There are some specified challenges when trying to debug allocations
+in processes which do not startup, run, and then shutdown.  Daemon
+processes are those that are spawned (often at system boot time) and
+run perpetually.  Other processes which are difficult to debug are CGI
 programs which are spawned by web servers or when you want to start
 debugging inside of a child process.
 
 @enumerate
 
-@item First you need to build your daemon or cgi-bin program with the
-dmalloc library like any other program.  @xref{Getting Started}.
+@item Build your daemon or cgi-bin program with the dmalloc library
+like any other program.  @xref{Getting Started}.
 
-@item Next you need to add code into your program to enable the library
-flags to perform the memory checks that you require.  Since these
-programs often do not run from the command line, you cannot use the
-dmalloc utility program and modify the process environment.
-@xref{Dmalloc Program}.  The library provides a couple of functions to
-set the debugging flags when a program is running.
+@item Add code into your program to enable the library flags to
+perform the memory checks that you require.  Since these programs
+often do not run from the command line, you cannot use the dmalloc
+utility program and modify the process environment.  @xref{Dmalloc
+Program}.  The library provides a couple of functions to set the
+debugging flags when a program is running.
 
 @cindex dmalloc_debug_setup function
 
-@item In version 5 and above of the library, you use the
+@item To set the memory debugging flags, use the
 @code{dmalloc_debug_setup} function which takes a string in the same
 format of the @samp{DMALLOC_OPTIONS} environmental variable.
 @xref{Environment Variable}.  Use the dmalloc utility with the
@@ -2427,7 +2427,7 @@ main()
 not know about @code{high}, @code{low}, or other debug tokens but
 needs the actual flag values.
 
-@item For earlier versions of the library without 
+@item For earlier versions of the library (before 5.0.0) without 
 @code{dmalloc_debug_setup}, the @code{dmalloc_debug} function is
 available to set the flags directly, but it cannot adjust the logfile
 name and the other environment settings.  You can use the dmalloc
