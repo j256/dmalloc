@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.138 1999/03/07 23:55:34 gray Exp $
+ * $Id: chunk.c,v 1.139 1999/03/08 04:26:45 gray Exp $
  */
 
 /*
@@ -41,17 +41,18 @@
 #include "chunk_loc.h"
 #include "compat.h"
 #include "debug_val.h"
+#include "dmalloc_loc.h"
 #include "error.h"
 #include "error_val.h"
 #include "heap.h"
-#include "dmalloc_loc.h"
+#include "table.h"
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.138 1999/03/07 23:55:34 gray Exp $";
+#ident "$Id: chunk.c,v 1.139 1999/03/08 04:26:45 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.138 1999/03/07 23:55:34 gray Exp $";
+  "$Id: chunk.c,v 1.139 1999/03/08 04:26:45 gray Exp $";
 #endif
 #endif
 
@@ -3262,8 +3263,8 @@ void	_chunk_stats(void)
 		   extern_count * BLOCK_SIZE, extern_count);
   
 #if MEMORY_TABLE_LOG
-  _dmalloc_message("Allocated memory summary:");
-  _table_log_info(MEMORY_TABLE_LOG);
+  _dmalloc_message("Summary of top %d allocations:", MEMORY_TABLE_LOG);
+  _table_log_info(MEMORY_TABLE_LOG, 1);
 #endif
 }
 
@@ -3473,6 +3474,6 @@ void	_chunk_dump_unfreed(void)
   
   /* dump the summary and clear the table */
   _dmalloc_message("Unfreed pointer summary:");
-  _table_log_info(0);
+  _table_log_info(0, 0);
   _table_clear();
 }
