@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.95 1995/06/21 18:20:01 gray Exp $";
+  "$Id: chunk.c,v 1.96 1995/08/13 20:02:56 gray Exp $";
 #endif
 
 /*
@@ -1009,7 +1009,7 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
 /*
  * run extensive tests on the entire heap
  */
-EXPORT	int	_chunk_heap_check(void)
+EXPORT	int	_chunk_check(void)
 {
   bblock_adm_t	*this_admp;
   bblock_t	*bblockp, *bblistp, *last_bblockp;
@@ -1046,7 +1046,7 @@ EXPORT	int	_chunk_heap_check(void)
 	 */
 	if (! IS_IN_HEAP(bblockp)) {
 	  dmalloc_errno = ERROR_BAD_FREE_LIST;
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
       }
@@ -1066,7 +1066,7 @@ EXPORT	int	_chunk_heap_check(void)
 	 */
 	if (! IS_IN_HEAP(dblockp)) {
 	  dmalloc_errno = ERROR_BAD_FREE_LIST;
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
       }
@@ -1080,7 +1080,7 @@ EXPORT	int	_chunk_heap_check(void)
   /* test admin pointer validity */
   if (! IS_IN_HEAP(this_admp)) {
     dmalloc_errno = ERROR_BAD_ADMINP;
-    dmalloc_error("_chunk_heap_check");
+    dmalloc_error("_chunk_check");
     return ERROR;
   }
   
@@ -1088,14 +1088,14 @@ EXPORT	int	_chunk_heap_check(void)
   if (this_admp->ba_magic1 != CHUNK_MAGIC_BOTTOM
       || this_admp->ba_magic2 != CHUNK_MAGIC_TOP) {
     dmalloc_errno = ERROR_BAD_ADMIN_MAGIC;
-    dmalloc_error("_chunk_heap_check");
+    dmalloc_error("_chunk_check");
     return ERROR;
   }
   
   /* verify count value */
   if (this_admp->ba_posn != bbc) {
     dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
-    dmalloc_error("_chunk_heap_check");
+    dmalloc_error("_chunk_check");
     return ERROR;
   }
   
@@ -1114,7 +1114,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* test admin pointer validity */
       if (! IS_IN_HEAP(this_admp)) {
 	dmalloc_errno = ERROR_BAD_ADMINP;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1122,14 +1122,14 @@ EXPORT	int	_chunk_heap_check(void)
       if (this_admp->ba_magic1 != CHUNK_MAGIC_BOTTOM
 	  || this_admp->ba_magic2 != CHUNK_MAGIC_TOP) {
 	dmalloc_errno = ERROR_BAD_ADMIN_MAGIC;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
       /* verify count value */
       if (this_admp->ba_posn != bbc) {
 	dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1145,7 +1145,7 @@ EXPORT	int	_chunk_heap_check(void)
     /* we better not have seen a not-allocated block before */
     if (undef > 0 && bblockp->bb_flags != BBLOCK_ADMIN_FREE) {
       dmalloc_errno = ERROR_BAD_BLOCK_ORDER;
-      dmalloc_error("_chunk_heap_check");
+      dmalloc_error("_chunk_check");
       return ERROR;
     }
     
@@ -1162,7 +1162,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* check X blocks in a row */
       if (bblockc != 0) {
 	dmalloc_errno = ERROR_USER_NON_CONTIG;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1189,7 +1189,7 @@ EXPORT	int	_chunk_heap_check(void)
 	dmalloc_errno = ERROR_BAD_LINE;
 	log_error_info(bblockp->bb_file, bblockp->bb_line, FALSE, NULL,
 		       NULL, "heap-check", FALSE);
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1199,7 +1199,7 @@ EXPORT	int	_chunk_heap_check(void)
 	dmalloc_errno = ERROR_BAD_SIZE;
 	log_error_info(bblockp->bb_file, bblockp->bb_line, FALSE, NULL,
 		       NULL, "heap-check", FALSE);
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1209,7 +1209,7 @@ EXPORT	int	_chunk_heap_check(void)
 	len = strlen(bblockp->bb_file);
 	if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	  dmalloc_errno = ERROR_BAD_FILEP;
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
       }
@@ -1217,7 +1217,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* check X blocks in a row */
       if (bblockc == 0) {
 	dmalloc_errno = ERROR_USER_NON_CONTIG;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       else
@@ -1229,7 +1229,7 @@ EXPORT	int	_chunk_heap_check(void)
 		|| bblockp->bb_line != last_bblockp->bb_line
 		|| bblockp->bb_size != last_bblockp->bb_size)) {
 	  dmalloc_errno = ERROR_USER_NON_CONTIG;
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
       
@@ -1244,7 +1244,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* check the bblock_admin linked-list */
       if (bblockp->bb_adminp != this_admp) {
 	dmalloc_errno = ERROR_BAD_BLOCK_ADMINP;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1252,7 +1252,7 @@ EXPORT	int	_chunk_heap_check(void)
       if (bblockp->bb_freen !=
 	  this_admp->ba_posn + (bblockp - this_admp->ba_blocks)) {
 	dmalloc_errno = ERROR_BAD_BLOCK_ADMINC;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       break;
@@ -1262,14 +1262,14 @@ EXPORT	int	_chunk_heap_check(void)
       /* check out bitc */
       if (bblockp->bb_bitn >= BASIC_BLOCK) {
 	dmalloc_errno = ERROR_BAD_DBLOCK_SIZE;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
       /* check out dblock pointer */
       if (! IS_IN_HEAP(bblockp->bb_dblock)) {
 	dmalloc_errno = ERROR_BAD_DBLOCK_POINTER;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1277,7 +1277,7 @@ EXPORT	int	_chunk_heap_check(void)
       if (bblockp->bb_mem != BLOCK_POINTER(this_admp->ba_posn +
 					   (bblockp - this_admp->ba_blocks))) {
 	dmalloc_errno = ERROR_BAD_DBLOCK_MEM;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1308,7 +1308,7 @@ EXPORT	int	_chunk_heap_check(void)
 	    /* did we find it? */
 	    if (dblistp == NULL) {
 	      dmalloc_errno = ERROR_BAD_FREE_LIST;
-	      dmalloc_error("_chunk_heap_check");
+	      dmalloc_error("_chunk_check");
 	      return ERROR;
 	    }
 	    
@@ -1326,7 +1326,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
 	  log_error_info(dblockp->db_file, dblockp->db_line, FALSE, NULL,
 			 NULL, "heap-check", FALSE);
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
 	
@@ -1344,7 +1344,7 @@ EXPORT	int	_chunk_heap_check(void)
       /* check out dblock pointer */
       if (! IS_IN_HEAP(bblockp->bb_slotp)) {
 	dmalloc_errno = ERROR_BAD_DBADMIN_POINTER;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1352,7 +1352,7 @@ EXPORT	int	_chunk_heap_check(void)
       if (bblockp->bb_slotp->da_magic1 != CHUNK_MAGIC_BOTTOM
 	  || bblockp->bb_slotp->da_magic2 != CHUNK_MAGIC_TOP) {
 	dmalloc_errno = ERROR_BAD_DBADMIN_MAGIC;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1387,7 +1387,7 @@ EXPORT	int	_chunk_heap_check(void)
 		dmalloc_errno = ERROR_FREE_NON_BLANK;
 		log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE,
 			       TRUE, bytep, NULL, "heap-check", TRUE);
-		dmalloc_error("_chunk_heap_check");
+		dmalloc_error("_chunk_check");
 		return ERROR;
 	      }
 	  }
@@ -1400,7 +1400,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
 	  log_error_info(dblockp->db_file, dblockp->db_line, FALSE, NULL,
 			 NULL, "heap-check", FALSE);
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
 	
@@ -1409,7 +1409,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
 	  log_error_info(dblockp->db_file, dblockp->db_line, FALSE, NULL,
 			 NULL, "heap-check", FALSE);
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
 	
@@ -1419,7 +1419,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  if (len < MIN_FILE_LENGTH || len > MAX_FILE_LENGTH) {
 	    dmalloc_errno = ERROR_BAD_DBADMIN_SLOT;
 	    /* should there be a log-error-info call here? */
-	    dmalloc_error("_chunk_heap_check");
+	    dmalloc_error("_chunk_check");
 	    return ERROR;
 	  }
 	}
@@ -1437,7 +1437,7 @@ EXPORT	int	_chunk_heap_check(void)
        */
       if (bblockp->bb_next != NULL && ! IS_IN_HEAP(bblockp->bb_next)) {
 	dmalloc_errno = ERROR_BAD_FREE_LIST;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
       
@@ -1456,7 +1456,7 @@ EXPORT	int	_chunk_heap_check(void)
 	  /* did we find it? */
 	  if (bblistp == NULL) {
 	    dmalloc_errno = ERROR_BAD_FREE_LIST;
-	    dmalloc_error("_chunk_heap_check");
+	    dmalloc_error("_chunk_check");
 	    return ERROR;
 	  }
 	  
@@ -1468,7 +1468,7 @@ EXPORT	int	_chunk_heap_check(void)
 	    || last_bblockp->bb_flags != BBLOCK_FREE
 	    || bblockp->bb_bitn != last_bblockp->bb_bitn) {
 	  dmalloc_errno = ERROR_FREE_NON_CONTIG;
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
       freec--;
@@ -1482,7 +1482,7 @@ EXPORT	int	_chunk_heap_check(void)
 	    dmalloc_errno = ERROR_FREE_NON_BLANK;
 	    log_error_info(DMALLOC_DEFAULT_FILE, DMALLOC_DEFAULT_LINE, TRUE,
 			   bytep, NULL, "heap-check", TRUE);
-	    dmalloc_error("_chunk_heap_check");
+	    dmalloc_error("_chunk_check");
 	    return ERROR;
 	  }
 	break;
@@ -1498,14 +1498,14 @@ EXPORT	int	_chunk_heap_check(void)
 	if (bblockp != this_admp->ba_blocks + (BB_PER_ADMIN - 1)
 	    || bblockp->bb_freen != (BB_PER_ADMIN - 1) - undef) {
 	  dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
-	  dmalloc_error("_chunk_heap_check");
+	  dmalloc_error("_chunk_check");
 	  return ERROR;
 	}
 	break;
 	
       default:
 	dmalloc_errno = ERROR_BAD_FLAG;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
 	break;
       }
@@ -1517,12 +1517,12 @@ EXPORT	int	_chunk_heap_check(void)
    */
   if (bblockc > 0) {
     dmalloc_errno = ERROR_USER_NON_CONTIG;
-    dmalloc_error("_chunk_heap_check");
+    dmalloc_error("_chunk_check");
     return ERROR;
   }
   if (freec > 0) {
     dmalloc_errno = ERROR_FREE_NON_CONTIG;
-    dmalloc_error("_chunk_heap_check");
+    dmalloc_error("_chunk_check");
     return ERROR;
   }
   
@@ -1532,7 +1532,7 @@ EXPORT	int	_chunk_heap_check(void)
     for (bitc = 0; bitc < MAX_SLOTS; bitc++)
       if (free_bblockc[bitc] != 0) {
 	dmalloc_errno = ERROR_BAD_FREE_LIST;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
     
@@ -1540,7 +1540,7 @@ EXPORT	int	_chunk_heap_check(void)
     for (bitc = 0; bitc < BASIC_BLOCK; bitc++) {
       if (free_dblockc[bitc] != 0) {
 	dmalloc_errno = ERROR_BAD_FREE_LIST;
-	dmalloc_error("_chunk_heap_check");
+	dmalloc_error("_chunk_check");
 	return ERROR;
       }
     }

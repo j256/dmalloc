@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk.h,v 1.40 1995/06/21 18:18:59 gray Exp $
+ * $Id: chunk.h,v 1.41 1995/08/13 20:02:57 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -58,7 +58,7 @@ IMPORT	char	*_chunk_display_where(const char * file,
 /*
  * run extensive tests on the entire heap
  */
-IMPORT	int	_chunk_heap_check(void);
+IMPORT	int	_chunk_check(void);
 
 /*
  * run extensive tests on PNT from FUNC. test PNT HOW_MUCH of MIN_SIZE

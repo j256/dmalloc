@@ -55,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.81 1995/07/04 02:05:41 gray Exp $";
+  "$Id: malloc.c,v 1.82 1995/08/13 20:02:58 gray Exp $";
 #endif
 
 /*
@@ -145,7 +145,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   
   /* after all that, do we need to check the heap? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
+    (void)_chunk_check();
   
   return NOERROR;
 }
@@ -286,7 +286,7 @@ EXPORT	void	_dmalloc_shutdown(void)
   
   /* check the heap since we are dumping info from it */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
-    (void)_chunk_heap_check();
+    (void)_chunk_check();
   
   /* dump some statistics to the logfile */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STATS))
@@ -550,7 +550,7 @@ EXPORT	int	_dmalloc_verify(const DMALLOC_PNT pnt)
   in_alloc = TRUE;
   
   if (pnt == NULL)
-    ret = _chunk_heap_check();
+    ret = _chunk_check();
   else
     ret = _chunk_pnt_check("dmalloc_verify", pnt, CHUNK_PNT_EXACT, 0);
   
