@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.89 2000/02/17 14:03:47 gray Exp $
+ * $Id: dmalloc.c,v 1.90 2000/03/06 17:05:08 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.89 2000/02/17 14:03:47 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.90 2000/03/06 17:05:08 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.89 2000/02/17 14:03:47 gray Exp $";
+  "$Id: dmalloc.c,v 1.90 2000/03/06 17:05:08 gray Exp $";
 #endif
 #endif
 
@@ -115,85 +115,88 @@ static	default_t	defaults[] = {
 };
 
 /* argument variables */
-static	char	*address	= NULL;		/* for ADDRESS */
-static	char	bourne_b	= FALSE;	/* set bourne shell output */
-static	char	cshell_b	= FALSE;	/* set c-shell output */
-static	char	clear_b		= FALSE;	/* clear variables */
-static	int	debug		= NO_VALUE;	/* for DEBUG */
-static	int	errno_to_print	= NO_VALUE;	/* to print the error string */
-static	char	gdb_b		= FALSE;	/* set gdb output */
-static	char	*inpath		= NULL;		/* for config-file path */
-static	unsigned long interval	= INTERVAL_NO_VALUE; /* for setting INTERVAL */
-static	int	thread_lock_on	= NO_VALUE;	/* for setting LOCK_ON */
-static	char	keep_b		= FALSE;	/* keep settings override -r */
-static	char	list_tags_b	= FALSE;	/* list rc tags */
-static	char	debug_tokens_b	= FALSE;	/* list debug tokens */
-static	char	*logpath	= NULL;		/* for LOGFILE setting */
-static	char	long_tokens_b	= FALSE;	/* long-tok output */
+static	char	*address = NULL;		/* for ADDRESS */
+static	int	bourne_b = 0;			/* set bourne shell output */
+static	int	cshell_b = 0;			/* set c-shell output */
+static	int	clear_b = 0;			/* clear variables */
+static	int	debug = NO_VALUE;		/* for DEBUG */
+static	int	errno_to_print = NO_VALUE;	/* to print the error string */
+static	int	gdb_b = 0;			/* set gdb output */
+static	int	help_b = 0;			/* print help message */
+static	char	*inpath = NULL;			/* for config-file path */
+static	unsigned long interval = INTERVAL_NO_VALUE; /* for setting INTERVAL */
+static	int	thread_lock_on = NO_VALUE;	/* for setting LOCK_ON */
+static	int	keep_b = 0;			/* keep settings override -r */
+static	int	list_tags_b = 0;		/* list rc tags */
+static	int	debug_tokens_b = 0;		/* list debug tokens */
+static	char	*logpath = NULL;		/* for LOGFILE setting */
+static	int	long_tokens_b = 0;		/* long-tok output */
 static	argv_array_t	minus;			/* tokens to remove */
-static	char	make_changes_b	= TRUE;		/* make no changes to env */
+static	int	make_changes_b = 1;		/* make no changes to env */
 static	argv_array_t	plus;			/* tokens to add */
-static	char	remove_auto_b	= FALSE;	/* auto-remove settings */
-static	char	short_tokens_b	= FALSE;	/* short-tok output */
-static	char	*start		= NULL;		/* for START settings */
-static	char	verbose_b	= FALSE;	/* verbose flag */
-static	char	very_verbose_b	= FALSE;	/* very-verbose flag */
-static	char	*tag		= NULL;		/* maybe a tag argument */
+static	int	remove_auto_b = 0;		/* auto-remove settings */
+static	int	short_tokens_b = 0;		/* short-tok output */
+static	char	*start = NULL;			/* for START settings */
+static	int	verbose_b = 0;			/* verbose flag */
+static	int	very_verbose_b = 0;		/* very-verbose flag */
+static	char	*tag = NULL;			/* maybe a tag argument */
 
 static	argv_t	args[] = {
-  { 'b',	"bourne",	ARGV_BOOL,	&bourne_b,
-      NULL,			"set output for bourne shells" },
+  { 'b',	"bourne",	ARGV_BOOL_INT,	&bourne_b,
+    NULL,			"set output for bourne shells" },
   { ARGV_OR },
-  { 'C',	"c-shell",	ARGV_BOOL,	&cshell_b,
-      NULL,			"set output for C-type shells" },
+  { 'C',	"c-shell",	ARGV_BOOL_INT,	&cshell_b,
+    NULL,			"set output for C-type shells" },
   { ARGV_OR },
-  { 'g',	"gdb",		ARGV_BOOL,	&gdb_b,
-      NULL,			"set output for gdb parsing" },
+  { 'g',	"gdb",		ARGV_BOOL_INT,	&gdb_b,
+    NULL,			"set output for gdb parsing" },
   
-  { 'L',	"long-tokens",	ARGV_BOOL,	&long_tokens_b,
-      NULL,			"output long-tokens not 0x..." },
+  { 'L',	"long-tokens",	ARGV_BOOL_INT,	&long_tokens_b,
+    NULL,			"output long-tokens not 0x..." },
   { ARGV_OR },
-  { 'S',	"short-tokens",	ARGV_BOOL,	&short_tokens_b,
-      NULL,			"output short-tokens not 0x..." },
+  { 'S',	"short-tokens",	ARGV_BOOL_INT,	&short_tokens_b,
+    NULL,			"output short-tokens not 0x..." },
   
   { 'a',	"address",	ARGV_CHAR_P,	&address,
-      "address:#",		"stop when malloc sees address" },
-  { 'c',	"clear",	ARGV_BOOL,	&clear_b,
-      NULL,			"clear all variables not set" },
+    "address:#",		"stop when malloc sees address" },
+  { 'c',	"clear",	ARGV_BOOL_INT,	&clear_b,
+    NULL,			"clear all variables not set" },
   { 'd',	"debug-mask",	ARGV_HEX,	&debug,
-      "value",			"hex flag to set debug mask" },
-  { 'D',	"debug-tokens",	ARGV_BOOL,	&debug_tokens_b,
-      NULL,			"list debug tokens" },
+    "value",			"hex flag to set debug mask" },
+  { 'D',	"debug-tokens",	ARGV_BOOL_INT,	&debug_tokens_b,
+    NULL,			"list debug tokens" },
   { 'e',	"errno",	ARGV_INT,	&errno_to_print,
-      "errno",			"print error string for errno" },
+    "errno",			"print error string for errno" },
   { 'f',	"file",		ARGV_CHAR_P,	&inpath,
-      "path",			"config if not ~/.mallocrc" },
+    "path",			"config if not ~/.mallocrc" },
+  { 'h',	"help",		ARGV_BOOL_INT,	&help_b,
+    NULL,			"print help message" },
   { 'i',	"interval",	ARGV_U_LONG,	&interval,
-      "value",			"check heap every number times" },
-  { 'k',	"keep",		ARGV_BOOL,	&keep_b,
-      NULL,			"keep settings (override -r)" },
+    "value",			"check heap every number times" },
+  { 'k',	"keep",		ARGV_BOOL_INT,	&keep_b,
+    NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHAR_P,	&logpath,
-      "path",			"file to log messages to" },
+    "path",			"file to log messages to" },
   { 'm',	"minus",	ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&minus,
-      "token(s)",		"del tokens from current debug" },
+    "token(s)",			"del tokens from current debug" },
   { 'n',	"no-changes",	ARGV_BOOL_NEG,	&make_changes_b,
-      NULL,			"make no changes to the env" },
+    NULL,			"make no changes to the env" },
   { 'o',	"lock-on",	ARGV_INT,	&thread_lock_on,
-      "number",			"number of times to not lock" },
+    "number",			"number of times to not lock" },
   { 'p',	"plus",		ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&plus,
-      "token(s)",		"add tokens to current debug" },
-  { 'r',	"remove",	ARGV_BOOL,	&remove_auto_b,
-      NULL,			"remove other settings if tag" },
+    "token(s)",			"add tokens to current debug" },
+  { 'r',	"remove",	ARGV_BOOL_INT,	&remove_auto_b,
+    NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHAR_P,	&start,
-      "file:line",		"start check heap after this" },
-  { 't',	"list-tags",	ARGV_BOOL,	&list_tags_b,
-      NULL,			"list tags in rc file" },
-  { 'v',	"verbose",	ARGV_BOOL,	&verbose_b,
-      NULL,			"turn on verbose output" },
-  { 'V',	"very-verbose",	ARGV_BOOL,	&very_verbose_b,
-      NULL,			"turn on very-verbose output" },
+    "file:line",		"start check heap after this" },
+  { 't',	"list-tags",	ARGV_BOOL_INT,	&list_tags_b,
+    NULL,			"list tags in rc file" },
+  { 'v',	"verbose",	ARGV_BOOL_INT,	&verbose_b,
+    NULL,			"turn on verbose output" },
+  { 'V',	"very-verbose",	ARGV_BOOL_INT,	&very_verbose_b,
+    NULL,			"turn on very-verbose output" },
   { ARGV_MAYBE,	NULL,		ARGV_CHAR_P,	&tag,
-      "tag",			"debug token to find in rc" },
+    "tag",			"debug token to find in rc" },
   { ARGV_LAST }
 };
 
@@ -214,7 +217,7 @@ static	void	choose_shell(void)
   shell = getenv(SHELL_ENVIRON);
   if (shell == NULL) {
     /* oh well, we just guess on c-shell */
-    cshell_b = TRUE;
+    cshell_b = 1;
     return;
   }
   
@@ -228,12 +231,12 @@ static	void	choose_shell(void)
   
   for (shell_c = 0; sh_shells[shell_c] != NULL; shell_c++) {
     if (strcmp(sh_shells[shell_c], shell_p) == 0) {
-      bourne_b = TRUE;
+      bourne_b = 1;
       return;
     }
   }
   
-  cshell_b = TRUE;
+  cshell_b = 1;
 }
 
 /*
@@ -324,7 +327,7 @@ static	long	token_to_value(const char *tok)
 static	int	read_next_token(FILE *infile, long *debug_p,
 				char *token, const int token_size)
 {
-  int	cont_b = FALSE, found_b = FALSE;
+  int	cont_b = 0, found_b = 0;
   long	new_debug = 0;
   char	buf[1024], *tok_p, *buf_p;
   
@@ -364,7 +367,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
       found_b = 1;
     }
     
-    cont_b = FALSE;
+    cont_b = 0;
     
     while (1) {
       /* get the next token */
@@ -378,7 +381,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
       
       /* do we have a continuation character? */
       if (strcmp(tok_p, "\\") == 0) {
-	cont_b = TRUE;
+	cont_b = 1;
 	break;
       }
       
@@ -415,7 +418,7 @@ static	int	read_rc_file(const char *path, const long debug_value,
 			     char *token, const int token_size)
 {
   FILE	*infile;
-  int	found_b = FALSE;
+  int	found_b = 0;
   char	next_token[64];
   long	new_debug;
   
@@ -773,7 +776,7 @@ static	char	*local_strerror(const int error_num)
 int	main(int argc, char **argv)
 {
   char		buf[1024];
-  int		debug_set_b = FALSE, set_b = FALSE;
+  int		debug_set_b = 0, set_b = 0;
   char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
   unsigned long	addr = ADDRESS_INIT, inter = INTERVAL_INIT;
   long		addr_count = ADDRESS_COUNT_INIT;
@@ -786,8 +789,18 @@ int	main(int argc, char **argv)
   
   argv_process(args, argc, argv);
   
+  if (help_b) {
+    (void)fprintf(stderr, "Debug Malloc Utility: http://www.dmalloc.com/\n");
+    (void)fprintf(stderr,
+		  "  This utility helps set the Debug Malloc environment variables.\n");
+    (void)fprintf(stderr,
+		  "  For a list of the command-line options enter: %s --usage\n",
+		  argv_argv[0]);
+    exit(0);
+  }
+  
   if (very_verbose_b) {
-    verbose_b = TRUE;
+    verbose_b = 1;
   }
   
   /* try to figure out the shell we are using */
@@ -806,7 +819,7 @@ int	main(int argc, char **argv)
 		    argv_program, tag);
     }
     debug = process(0L, tag, NULL, 0);
-    debug_set_b = TRUE;
+    debug_set_b = 1;
   }
   
   if (plus.aa_entry_n > 0) {
@@ -856,20 +869,20 @@ int	main(int argc, char **argv)
     else {
       flags = debug;
     }
-    set_b = TRUE;
+    set_b = 1;
     /* should we clear the rest? */
     if (debug_set_b && remove_auto_b && ! keep_b) {
-      clear_b = TRUE;
+      clear_b = 1;
     }
   }
   
   if (clear_b) {
-    set_b = TRUE;
+    set_b = 1;
   }
   
   if (address != NULL) {
     _dmalloc_address_break(address, &addr, &addr_count);
-    set_b = TRUE;
+    set_b = 1;
   }
   else if (clear_b) {
     addr = ADDRESS_INIT;
@@ -883,7 +896,7 @@ int	main(int argc, char **argv)
     else {
       inter = interval;
     }
-    set_b = TRUE;
+    set_b = 1;
   }
   else if (clear_b) {
     inter = INTERVAL_INIT;
@@ -900,7 +913,7 @@ int	main(int argc, char **argv)
     else {
       lock_on = thread_lock_on;
     }
-    set_b = TRUE;
+    set_b = 1;
     if (! BIT_IS_SET(flags, DEBUG_ALLOW_NONLINEAR)) {
       (void)fprintf(stderr,
 		    "WARNING: the allow-nonlinear flag is not enabled\n");
@@ -912,7 +925,7 @@ int	main(int argc, char **argv)
   
   if (logpath != NULL) {
     lpath = logpath;
-    set_b = TRUE;
+    set_b = 1;
   }
   else if (clear_b) {
     lpath = LOGPATH_INIT;
@@ -920,7 +933,7 @@ int	main(int argc, char **argv)
   
   if (start != NULL) {
     _dmalloc_start_break(start, &sfile, &sline, &scount);
-    set_b = TRUE;
+    set_b = 1;
   }
   else if (clear_b) {
     sfile = START_FILE_INIT;

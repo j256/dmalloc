@@ -1,3 +1,7 @@
+Mon Mar  6 12:05:01 2000  Gray Watson  <gray@burger.256.com>
+
+	* Added better help messages to dmalloc.
+
 Thu Feb 17 09:04:19 2000  Gray Watson  <gray@burger.256.com>
 
 	* Fixed Makefile.dep creation with _th.o special objects.
@@ -1512,5 +1516,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.229 2000/02/17 14:06:05 gray Exp $
+$Id: ChangeLog,v 1.230 2000/03/06 17:05:19 gray Exp $
 -------------------------------------------------------------------------------
