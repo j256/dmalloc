@@ -29,6 +29,10 @@
 
 #include <ctype.h>
 
+#if HAVE_STRING_H
+# include <string.h>
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "dmalloc.h"
@@ -46,7 +50,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.109 1997/12/07 23:09:15 gray Exp $";
+  "$Id: chunk.c,v 1.110 1997/12/08 07:22:23 gray Exp $";
 #endif
 
 /*
