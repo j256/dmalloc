@@ -1,7 +1,7 @@
 /*
  * global error codes for chunk allocation problems
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,13 +12,13 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: error_val.h,v 1.4 1993/07/23 05:38:05 gray Exp $
+ * $Id: error_val.h,v 1.5 1993/07/23 21:24:32 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__

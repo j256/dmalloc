@@ -1,7 +1,7 @@
 /*
  * defines for the error and message code.
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,13 +12,13 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: error.h,v 1.11 1993/07/23 05:38:01 gray Exp $
+ * $Id: error.h,v 1.12 1993/07/23 21:24:29 gray Exp $
  */
 
 #ifndef __ERROR_H__

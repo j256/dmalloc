@@ -1,7 +1,7 @@
 /*
  * user-level memory-allocation routines
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,9 +12,9 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.34 1993/07/23 05:38:14 gray Exp $";
+  "$Id: malloc.c,v 1.35 1993/07/23 21:24:41 gray Exp $";
 #endif
 
 /*

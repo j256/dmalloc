@@ -14,15 +14,14 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.24 1993/07/23 05:38:16 gray Exp $
+@c $Id: dmalloc.texi,v 1.25 1993/07/23 21:24:44 gray Exp $
 @c ================================================================
 
 @ifinfo
 This file is an introduction to the Malloc library which handles general
 memory heap management.
  
-Copyright @copyright{} 1992 and 1993 by Gray Watson and the Antaire
-Corporation.
+Copyright @copyright{} 1992 and 1993 by the Antaire Corporation.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -52,8 +51,7 @@ translation approved by the author instead of in the original English.
 @author Gray Watson @samp{<gray.watson@@antaire.com>}
 
 @page
-Copyright @copyright{} 1992 and 1993 by Gray Watson and the Antaire
-Corporation.
+Copyright @copyright{} 1992 and 1993 by the Antaire Corporation.
 
 Published by Gray Watson @samp{<gray.watson@@antaire.com>}
 
@@ -119,9 +117,9 @@ that the name of Antaire not be used in advertising or publicity
 pertaining to distribution of the document or software without specific,
 written prior permission.
 
-Gray Watson and the Antaire Corporation makes no representations about
-the suitability of the software described herein for any purpose.  It is
-provided "as is" without express or implied warranty.
+The Antaire Corporation makes no representations about the suitability
+of the software described herein for any purpose.  It is provided "as
+is" without express or implied warranty.
 
 @node Allocation Basics, Features, Copying, Top
 @chapter Basic Description of Terms and Functions.
@@ -524,10 +522,16 @@ Zsh users on the other hand should put the following in their
 
 This allows the user to execute @code{malloc args}.
 
-The most basic usage for the program is @code{malloc_dbg [-b] tag}.  The
--b flag is for generating Bourne shell type commands (C shell type are
-the default).  The tag argument should match a line from the user's
-run-time configuration file.  @xref{RC File}.
+The most basic usage for the program is @code{malloc_dbg [-bC] tag}.
+The -b or -C flags are for generating Bourne or C shell type commands
+respectively.  Malloc_dbg will try and use the @code{SHELL} environment
+variable to determine whether bourne or c shell commands should be
+generated but you may want to explicitly specify -b or -C.
+
+The tag argument to malloc_dbg should match a line from the user's
+run-time configuration file.  @xref{RC File}.  If no tag is specified
+and no other option-commands used, malloc_dbg will disply the current
+settings of the environmental variables.
 
 Here is a detailed list of the flags that can passed to malloc_dbg:
 
@@ -536,9 +540,11 @@ Here is a detailed list of the flags that can passed to malloc_dbg:
 Set the @samp{MALLOC_ADDRESS} variable with the string address (or
 alternatively address:number).
 
-@item -b
-Output Bourne shell type commands.  (C shell type output is the
-default).
+ @item -b
+Output Bourne shell type commands.
+
+@item -C
+Output C shell type commands.
 
 @item -c
 Clear/unset all of the variables not specified with other arguments.
@@ -569,7 +575,8 @@ Set the @samp{MALLOC_LOGFILE} env variable to filename.
 @item -r
 Remove (unset) all variables when setting a tag.  This is useful when
 you are returning to a standard development tag and want the logfile,
-address, and interval variables to be cleared automatically.
+address, and interval variables to be cleared automatically.  I put this
+by default in my malloc alias.
 
 @item -s number
 Set the @samp{MALLOC_START} env variable to number (alternatively
@@ -583,11 +590,43 @@ If no arguments are specified, malloc_dbg dumps out the current settings
 that you have for the malloc environmental variables.  For example:
 
 @example
-        MALLOC_DEBUG == '0x6417' (debug1)
+        MALLOC_DEBUG == '0x4000417 (runtime)
         MALLOC_ADDRESS == '0'
         MALLOC_INTERVAL not set
         MALLOC_LOGFILE == 'malloc'
         MALLOC_START not set
+@end example
+
+With a -v option and no arguments, malloc_dbg dumps out the current
+settings in a verbose manner.  For example:
+
+@example
+        MALLOC_DEBUG == '0x4000417' (unknown)
+           log-stats, log-non-free, log-perror, log-bad-pnt
+           check-fence, catch-null
+        MALLOC_ADDRESS not set
+        MALLOC_INTERVAL not set
+        MALLOC_LOGFILE not set
+        MALLOC_START not set
+@end example
+
+Here are some more examples:
+
+@example
+        # start tough debugging, check the heap every 1000 times,
+        # send the log information to 'malloc'
+        malloc -l malloc -i 1000 5
+
+        # find out what error code 20 is (you got it from the logfile)
+        malloc -e 20
+
+        # after finding a corrupted address, cause the program to signal
+        # itself when it sees the address for the 6th time.
+        malloc -a 0x34238:6
+
+        # return to the normal runtime settings and clear out all
+        # other variables
+        malloc -r runtime
 @end example
 
 @node RC File, Debug Tokens, Malloc_dbg Program, Features

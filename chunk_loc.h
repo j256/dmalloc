@@ -1,7 +1,7 @@
 /*
  * local defines for the low level memory routines
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,13 +12,13 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk_loc.h,v 1.13 1993/07/23 05:37:46 gray Exp $
+ * $Id: chunk_loc.h,v 1.14 1993/07/23 21:24:14 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__

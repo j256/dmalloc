@@ -1,7 +1,7 @@
 /*
  * test program for malloc code
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,9 +12,9 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
@@ -30,7 +30,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.23 1993/07/23 05:38:33 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.24 1993/07/23 21:25:00 gray Exp $";
 #endif
 
 #define DEFAULT_ITERATIONS	1000

@@ -1,7 +1,7 @@
 #
-# Copyright 1993 by Gray Watson and the Antaire Corporation
+# Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.23 1993/07/23 05:37:31 gray Exp $
+# $Id: Makefile.in,v 1.24 1993/07/23 21:24:01 gray Exp $
 #
 
 HFLS	= malloc_dbg.h

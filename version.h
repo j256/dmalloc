@@ -1,7 +1,7 @@
 /*
  * version string for the library
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,13 +12,13 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: version.h,v 1.19 1993/07/23 05:38:38 gray Exp $
+ * $Id: version.h,v 1.20 1993/07/23 21:25:03 gray Exp $
  */
 
 #include "malloc_loc.h"				/* for LOCAL */
@@ -29,4 +29,4 @@
  */
 LOCAL	char	*malloc_version = "1.2.6";
 
-/* Version Date: $Date: 1993/07/23 05:38:38 $ */
+/* Version Date: $Date: 1993/07/23 21:25:03 $ */

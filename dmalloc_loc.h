@@ -1,7 +1,7 @@
 /*
  * local definitions for the user allocation level
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,13 +12,13 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Gray Watson and the Antaire Corporation make no representations about the
- * suitability of the software described herein for any purpose.  It is
- * provided "as is" without express or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.20 1993/07/23 05:38:23 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.21 1993/07/23 21:24:50 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__

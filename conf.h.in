@@ -1,7 +1,7 @@
 /*
  * manual and automatic configuration flags
  *
- * Copyright 1993 by Gray Watson and the Antaire Corporation
+ * Copyright 1993 by the Antaire Corporation
  *
  * This file is part of the malloc-debug package.
  *
@@ -12,13 +12,13 @@
  * distribution of the document or software without specific, written prior
  * permission.
  *
- * Antaire makes no representations about the suitability of the software
- * described herein for any purpose.  It is provided "as is" without express
- * or implied warranty.
+ * The Antaire Corporation makes no representations about the suitability of
+ * the software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.16 1993/07/23 05:37:52 gray Exp $
+ * $Id: conf.h.in,v 1.17 1993/07/23 21:24:20 gray Exp $
  */
 
 /*
