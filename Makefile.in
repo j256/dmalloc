@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.114 1998/11/12 21:42:21 gray Exp $
+# $Id: Makefile.in,v 1.115 1998/11/16 14:33:52 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -11,8 +11,6 @@ HFLS	= dmalloc.h
 OBJS	= arg_check.o compat.o dmalloc_lp.o env.o heap.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
-
-DOCS	= dmalloc.texi dmalloc.info dmalloc.ps dmalloc.html dmalloc_toc.html
 
 DEFS	= -DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
@@ -32,6 +30,7 @@ LIB_TH	= libdmallocth.a
 LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
 INFOFILE= dmalloc.info
+HTMLFILES = dmalloc.html dmalloc_toc.html
 
 #
 # WARNING: be careful about the order of this list some files are at
@@ -39,7 +38,7 @@ INFOFILE= dmalloc.info
 #
 FLS	=  conf.h.in configure.in config.help \
 	ChangeLog Manifest INSTALL PERMISSIONS NEWS NOTES README TODO \
-	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html dmalloc_toc.html \
+	dmallocrc dmalloc.texi $(INFOFILE) $(HTMLFILES) \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
@@ -52,8 +51,7 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/dmalloc_summarize.pl contrib/next_notes contrib/ra_info.pl \
 	contrib/stratus_ftx_notes
 
-DOCFLS	= README INSTALL dmalloc.texi $(INFOFILE) dmalloc.html \
-	dmalloc_toc.html dmalloc.ps texinfo.tex
+DOCS	= dmalloc.texi $(INFOFILE) $(HTMLFILES) dmalloc.ps
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -63,9 +61,9 @@ all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL)
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL) $(INFOFILE)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f dmalloc.h
-	rm -f INSTALL PERMISSIONS README README_ftp
+	rm -f INSTALL PERMISSIONS README README_ftp $(INFOFILE) $(HTMLFILES)
 
 distclean :: clean
 	rm -f confdefs.h configure config.status config.log config.cache conf.h
@@ -176,11 +174,11 @@ port :: $(FLS) $(CONTFLS) Makefile.all.in
 	@ echo ''
 	@ echo 'Please rename $(.TARGET) to dmalloc-version and tar up file'
 
-portdocs :: $(DOCFLS)
+portdocs :: $(DOCS)
 	@ answer 'Is it okay to remove the $(.TARGET) directory? '
 	rm -rf $(.TARGET)
 	mkdir $(.TARGET)
-	cp $(DOCFLS) $(.TARGET)
+	cp $(DOCS) $(.TARGET)
 
 dmalloc.ps : dmalloc.texi
 	rm -rf work
