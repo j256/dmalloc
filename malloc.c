@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.132 1999/03/10 21:39:47 gray Exp $
+ * $Id: malloc.c,v 1.133 1999/03/10 22:04:57 gray Exp $
  */
 
 /*
@@ -76,10 +76,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.132 1999/03/10 21:39:47 gray Exp $";
+#ident "$Id: malloc.c,v 1.133 1999/03/10 22:04:57 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.132 1999/03/10 21:39:47 gray Exp $";
+  "$Id: malloc.c,v 1.133 1999/03/10 22:04:57 gray Exp $";
 #endif
 #endif
 
@@ -103,6 +103,7 @@ int	_dmalloc_examine(const char *file, const int line,
 			 const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
 			 char **file_p, unsigned int *line_p,
 			 DMALLOC_PNT *ret_attr_p);
+void	_dmalloc_track(const dmalloc_track_t track_func);
 const char	*_dmalloc_strerror(const int error_num);
 
 /* local variables */
