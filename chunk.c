@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.190 2003/06/10 18:44:46 gray Exp $
+ * $Id: chunk.c,v 1.191 2003/09/05 21:42:53 gray Exp $
  */
 
 /*
@@ -2239,8 +2239,11 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   /* find our slot which does a lot of other checking */
   slot_p = find_slot(user_pnt, skip_update, NULL /* prev */, NULL /* next */);
   if (slot_p == NULL) {
-    /* dmalloc_errno set in find_slot */
-    if (exact_b || dmalloc_errno == ERROR_NOT_FOUND) {
+    /*
+     * if the error is something other than not-found or if it is
+     * not-found and the pointer _must_ be exactly found
+     */
+    if (dmalloc_errno != ERROR_NOT_FOUND || exact_b) {
       log_error_info(NULL, 0, NULL, 0, user_pnt, 0, NULL, "pointer-check");
       dmalloc_error(func);
       return 0;

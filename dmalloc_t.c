@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.102 2003/06/08 19:37:46 gray Exp $
+ * $Id: dmalloc_t.c,v 1.103 2003/09/05 21:42:52 gray Exp $
  */
 
 /*
@@ -1379,6 +1379,35 @@ static	int	check_special(void)
     dmalloc_debug(old_flags);
   }
 
+  /********************/
+  
+  /*
+   * Make sure that the dmalloc function checking allows external
+   * pointers.
+   */
+  {
+    unsigned int	old_flags;
+    char		buf[20];
+    
+    if (! silent_b) {
+      (void)printf("  Checking function checking of non-heap pointers\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
+    
+    _dmalloc_memset(buf, 0, sizeof(buf));
+    if (dmalloc_errno != ERROR_NONE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s\n",
+		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+  
   /********************/
   
   /* NOTE: add tests which get errors before the ------- message above */
