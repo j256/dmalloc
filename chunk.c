@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.195 2003/09/09 23:18:09 gray Exp $
+ * $Id: chunk.c,v 1.196 2003/11/10 23:46:16 gray Exp $
  */
 
 /*
@@ -2548,7 +2548,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   
   if (! check_used_slot(slot_p, user_pnt, 1 /* exact pnt */)) {
     /* error set in check slot */
-    log_error_info(file, line, NULL, 0, user_pnt, 0, NULL, "free");
+    log_error_info(file, line, slot_p->sa_file, slot_p->sa_line, user_pnt,
+		   0, NULL, "free");
     dmalloc_error("_dmalloc_chunk_free");
     return FREE_ERROR;
   }
@@ -2701,7 +2702,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   slot_p = find_address(old_user_pnt, 0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
-    log_error_info(NULL, 0, NULL, 0, old_user_pnt, 0, NULL,
+    log_error_info(file, line, NULL, 0, old_user_pnt, 0, NULL,
 		   "_dmalloc_chunk_realloc");
     dmalloc_error("_dmalloc_chunk_realloc");
     return 0;
