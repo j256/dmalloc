@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.177 2003/09/29 22:58:27 gray Exp $
+# $Id: Makefile.in,v 1.178 2004/07/02 02:42:09 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -146,8 +146,12 @@ installhtml ::
 		cd $(WWWDIR)/docs/$(VERSION)/online ;\
 		umask 022 ;\
 		texi2html -menu -number -split_node $$current/dmalloc.texi ;\
-		for f in dmalloc*.html ; do \
-			sed -e 's,</BODY>,<p><a href="http://dmalloc.com/">Dmalloc Home Page</a>.  Copyright 2003 <a href="http://256.com/gray/">Gray Watson</a></body>,' $$f > $$f.t ;\
+		for f in dmalloc?*.html ; do \
+			sed -e '1,/<BODY>/p' -e d $$f > $$f.t ;\
+			cat $(WWWDIR)/header_script.html >> $$f.t ;\
+			sed -e '1,/<BODY>/d' -e '/<\/BODY>/,$$d' $$f >> $$f.t;\
+			cat $(WWWDIR)/footer_script.html >> $$f.t ;\
+			sed -e '/<\/BODY>/,$$p' -e d $$f >> $$f.t ;\
 			mv $$f.t $$f ;\
 		done
 
