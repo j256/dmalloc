@@ -1,5 +1,8 @@
 Thu Mar 30 10:05:01 2000  Gray Watson  <gray@whopper.256.com>
 
+	* Reorganized the dmalloc.texi documentation and moved to using
+	makeinfo program.
+
 	* Releasing dmalloc version 4.5.1.
 
 	* Fixed a problem with compilation of dmalloc_lp.c.  Thanks Chip.
@@ -15,7 +18,7 @@ Fri Mar 24 16:21:39 2000  Gray Watson  <gray@whopper.256.com>
 	* Added new dmalloc_mark() and dmalloc_log_changed() functions.
 
 	* Added new BBLOCK_FREE_START and redid some of the block flag
- 	checking.
+	checking.
 
 Tue Mar 21 13:15:46 2000  Gray Watson  <gray@whopper.256.com>
 
@@ -1562,5 +1565,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.240 2000/03/30 15:39:37 gray Exp $
+$Id: ChangeLog,v 1.241 2000/03/30 17:45:15 gray Exp $
 -------------------------------------------------------------------------------

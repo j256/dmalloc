@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.131 2000/03/21 20:08:15 gray Exp $
+# $Id: Makefile.in,v 1.132 2000/03/30 17:45:07 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -31,7 +31,6 @@ LIB_TH	= libdmallocth.a
 LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
 INFOFILE= dmalloc.info
-TOC	= dmalloc_toc.html
 
 #
 # WARNING: be careful about the order of this list some files are at
@@ -39,7 +38,7 @@ TOC	= dmalloc_toc.html
 #
 FLS	=  conf.h.in configure.in config.help \
 	ChangeLog Manifest INSTALL NEWS NOTES README TODO \
-	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html $(TOC) \
+	dmallocrc dmalloc.texi $(INFOFILE) dmalloc.html \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \
 	debug_val.h env.[ch] error.[ch] error_str.h error_val.h heap.[ch] \
 	malloc.c dmalloc.c dmalloc.h.[13] dmalloc_loc.h dmalloc_lp.[ch] \
@@ -53,7 +52,7 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/dmalloc_summarize.pl contrib/next_notes contrib/ra_info.pl \
 	contrib/stratus_ftx_notes
 
-DOCS	= $(INFOFILE) dmalloc.html $(TOC) dmalloc.ps dmalloc.texi texinfo.tex
+DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi texinfo.tex
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -65,7 +64,7 @@ clean ::
 	$(CLEAN)
 	rm -f $(LIBRARY) $(LIB_TH) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f dmalloc.h
-	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html $(TOC)
+	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
 
 distclean :: clean
 	rm -f confdefs.h configure config.status config.log config.cache conf.h
@@ -87,8 +86,7 @@ install :: installlibs $(UTIL)
 installth ::
 	install -cevr -m 644 $(LIB_TH) $(DESTDIR)/lib
 
-installdocs :: dmalloc_1.html $(DOCS)
-	install -cev -m 444 dmalloc_[0-9].html $(TOC) $(WWWDIR)/docs/texi
+installdocs :: $(DOCS)
 	install -cev -m 444 $(DOCS) $(WWWDIR)/docs
 	cd $(WWWDIR)/docs ; for file in $(DOCS) ; \
 		do gzip -9fc $$file > $$file.gz.t ; \
@@ -188,12 +186,8 @@ dmalloc.ps : dmalloc.texi
 	rm -rf work
 
 dmalloc.html : $(srcdir)/dmalloc.texi
-	rm -f $(TOC) $@
-	texi2html -menu -glossary -verbose $(srcdir)/dmalloc.texi
-
-dmalloc_1.html : $(srcdir)/dmalloc.texi
-	rm -f $(TOC) dmalloc_[0-9].html
-	texi2html -menu -split -glossary -verbose $(srcdir)/dmalloc.texi
+	rm -f $@
+	makeinfo --number-sections --html --verbose $(srcdir)/dmalloc.texi
 
 dmalloc.dvi : dmalloc.texi
 	rm -rf work
