@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.86 1999/03/05 00:30:40 gray Exp $
+ * $Id: dmalloc.c,v 1.87 1999/03/08 19:07:52 gray Exp $
  */
 
 /*
@@ -59,17 +59,18 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.86 1999/03/05 00:30:40 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.87 1999/03/08 19:07:52 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.86 1999/03/05 00:30:40 gray Exp $";
+  "$Id: dmalloc.c,v 1.87 1999/03/08 19:07:52 gray Exp $";
 #endif
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
 #define SHELL_ENVIRON	"SHELL"			/* for the type of shell */
 #define DEFAULT_CONFIG	".dmallocrc"		/* default config file */
-#define TOKENIZE_CHARS	" \t,="			/* for tag lines */
+#define TOKENIZE_EQUALS	" \t="			/* for tag lines */
+#define TOKENIZE_CHARS	" \t,"			/* for tag lines */
 
 #define NO_VALUE		(-1)		/* no value ... value */
 #define INTERVAL_NO_VALUE	0		/* no value ... value */
@@ -325,7 +326,7 @@ static	long	process(const long debug_value, const char *tag_find,
 {
   static char	token[128];
   FILE		*infile = NULL;
-  char		path[1024], buf[1024];
+  char		path[1024], buf[1024], *buf_p;
   default_t	*def_p;
   const char	*home_p;
   int		found_b, cont_b;
@@ -369,30 +370,41 @@ static	long	process(const long debug_value, const char *tag_find,
       *end_p = '\0';
     }
     
-    /* get the first token on the line */
-    tok_p = strtok(buf, TOKENIZE_CHARS);
-    if (tok_p == NULL) {
-      continue;
-    }
+    buf_p = buf;
     
     /* if we're not continuing then we need to process a tag */
     if (! cont_b) {
+      
+      /* get the first token on the line */
+      tok_p = strsep(&buf_p, TOKENIZE_EQUALS);
+      if (tok_p == NULL) {
+	continue;
+      }
+      if (*tok_p == '\0') {
+	(void)fprintf(stderr, "Invalid start of line: %s\n", buf_p);
+	continue;
+      }
+      
       (void)strcpy(token, tok_p);
       new_debug = 0;
       
       if (tag_find != NULL && strcmp(tag_find, tok_p) == 0) {
 	found_b = TRUE;
       }
-      
-      tok_p = strtok(NULL, TOKENIZE_CHARS);
-      if (tok_p == NULL) {
-	continue;
-      }
     }
     
     cont_b = FALSE;
     
-    do {
+    while (1) {
+      /* get the next token */
+      tok_p = strsep(&buf_p, TOKENIZE_CHARS);
+      if (tok_p == NULL) {
+	break;
+      }
+      if (*tok_p == '\0') {
+	continue;
+      }
+      
       /* do we have a continuation character */
       if (strcmp(tok_p, "\\") == 0) {
 	cont_b = TRUE;
@@ -403,9 +415,7 @@ static	long	process(const long debug_value, const char *tag_find,
       if (found_b || tag_find == NULL) {
 	new_debug |= token_to_value(tok_p);
       }
-      
-      tok_p = strtok(NULL, TOKENIZE_CHARS);
-    } while (tok_p != NULL);
+    }
     
     if (list_tags_b && (! cont_b)) {
       if (verbose_b) {

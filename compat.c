@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: compat.c,v 1.44 1999/03/08 15:51:28 gray Exp $
+ * $Id: compat.c,v 1.45 1999/03/08 19:07:49 gray Exp $
  */
 
 /*
@@ -40,10 +40,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: compat.c,v 1.44 1999/03/08 15:51:28 gray Exp $";
+#ident "$Id: compat.c,v 1.45 1999/03/08 19:07:49 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: compat.c,v 1.44 1999/03/08 15:51:28 gray Exp $";
+  "$Id: compat.c,v 1.45 1999/03/08 19:07:49 gray Exp $";
 #endif
 #endif
 
@@ -305,59 +305,79 @@ char	*strncpy(char *str1, const char *str2, const int len)
 }
 #endif /* HAVE_STRNCPY == 0 */
 
-#if HAVE_STRTOK == 0
+#if HAVE_STRSEP == 0
 /*
- * Get the next token from STR (pass in NULL on the 2nd, 3rd,
- * etc. calls), tokens are a list of characters deliminated by a
- * character from DELIM.  writes null into STR to end token.
+ * char *strsep
+ *
+ * DESCRIPTION:
+ *
+ * This is a function which should be in libc in every Unix.  Grumble.
+ * It basically replaces the strtok function because it is reentrant.
+ * This tokenizes a string by returning the next token in a string and
+ * punching a \0 on the first delimiter character past the token.  The
+ * difference from strtok is that you pass in the address of a string
+ * pointer which will be shifted allong the buffer being processed.
+ * With strtok you passed in a 0L for subsequant calls.  Yeach.
+ *
+ * This will count the true number of delimiter characters in the string
+ * and will return an empty token (one with \0 in the zeroth position)
+ * if there are two delimiter characters in a row.
+ *
+ * Consider the following example:
+ *
+ * char *tok, *str_p = "1,2,3, hello there ";
+ *
+ * while (1) { tok = strsep(&str_p, " ,"); if (tok == 0L) { break; } }
+ *
+ * strsep will return as tokens: "1", "2", "3", "", "hello", "there", "".
+ * Notice the two empty "" tokens where there were two delimiter
+ * characters in a row ", " and at the end of the string where there
+ * was an extra delimiter character.  If you want to ignore these
+ * tokens then add a test to see if the first character of the token
+ * is \0.
+ *
+ * RETURNS:
+ *
+ * Success - Pointer to the next delimited token in the string.
+ *
+ * Failure - 0L if there are no more tokens.
+ *
+ * ARGUMENTS:
+ *
+ * string_p - Pointer to a string pointer which will be searched for
+ * delimiters.  \0's will be added to this buffer.
+ *
+ * delim - List of delimiter characters which separate our tokens.  It
+ * does not have to remain constant through all calls across the same
+ * string.
  */
-char	*strtok(char *str, char *delim)
+char	*strsep(char **string_p, const char *delim)
 {
-  static char	*last_str = "";
-  char		*start, *delim_p;
+  char		*str_p, *tok;
+  const char	*delim_p;
   
-  /* no new strings to search? */
-  if (str != NULL) {
-    last_str = str;
-  }
-  else {
-    /* have we reached end of old one? */
-    if (*last_str == '\0') {
-      return NULL;
-    }
+  /* no tokens left? */
+  str_p = *string_p;
+  if (str_p == 0L) {
+    return 0L;
   }
   
-  /* parse through starting token deliminators */
-  for (; *last_str != '\0'; last_str++) {
-    for (delim_p = delim; *delim_p != '\0'; delim_p++) {
-      if (*last_str == *delim_p) {
-	break;
-      }
-    }
+  /* now find end of token */
+  tok = str_p;
+  for (; *str_p != '\0'; str_p++) {
     
-    /* is the character NOT in the delim list? */
-    if (*delim_p == '\0') {
-      break;
-    }
-  }
-  
-  /* did we reach the end? */
-  if (*last_str == '\0') {
-    return NULL;
-  }
-  
-  /* now start parsing through the string, could be '\0' already */
-  for (start = last_str; *last_str != '\0'; last_str++) {
     for (delim_p = delim; *delim_p != '\0'; delim_p++) {
-      if (*last_str == *delim_p) {
-	/* punch NULL and point last_str past it */
-	*last_str++ = '\0';
-	return start;
+      if (*delim_p == *str_p) {
+	/* punch the '\0' */
+	*str_p = '\0';
+	*string_p = str_p + 1;
+	return tok;
       }
     }
   }
   
-  /* reached the end of the string */
-  return start;
+  /* there are no more delimiter characters */
+  *string_p = 0L;
+  return tok;
 }
-#endif /* HAVE_STRTOK == 0 */
+#endif /* HAVE_STRSEP == 0 */

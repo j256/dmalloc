@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: conf.h.in,v 1.73 1999/03/07 23:04:48 gray Exp $
+ * $Id: conf.h.in,v 1.74 1999/03/08 19:07:51 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -179,7 +179,7 @@
 #define HAVE_STRLEN 0
 #define HAVE_STRCMP 0
 #define HAVE_STRCPY 0
-#define HAVE_STRTOK 0
+#define HAVE_STRSEP 0
 
 /* for argv files */
 #define HAVE_STRNCMP 0
