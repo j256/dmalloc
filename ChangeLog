@@ -1,3 +1,7 @@
+2004-02-18  Gray Watson  <gray@outside.256.com>
+
+	* Fixed info install with feedback from Matt Fuller.  Thanks.
+
 2004-01-31  Gray Watson  <gray@outside.256.com>
 
 	* Added compat and arg_checking of atoi, atol, and memmove.
@@ -2158,5 +2162,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.317 2004/01/31 16:26:30 gray Exp $
+$Id: ChangeLog,v 1.318 2004/02/18 14:58:57 gray Exp $
 -------------------------------------------------------------------------------
