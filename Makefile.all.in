@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the Malloc library.
-# $Id: Makefile.all.in,v 1.23 1993/08/27 00:55:08 gray Exp $
+# $Id: Makefile.all.in,v 1.24 1993/08/27 03:03:46 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -81,17 +81,6 @@ installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 install : installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 
-config.status :
-	sh ./configure
-
-const.h : const.h.in config.status
-	rm -f $@
-	sh ./config.status
-
-conf.h : conf.h.in config.status
-	rm -f $@
-	sh ./config.status
-
 malloc_dbg.h : malloc_dbg.1 const.h malloc_dbg.2
 	rm -f $@ $@.t
 	cat malloc_dbg.1 const.h malloc_dbg.2 > $@.t
@@ -107,7 +96,7 @@ $(UTIL) : malloc_dbg.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
 
-$(ARGV)/lib$(ARGV).a :
+$(ARGV)/libargv.a $(ARGV)/argv.h :
 	( cd $(ARGV) ; $(MAKE) )
 
 # .PHONY : tests
