@@ -1,3 +1,7 @@
+2004-09-13  Gray Watson  <gray@outside.256.com>
+
+	* Made allocating zero size chunks the default.
+
 2004-08-13  Gray Watson  <gray@outside.256.com>
 
 	* Fixed some missing ; and a int/unsigned-int bug from feedback
@@ -2216,5 +2220,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.323 2004/08/13 21:26:51 gray Exp $
+$Id: ChangeLog,v 1.324 2004/09/27 20:18:16 gray Exp $
 -------------------------------------------------------------------------------

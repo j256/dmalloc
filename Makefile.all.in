@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.125 2004/07/10 03:49:51 gray Exp $
+# $Id: Makefile.all.in,v 1.126 2004/09/27 20:18:16 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -223,7 +223,7 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installinfo : $(srcdir)/$(INFOFILE)
+installinfo : $(srcdir)/docs/$(INFOFILE)
 	$(srcdir)/mkinstalldirs $(infodir)
 	$(INSTALL_DATA) $(srcdir)/docs/$(INFOFILE) $(infodir)
 
