@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.99 2000/11/13 15:47:17 gray Exp $
+ * $Id: dmalloc.c,v 1.100 2001/07/11 18:48:27 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: dmalloc.c,v 1.99 2000/11/13 15:47:17 gray Exp $"
+#ident "$Id: dmalloc.c,v 1.100 2001/07/11 18:48:27 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.99 2000/11/13 15:47:17 gray Exp $";
+  "$Id: dmalloc.c,v 1.100 2001/07/11 18:48:27 gray Exp $";
 #endif
 #endif
 
@@ -106,7 +106,7 @@ typedef struct {
 			 DEBUG_LOG_TRANS | DEBUG_LOG_ADMIN | \
 			 DEBUG_LOG_BLOCKS | \
 			 DEBUG_HEAP_CHECK_MAP | DEBUG_NEVER_REUSE)
-/* NOTE: print-error is not in this list because it is special */
+/* NOTE: print-messages is not in this list because it is special */
 
 static	default_t	defaults[] = {
   { "none",		0 },

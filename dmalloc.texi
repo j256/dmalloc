@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.205 2001/05/21 22:44:35 gray Exp $
+@c $Id: dmalloc.texi,v 1.206 2001/07/11 18:48:27 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1354,9 +1354,9 @@ track down problems with your program.
 You should first enable a logfile filename (I use @file{dmalloc}) and
 turn on a set of debug features.  You can use @kbd{dmalloc -l dmalloc
 low} to accomplish this.  If you are interested in having the error
-messages printed to your terminal as well, enable the @samp{print-error}
-token by typing @kbd{dmalloc -p print-error} afterwards.  @xref{Dmalloc
-Program}.
+messages printed to your terminal as well, enable the
+@samp{print-messages} token by typing @kbd{dmalloc -p print-messages}
+afterwards.  @xref{Dmalloc Program}.
 
 @cindex gdb
 @cindex dmalloc_error() routine
