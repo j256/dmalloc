@@ -1,3 +1,7 @@
+2003-07-08  Gray Watson  <gray@outside.256.com>
+
+	* Releasing version 5.2.1.
+
 2003-06-20  Gray Watson  <gray@outside.256.com>
 
 	* Fixed problems with macro arguments not in () thanks to Paul
@@ -2009,5 +2013,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.300 2003/07/08 18:01:34 gray Exp $
+$Id: ChangeLog,v 1.301 2003/07/08 18:09:50 gray Exp $
 -------------------------------------------------------------------------------

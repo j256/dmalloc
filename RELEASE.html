@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.2.0 </title>
+<title> Dmalloc Release Notes - 5.2.1 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.2.0 <br />
+Version: Release 5.2.1 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
 Last-Version: <a href="dmalloc-5.1.0.html">5.1.0</a> <br />
-Date: June 10, 2003
+Date: July 8, 2003
 </h4>
 
 <p>
@@ -24,69 +24,39 @@ Date: June 10, 2003
 <a href="#bugs">Bugs Fixed</a>
 </p>
 
+<!--========================================================================-->
+
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Quick feature release to fold in a couple of changes in the last
-couple of days.  Added the ability to put %p, %t, and other % strings
-in the logfile path and have then be expanded to <tt>getpid()</tt> and
-<tt>time()</tt> output respectively.  More documentation online. </p>
+<p> Bug fix release which resolves some issues with the strdup
+function that have been around a while.  Also fixed a problem where
+the macro arguments in dmalloc.h were not enclosed in (). </p>
+
+<!--========================================================================-->
 
 <h3><a name="func"> New Functionality </a></h3>
 
-<ul>
+<blockquote>
+None.
+</blockquote>
 
-<li> <p> Added new expansion of the -l --logfile environment setting.
-%h expands to the output of gethostname(), %p to getpid(), %t to
-time(), %u to getuid(), and %i to the thread-id, if configured.  So
-you can, for example, use <tt> dmalloc -l log.%u.%t </tt> and get
-logfiles in the form of: <tt> log.1001.1055273186 </tt> where 1001 is
-your user-id (under Unix) and 1055273186 is the time in seconds. </p>
-
-<p> NOTE: You must install the 5.2.0 version of the dmalloc utility
-for this to work. </p>
-</li>
-
-<li> Added LOG_PID to the settings.dist config file.  Set to 1 to have
-dmalloc log the PID on each line of the logfile. </li>
-
-<li><p> Added LOG_REOPEN to the settings.dist config file.  If set to
-1 (the default) it will reopen the logfile if the process-id changes.
-This will happen when the process forks.  The log will only be
-reopened if the %p string is in the logpath otherwise the reopened
-logfile might overwrite the initial one. </p>
-
-<p> NOTE: I removed the old logfile % processing.  %d no long expands
-to the process id. </p>
-</li>
-
-<li> Improved the dmalloc_log_stats, dmalloc_log_unfreed, and
-dmalloc_log_changed output. </li>
-
-</ul>
+<!--========================================================================-->
 
 <h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
-<ul>
+<blockquote>
+None.
+</blockquote>
 
-<li> The -l --logfile argument now takes special % strings.  See above. </li>
-
-</ul>
+<!--========================================================================-->
 
 <h3><a name="settings.dist"> Changes to the settings.dist File </a></h3>
 
-<ul>
+<blockquote>
+None.
+</blockquote>
 
-<li> Added LOG_PID setting.  See above. </li>
-<li> Added LOG_REOPEN setting.  See above. </li>
-
-<li> Renamed LOG_ITERATION_COUNT to LOG_ITERATION. </li>
-<li> Renamed STORE_SEEN_COUNT to LOG_PNT_SEEN_COUNT. </li>
-<li> Renamed STORE_ITERATION_COUNT to LOG_PNT_ITERATION. </li>
-<li> Renamed STORE_TIME to LOG_PNT_TIME. </li>
-<li> Renamed STORE_TIMEVAL to LOG_PNT_TIMEVAL. </li>
-<li> Renamed LOG_THREAD_ID to LOG_PNT_THREAD_ID. </li>
-
-</ul>
+<!--========================================================================-->
 
 <h3><a name="install"> Installation Changes </a></h3>
 
@@ -94,28 +64,36 @@ dmalloc_log_changed output. </li>
 None.
 </blockquote>
 
+<!--========================================================================-->
+
 <h3><a name="programming"> Programming Notes </a></h3>
 
 <blockquote>
 None.
 </blockquote>
 
+<!--========================================================================-->
+
 <h3><a name="env"> Environmental Variable Changes </a></h3>
 
-<ul>
+<blockquote>
+None.
+</blockquote>
 
-<li> The log=... setting now takes special % strings.  See
-above. </li>
-
-</ul>
+<!--========================================================================-->
 
 <h3><a name="bugs"> Bugs Fixed </a></h3>
 
 <ul>
 
-<li> Fixed a problem with the global Makefile and dmalloc_t where some
-architectures would pick up the old shared libraries while building
-the new test program. </li>
+<li> Fixed problems with arguments to the various allocation macros in
+dmalloc.h were not surrounded by parens ().  This meant that the
+calloc macro could produce bad arithmetic because of operator
+ordering.  Rookie mistake. </li>
+
+<li> Fixed problem with the strdup function being defined as void *
+instead of char *.  Also, there was a char ** and void ** bug in the
+function which caused some crashes on some architectures. </li>
 
 </ul>
 
