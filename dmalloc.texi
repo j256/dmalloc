@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.61 1994/10/04 17:42:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.62 1994/10/12 17:07:31 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1157,6 +1157,10 @@ Set the @samp{debug} part of the @samp{DMALLOC_OPTIONS} env variable to
 the bitmask value which should be in hex.  This is overridden (and
 unnecessary) if a tag is specified.
 
+@item -D
+List all of the debug-tokens.  Useful for getting a token to use with -p
+or -m.
+
 @item -e errno
 Print the dmalloc error string that corresponds to errno.
 
@@ -1176,7 +1180,8 @@ Set the @samp{log} part of the @samp{DMALLOC_OPTIONS} env variable to
 filename.
 
 @item -L
-List all of the tags in the rc-file.  Useful with -v.
+Output the debug-value not in hex but by individual debug-tokens in long
+form.
 
 @item -m token(s)
 Remove (minus) the debug capabilities of token(s) from the current debug
@@ -1202,9 +1207,12 @@ by default in my dmalloc alias.
 Set the @samp{start} part of the @samp{DMALLOC_OPTIONS} env variable to
 number (alternatively @samp{file:line}).
 
-@item -T
-List all of the debug-tokens.  Useful for getting a token to use with -p
-or -m.
+@item -S
+Output the debug-value not in hex but by individual debug-tokens in short
+form.
+
+@item -t
+List all of the tags in the rc-file.  Useful with -v.
 
 @item -v
 Give verbose output.  Especially useful when dumping current settings or
@@ -1261,10 +1269,10 @@ dmalloc 1 -p log-trans -l dmalloc
 dmalloc -V
 
 # list the available debug malloc tokens with Very-verbose output
-dmalloc -TV
+dmalloc -DV
 
 # list the available tags from the rc file with verbose output
-dmalloc -Lv
+dmalloc -tv
 @end example
 
 @node RC File, Debugging with the Library, Dmalloc Program, Running

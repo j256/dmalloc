@@ -35,7 +35,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.2 1994/09/26 16:01:17 gray Exp $";
+  "$Id: env.c,v 1.3 1994/10/12 17:07:12 gray Exp $";
 #endif
 
 /* local variables */
@@ -116,7 +116,8 @@ EXPORT	void	_dmalloc_start_break(const char * start_all,
 }
 
 /*
- * process the values of dmalloc environ variable(s)
+ * process the values of dmalloc environ variable(s) from ENVIRON
+ * string.
  */
 EXPORT	void	_dmalloc_environ_get(const char * environ,
 				     unsigned long * addrp,
@@ -253,14 +254,21 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
   }
   
   /* append the token settings to the debug setting */
-  if (debugp != NULL)
-    *debugp |= flags;
+  if (debugp != NULL) {
+    if (*debugp == DEBUG_INIT)
+      *debugp = flags;
+    else
+      *debugp |= flags;
+  }
 }
 
 /*
- * set dmalloc environ variable(s) with the values
+ * set dmalloc environ variable(s) with the values (maybe SHORT debug
+ * info) into BUF
  */
-EXPORT	void	_dmalloc_environ_set(char * buf, const unsigned long address,
+EXPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
+				     const char short_tokens,
+				     const unsigned long address,
 				     const int addr_count, const long debug,
 				     const int interval,
 				     const char * logpath,
@@ -271,8 +279,22 @@ EXPORT	void	_dmalloc_environ_set(char * buf, const unsigned long address,
   char	*bufp = buf;
   
   if (debug != DEBUG_INIT) {
-    (void)sprintf(bufp, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
-    for (; *bufp != NULLC; bufp++);
+    if (short_tokens || long_tokens) {
+      attr_t	*attrp;
+      
+      for (attrp = attributes; attrp->at_string != NULL; attrp++)
+	if (debug & attrp->at_value) {
+	  if (short_tokens)
+	    (void)sprintf(bufp, "%s,", attrp->at_short);
+	  else
+	    (void)sprintf(bufp, "%s,", attrp->at_string);
+	  for (; *bufp != NULLC; bufp++);
+	}
+    }
+    else {
+      (void)sprintf(bufp, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
+      for (; *bufp != NULLC; bufp++);
+    }
   }
   if (address != ADDRESS_INIT) {
     if (addr_count != ADDRESS_COUNT_INIT)

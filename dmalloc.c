@@ -47,7 +47,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.44 1994/09/26 16:00:15 gray Exp $";
+  "$Id: dmalloc.c,v 1.45 1994/10/12 17:07:16 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -69,29 +69,38 @@ LOCAL	char	*inpath		= NULL;		/* for config-file path */
 LOCAL	int	interval	= NO_VALUE;	/* for setting INTERVAL */
 LOCAL	char	keep		= FALSE;	/* keep settings override -r */
 LOCAL	char	list_tags	= FALSE;	/* list rc tags */
-LOCAL	char	list_tokens	= FALSE;	/* list debug tokens */
+LOCAL	char	debug_tokens	= FALSE;	/* list debug tokens */
 LOCAL	char	*logpath	= NULL;		/* for LOGFILE setting */
+LOCAL	char	long_tokens	= FALSE;	/* long-tok output */
 LOCAL	argv_array_t	minus;			/* tokens to remove */
 LOCAL	char	no_changes	= FALSE;	/* make no changes to env */
 LOCAL	argv_array_t	plus;			/* tokens to add */
 LOCAL	char	remove_auto	= FALSE;	/* auto-remove settings */
+LOCAL	char	short_tokens	= FALSE;	/* short-tok output */
 LOCAL	char	*start		= NULL;		/* for START settings */
 LOCAL	char	verbose		= FALSE;	/* verbose flag */
 LOCAL	char	very_verbose	= FALSE;	/* very-verbose flag */
 LOCAL	char	*tag		= NULL;		/* maybe a tag argument */
 
 LOCAL	argv_t	args[] = {
-  { 'a',	"address",	ARGV_CHARP,	&address,
-      "address:#",		"stop when malloc sees address" },
   { 'b',	"bourne",	ARGV_BOOL,	&bourne,
       NULL,			"set output for bourne shells" },
   { ARGV_OR },
   { 'C',	"c-shell",	ARGV_BOOL,	&cshell,
       NULL,			"set output for C-type shells" },
+  { 'L',	"long-tokens",	ARGV_BOOL,	&long_tokens,
+      NULL,			"output long-tokens not 0x..." },
+  { ARGV_OR },
+  { 'S',	"short-tokens",	ARGV_BOOL,	&short_tokens,
+      NULL,			"output short-tokens not 0x..." },
+  { 'a',	"address",	ARGV_CHARP,	&address,
+      "address:#",		"stop when malloc sees address" },
   { 'c',	"clear",	ARGV_BOOL,	&clear,
       NULL,			"clear all variables not set" },
   { 'd',	"debug-mask",	ARGV_HEX,	&debug,
       "value",			"hex flag to set debug mask" },
+  { 'D',	"debug-tokens",	ARGV_BOOL,	&debug_tokens,
+      NULL,			"list debug tokens" },
   { 'e',	"errno",	ARGV_INT,	&errno_to_print,
       "errno",			"print error string for errno" },
   { 'f',	"file",		ARGV_CHARP,	&inpath,
@@ -102,8 +111,6 @@ LOCAL	argv_t	args[] = {
       NULL,			"keep settings (override -r)" },
   { 'l',	"logfile",	ARGV_CHARP,	&logpath,
       "path",			"file to log messages to" },
-  { 'L',	"list-tags",	ARGV_BOOL,	&list_tags,
-      NULL,			"list tags in rc file" },
   { 'm',	"minus",	ARGV_CHARP | ARGV_ARRAY,	&minus,
       "token(s)",		"del tokens from current debug" },
   { 'n',	"no-changes",	ARGV_BOOL,	&no_changes,
@@ -114,8 +121,8 @@ LOCAL	argv_t	args[] = {
       NULL,			"remove other settings if tag" },
   { 's',	"start",	ARGV_CHARP,	&start,
       "file:line",		"start check heap after this" },
-  { 'T',	"list-tokens",	ARGV_BOOL,	&list_tokens,
-      NULL,			"list debug tokens" },
+  { 't',	"list-tags",	ARGV_BOOL,	&list_tags,
+      NULL,			"list tags in rc file" },
   { 'v',	"verbose",	ARGV_BOOL,	&verbose,
       NULL,			"turn on verbose output" },
   { 'V',	"very-verbose",	ARGV_BOOL,	&very_verbose,
@@ -552,7 +559,7 @@ EXPORT	int	main(int argc, char ** argv)
     process(0L, NULL, NULL);
   }
   
-  if (list_tokens) {
+  if (debug_tokens) {
     attr_t	*attrp;
     (void)fprintf(stderr, "Debug Tokens:\n");
     for (attrp = attributes; attrp->at_string != NULL; attrp++)
@@ -568,11 +575,11 @@ EXPORT	int	main(int argc, char ** argv)
   }
   
   if (set) {
-    _dmalloc_environ_set(buf, addr, addr_count, flags, inter, lpath, sfile,
-			 sline, scount);
+    _dmalloc_environ_set(buf, long_tokens, short_tokens, addr, addr_count,
+			 flags, inter, lpath, sfile, sline, scount);
     set_variable(OPTIONS_ENVIRON, buf);
   }
-  else if (errno_to_print == NO_VALUE && ! list_tags && ! list_tokens)
+  else if (errno_to_print == NO_VALUE && ! list_tags && ! debug_tokens)
     dump_current();
   
   argv_cleanup(args);

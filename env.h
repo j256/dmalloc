@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: env.h,v 1.1 1994/09/20 17:59:44 gray Exp $
+ * $Id: env.h,v 1.2 1994/10/12 17:07:14 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -76,7 +76,9 @@ IMPORT	void	_dmalloc_environ_get(const char * environ,
 /*
  * set dmalloc environ variable(s) with the values
  */
-IMPORT	void	_dmalloc_environ_set(char * buf, const unsigned long address,
+IMPORT	void	_dmalloc_environ_set(char * buf, const char long_tokens,
+				     const char short_tokens,
+				     const unsigned long address,
 				     const int addr_count, const long debug,
 				     const int interval,
 				     const char * logpath,
