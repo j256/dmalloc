@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.129 1998/11/12 23:56:50 gray Exp $
+ * $Id: chunk.c,v 1.130 1998/11/16 16:51:34 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.129 1998/11/12 23:56:50 gray Exp $";
+#ident "$Id: chunk.c,v 1.130 1998/11/16 16:51:34 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.129 1998/11/12 23:56:50 gray Exp $";
+  "$Id: chunk.c,v 1.130 1998/11/16 16:51:34 gray Exp $";
 #endif
 #endif
 
@@ -538,7 +538,7 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
       bblock_p->bb_line = (unsigned short)num;
       bblock_p->bb_size = (unsigned int)info;
       bblock_p->bb_file = (char *)pnt;
-#if FREED_POINTER_REUSE
+#if FREED_POINTER_DELAY
       bblock_p->bb_reuse_iter = 0;
 #endif
       break;
@@ -553,7 +553,7 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
       else {
 	bblock_p->bb_next = (struct bblock_st *)NULL;
       }
-#if FREED_POINTER_REUSE
+#if FREED_POINTER_DELAY
       bblock_p->bb_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
 #endif
       break;
