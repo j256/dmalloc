@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: Manifest,v 1.32 1997/07/07 07:13:53 gray Exp $
+$Id: Manifest,v 1.33 1998/10/05 02:47:43 gray Exp $
 -------------------------------------------------------------------------------
 Description of the files in the debug-malloc package.
 
@@ -9,9 +9,6 @@ Deansify.pl		Perl script to attempt to convert the code to
 			non-ansi format. (yeaauuck!)
 
 INSTALL			Installation guide.
-
-PERMISSIONS		File detailing commercial and non-commercial
-			copying and distrbution permissions.
 
 Makefile.in		Used by configure to create the Makefile.
 
@@ -23,15 +20,14 @@ NEWS			File with a condensed view of the module's
 NOTES			General Notes of the debug-malloc routines and
 			associated algorithms.
 
+PERMISSIONS		File detailing commercial and non-commercial
+			copying and distrbution permissions.
+
 README			Quick startup notes.
 
 TODO			Things to do list.  It gets longer and longer.
 
 arg_check.[ch]		Malloc routines used for testing of arguments.
-
-argv.[ch]		Argument processing library files.
-
-argv_loc.h		Local defines for the argv files.
 
 chunk.[ch]		Lower level allocation routines.  This is the
 			meat of the allocation algorithms.  Manages
@@ -81,6 +77,10 @@ dmalloc.ps		Postscript file for TeX-less folks.
 dmalloc.texi		Texinfo user manual for generating Info or dvi
 			formats.
 
+dmalloc_argv.[ch]	Argument processing library files.
+
+dmalloc_argv_loc.h	Local defines for the argv files.
+
 dmalloc_loc.h		Local defines for all of the dmalloc routines.
 
 dmalloc_lp.[ch]		Leap-frog routines to provide file/line info
@@ -104,19 +104,19 @@ error_val.h		General error codes for the dmalloc module.
 heap.[ch]		Possibly machine specific routines for
 			allocating space on and manipulating the heap.
 
-instal-sh		A shell script for systems without a sane install.
+install-sh		Shell script for systems without a sane install.
 
 malloc.c		Higher level alloc routines including malloc,
 			free, realloc, etc.  These are the routines to
 			be called from user space.
 
-mkinstalldirs		A script that makes the directories to install into.
+mkinstalldirs		Script that makes the directories to install into.
 
 return.h		Defines to get the return-address for non-malloc calls.
 
 settings.h		File included by conf.h which contains manual defines.
 
-texinfo.tex		File included to allow tex output from the
+texinfo.tex		File included to allow TeX output from the
 			malloc.texi file.
 
 version.h		Version number for the library.
