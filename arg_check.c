@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.25 2000/04/18 01:56:44 gray Exp $
+ * $Id: arg_check.c,v 1.26 2000/05/02 00:34:30 gray Exp $
  */
 
 /*
@@ -44,10 +44,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: arg_check.c,v 1.25 2000/04/18 01:56:44 gray Exp $";
+#ident "$Id: arg_check.c,v 1.26 2000/05/02 00:34:30 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: arg_check.c,v 1.25 2000/04/18 01:56:44 gray Exp $";
+  "$Id: arg_check.c,v 1.26 2000/05/02 00:34:30 gray Exp $";
 #endif
 #endif
 
@@ -271,7 +271,7 @@ void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking strchr's arguments.
  */
-char	*_dmalloc_strchr(const char *str, const char ch)
+char	*_dmalloc_strchr(const char *str, const int ch)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strchr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,
@@ -286,7 +286,7 @@ char	*_dmalloc_strchr(const char *str, const char ch)
 /*
  * Dummy function for checking strrchr's arguments.
  */
-char	*_dmalloc_strrchr(const char *str, const char ch)
+char	*_dmalloc_strrchr(const char *str, const int ch)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (_chunk_pnt_check("strrchr", str, CHUNK_PNT_LOOSE | CHUNK_PNT_NULL,

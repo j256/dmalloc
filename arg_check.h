@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.h,v 1.20 2000/04/18 01:56:44 gray Exp $
+ * $Id: arg_check.h,v 1.21 2000/05/02 00:34:31 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -147,7 +147,7 @@ void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len);
  * Dummy function for checking strchr's arguments.
  */
 extern
-char	*_dmalloc_strchr(const char *str, const char ch);
+char	*_dmalloc_strchr(const char *str, const int ch);
 #endif /* if HAVE_STRCHR */
 
 #if HAVE_STRRCHR
@@ -155,7 +155,7 @@ char	*_dmalloc_strchr(const char *str, const char ch);
  * Dummy function for checking strrchr's arguments.
  */
 extern
-char	*_dmalloc_strrchr(const char *str, const char ch);
+char	*_dmalloc_strrchr(const char *str, const int ch);
 #endif /* if HAVE_STRRCHR */
 
 #if HAVE_STRCPY
