@@ -1,3 +1,10 @@
+Mon Oct 18 12:09:30 1999  Gray Watson  <gray@burger.256.com>
+
+	* Releasing dmalloc version 4.3.0.
+
+	* Added info about log-unknown to the Getting Started section and
+ 	more info about ident.
+
 Fri Oct 15 18:13:39 1999  Gray Watson  <gray@burger.256.com>
 
 	* Added power pc return.h macros from Shawn.
@@ -1493,5 +1500,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.226 1999/10/15 22:13:51 gray Exp $
+$Id: ChangeLog,v 1.227 1999/10/18 16:12:17 gray Exp $
 -------------------------------------------------------------------------------
