@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.72 1997/12/08 04:23:34 gray Exp $";
+  "$Id: dmalloc.c,v 1.73 1997/12/08 07:22:39 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -668,6 +668,9 @@ int	main(int argc, char **argv)
     }
   }
   
+  /*
+   * NOTE: this should be ahead of lock_on setting which tests this.
+   */
   if (debug != NO_VALUE) {
     /* special case, undefine if 0 */
     if (debug == 0) {
@@ -709,6 +712,9 @@ int	main(int argc, char **argv)
     inter = INTERVAL_INIT;
   }
   
+  /*
+   * NOTE: this should be after the debug setting which this tests.
+   */
   if (thread_lock_on != NO_VALUE) {
 #if LOCK_THREADS
     /* NOTE: special case, == 0 causes it to be undef'ed */
@@ -719,6 +725,10 @@ int	main(int argc, char **argv)
       lock_on = thread_lock_on;
     }
     set_b = TRUE;
+    if (! (flags & DEBUG_ALLOW_NONLINEAR)) {
+      (void)fprintf(stderr,
+		    "WARNING: the allow-nonlinear flag is not enabled\n");
+    }
 #else
     (void)fprintf(stderr, "WARNING: LOCK_THREADS not-configured\n");
     lock_on = LOCK_ON_INIT;
