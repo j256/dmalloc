@@ -36,13 +36,15 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.36 1994/04/07 21:13:11 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.37 1994/05/11 19:28:15 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
 #define MAX_POINTERS		1024
 #define MAX_ALLOC		(1024 * 1024)
+
+#define RANDOM_VALUE(x)		((rand() % ((x) * 10)) / 10)
 
 /* pointer tracking structure */
 struct pnt_info_st {
@@ -61,6 +63,7 @@ static	int		default_itern = DEFAULT_ITERATIONS; /* # of iters */
 static	char		interactive = ARGV_FALSE;	/* interactive flag */
 static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
 static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
+static	char		random_debug = ARGV_FALSE;	/* random flag */
 static	char		silent = ARGV_FALSE;		/* silent flag */
 static	char		verbose = ARGV_FALSE;		/* verbose flag */
 
@@ -71,6 +74,8 @@ static	argv_t		arg_list[] = {
       "bytes",			"maximum allocation to test" },
   { 'p',	"max-pointers",		ARGV_INT,		&max_pointers,
       "pointers",		"number of pointers to test" },
+  { 'r',	"random-debug",		ARGV_BOOL,		&random_debug,
+      NULL,			"randomly change debug flag" },
   { 's',	"silent",		ARGV_BOOL,		&silent,
       NULL,			"do not display messages" },
   { 't',	"times",		ARGV_INT,		&default_itern,
@@ -131,11 +136,12 @@ static	void	*get_address(void)
  */
 static	int	do_random(const int itern)
 {
-  int		iterc, last, amount, max = max_alloc;
+  int		iterc, last, amount, max = max_alloc, flags;
   pnt_info_t	*freep, *usedp = NULL;
   pnt_info_t	*pntp, *lastp, *thisp;
   
   malloc_errno = last = 0;
+  flags = malloc_debug_current();
   
   pointer_grid = ALLOC(pnt_info_t, max_pointers);
   if (pointer_grid == NULL) {
@@ -163,7 +169,15 @@ static	int	do_random(const int itern)
       last = malloc_errno;
     }
     
-    which = (rand() % 20) / 10;
+    if (random_debug) {
+      which = RANDOM_VALUE(sizeof(int) * 8);
+      flags ^= 1 << which;
+      if (verbose)
+	(void)printf("%d: debug flags = %#x\n", iterc + 1, flags);
+      malloc_debug(flags);
+    }
+    
+    which = RANDOM_VALUE(2);
     
     /*
      * < 10 means alloc as long as we have enough memory and there are
@@ -171,7 +185,7 @@ static	int	do_random(const int itern)
      */
     if (which == 0 && max > 10 && freep != NULL) {
       for (;;) {
-	amount = rand() % (max / 2);
+	amount = RANDOM_VALUE(max / 2);
 	if (amount > 0)
 	  break;
 #if ALLOW_ALLOC_ZERO_SIZE
@@ -180,7 +194,7 @@ static	int	do_random(const int itern)
 #endif
       }
       
-      which = (rand() % 30) / 10;
+      which = RANDOM_VALUE(3);
       if (which == 0) {
 	pntp = freep;
 	pntp->pi_pnt = CALLOC(char, amount);
@@ -200,7 +214,7 @@ static	int	do_random(const int itern)
 		       (long)pntp->pi_pnt);
       }
       else {
-	pntp = pointer_grid + (rand() % max_pointers);
+	pntp = pointer_grid + RANDOM_VALUE(max_pointers);
 	if (pntp->pi_pnt == NULL)
 	  continue;
 	
@@ -238,7 +252,7 @@ static	int	do_random(const int itern)
     /*
      * choose a rand slot to free and make sure it is not a free-slot
      */
-    pntp = pointer_grid + (rand() % max_pointers);
+    pntp = pointer_grid + RANDOM_VALUE(max_pointers);
     if (pntp->pi_pnt == NULL)
       continue;
     
