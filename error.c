@@ -55,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.57 1995/05/16 01:59:37 gray Exp $";
+  "$Id: error.c,v 1.58 1995/05/16 02:17:20 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(60 * SECS_IN_MIN)
@@ -255,10 +255,7 @@ EXPORT	void	_dmalloc_die(const char silent)
   
   /* do I need to drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)
-#if DUMP_CONTINUE
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)
-#endif
-      ) {
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
 #if USE_ABORT
     abort();
 #else
@@ -297,7 +294,8 @@ EXPORT	void	dmalloc_error(const char * func)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT))
     _dmalloc_die(FALSE);
   
-#if DUMP_CONTINUE
+#if HAVE_FORK
+  /* how about just drop core? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
     int		pid = fork();
     if (pid == 0)

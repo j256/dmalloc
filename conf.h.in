@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.45 1995/05/16 01:59:07 gray Exp $
+ * $Id: conf.h.in,v 1.46 1995/05/16 02:17:14 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -126,19 +126,6 @@
 #define USE_ABORT		0
 #define KILL_PROCESS		(void)kill(0,SIGABRT)
 #define SIGNAL_INCLUDE		<signal.h>
-
-/*
- * try to fork the process when there is an error, and have the child
- * dump-core.  This allows the parent process to continue running.  Of
- * course multiple dumps will overwrite each other so you may get only
- * the last of the dumps.  This allows the runtime token 'error-dump'
- * to be used which enables this behavior during execution.
- *
- * NOTE: I may have encountered some problems on an archetecture with
- * fork causing the library to go recursive.  It is for this reason
- * that this feature is not enabled here as a default.
- */
-#define DUMP_CONTINUE		0
 
 /*
  * number of bytes to write at the top of allocations (if fence-post
@@ -301,6 +288,7 @@
 #define HAVE_STRTOK 0
 
 /* place fillers */
+#define HAVE_FORK 0
 #define HAVE_GETPID 0
 #define HAVE_TIME 0
 

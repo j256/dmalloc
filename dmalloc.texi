@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.90 1995/05/16 01:58:23 gray Exp $
+@c $Id: dmalloc.texi,v 1.91 1995/05/16 02:17:18 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1444,7 +1444,15 @@ options which can be adjusted in @file{conf.h}.
 @cindex dump core
 @cindex core dump
 @item error-dump
-dump core on error and then continue
+dump core on error and then continue.  Later core dumps overwrite
+earlier ones if the program encounters more than one error.
+
+@emph{NOTE}: This will only work if your system supports the @code{fork}
+system call.
+
+@emph{WARNING}: I believe I have encountered some problems in the past
+with fork calling memory routines and thus causing the library to go
+recursive.  For this reason, this token should be used with caution.
 
 @end table
 

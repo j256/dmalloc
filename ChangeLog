@@ -6,8 +6,6 @@ Mon May 15 20:13:10 1995  Gray Watson  (gray@burger.letters.com)
 
 	* Added abort() auto-configuration for KILL_PROCESS.
 
-	* Added DUMP_CONTINUE conf.h define which enable error-dump token.
-
 	* Minor fixes.  Added an arg to dmalloc_die to be silent.
 
 Fri May 12 16:33:44 1995  Gray Watson  (gray@burger.letters.com)
@@ -978,5 +976,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.146 1995/05/16 01:59:35 gray Exp $
+$Id: ChangeLog,v 1.147 1995/05/16 02:17:11 gray Exp $
 -------------------------------------------------------------------------------
