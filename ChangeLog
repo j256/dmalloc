@@ -1,5 +1,7 @@
 Mon Sep 26 11:59:56 1994  Gray Watson  (gray@blender.antaire.com)
 
+	* Releasing version 3.0.2.
+
 	* Fixed stupid strtok error in dmallocrc file processing.
 
 Mon Sep 26 11:20:17 1994  Gray Watson  (gray at toaster.antaire.com)
@@ -832,5 +834,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.119 1994/09/26 16:13:55 gray Exp $
+$Id: ChangeLog,v 1.120 1994/09/26 17:54:38 gray Exp $
 -------------------------------------------------------------------------------

@@ -1,11 +1,13 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.38 1994/09/26 16:13:58 gray Exp $
+$Id: NEWS,v 1.39 1994/09/26 17:54:41 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.0.2:
 
+	* Fixed strtok error in dmallocrc file processing.
 	* Fixed problems with env code when sprintf doesn't returns int.
 	* Library now dumps the proper fence-bottom bytes on 1st pointer error.
+	* Fixed casting problems on OSF.  Thanks Dave.
 
 Version 3.0.1:
 
