@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your $HOME directory to
 # activate.  See malloc.info for more information.
 #
-# $Id: dmallocrc,v 1.24 1994/10/14 01:28:38 gray Exp $
+# $Id: dmallocrc,v 1.25 1994/10/14 02:00:51 gray Exp $
 #
 
 #
@@ -41,7 +41,7 @@
 # check-fence			check fence-post areas
 # check-heap			do general heap checking
 # check-lists			verify internal heap linked-lists
-# check-free			check to see if free space has been overwritten
+# check-blank			check to see if blank space is overwritten
 # check-funcs			check the arguments of some routines
 #
 # realloc-copy			always copy data to a new pointer when realloc
@@ -80,7 +80,7 @@ medium		log-stats, log-non-free, log-error, log-blocks, \
 # extensive checking
 high		log-stats, log-non-free, log-error, log-blocks, \
 		log-bad-space, log-unknown, \
-		check-fence, check-heap, check-lists, check-free, \
+		check-fence, check-heap, check-lists, check-blank, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
 		catch-null
@@ -105,7 +105,7 @@ verbose		log-stats, log-non-free, log-error, log-trans, log-admin, \
 # the kitchen-sink - print-error so it doesn't fload your terminal
 all		log-stats, log-non-free, log-error, log-trans, log-stamp, \
 		log-admin, log-blocks, log-unknown, log-bad-space, \
-		check-fence, check-heap, check-lists, check-free, \
+		check-fence, check-heap, check-lists, check-blank, \
 		check-funcs, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
 		heap-check-map, catch-null, never-reuse
