@@ -20,7 +20,7 @@
 #
 # The author may be contacted at gray.watson@antaire.com
 #
-# $Id: ra_info.pl,v 1.1 1993/11/08 10:45:47 gray Exp $
+# $Id: ra_info.pl,v 1.2 1994/03/03 04:02:07 gray Exp $
 #
 
 #
@@ -40,8 +40,7 @@
 # usage message
 #
 if (@ARGV != 2 ) {
-  die "Usage:  $0 malloc-log-file binary\n";
-  die "        binary is the executable which generated the malloc-log-file\n";
+  die "Usage:  $0 malloc-log-file binary-that-generated-log-file\n";
 }
 
 $malloc = @ARGV[0];
