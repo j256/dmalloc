@@ -39,8 +39,13 @@
 
 #include "argv.h"				/* for argument processing */
 
-#include "dmalloc.h"
+#if STDC_HEADERS
+# include <string.h>
+# include <stdlib.h>
+#endif
+
 #include "conf.h"
+#include "dmalloc.h"
 
 #include "compat.h"
 #include "debug_tok.h"
@@ -53,7 +58,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.60 1995/06/21 18:20:03 gray Exp $";
+  "$Id: dmalloc.c,v 1.61 1995/06/28 23:51:51 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -189,13 +194,13 @@ LOCAL	void	choose_shell(void)
   const char	*shell, *shellp;
   int		shellc;
   
-  shell = (const char *)getenv(SHELL_ENVIRON);
+  shell = getenv(SHELL_ENVIRON);
   if (shell == NULL) {
     cshell = TRUE;
     return;
   }
   
-  shellp = (char *)rindex(shell, '/');
+  shellp = strrchr(shell, '/');
   if (shellp == NULL)
     shellp = shell;
   else
@@ -294,7 +299,7 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
-    homep = (const char *)getenv(HOME_ENVIRON);
+    homep = getenv(HOME_ENVIRON);
     if (homep == NULL) {
       (void)fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
@@ -323,12 +328,12 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       continue;
     
     /* chop off the ending \n */
-    endp = (char *)rindex(buf, '\n');
+    endp = strrchr(buf, '\n');
     if (endp != NULL)
       *endp = NULLC;
     
     /* get the first token on the line */
-    tokp = (char *)strtok(buf, TOKENIZE_CHARS);
+    tokp = strtok(buf, TOKENIZE_CHARS);
     if (tokp == NULL)
       continue;
     
@@ -340,7 +345,7 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       if (tag_find != NULL && strcmp(tag_find, tokp) == 0)
 	found = TRUE;
       
-      tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
+      tokp = strtok(NULL, TOKENIZE_CHARS);
       if (tokp == NULL)
 	continue;
     }
@@ -358,7 +363,7 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
       if (found || tag_find == NULL)
 	new_debug |= token_to_value(tokp);
       
-      tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
+      tokp = strtok(NULL, TOKENIZE_CHARS);
     } while (tokp != NULL);
     
     if (list_tags && ! cont) {

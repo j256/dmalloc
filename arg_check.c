@@ -30,6 +30,10 @@
 
 #define DMALLOC_DISABLE
 
+#if STDC_HEADERS
+# include <string.h>
+#endif
+
 #include "dmalloc.h"
 #include "conf.h"
 
@@ -41,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: arg_check.c,v 1.13 1995/06/21 18:19:58 gray Exp $";
+  "$Id: arg_check.c,v 1.14 1995/06/28 23:56:28 gray Exp $";
 #endif
 
 #if HAVE_BCMP

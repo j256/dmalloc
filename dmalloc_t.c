@@ -29,6 +29,10 @@
 
 #include <stdio.h>				/* for stdin */
 
+#if STDC_HEADERS
+# include <string.h>
+#endif
+
 #include "argv.h"
 #include "dmalloc.h"
 
@@ -39,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.45 1995/06/21 18:20:05 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.46 1995/06/28 23:49:44 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -393,7 +397,7 @@ static	void	do_interactive(void)
   for (;;) {
     (void)printf("> ");
     (void)fgets(line, sizeof(line), stdin);
-    linep = (char *)index(line, '\n');
+    linep = strchr(line, '\n');
     if (linep != NULL)
       *linep = '\0';
     

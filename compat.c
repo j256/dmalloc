@@ -37,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.32 1995/06/21 18:20:02 gray Exp $";
+  "$Id: compat.c,v 1.33 1995/06/28 23:51:52 gray Exp $";
 #endif
 
 #if HAVE_BCOPY == 0
@@ -82,11 +82,11 @@ EXPORT	int	bcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
 }
 #endif /* HAVE_BCMP == 0 */
 
-#if HAVE_INDEX == 0
+#if HAVE_STRCHR == 0
 /*
  * find CH in STR by searching backwards through the string
  */
-EXPORT	char	*index(const char * str, int ch)
+EXPORT	char	*strchr(const char * str, int ch)
 {
   for (; *str != NULLC; str++)
     if (*str == (char)ch)
@@ -97,7 +97,26 @@ EXPORT	char	*index(const char * str, int ch)
   else
     return NULL;
 }
-#endif /* HAVE_INDEX == 0 */
+#endif /* HAVE_STRCHR == 0 */
+
+#if HAVE_STRRCHR == 0
+/*
+ * find CH in STR by searching backwards through the string
+ */
+EXPORT	char	*strrchr(const char * str, int ch)
+{
+  const char	*pnt = NULL;
+  
+  for (; *str != NULLC; str++)
+    if (*str == (char)ch)
+      pnt = (char *)str;
+  
+  if (ch == NULLC)
+    return (char *)str;
+  else
+    return (char *)pnt;
+}
+#endif /* HAVE_STRRCHR == 0 */
 
 #if HAVE_MEMSET == 0
 /*
@@ -114,25 +133,6 @@ EXPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len)
   return hold;
 }
 #endif /* HAVE_MEMSET == 0 */
-
-#if HAVE_RINDEX == 0
-/*
- * find CH in STR by searching backwards through the string
- */
-EXPORT	char	*rindex(const char * str, int ch)
-{
-  const char	*pnt = NULL;
-  
-  for (; *str != NULLC; str++)
-    if (*str == (char)ch)
-      pnt = (char *)str;
-  
-  if (ch == NULLC)
-    return (char *)str;
-  else
-    return (char *)pnt;
-}
-#endif /* HAVE_RINDEX == 0 */
 
 #if HAVE_STRCAT == 0
 /*

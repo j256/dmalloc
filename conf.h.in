@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.52 1995/06/21 18:20:28 gray Exp $
+ * $Id: conf.h.in,v 1.53 1995/06/28 23:51:25 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -121,8 +121,8 @@
 #define HAVE_BCOPY 0
 #define HAVE_MEMSET 0
 
-#define HAVE_INDEX 0
-#define HAVE_RINDEX 0
+#define HAVE_STRCHR 0
+#define HAVE_STRRCHR 0
 
 #define HAVE_STRCAT 0
 #define HAVE_STRCMP 0
@@ -153,8 +153,8 @@
 #define HAVE_MEMCHR 0
 #define HAVE_MEMCMP 0
 
-#define HAVE_STRCHR 0
-#define HAVE_STRRCHR 0
+#define HAVE_INDEX 0
+#define HAVE_RINDEX 0
 #define HAVE_STRCASECMP 0
 #define HAVE_STRNCASECMP 0
 #define HAVE_STRSPN 0

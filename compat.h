@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: compat.h,v 1.23 1995/06/21 18:19:01 gray Exp $
+ * $Id: compat.h,v 1.24 1995/06/28 23:51:53 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -56,15 +56,15 @@ IMPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len);
 /*
  * find CH in STR by searching backwards through the string
  */
-#if HAVE_INDEX == 0
-IMPORT	char	*index(const char * str, int ch);
+#if HAVE_STRCHR == 0
+IMPORT	char	*strchr(const char * str, int ch);
 #endif
 
 /*
  * find CH in STR by searching backwards through the string
  */
-#if HAVE_RINDEX == 0
-IMPORT	char	*rindex(const char * str, int ch);
+#if HAVE_STRRCHR == 0
+IMPORT	char	*strrchr(const char * str, int ch);
 #endif
 
 /*

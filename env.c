@@ -29,6 +29,12 @@
 
 #define DMALLOC_DISABLE
 
+#if STDC_HEADERS
+# include <string.h>
+# include <stdlib.h>
+#endif
+
+#include "conf.h"
 #include "dmalloc.h"
 
 #include "dmalloc_loc.h"
@@ -38,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: env.c,v 1.7 1995/06/21 18:20:06 gray Exp $";
+  "$Id: env.c,v 1.8 1995/06/28 23:50:52 gray Exp $";
 #endif
 
 /* local variables */
@@ -89,7 +95,7 @@ EXPORT	void	_dmalloc_address_break(const char * addr_all,
   if (addrp != NULL)
     *addrp = hex_to_long(addr_all);
   if (addr_countp != NULL) {
-    colonp = (char *)index(addr_all, ':');
+    colonp = strchr(addr_all, ':');
     if (colonp != NULL)
       *addr_countp = atoi(colonp + 1);
   }
@@ -104,7 +110,7 @@ EXPORT	void	_dmalloc_start_break(const char * start_all,
 {
   char	*startp;
   
-  startp = (char *)index(start_all, ':');
+  startp = strchr(start_all, ':');
   if (startp != NULL) {
     (void)strcpy(start_file, start_all);
     if (sfilep != NULL)
@@ -155,7 +161,7 @@ EXPORT	void	_dmalloc_environ_get(const char * environ,
     *scountp = START_COUNT_INIT;
   
   /* get the options flag */
-  env = (const char *)getenv(environ);
+  env = getenv(environ);
   if (env == NULL)
     return;
   
