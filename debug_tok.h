@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: debug_tok.h,v 1.24 1998/10/26 14:24:30 gray Exp $
+ * $Id: debug_tok.h,v 1.25 1998/11/09 18:09:33 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -95,8 +95,11 @@ static	attr_t		attributes[] = {
       "blank newly alloced memory" },
   { "heap-check-map",	"hcm",	DEBUG_HEAP_CHECK_MAP,
       "log heap-map on heap-check" },
-  { "print-error",	"per",	DEBUG_PRINT_ERROR,
-      "print errors to stderr" },
+  /* old version -- can be removed later */
+  { "print-error",	"per",	DEBUG_PRINT_MESSAGES,
+      "old version -- please use print-messages" },
+  { "print-messages",	"pme",	DEBUG_PRINT_MESSAGES,
+      "write messages to stderr" },
   { "catch-null",	"cnu",	DEBUG_CATCH_NULL,
       "abort if no memory available" },
   { "never-reuse",	"nre",	DEBUG_NEVER_REUSE,

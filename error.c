@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: error.c,v 1.74 1998/10/26 14:24:36 gray Exp $
+ * $Id: error.c,v 1.75 1998/11/09 18:09:31 gray Exp $
  */
 
 /*
@@ -67,10 +67,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.74 1998/10/26 14:24:36 gray Exp $";
+#ident "$Id: error.c,v 1.75 1998/11/09 18:09:31 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.74 1998/10/26 14:24:36 gray Exp $";
+  "$Id: error.c,v 1.75 1998/11/09 18:09:31 gray Exp $";
 #endif
 #endif
 
@@ -180,7 +180,7 @@ void	_dmalloc_message(const char *format, ...)
   
   /* no logpath and no print then no workie */
   if (dmalloc_logpath == LOGPATH_INIT
-      && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
+      && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     return;
   }
   
@@ -276,7 +276,7 @@ void	_dmalloc_message(const char *format, ...)
   }
   
   /* do we need to print the message? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     (void)write(STDERR, str, len);
   }
 }
@@ -339,7 +339,7 @@ void	dmalloc_error(const char *func)
 {
   /* do we need to log or print the error? */
   if (dmalloc_logpath != NULL
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_ERROR)) {
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
     
     /* default str value */
     if (func == NULL) {
