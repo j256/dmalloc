@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.100 1995/09/06 19:25:15 gray Exp $";
+  "$Id: chunk.c,v 1.101 1995/09/06 20:44:37 gray Exp $";
 #endif
 
 /*
@@ -553,8 +553,8 @@ LOCAL	int	find_free_bblocks(const int many, bblock_t ** retp)
 }
 
 /*
- * get MANY new bblock block(s) from the free list physically allocation.
- * if EXTEND then extend block list and don't allocate.
+ * get MANY new bblock block(s) from the free list physically
+ * allocation.  return a pointer to the new blocks' memory in MEMP.
  * returns the blocks or NULL on error.
  */
 LOCAL	bblock_t	*get_bblocks(const int many, void ** memp)
