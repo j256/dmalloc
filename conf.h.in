@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: conf.h.in,v 1.31 1994/02/20 05:40:38 gray Exp $
+ * $Id: conf.h.in,v 1.32 1994/03/03 03:50:21 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -83,11 +83,11 @@
 
 /*
  * although I don't know why you would want to tune this since this is
- * pretty dependant on my general heap mechanisms, here are some
+ * pretty dependent on my general heap mechanisms, here are some
  * options to use general first, best, and worst fit algorithms.  if
  * you don't know what these are, then DON'T TOUCH.  NOTES: they may
  * go away in the future and/or be replaced by debug-tokens.  I've
- * tested all three and have not noticed and large differences.  Also,
+ * tested all three and have not noticed any large differences.  Also,
  * they only apply for allocations > basic-block (page) size.
  */
 #define FIRST_FIT 1

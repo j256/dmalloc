@@ -1,3 +1,7 @@
+Wed Mar  2 22:49:18 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Fixed some spelling and other misc problems.
+
 Sun Feb 27 17:53:35 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* New argv files.  Fixed Makefile.all.in problem.
@@ -74,7 +78,7 @@ Tue Nov 30 05:35:39 1993  Gray Watson  (gray@fridge.antaire.com)
 
 Mon Nov 29 21:39:54 1993  Gray Watson  (gray@fridge.antaire.com)
 
-	* turned num_bits into a macro and condenced log_heap_map.  added
+	* turned num_bits into a macro and condensed log_heap_map.  added
 	MAX_SLOTS to chunk.
 
 Tue Nov 23 02:39:44 1993  Gray Watson  (gray at toaster.antaire.com)
@@ -150,7 +154,7 @@ Sat Oct 16 19:18:53 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Thu Oct 14 19:48:42 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* malloc_heap_map() -> malloc_log_heap_map() for consistancy.
+	* malloc_heap_map() -> malloc_log_heap_map() for consistency.
 
 Wed Oct 13 17:58:55 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -191,7 +195,7 @@ Mon Sep 20 20:36:23 1993  Gray Watson  (gray at toaster.antaire.com)
 	* Releasing version 1.3.3.
 
 	* Added ALLOW_FREE_NULL defines because of some systems allowing
-	free(0).  Yeach!  Via freeback from Dave.
+	free(0).  Yeach!  Via feedback from Dave.
 
 Fri Sep 10 17:10:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -212,7 +216,7 @@ Mon Aug 30 17:23:47 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Thu Aug 26 19:06:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Releaced version 1.3.2.  Uploaded to the ftp site.
+	* Released version 1.3.2.  Uploaded to the ftp site.
 
 	* Removed MALLOC_TRACE and malloc_dbg -t.  Replaced by
 	MALLOC_ADDRESS:0 functionality and logging of a message every time
@@ -317,7 +321,7 @@ Mon Jul 12 02:03:25 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Tue Jul  6 16:04:17 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Added 'catch-null' token for quiting as soon as we get a sbrk
+	* Added 'catch-null' token for quitting as soon as we get a sbrk
 	failure (i.e. the swap is full or something) as opposed to
 	returning NULL.
 
@@ -342,7 +346,7 @@ Thu Jun  3 16:01:14 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Mon May 24 12:58:06 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Added -r and -k options for auto-unseting of variables or
+	* Added -r and -k options for auto-unsetting of variables or
 	keeping of variables with malloc_dbg when setting a tag.
 
 	* Added const checking to configure and reordered some include
@@ -560,9 +564,9 @@ Thu Nov  5 22:13:18 1992  Gray Watson  (gray at toaster.antaire.com)
 	* Released version 1.01b.  Sending it off to some folks.
 
 	* Lots and lots of changes.  Translated all programs into non-ansi
-	C dependance and then went back again when I found some problems
+	C dependence and then went back again when I found some problems
 	with my macros.  :-)  Took out all (and I mean all) Antaire
-	dependancies and defines.
+	dependencies and defines.
 
 Thu Oct 22 00:47:18 1992  Gray Watson  (gray at toaster.antaire.com)
 
@@ -589,10 +593,10 @@ Tue Oct 20 18:06:36 1992  Gray Watson  (gray at toaster.antaire.com)
 	* Removed useful.h requirements and integrated necessary
 	definitions into malloc.h.
 
-	* Transfered malloc.txt documentation into malloc.texinfo.  Boy
+	* Transferred malloc.txt documentation into malloc.texinfo.  Boy
 	is it nifty!!  And damn easy!!!
 
-	* Major changes to improve general machine independance.  Added
+	* Major changes to improve general machine independence.  Added
 	malloc_mach.h.  Moved alloc.[ch] to malloc.[ch] for sanity
 	reasons.
 
@@ -635,12 +639,12 @@ Fri Aug 14 15:54:03 1992  Gray Watson  (gray at toaster)
 	debug output pnt/size did not match user-supplied information.
 
 	* Moved most of the debug variables into alloc.c from chunk.c and
-	added a standardizied check_debug_vars() checking routine.
+	added a standardized check_debug_vars() checking routine.
 
 Tue Jul 21 16:06:13 1992  Gray Watson  (gray at toaster)
 
 	* Fixed malloc count statistics.  Removed duplicate malloc_count
-	varaibale from a number of places.
+	variable from a number of places.
 
 Mon Mar 23 10:49:25 1992  Gray Watson  (gray at toaster)
 
@@ -655,5 +659,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.95 1994/02/28 02:34:34 gray Exp $
+$Id: ChangeLog,v 1.96 1994/03/03 03:50:01 gray Exp $
 -------------------------------------------------------------------------------

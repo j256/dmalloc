@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.13 1994/02/27 22:55:12 gray Exp $
+$Id: TODO,v 1.14 1994/03/03 03:50:19 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
 
-- realloc should look on either side (prefering above of course) for
+- realloc should look on either side (preferring above of course) for
 	free bblocks and absorb them
 	- find free section we can use
 	- remove from free list(s)
@@ -44,9 +44,9 @@ CHECKING:
 		some allocation factor
 	- maybe some sort of compact heap orientation like ndt organization.
 		- need a different dblock admin maintenance or
-		- need to allowcate max dblock-admin for every block
+		- need to allocate max dblock-admin for every block
 	- maybe generate some magical value which corresponds to the
-		orientation becasue you want to be able to reproduce
+		orientation because you want to be able to reproduce
 		the error (bsd random?)
 	- probably need an internal randomizer with log-able seed
 		value and the ability to set the seed
@@ -96,6 +96,6 @@ TESTING / STATISTICS:
 - general tons of small blocks and watch for dblock_admin entry leak
 	like with large ndb_shell scripts
 - maybe a program that would try a standard set of tests on a number of
-	different combinations of debug-values to look for dependancies.
+	different combinations of debug-values to look for dependencies.
 
 -------------------------------------------------------------------------------
