@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.267 2004/10/19 14:50:52 gray Exp $
+@c $Id: dmalloc.texi,v 1.268 2004/10/20 13:15:33 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -417,13 +417,26 @@ should probably be placed at or near the end of the library list.
 
 @itemize @bullet
 
-@item set the malloc log path to @file{logfile} (@kbd{-l logfile})
+@item Set the malloc logfile name to @file{logfile} (@kbd{-l logfile}).
+For programs which change directories, you may want to specify the
+full path to your logfile.
 
-@item have the library check itself every 100 iterations (@kbd{-i 100})
+@item Have the library check itself every 100 iterations (@kbd{-i 100}).
+This controls how fast your program will run.  Larger numbers check
+the heap less and so it will run faster.  Lower numbers will be more
+likely to catch memory problems.
 
-@item enable a number of debug features (@kbd{low}).  You can
+@item Enable a number of debug features (@kbd{low}).  You can
 also try @kbd{runtime} for minimal checking or @kbd{medium} or
 @kbd{high} for more extensive heap verification.
+
+@item By default, the low, medium, and high values enable the
+@code{error-abort} token which will cause the library to abort and
+usually dump core immediately upon seeing an error.  This is useful if
+you are running your program in a debugger.  @xref{Using With a
+Debugger}.  You can disable this feature by entering @kbd{dmalloc -m
+error-abort} (-m for minus) and your program will just log errors and
+continue.
 
 @end itemize
 
@@ -434,9 +447,9 @@ You may also want to install the @file{dmallocrc} file in your home
 directory as @file{.dmallocrc}.  This allows you to add your own
 combination of debug tokens.  @xref{RC File}.
 
-@item Run your program, examine the logfile that should have been created by
-dmalloc_shutdown, and use its information to help debug your program.
-See the next section for help with this.  @xref{Troubleshooting}.
+@item Run your program, examine the logfile that should have been
+created by @code{dmalloc_shutdown}, and use its information to help
+debug your program.
 
 @end enumerate
 
@@ -2544,10 +2557,10 @@ Set the @samp{addr} part of the @samp{DMALLOC_OPTIONS} variable to
 address (or alternatively address:number).
 
 @item -b
-Output Bourne shell type commands.
+Output Bourne shell type commands.  Usually handled automagically.
 
 @item -C
-Output C shell type commands.
+Output C shell type commands.  Usually handled automagically.
 
 @item -c
 Clear/unset all of the settings not specified with other arguments.  You
@@ -2574,6 +2587,12 @@ errno.
 @item -f filename
 Use this configuration file instead of the RC file
 @file{$HOME/.dmallocrc}.
+
+@item -g
+Output gdb type commands for using inside of the gdb debugger.
+
+@item -h
+Output a help message for the utility.
 
 @item -i number
 @cindex interval setting
@@ -2650,17 +2669,13 @@ dmalloc -l log.thread%i
 @end example
 
 @item -L
-Output the debug-value not in hex but by individual debug-tokens in long
-form.
+Write the debug-value into the environment not in hex but by
+individual debug-tokens in long form.
 
 @item -m token(s)
 Remove (minus) the debug capabilities of token(s) from the current debug
 setting or from the selected tag (or @kbd{-d} value).  Multiple @kbd{-m}
 options can be specified.
-
-@item -n
-Without changing the environment, output the commands resulting from the
-supplied options.
 
 @cindex memory limit
 @cindex ERROR_OVER_LIMIT
@@ -2670,6 +2685,10 @@ total memory allocations exceed this number of bytes.  The limit can be
 a number with a k, m, or g at the end to indicate kilobyte, megabyte,
 and gigabyte respectively.  Ex: 100k, 200m, 1g.  If the limit is
 exceeded, this will generate an @code{ERROR_OVER_LIMIT} error.
+
+@item -n
+Without changing the environment, output the commands resulting from the
+supplied options.
 
 @cindex lock on
 @item -o times
@@ -2690,6 +2709,10 @@ Remove (unset) all settings when using a tag.  This is useful when you
 are returning to a standard development tag and want the logfile,
 address, and interval settings to be cleared automatically.  If you want
 this behavior by default, this can be put into the dmalloc alias.
+
+@item -R
+Output rc shell type commands.  This is not for the runtime
+configuration file but for the rc shell program.
 
 @cindex delay heap checking
 @cindex start heap check later
@@ -2732,9 +2755,17 @@ to mean 250 megabytes, 1 gigabyte, and 102 kilobytes respectively.
 List all of the tags in the rc-file.  Use with @kbd{-v} or @kbd{-V}
 verbose options.
 
+@item -u
+Output the usage information for the utility.
+
 @item -v
 Give verbose output.  Especially useful when dumping current settings or
 listing all of the tags.
+
+@item -V
+Give very verbose output for outputting even more details about
+settings.
+
 @end table
 
 If no arguments are specified, dmalloc dumps out the current settings
