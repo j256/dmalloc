@@ -65,7 +65,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.101 1997/12/22 00:25:47 gray Exp $";
+  "$Id: malloc.c,v 1.102 1998/09/17 13:18:55 gray Exp $";
 #endif
 
 /*
@@ -80,16 +80,24 @@ int		dmalloc_address_count = ADDRESS_COUNT_INIT;
 /* local routines */
 static	int		dmalloc_startup(void);
 void		_dmalloc_shutdown(void);
-void		_dmalloc_log_heap_map(void);
-void		_dmalloc_log_stats(void);
-void		_dmalloc_log_unfreed(void);
-int		_dmalloc_verify(const DMALLOC_PNT pnt);
-int		_malloc_verify(const DMALLOC_PNT pnt);
-void		_dmalloc_debug(const int flags);
-int		_dmalloc_debug_current(void);
-int		_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE * size,
-				 char ** file, unsigned int * line,
-				 DMALLOC_PNT * ret_attr);
+DMALLOC_PNT	_loc_malloc(DMALLOC_SIZE size,
+			    const char *file, const int line);
+DMALLOC_PNT	_loc_calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size,
+			    const char *file, const int line);
+DMALLOC_PNT	_loc_realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
+			     const char *file, const int line);
+DMALLOC_FREE_RET	_loc_free(DMALLOC_PNT pnt,
+				  const char *file, const int line);
+void	_dmalloc_log_heap_map(const char *file, const int line);
+void	_dmalloc_log_stats(const char *file, const int line);
+void	_dmalloc_log_unfreed(const char *file, const int line);
+int	_dmalloc_verify(const DMALLOC_PNT pnt);
+void	_dmalloc_debug(const int flags);
+int	_dmalloc_debug_current(void);
+int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
+			 char **file_p, unsigned int *line_p,
+			 DMALLOC_PNT *ret_attr_p,
+			 const char *file, const int line);
 const char	*_dmalloc_strerror(const int error_num);
 
 
@@ -116,7 +124,7 @@ static	int		thread_lock_on = LOCK_ON_INIT;	/* turn locking on */
  * a call to the alloc routines has been made, check the debug variables
  * returns ERROR or NOERROR.
  */
-static	int	check_debug_vars(const char * file, const int line)
+static	int	check_debug_vars(const char *file, const int line)
 {
   if (_dmalloc_aborting_b) {
     return ERROR;
@@ -183,8 +191,8 @@ static	int	check_debug_vars(const char * file, const int line)
  * check out a pointer to see if we were looking for it.  this should
  * be re-entrant and it may not return.
  */
-static	void	check_pnt(const char * file, const int line, const void * pnt,
-			  const char * label)
+static	void	check_pnt(const char *file, const int line, const void *pnt,
+			  const char *label)
 {
   static int	addc = 0;
   
@@ -215,7 +223,7 @@ static	void	process_environ(void)
 		       &start_file, &start_line, &start_count);
   
   /* if it was not set then no flags set */
-  if (_dmalloc_flags == DEBUG_INIT) {
+  if (_dmalloc_flags == (unsigned int)DEBUG_INIT) {
     _dmalloc_flags = 0;
   }
   
@@ -284,12 +292,15 @@ static	int	dmalloc_startup(void)
   }
   
   /* set leap variables */
+  _dmalloc_malloc_func = _loc_malloc;
+  _dmalloc_calloc_func = _loc_calloc;
+  _dmalloc_realloc_func = _loc_realloc;
+  _dmalloc_free_func = _loc_free;
   _dmalloc_shutdown_func = _dmalloc_shutdown;
   _dmalloc_log_heap_map_func = _dmalloc_log_heap_map;
   _dmalloc_log_stats_func = _dmalloc_log_stats;
   _dmalloc_log_unfreed_func = _dmalloc_log_unfreed;
   _dmalloc_verify_func = _dmalloc_verify;
-  _malloc_verify_func = _malloc_verify;
   _dmalloc_debug_func = _dmalloc_debug;
   _dmalloc_debug_current_func = _dmalloc_debug_current;
   _dmalloc_examine_func = _dmalloc_examine;
@@ -302,22 +313,14 @@ static	int	dmalloc_startup(void)
    * allocating.  Ugh.
    */
 #if AUTO_SHUTDOWN
-  {
-    unsigned int	line_hold = _dmalloc_line;
-    char		*file_hold = _dmalloc_file;
-    
-    /* NOTE: I use the else here in case some dumb systems has both */
+  /* NOTE: I use the else here in case some dumb systems has both */
 #if HAVE_ATEXIT
-    (void)atexit(_dmalloc_shutdown);
+  (void)atexit(_dmalloc_shutdown);
 #else
 #if HAVE_ON_EXIT
-    (void)on_exit(_dmalloc_shutdown, NULL);
-#endif
-#endif
-    
-    _dmalloc_line = line_hold;
-    _dmalloc_file = file_hold;
-  }
+  (void)on_exit(_dmalloc_shutdown, NULL);
+#endif /* HAVE_ON_EXIT */
+#endif /* ! HAVE_ATEXIT */
 #endif /* AUTO_SHUTDOWN */
   
 #if SIGNAL_OKAY
@@ -426,14 +429,12 @@ void	__fini_dmalloc()
 /******************************* memory calls ********************************/
 
 /*
- * allocate and return a SIZE block of bytes.  returns 0L on error.
+ * Allocate and return a SIZE block of bytes.  Returns 0L on error.
  */
-#undef malloc
-DMALLOC_PNT	malloc(DMALLOC_SIZE size)
+DMALLOC_PNT	_loc_malloc(DMALLOC_SIZE size,
+			    const char *file, const int line)
 {
   void		*new_p;
-  
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
 #if DMALLOC_SIZE_UNSIGNED == 0
   if (size < 0) {
@@ -443,17 +444,14 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
   }
 #endif
   
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
     return MALLOC_ERROR;
   }
   
-  new_p = _chunk_malloc(_dmalloc_file, _dmalloc_line, size);
+  new_p = _chunk_malloc(file, line, size);
   in_alloc_b = FALSE;
   
-  check_pnt(_dmalloc_file, _dmalloc_line, new_p, "malloc");
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
+  check_pnt(file, line, new_p, "malloc");
   
   THREAD_UNLOCK;
   
@@ -469,18 +467,16 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
  * NUM_ELEMENTS, each element contains SIZE bytes.  returns 0L on
  * error.
  */
-#undef calloc
-DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
+DMALLOC_PNT	_loc_calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size,
+			    const char *file, const int line)
 {
   void		*new_p;
   DMALLOC_SIZE	len = num_elements * size;
   
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
   /* needs to be done here */
   _calloc_count++;
   
-  new_p = malloc(len);
+  new_p = _loc_malloc(len, file, line);
   if (new_p != MALLOC_ERROR && len > 0) {
     (void)memset(new_p, 0, len);
   }
@@ -496,12 +492,10 @@ DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
  * equivalent of free(OLD_PNT) and will return 0L.  Returns 0L on
  * error.
  */
-#undef realloc
-DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
+DMALLOC_PNT	_loc_realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
+			     const char *file, const int line)
 {
   void		*new_p;
-  
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
 #if DMALLOC_SIZE_UNSIGNED == 0
   if (new_size < 0) {
@@ -511,15 +505,15 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
   }
 #endif
   
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
     return REALLOC_ERROR;
   }
   
-  check_pnt(_dmalloc_file, _dmalloc_line, old_pnt, "realloc-in");
+  check_pnt(file, line, old_pnt, "realloc-in");
   
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL) {
-    new_p = _chunk_malloc(_dmalloc_file, _dmalloc_line, new_size);
+    new_p = _chunk_malloc(file, line, new_size);
   }
   else
 #endif
@@ -530,21 +524,18 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
        * Stefan.Froehlich@tuwien.ac.at for patiently pointing that the
        * realloc in just about every Unix has this functionality.
        */
-      (void)_chunk_free(_dmalloc_file, _dmalloc_line, old_pnt);
+      (void)_chunk_free(file, line, old_pnt);
       new_p = NULL;
     }
     else
 #endif
-      new_p = _chunk_realloc(_dmalloc_file, _dmalloc_line, old_pnt, new_size);
+      new_p = _chunk_realloc(file, line, old_pnt, new_size);
   
   in_alloc_b = FALSE;
   
   if (new_p != NULL) {
-    check_pnt(_dmalloc_file, _dmalloc_line, new_p, "realloc-out");
+    check_pnt(file, line, new_p, "realloc-out");
   }
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
   
@@ -559,14 +550,12 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
  * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
  * depending on whether STDC is defined by your compiler.
  */
-#undef free
-DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
+DMALLOC_FREE_RET	_loc_free(DMALLOC_PNT pnt,
+				  const char *file, const int line)
 {
   int		ret;
   
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
 #if defined(__STDC__) && __STDC__ == 1
     return;
 #else
@@ -574,26 +563,23 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 #endif
   }
   
-  check_pnt(_dmalloc_file, _dmalloc_line, pnt, "free");
+  check_pnt(file, line, pnt, "free");
   
 #if ALLOW_FREE_NULL
   if (pnt == NULL) {
 #if ALLOW_FREE_NULL_MESSAGE
     _dmalloc_message("WARNING: tried to free(0) from '%s'",
-		     _chunk_display_where(_dmalloc_file, _dmalloc_line));
+		     _chunk_display_where(file, line));
 #endif
     ret = FREE_NOERROR;
   }
   else
-    ret = _chunk_free(_dmalloc_file, _dmalloc_line, pnt);
+    ret = _chunk_free(file, line, pnt);
 #else /* ! ALLOW_FREE_NULL */
-  ret = _chunk_free(_dmalloc_file, _dmalloc_line, pnt);
+  ret = _chunk_free(file, line, pnt);
 #endif
   
   in_alloc_b = FALSE;
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
   
@@ -607,18 +593,81 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 #endif
 }
 
+/*************************** external memory calls ***************************/
+
+/*
+ * allocate and return a SIZE block of bytes.  returns 0L on error.
+ */
+#undef malloc
+DMALLOC_PNT	malloc(DMALLOC_SIZE size)
+{
+  char	*file;
+  
+  GET_RET_ADDR(file);
+  return _loc_malloc(size, file, 0);
+}
+
+/*
+ * allocate and return a block of _zeroed_ bytes able to hold
+ * NUM_ELEMENTS, each element contains SIZE bytes.  returns 0L on
+ * error.
+ */
+#undef calloc
+DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
+{
+  char	*file;
+  
+  GET_RET_ADDR(file);
+  return _loc_calloc(num_elements, size, file, 0);
+}
+
+/*
+ * Resizes OLD_PNT to NEW_SIZE bytes and return the new space after
+ * either copying all of OLD_PNT to the new area or truncating.  If
+ * OLD_PNT is 0L then it will do the equivalent of malloc(NEW_SIZE).
+ * If NEW_SIZE is 0 and OLD_PNT is not 0L then it will do the
+ * equivalent of free(OLD_PNT) and will return 0L.  Returns 0L on
+ * error.
+ */
+#undef realloc
+DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
+{
+  char	*file;
+	 
+  GET_RET_ADDR(file);
+  return _loc_realloc(old_pnt, new_size, file, 0);
+}
+
+/*
+ * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
+ * depending on whether STDC is defined by your compiler.
+ */
+#undef free
+DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
+{
+  char	*file;
+  
+  GET_RET_ADDR(file);
+#if defined(__STDC__) && __STDC__ == 1
+  _loc_free(pnt, file, 0);
+#else
+  return _loc_free(pnt, file, 0);
+#endif
+}
+
 /*
  * same as free PNT
  */
 #undef cfree
 DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 {
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
+  char	*file;
   
+  GET_RET_ADDR(file);
 #if defined(__STDC__) && __STDC__ == 1
-  free(pnt);
+  _loc_free(pnt, file, 0);
 #else
-  return free(pnt);
+  return _loc_free(pnt, file, 0);
 #endif
 }
 
@@ -628,21 +677,16 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
  * log the heap structure plus information on the blocks if necessary.
  * NOTE: called by way of leap routine in dmalloc_lp.c
  */
-void	_dmalloc_log_heap_map(void)
+void	_dmalloc_log_heap_map(const char *file, const int line)
 {
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
   /* check the heap since we are dumping info from it */
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
     return;
   }
   
   _chunk_log_heap_map();
   
   in_alloc_b = FALSE;
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
   
@@ -655,11 +699,9 @@ void	_dmalloc_log_heap_map(void)
  * dump dmalloc statistics to logfile
  * NOTE: called by way of leap routine in dmalloc_lp.c
  */
-void	_dmalloc_log_stats(void)
+void	_dmalloc_log_stats(const char *file, const int line)
 {
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
     return;
   }
   
@@ -667,9 +709,6 @@ void	_dmalloc_log_stats(void)
   _chunk_stats();
   
   in_alloc_b = FALSE;
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
   
@@ -682,11 +721,9 @@ void	_dmalloc_log_stats(void)
  * dump unfreed-memory info to logfile
  * NOTE: called by way of leap routine in dmalloc_lp.c
  */
-void	_dmalloc_log_unfreed(void)
+void	_dmalloc_log_unfreed(const char *file, const int line)
 {
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
     return;
   }
   
@@ -697,9 +734,6 @@ void	_dmalloc_log_unfreed(void)
   _chunk_dump_unfreed();
   
   in_alloc_b = FALSE;
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
   
@@ -716,8 +750,6 @@ void	_dmalloc_log_unfreed(void)
 int	_dmalloc_verify(const DMALLOC_PNT pnt)
 {
   int	ret;
-  
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
   
   /* should not check heap here because we will be doing it below */
   
@@ -746,9 +778,6 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
   
   in_alloc_b = FALSE;
   
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
-  
   THREAD_UNLOCK;
   
   if (do_shutdown_b) {
@@ -761,14 +790,6 @@ int	_dmalloc_verify(const DMALLOC_PNT pnt)
   else {
     return DMALLOC_VERIFY_ERROR;
   }
-}
-
-/*
- * same as dmalloc_verify
- */
-int	_malloc_verify(const DMALLOC_PNT pnt)
-{
-  return _dmalloc_verify(pnt);
 }
 
 /*
@@ -809,27 +830,23 @@ int	_dmalloc_debug_current(void)
  * if FILE returns 0L then RET_ATTR may have a value and vice versa.
  * returns NOERROR or ERROR depending on whether PNT is good or not
  */
-int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size,
-			 char **file, unsigned int *line,
-			 DMALLOC_PNT *ret_attr)
+int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size_p,
+			 char **file_p, unsigned int *line_p,
+			 DMALLOC_PNT *ret_attr_p,
+			 const char *file, const int line)
 {
   int		ret;
   unsigned int	size_map;
   
-  SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
-  
   /* need to check the heap here since we are geting info from it below */
-  if (check_debug_vars(_dmalloc_file, _dmalloc_line) != NOERROR) {
+  if (check_debug_vars(file, line) != NOERROR) {
     return ERROR;
   }
   
   /* NOTE: we do not need the alloc-size info */
-  ret = _chunk_read_info(pnt, &size_map, NULL, file, line, ret_attr,
+  ret = _chunk_read_info(pnt, &size_map, NULL, file_p, line_p, ret_attr_p,
 			 "dmalloc_examine", NULL);
   in_alloc_b = FALSE;
-  
-  _dmalloc_file = DMALLOC_DEFAULT_FILE;
-  _dmalloc_line = DMALLOC_DEFAULT_LINE;
   
   THREAD_UNLOCK;
   
@@ -838,8 +855,8 @@ int	_dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *size,
   }
   
   if (ret == NOERROR) {
-    if (size != NULL) {
-      *size = size_map;
+    if (size_p != NULL) {
+      *size_p = size_map;
     }
     return NOERROR;
   }
