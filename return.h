@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: return.h,v 1.3 1993/09/03 01:20:06 gray Exp $
+ * $Id: return.h,v 1.4 1993/09/07 04:55:11 gray Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
 #define SET_RET_ADDR(file, line)	\
   do { \
     if (line == 0) \
-      file = asm("bis %ra,%ra,%v0"); \
+      file = (char *)asm("bis %ra,%ra,%v0"); \
   } while(0)
 
 #endif /* __alpha */

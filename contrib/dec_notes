@@ -33,3 +33,22 @@ variables on the program invocation line, for example:
 _RLD_LIST=/path_to_the_dir/libmalloc_dbg.so:DEFAULT program
 
 This command will set the specified env variable and then run program.
+
+-------------------------------------------------------------------------------
+
+OSF1 also supports the use of an 'init' and a 'fini' routine. Any function
+prefixed with '__init_' will be executed prior to main() and any function
+prefixed with '__fini_' will be executed after any call to exit() or
+after main() returns.
+
+A fini routine can be used with the debug library to invoke malloc_shutdown
+to get final statistics from the library package. For example:
+
+void
+__fini_mallocdbg()
+{
+    malloc_shutdown();
+}
+
+Try putting this code in a separate .o file and linking it into your
+application when you are debugging.
