@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.53 1994/08/29 15:09:41 gray Exp $
+# $Id: Makefile.in,v 1.54 1994/09/08 14:43:30 gray Exp $
 #
 
 HFLS	= dmalloc.h
@@ -77,7 +77,7 @@ installlibs : installincs $(LIBRARY) $(OBJS_INST) $(MANFILE)
 install : installlibs $(UTIL)
 	install -cev $(UTIL) $(DESTDIR)/bin
 
-.PHONY : install
+.PHONY : installftp
 installftp : README_ftp $(DOCS)
 	install -cev -o ftp -g ftp -m 444 README_ftp ftp/README
 	install -cev -o ftp -g ftp -m 444 $(DOCS) ftp/docs

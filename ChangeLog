@@ -1,3 +1,13 @@
+Thu Sep  8 10:07:56 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Releasing version 3.0.0.
+
+	* Fixed a problem with some list checking via user feedback.
+
+Fri Sep  2 17:34:02 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed possible recursion problem via feedback from Marty.
+
 Mon Aug 29 11:08:36 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Tons of name changes going from malloc_dbg -> dmalloc.  Lots of
@@ -293,7 +303,7 @@ Sun Sep 26 14:36:54 1993  Gray Watson  (gray@fridge.antaire.com)
 	reflect reality.  Some real dumb errors found.
 
 	* Added malloc_debug_current() and #ifdef STDC instead of
-	#if, via feedback from Scott Michel.
+	#if, via feedback from Scott.
 
 Wed Sep 22 00:43:54 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -768,5 +778,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.112 1994/08/29 15:09:37 gray Exp $
+$Id: ChangeLog,v 1.113 1994/09/08 14:43:23 gray Exp $
 -------------------------------------------------------------------------------
