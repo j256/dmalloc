@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: chunk.h,v 1.30 1993/11/30 02:41:31 gray Exp $
+ * $Id: chunk.h,v 1.31 1994/02/17 22:48:37 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -50,6 +50,13 @@ IMPORT	int	_chunk_startup(void);
  * display a bad pointer with FILE and LINE information
  */
 IMPORT	char	*_chunk_display_pnt(const char * file, const unsigned int line);
+
+/*
+ * note in the chunk-level admin structures that BLOCKN blocks were
+ * sbrk'ed externally by someone else up to MEM
+ * returns [NO]ERROR
+ */
+IMPORT	int	_chunk_note_external(const int blockn, const void * mem);
 
 /*
  * run extensive tests on the entire heap depending on TYPE

@@ -1,3 +1,12 @@
+Thu Feb 17 17:47:05 1994  Gray Watson  (gray@fridge.antaire.com)
+
+	* added initial support for external block locating.  this is
+	going to be a toughy to solve.  there is a catch-22 here.
+
+Sat Jan 22 01:34:55 1994  Gray Watson  (gray@fridge.antaire.com)
+
+	* moved BLOCK_SIZE into malloc_log because its used everywhere.
+
 Fri Jan 21 23:45:26 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* added missing checks for ADMIN_FREE in heap_check
@@ -624,5 +633,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.88 1994/01/22 04:46:13 gray Exp $
+$Id: ChangeLog,v 1.89 1994/02/17 22:48:21 gray Exp $
 -------------------------------------------------------------------------------
