@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.45 1993/09/22 02:51:23 gray Exp $";
+  "$Id: malloc.c,v 1.46 1993/09/25 17:46:31 gray Exp $";
 #endif
 
 /*
@@ -54,7 +54,7 @@ EXPORT	char		*malloc_logpath	= NULL;
 /* internal malloc error number for reference purposes only */
 EXPORT	int		malloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call _malloc_error() */
-#if __STDC__
+#ifdef __STDC__
 EXPORT	void		*malloc_address	= NULL;
 #else
 EXPORT	char		*malloc_address	= NULL;
@@ -365,16 +365,20 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
   
   SET_RET_ADDR(_malloc_file, _malloc_line);
   
-#if ALLOW_REALLOC_NULL
-  if (old_pnt == NULL)
-    return malloc(new_size);
-#endif
-  
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
   check_pnt(_malloc_file, _malloc_line, old_pnt, "realloc-in");
+  
+#if ALLOW_REALLOC_NULL
+  if (old_pnt == NULL)
+    newp = _chunk_malloc(_malloc_file, _malloc_line, new_size);
+  else
+    newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
+#else
   newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
+#endif
+  
   check_pnt(_malloc_file, _malloc_line, newp, "realloc-out");
   
   in_alloc = FALSE;
@@ -389,7 +393,7 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
  * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
  * depending on whether STDC is defined by your compiler.
  */
-#if __STDC__
+#ifdef __STDC__
 EXPORT	void	free(void * pnt)
 #else
 EXPORT	int	free(void * pnt)
@@ -400,7 +404,7 @@ EXPORT	int	free(void * pnt)
   SET_RET_ADDR(_malloc_file, _malloc_line);
   
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR) {
-#if __STDC__
+#ifdef __STDC__
     return;
 #else
     return FREE_ERROR;
@@ -428,7 +432,7 @@ EXPORT	int	free(void * pnt)
   _malloc_file = MALLOC_DEFAULT_FILE;
   _malloc_line = MALLOC_DEFAULT_LINE;
   
-#if ! __STDC__
+#ifndef __STDC__
   return ret;
 #endif
 }
@@ -497,6 +501,16 @@ EXPORT	int	malloc_debug(const int debug)
   }
   
   return NOERROR;
+}
+
+/*
+ * returns the current debug functionality flags.  this allows you to
+ * save a malloc library state to be restored later.
+ */
+EXPORT	int	malloc_debug_current(void)
+{
+  /* should not check the heap here since we are dumping the debug variable */
+  return _malloc_debug;
 }
 
 /*
