@@ -1,9 +1,9 @@
 #
-# $Id: Makefile,v 1.7 2003/09/08 14:50:43 gray Exp $
+# $Id: Makefile,v 1.8 2003/09/29 23:13:35 gray Exp $
 #
 
 PORTNAME=	dmalloc
-PORTVERSION=	5.2.2
+PORTVERSION=	5.2.3
 CATEGORIES=	devel
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	dmalloc

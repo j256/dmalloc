@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.2.2 </title>
+<title> Dmalloc Release Notes - 5.2.3 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.2.2 <br />
+Version: Release 5.2.3 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.2.1.html">5.2.1</a> <br />
-Date: September 8, 2003
+Last-Version: <a href="dmalloc-5.2.2.html">5.2.2</a> <br />
+Date: September 29, 2003
 </h4>
 
 <p>
@@ -28,8 +28,7 @@ Date: September 8, 2003
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Bug fix release to fix a couple of problems.  See the Bugs section
-for details. </p>
+<p> Added some better handling for Cygwin environments.  Other fixes. </p>
 
 <!--========================================================================-->
 
@@ -61,9 +60,9 @@ None.
 
 <ul>
 
-<li> Added a section to the configure script to test for segfaults
-when getenv is called during the initialization process inside of
-malloc. </li>
+<li> Added a section to the configure script to test for the existance
+of the GetEnvironmentVariableA for Cygwin environments which did not
+like getenv(). </li>
 
 </ul>
 
@@ -73,13 +72,10 @@ malloc. </li>
 
 <ul>
 
-<li> Added a section to the manual to discuss usage of the library
-with the Cygwin environment. </li>
+<li> Added new constructor and GetEnvironmentVariableA tests to better
+initialize the library. </li>
 
-<li> Added a new ERROR_NOT_START_BLOCK (30) errno to report on
-addresses which are within an allocation but not pointing to the start
-of the block.  In the past, the library would have returned
-ERROR_NOT_FOUND. </li>
+<li> Added better generation of the dmalloc.h include file. </li>
 
 </ul>
 
@@ -97,19 +93,11 @@ None.
 
 <ul>
 
-<li> Fixed a bug in the function argument pointer checking code.
-Dmalloc was improperly using the not-found error. Added to regression
-tests.  </li>
+<li> Removed usage of the environ variable from dmalloc_argv.c.  It is
+usually an exported variable. </li>
 
-<li> Improved the pointer checking code to properly check free space
-above an allocation.  Added to regression tests.  </li>
-
-<li> Fixed a possible pthread lock leak in the dmalloc shutdown code
-under certain circumstances. </li>
-
-<li> Added GETENV_SAFE configuration testing for problems when getenv
-is called during initialization of the library.  This hopefully will
-better handle Cygwin environments.  </li>
+<li> Changed the configure script to define the HAVE_ variables as 1
+or 0 to better satisfy compilers. </li>
 
 </ul>
 

@@ -1,6 +1,13 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.111 2003/09/08 14:52:26 gray Exp $
+$Id: NEWS,v 1.112 2003/09/29 23:13:33 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.2.3:
+
+	* Added new GetEnvironmentVariableA Cygwin call.  Thanks to Rolf.
+	* Added quick checks for the constructor attribute.
+	* Changed configure script to define HAVE_... to 0 or 1.  Thanks Brian.
+	* Removed usage of environ from dmalloc_argv.c.  Thanks Brian.
 
 Version 5.2.2:
 

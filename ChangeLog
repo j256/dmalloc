@@ -1,3 +1,7 @@
+2003-09-29  Gray Watson  <gray@outside.256.com>
+
+	* Releasing dmalloc version 5.2.3.
+
 2003-09-12  Gray Watson  <gray@outside.256.com>
 
 	* Added new GetEnvironmentVariableA Cygwin call.  Thanks to Rolf
@@ -2073,5 +2077,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.309 2003/09/12 05:55:56 gray Exp $
+$Id: ChangeLog,v 1.310 2003/09/29 23:13:33 gray Exp $
 -------------------------------------------------------------------------------

@@ -18,10 +18,10 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.18 2003/09/29 22:58:27 gray Exp $
+# $Id: configure.ac,v 1.19 2003/09/29 23:13:34 gray Exp $
 #
-AC_REVISION($Revision: 1.18 $)
-AC_INIT(dmalloc, 5.2.2, [http://dmalloc.com/])
+AC_REVISION($Revision: 1.19 $)
+AC_INIT(dmalloc, 5.2.3, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
@@ -428,16 +428,6 @@ main() { malloc(10); _exit(0); }
   getenv_safe=yes ]
 )
 
-if test x$getenv_safe != xyes; then
-  AC_MSG_WARN([Since getenv is not safe, you MUST add the following])
-  AC_MSG_WARN([code to the front of main():])
-  AC_MSG_WARN([[  #ifdef DMALLOC]])
-  AC_MSG_WARN([[    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
-  AC_MSG_WARN([[  #endif]])
-  AC_MSG_WARN([You will need to compile your program with: -DDMALLOC])
-  AC_MSG_WARN([See the Cygwin section in the documentation for details.])
-fi
-
 # now check to see if we can replace getenv with GetEnvironmentVariableA
 AC_CHECK_HEADER([sys/cygwin.h],
 		[AC_SUBST([HAVE_SYS_CYGWIN_H],1)],
@@ -470,10 +460,25 @@ main() {
   GetEnvironmentVariableA("PATH", env_buf, sizeof(env_buf));
 }
 ]],
-[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1) AC_MSG_RESULT([yes]) ],
-[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 0) AC_MSG_RESULT([no]) ],
-[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1) AC_MSG_RESULT([yes]) ]
+[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1)
+  AC_MSG_RESULT([yes])
+  have_getenvironmentvariablea=yes ],
+[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 0)
+  AC_MSG_RESULT([no])
+  have_getenvironmentvariablea=no ],
+[ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1)
+  AC_MSG_RESULT([yes])
+  have_getenvironmentvariablea=yes ]
 )
+
+if test x$getenv_safe != xyes && x$have_getenvironmentvariablea != xyes ; then
+  AC_MSG_WARN([Since getenv is not safe, you MUST add the following])
+  AC_MSG_WARN([code to the front of main():])
+  AC_MSG_WARN([[  #ifdef DMALLOC]])
+  AC_MSG_WARN([[    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
+  AC_MSG_WARN([[  #endif]])
+  AC_MSG_WARN([You will need to compile your program with: -DDMALLOC])
+fi
 
 ############
 
@@ -535,7 +540,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.18 2003/09/29 22:58:27 gray Exp $"
+#ident "$Id: configure.ac,v 1.19 2003/09/29 23:13:34 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
