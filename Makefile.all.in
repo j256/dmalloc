@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.58 1995/08/18 15:49:38 gray Exp $
+# $Id: Makefile.all.in,v 1.59 1995/09/02 21:39:27 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -12,6 +12,7 @@ VPATH = @srcdir@
 
 bindir = $(exec_prefix)/bin
 libdir = $(exec_prefix)/lib
+shlibdir = $(exec_prefix)/shlib
 incdir = $(prefix)/include
 infodir = $(prefix)/info
 
@@ -23,9 +24,14 @@ INCS = -I. -I$(srcdir)
 LIBS = -L. @LIBS@
 
 LIBNAME	= dmalloc
+
 LIBRARY	= lib$(LIBNAME).a
+SHLIBRARY = lib$(LIBNAME).so
+
 # library with dmalloc disabled
 LIB_DIS	= libdmalloclp.a
+SHLIB_DIS = libdmalloclp.so
+
 UTIL = dmalloc
 INFOFILE = dmalloc.info
 
@@ -58,10 +64,12 @@ realclean : clean
 
 distclean : clean
 	rm -f Makefile config.status config.cache config.log conf.h dmalloc.h.2
+	rm -f settings.h
 #	rm -f configure
 
 installdirs :
 	$(srcdir)/mkinstalldirs $(incdir) $(libdir) $(infodir) $(bindir)
+# may want to add $(shlibdir) to this list
 
 installincs : $(HFLS)
 	$(INSTALL_DATA) $(HFLS) $(incdir)
@@ -72,6 +80,7 @@ installlib : installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
 	$(INSTALL_DATA) $(LIB_DIS) $(libdir)
 	@RANLIB@ $(libdir)/$(LIB_DIS)
 	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(infodir)
+#	$(INSTALL_DATA) $(srcdir)/$(SHLIBRARY)   $(shlibdir)
 
 install : installdirs installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
@@ -79,10 +88,18 @@ install : installdirs installlib $(UTIL)
 dmalloc.h.2 : configure
 	$(SHELL) configure
 
+settings.h : settings.dist configure
+	$(SHELL) configure
+
 dmalloc.h : dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
 	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > $@.t
 	mv $@.t $@
+
+shlib : ${SHLIBRARY}
+
+${SHLIBRARY} : $(LIBRARY)
+#	ld -shared -o $@ -all $(LIBRARY) -all -soname $@ -none -lc
 
 $(LIBRARY) : $(OBJS)
 	ar cr $(LIBRARY) $?

@@ -1,10 +1,21 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.63 1995/08/18 18:31:41 gray Exp $
+$Id: NEWS,v 1.64 1995/09/02 21:39:28 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 3.1.2:
+
+	* Added inital thread locking for debugging threaded programs.
+	* New attempts to auto-configure DMALLOC_SIZE for size_t.
+	* Added settings.dist file which is copied to settings.h during config.
+	* Added better autoconfiguring of dmalloc size variable.
+	* Added dmalloc_aborting flag in case kill or abort recurses. 
+	* Added new[] C++ function.
+	* Changed DMALLOC_SIZE to 'unsigned long' instead of unsigned.
 
 Version 3.1.1:
 
-	* Added better non-linear and now non-linear is a default.
+	* Added better non-linear processing.
+	* Made non-linear now default behaviour with internal dmalloc tags.
 	* Fixed up dmalloc_t to propogate errors better.
 
 Version 3.1.0:

@@ -1,9 +1,35 @@
+Sat Sep  2 15:34:01 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Added inital thread locking for debugging threaded programs.
+
+	* New attempts to auto-configure DMALLOC_SIZE for size_t.  I've
+	tried this before.  We'll have to see what it screws up.
+
+	* Added settings.dist which is copied by configure.  Thanks Marty.
+
+Fri Sep  1 15:53:50 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Added better autoconfiguring of dmalloc size variable.
+
+Wed Aug 30 14:05:39 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Added dmalloc_aborting flag in case kill or abort recurses.  I
+	forgot who sent me this :-(.  Thanks.
+
+Tue Aug 29 17:43:54 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Added new[] C++ function.  Thanks Arno.
+
+Tue Aug 28 00:00:00 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Changed DMALLOC_SIZE to 'unsigned long' instead of unsigned.
+
 Fri Aug 18 11:50:03 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.1.1.
 
-	* Located all non-linear heap checking to heap code and improved
-        immensely (read it works now).
+	* Moved all non-linear heap checking to heap code and improved the
+	code immensely (read it works now).
 
 	* Fixed dumb bug in argv code.
 
@@ -34,7 +60,7 @@ Mon Jul  3 19:57:05 1995  Gray Watson  <gray@burger.letters.com>
 Wed Jun 28 19:48:47 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Improved header file configurations immensely.  Removed all
-        casts and other dumb coding assumptions for 64 bit machines.
+	casts and other dumb coding assumptions for 64 bit machines.
 
 	* Fixed dumb sparc preprocesser error.
 
@@ -126,9 +152,9 @@ Fri Mar  3 12:37:17 1995  Gray Watson  (gray@burger.letters.com)
 
 Mon Jan  2 18:51:19 1995  Gray Watson  (gray@fridge.antaire.com)
 
-        * Released version 3.0.5.
+	* Released version 3.0.5.
 
-        * Changed my mail address and ftp location.
+	* Changed my mail address and ftp location.
 
 Fri Dec 16 15:07:29 1994  Gray Watson  (gray@blender.antaire.com)
 
@@ -1042,5 +1068,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.159 1995/08/18 19:14:45 gray Exp $
+$Id: ChangeLog,v 1.160 1995/09/02 21:39:26 gray Exp $
 -------------------------------------------------------------------------------
