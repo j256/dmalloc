@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.59 2000/03/20 23:19:20 gray Exp $
+ * $Id: chunk_loc.h,v 1.60 2000/03/21 01:37:56 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -125,7 +125,7 @@
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
-/* bb_flags values (short) */
+/* bb_flags values (unsigned short) */
 #define BBLOCK_ALLOCATED	0x00FF		/* block has been allocated */
 #define BBLOCK_START_USER	0x0001		/* start of some user space */
 #define BBLOCK_USER		0x0002		/* allocated by user space */
@@ -176,103 +176,51 @@ typedef struct {
  * allocations will be put into 1 basic-block, each getting one of
  * these admin structures.  Or 4 1k allocations, or 8 512 byte
  * allocations, etc.
- *
- * In an attempt to keep per-pointer overhead as low as possible I use a
- * lot of unions in this structure.  This tends to complicate the code
- * a bit, so to simplify I use define statements.  This in turn
- * complicates debugging :-) -- a trade-off.  The comments at the end
- * of the define statements show when the field in the union is used.
- * For instance, db_size (really db_info.in_nums.nu_size) is in use
- * when the pointer is Alloc[at]ed.  The db_next field is used when
- * the admin structure is on the free list.
  */
 typedef struct dblock_st {
-  union {
-    struct {
-      unsigned short	nu_size;		/* size of contiguous area */
-      unsigned short	nu_line;		/* line where it was alloced */
-    } in_nums;
-    
-    struct bblock_st	*in_bblock;		/* pointer to the bblock */
-  } db_info;
+  unsigned short	db_flags;		/* what it is */
   
-  /* to reference union and struct elements as db elements */
-#define db_size		db_info.in_nums.nu_size	/* Alloced */
-#define db_line		db_info.in_nums.nu_line	/* Alloced */
-#define db_bblock	db_info.in_bblock	/* Free */
+  unsigned short	db_size;		/* size of allocated area */
+  unsigned short	db_line;		/* line where it was alloced */
+  struct bblock_st	*db_bblock;		/* pointer to free bblock */
   
-  union {
-    struct dblock_st	*pn_next;		/* next in the free list */
-    const char		*pn_file;		/* .c filename where alloced */
-  } db_pnt;
-  
-  /* to reference union elements as db elements */
-#define db_next		db_pnt.pn_next		/* Free */
-#define db_file		db_pnt.pn_file		/* Alloced */
+  struct dblock_st	*db_next;		/* next in the free list */
+  const char		*db_file;		/* .c filename where alloced */
   
 #if FREED_POINTER_DELAY
-  unsigned long	db_reuse_iter;			/* when avail for reuse */
+  unsigned long		db_reuse_iter;		/* when avail for reuse */
 #endif
   
-  overhead_t	db_overhead;			/* configured overhead adds */
+  overhead_t		db_overhead;		/* configured overhead adds */
 } dblock_t;
+
+/* db_flags values (unsigned short) */
+#define DBLOCK_USER	0x0001			/* block is free */
+#define DBLOCK_FREE	0x0002			/* block is free */
 
 /*
  * Below defines a basic-block structure.  This structure is used to
  * track allocations that fit in one or many basic-blocks.  If you
  * have a basic-block size of 4k then a 16k allocation will take up 4
  * basic-blocks and 4 of these admin structures.
- *
- * Like the above divided-block structure, I use unions here to to
- * simplify the code and the comments at the end show when the field
- * is used.  For instance, bb_bit_n (really bb_nums.nu_bit_n) is in use
- * when the pointer is tracking user divided-block allocations or when
- * the pointer is free.  The bb_free_n field is used when the block is
- * full of admin structures such as this.  Yes, the library uses this
- * structure to track another block full of these structures.  Yikes!
  */
 typedef struct bblock_st {
   unsigned short	bb_flags;		/* what it is */
   
-  union {
-    unsigned short	nu_bit_n;		/* chunk bit size */
-    unsigned short	nu_line;		/* line where it was alloced */
-  } bb_nums;
+  unsigned short	bb_bit_n;		/* free chunk bit size */
+  unsigned short	bb_line;		/* line where it was alloced */
   
-  /* to reference union elements as bb elements */
-#define bb_bit_n	bb_nums.nu_bit_n	/* User-dblock, Free */
-#define bb_line		bb_nums.nu_line		/* User-bblock */
+  unsigned long		bb_free_n;		/* admin free number */
+  unsigned long		bb_pos_n;		/* admin block position */
+  unsigned long		bb_block_n;		/* number of free blocks */
+  unsigned long		bb_size;		/* size of user allocation */
+  dblock_t		*bb_dblock;		/* pointer to dblock info */
   
-  union {
-    unsigned long	in_free_n;		/* admin free number */
-    unsigned long	in_pos_n;		/* admin block position */
-    unsigned long	in_block_n;		/* number of blocks */
-    unsigned long	in_size;		/* size of allocation */
-    /* NOTE: this pointer and the longs may be of a different type */
-    dblock_t		*in_dblock;		/* pointer to dblock info */
-  } bb_info;
-  
-  /* to reference union elements as bb elements */
-#define bb_free_n	bb_info.in_free_n	/* BBlock-admin-free */
-#define	bb_pos_n	bb_info.in_pos_n	/* BBlock-admin */
-#define	bb_block_n	bb_info.in_block_n	/* Free */
-#define	bb_size		bb_info.in_size		/* User-bblock */
-#define	bb_dblock	bb_info.in_dblock	/* User-dblock */
-  
-  union {
-    struct dblock_adm_st	*pn_slot_p;	/* pointer to db_admin block */
-    struct bblock_adm_st	*pn_admin_p;	/* pointer to bb_admin block */
-    void			*pn_mem;	/* memory associated to it */
-    struct bblock_st		*pn_next;	/* next in free list */
-    const char			*pn_file;	/* .c filename where alloced */
-  } bb_pnt;
-  
-  /* to reference union elements as bb elements */
-#define	bb_slot_p	bb_pnt.pn_slot_p	/* DBlock-admin */
-#define	bb_admin_p	bb_pnt.pn_admin_p	/* BBlock-admin */
-#define	bb_mem		bb_pnt.pn_mem		/* User-dblock, External */
-#define	bb_next		bb_pnt.pn_next		/* Free */
-#define	bb_file		bb_pnt.pn_file		/* User-bblock */
+  struct dblock_adm_st	*bb_slot_p;		/* pointer to db_admin block */
+  struct bblock_adm_st	*bb_admin_p;		/* pointer to bb_admin block */
+  void			*bb_mem;		/* extern user dblock mem */
+  struct bblock_st	*bb_next;		/* next in free list */
+  const char		*bb_file;		/* .c filename where alloced */
   
 #if FREED_POINTER_DELAY
   unsigned long	bb_reuse_iter;			/* when avail for reuse */

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $
+ * $Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $
  */
 
 /*
@@ -62,25 +62,25 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $";
+#ident "$Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $";
+  "$Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $";
 #endif
 #endif
 
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $";
+#ident "$Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $";
 #ident "@(#) Dmalloc package Copyright 1999 by Gray Watson";
-#ident "$Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $";
+#ident "$Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $";
 #ident "@(#) Source for dmalloc available from http://dmalloc.com/";
 #else
 static	char	*copyright =
-  "$Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $";
+  "$Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $";
 static	char	*copyright_w =
   "@(#) Dmalloc package Copyright 1999 by Gray Watson";
 static	char	*source_url =
-  "$Id: chunk.c,v 1.153 2000/03/20 23:19:19 gray Exp $";
+  "$Id: chunk.c,v 1.154 2000/03/21 01:37:55 gray Exp $";
 static	char	*source_url_w =
   "@(#) Source for dmalloc available from http://dmalloc.com/";
 #endif
@@ -952,15 +952,15 @@ static	bblock_t	*get_bblocks(const int many, void **mem_p)
 }
 
 /*
- * Find the bblock entry for PNT, LAST_P and NEXT_P point to the last
+ * Find the bblock entry for PNT, PREV_P and NEXT_P point to the last
  * and next blocks starting block
  */
-static	bblock_t	*find_bblock(const void *pnt, bblock_t **last_p,
+static	bblock_t	*find_bblock(const void *pnt, bblock_t **prev_p,
 				     bblock_t **next_p)
 {
   void		*tmp;
   unsigned int	bblock_c, bblock_n;
-  bblock_t	*last = NULL, *this;
+  bblock_t	*prev = NULL, *this;
   bblock_adm_t	*bblock_adm_p;
   
   if (pnt == NULL) {
@@ -980,8 +980,8 @@ static	bblock_t	*find_bblock(const void *pnt, bblock_t **last_p,
   for (bblock_c = WHICH_BLOCK(pnt), bblock_adm_p = bblock_adm_head;
        bblock_c >= BB_PER_ADMIN && bblock_adm_p != NULL;
        bblock_c -= BB_PER_ADMIN, bblock_adm_p = bblock_adm_p->ba_next) {
-    if (last_p != NULL) {
-      last = bblock_adm_p->ba_blocks + (BB_PER_ADMIN - 1);
+    if (prev_p != NULL) {
+      prev = bblock_adm_p->ba_blocks + (BB_PER_ADMIN - 1);
     }
   }
   
@@ -992,25 +992,25 @@ static	bblock_t	*find_bblock(const void *pnt, bblock_t **last_p,
   
   this = bblock_adm_p->ba_blocks + bblock_c;
   
-  if (last_p != NULL) {
+  if (prev_p != NULL) {
     if (bblock_c > 0) {
-      last = bblock_adm_p->ba_blocks + (bblock_c - 1);
+      prev = bblock_adm_p->ba_blocks + (bblock_c - 1);
     }
     
     /* adjust the last pointer back to start of free block */
-    if (last != NULL && BIT_IS_SET(last->bb_flags, BBLOCK_FREE)) {
-      if (last->bb_block_n <= bblock_c) {
-	last = bblock_adm_p->ba_blocks + (bblock_c - last->bb_block_n);
+    if (prev != NULL && BIT_IS_SET(prev->bb_flags, BBLOCK_FREE)) {
+      if (prev->bb_block_n <= bblock_c) {
+	prev = bblock_adm_p->ba_blocks + (bblock_c - prev->bb_block_n);
       }
       else {
 	/* need to go recursive to go bblock_n back, check if at 1st block */
-	tmp = (char *)pnt - last->bb_block_n * BLOCK_SIZE;
+	tmp = (char *)pnt - prev->bb_block_n * BLOCK_SIZE;
 	if (! IS_IN_HEAP(tmp)) {
-	  last = NULL;
+	  prev = NULL;
 	}
 	else {
-	  last = find_bblock(tmp, NULL, NULL);
-	  if (last == NULL) {
+	  prev = find_bblock(tmp, NULL, NULL);
+	  if (prev == NULL) {
 	    dmalloc_error("find_bblock");
 	    return NULL;
 	  }
@@ -1018,7 +1018,7 @@ static	bblock_t	*find_bblock(const void *pnt, bblock_t **last_p,
       }
     }
     
-    *last_p = last;
+    *prev_p = prev;
   }
   if (next_p != NULL) {
     /* next pointer should move past current allocation */
@@ -1032,7 +1032,7 @@ static	bblock_t	*find_bblock(const void *pnt, bblock_t **last_p,
       *next_p = this + bblock_n;
     }
     else {
-      /* need to go recursive to go bblock_n ahead, check if at last block */
+      /* need to go recursive to go bblock_n ahead, check if at prev block */
       tmp = (char *)pnt + bblock_n * BLOCK_SIZE;
       if (! IS_IN_HEAP(tmp)) {
 	*next_p = NULL;
@@ -1099,6 +1099,7 @@ static	dblock_t	*get_dblock_admin(const int many)
        dblock_p++) {
     dblock_p->db_bblock = NULL;
     dblock_p->db_next = NULL;
+    dblock_p->db_flags = DBLOCK_FREE;
   }
   
   dblock_adm_p->da_magic2 = CHUNK_MAGIC_TOP;
@@ -1115,12 +1116,12 @@ static	dblock_t	*find_free_dblock(const int bit_n)
 {
   dblock_t	*dblock_p;
 #if FREED_POINTER_DELAY
-  dblock_t	*last_p;
+  dblock_t	*prev_p;
   
   /* find a value dblock entry */
-  for (dblock_p = free_dblock[bit_n], last_p = NULL;
+  for (dblock_p = free_dblock[bit_n], prev_p = NULL;
        dblock_p != NULL;
-       last_p = dblock_p, dblock_p = dblock_p->db_next) {
+       prev_p = dblock_p, dblock_p = dblock_p->db_next) {
     
     /* are we still waiting on this guy? */
     if (_dmalloc_iter_c < dblock_p->db_reuse_iter) {
@@ -1128,11 +1129,11 @@ static	dblock_t	*find_free_dblock(const int bit_n)
     }
     
     /* keep the linked lists */
-    if (last_p == NULL) {
+    if (prev_p == NULL) {
       free_dblock[bit_n] = dblock_p->db_next;
     }
     else {
-      last_p->db_next = dblock_p->db_next;
+      prev_p->db_next = dblock_p->db_next;
     }
     break;
   }
@@ -1207,6 +1208,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     free_dblock[bit_n] = dblock_p;
     
     for (; dblock_p < first_p + (1 << (BASIC_BLOCK - bit_n)) - 1; dblock_p++) {
+      dblock_p->db_flags = DBLOCK_FREE;
       dblock_p->db_bblock = bblock_p;
       dblock_p->db_next = dblock_p + 1;
 #if FREED_POINTER_DELAY
@@ -1218,7 +1220,8 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
       free_space_count += 1 << bit_n;
     }
     
-    /* last one points to the free list (probably NULL) */
+    /* prev one points to the free list (probably NULL) */
+    dblock_p->db_flags = DBLOCK_FREE;
     dblock_p->db_next = free_p;
     dblock_p->db_bblock = bblock_p;
 #if FREED_POINTER_DELAY
@@ -1243,6 +1246,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     dblock_p = first_p;
   }
   
+  dblock_p->db_flags = DBLOCK_USER;
   dblock_p->db_line = line;
   dblock_p->db_size = byte_n;
   dblock_p->db_file = file;
@@ -1281,7 +1285,7 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
 int	_chunk_check(void)
 {
   bblock_adm_t	*this_adm_p, *ahead_p;
-  bblock_t	*bblock_p, *bblist_p, *last_bblock_p;
+  bblock_t	*bblock_p, *bblist_p, *prev_bblock_p;
   dblock_t	*dblock_p;
   unsigned int	undef = 0, start = 0;
   char		*byte_p;
@@ -1312,10 +1316,6 @@ int	_chunk_check(void)
       for (bblock_p = free_bblock[bit_c];
 	   bblock_p != NULL;
 	   bblock_p = bblock_p->bb_next, free_bblock_c[bit_c]++) {
-	/*
-	 * NOTE: this should not present problems since the bb_next is
-	 * NOT unioned with bb_file.
-	 */
 	if (! IS_IN_HEAP(bblock_p)) {
 	  dmalloc_errno = ERROR_BAD_FREE_LIST;
 	  dmalloc_error("_chunk_check");
@@ -1332,12 +1332,12 @@ int	_chunk_check(void)
       for (dblock_p = free_dblock[bit_c];
 	   dblock_p != NULL;
 	   dblock_p = dblock_p->db_next) {
-	/*
-	 * NOTE: this might miss problems if the slot is allocated but
-	 * db_file (unioned with db_next) points to a return address
-	 * in the heap
-	 */
 	if (! IS_IN_HEAP(dblock_p)) {
+	  dmalloc_errno = ERROR_BAD_FREE_LIST;
+	  dmalloc_error("_chunk_check");
+	  return ERROR;
+	}
+	if (dblock_p->db_flags != DBLOCK_FREE) {
 	  dmalloc_errno = ERROR_BAD_FREE_LIST;
 	  dmalloc_error("_chunk_check");
 	  return ERROR;
@@ -1350,7 +1350,6 @@ int	_chunk_check(void)
   /* start pointers */
   this_adm_p = bblock_adm_head;
   ahead_p = this_adm_p;
-  last_bblock_p = NULL;
   
   /* test admin pointer validity */
   if (! IS_IN_HEAP(this_adm_p)) {
@@ -1375,7 +1374,8 @@ int	_chunk_check(void)
   }
   
   /* check out the basic blocks */
-  for (bblock_p = this_adm_p->ba_blocks;; last_bblock_p = bblock_p++) {
+  prev_bblock_p = NULL;
+  for (bblock_p = this_adm_p->ba_blocks;; prev_bblock_p = bblock_p++) {
     
     /* are we at the end of the bb_admin section */
     if (bblock_p >= this_adm_p->ba_blocks + BB_PER_ADMIN) {
@@ -1509,12 +1509,12 @@ int	_chunk_check(void)
       }
       else {
 	if (start == 0
-	    && (last_bblock_p == NULL
-		|| ((! BIT_IS_SET(last_bblock_p->bb_flags, BBLOCK_START_USER))
-		    && (! BIT_IS_SET(last_bblock_p->bb_flags, BBLOCK_USER)))
-		|| bblock_p->bb_file != last_bblock_p->bb_file
-		|| bblock_p->bb_line != last_bblock_p->bb_line
-		|| bblock_p->bb_size != last_bblock_p->bb_size)) {
+	    && (prev_bblock_p == NULL
+		|| ((! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_START_USER))
+		    && (! BIT_IS_SET(prev_bblock_p->bb_flags, BBLOCK_USER)))
+		|| bblock_p->bb_file != prev_bblock_p->bb_file
+		|| bblock_p->bb_line != prev_bblock_p->bb_line
+		|| bblock_p->bb_size != prev_bblock_p->bb_size)) {
 	  dmalloc_errno = ERROR_USER_NON_CONTIG;
 	  dmalloc_error("_chunk_check");
 	  return ERROR;
@@ -1576,13 +1576,7 @@ int	_chunk_check(void)
 	   dblock_c++, dblock_p++) {
 	
 	/* check out dblock entry to see if it is not free */
-	/*
-	 * XXX: this test might think it was a free'd slot if db_file
-	 * (unioned with db_next) points to a return address in the
-	 * heap.
-	 */
-	if ((dblock_p->db_next == NULL || IS_IN_HEAP(dblock_p->db_next))
-	    && IS_IN_HEAP(dblock_p->db_bblock)) {
+	if (dblock_p->db_flags == DBLOCK_FREE) {
 	  
 	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_LISTS)) {
 	    dblock_t	*dblist_p;
@@ -1661,22 +1655,26 @@ int	_chunk_check(void)
 	  continue;
 	}
 	
+	/* sanity check */
+	if (dblock_p->db_bblock != bblock_p) {
+	  dmalloc_errno = ERROR_BAD_FLAG;
+	  log_error_info(NULL, 0, dblock_p->db_bblock, 0, NULL, "heap-check",
+			 TRUE);
+	  dmalloc_error("_chunk_check");
+	  continue;
+	}
+	
 	/* check out dblock pointer and next pointer (if free) */
-	/*
-	 * XXX: this test might think it was a free'd slot if db_file
-	 * (unioned with db_next) points to a return address in the
-	 * heap.
-	 */
-	if ((dblock_p->db_next == NULL || IS_IN_HEAP(dblock_p->db_next))
-	    && IS_IN_HEAP(dblock_p->db_bblock)) {
-	  
-	  /* find pointer to memory chunk */
-	  pnt = (char *)dblock_p->db_bblock->bb_mem +
-	    (dblock_p - dblock_p->db_bblock->bb_dblock) *
-	      (1 << dblock_p->db_bblock->bb_bit_n);
+	if (dblock_p->db_flags == DBLOCK_FREE) {
 	  
 	  /* should we verify that we have a block of BLANK_CHAR? */
 	  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+	    
+	    /* find pointer to memory chunk */
+	    pnt = (char *)dblock_p->db_bblock->bb_mem +
+	      (dblock_p - dblock_p->db_bblock->bb_dblock) *
+	      (1 << dblock_p->db_bblock->bb_bit_n);
+	    
 	    for (byte_p = (char *)pnt;
 		 byte_p < (char *)pnt + (1 << dblock_p->db_bblock->bb_bit_n);
 		 byte_p++) {
@@ -1725,11 +1723,7 @@ int	_chunk_check(void)
       
       /* NOTE: check out free_lists, depending on debug value? */
       
-      /*
-       * verify linked list pointer
-       * NOTE: this should not present problems since the bb_next is
-       * NOT unioned with bb_file.
-       */
+      /* verify linked list pointer */
       if (bblock_p->bb_next != NULL && (! IS_IN_HEAP(bblock_p->bb_next))) {
 	dmalloc_errno = ERROR_BAD_FREE_LIST;
 	dmalloc_error("_chunk_check");
@@ -1764,9 +1758,9 @@ int	_chunk_check(void)
 	}
       }
       else {
-	if (last_bblock_p == NULL
-	    || last_bblock_p->bb_flags != BBLOCK_FREE
-	    || bblock_p->bb_bit_n != last_bblock_p->bb_bit_n) {
+	if (prev_bblock_p == NULL
+	    || prev_bblock_p->bb_flags != BBLOCK_FREE
+	    || bblock_p->bb_bit_n != prev_bblock_p->bb_bit_n) {
 	  dmalloc_errno = ERROR_FREE_NON_CONTIG;
 	  dmalloc_error("_chunk_check");
 	  return ERROR;
@@ -1785,34 +1779,35 @@ int	_chunk_check(void)
 	    dmalloc_errno = ERROR_FREE_NON_BLANK;
 	    log_error_info(NULL, 0, byte_p, 0, NULL, "heap-check", TRUE);
 	    dmalloc_error("_chunk_check");
-	    return ERROR;
+	    /* continue to check the rest of the free list */
+	    break;
 	  }
 	}
-	break;
-	
-	/* externally used block */
-      case BBLOCK_EXTERNAL:
-	/* nothing much to check */
-	break;
-	
-	/* pointer to first free slot */
-      case BBLOCK_ADMIN_FREE:
-	/* better be the last block and the count should match undef */
-	if (bblock_p != this_adm_p->ba_blocks + (BB_PER_ADMIN - 1)
-	    || bblock_p->bb_free_n != (BB_PER_ADMIN - 1) - undef) {
-	  dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
-	  dmalloc_error("_chunk_check");
-	  return ERROR;
-	}
-	break;
-	
-      default:
-	dmalloc_errno = ERROR_BAD_FLAG;
+      }
+      break;
+      
+      /* externally used block */
+    case BBLOCK_EXTERNAL:
+      /* nothing much to check */
+      break;
+      
+      /* pointer to first free slot */
+    case BBLOCK_ADMIN_FREE:
+      /* better be the last block and the count should match undef */
+      if (bblock_p != this_adm_p->ba_blocks + (BB_PER_ADMIN - 1)
+	  || bblock_p->bb_free_n != (BB_PER_ADMIN - 1) - undef) {
+	dmalloc_errno = ERROR_BAD_ADMIN_COUNT;
 	dmalloc_error("_chunk_check");
 	return ERROR;
-	/* NOTREACHED */
-	break;
       }
+      break;
+      
+    default:
+      dmalloc_errno = ERROR_BAD_FLAG;
+      dmalloc_error("_chunk_check");
+      return ERROR;
+      /* NOTREACHED */
+      break;
     }
   }
   
@@ -2127,7 +2122,7 @@ int	_chunk_read_info(const void *pnt, unsigned int *size_p,
     dblock_p = bblock_p->bb_dblock + ((char *)pnt - (char *)bblock_p->bb_mem) /
       (1 << bblock_p->bb_bit_n);
     
-    if (dblock_p->db_bblock == bblock_p) {
+    if (dblock_p->db_flags != DBLOCK_USER) {
       /* NOTE: we should run through free list here */
       dmalloc_errno = ERROR_IS_FREE;
       log_error_info(NULL, 0, CHUNK_TO_USER(pnt), 0, NULL, where, FALSE);
@@ -2273,7 +2268,7 @@ static	int	chunk_write_info(const char *file, const unsigned int line,
     dblock_p = bblock_p->bb_dblock + ((char *)pnt - (char *)bblock_p->bb_mem) /
       (1 << bblock_p->bb_bit_n);
     
-    if (dblock_p->db_bblock == bblock_p) {
+    if (dblock_p->db_flags != DBLOCK_USER) {
       /* NOTE: we should run through free list here */
       dmalloc_errno = ERROR_NOT_USER;
       log_error_info(file, line, CHUNK_TO_USER(pnt), 0, NULL, where, FALSE);
@@ -2768,7 +2763,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     dblock_p = bblock_p->bb_dblock + ((char *)pnt - (char *)bblock_p->bb_mem) /
       (1 << bblock_p->bb_bit_n);
     
-    if (dblock_p->db_bblock == bblock_p) {
+    if (dblock_p->db_flags != DBLOCK_USER) {
       /* NOTE: we should run through free list here? */
       dmalloc_errno = ERROR_ALREADY_FREE;
       log_error_info(file, line, CHUNK_TO_USER(pnt), 0, NULL, "free", FALSE);
@@ -2817,6 +2812,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     free_space_count += 1 << bit_n;
     
     /* adjust the pointer info structure */
+    dblock_p->db_flags = DBLOCK_FREE;
     dblock_p->db_bblock = bblock_p;
 #if FREED_POINTER_DELAY
     dblock_p->db_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
@@ -3422,62 +3418,55 @@ void	_chunk_dump_unfreed(void)
       for (dblock_p = bblock_p->bb_slot_p->da_block;
 	   dblock_p < bblock_p->bb_slot_p->da_block + DB_PER_ADMIN;
 	   dblock_p++) {
+	bblock_adm_t	*bba_p;
+	bblock_t	*bb_p;
 	
 	/* see if this admin slot has ever been used */
 	if (dblock_p->db_bblock == NULL && dblock_p->db_next == NULL) {
 	  continue;
 	}
 	
-	/*
-	 * is this slot in a free list?
-	 * NOTE: this may bypass a non-freed entry if the db_file pointer
-	 * (unioned to db_next) points to return address in the heap
-	 */
-	if (dblock_p->db_next == NULL || IS_IN_HEAP(dblock_p->db_next)) {
+	/* is this slot in a free list? */
+	if (dblock_p->db_flags == DBLOCK_FREE) {
 	  continue;
 	}
 	
-	{
-	  bblock_adm_t	*bba_p;
-	  bblock_t	*bb_p;
+	bba_p = bblock_adm_head;
+	
+	/* check out the basic blocks */
+	for (bb_p = bba_p->ba_blocks;; bb_p++) {
 	  
-	  bba_p = bblock_adm_head;
-	  
-	  /* check out the basic blocks */
-	  for (bb_p = bba_p->ba_blocks;; bb_p++) {
+	  /* are we at the end of the bb_admin section */
+	  if (bb_p >= bba_p->ba_blocks + BB_PER_ADMIN) {
+	    bba_p = bba_p->ba_next;
 	    
-	    /* are we at the end of the bb_admin section */
-	    if (bb_p >= bba_p->ba_blocks + BB_PER_ADMIN) {
-	      bba_p = bba_p->ba_next;
-	      
-	      /* are we done? */
-	      if (bba_p == NULL) {
-		break;
-	      }
-	      
-	      bb_p = bba_p->ba_blocks;
-	    }
-	    
-	    if (bb_p->bb_flags != BBLOCK_DBLOCK) {
-	      continue;
-	    }
-	    
-	    if (dblock_p >= bb_p->bb_dblock
-		&& dblock_p < bb_p->bb_dblock +
-		(1 << (BASIC_BLOCK - bb_p->bb_bit_n))) {
+	    /* are we done? */
+	    if (bba_p == NULL) {
 	      break;
 	    }
+	    
+	    bb_p = bba_p->ba_blocks;
 	  }
 	  
-	  if (bba_p == NULL) {
-	    dmalloc_errno = ERROR_BAD_DBLOCK_POINTER;
-	    dmalloc_error("_chunk_dump_unfreed");
-	    return;
+	  if (bb_p->bb_flags != BBLOCK_DBLOCK) {
+	    continue;
 	  }
 	  
-	  pnt = (char *)bb_p->bb_mem + (dblock_p - bb_p->bb_dblock) *
-	    (1 << bb_p->bb_bit_n);
+	  if (dblock_p >= bb_p->bb_dblock
+	      && dblock_p < bb_p->bb_dblock +
+	      (1 << (BASIC_BLOCK - bb_p->bb_bit_n))) {
+	    break;
+	  }
 	}
+	
+	if (bba_p == NULL) {
+	  dmalloc_errno = ERROR_BAD_DBLOCK_POINTER;
+	  dmalloc_error("_chunk_dump_unfreed");
+	  return;
+	}
+	
+	pnt = (char *)bb_p->bb_mem + (dblock_p - bb_p->bb_dblock) *
+	  (1 << bb_p->bb_bit_n);
 	
 	unknown_b = 0;
 	
