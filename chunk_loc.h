@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk_loc.h,v 1.52 1998/11/09 16:54:54 gray Exp $
+ * $Id: chunk_loc.h,v 1.53 1998/11/12 21:50:56 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -182,7 +182,7 @@ typedef struct {
  * when the pointer is Alloc[at]ed.  The db_next field is used when
  * the admin structure is on the free list.
  */
-struct dblock_st {
+typedef struct dblock_st {
   union {
     struct {
       unsigned short	nu_size;		/* size of contiguous area */
@@ -207,8 +207,7 @@ struct dblock_st {
 #define db_file		db_pnt.pn_file		/* Alloced */
   
   overhead_t	db_overhead;			/* configured overhead adds */
-};
-typedef struct dblock_st	dblock_t;
+} dblock_t;
 
 /*
  * Below defines a basic-block structure.  This structure is used to
@@ -224,7 +223,7 @@ typedef struct dblock_st	dblock_t;
  * full of admin structures such as this.  Yes, the library uses this
  * structure to track another block full of these structures.  Yikes!
  */
-struct bblock_st {
+typedef struct bblock_st {
   unsigned short	bb_flags;		/* what it is */
   
   union {
@@ -253,7 +252,7 @@ struct bblock_st {
 #define	bb_dblock	bb_info.in_dblock	/* User-dblock */
   
   union {
-    struct dblock_adm_st	*pn_slotp;	/* pointer to db_admin block */
+    struct dblock_adm_st	*pn_slot_p;	/* pointer to db_admin block */
     struct bblock_adm_st	*pn_admin_p;	/* pointer to bb_admin block */
     void			*pn_mem;	/* memory associated to it */
     struct bblock_st		*pn_next;	/* next in free list */
@@ -261,40 +260,37 @@ struct bblock_st {
   } bb_pnt;
   
   /* to reference union elements as bb elements */
-#define	bb_slotp	bb_pnt.pn_slotp		/* DBlock-admin */
+#define	bb_slot_p	bb_pnt.pn_slot_p	/* DBlock-admin */
 #define	bb_admin_p	bb_pnt.pn_admin_p	/* BBlock-admin */
 #define	bb_mem		bb_pnt.pn_mem		/* User-dblock, External */
 #define	bb_next		bb_pnt.pn_next		/* Free */
 #define	bb_file		bb_pnt.pn_file		/* User-bblock */
   
   overhead_t	bb_overhead;			/* configured overhead adds */
-};
-typedef struct bblock_st	bblock_t;
+} bblock_t;
 
 /*
  * Below is a definition of a bblock (basic-block) administration
  * structure.  This structure which fills a basic-block of space in
  * memory and holds a number of bblock structures.
  */
-struct bblock_adm_st {
+typedef struct bblock_adm_st {
   long			ba_magic1;		/* bottom magic number */
   unsigned int		ba_pos_n;		/* position in bblock array */
   bblock_t		ba_blocks[BB_PER_ADMIN]; /* bblock admin info */
   struct bblock_adm_st	*ba_next;		/* next bblock adm struct */
   long			ba_magic2;		/* top magic number */
-};
-typedef struct bblock_adm_st	bblock_adm_t;
+} bblock_adm_t;
 
 /*
  * Below is a definition of a dblock (divided-block) administration
  * structure.  This structure fills a basic-block of space in memory
  * and holds a number of dblock structures.
  */
-struct dblock_adm_st {
+typedef struct dblock_adm_st {
   long			da_magic1;		/* bottom magic number */
   dblock_t		da_block[DB_PER_ADMIN];	/* dblock admin info */
   long			da_magic2;		/* top magic number */
-};
-typedef struct dblock_adm_st	dblock_adm_t;
+} dblock_adm_t;
 
 #endif /* ! __CHUNK_LOC_H__ */
