@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.133 1999/03/04 16:32:33 gray Exp $
+ * $Id: chunk.c,v 1.134 1999/03/04 17:21:36 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.133 1999/03/04 16:32:33 gray Exp $";
+#ident "$Id: chunk.c,v 1.134 1999/03/04 17:21:36 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.133 1999/03/04 16:32:33 gray Exp $";
+  "$Id: chunk.c,v 1.134 1999/03/04 17:21:36 gray Exp $";
 #endif
 #endif
 
@@ -2882,6 +2882,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
       return FREE_ERROR;
     }
     
+    /* remove from the free linked list */
     if (list_p == NULL) {
       free_bblock[prev_p->bb_bit_n] = prev_p->bb_next;
     }
@@ -2889,6 +2890,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
       list_p->bb_next = prev_p->bb_next;
     }
     
+    /* now we add in the previous guys space and we are now freeing it again */
     block_n += prev_p->bb_block_n;
     NUM_BITS(block_n * BLOCK_SIZE, bit_n);
     bblock_p = prev_p;
@@ -2910,6 +2912,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
       return FREE_ERROR;
     }
     
+    /* remove from the free linked list */
     if (list_p == NULL) {
       free_bblock[next_p->bb_bit_n] = next_p->bb_next;
     }
@@ -2921,12 +2924,18 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     NUM_BITS(block_n * BLOCK_SIZE, bit_n);
   }
   
-  /* set the information for the bblock(s) */
-  set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, bit_n, 0,
-		   free_bblock[bit_n]);
-  
-  /* block goes at the start of the free list */
-  free_bblock[bit_n] = bblock_p;
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
+    /* set the information for the bblock(s), NULL for the next pointer */
+    set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, bit_n, 0, NULL);
+  }
+  else {
+    /* set the information for the bblock(s) */
+    set_bblock_admin(block_n, bblock_p, BBLOCK_FREE, bit_n, 0,
+		     free_bblock[bit_n]);
+    
+    /* block goes at the start of the free list */
+    free_bblock[bit_n] = bblock_p;
+  }
   
   return FREE_NOERROR;
 }
