@@ -60,7 +60,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: error.c,v 1.67 1997/12/22 00:25:05 gray Exp $";
+  "$Id: error.c,v 1.68 1997/12/22 00:32:02 gray Exp $";
 #endif
 
 #define SECS_IN_HOUR	(MINS_IN_HOUR * SECS_IN_MIN)
@@ -81,7 +81,7 @@ int		dmalloc_errno = ERROR_NONE;
 DMALLOC_PNT	dmalloc_address = ADDRESS_INIT;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
-unisnged int	_dmalloc_flags = 0;
+unsigned int	_dmalloc_flags = 0;
 
 /* global iteration counter for activities */
 unsigned long	_dmalloc_iter_c = 0;

@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: env.h,v 1.10 1997/12/05 21:09:46 gray Exp $
+ * $Id: env.h,v 1.11 1997/12/22 00:32:01 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -70,8 +70,9 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  */
 extern
 void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
-			     int *addr_count_p, long *debug_p, int *interval_p,
-			     int *lock_on_p, char **logpath_p, char **sfile_p,
+			     int *addr_count_p, unsigned int *debug_p,
+			     int *interval_p, int *lock_on_p,
+			     char **logpath_p, char **sfile_p,
 			     int *sline_p, int *scount_p);
 
 /*
@@ -82,7 +83,7 @@ extern
 void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
 			     const int short_tokens_b,
 			     const unsigned long address,
-			     const int addr_count, const long debug,
+			     const int addr_count, const unsigned int debug,
 			     const int interval, const int lock_on,
 			     const char *logpath, const char *sfile,
 			     const int sline, const int scount);

@@ -46,7 +46,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: env.c,v 1.12 1997/12/22 00:24:19 gray Exp $";
+  "$Id: env.c,v 1.13 1997/12/22 00:32:01 gray Exp $";
 #endif
 
 /* local variables */
@@ -295,7 +295,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
   
   /* append the token settings to the debug setting */
   if (debug_p != NULL) {
-    if (*debug_p == DEBUG_INIT) {
+    if (*debug_p == (unsigned int)DEBUG_INIT) {
       *debug_p = flags;
     }
     else {
@@ -318,7 +318,7 @@ void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
 {
   char	*buf_p = buf;
   
-  if (debug != DEBUG_INIT) {
+  if (debug != (unsigned int)DEBUG_INIT) {
     if (short_tokens_b || long_tokens_b) {
       attr_t	*attr_p;
       
@@ -336,7 +336,7 @@ void	_dmalloc_environ_set(char *buf, const int long_tokens_b,
       }
     }
     else {
-      (void)sprintf(buf_p, "%s%c%#lx,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
+      (void)sprintf(buf_p, "%s%c%#x,", DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
       for (; *buf_p != '\0'; buf_p++) {
       }
     }

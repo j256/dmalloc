@@ -41,10 +41,11 @@
  */
 #include "conf.h"
 #include "debug_val.h"
+#include "error_val.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.62 1997/12/22 00:25:30 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.63 1997/12/22 00:32:00 gray Exp $";
 #endif
 
 /* external routines */
@@ -339,7 +340,7 @@ static	int	do_random(const int iter_n)
       pnt_p = pnt_p->pi_next;
     }
     
-    FREE(pnt_p->pi_pnt);
+    free(pnt_p->pi_pnt);
     
     if (verbose_b) {
       (void)printf("%d: free'd %d bytes from slot %d (%#lx)\n",
@@ -374,11 +375,11 @@ static	int	do_random(const int iter_n)
   /* free used pointers */
   for (pnt_p = pointer_grid; pnt_p < pointer_grid + max_pointers; pnt_p++) {
     if (pnt_p->pi_pnt != NULL) {
-      FREE(pnt_p->pi_pnt);
+      free(pnt_p->pi_pnt);
     }
   }
   
-  FREE(pointer_grid);
+  free(pointer_grid);
   
   if (dmalloc_errno == ERROR_NONE) {
     return 1;
@@ -411,7 +412,7 @@ static	int	check_special(void)
     }
   }
   else {
-    FREE(pnt);
+    free(pnt);
   }
 #else
   if (pnt == NULL) {
@@ -421,14 +422,14 @@ static	int	check_special(void)
     if (! silent_b) {
       (void)printf("   ERROR: re-allocation of 0L did not return error.\n");
     }
-    FREE(pnt);
+    free(pnt);
   }
 #endif
   
   if (! silent_b) {
     (void)printf("  Trying to free 0L pointer.\n");
   }
-  FREE(NULL);
+  free(NULL);
 #if ALLOW_FREE_NULL
   if (dmalloc_errno != ERROR_NONE && ! silent_b) {
     (void)printf("   ERROR: free of 0L returned error.\n");
@@ -453,7 +454,7 @@ static	int	check_special(void)
     if (! silent_b) {
       (void)printf("   ERROR: allocation of > largest allowed size did not return error.\n");
     }
-    FREE(pnt);
+    free(pnt);
   }
   
   if (dmalloc_errno == ERROR_NONE) {
@@ -584,7 +585,7 @@ static	void	do_interactive(void)
     
     if (strncmp(line, "free", len) == 0) {
       pnt = get_address();
-      FREE(pnt);
+      free(pnt);
       continue;
     }
     

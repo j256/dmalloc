@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: error.h,v 1.31 1997/12/05 21:09:47 gray Exp $
+ * $Id: error.h,v 1.32 1997/12/22 00:32:03 gray Exp $
  */
 
 #ifndef __ERROR_H__
@@ -54,11 +54,11 @@ DMALLOC_PNT	dmalloc_address;
 
 /* global debug flags that are set my DMALLOC_DEBUG environ variable */
 extern
-long		_dmalloc_flags;
+unsigned int	_dmalloc_flags;
 
 /* global iteration counter for activities */
 extern
-unsigned long	_dmalloc_iterc;
+unsigned long	_dmalloc_iter_c;
 
 #if STORE_TIMEVAL
 /* overhead information storing when the library started up for elapsed time */
