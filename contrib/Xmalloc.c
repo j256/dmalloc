@@ -6,7 +6,7 @@
  * 	XtRealloc
  * so that we can get accurate caller data.
  *
- * ddhill@zk3.dec.com
+ * David Hill
  */
 #define DMALLOC_DISABLE
 
