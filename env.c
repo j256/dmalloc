@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.28 2001/03/29 00:11:44 gray Exp $
+ * $Id: env.c,v 1.29 2001/07/12 22:47:34 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #if IDENT_WORKS
-#ident "$Id: env.c,v 1.28 2001/03/29 00:11:44 gray Exp $"
+#ident "$Id: env.c,v 1.29 2001/07/12 22:47:34 gray Exp $"
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.28 2001/03/29 00:11:44 gray Exp $";
+  "$Id: env.c,v 1.29 2001/07/12 22:47:34 gray Exp $";
 #endif
 #endif
 
@@ -141,13 +141,12 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  * Process the values of dmalloc environ variable(s) from ENVIRON
  * string.
  */
-void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
-			     long *addr_count_p, unsigned int *debug_p,
-			     unsigned long *interval_p, int *lock_on_p,
-			     char **logpath_p, char **sfile_p,
-			     int *sline_p, int *scount_p)
+void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
+				 long *addr_count_p, unsigned int *debug_p,
+				 unsigned long *interval_p, int *lock_on_p,
+				 char **logpath_p, char **sfile_p,
+				 int *sline_p, int *scount_p)
 {
-  const char	*env;
   char		*env_p, *this_p;
   char		buf[1024];
   int		len, done_b = 0;
@@ -164,14 +163,8 @@ void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
   SET_POINTER(sline_p, 0);
   SET_POINTER(scount_p, 0);
   
-  /* get the options flag */
-  env = getenv(environ);
-  if (env == NULL) {
-    return;
-  }
-  
   /* make a copy */
-  (void)strncpy(buf, env, sizeof(buf));
+  (void)strncpy(buf, env_str, sizeof(buf));
   buf[sizeof(buf) - 1] = '\0';
   
   /* handle each of tokens, in turn */

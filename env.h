@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.20 2000/10/04 16:36:33 gray Exp $
+ * $Id: env.h,v 1.21 2001/07/12 22:47:34 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -55,11 +55,11 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  * string.
  */
 extern
-void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
-			     long *addr_count_p, unsigned int *debug_p,
-			     unsigned long *interval_p, int *lock_on_p,
-			     char **logpath_p, char **sfile_p,
-			     int *sline_p, int *scount_p);
+void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
+				 long *addr_count_p, unsigned int *debug_p,
+				 unsigned long *interval_p, int *lock_on_p,
+				 char **logpath_p, char **sfile_p,
+				 int *sline_p, int *scount_p);
 
 /*
  * Set dmalloc environ variable(s) with the values (maybe SHORT debug
