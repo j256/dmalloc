@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: TODO,v 1.16 1994/03/30 06:06:39 gray Exp $
+$Id: TODO,v 1.17 1994/07/21 18:43:14 gray Exp $
 -------------------------------------------------------------------------------
 
 HEAP OPERATIONS:
@@ -97,6 +97,10 @@ GENERAL:
 	overflow the pointer above's info
 - handle memalign, valloc, maybe some form of mallopt
 	- maybe mallopt could be mapped into malloc_debug()
+
+- maybe store the time and iteration count in the allocated structure
+	for when dumping non-freed blocks list
+- maybe add another time logging flag to dump the elapsed time since start
 
 -------------------------------------------------------------------------------
 
