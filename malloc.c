@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.41 1993/08/30 20:14:32 gray Exp $";
+  "$Id: malloc.c,v 1.42 1993/09/07 04:50:39 gray Exp $";
 #endif
 
 /*
@@ -52,7 +52,7 @@ LOCAL	char	*rcs_id =
 /* logfile for dumping malloc info, MALLOC_LOGFILE env var overrides this */
 EXPORT	char		*malloc_logpath	= NULL;
 /* internal malloc error number for reference purposes only */
-EXPORT	int		malloc_errno = 0;
+EXPORT	int		malloc_errno = ERROR_NONE;
 /* address to look for.  when discovered call _malloc_error() */
 #if __STDC__
 EXPORT	void		*malloc_address	= NULL;
@@ -119,7 +119,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
   static int	iterc = 0;
   
   if (in_alloc) {
-    malloc_errno = MALLOC_IN_TWICE;
+    malloc_errno = ERROR_IN_TWICE;
     _malloc_error("check_debug_vars");
     /* malloc_error may die already */
     _malloc_die();
@@ -180,7 +180,7 @@ LOCAL	void	check_pnt(const char * file, const int line, char * pnt,
   
   /* NOTE: if malloc_address_count == 0 then never quit */
   if (malloc_address_count > 0 && addc >= malloc_address_count) {
-    malloc_errno = MALLOC_POINTER_FOUND;
+    malloc_errno = ERROR_IS_FOUND;
     _malloc_error("check_pnt");
   }
 }
@@ -516,7 +516,7 @@ EXPORT	char	*malloc_strerror(int errnum)
   /* should not check_debug_vars here because _malloc_error calls this */
   
   if (! IS_MALLOC_ERRNO(errnum))
-    return malloc_errlist[MALLOC_BAD_ERRNO];
+    return malloc_errlist[ERROR_BAD_ERRNO];
   else
     return malloc_errlist[errnum];
 }
