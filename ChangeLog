@@ -1,3 +1,28 @@
+Wed Sep  6 13:33:59 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Added sbrk handling in the dmalloc_t test program.
+
+	* Renumbered error values so inserting won't be a problem in the
+	future.  Added ERROR_EXTERNAL_HUGE.
+
+	* Added new argv files.
+
+	* Fixed up statistics to include external block handling.
+
+	* Fixed up the external sbrk handling.  I broke it with the 3.1.1
+	version.  This re-write is much cleaner.  Made some changes to
+	dblock admin handling and heap-check
+
+	* Re-added THREAD_LOCK definitions to settings.dist.  Where did
+	they go?
+
+Tue Sep  5 12:38:48 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Moved install.sh to install-sh and fixed some Makefile problems.
+	Thanks Francois.
+
+	* Simplified the heap code a lot.  Fixed race conditions.
+
 Sun Sep  3 12:50:30 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing 3.1.2-beta.
@@ -25,8 +50,8 @@ Fri Sep  1 15:53:50 1995  Gray Watson  <gray@burger.letters.com>
 
 Wed Aug 30 14:05:39 1995  Gray Watson  <gray@burger.letters.com>
 
-	* Added dmalloc_aborting flag in case kill or abort recurses.  I
-	forgot who sent me this :-(.  Thanks.
+	* Added dmalloc_aborting flag in case kill or abort recurses.
+	Thanks Stephen.
 
 Tue Aug 29 17:43:54 1995  Gray Watson  <gray@burger.letters.com>
 
@@ -279,13 +304,13 @@ Fri Sep 16 14:50:26 1994  Gray Watson  (gray@blender.antaire.com)
 
 Tue Sep 13 11:36:10 1994  Gray Watson  (gray@toaster.antaire.com)
 
-	* Added mkinstalldirs to distribution per feedback from Francois.
+	* Added mkinstalldirs to distribution.  Thanks Francois.
 
 Mon Sep 12 13:12:38 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Fixed zsh and [t]csh alias messages in documentation.
 
-	* Added install.sh to distribution per feedback from Francois.
+	* Added install.sh to distribution. Thanks Francois.
 
 Mon Sep 12 10:07:29 1994  Gray Watson  (gray@toaster.antaire.com)
 
@@ -297,8 +322,7 @@ Mon Sep 12 10:07:29 1994  Gray Watson  (gray@toaster.antaire.com)
 
 	* Changed DMALLOC_DEBUG_DISABLE flag to DMALLOC_DISABLE.
 
-	* Fixed some include file auto-include messages from feedback from
-	Francois.
+	* Fixed some include file auto-include messages. Thanks Francois.
 
 Thu Sep  8 10:07:56 1994  Gray Watson  (gray@blender.antaire.com)
 
@@ -308,7 +332,7 @@ Thu Sep  8 10:07:56 1994  Gray Watson  (gray@blender.antaire.com)
 
 Fri Sep  2 17:34:02 1994  Gray Watson  (gray@blender.antaire.com)
 
-	* Fixed possible recursion problem via feedback from Marty.
+	* Fixed possible recursion problem.  Thanks Marty.
 
 Mon Aug 29 11:08:36 1994  Gray Watson  (gray@blender.antaire.com)
 
@@ -340,9 +364,9 @@ Wed Aug  3 14:28:20 1994  Gray Watson  (gray@blender.antaire.com)
 
 Mon Aug  1 23:03:50 1994  Gray Watson  (gray@blender.antaire.com)
 
-	* Added $verbose checks in configure from francois' feedback.
+	* Added $verbose checks in configure.  Thanks Francois.
 
-	* Added 'err' label to error printing from francois' feedback.
+	* Added 'err' label to error printing.  Thanks Francois.
 
 Fri Jul 22 11:48:26 1994  Gray Watson  (gray@blender.antaire.com)
 
@@ -354,7 +378,7 @@ Thu Jul 21 14:44:25 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Made a 'malloc_dbg -i 0' undefine MALLOC_INTERVAL.
 
-	* Fixed calloc return-address problem from Gregory Stark's feedback.
+	* Fixed calloc return-address problem.  Thanks Gregory.
 
 	* Added KILL_PROCESS macro to configuration scripts.  Replaces
 	ERROR_SIGNAL.
@@ -603,7 +627,7 @@ Sun Sep 26 14:36:54 1993  Gray Watson  (gray@fridge.antaire.com)
 	reflect reality.  Some real dumb errors found.
 
 	* Added malloc_debug_current() and #ifdef STDC instead of
-	#if, via feedback from Scott.
+	#if.  Thanks Scott.
 
 Wed Sep 22 00:43:54 1993  Gray Watson  (gray@toaster.antaire.com)
 
@@ -614,13 +638,12 @@ Mon Sep 20 20:36:23 1993  Gray Watson  (gray@toaster.antaire.com)
 	* Releasing version 1.3.3.
 
 	* Added ALLOW_FREE_NULL defines because of some systems allowing
-	free(0).  Yeach!  Via feedback from Dave.
+	free(0).  Yeach!  Thanks Dave.
 
 Fri Sep 10 17:10:45 1993  Gray Watson  (gray@toaster.antaire.com)
 
 	* Fixed debug value changes in mid-stream.  Repaired configuration
-	error with memcpy/bcopy and memcmp/bcmp via feedback from Marc
-	Evans (?).
+	error with memcpy/bcopy and memcmp/bcmp.  Thanks Marc.
 
 Tue Sep  7 00:49:50 1993  Gray Watson  (gray@toaster.antaire.com)
 
@@ -657,15 +680,15 @@ Tue Aug 24 00:35:49 1993  Gray Watson  (gray@toaster.antaire.com)
 	* Added log-ra token to log specific information about non-freed
 	memory with only return-address information (NOTE: later removed).
 
-	* Added the beginnings of return-address handling via feedback
-	from Dave.  Need to resolve some XXX sections in chunk and
-	get more architecture/compiler hacks in return.h.  Along the way
-	had to change the malloc_examine() arguments to add ret_attr.
+	* Added the beginnings of return-address handling.  Thanks Dave.
+	Need to resolve some XXX sections in chunk and get more
+	architecture/compiler hacks in return.h.  Along the way had to
+	change the malloc_examine() arguments to add ret_attr.
 
 	* Added -L or --list to malloc_dbg to list all the rc-file tags.
 
-	* Fixed some problems in chunk.c via Dave's feedback and
-	renamed malloc_str.[ch] to be arg_check.[ch].
+	* Fixed some problems in chunk.c.  Thanks Dave.  Renamed
+	malloc_str.[ch] to be arg_check.[ch].
 
 Tue Aug 17 16:22:20 1993  Gray Watson  (gray@toaster.antaire.com)
 
@@ -682,7 +705,7 @@ Thu Aug 12 18:11:01 1993  Gray Watson  (gray@toaster.antaire.com)
 
 Tue Aug 10 16:43:07 1993  Gray Watson  (gray@toaster.antaire.com)
 
-	* Made some minor fixes via feedback from Marc Evans.
+	* Made some minor fixes.  Thanks Marc.
 
 Mon Jul 26 05:50:27 1993  Gray Watson  (gray@toaster.antaire.com)
 
@@ -1080,5 +1103,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.162 1995/09/03 16:52:24 gray Exp $
+$Id: ChangeLog,v 1.163 1995/09/06 18:08:00 gray Exp $
 -------------------------------------------------------------------------------

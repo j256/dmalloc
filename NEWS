@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.65 1995/09/03 16:36:00 gray Exp $
+$Id: NEWS,v 1.66 1995/09/06 18:08:01 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 3.1.2:
 
+	* Changes to basic-block handling in chunk.  Fixed non-linear code.
 	* Added inital thread locking for debugging threaded programs.
 	* Added settings.dist file which is copied to settings.h during config.
 	* New attempts to auto-configure DMALLOC_SIZE for size_t.
