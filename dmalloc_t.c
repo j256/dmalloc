@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.86 2000/05/15 22:23:03 gray Exp $
+ * $Id: dmalloc_t.c,v 1.87 2000/05/16 15:48:20 gray Exp $
  */
 
 /*
@@ -57,10 +57,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc_t.c,v 1.86 2000/05/15 22:23:03 gray Exp $";
+#ident "$Id: dmalloc_t.c,v 1.87 2000/05/16 15:48:20 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.86 2000/05/15 22:23:03 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.87 2000/05/16 15:48:20 gray Exp $";
 #endif
 #endif
 
@@ -837,7 +837,7 @@ static	void	do_interactive(void)
       ret = malloc_verify((char *)pnt);
       (void)printf("malloc_verify(%#lx) returned '%s'\n",
 		   (long)pnt,
-		   (ret == DMALLOC_VERIFY_NOERROR ? "success" : "failure"));
+		   (ret == DMALLOC_NOERROR ? "success" : "failure"));
       continue;
     }
     
@@ -1006,7 +1006,7 @@ int	main(int argc, char **argv)
   
   /* last thing is to verify the heap */
   ret = malloc_verify(NULL);
-  if (ret != DMALLOC_VERIFY_NOERROR) {
+  if (ret != DMALLOC_NOERROR) {
     (void)fprintf(stderr, "Final malloc_verify returned failure: %s (%d)\n",
 		  dmalloc_strerror(dmalloc_errno), dmalloc_errno);
   }
