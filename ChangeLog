@@ -1,3 +1,13 @@
+2005-03-18  Gray Watson  <gray@outside.256.com>
+
+	* Increased the basic block default to 32k.
+
+	* Fixed some documentation.
+
+	* Added better error code output in dmalloc_t.
+
+	* Fixed the global Makefile to install libs as 755 not 644.
+
 2005-01-11  Gray Watson  <gray@outside.256.com>
 
 	* Added some fixes for Compaq's C compiler, some include ordering
@@ -2259,5 +2269,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.329 2005/01/11 19:31:09 gray Exp $
+$Id: ChangeLog,v 1.330 2005/03/19 00:06:20 gray Exp $
 -------------------------------------------------------------------------------

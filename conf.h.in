@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.97 2005/01/11 18:26:31 gray Exp $
+ * $Id: conf.h.in,v 1.98 2005/03/19 00:06:20 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -65,13 +65,13 @@
  * This is the basic block size in bits.  If possible, the configure
  * script will set this to be the value returned by the getpagesize()
  * function.  If not then some sort of best guess will be necessary.
- * 14 (meaning basic block size of 16k) will probably be good.
+ * 15 (meaning basic block size of 32k) will probably be good.
  *
  * NOTE: some sbrk functions round to the correct page-size.  No
  * problems aside from a possible small increase in the administration
  * overhead should happen if this value is too high.
  */
-#define BASIC_BLOCK 12
+#define BASIC_BLOCK 15
 
 /*
  * The alignment value of all allocations in number of bytes for
