@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.57 1994/02/18 23:19:41 gray Exp $";
+  "$Id: malloc.c,v 1.58 1994/03/25 06:20:20 gray Exp $";
 #endif
 
 /*
@@ -309,6 +309,9 @@ LOCAL	int	malloc_startup(void)
   
 #if AUTO_SHUTDOWN
   {
+    unsigned int	line_hold = _malloc_line;
+    char		*file_hold = _malloc_file;
+    
     /*
      * HACK: we have to disable the in_alloc because we might be about
      * to go recursize.  this should not get back here since malloc
@@ -326,6 +329,9 @@ LOCAL	int	malloc_startup(void)
 #endif
     
     in_alloc = TRUE;
+    
+    _malloc_line = line_hold;
+    _malloc_file = file_hold;
   }
 #endif /* AUTO_SHUTDOWN */
   

@@ -1,13 +1,13 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.49 1994/03/20 19:49:07 gray Exp $
+# $Id: Makefile.in,v 1.50 1994/03/25 06:20:11 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
 OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_INST= malloc_lp.o
-FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
+FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_t.c
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
@@ -169,10 +169,10 @@ shar : malloc.head
 #
 # auto configure settings
 #
-Makefile : Makefile.in config.status
+Makefile : Makefile.in
 	$(SHELL) config.status
 
-conf.h : conf.h.in config.status
+conf.h : conf.h.in
 	$(SHELL) config.status
 
 config.status : configure

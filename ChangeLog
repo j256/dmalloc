@@ -1,3 +1,11 @@
+Fri Mar 25 01:18:55 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Fixed small recursive problem messing up malloc #2 info.
+
+Mon Mar 21 09:58:21 1994  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added xmalloc,xrealloc,etc. override functions.
+
 Sun Mar 20 14:48:25 1994  Gray Watson  (gray@fridge.antaire.com)
 
 	* Added better mechanisms for const definition.
@@ -667,5 +675,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	when MALLOC_ADDRESS was not working correctly.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.98 1994/03/20 19:49:01 gray Exp $
+$Id: ChangeLog,v 1.99 1994/03/25 06:20:03 gray Exp $
 -------------------------------------------------------------------------------
