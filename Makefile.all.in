@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.122 2003/10/06 18:20:24 gray Exp $
+# $Id: Makefile.all.in,v 1.123 2004/01/28 14:53:46 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -417,7 +417,6 @@ malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
  malloc_funcs.h return.h
 protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
  heap.h protect.h
-x.o: x.c
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
  error.h error_val.h heap.h
