@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.3 1992/12/22 04:55:36 gray Exp $
+@c $Id: dmalloc.texi,v 1.4 1992/12/22 18:01:41 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -74,7 +74,7 @@ translation approved by the author instead of in the original English.
 @node Top, Copying, (dir), (dir)
 @top Malloc Debug Library
 
-The file documents the general-usage and the inner-workings of the
+This file documents the general-usage and the inner-workings of the
 memory allocation or @dfn{malloc} library it accompanies.
 
 This malloc library has been designed as a drop in replacement for the
@@ -98,9 +98,7 @@ Gray Watson, Antaire Corporation.
 * Allocation Basics::           Basic description of terms and functions.
 * Features::                    Description of the benefits of the library.
 * Usage::                       How to run programs with the library.
-* Compatibility::               General compatibility concerns.
-* Portability::                 Issues important for porting the library.
-* Code::                        Information on the source and general concepts.
+* Code::                        Information on the source and general concerns.
 * Plugs::                       A couple soapbox comments.
 @end menu
 
@@ -465,7 +463,7 @@ allocating or freeing that address.
 
 The address can also have an @samp{:number} argument.  For instance, if
 it was set it to @samp{0x3e45:10}, the library will kill itself the 10th
-time it allocates address @samp{0x3e45}.
+time it sees address @samp{0x3e45}.
 
 This makes it easier to track down specific addresses not being freed.
 
@@ -687,7 +685,7 @@ log any errors and messages to the screen via standard-error
 
 @end table
 
-@node Usage, Compatibility, Features, Top
+@node Usage, Code, Features, Top
 @section How to run programs with the library.
 
 @menu
@@ -869,47 +867,17 @@ the logging of more verbose memory error messages.
 
 For some more information, refer to the @file{malloc.h} header file.
 
-@node Compatibility, Portability, Usage, Top
-@section General compatibility concerns.
+@node Code, Plugs, Usage, Top
+@section Information on the source and general concerns.
 
-@itemize @bullet
-@item
-Realloc() backwards compatibility with being able to realloc from the last
-freed block is @emph{not} supported.
+@menu
+* Definitions::                 Some terms and other information.
+* Compatibility::               General compatibility concerns.
+* Portability::                 Issues important for porting the library.
+@end menu
 
-@item
-The library does @emph{not} provide memalign() nor valloc() support as
-of yet, but may in future releases.  I would be interested to know who
-is using these functions, which architectures they are supported on, and
-for what reason they are being used.
-
-@item
-Aside from possibly being slower than the system's memory allocation
-functions, the library should be fully compatible with the standard
-memory routines.  If this is not the case please bring this to my
-attention.
-@end itemize
-
-@node Portability, Code, Compatibility, Top
-@section Issues important for porting the library.
-
-General compatibility issues center around:
-
-@itemize @bullet
-@item
-sbrk or compatible function usages
-@item
-Whether the systems's heap grows towards high or low memory.  The
-chunk.c code is designed (loosely) around the fact that consecutive
-calls to sbrk should give higher memory addresses.
-
-I have not been able to test the library on a system whose heap grows
-towards low memory.  If you are trying to run the library on such a
-system I would be interested in talking with you.
-@end itemize
-
-@node Code, Plugs, Portability, Top
-@section Information on the source and general concepts.
+@node Definitions, Compatibility,  , Code
+@subsection Some terms and other information.
 
 Here are a couple definitions and other information for those interested
 in "picking the brain" of the library.  The code is a little ugly here
@@ -935,11 +903,52 @@ some anonymous amount of memory
 
 @end table
 
+@node Compatibility, Portability, Definitions, Code
+@subsection General compatibility concerns.
+
+@itemize @bullet
+@item
+Realloc() backwards compatibility with being able to realloc from the last
+freed block is @emph{not} supported.
+
+@item
+The library does @emph{not} provide memalign() nor valloc() support as
+of yet, but may in future releases.  I would be interested to know who
+is using these functions, which architectures they are supported on, and
+for what reason they are being used.
+
+@item
+Aside from possibly being slower than the system's memory allocation
+functions, the library should be fully compatible with the standard
+memory routines.  If this is not the case please bring this to my
+attention.
+@end itemize
+
+@node Portability,  , Compatibility, Code
+@subsection Issues important for porting the library.
+
+General compatibility issues center around:
+
+@itemize @bullet
+@item
+sbrk or compatible function usages
+@item
+Whether the systems's heap grows towards high or low memory.  The
+chunk.c code is designed (loosely) around the fact that consecutive
+calls to sbrk should give higher memory addresses.
+
+I have not been able to test the library on a system whose heap grows
+towards low memory.  If you are trying to run the library on such a
+system I would be interested in talking with you.
+@end itemize
+
 @node Plugs,  , Code, Top
 @section A couple soapbox comments.
 
 Since I have your attention I would like to talk for a second about a
-couple of things that I feel strongly about.
+couple of things that I feel strongly about.  If you would like any more
+information about the below, please mail to the supplied addresses or
+drop me a line with any questions.
 
 @table @samp
 @item The Free Software Foundation <gnu@@prep.ai.mit.edu>
@@ -951,20 +960,15 @@ perl, bison, or any of their many programs and libraries then you have
 benefited from the movement.  Please consider supporting it.
 
 @item Berkeley Software Design, Inc. <bsdi-info@@bsdi.com>
-We at the Antaire Corporation are the proud owner and reseller of the
-BSDi operating system.  We are very excited about this product and would
-like to heartily recommend it to others.
-
-For $1k you get a @emph{complete} BSD-flavor operating system with
-@emph{full source} for 386 and 486 systems (other packages are
-available).  Additional binary licenses are $200.  The system is still
-at pre-production status although we have yet to have a major problem
-with our system that has been running for a number of months now.  Among
-other features, it comes with a MS-DOG runtime environment.
-
-For an organization that has a lot of System 5 experience it comes as a
-welcome relief.  For more information, please mail to above address or
-drop me a line with any questions.
+We at the Antaire Corporation are the proud and enthusiastic
+owners/resellers of the BSD/386 operating system.  The system is still at
+pre-production status although we have yet to have a major problem with
+our 486/33 that has been running for a number of months now.  For $1k
+you get a @emph{complete} BSD-flavor operating system with @emph{full
+source} for 386 and 486 systems (binary licenses are available).  Along
+with the obvious benefits of full source code come excellent customer
+support/service and system features such as a MS-DOG runtime
+environment, nfs/tcp-ip, full software development utilities, X, etc.
 
 @contents
 @bye

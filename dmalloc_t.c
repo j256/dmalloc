@@ -9,16 +9,16 @@
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library (see COPYING-LIB); if not, write to the
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * 
+ *
  * The author of the program may be contacted at gray.watson@antaire.com
  */
 
@@ -34,8 +34,10 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.9 1992/12/17 23:30:53 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.10 1992/12/22 18:01:44 gray Exp $";
 #endif
+
+#define DEFAULT_ITERATIONS	1000
 
 /*
  * hexadecimal STR to integer translation
@@ -85,18 +87,17 @@ LOCAL	long	get_address(void)
 
 EXPORT	int	main(int argc, char ** argv)
 {
-  int	size, count;
-  long	pnt, magic;
-  char	line[80], *linep;
-  
   argc--, argv++;
   
-  (void)srand(time(0) ^ 0xdeadbeef);
+  (void)srand(time(0) ^ 0xDEADBEEF);
   
   (void)printf("------------------------------------------------------\n");
   (void)printf("Malloc test program.  Type 'help' for assistance.\n");
   
   for (;;) {
+    int		len;
+    char	line[128], *linep;
+    
     (void)printf("------------------------------------------------------\n");
     (void)printf("prompt> ");
     (void)fgets(line, sizeof(line), stdin);
@@ -104,8 +105,12 @@ EXPORT	int	main(int argc, char ** argv)
     if (linep != NULL)
       *linep = '\0';
     
-    if (strcmp(line, "?") == 0
-	|| strcmp(line, "help") == 0) {
+    len = strlen(line);
+    if (len == 0)
+      continue;
+    
+    if (strncmp(line, "?", len) == 0
+	|| strncmp(line, "help", len) == 0) {
       (void)printf("------------------------------------------------------\n");
       (void)printf("HELP:\n\n");
       
@@ -117,17 +122,19 @@ EXPORT	int	main(int argc, char ** argv)
       
       (void)printf("map       - map the heap to the logfile\n");
       (void)printf("overwrite - overwrite some memory to test errors\n");
-      (void)printf("random    - randomly to a number of malloc/frees\n");
+      (void)printf("random    - randomly execute a number of malloc/frees\n");
       (void)printf("verify    - check out a memory address\n\n");
       
       (void)printf("quit      - quit this test program\n");
       continue;
     }
     
-    if (strcmp(line, "quit") == 0)
+    if (strncmp(line, "quit", len) == 0)
       break;
     
-    if (strcmp(line, "malloc") == 0) {
+    if (strncmp(line, "malloc", len) == 0) {
+      int	size;
+      
       (void)printf("How much: ");
       (void)fgets(line, sizeof(line), stdin);
       size = atoi(line);
@@ -135,14 +142,19 @@ EXPORT	int	main(int argc, char ** argv)
       continue;
     }
     
-    if (strcmp(line, "free") == 0) {
+    if (strncmp(line, "free", len) == 0) {
+      long	pnt;
+      
       pnt = get_address();
       (void)printf("free(%#lx) returned: %s\n",
 		   pnt, (FREE(pnt) == FREE_NOERROR ? "success" : "failure"));
       continue;
     }
     
-    if (strcmp(line, "realloc") == 0) {
+    if (strncmp(line, "realloc", len) == 0) {
+      int	size;
+      long	pnt;
+      
       pnt = get_address();
       
       (void)printf("How much: ");
@@ -155,22 +167,36 @@ EXPORT	int	main(int argc, char ** argv)
       continue;
     }
     
-    if (strcmp(line, "map") == 0) {
+    if (strncmp(line, "map", len) == 0) {
       (void)malloc_heap_map();
+      (void)printf("Done.\n");
       continue;
     }
     
-    if (strcmp(line, "overwrite") == 0) {
+    if (strncmp(line, "overwrite", len) == 0) {
+      long	pnt, magic;
+      
       pnt = get_address();
       
       magic = 0x12345678;
       bcopy(&magic, (char *)pnt, sizeof(magic));
+      
+      (void)printf("Done.\n");
       continue;
     }
     
     /* do random heap hits */
-    if (strcmp(line, "random") == 0) {
-      for (count = 1; count < 1000; count += 10) {
+    if (strncmp(line, "random", len) == 0) {
+      int	count, max;
+      
+      (void)printf("How many iterations[%d]: ", DEFAULT_ITERATIONS);
+      (void)fgets(line, sizeof(line), stdin);
+      if (line[0] == '\0' || line[0] == '\n')
+	max = DEFAULT_ITERATIONS;
+      else
+	max = atoi(line);
+      
+      for (count = 1; count < max; count += 10) {
 	int	amount;
 	char	*data;
 	
@@ -178,20 +204,26 @@ EXPORT	int	main(int argc, char ** argv)
 	data = MALLOC(amount);
 	(void)FREE(data);
       }
+      
+      (void)printf("Done.\n");
       continue;
     }
     
-    if (strcmp(line, "verify") == 0) {
+    if (strncmp(line, "verify", len) == 0) {
+      long	pnt;
+      int	ret;
+      
       pnt = get_address();
       
+      ret = malloc_verify((char *)pnt);
       (void)printf("malloc_verify(%#lx) returned: %s\n",
 		   pnt,
-		   (malloc_verify((char *)pnt) == MALLOC_VERIFY_NOERROR
-		    ? "success" : "failure"));
+		   (ret == MALLOC_VERIFY_NOERROR ? "success" : "failure"));
       continue;
     }
     
-    (void)printf("Unknown command.\n");
+    (void)printf("Unknown command '%s'.\n", line);
+    (void)printf("Type 'help' for assistance.\n");
   }
   
   /* shutdown the alloc routines */

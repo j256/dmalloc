@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.11 1992/12/22 04:55:32 gray Exp $
+ * $Id: malloc.h,v 1.12 1992/12/22 18:01:38 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -111,25 +111,31 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 
 #ifdef __GNUC__
 
-/* duplicate BUF of SIZE bytes */
+/*
+ * duplicate BUF of SIZE bytes
+ */
 #define BDUP(buf, size)	({ \
 			  char	*_ret; \
 			  int	_size = (size); \
 			   \
-			  if ((_ret = MALLOC(_size)) != NULL) \
+			  _ret = MALLOC(_size); \
+			  if (_ret != NULL) \
 			    MEMORY_COPY((buf), _ret, _size); \
 			   \
 			  _ret; \
 			})
 
-/* the strdup() function in macro form.  duplicate string STR */
+/*
+ * the strdup() function in macro form.  duplicate string STR
+ */
 #define STRDUP(str)	({ \
 			  char	*_strp = (str); \
 			  char	*_ret; \
 			  int	_len; \
 			   \
 			  _len = strlen(_strp); \
-			  if ((_ret = MALLOC(_len + 1)) != NULL) \
+			  _ret = MALLOC(_len + 1); \
+			  if (_ret != NULL) \
 			    MEMORY_COPY(_strp, _ret, _len + 1); \
 			   \
 			  _ret; \
@@ -137,25 +143,31 @@ IMPORT	char	*memcpy(char * to, char * from, int length);
 
 #else /* ! __GNUC__ */
 
-/* duplicate BUF of SIZE and return the new address in OUT */
+/*
+ * duplicate BUF of SIZE and return the new address in OUT
+ */
 #define BDUP(buf, size, out)	do { \
 				  char	*_ret; \
 				  int	_size = (size); \
 				   \
-				  if ((_ret = MALLOC(_size)) != NULL) \
+				  _ret = MALLOC(_size); \
+				  if (_ret != NULL) \
 				    MEMORY_COPY((buf), _ret, _size); \
 				   \
 				  (out) = _ret; \
 				} while(0)
 
-/* strdup() in macro form.  duplicate string STR and return a copy in OUT */
+/*
+ * strdup() in macro form.  duplicate string STR and return a copy in OUT
+ */
 #define STRDUP(str, out)	do { \
 				  char	*_strp = (str); \
 				  char	*_ret; \
 				  int	_len; \
 				   \
 				  _len = strlen(_strp); \
-				  if ((_ret = MALLOC(_len + 1)) != NULL) \
+				  _ret = MALLOC(_len + 1); \
+				  if (_ret != NULL) \
 				    MEMORY_COPY(_strp, _ret, _len + 1); \
 				   \
 				  (out) = _ret; \
@@ -172,34 +184,31 @@ IMPORT	char		*malloc_logpath;
 IMPORT	int		malloc_errno;
 
 /*
- * shutdown alloc module, provide statistics
+ * shutdown memory-allocation module, provide statistics if necessary
  */
 IMPORT	void	malloc_shutdown(void);
 
 /*
- * allocate NUM_ELEMENTS of elements of SIZE, then zero's the block
- */
-IMPORT	char	*calloc(unsigned int num_elements, unsigned int size);
-
-/*
- * release PNT in the heap
- */
-IMPORT	int	free(char * pnt);
-
-/*
- * same as free
- */
-IMPORT	int	cfree(char * pnt);
-
-/*
- * allocate a SIZE block of bytes
+ * allocate and return a SIZE block of bytes
  */
 IMPORT	char	*malloc(unsigned int size);
 
 /*
- * resizes OLD_PNT to SIZE bytes either copying or truncating
+ * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
+ * of SIZE bytes and zero the block
+ */
+IMPORT	char	*calloc(unsigned int num_elements, unsigned int size);
+
+/*
+ * resizes OLD_PNT to SIZE bytes and return the new space after either copying
+ * all of OLD_PNT to the new area or truncating
  */
 IMPORT	char	*realloc(char * old_pnt, unsigned int new_size);
+
+/*
+ * release PNT in the heap, returning FREE_[NO]ERROR
+ */
+IMPORT	int	free(char * pnt);
 
 /*
  * call through to _heap_map function, returns [NO]ERROR
@@ -207,7 +216,7 @@ IMPORT	char	*realloc(char * old_pnt, unsigned int new_size);
 IMPORT	int	malloc_heap_map(void);
 
 /*
- * verify pointer PNT or if it equals 0, the entire heap
+ * verify pointer PNT or if it equals 0, the entire heap.
  * returns MALLOC_VERIFY_[NO]ERROR
  */
 IMPORT	int	malloc_verify(char * pnt);

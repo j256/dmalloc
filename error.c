@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.14 1992/12/17 23:30:35 gray Exp $";
+  "$Id: error.c,v 1.15 1992/12/22 18:01:34 gray Exp $";
 #endif
 
 /*
@@ -76,7 +76,7 @@ EXPORT	void	_malloc_message(char * format, ...)
   /* tack on a '\n' if necessary */
   if (str[len - 1] != '\n') {
     str[len++] = '\n';
-    str[len] = '\0';
+    str[len] = NULLC;
   }
   
   /* do we need to log the message? */

@@ -39,7 +39,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.13 1992/12/22 04:55:30 gray Exp $";
+  "$Id: malloc.c,v 1.14 1992/12/22 18:01:36 gray Exp $";
 #endif
 
 /*
@@ -57,7 +57,7 @@ EXPORT	void		malloc_shutdown(void);
 /* local variables */
 LOCAL	int		malloc_enabled	= FALSE; /* have we started yet? */
 LOCAL	char		in_alloc	= FALSE; /* can't be here twice */
-LOCAL	char		log_path[128];		/* storage for env path */
+LOCAL	char		log_path[128]	= { NULLC }; /* storage for env path */
 
 /* debug variables */
 LOCAL	char		*malloc_address	= NULL;	/* address to catch */
@@ -121,7 +121,8 @@ LOCAL	int	check_debug_vars(char * file, int line)
   
   /* check start file/line specifications */
   if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP)
-      && start_file[0] != NULLC && file != NULL
+      && start_file[0] != NULLC
+      && file != NULL
       && strcmp(start_file, file) == 0
       && (line == 0 || line == start_line))
     BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
@@ -140,14 +141,12 @@ LOCAL	int	check_debug_vars(char * file, int line)
       BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
   }
   
-  /* do we need to check the heap? */
+  /* after all that, do we need to check the heap? */
   if (BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP))
     (void)_chunk_heap_check();
   
   return NOERROR;
 }
-
-/*************************** startup/shutdown calls **************************/
 
 /*
  * get the values of malloc environ variables
@@ -211,8 +210,10 @@ LOCAL	void	get_environ(void)
   }
 }
 
+/*************************** startup/shutdown calls **************************/
+
 /*
- * startup the alloc module
+ * startup the memory-allocation module
  */
 LOCAL	int	malloc_startup(void)
 {
@@ -237,7 +238,7 @@ LOCAL	int	malloc_startup(void)
 }
 
 /*
- * shutdown alloc module, provide statistics
+ * shutdown memory-allocation module, provide statistics if necessary
  */
 EXPORT	void	malloc_shutdown(void)
 {
@@ -263,7 +264,33 @@ EXPORT	void	malloc_shutdown(void)
 /******************************** memory calls *******************************/
 
 /*
- * allocate NUM_ELEMENTS of elements of SIZE, then zero's the block
+ * allocate and return a SIZE block of bytes
+ */
+EXPORT	char	*malloc(unsigned int size)
+{
+  char		*newp;
+  
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
+    return MALLOC_ERROR;
+  
+  newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, size);
+  
+  /* is this the address we are looking for? */
+  if (malloc_address != NULL && newp == malloc_address) {
+    if (address_count - 1 <= 0)
+      _malloc_die();
+    else
+      address_count--;
+  }
+  
+  in_alloc = FALSE;
+  
+  return newp;
+}
+
+/*
+ * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
+ * of SIZE bytes and zero the block
  */
 EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
 {
@@ -295,65 +322,8 @@ EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
 }
 
 /*
- * release PNT in the heap
- */
-EXPORT	int	free(char * pnt)
-{
-  int		ret;
-  
-  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
-    return FREE_ERROR;
-  
-  /* is this the address we are looking for? */
-  if (malloc_address != NULL && pnt == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
-  
-  ret = _chunk_free(_malloc_file, _malloc_line, pnt);
-  
-  in_alloc = FALSE;
-  
-  return ret;
-}
-
-/*
- * same as free
- */
-EXPORT	int	cfree(char * pnt)
-{
-  return free(pnt);
-}
-
-/*
- * allocate a SIZE block of bytes
- */
-EXPORT	char	*malloc(unsigned int size)
-{
-  char		*newp;
-  
-  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
-    return MALLOC_ERROR;
-  
-  newp = (char *)_chunk_malloc(_malloc_file, _malloc_line, size);
-  
-  /* is this the address we are looking for? */
-  if (malloc_address != NULL && newp == malloc_address) {
-    if (address_count - 1 <= 0)
-      _malloc_die();
-    else
-      address_count--;
-  }
-  
-  in_alloc = FALSE;
-  
-  return newp;
-}
-
-/*
- * resizes OLD_PNT to SIZE bytes either copying or truncating
+ * resizes OLD_PNT to SIZE bytes and return the new space after either copying
+ * all of OLD_PNT to the new area or truncating
  */
 EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
 {
@@ -390,6 +360,31 @@ EXPORT	char	*realloc(char * old_pnt, unsigned int new_size)
   return newp;
 }
 
+/*
+ * release PNT in the heap, returning FREE_[NO]ERROR
+ */
+EXPORT	int	free(char * pnt)
+{
+  int		ret;
+  
+  if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
+    return FREE_ERROR;
+  
+  /* is this the address we are looking for? */
+  if (malloc_address != NULL && pnt == malloc_address) {
+    if (address_count - 1 <= 0)
+      _malloc_die();
+    else
+      address_count--;
+  }
+  
+  ret = _chunk_free(_malloc_file, _malloc_line, pnt);
+  
+  in_alloc = FALSE;
+  
+  return ret;
+}
+
 /******************************** utility calls ******************************/
 
 /*
@@ -408,7 +403,7 @@ EXPORT	int	malloc_heap_map(void)
 }
 
 /*
- * verify pointer PNT or if it equals 0, the entire heap
+ * verify pointer PNT or if it equals 0, the entire heap.
  * returns MALLOC_VERIFY_[NO]ERROR
  */
 EXPORT	int	malloc_verify(char * pnt)
@@ -438,6 +433,9 @@ EXPORT	int	malloc_verify(char * pnt)
 EXPORT	int	malloc_debug(long debug)
 {
   int	hold;
+  
+  if (check_debug_vars(NULL, 0) != NOERROR)
+    return MALLOC_ERROR;
   
   /* make sure that the not-changeable flags' values are preserved */
   hold = _malloc_debug & DEBUG_NOT_CHANGEABLE;
@@ -476,6 +474,9 @@ EXPORT	int	malloc_examine(char * pnt, unsigned int * size, char ** file,
  */
 EXPORT	char	*malloc_strerror(int errnum)
 {
+  if (check_debug_vars(NULL, 0) != NOERROR)
+    return ERROR;
+  
   if (! IS_MALLOC_ERRNO(errnum))
     return malloc_errlist[MALLOC_BAD_ERRNO];
   else

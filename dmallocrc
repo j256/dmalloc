@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.3 1992/11/14 21:19:45 gray Exp $
+# $Id: dmallocrc,v 1.4 1992/12/22 18:01:47 gray Exp $
 #
 
 #
@@ -43,7 +43,7 @@
 # error-abort			abort the program (and dump core) on errors
 # alloc-blank			overwrite space that is to be alloced
 # heap-check-map		log a heap-map every time the heap is checked
-# print-perror			dump error messages to STDERR
+# print-perror			dump errors and messages to STDERR
 #
 
 # no debugging
