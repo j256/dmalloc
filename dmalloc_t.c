@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.65 1998/09/18 19:23:55 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.66 1998/10/15 15:31:16 gray Exp $";
 #endif
 
 /* external routines */
@@ -794,7 +794,7 @@ int	main(int argc, char **argv)
   (void)srand(seed_random);
   
   if (! silent_b) {
-    (void)printf("Random seed = %u\n", seed_random);
+    (void)printf("Random seed is %u\n", seed_random);
   }
   
   if (interactive_b) {
@@ -844,6 +844,19 @@ int	main(int argc, char **argv)
     exit(0);
   }
   else {
+    /*
+     * Even if we are silent, we must give the random seed which is
+     * the only way we can reproduce the problem.
+     */
+    if (silent_b) {
+      (void)fprintf(stderr, "Random seed is %u.  Error: %s (%d)\n",
+		    seed_random, dmalloc_strerror(dmalloc_errno),
+		    dmalloc_errno);
+    }
+    else {
+      (void)fprintf(stderr, "Final malloc error: %s (%d)\n",
+		    dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+    }
     exit(1);
   }
 }
