@@ -1,6 +1,17 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.87 1999/10/11 23:59:40 gray Exp $
+$Id: NEWS,v 1.88 2000/03/21 01:47:20 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.4.0:
+
+	* Added code to fix some recursive problems with open and atexit.
+	* Basically encorporated Randell's changes [finally].  Thanks dude.
+	* Removed the stupid chunk.c unions.  Why did I ever do that?
+	* www.dmalloc.com -> dmalloc.com.
+	* Added better help messages to dmalloc.
+	* Fixed Makefile.dep creation with _th.o special objects.
+	* Fixed the outputting of gratuitous colons.
+	* Added @uref texinfo tags and new texinfo.tex.
 
 Version 4.3.0:
 

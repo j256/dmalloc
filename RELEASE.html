@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-<!-- $Id: RELEASE.html,v 1.3 1999/11/08 22:07:45 gray Exp $ -->
-<TITLE> Dmalloc Release Notes - 4.3.0 </TITLE>
+<!-- $Id: RELEASE.html,v 1.4 2000/03/21 01:47:20 gray Exp $ -->
+<TITLE> Dmalloc Release Notes - 4.4.0 </TITLE>
 </HEAD>
 <BODY>
 
 <CENTER>
 <H1> Debug Malloc (Dmalloc) Library Release Notes </H1>
 <H4>
-Version: Release 4.3.0 <BR>
+Version: Release 4.4.0 <BR>
 <!-- Fix the TITLE ^^^above^^^ too -->
-Last-Version: <A HREF="dmalloc-4.2.0.html">4.2.0</A> <BR>
-Date: November 8, 1999
+Last-Version: <A HREF="dmalloc-4.3.0.html">4.3.0</A> <BR>
+Date: March 20, 2000
 </H4>
 </CENTER>
 
@@ -31,8 +31,8 @@ Date: November 8, 1999
 
 <H3><A NAME="overview"> Overview </A></H3>
 
-<P> Small feature and bug fix release.  Fixed the Linux strdup problem
-and also rewrote the dmalloc utility internals a good bit.
+<P> Some changes her to improve the pthread workings and lower the
+incidence of recursive behavior.  Various other lower level changes.
 
 <P>
 <HR>
@@ -41,11 +41,10 @@ and also rewrote the dmalloc utility internals a good bit.
 
 <UL>
 
-<P><LI> The dmalloc utility will now look in the current directory for
-.dmallocrc before checking your $HOME directory.
-
-<P><LI> Increased the internal storage of C filename sizes from 40 to
-100 characters.
+<P><LI> The library should handle pthreaded applications better.
+Especially under Freebsd.  More attention was spent to handling
+initialization recursive problems.  More work needs to be spent in
+this area.
 
 </UL>
 
@@ -56,12 +55,7 @@ and also rewrote the dmalloc utility internals a good bit.
 
 <UL>
 
-<P><LI> The dmalloc utility will now look in the current directory for
-.dmallocrc before checking your $HOME directory.  This helps
-programmers have per-module specific dmalloc settings and controls.
-
-<P><LI> Rewrote a significant portion of the internals of the dmalloc
-utility.  It's processing of the RC files has been much improved.
+<P> None.
 
 </UL>
 
@@ -72,13 +66,7 @@ utility.  It's processing of the RC files has been much improved.
 
 <UL>
 
-<P><LI> Added USE_DMALLOC_LEAP variable which enables the library's
-leap functionality.  The leap stuff allows you to disable the library
-by just linking in the libdmalloc_lp.a library instead of having to
-recompile your source files which included dmalloc.h.  This was
-removed as a default feature since a poll on the dmalloc mailing list
-found few people aware of the feature and only one developer actually
-used it.
+<P> None.
 
 </UL>
 
@@ -89,8 +77,15 @@ used it.
 
 <UL>
 
-<P><LI> Added support for the PTHREAD_MUTEX_INITIALIZER define which
-is defined on some systems.
+<P><LI> Removed support for the PTHREAD_MUTEX_INITIALIZER define.  It
+turns out that this only delayed the mutex initialization process
+until the lock was called increasing the recursive nature of dmalloc
+under pthreads.
+
+<P><LI> Finally removed all of the gross unions in chunk_loc.h.
+Thanks much to Randell Jesup's patches which I sat on forever.  He
+also added flags for the dblock entries which makes detecting of small
+block allocations status more deterministic.
 
 </UL>
 
@@ -112,18 +107,7 @@ is defined on some systems.
 
 <UL>
 
-<P><LI> Newer versions of Linux (6.X?) define strdup as a macro which
-was confusing prototypes in dmalloc.h.  I added some specific
-autoconfiguration to handle this problem.
-
-<P><LI> Increased the internal storage of C filename sizes from 40 to
-100 characters.
-
-<P><LI> In moving away from the leap substrate with the addition of
-the USE_DMALLOC_LEAP variable in the settings.dist file, this fixes a
-long standing bug with improperly tracking the first memory
-transaction -- usually an allocation.  There was a chicken and egg
-problem with the way the library bootstrapped which has been resolved.
+<P> None.
 
 </UL>
 
