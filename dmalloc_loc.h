@@ -18,11 +18,11 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.29 1994/09/10 23:27:29 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.30 1994/09/12 17:18:09 gray Exp $
  */
 
-#ifndef __MALLOC_LOC_H__
-#define __MALLOC_LOC_H__
+#ifndef __DMALLOC_LOC_H__
+#define __DMALLOC_LOC_H__
 
 #include "conf.h"			/* for HAVE_BCMP and BASIC_BLOCK */
 
@@ -112,4 +112,4 @@
  */
 #define BLOCK_SIZE		(1 << BASIC_BLOCK)	/* size of a block */
 
-#endif /* ! __MALLOC_LOC_H__ */
+#endif /* ! __DMALLOC_LOC_H__ */
