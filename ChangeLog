@@ -1,3 +1,8 @@
+Sat Feb 13 17:25:43 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Finished add a number of const operators to improve coding per
+	scott's recommendations.
+
 Sat Jan 30 12:33:43 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Took out the check_vars call inside of malloc_strerror since
@@ -164,4 +169,3 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 	* Fixed a large problem with chunk.c not reporting the correct
 	memory address when listing unfreed memory.  This was discovered
 	when MALLOC_ADDRESS was not working correctly.
-
