@@ -36,8 +36,12 @@
 #include "compat.h"
 
 #if INCLUDE_RCS_IDS
+#if IDENT_WORKS
+#ident "@(#) $Id: dmalloc_argv.c,v 1.12 2003/05/13 16:40:18 gray Exp $"
+#else
 static	char	*rcs_id =
-  "$Id: dmalloc_argv.c,v 1.11 2003/05/13 14:57:35 gray Exp $";
+  "@(#) $Id: dmalloc_argv.c,v 1.12 2003/05/13 16:40:18 gray Exp $";
+#endif
 #endif
 
 /* internal routines */
