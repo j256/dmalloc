@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.108 1995/09/02 20:48:24 gray Exp $
+@c $Id: dmalloc.texi,v 1.109 1995/09/06 20:24:49 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -93,7 +93,7 @@ statistics.
 
 The library is reasonably portable having been run successfully on at
 least the following operating systems: AIX, BSDI, DG/UX, HPUX, Irix,
-Linux, MS-DOG, OSF, Solaris, SunOS, and Ultrix.
+Linux, MS-DOG, NeXT, OSF, Solaris, SunOS, and Ultrix.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
