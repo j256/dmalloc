@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.126 1999/03/08 15:56:44 gray Exp $
+ * $Id: malloc.c,v 1.127 1999/03/08 16:19:38 gray Exp $
  */
 
 /*
@@ -78,10 +78,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.126 1999/03/08 15:56:44 gray Exp $";
+#ident "$Id: malloc.c,v 1.127 1999/03/08 16:19:38 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.126 1999/03/08 15:56:44 gray Exp $";
+  "$Id: malloc.c,v 1.127 1999/03/08 16:19:38 gray Exp $";
 #endif
 #endif
 
@@ -89,11 +89,11 @@ static	char	*rcs_id =
 static	int	dmalloc_startup(void);
 void		_dmalloc_shutdown(void);
 DMALLOC_PNT	_loc_malloc(const char *file, const int line,
-			    const DMALLOC_SIZE size, const int calloc_b,
+			    const DMALLOC_SIZE size, const int func_id,
 			    const DMALLOC_SIZE alignment);
 DMALLOC_PNT	_loc_realloc(const char *file, const int line,
 			     DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size,
-			     const int recalloc_b);
+			     const int func_id);
 int	_loc_free(const char *file, const int line, DMALLOC_PNT pnt);
 void	_dmalloc_log_heap_map(const char *file, const int line);
 void	_dmalloc_log_stats(const char *file, const int line);
@@ -654,8 +654,15 @@ DMALLOC_PNT	_loc_realloc(const char *file, const int line,
   
 #if ALLOW_REALLOC_NULL
   if (old_pnt == NULL) {
-    /* recalloc_b acts the same way as a calloc */
-    new_p = _chunk_malloc(file, line, new_size, func_id, 0);
+    int		new_func_id;
+    /* shift the function id to be calloc or malloc */
+    if (func_id == DMALLOC_FUNC_RECALLOC) {
+      new_func_id = DMALLOC_FUNC_CALLOC;
+    }
+    else {
+      new_func_id = DMALLOC_FUNC_MALLOC;
+    }
+    new_p = _chunk_malloc(file, line, new_size, new_func_id, 0);
   }
   else
 #endif
