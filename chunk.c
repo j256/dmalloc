@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.144 1999/03/09 15:53:57 gray Exp $
+ * $Id: chunk.c,v 1.145 1999/03/09 19:28:48 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.144 1999/03/09 15:53:57 gray Exp $";
+#ident "$Id: chunk.c,v 1.145 1999/03/09 19:28:48 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.144 1999/03/09 15:53:57 gray Exp $";
+  "$Id: chunk.c,v 1.145 1999/03/09 19:28:48 gray Exp $";
 #endif
 #endif
 
@@ -3232,9 +3232,10 @@ void	_chunk_stats(void)
 		   (HEAP_GROWS_UP ? "up" : "down"));
   
   /* general heap information */
-  _dmalloc_message("heap: %#lx to %#lx, size %ld bytes (%ld blocks), checked %ld",
+  _dmalloc_message("heap: %#lx to %#lx, size %ld bytes (%ld blocks)",
 		   (unsigned long)_heap_base, (unsigned long)_heap_last,
-		   (long)HEAP_SIZE, bblock_count, check_count);
+		   (long)HEAP_SIZE, bblock_count);
+  _dmalloc_message("heap checked %ld", check_count);
   
   /* log user allocation information */
   _dmalloc_message("alloc calls: malloc %lu, calloc %lu, realloc %lu, free %lu",
@@ -3276,7 +3277,7 @@ void	_chunk_stats(void)
 		   extern_count * BLOCK_SIZE, extern_count);
   
 #if MEMORY_TABLE_LOG
-  _dmalloc_message("Summary of top %d allocations:", MEMORY_TABLE_LOG);
+  _dmalloc_message("Top %d allocations:", MEMORY_TABLE_LOG);
   _table_log_info(MEMORY_TABLE_LOG, 1);
 #endif
 }
@@ -3486,7 +3487,7 @@ void	_chunk_dump_unfreed(void)
   }
   
   /* dump the summary and clear the table */
-  _dmalloc_message("Summary of unfreed allocations:");
+  _dmalloc_message("Unfreed allocations:");
   _table_log_info(0, 0);
   _table_clear();
 }
