@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.140 1999/03/08 05:08:30 gray Exp $
+ * $Id: chunk.c,v 1.141 1999/03/08 15:54:04 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.140 1999/03/08 05:08:30 gray Exp $";
+#ident "$Id: chunk.c,v 1.141 1999/03/08 15:54:04 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.140 1999/03/08 05:08:30 gray Exp $";
+  "$Id: chunk.c,v 1.141 1999/03/08 15:54:04 gray Exp $";
 #endif
 #endif
 
@@ -2443,14 +2443,13 @@ void	_chunk_log_heap_map(void)
 /************************** low-level user functions *************************/
 
 /*
- * Get a SIZE chunk of memory for FILE at LINE.  If CALLOC_B then
- * count this as a calloc not a malloc call.  If REALLOC_B then don't
- * count it as a malloc call.  If ALIGNMENT is greater than 0 then try
- * to align the returned block.
+ * Get a SIZE chunk of memory for FILE at LINE.  FUNC_ID is the type
+ * of function which generated this call.  If ALIGNMENT is greater
+ * than 0 then try to align the returned block.
  */
 void	*_chunk_malloc(const char *file, const unsigned int line,
-		       const unsigned long size, const int calloc_b,
-		       const int realloc_b, const unsigned int alignment)
+		       const unsigned long size, const int func_id,
+		       const unsigned int alignment)
 {
   unsigned int	bit_n;
   unsigned long	byte_n = size;
@@ -2462,7 +2461,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   void		*pnt;
   
   /* counts calls to malloc */
-  if (calloc_b) {
+  if (func_id == DMALLOC_FUNC_CALLOC) {
     calloc_count++;
   }
   else if (alignment == BLOCK_SIZE) {
@@ -2473,7 +2472,8 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
     memalign_count++;
     memalign_b = 1;
   }
-  else if (! realloc_b) {
+  else if (func_id != DMALLOC_FUNC_REALLOC
+	   && func_id != DMALLOC_FUNC_RECALLOC) {
     malloc_count++;
   }
   
@@ -2609,23 +2609,25 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   
   pnt = CHUNK_TO_USER(pnt);
   
-  if (calloc_b) {
+  if (func_id == DMALLOC_FUNC_CALLOC) {
     (void)memset(pnt, 0, size);
   }
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    if (calloc_b) {
+    switch (func_id) {
+    case DMALLOC_FUNC_CALLOC:
       trans_log = "calloc";
-    }
-    else if (memalign_b) {
+      break;
+    case DMALLOC_FUNC_MEMALIGN:
       trans_log = "memalign";
-    }
-    else if (valloc_b) {
+      break;
+    case DMALLOC_FUNC_VALLOC:
       trans_log = "valloc";
-    }
-    else {
+      break;
+    default:
       trans_log = "alloc";
+      break;
     }
     _dmalloc_message("*** %s: at '%s' for %ld bytes, got '%s'",
 		     trans_log, _chunk_desc_pnt(where_buf, sizeof(where_buf),
@@ -2635,7 +2637,7 @@ void	*_chunk_malloc(const char *file, const unsigned int line,
   }
   
 #if MEMORY_TABLE_LOG
-  if (! realloc_b) {
+  if (func_id != DMALLOC_FUNC_REALLOC && func_id != DMALLOC_FUNC_RECALLOC) {
     _table_alloc(file, line, size);
   }
 #endif
@@ -2973,7 +2975,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
  */
 void	*_chunk_realloc(const char *file, const unsigned int line,
 			void *old_p, unsigned long new_size,
-			const int recalloc_b)
+			const int func_id)
 {
   void		*new_p, *ret_addr;
   char		*old_file;
@@ -2985,7 +2987,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
   unsigned int	old_bit_n, new_bit_n;
   
   /* counts calls to realloc */
-  if (recalloc_b) {
+  if (func_id == DMALLOC_FUNC_RECALLOC) {
     recalloc_count++;
   }
   else {
@@ -3053,7 +3055,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     new_size -= fence_overhead_size;
     
     /* allocate space for new chunk -- this will */
-    new_p = _chunk_malloc(file, line, new_size, recalloc_b, 1, 0);
+    new_p = _chunk_malloc(file, line, new_size, func_id, 0);
     if (new_p == MALLOC_ERROR) {
       return REALLOC_ERROR;
     }
@@ -3116,7 +3118,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
     old_size -= fence_overhead_size;
     new_size -= fence_overhead_size;
     
-    if (recalloc_b && new_size > old_size) {
+    if (func_id == DMALLOC_FUNC_RECALLOC && new_size > old_size) {
       (void)memset((char *)new_p + old_size, 0, new_size - old_size);
     }
     
@@ -3134,7 +3136,7 @@ void	*_chunk_realloc(const char *file, const unsigned int line,
    * NOTE: pointers and sizes here a user-level real
    */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
-    if (recalloc_b) {
+    if (func_id == DMALLOC_FUNC_RECALLOC) {
       trans_log = "recalloc";
     }
     else {
@@ -3286,7 +3288,7 @@ void	_chunk_dump_unfreed(void)
     _dmalloc_message("dumping the unfreed pointers:");
   }
   
-  /* clear out our memory table */
+  /* clear out our memory table so we can fill it with unfreed pointer info */
   _table_clear();
   
   /* has anything been alloced yet? */
@@ -3473,7 +3475,7 @@ void	_chunk_dump_unfreed(void)
   }
   
   /* dump the summary and clear the table */
-  _dmalloc_message("Unfreed pointer summary:");
+  _dmalloc_message("Summary of unfreed allocations:");
   _table_log_info(0, 0);
   _table_clear();
 }

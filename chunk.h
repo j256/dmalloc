@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.h,v 1.55 1999/03/07 23:05:40 gray Exp $
+ * $Id: chunk.h,v 1.56 1999/03/08 15:54:06 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -76,15 +76,14 @@ extern
 void	_chunk_log_heap_map(void);
 
 /*
- * Get a SIZE chunk of memory for FILE at LINE.  If CALLOC_B then
- * count this as a calloc not a malloc call.  If REALLOC_B then don't
- * count it as a malloc call.  If ALIGNMENT is greater than 0 then try
- * to align the returned block.
+ * Get a SIZE chunk of memory for FILE at LINE.  FUNC_ID is the type
+ * of function which generated this call.  If ALIGNMENT is greater
+ * than 0 then try to align the returned block.
  */
 extern
 void	*_chunk_malloc(const char *file, const unsigned int line,
-		       const unsigned long size, const int calloc_b,
-		       const int realloc_b, const unsigned int alignment);
+		       const unsigned long size, const int func_id,
+		       const unsigned int alignment);
 
 /*
  * Frees PNT from the heap.  REALLOC_B set if realloc is freeing a
@@ -103,7 +102,7 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
 extern
 void	*_chunk_realloc(const char *file, const unsigned int line,
 			void *old_p, unsigned long new_size,
-			const int recalloc_b);
+			const int func_id);
 
 /*
  * Log present free and used lists
