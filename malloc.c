@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.24 1993/04/09 06:34:38 gray Exp $";
+  "$Id: malloc.c,v 1.25 1993/04/14 22:13:57 gray Exp $";
 #endif
 
 /*
@@ -158,7 +158,7 @@ LOCAL	int	check_debug_vars(const char * file, const int line)
  * check out a pointer to see if we were looking for it.
  * may not return.
  */
-LOCAL	void	check_var(const char * file, const int line, char * pnt)
+LOCAL	void	check_pnt(const char * file, const int line, char * pnt)
 {
   static int	addc = 0;
   
@@ -172,7 +172,7 @@ LOCAL	void	check_var(const char * file, const int line, char * pnt)
     _malloc_message("found address '%#lx' after %d pass%s from '%s:%u'",
 		    pnt, addc, (addc == 1 ? "" : "es"), file, line);
   malloc_errno = MALLOC_POINTER_FOUND;
-  _malloc_perror("check_var");
+  _malloc_perror("check_pnt");
 }
 
 /*
@@ -199,7 +199,7 @@ LOCAL	void	get_environ(void)
   if (env != NULL) {
     char	*addp;
     
-    addp = index(env, ':');
+    addp = (char *)index(env, ':');
     if (addp != NULL) {
       *addp = NULLC;
       address_count = atoi(addp + 1);
@@ -225,7 +225,7 @@ LOCAL	void	get_environ(void)
     
     BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
     
-    startp = index(env, ':');
+    startp = (char *)index(env, ':');
     if (startp != NULL) {
       *startp = NULLC;
       (void)strcpy(start_file, env);
@@ -301,7 +301,7 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
     return MALLOC_ERROR;
   
   newp = _chunk_malloc(_malloc_file, _malloc_line, size);
-  check_var(_malloc_file, _malloc_line, newp);
+  check_pnt(_malloc_file, _malloc_line, newp);
   
   in_alloc = FALSE;
   
@@ -325,7 +325,7 @@ EXPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size)
   
   /* alloc and watch for the die address */
   newp = _chunk_malloc(_malloc_file, _malloc_line, len);
-  check_var(_malloc_file, _malloc_line, newp);
+  check_pnt(_malloc_file, _malloc_line, newp);
   
   (void)memset(newp, NULLC, len);
   
@@ -350,9 +350,9 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
   if (check_debug_vars(_malloc_file, _malloc_line) != NOERROR)
     return REALLOC_ERROR;
   
-  check_var(_malloc_file, _malloc_line, old_pnt);
+  check_pnt(_malloc_file, _malloc_line, old_pnt);
   newp = _chunk_realloc(_malloc_file, _malloc_line, old_pnt, new_size);
-  check_var(_malloc_file, _malloc_line, newp);
+  check_pnt(_malloc_file, _malloc_line, newp);
   
   in_alloc = FALSE;
   
@@ -378,7 +378,7 @@ EXPORT	int	free(void * pnt)
 #endif
   }
   
-  check_var(_malloc_file, _malloc_line, pnt);
+  check_pnt(_malloc_file, _malloc_line, pnt);
   ret = _chunk_free(_malloc_file, _malloc_line, pnt);
   
   in_alloc = FALSE;
@@ -416,10 +416,10 @@ EXPORT	int	malloc_verify(void * pnt)
   if (check_debug_vars(NULL, 0) != NOERROR)
     return MALLOC_VERIFY_ERROR;
   
-  if (pnt != 0)
-    ret = _chunk_pnt_check("malloc_verify", pnt, 0, 0);
-  else
+  if (pnt == NULL)
     ret = _chunk_heap_check();
+  else
+    ret = _chunk_pnt_check("malloc_verify", pnt, CHUNK_PNT_EXACT, 0);
   
   in_alloc = FALSE;
   

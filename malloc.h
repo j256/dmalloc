@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.23 1993/04/09 06:34:41 gray Exp $
+ * $Id: malloc.h,v 1.24 1993/04/14 22:13:59 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -307,8 +307,7 @@ IMPORT	char	*malloc_strerror(int errnum);
 
 /*
  * do debugging on the following functions.  this may cause compilation or
- * other problems depending on your architecture, hence the need for the
- * MALLOC_STRING_DISABLE define.
+ * other problems depending on your architecture.
  */
 #undef bcmp
 #define bcmp(b1, b2, len)		_malloc_bcmp(b1, b2, len)

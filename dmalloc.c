@@ -30,7 +30,6 @@
  *   eval by default.  Any messages for the user should be fprintf to stderr.
  */
 
-#include <stdarg.h>				/* for vsprintf handling */
 #include <stdio.h>				/* for stderr */
 
 #define MALLOC_DEBUG_DISABLE
@@ -45,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.8 1993/04/09 06:34:43 gray Exp $";
+  "$Id: dmalloc.c,v 1.9 1993/04/14 22:14:01 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -135,7 +134,7 @@ LOCAL	void	usage(void)
  */
 LOCAL	void	process_arguments(int argc, char ** argv)
 {
-  program = rindex(*argv, '/');
+  program = (char *)rindex(*argv, '/');
   if (program == NULL)
     program = *argv;
   else
@@ -312,11 +311,11 @@ LOCAL	int	process(int debug_value, char ** strp)
       continue;
     
     /* chop off the ending \n */
-    endp = rindex(buf, '\n');
+    endp = (char *)rindex(buf, '\n');
     if (endp != NULL)
       *endp = NULLC;
     
-    tokp = strtok(buf, TOKENIZE_CHARS);
+    tokp = (char *)strtok(buf, TOKENIZE_CHARS);
     
     /* if we're not continuing then we need to process a tag */
     if (! cont) {
@@ -326,7 +325,7 @@ LOCAL	int	process(int debug_value, char ** strp)
       if (tag != NULL && strcmp(tag, tokp) == 0)
 	found = TRUE;
       
-      tokp = strtok(NULL, TOKENIZE_CHARS);
+      tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
     }
     
     cont = FALSE;
@@ -353,7 +352,7 @@ LOCAL	int	process(int debug_value, char ** strp)
 	  new_debug |= attributes[attrc].at_value;
       }
       
-      tokp = strtok(NULL, TOKENIZE_CHARS);
+      tokp = (char *)strtok(NULL, TOKENIZE_CHARS);
     } while (tokp != NULL);
     
     if (tag == NULL && ! cont && new_debug == debug_value) {
@@ -429,18 +428,10 @@ LOCAL	void	dump_current(void)
 }
 
 /*
- * output the code to set env VAR to VALUE using printf FORMAT
+ * output the code to set env VAR to VALUE
  */
-LOCAL	void	set_variable(char * var, char * format, ...)
+LOCAL	void	set_variable(char * var, char * value)
 {
-  char		value[256];
-  va_list	args;
-  
-  /* write the format + info into str */
-  va_start(args, format);
-  (void)vsprintf(value, format, args);
-  va_end(args);
-  
   if (bourne)
     (void)printf("%s=%s; export %s;\n", var, value, var);
   else
@@ -464,6 +455,8 @@ LOCAL	void	unset_variable(char * var)
 
 EXPORT	int	main(int argc, char ** argv)
 {
+  char	buf[20];
+  
   /* turn off debugging for this program */
   (void)malloc_debug(0);
   
@@ -477,26 +470,30 @@ EXPORT	int	main(int argc, char ** argv)
     debug = process(0, NULL);
   }
   
-  if (tag != NULL || debug != NO_VALUE)
-    set_variable(DEBUG_ENVIRON, "%#lx", debug);
+  if (tag != NULL || debug != NO_VALUE) {
+    (void)sprintf(buf, "%#lx", debug);
+    set_variable(DEBUG_ENVIRON, buf);
+  }
   
   if (address != NULL)
-    set_variable(ADDRESS_ENVIRON, "%s", address);
+    set_variable(ADDRESS_ENVIRON, address);
   else if (clear)
     unset_variable(ADDRESS_ENVIRON);
   
-  if (interval != NO_VALUE)
-    set_variable(INTERVAL_ENVIRON, "%d", interval);
+  if (interval != NO_VALUE) {
+    (void)sprintf(buf, "%d", interval);
+    set_variable(INTERVAL_ENVIRON, buf);
+  }
   else if (clear)
     unset_variable(INTERVAL_ENVIRON);
   
   if (logpath != NULL)
-    set_variable(LOGFILE_ENVIRON, "%s", logpath);
+    set_variable(LOGFILE_ENVIRON, logpath);
   else if (clear)
     unset_variable(LOGFILE_ENVIRON);
   
   if (start != NULL)
-    set_variable(START_ENVIRON, "%s", start);
+    set_variable(START_ENVIRON, start);
   else if (clear)
     unset_variable(START_ENVIRON);
   

@@ -37,14 +37,14 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.8 1993/04/05 01:28:54 gray Exp $";
+  "$Id: compat.c,v 1.9 1993/04/14 22:13:52 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0 && HAVE_BCOPY == 0
 /*
  * copy LEN characters from FROM to TO
  */
-EXPORT	char	*memcpy(char * to, const char * from, int len)
+EXPORT	char	*memcpy(char * to, const char * from, MALLOC_SIZE len)
 {
   char	*hold = to;
   
@@ -59,7 +59,7 @@ EXPORT	char	*memcpy(char * to, const char * from, int len)
 /*
  * compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
  */
-EXPORT	int	memcmp(const char * str1, const char * str2, int len)
+EXPORT	int	memcmp(const char * str1, const char * str2, MALLOC_SIZE len)
 {
   for (; len > 0; len--, str1++, str2++)
     if (*str1 != *str2)
@@ -73,7 +73,7 @@ EXPORT	int	memcmp(const char * str1, const char * str2, int len)
 /*
  * set LEN characters in STR to character CH
  */
-EXPORT	char	*memset(char * str, int ch, int len)
+EXPORT	char	*memset(char * str, int ch, MALLOC_SIZE len)
 {
   char	*hold = str;
   
@@ -147,7 +147,7 @@ EXPORT	int	strcmp(const char * str1, const char * str2)
 /*
  * return the length in characters of STR
  */
-EXPORT	int	strlen(const char * str)
+EXPORT	MALLOC_SIZE	strlen(const char * str)
 {
   int	len;
   

@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.31 1993/04/09 06:34:33 gray Exp $";
+  "$Id: chunk.c,v 1.32 1993/04/14 22:13:47 gray Exp $";
 #endif
 
 /* checking information */
@@ -1205,7 +1205,8 @@ EXPORT	int	_chunk_heap_check(void)
 
 /*
  * run extensive tests on PNT from FUNC. test PNT HOW_MUCH of MIN_SIZE
- * (or 0 if unknown).  returns [NO]ERROR
+ * (or 0 if unknown).  CHECK is flags for types of checking (see chunk.h).
+ * returns [NO]ERROR
  */
 EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
 				 const int check, int min_size)
@@ -1227,7 +1228,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
   /* find which block it is in */
   bblockp = find_bblock(pnt, NULL, NULL);
   if (bblockp == NULL) {
-    if (check == CHUNK_PNT_LOOSE) {
+    if (check & CHUNK_PNT_LOOSE) {
       /* the pointer might not be the heap or might be NULL */
       malloc_errno = 0;
       return NOERROR;
@@ -1240,11 +1241,20 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
     }
   }
   
+  /* maybe watch out for nullc character */
+  if (check & CHUNK_PNT_NULL) {
+    if (min_size != 0) {
+      len = strlen(pnt) + 1;
+      if (len > min_size)
+	min_size = len;
+    }
+  }
+  
   if (BIT_IS_SET(bblockp->bb_flags, BBLOCK_DBLOCK)) {
     /* on a mini-block boundary? */
     diff = ((char *)pnt - bblockp->bb_mem) % (1 << bblockp->bb_bitc);
     if (diff != 0) {
-      if (check == CHUNK_PNT_LOOSE) {
+      if (check & CHUNK_PNT_LOOSE) {
 	if (min_size != 0)
 	  min_size += diff;
 	(char *)pnt -= diff;
@@ -1328,7 +1338,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
   
   /* on a block boundary? */
   if (! ON_BLOCK(pnt)) {
-    if (check == CHUNK_PNT_LOOSE) {
+    if (check & CHUNK_PNT_LOOSE) {
       /*
        * normalize size and pointer to nearest block.
        *
@@ -1351,7 +1361,7 @@ EXPORT	int	_chunk_pnt_check(const char * func, void * pnt,
   
   /* are we on a normal block */
   if (! BIT_IS_SET(bblockp->bb_flags, BBLOCK_START_USER)
-      && ! (check == CHUNK_PNT_LOOSE
+      && ! (check & CHUNK_PNT_LOOSE
 	    && BIT_IS_SET(bblockp->bb_flags, BBLOCK_USER))) {
     if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
       _malloc_message("bad pointer '%#lx'", CHUNK_TO_USER(pnt));

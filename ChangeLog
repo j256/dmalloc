@@ -1,3 +1,10 @@
+Wed Apr 14 18:11:00 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added some more point checking tests to malloc_str.  Added
+	MALLOC_SIZE to some more places.  Completely ifdef'ed compat.h.
+	If cannot open logfile, now it complains and continues.  Removed
+	stdarg from malloc_dbg.
+
 Fri Apr  9 01:50:17 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Released version 1.2.1.

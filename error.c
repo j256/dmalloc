@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.20 1993/04/09 06:34:36 gray Exp $";
+  "$Id: error.c,v 1.21 1993/04/14 22:13:55 gray Exp $";
 #endif
 
 /*
@@ -96,7 +96,9 @@ EXPORT	void	_malloc_message(const char * format, ...)
 	(void)sprintf(str, "%s:%d: could not open '%s'\n",
 		      __FILE__, __LINE__, malloc_logpath);
 	(void)write(STDERR, str, strlen(str));
-	exit(1);
+	/* disable log_path */
+	malloc_logpath = NULL;
+	return;
       }
     }
     
