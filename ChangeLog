@@ -1,3 +1,17 @@
+Thu Dec 28 20:39:00 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Don't allow silent dumps of test program.
+
+Tue Dec 19 19:11:19 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Added registration subdirectory.
+
+Mon Nov 20 22:14:14 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Removed some unresolved references in argv.c: strcasecmp, strdup.
+
+	* Fixed some porting problems to Unixware.  Unsigned chars.
+
 Tue Oct 10 18:43:09 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing version 3.1.2.
@@ -1114,5 +1128,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.165 1995/10/10 22:43:59 gray Exp $
+$Id: ChangeLog,v 1.166 1995/12/29 01:39:49 gray Exp $
 -------------------------------------------------------------------------------

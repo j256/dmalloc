@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.111 1995/10/10 22:42:58 gray Exp $
+@c $Id: dmalloc.texi,v 1.112 1995/12/29 01:39:55 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -93,8 +93,8 @@ statistics.
 
 The library is reasonably portable having been run successfully on at
 least the following operating systems: AIX, BSDI, DG/UX, HPUX, Irix,
-Linux, MS-DOG, NeXT, OSF, Solaris, SunOS, Ultrix, and even Unicos on a
-Cray Y-MP.
+Linux, MS-DOG, NeXT, OSF, Solaris, SunOS, Ultrix, Unixware, and even
+Unicos on a Cray Y-MP.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
@@ -843,6 +843,9 @@ from calloc(unsigned int count, unsigned int size).
 
 Usage: @code{long_pnt = REALLOC(old_pnt, long, 10)}.  This takes
 old_pnt and and changes its size to accommodate 10 longs.
+
+@emph{NOTE}: the arguments for the REALLOC macro are different from the
+realloc function.
 @end deftypefun
 
 @deftypefun void * REMALLOC ( void * @var{pnt}, int @var{size} )

@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.51 1995/09/06 19:25:23 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.52 1995/12/29 01:39:57 gray Exp $";
 #endif
 
 /* external routines */
@@ -637,7 +637,9 @@ int	main(int argc, char ** argv)
       (void)printf("%s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   }
   
-  if (! no_special) {
+  /* don't allow silent dumps */
+  if (! no_special
+      && (! (silent && (dmalloc_debug_current() & DEBUG_ERROR_ABORT)))) {
     if (! silent)
       (void)printf("Running special tests...\n");
     ret = check_special();

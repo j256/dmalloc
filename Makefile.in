@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.89 1995/09/18 14:15:46 gray Exp $
+# $Id: Makefile.in,v 1.90 1995/12/29 01:39:52 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -32,7 +32,7 @@ LIB_DIS	= libdmalloclp.a
 UTIL	= dmalloc
 INFOFILE= dmalloc.info
 
-FLS	=  conf.h.in configure configure.in config.help \
+FLS	=  conf.h.in configure.in configure config.help \
 	ChangeLog Manifest INSTALL PERMISSIONS NEWS NOTES README TODO \
 	dmallocrc \
 	arg_check.[ch] chunk.[ch] chunk_loc.h compat.[ch] debug_tok.h \

@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.61 1995/09/18 14:15:45 gray Exp $
+# $Id: Makefile.all.in,v 1.62 1995/12/29 01:39:50 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -140,7 +140,7 @@ heavy : $(TEST) light
 
 .c.o :
 	rm -f $@
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
 
 .texi.info :
 	makeinfo --no-split $<
