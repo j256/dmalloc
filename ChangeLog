@@ -1,3 +1,13 @@
+Wed Aug 25 08:33:39 1999  Gray Watson  <gray@burger.256.com>
+
+	* Added support for PTHREAD_MUTEX_INITIALIZER.
+
+Tue Jul 20 12:47:14 1999  Gray Watson  <gray@burger.256.com>
+
+	* Added USE_DMALLOC_LEAP define in the settings.dist file with
+ 	which you can enable the leap functionality which previously was
+ 	the default.
+
 Thu Apr 15 10:21:55 1999  Gray Watson  <gray@burger.letters.com>
 
 	* Dmalloc now looks in the current directory for .dmallocrc before
@@ -1459,5 +1469,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.220 1999/05/06 15:11:46 gray Exp $
+$Id: ChangeLog,v 1.221 1999/08/25 12:34:22 gray Exp $
 -------------------------------------------------------------------------------

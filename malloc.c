@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: malloc.c,v 1.135 1999/03/11 22:30:55 gray Exp $
+ * $Id: malloc.c,v 1.136 1999/08/25 12:34:21 gray Exp $
  */
 
 /*
@@ -79,10 +79,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: malloc.c,v 1.135 1999/03/11 22:30:55 gray Exp $";
+#ident "$Id: malloc.c,v 1.136 1999/08/25 12:34:21 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.135 1999/03/11 22:30:55 gray Exp $";
+  "$Id: malloc.c,v 1.136 1999/08/25 12:34:21 gray Exp $";
 #endif
 #endif
 
@@ -128,7 +128,11 @@ static	int		thread_lock_c = 0;		/* lock counter */
 #if LOCK_THREADS
 #ifdef THREAD_MUTEX_T
 /* define a global variable we use as a lock counter */
+#ifdef PTHREAD_MUTEX_INITIALIZER
+static THREAD_MUTEX_T dmalloc_mutex = PTHREAD_MUTEX_INITIALIZER;
+#else
 static THREAD_MUTEX_T dmalloc_mutex;
+#endif
 #else
 #error We need to have THREAD_MUTEX_T defined by the configure script
 #endif
@@ -199,7 +203,7 @@ static	void	unlock_thread(void)
      * into the library.  Ugh.
      */
     if (thread_lock_c == THREAD_INIT_LOCK) {
-#if HAVE_PTHREAD_MUTEX_INIT
+#if HAVE_PTHREAD_MUTEX_INIT && !defined(PTHREAD_MUTEX_INITIALIZER)
       /* we init instead of the lock point to avoid recursion */
       pthread_mutex_init(&dmalloc_mutex, THREAD_LOCK_INIT_VAL);
 #endif
@@ -403,6 +407,7 @@ static	int	dmalloc_startup(void)
   }
   
   /* set leap variables */
+#ifdef USE_DMALLOC_LEAP
   _dmalloc_malloc_func = _loc_malloc;
   _dmalloc_realloc_func = _loc_realloc;
   _dmalloc_free_func = _loc_free;
@@ -417,6 +422,7 @@ static	int	dmalloc_startup(void)
   _dmalloc_vmessage_func = _dmalloc_vmessage;
   _dmalloc_track_func = _dmalloc_track;
   _dmalloc_strerror_func = _dmalloc_strerror;
+#endif
   
   /*
    * NOTE: we may go recursive below here becasue atexit or on_exit
