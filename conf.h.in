@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.53 1995/06/28 23:51:25 gray Exp $
+ * $Id: conf.h.in,v 1.54 1995/06/29 00:35:58 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -139,7 +139,6 @@
 #define HAVE_STRDUP 0
 #define HAVE_STRNCMP 0
 #define HAVE_STRNCPY 0
-#define HAVE_STRSTR 0
 
 /*
  * The below functions are here to provide function argument checking
@@ -161,6 +160,7 @@
 #define HAVE_STRCSPN 0
 #define HAVE_STRNCAT 0
 #define HAVE_STRPBRK 0
+#define HAVE_STRSTR 0
 
 #define DMALLOC_LICENSE 0			/* license value */
 
