@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.90 1995/12/29 01:39:52 gray Exp $
+# $Id: Makefile.in,v 1.91 1995/12/29 04:49:38 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -208,7 +208,7 @@ README_ftp : $(srcdir)/README_ftp.1 $(srcdir)/$(INFOFILE)
 	echo ------------------------------------------------------------------------------- \
 		> $(.TARGET).t
 	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
-		< $$(srcdir)/(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
+		< $(srcdir)/$(INFOFILE) | tr -d '\037'  >> $(.TARGET).t
 	echo ------------------------------------------------------------------------------- \
 		>> $(.TARGET).t
 	sed -e '1,/,  Node: How To Get/d' -e '/,  Prev: How To Get/,$$d' \
