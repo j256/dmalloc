@@ -21,7 +21,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.220 2003/06/06 05:01:49 gray Exp $
+@c $Id: dmalloc.texi,v 1.221 2003/06/06 19:03:51 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -99,11 +99,10 @@ detection, file/line number reporting, and general logging of
 statistics.
 
 The library is reasonably portable having been run successfully on at
-least the following operating systems: AIX, BSD/OS, DG/UX,
-Free/Net/OpenBSD, GNU/Hurd, HPUX, Irix, Linux, MS-DOG, NeXT, OSF, SCO,
-Solaris, SunOS, Ultrix, Unixware, Windoze, and even Unicos on a Cray
-T3E.  It also provides support for the debugging of threaded programs.
-@xref{Using With Threads}.
+least the following operating systems: AIX, DG/UX, Free/Net/OpenBSD,
+GNU/Hurd, HPUX, Irix, Linux, NeXT, OSF, SCO, Solaris, Ultrix, Unixware,
+Windoze, and Unicos on a Cray T3E.  It also provides support for the
+debugging of threaded programs.  @xref{Using With Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and documentation.  Online documentation as
