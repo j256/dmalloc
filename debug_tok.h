@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.36 2003/05/15 02:47:28 gray Exp $
+ * $Id: debug_tok.h,v 1.37 2003/05/20 04:03:56 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -71,20 +71,6 @@
 /* 29 available - 20011130 */
 #define DEBUG_ERROR_DUMP	BIT_FLAG(30)	/* dump core on error */
 /* 31 is the high bit and off-limits */
-
-/*
- * Flags that after being set or not/set at process start-up, cannot
- * be removed.
- *
- * NOTE: CHECK_FENCE _can_ be removed since the pnt_below/above_adm
- * values are never reset in chunk.
- */
-#define DEBUG_NOT_REMOVABLE	(DEBUG_CATCH_SIGNALS)
-
-/*
- * flags that cannot be added after process start-up.
- */
-#define DEBUG_NOT_ADDABLE	(DEBUG_CHECK_FENCE | DEBUG_CHECK_BLANK)
 
 /*
  * structure for mapping the string to the numerical token

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.165 2003/05/20 03:59:14 gray Exp $
+ * $Id: malloc.c,v 1.166 2003/05/20 04:03:56 gray Exp $
  */
 
 /*
@@ -1343,11 +1343,8 @@ unsigned int	dmalloc_debug(const unsigned int flags)
   
   old_flags = _dmalloc_flags;
   
-  /* make sure that the not-removable flags are preserved */
-  _dmalloc_flags &= DEBUG_NOT_REMOVABLE;
-  
-  /* add the new flags - the not-addable ones */
-  _dmalloc_flags |= flags & ~DEBUG_NOT_ADDABLE;
+  /* add the new flags */
+  _dmalloc_flags = flags;
   
   return old_flags;
 }
