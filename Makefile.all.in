@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.126 2004/09/27 20:18:16 gray Exp $
+# $Id: Makefile.all.in,v 1.127 2005/03/18 23:42:41 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -182,42 +182,42 @@ installincs : $(HFLS)
 
 installthsl : $(LIB_TH_SL)
 	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_TH_SL) $(libdir)
+	$(INSTALL_PROGRAM) $(LIB_TH_SL) $(libdir)
 
 installth : $(INSTALL_THREADS)
 	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_TH) $(libdir)
+	$(INSTALL_PROGRAM) $(LIB_TH) $(libdir)
 @CXX_OFF@	@echo "Enter 'make installthcxx' to install the threaded C++ library"
 @SL_OFF@	@echo "Enter 'make installthsl' to install the threaded shared-library"
 
 installthcxxsl : $(LIB_TH_CXX_SL)
 	$(srcdir)/mkinstalldirs $(shlibdir)
-	$(INSTALL_DATA) $(LIB_TH_CXX_SL) $(shlibdir)
+	$(INSTALL_PROGRAM) $(LIB_TH_CXX_SL) $(shlibdir)
 
 installthcxx : $(INSTALL_TH_CXX)
 	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_TH_CXX) $(libdir)
+	$(INSTALL_PROGRAM) $(LIB_TH_CXX) $(libdir)
 @SL_OFF@	@echo "Enter 'make installthcxxsl' to install the threaded C++ shared-library"
 
 installcxxsl : $(LIB_CXX_SL)
 	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_CXX_SL) $(libdir)
+	$(INSTALL_PROGRAM) $(LIB_CXX_SL) $(libdir)
 
 installcxx : $(INSTALL_CXX)
 	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_CXX) $(libdir)
+	$(INSTALL_PROGRAM) $(LIB_CXX) $(libdir)
 @TH_OFF@	@echo "Enter 'make installthcxx' to install the threaded C++ library"
 @SL_OFF@	@echo "Enter 'make installcxxsl' to install the C++ shared-library"
 
 installsl : $(LIB_SL)
 	$(srcdir)/mkinstalldirs $(shlibdir)
-	$(INSTALL_DATA) $(LIB_SL) $(shlibdir)
+	$(INSTALL_PROGRAM) $(LIB_SL) $(shlibdir)
 @CXX_OFF@	@echo "Enter 'make installcxxsl' to install the C++ shared-library"
 @TH_OFF@	@echo "Enter 'make installthsl' to install thread shared-library"
 
 installlib : $(INSTALL_LIB)
 	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIBRARY) $(libdir)
+	$(INSTALL_PROGRAM) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
 @SL_OFF@	@echo "Enter 'make installsl' to install $(LIB_SL) in $(shlibdir)"
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
