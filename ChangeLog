@@ -1,3 +1,9 @@
+Tue Sep  7 00:49:50 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Renamed all error codes to ERROR_*.  Added ERROR_IS_FREE and
+	changed some of the already-free errors to this.  Reworded some
+	error messages and added free's file/line into to log_bad_pnt.
+
 Mon Aug 30 17:23:47 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added prototypes for _malloc_strcpy, etc. functions to
