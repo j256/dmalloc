@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.130 1998/02/11 02:17:02 gray Exp $
+@c $Id: dmalloc.texi,v 1.131 1998/09/18 23:32:51 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -96,7 +96,8 @@ statistics.
 The library is reasonably portable having been run successfully on at
 least the following operating systems: AIX, BSDI, DG/UX, FreeBSD, HPUX,
 Irix, Linux, MS-DOG, NeXT, OSF, SCO, Solaris, SunOS, Ultrix, Unixware,
-and even Unicos on a Cray Y-MP.
+Windoze and even Unicos on a Cray Y-MP.  It also provides support for
+the debugging of threaded programs.  @xref{Using With Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
@@ -251,6 +252,7 @@ USA
 * How To Get::			How to get the library.
 * Installation::                How to install the library.
 * Getting Started::             Getting started with the library.
+* Using With Threads::          Using the library with a thread package.
 @end menu
 
 @node Allocation Basics, Features, Overview, Overview
@@ -423,6 +425,17 @@ malloc, calloc, or realloc back to the heap.  This allows other parts of
 the program to re-use memory that is not needed anymore.  It guarantees
 that the process does not grow too big and swallow a large portion of
 the system resources.
+
+@end deftypefun
+@deftypefun
+void *valloc ( unsigned int @var{size} )
+@cindex valloc
+
+Usage: @code{pnt = (type *)valloc(size)}
+
+The valloc routine is the same as malloc however memory that is returned
+is specially aligned.  This is used usually only for system routines
+that need alignment for stack frames or some such.
 
 @end deftypefun
 
@@ -670,6 +683,16 @@ If it doesn't work you may have to do Deansify.pl's job by hand.
 @cindex testing the library
 @cindex dmalloc_t test program
 
+@item Typing @kbd{make threads} should be enough to build
+@file{libdmallocth.a} which is the threaded version of the library.
+This may or may not work depending on the configuration scripts ability
+to detect your local thread functionality.  Feel free to send me mail
+with improvements.
+
+See the ``Using With Threads'' section for more information about the
+operation of the library with your threaded program.  @xref{Using With
+Threads}.
+
 @item Typing @kbd{make tests} should build the @file{dmalloc_t} test
 program.
 
@@ -690,15 +713,15 @@ which case @samp{/usr/local} will have been replaced with @samp{PATH}.
 
 @end enumerate
 
-See the Getting Started section to get up and running with the library.
-@xref{Getting Started}.
+See the ``Getting Started'' section to get up and running with the
+library.  @xref{Getting Started}.
 
 @emph{NOTE}: This library has never been (and maybe never will be)
 optimized for space nor speed.  in fact, some of its features make it
 unable to use some of the organizational methods of other more efficient
 heap libraries.
 
-@node Getting Started,  , Installation, Overview
+@node Getting Started, Using With Threads, Installation, Overview
 @section Getting Started with the Library
 
 @cindex quick start
@@ -785,6 +808,73 @@ dmalloc_shutdown, and ta-dah!
 
 @end enumerate
 
+@node Using With Threads, , Getting Started, Overview
+@section Using the Library with a Thread Package
+
+@cindex threads
+
+This is the newest section of the library and therefore contains the
+least information about a subject on which I probably could write a
+book.  My apologies.
+
+@cindex pthreads
+
+Threads are special operating system facilities which allow your
+programs to have multiple threads of execution (hence the name).  In
+effect your program can be doing a number of things ``at the same
+time''.  This gives you the opportunity to take advantage of modern
+operating system scheduling and multi-processor hardware efficiently.  If
+I've already lost you or if any of the terminology below does not make
+sense, see manuals about POSIX threads (pthreads) before going any
+further.  O'Reilly publishes a pretty good pthreads manual for example.
+
+The support for threads in dmalloc is minimal although probably adequate
+for most if not all testing scenarios.  It provides support for mutex
+locking itself to protect against race conditions that result in
+multiple simultaneous execution.  One of the major problems is that most
+thread libraries uses malloc themselves.  Since all of dmalloc's
+initialization happens when a call to malloc is made, we may be
+attempting to initialize or lock the mutex while the thread library is
+booting up.  A baaaad thing since thread libraries aren't reentrant.
+
+@cindex lock on
+
+The solution to this problem is to have the library not initialize or
+lock its mutex variable until after a certain number of allocation calls
+have been completed.  If the library does not wait before initializing
+the locks, the thread library will probably core dump.  If it waits too
+long then it can't protect itself from multiple execution and it will
+abort or other bad things might happen.  You adjust the number of times
+to wait at runtime with the ``lock-on'' option to the dmalloc program
+(for example @kbd{dmalloc -o 20}).  Times values between 2 and 30 are
+probably good although operating systems will vary significantly.  You
+know its too low if your program core dumps and too high if the library
+generates an exception.
+
+An additional complexity is when we are initializing the lock before
+mutex locking around the library.  As mentioned, the init itself may
+generate a malloc call causing the library to go recursive and the
+pthread library to possibly core dump. With the THREAD_LOCK_INIT setting
+defined in @file{settings.h}, you can tune how many times before we
+start locking to try and initialize the mutex lock.  It defaults to 2
+which seems to work for me.  If people need to have this runtime
+configurable or would like to present an alternative default, please let
+me know.
+
+In addition to the ``lock-on'' option, you probably will need to enable
+the @samp{allow-nonlinear} token if you thread library needs to call
+sbrk directly to allocate some storage.  @xref{Debug Tokens}.
+
+To build the library with the threaded stubs type @kbd{make threads}
+which should build @file{libdmallocth.a}.  The auto-configurations for
+these functions is in its infancy and may or may not work depending on
+the script's ability to detect your local thread functionality.  Feel
+free to send me mail with comments or improvements to them.
+
+So that's it.  If you have any specific questions or would like addition
+information posted in this section, please let me know.  Experienced
+thread programmers only please.
+
 @node Details, Source Code, Overview, Top
 @chapter Details about the Library's Operations
 
@@ -820,11 +910,12 @@ dmalloc_shutdown, and ta-dah!
 @cindex allocation macros
 @cindex dmalloc.h file
 
-By including @file{dmalloc.h} in your C files, your calls to calloc,
-free, malloc, or realloc are replaced with calls to _calloc_leap,
-_free_leap, _malloc_leap, and _realloc_leap.  Additionally the library
-replaces calls to xcalloc, xfree, xmalloc, xrealloc, and xstrdup with
-_leap calls.
+By including @file{dmalloc.h} in your C files, your calls to malloc,
+calloc, realloc, valloc, strdup, and free are replaced with calls to
+_malloc_leap, _calloc_leap, _realloc_leap, _valloc_leap, _strdup_leap,
+and _free_leap.  Additionally the library replaces calls to xmalloc,
+xcalloc, xrealloc, xvalloc, xstrdup, and xfree with associated _leap
+calls.
 
 @emph{WARNING}: You should be sure to have @file{dmalloc.h} included at
 the end of your include file list because dmalloc uses macros and may
@@ -1236,7 +1327,7 @@ is most likely that some code that has been executed was naughty.
 To get more information about the problem, first print via the debugger
 the dmalloc_errno variable to get the library's internal error code.
 You can suspend your debugger and run @samp{dmalloc -e
-value-returned-from-print} to get an english translation of the error.
+value-returned-from-print} to get an English translation of the error.
 A number of the error messages are designed to indicate specific
 problems with the library administrative structures and may not be
 user-friendly.
@@ -1342,7 +1433,7 @@ it may cause your program to run out of memory.
 
 @cindex fence-post errors
 
-For a definition of fence-posts please see the Features section.
+For a definition of fence-posts please see the ``Features'' section.
 @xref{Features}.
 
 If you have encountered a fence-post memory error, the logfile should be
@@ -1847,6 +1938,15 @@ specified.
 Without changing the environment, output the commands resulting from the
 supplied options.
 
+@cindex lock on
+@item -o times
+Set the ``lock-on'' period which dictates with the threaded version of
+the library to not initialize or lock the mutex lock around the library
+until after a certain number of allocation calls have been made.  Some
+number between 2 and 30 is probably good.  See the ``Using With
+Threads'' section for more information about the operation of the
+library with threads.  @xref{Using With Threads}.
+
 @item -p token(s)
 Add (plus) the debug capabilities of token(s) to the current debug
 setting or to the selected tag (or -d value).  Multiple -p's can be
@@ -1989,9 +2089,9 @@ just make a call to malloc().  This can be disabled with the help of a
 manual compilation option in the @file{conf.h} file.
 
 @item
-The library does @emph{not} provide memalign() nor valloc() support as
-of yet, but may in future releases.  The author is interested to know
-who is using these functions and for what reason.
+The library does @emph{not} provide memalign() support as of yet, but
+may in future releases.  The author is interested to know who is using
+these functions and for what reason.
 
 @item
 Some systems allow free(0) to not be an error for some reason.  Since 0
