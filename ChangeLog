@@ -1,3 +1,19 @@
+Thu Nov 12 10:08:58 1998  Gray Watson  <gray@burger.letters.com>
+
+	* Added FREED_POINTER_DELAY in settings.h which will hold a
+	pointer from being reused for a certain amount of time.
+
+	* Renamed allow-zero token to be allow-free-null.
+
+	* Added LOG_TIME_NUMBER and LOG_CTIME_STRING to the settings.dist
+	file for logging times in the logfile.
+
+	* Disabled the log-thread-id macro.  Use the THREAD_STORE_ID
+	define in settings.h to control.
+
+	* Disabled the log-stamp macro.  Use the STORE_TIME define in
+	settings.h to control.
+
 Tue Nov 10 12:43:00 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Added Jens' cool gdb script and -g flag to dmalloc.
@@ -13,8 +29,8 @@ Mon Nov  9 11:48:29 1998  Gray Watson  <gray@burger.letters.com>
 	* Improved the handling of free(NULL) and malloc(0) settings.
 
 	* Added initial memalign support with a error message if the
-        alignment is less than block size which is not currently
-        supported.
+	alignment is less than block size which is not currently
+	supported.
 
 	* Renamed print-error token to print-messages.
 
@@ -29,28 +45,28 @@ Thu Oct 15 11:06:41 1998  Gray Watson  <gray@burger.letters.com>
 	* Moved to #ident for rcs-ids in GCC.
 
 	* Found and fixed a bug when reallocing a previous valloced
-        section.  Not a good idea anyway since it will not preserve the
-        block-aligned status (should it).
+	section.  Not a good idea anyway since it will not preserve the
+	block-aligned status (should it).
 
 	* Released dmalloc version 4.0.2.
 
 	* Fixed a problem in return.h and DMALLOC_UNKNOWN_FILE.  Ugh.
-        Thanks much to Mike Sacauskis for pointing this out.
+	Thanks much to Mike Sacauskis for pointing this out.
 
 Thu Oct  8 11:07:25 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Released dmalloc version 4.0.1.
 
 	* Added startup messages acknowledging the thread status.  Added
-        error.o to the thread object list.
+	error.o to the thread object list.
 
 Wed Oct  7 14:52:14 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Fixed problem with thread compilation and chunk.c.  Thanks much
-        to Didier Verna for pointing out this problem.
+	to Didier Verna for pointing out this problem.
 
 	* Fixed possible race condition with synchronizing with external
-        sbrk calls.
+	sbrk calls.
 
 Mon Oct  5 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
 
@@ -63,14 +79,14 @@ Sun Oct  4 22:56:46 1998  Gray Watson  <gray@burger.letters.com>
 	* Updated the manual a bit.
 
 	* Made a small change to the solaris return.h code.  Thanks
-        Alexandre.
+	Alexandre.
 
 Tue Sep 29 09:26:50 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.0.0 beta2. 
 
 	* Aligned valloc to block alignment as it should have been with
-        fence post checking installed.
+	fence post checking installed.
 
 	* Renamed some internal variables and macros better names.
 
@@ -81,26 +97,26 @@ Mon Sep 28 17:55:24 1998  Gray Watson  <gray@burger.letters.com>
 	* Improved the log-trans output messages.
 
 	* Added the printf attribute to error.c's dmalloc_message.  Fixed
-        a number of casting problems.
+	a number of casting problems.
 
 Fri Sep 18 13:37:23 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Releasing dmalloc version 4.0.0 beta.
 
 	* Added recalloc support into the library.  Thanks to Nick
-        Albright for suggesting it.
+	Albright for suggesting it.
 
 	* Cleaned up the calloc special handling and accounting.
-        Simplified the local malloc functions in malloc.c.
+	Simplified the local malloc functions in malloc.c.
 
 	* Added valloc support to the library after it was determined that
-        OSF thread libraries still use the function.  memalign will be
-        much harder to add.
+	OSF thread libraries still use the function.  memalign will be
+	much harder to add.
 
 Thu Sep 17 08:42:14 1998  Gray Watson  <gray@burger.letters.com>
 
 	* Improved the pthread autoconfiguration and the code.  Removed
-        the gross macro code sections.
+	the gross macro code sections.
 
 	* Lots of small code improvements.
 
@@ -1355,5 +1371,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.201 1998/11/10 17:48:03 gray Exp $
+$Id: ChangeLog,v 1.202 1998/11/12 23:59:03 gray Exp $
 -------------------------------------------------------------------------------

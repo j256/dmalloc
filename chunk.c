@@ -21,7 +21,7 @@
  *
  * The author may be contacted via http://www.letters.com/~gray/
  *
- * $Id: chunk.c,v 1.128 1998/11/12 23:05:31 gray Exp $
+ * $Id: chunk.c,v 1.129 1998/11/12 23:56:50 gray Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.128 1998/11/12 23:05:31 gray Exp $";
+#ident "$Id: chunk.c,v 1.129 1998/11/12 23:56:50 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.128 1998/11/12 23:05:31 gray Exp $";
+  "$Id: chunk.c,v 1.129 1998/11/12 23:56:50 gray Exp $";
 #endif
 #endif
 
@@ -522,6 +522,7 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
     switch (flag) {
       
     case BBLOCK_START_USER:
+    case BBLOCK_VALLOC:
       if (bblock_c == 0) {
 	bblock_p->bb_flags = BBLOCK_START_USER;
       }
@@ -529,24 +530,17 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
 	bblock_p->bb_flags = BBLOCK_USER;
       }
       
-      bblock_p->bb_line = (unsigned short)num;
-      bblock_p->bb_size = (unsigned int)info;
-      bblock_p->bb_file = (char *)pnt;
-      break;
-      
       /* same as START_USER with the VALLOC flag added */ 
-    case BBLOCK_VALLOC:
-      /* valloc blocks gets marked with the valloc flag */
-      if (bblock_c == 0) {
-	bblock_p->bb_flags = BBLOCK_START_USER | BBLOCK_VALLOC;
-      }
-      else {
-	bblock_p->bb_flags = BBLOCK_USER | BBLOCK_VALLOC;
+      if (flag == BBLOCK_VALLOC) {
+	bblock_p->bb_flags |= BBLOCK_VALLOC;
       }
       
       bblock_p->bb_line = (unsigned short)num;
       bblock_p->bb_size = (unsigned int)info;
       bblock_p->bb_file = (char *)pnt;
+#if FREED_POINTER_REUSE
+      bblock_p->bb_reuse_iter = 0;
+#endif
       break;
       
     case BBLOCK_FREE:
@@ -559,6 +553,9 @@ static	int	set_bblock_admin(const int block_n, bblock_t *bblock_p,
       else {
 	bblock_p->bb_next = (struct bblock_st *)NULL;
       }
+#if FREED_POINTER_REUSE
+      bblock_p->bb_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
+#endif
       break;
       
     default:
@@ -595,11 +592,17 @@ static	int	find_free_bblocks(const unsigned int many, bblock_t **ret_p)
   bit_c += BASIC_BLOCK;
   
   for (; bit_c < MAX_SLOTS; bit_c++) {
-    /* XXX: empty the hold queue */
     
     for (bblock_p = free_bblock[bit_c], prev_p = NULL;
 	 bblock_p != NULL;
 	 prev_p = bblock_p, bblock_p = bblock_p->bb_next) {
+      
+#if FREED_POINTER_DELAY
+      /* are we still waiting on this guy? */
+      if (_dmalloc_iter_c < bblock_p->bb_reuse_iter) {
+	continue;
+      }
+#endif
       
       if (bblock_p->bb_block_n >= many
 #if BEST_FIT
@@ -1082,6 +1085,43 @@ static	dblock_t	*get_dblock_admin(const int many)
 }
 
 /*
+ * Find the next available free dblock in the BIT_N bucket.
+ */
+static	dblock_t	*find_free_dblock(const int bit_n)
+{
+  dblock_t	*dblock_p;
+#if FREED_POINTER_DELAY
+  dblock_t	*last_p;
+  
+  /* find a value dblock entry */
+  for (dblock_p = free_dblock[bit_n], last_p = NULL;
+       dblock_p != NULL;
+       last_p = dblock_p, dblock_p = dblock_p->db_next) {
+    
+    /* are we still waiting on this guy? */
+    if (_dmalloc_iter_c < dblock_p->db_reuse_iter) {
+      continue;
+    }
+    
+    /* keep the linked lists */
+    if (last_p == NULL) {
+      free_dblock[bit_n] = dblock_p->db_next;
+    }
+    else {
+      last_p->db_next = dblock_p->db_next;
+    }
+    break;
+  }
+  
+#else /* FREED_POINTER_DELAY == 0 */
+  dblock_p = free_dblock[bit_n];
+  free_dblock[bit_n] = dblock_p->db_next;
+#endif /* FREED_POINTER_DELAY == 0 */
+  
+  return dblock_p;
+}
+
+/*
  * Get a dblock of 1<<BIT_N sized chunks, also asked for the slot memory
  */
 static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
@@ -1093,9 +1133,9 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
   void		*pnt;
   
   /* is there anything on the dblock free list? */
-  dblock_p = free_dblock[bit_n];
+  dblock_p = find_free_dblock(bit_n);
+  
   if (dblock_p != NULL && ! BIT_IS_SET(_dmalloc_flags, DEBUG_NEVER_REUSE)) {
-    free_dblock[bit_n] = dblock_p->db_next;
     free_space_count -= 1 << bit_n;
     
     /* find pointer to memory chunk */
@@ -1109,7 +1149,6 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     }
   }
   else {
-    /* XXX: check the hold queue */
     
     /* do we need to print admin info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
@@ -1144,8 +1183,11 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     free_dblock[bit_n] = dblock_p;
     
     for (; dblock_p < first_p + (1 << (BASIC_BLOCK - bit_n)) - 1; dblock_p++) {
-      dblock_p->db_next = dblock_p + 1;
       dblock_p->db_bblock = bblock_p;
+      dblock_p->db_next = dblock_p + 1;
+#if FREED_POINTER_DELAY
+      dblock_p->db_reuse_iter = 0;
+#endif
 #if STORE_SEEN_COUNT
       dblock_p->db_overhead.ov_seen_c = 0;
 #endif
@@ -1155,6 +1197,9 @@ static	void	*get_dblock(const int bit_n, const unsigned short byte_n,
     /* last one points to the free list (probably NULL) */
     dblock_p->db_next = free_p;
     dblock_p->db_bblock = bblock_p;
+#if FREED_POINTER_DELAY
+    dblock_p->db_reuse_iter = 0;
+#endif
     free_space_count += 1 << bit_n;
     
     /*
@@ -2706,6 +2751,9 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
     /* rearrange info */
     dblock_p->db_bblock = bblock_p;
     dblock_p->db_next = free_dblock[bit_n];
+#if FREED_POINTER_DELAY
+    dblock_p->db_reuse_iter = _dmalloc_iter_c + FREED_POINTER_DELAY;
+#endif
     free_dblock[bit_n] = dblock_p;
     free_space_count += 1 << bit_n;
     
@@ -2808,12 +2856,16 @@ int	_chunk_free(const char *file, const unsigned int line, void *pnt,
   }
   
   /*
-   * check above and below the free bblock looking for neighbors that
+   * Check above and below the free bblock looking for neighbors that
    * are free so we can add them together and put them in a different
    * free slot.
+   *
+   * NOTE: all of these block's reuse-iter count will be moved ahead
+   * because we are encorporating in this newly freed block.
    */
   
   if (last != NULL && BIT_IS_SET(last->bb_flags, BBLOCK_FREE)) {
+    
     /* find last in free list and remove it */
     for (tmp = free_bblock[last->bb_bit_n], prev_p = NULL;
 	 tmp != NULL;
