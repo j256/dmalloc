@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: dmalloc_loc.h,v 1.35 1995/06/21 18:19:04 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.36 1997/03/21 14:30:23 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -111,6 +111,6 @@
 /*
  * global malloc defines
  */
-#define BLOCK_SIZE		(1 << BASIC_BLOCK)	/* size of a block */
+#define BLOCK_SIZE		(int)(1 << BASIC_BLOCK)	/* size of a block */
 
 #endif /* ! __DMALLOC_LOC_H__ */
