@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.257 2004/07/11 03:08:38 gray Exp $
+@c $Id: dmalloc.texi,v 1.258 2004/07/11 14:45:47 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -929,17 +929,17 @@ system version/type, and the version of Dmalloc you are using.
 @cindex programming
 
 @menu
-* Allocation Macros::           Macros providing file and line information.
-* Return Address::              Getting caller address information.
-* Argument Checking::           Checking of function arguments.
-* Extensions::                  Additional non-standard routines.
-* Error Codes::                 Description of the internal error numbers.
-* Disabling the Library::       How to disable the library.
-* Using With C++::              Using the library with C++.
-* Using With a Debugger::       Using a debugger with the library.
-* Using With Threads::          Using the library with a thread package.
-* Using With Cygwin::           Using the library with Cygwin environment.
-* Debugging A Daemon::          Debugging memory in a daemon process.
+* Allocation Macros::          Macros providing file and line information.
+* Return Address::             Getting caller address information.
+* Argument Checking::          Checking of function arguments.
+* Extensions::                 Additional non-standard routines.
+* Error Codes::                Description of the internal error numbers.
+* Disabling the Library::      How to disable the library.
+* Using With C++::             Using the library with C++.
+* Using With a Debugger::      Using a debugger with the library.
+* Using With Threads::         Using the library with a thread package.
+* Using With Cygwin::          Using the library with Cygwin environment.
+* Debugging A Server::         Debugging memory in a server or cgi-bin process.
 @end menu
 
 @c --------------------------------
@@ -1180,12 +1180,13 @@ areas in the heap.
 @deftypefun
 unsigned int dmalloc_debug ( const unsigned int @var{flags} )
 
-This routine sets the debug functionality flags and returns the previous
-flag value.  It is helpful in server or cgi-bin programs where
-environmental variables cannot be used.  For instance, if debugging
-should never be enabled for a program, a call to @code{dmalloc_debug(0)}
-as the first call in @code{main()} will disable all the memory debugging
-from that point on.
+This routine sets the debug functionality flags and returns the
+previous flag value.  It is helpful in server or cgi-bin programs
+where environmental variables cannot be used.  @xref{Debugging A
+Server}.  For instance, if debugging should never be enabled for a
+program, a call to @code{dmalloc_debug(0)} as the first call in
+@code{main()} will disable all the memory debugging from that point
+on.
 
 @emph{NOTE}: you cannot add or remove certain flags such as signal
 handlers since they are setup at initialization time only.
@@ -1223,7 +1224,8 @@ This routine sets the global debugging functionality as an option
 string.  Normally this would be passed in in the DMALLOC_OPTIONS
 environmental variable.  This is here to override the env or for
 circumstances where modifying the environment is not possible or does
-not apply such as servers or cgi-bin programs.
+not apply such as servers or cgi-bin programs.  @xref{Debugging A
+Server}.
 
 Some examples:
 
@@ -1293,10 +1295,10 @@ the pointers which have changed since this mark with the
 @code{dmalloc_log_changed} function.  Multiple marks can be saved and
 used.
 
-This is very useful when using the library with a server which does not
-exit.  You can then save a mark before a transaction or event happens
-and then check to see what has changed using the
-@code{dmalloc_log_changed} function below.
+This is very useful when using the library with a server which does
+not exit.  You can then save a mark before a transaction or event
+happens and then check to see what has changed using the
+@code{dmalloc_log_changed} function below.  @xref{Debugging A Server}.
 
 If you @code{LOG_ITERATION} enabled in your @file{settings.h} file then
 the entries in the log file will be prepended with the number of memory
@@ -1350,9 +1352,9 @@ Count the pointers that have changed since the mark which was returned by
 pointers that have not been freed.  If @code{free_b} is set to non-0
 then count the pointers that have been freed.
 
-This can be used in conjunction with the @code{dmalloc_mark()} function
-to help servers which never exit encure that transactions or events are
-not leaking memory.
+This can be used in conjunction with the @code{dmalloc_mark()}
+function to help servers which never exit encure that transactions or
+events are not leaking memory.  @xref{Debugging A Server}.
 
 @example
 unsigned long mark = dmalloc_mark() ;
@@ -1407,9 +1409,9 @@ then log the pointers that have been freed.  If @code{details_b} set to
 non-0 then log the individual pointers that have changed otherwise just
 log the summaries.
 
-This can be used in conjunction with the @code{dmalloc_mark()} function
-to help servers which never exit find transactions or events which are
-leaking memory.
+This can be used in conjunction with the @code{dmalloc_mark()}
+function to help servers which never exit find transactions or events
+which are leaking memory.  @xref{Debugging A Server}.
 
 @end deftypefun
 
@@ -2304,7 +2306,7 @@ programmers only please.
 
 @c --------------------------------
 
-@node Using With Cygwin, Debugging A Daemon, Using With Threads, Programming
+@node Using With Cygwin, Debugging A Server, Using With Threads, Programming
 @section Using the library with Cygwin environment.
 
 @cindex cygwin
@@ -2360,8 +2362,8 @@ do this.
 
 @c --------------------------------
 
-@node Debugging A Daemon,, Using With Cygwin, Programming
-@section Debugging Memory in a Daemon Process
+@node Debugging A Server,, Using With Cygwin, Programming
+@section Debugging Memory in a Server or Cgi-Bin Process
 
 @cindex daemon process debugging
 @cindex debugging daemon processes
@@ -2376,15 +2378,15 @@ do this.
 @cindex usage of dmalloc with cgi-bin
 
 There are some specified challenges when trying to debug allocations
-in processes which do not startup, run, and then shutdown.  Daemon
-processes are those that are spawned (often at system boot time) and
-run perpetually.  Other processes which are difficult to debug are CGI
-programs which are spawned by web servers or when you want to start
-debugging inside of a child process.
+in processes which do not startup, run, and then shutdown.  Server
+processes (often called daemons) are those that are started (often at
+system boot time) and run perpetually.  Other processes which are
+difficult to debug are CGI programs which are spawned by web servers
+or when you want to start debugging inside of a child process.
 
 @enumerate
 
-@item Build your daemon or cgi-bin program with the dmalloc library
+@item Build your server or cgi-bin program with the dmalloc library
 like any other program.  @xref{Getting Started}.
 
 @item Add code into your program to enable the library flags to
