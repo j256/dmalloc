@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.51 2001/11/30 23:54:57 gray Exp $
+ * $Id: settings.dist,v 1.52 2003/05/13 14:57:01 gray Exp $
  */
 
 /*
@@ -360,20 +360,6 @@
 #define DUMP_UNFREED_SUMMARY_ONLY 0
 
 /*
- * If you are including the dmalloc.h include file, define this to 1
- * to be able to disable the library by linking in the libdmalloc_lp.a
- * library.  The alternative is to have to recompile your source files
- * without including dmalloc.h.  With the libdmalloc_lp.a you can use
- * the system's or another set of malloc functions without having to
- * recompile.
- *
- * During a poll on the dmalloc mailing list, very few people
- * showed that they cared at all about this and only 1 (one) said that
- * they actually used it.
- */
-#define USE_DMALLOC_LEAP 0
-
-/*
  * Set to 0 if you don't want dmalloc to be using mprotect to restrict
  * accesses to memory blocks.  This is a newer part of the library and
  * still may have bugs.  Protection will only be on if the
@@ -394,6 +380,12 @@
  * me email with any problems or comments on this feature.
  */
 #define INTERNAL_MEMORY_SPACE (1024 * 1024)
+
+/*
+ * The default smallest allowable allocations in bytes.  This means
+than
+ */
+#define DEFAULT_SMALLEST_BLOCK	8
 
 /****************************** thread settings ******************************/
 
