@@ -2,8 +2,9 @@ Tue May 16 14:34:14 2000  Gray Watson  <gray@256.com>
 
 	* Added SET_POINTER macro and cleaned some code.
 
-	* Reworked the internal initialization values for the
- 	environmental variables.
+	* Completely reworked the internal initialization values for the
+ 	environmental variables to fix problems pointed out by Carlton
+ 	Teel.
 
 	* Fixed a bug found by Mcvey where the 1st dblock allocation in a
  	block would not have been found in non-freed memory lists.
@@ -1614,5 +1615,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.249 2000/05/16 19:46:35 gray Exp $
+$Id: ChangeLog,v 1.250 2000/05/16 19:48:28 gray Exp $
 -------------------------------------------------------------------------------

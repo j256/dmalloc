@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.92 2000/03/21 18:19:10 gray Exp $
+ * $Id: dmalloc.c,v 1.93 2000/05/16 19:46:35 gray Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: dmalloc.c,v 1.92 2000/03/21 18:19:10 gray Exp $";
+#ident "$Id: dmalloc.c,v 1.93 2000/05/16 19:46:35 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.92 2000/03/21 18:19:10 gray Exp $";
+  "$Id: dmalloc.c,v 1.93 2000/05/16 19:46:35 gray Exp $";
 #endif
 #endif
 
@@ -72,9 +72,14 @@ static	char	*rcs_id =
 #define TOKENIZE_EQUALS	" \t="			/* for tag lines */
 #define TOKENIZE_CHARS	" \t,"			/* for tag lines */
 
-#define NO_VALUE		(-1)		/* no value ... value */
-#define INTERVAL_NO_VALUE	0		/* no value ... value */
+#define DEBUG_ARG		'd'		/* debug argument */
+#define INTERVAL_ARG		'i'		/* interval argument */
+#define THREAD_LOCK_ON_ARG	'o'		/* lock-on argument */
 #define TOKENS_PER_LINE		5		/* num debug toks per line */
+
+#define FILE_NOT_FOUND		1
+#define FILE_FOUND		2
+#define TOKEN_FOUND		3
 
 /*
  * default flag information
@@ -104,6 +109,7 @@ typedef struct {
 /* NOTE: print-error is not in this list because it is special */
 
 static	default_t	defaults[] = {
+  { "none",		0 },
   { "runtime",		RUNTIME_FLAGS },
   { "run",		RUNTIME_FLAGS },
   { "low",		LOW_FLAGS },
@@ -119,13 +125,13 @@ static	char	*address = NULL;		/* for ADDRESS */
 static	int	bourne_b = 0;			/* set bourne shell output */
 static	int	cshell_b = 0;			/* set c-shell output */
 static	int	clear_b = 0;			/* clear variables */
-static	int	debug = NO_VALUE;		/* for DEBUG */
-static	int	errno_to_print = NO_VALUE;	/* to print the error string */
+static	int	debug = 0;			/* for DEBUG */
+static	int	errno_to_print = 0;		/* to print the error string */
 static	int	gdb_b = 0;			/* set gdb output */
 static	int	help_b = 0;			/* print help message */
 static	char	*inpath = NULL;			/* for config-file path */
-static	unsigned long interval = INTERVAL_NO_VALUE; /* for setting INTERVAL */
-static	int	thread_lock_on = NO_VALUE;	/* for setting LOCK_ON */
+static	unsigned long interval = 0;		/* for setting INTERVAL */
+static	int	thread_lock_on = 0;		/* for setting LOCK_ON */
 static	int	keep_b = 0;			/* keep settings override -r */
 static	int	list_tags_b = 0;		/* list rc tags */
 static	int	debug_tokens_b = 0;		/* list debug tokens */
@@ -161,7 +167,7 @@ static	argv_t	args[] = {
     "address:#",		"stop when malloc sees address" },
   { 'c',	"clear",	ARGV_BOOL_INT,	&clear_b,
     NULL,			"clear all variables not set" },
-  { 'd',	"debug-mask",	ARGV_HEX,	&debug,
+  { DEBUG_ARG,	"debug-mask",	ARGV_HEX,	&debug,
     "value",			"hex flag to set debug mask" },
   { 'D',	"debug-tokens",	ARGV_BOOL_INT,	&debug_tokens_b,
     NULL,			"list debug tokens" },
@@ -171,7 +177,7 @@ static	argv_t	args[] = {
     "path",			"config if not ~/.mallocrc" },
   { 'h',	"help",		ARGV_BOOL_INT,	&help_b,
     NULL,			"print help message" },
-  { 'i',	"interval",	ARGV_U_LONG,	&interval,
+  { INTERVAL_ARG, "interval",	ARGV_U_LONG,	&interval,
     "value",			"check heap every number times" },
   { 'k',	"keep",		ARGV_BOOL_INT,	&keep_b,
     NULL,			"keep settings (override -r)" },
@@ -181,7 +187,7 @@ static	argv_t	args[] = {
     "token(s)",			"del tokens from current debug" },
   { 'n',	"no-changes",	ARGV_BOOL_NEG,	&make_changes_b,
     NULL,			"make no changes to the env" },
-  { 'o',	"lock-on",	ARGV_INT,	&thread_lock_on,
+  { THREAD_LOCK_ON_ARG, "lock-on", ARGV_INT,	&thread_lock_on,
     "number",			"number of times to not lock" },
   { 'p',	"plus",		ARGV_CHAR_P | ARGV_FLAG_ARRAY,	&plus,
     "token(s)",			"add tokens to current debug" },
@@ -340,9 +346,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
     
     /* chop off the ending \n */
     buf_p = strrchr(buf, '\n');
-    if (buf_p != NULL) {
-      *buf_p = '\0';
-    }
+    SET_POINTER(buf_p, '\0');
     
     buf_p = buf;
     
@@ -394,9 +398,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
     }
   }
   
-  if (debug_p != NULL) {
-    *debug_p = new_debug;
-  }
+  SET_POINTER(debug_p, new_debug);
   
   if (found_b) {
     return 1;
@@ -410,8 +412,9 @@ static	int	read_next_token(FILE *infile, long *debug_p,
  * Read in a rc file from PATH and process it looking for the
  * specified DEBUG_VALUE or TAG_FIND token.  It passes back the
  * returned debug value in DEBUG_P.  Passes back the matching TOKEN of
- * TOKEN_SIZE.  Returns 0 if the file was not found.  Returns 1 if the
- * file was found, 2 if the file and the token was found.
+ * TOKEN_SIZE.
+ *
+ * Returns FILE_NOT_FOUND, FILE_FOUND, or TOKEN_FOUND.
  */
 static	int	read_rc_file(const char *path, const long debug_value,
 			     const char *tag_find, long *debug_p,
@@ -425,7 +428,7 @@ static	int	read_rc_file(const char *path, const long debug_value,
   /* open the path */
   infile = fopen(path, "r");
   if (infile == NULL) {
-    return 0;
+    return FILE_NOT_FOUND;
   }
   
   /* run through the tokens, looking for a match */
@@ -447,19 +450,17 @@ static	int	read_rc_file(const char *path, const long debug_value,
   
   (void)fclose(infile);
   
-  if (debug_p != NULL) {
-    *debug_p = new_debug;
-  }
+  SET_POINTER(debug_p, new_debug);
   if (token != NULL) {
     strncpy(token, next_token, token_size);
     token[token_size - 1] = '\0';
   }
   
   if (found_b) {
-    return 2;
+    return TOKEN_FOUND;
   }
   else {
-    return 1;
+    return FILE_FOUND;
   }
 }
 
@@ -485,13 +486,15 @@ static	long	process(const long debug_value, const char *tag_find,
     ret = read_rc_file(DEFAULT_CONFIG, debug_value, tag_find, &new_debug,
 		       token, token_size);
     /* did we find the correct value in the file? */
-    if (ret == 2) {
+    if (ret == TOKEN_FOUND) {
       return new_debug;
     }
-    path_p = DEFAULT_CONFIG;
     
     /* if we did not find the file, check the home directory */
-    if (ret == 0) {
+    if (ret == FILE_FOUND) {
+      path_p = DEFAULT_CONFIG;
+    }
+    else {
       /* find our home directory */
       home_p = getenv(HOME_ENVIRON);
       if (home_p == NULL) {
@@ -506,10 +509,15 @@ static	long	process(const long debug_value, const char *tag_find,
       ret = read_rc_file(path, debug_value, tag_find, &new_debug,
 			 token, token_size);
       /* did we find the correct value in the file? */
-      if (ret == 2) {
+      if (ret == TOKEN_FOUND) {
 	return new_debug;
       }
-      path_p = path;
+      if (ret == FILE_FOUND) {
+	path_p = path;
+      }
+      else {
+	path_p = NULL;
+      }
     }
   }
   else {
@@ -517,11 +525,11 @@ static	long	process(const long debug_value, const char *tag_find,
     ret = read_rc_file(inpath, debug_value, tag_find, &new_debug,
 		       token, token_size);
     /* did we find the correct value in the file? */
-    if (ret == 2) {
+    if (ret == TOKEN_FOUND) {
       return new_debug;
     }
     /* if the specified was not found, return error */
-    if (ret == 0) {
+    if (ret != FILE_FOUND) {
       (void)fprintf(stderr, "%s: could not read '%s': ",
 		    argv_program, inpath);
       perror("");
@@ -562,8 +570,14 @@ static	long	process(const long debug_value, const char *tag_find,
     
     /* did we not find the token? */
     if (def_p->de_string == NULL) {
-      (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		    argv_program, tag_find, path_p);
+      if (path_p == NULL) {
+	(void)fprintf(stderr, "%s: unknown tag '%s'\n",
+		      argv_program, tag_find);
+      }
+      else {
+	(void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
+		      argv_program, tag_find, path_p);
+      }
       exit(1);
     }
   }
@@ -658,7 +672,8 @@ static	void	list_tags(void)
 static	void	dump_current(void)
 {
   char		*lpath, *start_file, token[64];
-  unsigned long	addr, inter;
+  DMALLOC_PNT	addr;
+  unsigned long	inter;
   long		addr_count;
   int		lock_on, start_line, start_count;
   unsigned int	flags;
@@ -672,7 +687,7 @@ static	void	dump_current(void)
 		       &inter, &lock_on, &lpath,
 		       &start_file, &start_line, &start_count);
   
-  if (flags == (unsigned int)DEBUG_INIT) {
+  if (flags == 0) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
   }
   else {
@@ -684,11 +699,11 @@ static	void	dump_current(void)
     }
   }
   
-  if (addr == ADDRESS_INIT) {
+  if (addr == NULL) {
     (void)fprintf(stderr, "Address      not-set\n");
   }
   else {
-    if (addr_count == ADDRESS_COUNT_INIT) {
+    if (addr_count == 0) {
       (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
     }
     else {
@@ -697,31 +712,31 @@ static	void	dump_current(void)
     }
   }
   
-  if (inter == INTERVAL_INIT) {
+  if (inter == 0) {
     (void)fprintf(stderr, "Interval     not-set\n");
   }
   else {
     (void)fprintf(stderr, "Interval     %lu\n", inter);
   }
   
-  if (lock_on == LOCK_ON_INIT) {
+  if (lock_on == 0) {
     (void)fprintf(stderr, "Lock-On      not-set\n");
   }
   else {
     (void)fprintf(stderr, "Lock-On      %d\n", lock_on);
   }
   
-  if (lpath == LOGPATH_INIT) {
+  if (lpath == NULL) {
     (void)fprintf(stderr, "Logpath      not-set\n");
   }
   else {
     (void)fprintf(stderr, "Logpath      '%s'\n", lpath);
   }
   
-  if (start_file == START_FILE_INIT && start_count == START_COUNT_INIT) {
+  if (start_file == NULL && start_count == 0) {
     (void)fprintf(stderr, "Start-File   not-set\n");
   }
-  else if (start_count != START_COUNT_INIT) {
+  else if (start_count > 0) {
     (void)fprintf(stderr, "Start-Count  %d\n", start_count);
   }
   else {
@@ -776,13 +791,14 @@ static	char	*local_strerror(const int error_num)
 int	main(int argc, char **argv)
 {
   char		buf[1024];
-  int		debug_set_b = 0, set_b = 0;
-  char		*lpath = LOGPATH_INIT, *sfile = START_FILE_INIT;
-  unsigned long	addr = ADDRESS_INIT, inter = INTERVAL_INIT;
-  long		addr_count = ADDRESS_COUNT_INIT;
-  int		lock_on = LOCK_ON_INIT;
-  int		sline = START_LINE_INIT, scount = START_COUNT_INIT;
-  unsigned int	flags = DEBUG_INIT;
+  int		set_b = 0;
+  char		*lpath, *sfile;
+  DMALLOC_PNT	addr;
+  unsigned long	inter;
+  long		addr_count;
+  int		lock_on;
+  int		sline, scount;
+  unsigned int	flags;
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
   argv_version_string = dmalloc_version;
@@ -812,29 +828,39 @@ int	main(int argc, char **argv)
   _dmalloc_environ_get(OPTIONS_ENVIRON, &addr, &addr_count, &flags, &inter,
 		       &lock_on, &lpath, &sfile, &sline, &scount);
   
-  /* get a new debug value from tag */
-  if (tag != NULL) {
-    if (debug != NO_VALUE) {
+  /*
+   * So, if a tag was specified on the command line then we set the
+   * debug from it.  If it was not then we see if the debug flags were
+   * set as a hex value from the -d.  If this was not used then take
+   * the current value.
+   */
+  if (tag == NULL) {
+    if (argv_was_used(args, DEBUG_ARG)) {
+      set_b = 1;
+      /* should we clear the rest? */
+      if (remove_auto_b && (! keep_b)) {
+	clear_b = 1;
+      }
+    }
+    else {
+      debug = flags;
+    }
+  }
+  else {
+    if (argv_was_used(args, DEBUG_ARG)) {
       (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
 		    argv_program, tag);
     }
+    set_b = 1;
     debug = process(0L, tag, NULL, 0);
-    debug_set_b = 1;
+    /* should we clear the rest? */
+    if (remove_auto_b && (! keep_b)) {
+      clear_b = 1;
+    }
   }
   
   if (plus.aa_entry_n > 0) {
     int		plus_c;
-    
-    /* get current debug value and add tokens if possible */
-    if (debug == NO_VALUE) {
-      if (flags == (unsigned int)DEBUG_INIT) {
-	debug = 0;
-      }
-      else {
-	debug = flags;
-      }
-    }
-    
     for (plus_c = 0; plus_c < plus.aa_entry_n; plus_c++) {
       debug |= token_to_value(ARGV_ARRAY_ENTRY(plus, char *, plus_c));
     }
@@ -842,42 +868,9 @@ int	main(int argc, char **argv)
   
   if (minus.aa_entry_n > 0) {
     int		minus_c;
-    
-    /* get current debug value and add tokens if possible */
-    if (debug == NO_VALUE) {
-      if (flags == (unsigned int)DEBUG_INIT) {
-	debug = 0;
-      }
-      else {
-	debug = flags;
-      }
-    }
-    
     for (minus_c = 0; minus_c < minus.aa_entry_n; minus_c++) {
       debug &= ~token_to_value(ARGV_ARRAY_ENTRY(minus, char *, minus_c));
     }
-  }
-  
-  /*
-   * NOTE: this should be ahead of lock_on setting which tests this.
-   */
-  if (debug != NO_VALUE) {
-    /* special case, undefine if 0 */
-    if (debug == 0) {
-      flags = DEBUG_INIT;
-    }
-    else {
-      flags = debug;
-    }
-    set_b = 1;
-    /* should we clear the rest? */
-    if (debug_set_b && remove_auto_b && ! keep_b) {
-      clear_b = 1;
-    }
-  }
-  
-  if (clear_b) {
-    set_b = 1;
   }
   
   if (address != NULL) {
@@ -885,42 +878,30 @@ int	main(int argc, char **argv)
     set_b = 1;
   }
   else if (clear_b) {
-    addr = ADDRESS_INIT;
+    addr = NULL;
   }
   
-  if (interval != INTERVAL_NO_VALUE) {
-    /* NOTE: special case, == 0 causes it to be undef'ed */
-    if (interval == 0) {
-      inter = INTERVAL_INIT;
-    }
-    else {
-      inter = interval;
-    }
+  if (argv_was_used(args, INTERVAL_ARG)) {
+    inter = interval;
     set_b = 1;
   }
   else if (clear_b) {
-    inter = INTERVAL_INIT;
+    inter = 0;
   }
   
   /*
    * NOTE: this should be after the debug setting which this tests.
    */
-  if (thread_lock_on != NO_VALUE) {
-    /* NOTE: special case, == 0 causes it to be undef'ed */
-    if (thread_lock_on == 0) {
-      lock_on = LOCK_ON_INIT;
-    }
-    else {
-      lock_on = thread_lock_on;
-    }
+  if (argv_was_used(args, THREAD_LOCK_ON_ARG)) {
+    lock_on = thread_lock_on;
     set_b = 1;
-    if (! BIT_IS_SET(flags, DEBUG_ALLOW_NONLINEAR)) {
+    if (! BIT_IS_SET(debug, DEBUG_ALLOW_NONLINEAR)) {
       (void)fprintf(stderr,
 		    "WARNING: the allow-nonlinear flag is not enabled\n");
     }
   }
   else if (clear_b) {
-    lock_on = LOCK_ON_INIT;
+    lock_on = 0;
   }
   
   if (logpath != NULL) {
@@ -928,7 +909,7 @@ int	main(int argc, char **argv)
     set_b = 1;
   }
   else if (clear_b) {
-    lpath = LOGPATH_INIT;
+    lpath = NULL;
   }
   
   if (start != NULL) {
@@ -936,11 +917,12 @@ int	main(int argc, char **argv)
     set_b = 1;
   }
   else if (clear_b) {
-    sfile = START_FILE_INIT;
-    scount = START_COUNT_INIT;
+    sfile = NULL;
+    sline = 0;
+    scount = 0;
   }
   
-  if (errno_to_print != NO_VALUE) {
+  if (errno_to_print > 0) {
     (void)fprintf(stderr, "%s: dmalloc_errno value '%d' = \n",
 		  argv_program, errno_to_print);
     (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
@@ -980,13 +962,13 @@ int	main(int argc, char **argv)
     }
   }
   
-  if (set_b) {
+  if (clear_b || set_b) {
     _dmalloc_environ_set(buf, sizeof(buf), long_tokens_b, short_tokens_b,
-			 addr, addr_count, flags, inter, lock_on, lpath,
+			 addr, addr_count, debug, inter, lock_on, lpath,
 			 sfile, sline, scount);
     set_variable(OPTIONS_ENVIRON, buf);
   }
-  else if (errno_to_print == NO_VALUE
+  else if (errno_to_print == 0
 	   && (! list_tags_b)
 	   && (! debug_tokens_b)) {
     dump_current();

@@ -18,22 +18,11 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.18 2000/03/21 18:19:13 gray Exp $
+ * $Id: env.h,v 1.19 2000/05/16 19:46:36 gray Exp $
  */
 
 #ifndef __ENV_H__
 #define __ENV_H__
-
-/* init values for arguments */
-#define ADDRESS_INIT		0L
-#define ADDRESS_COUNT_INIT	(-1)
-#define DEBUG_INIT		(-1L)
-#define INTERVAL_INIT		0
-#define LOCK_ON_INIT		(-1)
-#define LOGPATH_INIT		NULL
-#define START_FILE_INIT		NULL
-#define START_LINE_INIT		(-1)
-#define START_COUNT_INIT	(-1)
 
 /* env labels */
 #define ADDRESS_LABEL		"addr"
@@ -51,7 +40,7 @@
  * Break up ADDR_ALL into ADDR_P and ADDR_COUNT_P
  */
 extern
-void	_dmalloc_address_break(const char *addr_all, unsigned long *addr_p,
+void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
 			       long *addr_count_p);
 
 /*
@@ -66,7 +55,7 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  * string.
  */
 extern
-void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
+void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
 			     long *addr_count_p, unsigned int *debug_p,
 			     unsigned long *interval_p, int *lock_on_p,
 			     char **logpath_p, char **sfile_p,
@@ -80,8 +69,9 @@ extern
 void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const int long_tokens_b,
 			     const int short_tokens_b,
-			     const unsigned long address,
-			     const long addr_count, const unsigned int debug,
+			     const DMALLOC_PNT address,
+			     const unsigned long addr_count,
+			     const unsigned int debug,
 			     const int interval, const int lock_on,
 			     const char *logpath, const char *sfile,
 			     const int sline, const int scount);

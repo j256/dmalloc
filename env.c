@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.24 2000/03/21 18:19:13 gray Exp $
+ * $Id: env.c,v 1.25 2000/05/16 19:46:36 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: env.c,v 1.24 2000/03/21 18:19:13 gray Exp $";
+#ident "$Id: env.c,v 1.25 2000/05/16 19:46:36 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: env.c,v 1.24 2000/03/21 18:19:13 gray Exp $";
+  "$Id: env.c,v 1.25 2000/05/16 19:46:36 gray Exp $";
 #endif
 #endif
 
@@ -101,14 +101,12 @@ static	long	hex_to_long(const char *str)
 /*
  * Break up ADDR_ALL into ADDR_P and ADDR_COUNT_P
  */
-void	_dmalloc_address_break(const char *addr_all, unsigned long *addr_p,
+void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
 			       long *addr_count_p)
 {
   char	*colon_p;
   
-  if (addr_p != NULL) {
-    *addr_p = hex_to_long(addr_all);
-  }
+  SET_POINTER(addr_p, (DMALLOC_PNT)hex_to_long(addr_all));
   if (addr_count_p != NULL) {
     colon_p = strchr(addr_all, ':');
     if (colon_p != NULL) {
@@ -128,17 +126,13 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
   start_p = strchr(start_all, ':');
   if (start_p != NULL) {
     (void)strcpy(start_file, start_all);
-    if (sfile_p != NULL) {
-      *sfile_p = start_file;
-    }
+    SET_POINTER(sfile_p, start_file);
     start_p = start_file + (start_p - start_all);
     *start_p = '\0';
-    if (sline_p != NULL) {
-      *sline_p = atoi(start_p + 1);
-    }
+    SET_POINTER(sline_p, atoi(start_p + 1));
   }
-  else if (scount_p != NULL) {
-    *scount_p = atoi(start_all);
+  else {
+    SET_POINTER(scount_p, atoi(start_all));
   }
 }
 
@@ -146,7 +140,7 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
  * Process the values of dmalloc environ variable(s) from ENVIRON
  * string.
  */
-void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
+void	_dmalloc_environ_get(const char *environ, DMALLOC_PNT *addr_p,
 			     long *addr_count_p, unsigned int *debug_p,
 			     unsigned long *interval_p, int *lock_on_p,
 			     char **logpath_p, char **sfile_p,
@@ -159,33 +153,15 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
   unsigned int	flags = 0;
   attr_t	*attr_p;
   
-  if (addr_p != NULL) {
-    *addr_p = ADDRESS_INIT;
-  }
-  if (addr_count_p != NULL) {
-    *addr_count_p = ADDRESS_COUNT_INIT;
-  }
-  if (debug_p != NULL) {
-    *debug_p = DEBUG_INIT;
-  }
-  if (interval_p != NULL) {
-    *interval_p = INTERVAL_INIT;
-  }
-  if (lock_on_p != NULL) {
-    *lock_on_p = LOCK_ON_INIT;
-  }
-  if (logpath_p != NULL) {
-    *logpath_p = LOGPATH_INIT;
-  }
-  if (sfile_p != NULL) {
-    *sfile_p = START_FILE_INIT;
-  }
-  if (sline_p != NULL) {
-    *sline_p = START_LINE_INIT;
-  }
-  if (scount_p != NULL) {
-    *scount_p = START_COUNT_INIT;
-  }
+  SET_POINTER(addr_p, NULL);
+  SET_POINTER(addr_count_p, 0);
+  SET_POINTER(debug_p, 0);
+  SET_POINTER(interval_p, 0);
+  SET_POINTER(lock_on_p, 0);
+  SET_POINTER(logpath_p, NULL);
+  SET_POINTER(sfile_p, NULL);
+  SET_POINTER(sline_p, 0);
+  SET_POINTER(scount_p, 0);
   
   /* get the options flag */
   env = getenv(environ);
@@ -230,9 +206,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
     if (strncmp(this_p, DEBUG_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      if (debug_p != NULL) {
-	*debug_p = hex_to_long(this_p);
-      }
+      SET_POINTER(debug_p, hex_to_long(this_p));
       continue;
     }
     
@@ -240,9 +214,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
     if (strncmp(this_p, INTERVAL_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      if (interval_p != NULL) {
-	*interval_p = (unsigned long)atol(this_p);
-      }
+      SET_POINTER(interval_p, (unsigned long)atol(this_p));
       continue;
     }
     
@@ -250,9 +222,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
     if (strncmp(this_p, LOCK_ON_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      if (lock_on_p != NULL) {
-	*lock_on_p = atoi(this_p);
-      }
+      SET_POINTER(lock_on_p, atoi(this_p));
       continue;
     }
     
@@ -303,7 +273,7 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
   
   /* append the token settings to the debug setting */
   if (debug_p != NULL) {
-    if (*debug_p == (unsigned int)DEBUG_INIT) {
+    if (*debug_p == 0) {
       *debug_p = flags;
     }
     else {
@@ -319,15 +289,16 @@ void	_dmalloc_environ_get(const char *environ, unsigned long *addr_p,
 void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const int long_tokens_b,
 			     const int short_tokens_b,
-			     const unsigned long address,
-			     const long addr_count, const unsigned int debug,
+			     const DMALLOC_PNT address,
+			     const unsigned long addr_count,
+			     const unsigned int debug,
 			     const int interval, const int lock_on,
-			     const char *logpath, const char *sfile,
-			     const int sline, const int scount)
+			     const char *logpath, const char *start_file_p,
+			     const int start_line, const int start_count)
 {
   char	*buf_p = buf, *bounds_p = buf + buf_size;
   
-  if (debug != (unsigned int)DEBUG_INIT) {
+  if (debug > 0) {
     if (short_tokens_b || long_tokens_b) {
       attr_t	*attr_p;
       
@@ -349,42 +320,43 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
 			    DEBUG_LABEL, ASSIGNMENT_CHAR, debug);
     }
   }
-  if (address != ADDRESS_INIT) {
-    if (addr_count != ADDRESS_COUNT_INIT) {
+  if (address != NULL) {
+    if (addr_count > 0) {
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx:%ld,",
-			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address,
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, (long)address,
 			    addr_count);
     }
     else {
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx,",
-			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, (long)address);
     }
   }
-  if (interval != INTERVAL_INIT) {
+  if (interval > 0) {
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
 			  INTERVAL_LABEL, ASSIGNMENT_CHAR, interval);
   }
-  if (lock_on != LOCK_ON_INIT) {
+  if (lock_on > 0) {
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
 			  LOCK_ON_LABEL, ASSIGNMENT_CHAR, lock_on);
   }
-  if (logpath != LOGPATH_INIT) {
+  if (logpath != NULL) {
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%s,",
 			  LOGFILE_LABEL, ASSIGNMENT_CHAR, logpath);
   }
-  if (sfile != START_FILE_INIT) {
-    if (sline != START_LINE_INIT) {
+  if (start_file_p != NULL) {
+    if (start_line > 0) {
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%s:%d,",
-			    START_LABEL, ASSIGNMENT_CHAR, sfile, sline);
+			    START_LABEL, ASSIGNMENT_CHAR, start_file_p,
+			    start_line);
     }
     else {
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%s,",
-			    START_LABEL, ASSIGNMENT_CHAR, sfile);
+			    START_LABEL, ASSIGNMENT_CHAR, start_file_p);
     }
   }
-  else if (scount != START_COUNT_INIT) {
+  else if (start_count > 0) {
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
-			  START_LABEL, ASSIGNMENT_CHAR, scount);
+			  START_LABEL, ASSIGNMENT_CHAR, start_count);
   }
   
   /* cut off the last comma */
