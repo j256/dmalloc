@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.91 2000/05/15 22:21:01 gray Exp $
+# $Id: Makefile.all.in,v 1.92 2000/05/16 18:40:25 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -18,6 +18,7 @@ infodir = $(prefix)/info
 
 # default c-compiler
 CC = @CC@
+CXX = @CXX@
 
 DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
@@ -42,7 +43,7 @@ SHLIB_TH = lib$(MODULE)th.so
 LIB_CXX	= lib$(MODULE)xx.a
 SHLIB_CXX = lib$(MODULE)xx.so
 @CXX_ON@BUILD_CXX = $(LIB_CXX)
-@CXX_ON@INSTALL_CXX = $(LIB_CXX)
+@CXX_ON@INSTALL_CXX = installcxx
 
 # library with dmalloc disabled
 LIB_DIS	= lib$(MODULE)lp.a
@@ -97,18 +98,18 @@ installincs : $(HFLS)
 	$(srcdir)/mkinstalldirs $(incdir)
 	$(INSTALL_DATA) $(HFLS) $(incdir)
 
-installlib : installincs $(LIBRARY) $(LIB_DIS)
+installcxx : $(LIB_CXX)
+	$(srcdir)/mkinstalldirs $(libdir)
+	$(INSTALL_DATA) $(LIB_CXX) $(libdir)
+
+installlib : installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
 	$(INSTALL_DATA) $(LIB_DIS) $(libdir)
 	@RANLIB@ $(libdir)/$(LIB_DIS)
 
-installcxx : $(LIB_CXX)
-	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_CXX) $(libdir)
-
-install : installdirs installlib $(UTIL) $(INSTALL_CXX)
+install : installdirs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
@@ -212,6 +213,10 @@ heavy : $(TEST) light
 .c.o :
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
+
+.cc.o :
+	rm -f $@
+	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
 
 .texi.info :
 	makeinfo --no-split $<

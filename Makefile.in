@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.136 2000/05/15 22:21:01 gray Exp $
+# $Id: Makefile.in,v 1.137 2000/05/16 18:40:25 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -37,6 +37,7 @@ SHLIB_TH = lib$(MODULE)th.so
 LIB_CXX	= lib$(MODULE)xx.a
 SHLIB_CXX = lib$(MODULE)xx.so
 @CXX_ON@BUILD_CXX = $(LIB_CXX)
+@CXX_ON@INSTALL_CXX = installcxx
 
 # library with dmalloc disabled
 LIB_DIS	= lib$(MODULE)lp.a
