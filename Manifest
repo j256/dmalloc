@@ -1,0 +1,41 @@
+-------------------------------------------------------------------------------
+@(#)Files	1.1  11/27/91
+-------------------------------------------------------------------------------
+Description of the files in the malloc package.
+
+Antaire/		Directory of Antaire Corporation lower level routines
+			used by the malloc package.
+
+Makefile		Makefile for the malloc library.
+
+NOTES			General Notes of the malloc routines and associated
+			algorithms.
+
+TTD			Things To Do list.
+
+alloc.[ch]		Higher level alloc routines including malloc, free,
+			realloc, etc.  These are the routines to be called
+			from user space.
+
+alloc_dbg.h		How the routines in libmalloc respond to different
+			setting of the MALLOC_DEBUG environmental variable.
+
+chunk.[ch]		Lower level allocation routines.  This is the meat of
+			the allocation algorithms.  Manages and debugs the
+			administration structures of the heap.
+
+chunk_loc.h		Local defines specific to the chunk routines only.
+
+heap.[ch]		Possibly machine specific routines for allocating space
+			on and manipulating the heap.  Heap.h contains a number
+			of macros that may need to be defined for each machine
+			type.
+
+malloc.man		User-level text manual file for the malloc routines.
+
+malloc_err.h		General error codes for the malloc module.
+
+malloc_loc.h		Local defines for all of the malloc routines.
+
+malloc_t.c		Test program for testing the malloc routines.
+-------------------------------------------------------------------------------
