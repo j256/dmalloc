@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.34 1993/08/30 20:16:14 gray Exp $
+# $Id: Makefile.in,v 1.35 1993/08/30 21:24:41 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -9,9 +9,10 @@ OBJS	= arg_check.o chunk.o compat.o error.o heap.o malloc.o malloc_lp.o
 OBJS_IN	= malloc_lp.o 
 FILLFLS	= arg_check.c chunk.c error.c heap.c malloc_lp.c malloc_t.c
 
+ARGV	= argv
 DEFS	= $(DEFINES)
-INCS	= -I. -Iargv $(INCLUDES)
-LIBS	= -L. -Largv -largv -lmalloc_dbg $(LIBRARIES)
+INCS	= -I. -I$(ARGV) $(INCLUDES)
+LIBS	= -L. -L$(ARGV) -l$(ARGV) -lmalloc_dbg $(LIBRARIES)
 
 CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
@@ -92,10 +93,13 @@ $(LIBRARY) : $(OBJS)
 	ranlib $@
 	- chmod 660 $@
 
-$(UTIL) : malloc_dbg.o $(LIBRARY)
+$(UTIL) : malloc_dbg.o $(LIBRARY) $(ARGV)/lib$(ARGV).a
 	rm -f $@
 	$(CC) $(LDFLAGS) $@.o $(LIBS)
 	mv a.out $@
+
+$(ARGV)/lib$(ARGV).a $(ARGV)/$(ARGV).h :
+	( cd $(ARGV) ; $(MAKE) )
 
 .PHONY : port
 port : $(PORTFLS)
