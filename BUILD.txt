@@ -3,17 +3,11 @@
 The following set of tasks should be performed when the dmalloc
 library gets released.
 
-1) Update the version number in version.h, dmalloc.spec, dmalloc.texi
-(2 places), Makefile.bsd.ports, and dmalloc.h.3 (defines @ top).
-
+1) Update the version number in version.h and where else it lists.
 2) Update the ChangeLog and NEWS files.
-
 3) Update the RELEASE.html file.
-
 4) Check in all files.
-
-5) cvs tag the release with dmalloc_release_X_X_X[_bX]
-
+5) cvs tag the release with dmalloc_release_X_X_X
 6) make distclean ; autoconf ; configure ; make port
 
 7) Copy down to OpenBSD, Linux, OSF, FreeBSD, other operation systems
@@ -28,7 +22,18 @@ and run tests.
 	- examine the log file, check version, look for exceptions
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
 
-8) Copy to OpenBSD and build the package.
+8) md5 the tarball and adjust the various version and distinfo files
+   in the ports/ subdirectory.
+
+9) Install the tgz file and html file in the repository
+10) Ftp the new version files over to download.sourforge.net/incoming
+11) Edit releases/index.html to include the new version
+12) Copy the .tgz file to /usr/ports/distfiles
+
+13) Update the /usr/ports/devel/dmalloc directory files from the
+    ports/ subdir, and run 'make package'.  Install the package.
+
+14) Copy to OpenBSD and build the package.
 
 	1) cd /usr/ports/devel/dmalloc
 	2) make clean
@@ -44,21 +49,14 @@ and run tests.
 	12) tar up the /usr/ports/devel/dmalloc directory
 	13) Copy the resulting tarball to the repository as -ports.tgz
 
-9) Copy to RPM and build the package.
+15) Copy to RPM and build the package.
 
 	1) Update the dmalloc.spec file
 	2) rpm -ba dmalloc.spec
 	3) Try to rpm -U dmalloc-X.X.X-1.i386.rpm
 	4) Copy the resulting RPM and SRPM to the repository
 
-10) Install the tgz file and html file in the repository
-
-11) Ftp the new version files over to download.sourforge.net/incoming
-
-12) Edit releases/index.html to include the new version
-
-13) Possibly announce on freshmeat
-
-14) Announce on egroups.
+16) Possibly announce on freshmeat
+17) Announce on egroups.
 
 -------------------------------------------------------------------------------
