@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-$Id: dec_notes,v 1.4 1993/10/17 01:34:44 gray Exp $
+$Id: dec_notes,v 1.5 1994/01/20 01:47:52 gray Exp $
 -------------------------------------------------------------------------------
 
 From Dave Hill <ddhill@zk3.dec.com>:
@@ -40,6 +40,10 @@ variables on the program invocation line, for example:
 This command will set the specified env variable and then run program.
 
 -------------------------------------------------------------------------------
+
+[The malloc_dbg library currently supports the at_exit() auto-shutdown
+routine.  If this is not working, however, you may want to consider
+the following.]
 
 OSF1 also supports the use of an 'init' and a 'fini' routine. Any function
 prefixed with '__init_' will be executed prior to main() and any function
