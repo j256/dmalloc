@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.94 2000/07/21 21:00:38 gray Exp $
+# $Id: Makefile.all.in,v 1.95 2000/07/24 20:17:31 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -38,6 +38,8 @@ SHLIBRARY = lib$(MODULE).so
 # thread version of the library
 LIB_TH	= lib$(MODULE)th.a
 SHLIB_TH = lib$(MODULE)th.so
+@TH_ON@BUILD_TH = $(LIB_TH)
+@TH_ON@INSTALL_TH = installth
 
 # C++ version of the library
 LIB_CXX	= lib$(MODULE)xx.a
@@ -78,9 +80,9 @@ CXX_OBJS = dmallocc.o
 CFLAGS = $(CCFLAGS)
 TEST = $(MODULE)_t
 
-all : dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX)
+all : dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
 @CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
-	@echo "To make the thread version of the library type 'make threads'"
+@TH_OFF@	@echo "To make the thread version of the library type 'make threads'"
 
 clean :
 	rm -f a.out core *.o *.t
@@ -106,7 +108,7 @@ installcxx : $(LIB_CXX)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIB_CXX) $(libdir)
 
-installlib : installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX)
+installlib : installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX) $(INSTALL_TH)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
@@ -119,7 +121,7 @@ install : installdirs installlib $(UTIL)
 	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
 	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
-	@echo "Enter 'make installth' to install thread library"
+@TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
 installth : $(LIB_TH)
 	$(srcdir)/mkinstalldirs $(libdir)
