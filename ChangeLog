@@ -1,5 +1,9 @@
 Thu Dec 28 20:39:00 1995  Gray Watson  <gray@burger.letters.com>
 
+	* Releasing version 3.1.3.
+
+	* Added new argv versions to fix problems.
+
 	* Don't allow silent dumps of test program.
 
 Tue Dec 19 19:11:19 1995  Gray Watson  <gray@burger.letters.com>
@@ -1128,5 +1132,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.166 1995/12/29 01:39:49 gray Exp $
+$Id: ChangeLog,v 1.167 1995/12/29 01:58:40 gray Exp $
 -------------------------------------------------------------------------------
