@@ -21,14 +21,13 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.50 1995/06/20 22:37:17 gray Exp $
+ * $Id: conf.h.in,v 1.51 1995/06/21 16:30:39 gray Exp $
  */
 
 #ifndef __CONF_H__
 #define __CONF_H__
 
 /* please see settings.h for manual configuration options */
-#include "settings.h"
 
 /*
  * NOTE: The following settings should not need to be tuned by hand.
@@ -84,6 +83,15 @@
  * debugging settings like fence-post checking.
  */
 #define ALLOCATION_ALIGNMENT 8
+
+/*
+ * This checks to see if the abort routine does extensive cleaning up
+ * before halting a program.  If so then it may call malloc functions
+ * making the library go recursive.  If abort is set to not okay then
+ * you should tune the KILL_PROCESS and SIGNAL_INCLUDE options in
+ * settings.h if you want the library to be able to dump core.
+ */
+#define ABORT_OKAY 0
 
 /*
  * LIBRARY DEFINES:
@@ -153,5 +161,8 @@
 #define HAVE_STRCSPN 0
 #define HAVE_STRNCAT 0
 #define HAVE_STRPBRK 0
+
+/* manual settings */
+#include "settings.h"
 
 #endif /* ! __CONF_H__ */
