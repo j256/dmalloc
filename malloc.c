@@ -68,7 +68,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: malloc.c,v 1.105 1998/09/17 16:07:23 gray Exp $";
+  "$Id: malloc.c,v 1.106 1998/09/17 19:26:27 gray Exp $";
 #endif
 
 /*
@@ -163,7 +163,13 @@ static	void	thread_lock(void)
     pthread_mutex_lock(&dmalloc_mutex);
 #endif
   }
-#endif
+#else /* ! LOCK_THREADS */
+  /* was thread-lock-on specified but not configured? */
+  if (thread_lock_on != LOCK_ON_INIT) {
+    dmalloc_errno = ERROR_LOCK_NOT_CONFIG;
+    _dmalloc_die(0);
+  }
+#endif /* ! LOCK_THREADS */
 }
 
 /* mutex unlock the malloc library */
