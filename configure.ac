@@ -21,9 +21,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.1 2003/05/21 03:07:55 gray Exp $
+# $Id: configure.ac,v 1.2 2003/05/21 04:05:05 gray Exp $
 #
-AC_REVISION($Revision: 1.1 $)
+AC_REVISION($Revision: 1.2 $)
 AC_INIT(dmalloc, 5.0.1, [http://dmalloc.org/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -34,14 +34,23 @@ AC_MSG_NOTICE([configurations for the dmalloc library])
 # arguments
 
 AC_ARG_ENABLE(cxx,
-    [  --disable-cxx      do not build in C++ support (enabled by default)],,
-    enable_cxx=yes)
+    [ AC_HELP_STRING([--disable-cxx],
+		[do not build in C++ support (enabled by default)] ) ],
+    [ # enable_cxx set by default ],
+    [ enable_cxx=yes ]
+)
 AC_ARG_ENABLE(threads,
-    [  --enable-threads   build in thread support (disabled by default)],,
-    enable_threads=no)
+    [ AC_HELP_STRING([--enable-threads],
+		[build in thread support (disabled by default)] ) ],
+    [ # enable_threads set by default ],
+    [ enable_threads=no ]
+)
 AC_ARG_ENABLE(shlib,
-    [  --enable-shlib     build shared libraries (disabled by default)],,
-    enable_shlib=no)
+    [ AC_HELP_STRING([--enable-shlib],
+		[build shared libraries (disabled by default)] ) ],
+    [ # enable_shlib set by default ],
+    [ enable_shlib=no ]
+)
 
 ##############################################################################
 AC_MSG_NOTICE([build utilities])
@@ -50,36 +59,9 @@ AC_PROG_CC
 AC_PROG_CXX
 
 # cxx support
-CXX_ON=#
-CXX_OFF=
-AC_MSG_CHECKING(C++ support)
-if test "$ac_cv_prog_cxx_works" = "yes"; then
-    if test "$enable_cxx" = "yes"; then
-	CXX_ON=
-	CXX_OFF=#
-    fi
-fi
-if test "$CXX_ON" = ""; then
-    AC_MSG_RESULT(enabled)
-else
-    AC_MSG_RESULT(disabled)
-fi
 AC_SUBST(CXX_ON)
 AC_SUBST(CXX_OFF)
-
 # thread support
-TH_ON=#
-TH_OFF=
-AC_MSG_CHECKING(thread support)
-if test "$enable_threads" = "yes"; then
-    TH_ON=
-    TH_OFF=#
-fi
-if test "$TH_ON" = ""; then
-    AC_MSG_RESULT(enabled)
-else
-    AC_MSG_RESULT(disabled)
-fi
 AC_SUBST(TH_ON)
 AC_SUBST(TH_OFF)
 
@@ -173,6 +155,30 @@ shlinkargs="$ac_cv_shared_link_args"
 AC_MSG_RESULT([$ac_cv_shared_link_args])
 AC_SUBST(shlinkargs)
 
+###############################################################################
+
+AC_MSG_CHECKING([C++ support])
+if test "$enable_cxx" = "yes"; then
+	CXX_ON=
+	CXX_OFF=#
+	AC_MSG_RESULT([enabled])
+else
+	CXX_ON=#
+	CXX_OFF=
+	AC_MSG_RESULT([disabled])
+fi
+
+AC_MSG_CHECKING([thread support])
+if test "$enable_threads" = "yes"; then
+	TH_ON=
+	TH_OFF=#
+	AC_MSG_RESULT([enabled])
+else
+	TH_ON=#
+	TH_OFF=
+	AC_MSG_RESULT([disabled])
+fi
+
 # shlib support
 AC_MSG_CHECKING(shlib support)
 if test "$enable_shlib" = "yes"; then
@@ -202,13 +208,13 @@ fi
 # check for unsigned-ness
 #
 AC_MSG_CHECKING([dmalloc size unsigned])
-AC_RUN_IFELSE([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <sys/types.h>
 #if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
-   ],
+]])],
 [AC_DEFINE(DMALLOC_SIZE_UNSIGNED,1)  AC_MSG_RESULT([yes])],
 [AC_DEFINE(DMALLOC_SIZE_UNSIGNED,0)  AC_MSG_RESULT([no])],
 )
@@ -217,7 +223,7 @@ main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
 # check for strdup macro (linux)
 #
 AC_MSG_CHECKING([strdup macro])
-AC_RUN_IFELSE([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_STDLIB_H
 #include <string.h>
 #endif
@@ -227,7 +233,7 @@ main() { exit(0); }
 #else
 main() { exit(1); }
 #endif
-],
+]])],
 [ac_cv_strdup_macro=yes ],
 [ac_cv_strdup_macro=no]
 )
@@ -270,9 +276,9 @@ else
 		  first = (char *)sbrk(SBRK_AMOUNT);
 		  next = (char *)sbrk(SBRK_AMOUNT);
 		  if (next > first)
-		    exit(0);
+		    _exit(0);
 		  else
-		    exit(1);
+		    _exit(1);
 		}
 	],
 	[ AC_DEFINE(HEAP_GROWS_UP, 1) AC_MSG_RESULT([up]) ],
@@ -328,13 +334,14 @@ else
 	ac_cv_data_align=$ac_cv_sizeof_long
 fi
 AC_DEFINE_UNQUOTED([ALLOCATION_ALIGNMENT],[$ac_cv_data_align])
+AC_MSG_RESULT([$ac_cv_data_align])
 
 #
 # check the safety of the abort function
 #
 AC_CHECK_FUNCS(abort)
 AC_MSG_CHECKING([abort safe])
-AC_RUN_IFELSE([
+AC_RUN_IFELSE([[
 static int main_b = 0;
 static char heap_mem[102400], *heap_p = heap_mem;
 free () { if (main_b) _exit(0); }
@@ -365,32 +372,23 @@ char *realloc (char *old_pnt, int new_size) {
   return start;
 }
 main() { main_b = 1; abort(); _exit(1); }
-],
-[ AC_DEFINE(ABORT_OKAY, 1) AC_MSG_RESULT([yes]) ],
-[ AC_DEFINE(ABORT_OKAY, 0) AC_MSG_RESULT([no]) ]
+]],
+# NOTE: this is reversed because abort core dumps and doesn't exit with
+# 0 which means that it should fail
+[ AC_DEFINE(ABORT_OKAY, 0) AC_MSG_RESULT([no]) ],
+# if it succeeds then something called free on the way out
+[ AC_DEFINE(ABORT_OKAY, 1) AC_MSG_RESULT([yes]) ]
 )
 
 AC_TYPE_SIGNAL
 AC_MSG_CHECKING([signal works])
-AC_RUN_IFELSE([
-
-/* test the include file */
-#include <signal.h>
-
-RETSIGTYPE
-handler (int sig)
-{
-}
-
-main()
-{
-  /* test the following signals */
-  (void)signal(SIGHUP, handler);
-  (void)signal(SIGINT, handler);
-  (void)signal(SIGTERM, handler);
-  _exit(0);
-}
-],
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+	#include <signal.h>
+]], [[
+	(void)signal(SIGHUP, SIG_IGN);
+	(void)signal(SIGINT, SIG_IGN);
+	(void)signal(SIGTERM, SIG_IGN);
+]])],
 [ AC_DEFINE(SIGNAL_OKAY, 1) AC_MSG_RESULT([yes]) ],
 [ AC_DEFINE(SIGNAL_OKAY, 0) AC_MSG_RESULT([no]) ]
 )
@@ -432,7 +430,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.1 2003/05/21 03:07:55 gray Exp $"
+#ident "$Id: configure.ac,v 1.2 2003/05/21 04:05:05 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -464,8 +462,11 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 
 AC_MSG_CHECKING([pthread attribute initialization])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-#ifdef THREAD_INCLUDE
-#include THREAD_INCLUDE
+#if HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+#if HAVE_PTHREADS_H
+#include <pthreads.h>
 #endif
 ]], [[
 	THREAD_MUTEX_T dmalloc_mutex;
