@@ -1,6 +1,13 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.75 1998/10/05 03:01:10 gray Exp $
+$Id: NEWS,v 1.76 1998/10/08 15:16:23 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 4.0.1:
+
+	* Added startup messages acknowledging the thread status.
+	* Fixed problem with thread compilation and chunk.c.
+	* Fixed possible race condition with synchronizing with external sbrks.
+	* Migrated in new argv code.
 
 Version 4.0.0:
 

@@ -1,5 +1,7 @@
 Thu Oct  8 11:07:25 1998  Gray Watson  <gray@burger.letters.com>
 
+	* Released dmalloc version 4.0.1.
+
 	* Added startup messages acknowledging the thread status.  Added
         error.o to the thread object list.
 
@@ -1314,5 +1316,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.193 1998/10/08 15:07:59 gray Exp $
+$Id: ChangeLog,v 1.194 1998/10/08 15:16:22 gray Exp $
 -------------------------------------------------------------------------------
