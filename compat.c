@@ -37,12 +37,12 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.35 1997/01/16 21:02:51 gray Exp $";
+  "$Id: compat.c,v 1.36 1997/03/21 17:23:41 gray Exp $";
 #endif
 
 #if HAVE_MEMCPY == 0
 /*
- * copy LEN characters from DEST to SRC
+ * copy LEN characters from SRC to DEST
  */
 EXPORT	void	memcpy(char * dest, const char * src, DMALLOC_SIZE len)
 {
@@ -85,7 +85,6 @@ EXPORT	int	memcmp(const char * str1, const char * str2, DMALLOC_SIZE len)
 #if HAVE_MEMSET == 0
 /*
  * set LEN characters in STR to character CH
- * NOTE: remember Gray, there is no bset().
  */
 EXPORT	char	*memset(char * str, int ch, DMALLOC_SIZE len)
 {
