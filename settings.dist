@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: settings.dist,v 1.40 1999/03/09 15:43:04 gray Exp $
+ * $Id: settings.dist,v 1.41 1999/03/09 15:54:10 gray Exp $
  */
 
 /*
@@ -289,7 +289,7 @@
 #define STORE_TIMEVAL		0
 #define TIMEVAL_INCLUDE		<sys/time.h>
 #define TIMEVAL_TYPE		struct timeval
-#define GET_TIMEVAL(t)		(void)gettimeofday(&(t), NULL)
+#define GET_TIMEVAL(timeval)	(void)gettimeofday(&(timeval), NULL)
 
 /*
  * In OSF (anyone else?) you can setup __fini_* functions in each
@@ -406,11 +406,6 @@
 				(void)sprintf((buf), "%#lx", (long)(thread_id))
 #endif
 
-#else /* LOCK_THREADS */
-
-#define THREAD_LOCK
-#define THREAD_UNLOCK
-
-#endif /* ! LOCK_THREADS */
+#endif /* LOCK_THREADS */
 
 #endif /* ! __SETTINGS_H__ */
