@@ -21,7 +21,7 @@
  * 
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.5 1992/11/06 05:41:06 gray Exp $
+ * $Id: malloc.h,v 1.6 1992/11/10 00:24:58 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -54,10 +54,12 @@
 #undef	LOCAL
 #define	LOCAL		static
 
+#if __GNUC__ < 2
 /*
- * system function prototype for memory copy.  needed for below macros.
+ * prototype for memory copy.  needed for below macros.
  */
-IMPORT	char	*memcpy(char * to, char * from, int length);
+IMPORT	char	*memcpy(char * to, const char * from, int length);
+#endif
 
 /*
  * memory copy: copy SIZE bytes from pointer FROM to pointer TO

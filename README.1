@@ -1,18 +1,19 @@
 -------------------------------------------------------------------------------
-$Id: README.1,v 1.8 1992/11/06 05:40:53 gray Exp $
+$Id: README.1,v 1.9 1992/11/10 00:24:40 gray Exp $
 -------------------------------------------------------------------------------
 
 INSTALLATION:
 
-1) Type 'make' should be enough to build libmalloc.a and malloc_debug program
-2) typing 'make test' should build the malloc_test program
-3) Examine the malloc.info file.  Is is a gnu-info file having the
+1) Run 'configure' to generate the Makefile and conf.h.  Examine conf.h and
+	Makefile to make sure it chose the correct settings.
+2) Type 'make' should be enough to build libmalloc.a and malloc_debug program
+3) typing 'make test' should build the malloc_test program
+4) Examine the malloc.info file.  Is is a gnu-info file having the
 	user-documentation for the malloc subsystem.
 	It is also suitable for reading as text.
 
 -------------------------------------------------------------------------------
 
-- I am using gnu-make and gcc which is ansi-prototype compatible.
 - the system is definately dependant on a good ansi-c compiler like gcc.
 - The file Manifest contains a list of each of the file and what it does
 - feel free to send me mail with porting issues.

@@ -31,12 +31,14 @@
 
 #include "malloc.h"
 #include "malloc_loc.h"
+
 #include "chunk.h"
+#include "compat.h"
+#include "conf.h"
 #include "error.h"
-#include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.5 1992/11/06 05:40:58 gray Exp $";
+  "$Id: error.c,v 1.6 1992/11/10 00:24:53 gray Exp $";
 
 /*
  * exported variables
@@ -77,7 +79,7 @@ EXPORT	void	_malloc_message(char * format, ...)
   va_end(args);
   
   /* find the length of str, if empty then return */
-  if ((len = STRING_LENGTH(str)) == 0)
+  if ((len = strlen(str)) == 0)
     return;
   
   /* tack on a '\n' if necessary */

@@ -28,17 +28,18 @@
 
 #include "malloc.h"
 #include "malloc_loc.h"
+
 #include "chunk.h"
+#include "compat.h"
+#include "conf.h"
 #include "error.h"
 #include "error_str.h"
 #include "heap.h"
 #include "malloc_errno.h"
 #include "malloc_leap.h"
-#include "malloc_loc.h"
-#include "proto.h"
 
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.5 1992/11/06 05:41:04 gray Exp $";
+  "$Id: malloc.c,v 1.6 1992/11/10 00:24:56 gray Exp $";
 
 /*
  * exported variables
@@ -120,7 +121,7 @@ LOCAL	int	check_debug_vars(char * file, int line)
   /* check start file/line specifications */
   if (! BIT_IS_SET(_malloc_debug, DEBUG_CHECK_HEAP)
       && start_file[0] != NULLC && file != NULL
-      && STRING_COMPARE(start_file, file) == 0
+      && strcmp(start_file, file) == 0
       && (line == 0 || line == start_line))
     BIT_SET(_malloc_debug, DEBUG_CHECK_HEAP);
   
@@ -151,20 +152,20 @@ LOCAL	void	get_environ(void)
   char		*env;
   
   /* get the malloc_debug level */
-  if ((env = GET_ENV(DEBUG_ENVIRON)) != NULL)
+  if ((env = (char *)getenv(DEBUG_ENVIRON)) != NULL)
     _malloc_debug = hex_to_int(env);
   
   /* get the malloc debug logfile name into a holding variable */
-  if ((env = GET_ENV(LOGFILE_ENVIRON)) != NULL) {
+  if ((env = (char *)getenv(LOGFILE_ENVIRON)) != NULL) {
     (void)strcpy(log_path, env);
     malloc_logpath = log_path;
   }
   
   /* watch for a specific address and die when we get it */
-  if ((env = GET_ENV(ADDRESS_ENVIRON)) != NULL) {
+  if ((env = (char *)getenv(ADDRESS_ENVIRON)) != NULL) {
     char	*addp;
     
-    if ((addp = STRING_SEARCH(env, ':')) != NULL) {
+    if ((addp = strchr(env, ':')) != NULL) {
       *addp = NULLC;
       address_count = atoi(addp + 1);
     }
@@ -175,19 +176,19 @@ LOCAL	void	get_environ(void)
   }
   
   /* check the heap every X times */
-  if ((env = GET_ENV(INTERVAL_ENVIRON)) != NULL)
+  if ((env = (char *)getenv(INTERVAL_ENVIRON)) != NULL)
     check_interval = atoi(env);
   
   /*
    * start checking the heap after X iterations OR
    * start at a file:line combination
    */
-  if ((env = GET_ENV(START_ENVIRON)) != NULL) {
+  if ((env = (char *)getenv(START_ENVIRON)) != NULL) {
     char	*startp;
     
     BIT_CLEAR(_malloc_debug, DEBUG_CHECK_HEAP);
     
-    if ((startp = STRING_SEARCH(env, ':')) != NULL) {
+    if ((startp = strchr(env, ':')) != NULL) {
       *startp = NULLC;
       (void)strcpy(start_file, env);
       start_line = atoi(startp + 1);
@@ -270,7 +271,7 @@ EXPORT	char	*calloc(unsigned int num_elements, unsigned int size)
       address_count--;
   }
   
-  MEMORY_SET(newp, NULLC, len);
+  (void)memset(newp, NULLC, len);
   
   in_alloc = FALSE;
   

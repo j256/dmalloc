@@ -1,0 +1,67 @@
+/*
+ * machine configuration flags
+ *
+ * Copyright 1992 by Gray Watson and the Antaire Corporation
+ *
+ * This file is part of the malloc-debug package.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * 
+ * The author of the program may be contacted at gray.watson@antaire.com
+ *
+ * $Id: conf.h.in,v 1.1 1992/11/10 00:24:50 gray Exp $
+ */
+
+/*
+ * The following macros indicate what header files you have.  Set the macro to
+ * 1 if you have the corresponding header file, or 0 if you do not.
+ */
+#define HAVE_STRING_H 1   	/* <string.h> */
+#define HAVE_STRINGS_H 1   	/* <strings.h> */
+
+/*
+ * the Malloc-Debug library needs versions of the following functions.
+ */
+#define HAVE_BCMP 1
+#define HAVE_BCOPY 1
+/* or */
+#define HAVE_MEMCMP 1
+#define HAVE_MEMCPY 1
+/* and */
+#define HAVE_MEMSET 1
+#define HAVE_GETENV 1
+
+/*
+ * the Malloc-Debug library provides its own versions of the following
+ * functions,  or knows how to work around their absence.
+ */
+#define HAVE_STRCHR 0
+#define HAVE_STRRCHR 0
+
+#define HAVE_STRCAT 0
+#define HAVE_STRCMP 0
+#define HAVE_STRLEN 0
+#define HAVE_STRTOK 0
+
+/*
+ * some defines to standardize memory functions
+ */
+#if !defined(HAVE_BCMP) && defined(HAVE_MEMCMP)
+#define bcmp(s1, s2, len)	(void)memcmp((s1), (s2), (len))
+#endif
+
+#if !defined(HAVE_BCOPY) && defined(HAVE_MEMCPY)
+#define bcopy(from, to, len)	(void)memcpy((to), (from), len)
+#endif
