@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: conf.h.in,v 1.88 2003/06/10 00:36:41 gray Exp $
+ * $Id: conf.h.in,v 1.89 2003/06/10 14:30:00 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -179,8 +179,9 @@
  */
 /* bells and whistles */
 #define HAVE_FORK 0
-#define HAVE_GETPID 0
 #define HAVE_GETHOSTNAME 0
+#define HAVE_GETPID 0
+#define HAVE_GETUID 0
 #define HAVE_TIME 0
 #define HAVE_CTIME 0
 

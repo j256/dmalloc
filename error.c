@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error.c,v 1.107 2003/06/10 00:39:55 gray Exp $
+ * $Id: error.c,v 1.108 2003/06/10 14:33:40 gray Exp $
  */
 
 /*
@@ -174,27 +174,6 @@ static	void	build_logfile_path(char *buf, const int buf_len)
     /* skip over the % */
     path_p++;
     
-    /* dump the time value */
-    if (*path_p == 't') {
-#if HAVE_TIME
-      /* we make time a long here so it will promote */
-      long	now;
-      now = time(NULL);
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", now);
-#else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-time");
-#endif
-    }
-    /* dump the pid */
-    if (*path_p == 'p') {
-#if HAVE_GETPID
-      /* we make it long in case it's big and we hope it will promote if not */
-      long	our_pid = getpid();
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", our_pid);
-#else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-getpid");
-#endif
-    }
     /* dump the hostname */
     if (*path_p == 'h') {
 #if HAVE_GETHOSTNAME
@@ -216,6 +195,37 @@ static	void	build_logfile_path(char *buf, const int buf_len)
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", id_str);
 #else
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-thread-id");
+#endif
+    }
+    /* dump the pid */
+    if (*path_p == 'p') {
+#if HAVE_GETPID
+      /* we make it long in case it's big and we hope it will promote if not */
+      long	our_pid = getpid();
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", our_pid);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-getpid");
+#endif
+    }
+    /* dump the time value */
+    if (*path_p == 't') {
+#if HAVE_TIME
+      /* we make time a long here so it will promote */
+      long	now;
+      now = time(NULL);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", now);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-time");
+#endif
+    }
+    /* dump the user-id */
+    if (*path_p == 'u') {
+#if HAVE_GETUID
+      /* we make it long in case it's big and we hope it will promote if not */
+      long	our_uid = getuid();
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", our_uid);
+#else
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-uid");
 #endif
     }
   }

@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.10 2003/06/10 00:36:41 gray Exp $
+# $Id: configure.ac,v 1.11 2003/06/10 14:30:00 gray Exp $
 #
-AC_REVISION($Revision: 1.10 $)
+AC_REVISION($Revision: 1.11 $)
 AC_INIT(dmalloc, 5.1.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -411,7 +411,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.10 2003/06/10 00:36:41 gray Exp $"
+#ident "$Id: configure.ac,v 1.11 2003/06/10 14:30:00 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -478,7 +478,7 @@ if test $ac_cv_func_atexit = no && test $ac_cv_func_on_exit = no; then
 fi
 
 # other bells and whistles
-AC_CHECK_FUNCS(fork getpid gethostname time ctime)
+AC_CHECK_FUNCS(fork gethostname getpid getuid time ctime)
 AC_CHECK_FUNCS(vprintf snprintf vsnprintf)
 AC_CHECK_FUNCS(recalloc memalign valloc)
 
