@@ -1,7 +1,7 @@
 #
 # Copyright 1993 by the Antaire Corporation
 #
-# $Id: Makefile.in,v 1.24 1993/07/23 21:24:01 gray Exp $
+# $Id: Makefile.in,v 1.25 1993/08/04 04:09:09 gray Exp $
 #
 
 HFLS	= malloc_dbg.h
@@ -17,6 +17,7 @@ LIBS	= -L. -Largv -largv -lmalloc_dbg $(LIBRARIES)
 CFLAGS	= -g $(CCFLS) -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
 	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
 	-Wuninitialized -Wparentheses -Waggregate-return
+LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= $(ROOT)
 TESTS	= malloc_t
 LIBRARY	= libmalloc_dbg.a
