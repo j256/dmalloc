@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.161 2003/05/15 20:08:46 gray Exp $
+ * $Id: malloc.c,v 1.162 2003/05/16 00:09:57 gray Exp $
  */
 
 /*
@@ -756,7 +756,7 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
        * Froehlich for patiently pointing that the realloc in just
        * about every Unix has this functionality.
        */
-      (void)_dmalloc_chunk_free(file, line, old_pnt, 0);
+      (void)_dmalloc_chunk_free(file, line, old_pnt, func_id);
       new_p = NULL;
     }
     else
@@ -805,7 +805,7 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
   
   check_pnt(file, line, pnt, "free");
   
-  ret = _dmalloc_chunk_free(file, line, pnt, 0);
+  ret = _dmalloc_chunk_free(file, line, pnt, func_id);
   
   dmalloc_out();
   
