@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@antaire.com
  *
- * $Id: debug_tok.h,v 1.9 1994/09/26 16:10:23 gray Exp $
+ * $Id: debug_tok.h,v 1.10 1994/09/26 16:20:08 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -39,7 +39,7 @@ typedef struct {
 } attr_t;
 
 LOCAL	attr_t		attributes[] = {
-  { "none",		"non",	0,
+  { "none",		"nil",	0,
       "no functionality" },
   
   { "log-stats",	"lst",	DEBUG_LOG_STATS,
