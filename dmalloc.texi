@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.163 1999/03/08 17:52:58 gray Exp $
+@c $Id: dmalloc.texi,v 1.164 1999/03/09 04:59:43 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -464,6 +464,9 @@ To configure, compile, and install the library, follow these steps
 carefully.
 
 @enumerate
+
+@item Make sure you have the latest version of the library available
+from the home page @samp{http://www.dmalloc.com/}.
 
 @cindex settings.dist file
 
