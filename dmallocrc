@@ -3,7 +3,7 @@
 # Rename this to .dmallocrc and place in your $HOME directory to
 # activate.  See dmalloc.info for more information.
 #
-# $Id: dmallocrc,v 1.29 1995/05/12 20:48:46 gray Exp $
+# $Id: dmallocrc,v 1.30 1995/05/16 01:58:21 gray Exp $
 #
 
 #
@@ -56,6 +56,7 @@
 # never-reuse			never reuse memory that has been freed
 # allow-nonlinear		allow non-linear heap space
 # allow-zero			allow alloc of 0 bytes and free of NULL pnt 
+# error-dump			dump core on error and then continue
 #
 
 # no debugging (for disabling memory checking)
@@ -113,4 +114,5 @@ all		log-stats, log-non-free, log-trans, log-stamp, log-admin, \
 		realloc-copy, free-blank, error-abort, alloc-blank, \
 		heap-check-map, catch-null, never-reuse
 # NOTE: for specific occasions:
-#    log-thread-id, log-current-time, allow-nonlinear, print-error
+#	log-thread-id, log-current-time, allow-nonlinear, print-error,
+#	dump-continue

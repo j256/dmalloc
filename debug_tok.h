@@ -18,7 +18,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.15 1995/05/12 20:36:31 gray Exp $
+ * $Id: debug_tok.h,v 1.16 1995/05/16 01:58:12 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -28,6 +28,7 @@
  * NOTE: see debug_val.h for instructions about changes here
  */
 
+#include "conf.h"			/* for DUMP_CONTINUE */
 #include "dmalloc_loc.h"		/* for LOCAL */
 #include "debug_val.h"			/* for debug codes */
 
@@ -101,6 +102,10 @@ LOCAL	attr_t		attributes[] = {
       "allow non-linear heap space"},
   { "allow-zero",	"aze",	DEBUG_ALLOW_ZERO,
       "allow allocs of 0 bytes, frees of NULL"},
+#if DUMP_CONTINUE
+  { "error-dump",	"edu",	DEBUG_ERROR_DUMP,
+      "dump core on error and then continue"},
+#endif
   
   { NULL }
 };

@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.89 1995/05/16 00:26:44 gray Exp $
+@c $Id: dmalloc.texi,v 1.90 1995/05/16 01:58:23 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -1440,6 +1440,11 @@ allocation or when someone tries to free a NULL pointer.
 
 @emph{NOTE}: This does not impact the ALLOW_REALLOC_NULL compilation
 options which can be adjusted in @file{conf.h}.
+
+@cindex dump core
+@cindex core dump
+@item error-dump
+dump core on error and then continue
 
 @end table
 
