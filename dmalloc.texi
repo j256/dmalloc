@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.81 1994/12/16 19:47:20 gray Exp $
+@c $Id: dmalloc.texi,v 1.82 1994/12/16 20:07:09 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -486,9 +486,9 @@ it did its job correctly.  Examine the manual settings section of
 file for more information.
 
 @emph{WARNING}: I was unable to auto-configure to my satisfaction the
-@code{DMALLOC_SIZE} variable in @file{malloc.h.3}.  You may have to hand
-edit this file and remake to get things to stop complaining about the
-size arguments to malloc routines.
+@code{DMALLOC_SIZE} variable in @file{dmalloc.h.3}.  You may have to
+hand edit this file and remake to get things to stop complaining about
+the size arguments to malloc routines.
 
 @item Typing @kbd{make tests} should build the @file{dmalloc_t} test
 program.
