@@ -1,7 +1,7 @@
 #
 # Registration information
 #
-# $Id: list,v 1.5 1998/02/11 02:10:17 gray Exp $
+# $Id: list,v 1.6 1998/06/23 14:44:40 gray Exp $
 #
 
 Number:		1011
@@ -176,5 +176,27 @@ Fax:
 Arrival Date:	2/14/97
 Letter Sent:	
 Email Sent:	2/10/98
+Other Sent:	none
+Status:		
+
+Number:		1019
+Name:		Gerry Fredette
+Organization:	Bay Networks Inc.
+Amount:		$500
+What:		1 Site License
+Type:		purchase order #2000496
+From:		email
+Position:	
+Street Address:	3 Federal St.
+City:		Billerica
+State:		MA
+Zip:		01821
+Country:	USA
+Email:		gfredett@BayNetworks.COM
+Phone:		
+Fax:		
+Arrival Date:	10/9/97
+Letter Sent:	
+Email Sent:	
 Other Sent:	none
 Status:		
