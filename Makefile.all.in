@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.68 1997/12/08 07:24:11 gray Exp $
+# $Id: Makefile.all.in,v 1.69 1998/09/17 13:19:14 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -65,8 +65,8 @@ clean :
 realclean : clean
 
 distclean : clean
-	rm -f Makefile config.status config.cache config.log conf.h dmalloc.h.2
-	rm -f settings.h
+	rm -f confdefs.h config.status config.log config.cache conf.h
+	rm -f Makefile settings.h dmalloc.h.2
 #	rm -f configure
 
 installdirs :
@@ -142,27 +142,17 @@ $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) -l$(LIBNAME)
 	mv a.out $@
 
-# NOTE: we sleep here to make sure we get a different random seed from time()
 check light : $(TEST)
 	./$(TEST) -s -t 10000
-	sleep 1
 	./$(TEST) -s -t 10000
-	sleep 1
 	./$(TEST) -s -t 10000
-	sleep 1
 	./$(TEST) -s -t 10000
-	sleep 1
 	./$(TEST) -s -t 10000
-	sleep 1
 
-# NOTE: we sleep here to make sure we get a different random seed from time()
 heavy : $(TEST) light
 	./$(TEST) -s -t 100000
-	sleep 1
 	./$(TEST) -s -t 100000
-	sleep 1
 	./$(TEST) -s -t 100000
-	sleep 1
 
 .c.o :
 	rm -f $@

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.101 1998/06/23 14:44:54 gray Exp $
+# $Id: Makefile.in,v 1.102 1998/09/17 13:19:13 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -50,7 +50,7 @@ FLS	=  conf.h.in configure.in config.help \
 	configure $(INFOFILE)
 CFGFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes contrib/atexit.c \
 	contrib/dec_notes contrib/dmalloc_summarize.pl contrib/next_notes \
-	contrib/ra_info.pl
+	contrib/ra_info.pl contrib/stratus_ftx_notes
 
 DOCFLS	= dmalloc.ps texinfo.tex
 
@@ -67,7 +67,7 @@ clean ::
 	rm -f INSTALL PERMISSIONS README README_ftp
 
 distclean :: clean
-	rm -f configure config.status config.log config.cache conf.h
+	rm -f confdefs.h configure config.status config.log config.cache conf.h
 	rm -f Makefile dmalloc.h.2 dmalloc.ps dmalloc.dvi settings.h
 	rm -rf port
 
@@ -138,33 +138,22 @@ $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) $(LIBRARY)
 	mv a.out $(.TARGET)
 
-# NOTE: we sleep here to make sure we get a different random seed from time()
 check light :: $(TEST)
 	$(TEST) -s -t 10000
-	sleep 1
 	$(TEST) -s -t 10000
-	sleep 1
 	$(TEST) -s -t 10000
-	sleep 1
 	$(TEST) -s -t 10000
-	sleep 1
 	$(TEST) -s -t 10000
-	sleep 1
 
-# NOTE: we sleep here to make sure we get a different random seed from time()
 heavy :: $(TEST) light
 	$(TEST) -s -t 100000
-	sleep 1
 	$(TEST) -s -t 100000
-	sleep 1
 	$(TEST) -s -t 100000
-	sleep 1
 
 continuous :: $(TEST)
 	while test 1 ;\
 		do  (\
 			$(TEST) -n -t 100000 ;\
-			sleep 1 ;\
 		); done
 
 dmalloc.ps : dmalloc.texi
