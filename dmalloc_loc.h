@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_loc.h,v 1.45 2000/05/15 22:25:26 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.46 2000/05/16 18:35:57 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__
@@ -83,6 +83,16 @@
 #define BIT_CLEAR(v,f)		(v) &= ~(f)
 #undef BIT_IS_SET
 #define BIT_IS_SET(v,f)		((v) & (f))
+
+/*
+ * set pointer macro
+ */
+#define SET_POINTER(pnt, val) \
+	do { \
+	  if ((pnt) != NULL) { \
+	    (*(pnt)) = (val); \
+          } \
+        } while(0)
 
 /*
  * Global malloc defines
