@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: error.c,v 1.86 1999/03/10 21:38:31 gray Exp $
+ * $Id: error.c,v 1.87 1999/03/10 22:05:46 gray Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: error.c,v 1.86 1999/03/10 21:38:31 gray Exp $";
+#ident "$Id: error.c,v 1.87 1999/03/10 22:05:46 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: error.c,v 1.86 1999/03/10 21:38:31 gray Exp $";
+  "$Id: error.c,v 1.87 1999/03/10 22:05:46 gray Exp $";
 #endif
 #endif
 
@@ -135,21 +135,25 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
   secs = timeval_p->tv_sec;
   usecs = timeval_p->tv_usec;
   
-  if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+  if (elapsed_b) {
     usecs -= _dmalloc_start.tv_usec;
     if (usecs < 0) {
       secs--;
       usecs = - usecs;
     }
     secs -= _dmalloc_start.tv_sec;
+    
+    hrs = secs / SECS_IN_HOUR;
+    mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
+    secs %= SECS_IN_MIN;
+    
+    (void)loc_snprintf(buf, buf_size, "%lu:%02lu:%02lu.%06lu",
+		       hrs, mins, secs, usecs);
   }
-  
-  hrs = secs / SECS_IN_HOUR;
-  mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
-  secs %= SECS_IN_MIN;
-  
-  (void)loc_snprintf(buf, buf_size, "%lu:%02lu:%02lu.%lu",
-		     hrs, mins, secs, usecs);
+  else {
+    (void)loc_snprintf(buf, buf_size, "%lu.%06lu",
+		       secs, usecs);
+  }
   
   return buf;
 }
@@ -167,15 +171,18 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
   
   secs = *time_p;
   
-  if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)) {
+  if (elapsed_b) {
     secs -= _dmalloc_start;
+    
+    hrs = secs / SECS_IN_HOUR;
+    mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
+    secs %= SECS_IN_MIN;
+    
+    (void)loc_snprintf(buf, buf_size, "%lu:%02lu:%02lu", hrs, mins, secs);
   }
-  
-  hrs = secs / SECS_IN_HOUR;
-  mins = (secs / SECS_IN_MIN) % MINS_IN_HOUR;
-  secs %= SECS_IN_MIN;
-  
-  (void)loc_snprintf(buf, buf_size, "%lu:%02lu:%02lu", hrs, mins, secs);
+  else {
+    (void)loc_snprintf(buf, buf_size, "%lu", secs);
+  }
   
   return buf;
 }
