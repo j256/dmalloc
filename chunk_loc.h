@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk_loc.h,v 1.69 2003/06/08 05:54:30 gray Exp $
+ * $Id: chunk_loc.h,v 1.70 2003/06/09 23:14:17 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
@@ -35,12 +35,12 @@
 #endif
 
 /* for time type -- see settings.h */
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 # ifdef TIMEVAL_INCLUDE
 #  include TIMEVAL_INCLUDE
 # endif
 #else
-# if STORE_TIME
+# if LOG_PNT_TIME
 #  ifdef TIME_INCLUDE
 #   include TIME_INCLUDE
 #  endif
@@ -98,20 +98,20 @@ typedef struct skip_alloc_st {
   const char		*sa_file;	/* .c filename where allocated */
   unsigned long		sa_use_iter;	/* when last ``used'' */
   
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   unsigned long		sa_seen_c;	/* times pointer was seen */
 #endif
-#if STORE_ITERATION_COUNT
+#if LOG_PNT_ITERATION
   unsigned long		sa_iteration;	/* interation when pointer alloced */
 #endif
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
   TIMEVAL_TYPE 		sa_timeval;	/* time when pointer alloced */
 #else
-#if STORE_TIME
+#if LOG_PNT_TIME
   TIME_TYPE		sa_time;	/* time when pointer alloced */
 #endif
 #endif
-#if LOG_THREAD_ID
+#if LOG_PNT_THREAD_ID
   THREAD_TYPE		sa_thread_id;	/* thread id which allocaed pnt */
 #endif
   

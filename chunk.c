@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.187 2003/06/08 21:26:08 gray Exp $
+ * $Id: chunk.c,v 1.188 2003/06/09 23:14:17 gray Exp $
  */
 
 /*
@@ -39,12 +39,12 @@
 
 #include "conf.h"
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 #ifdef TIMEVAL_INCLUDE
 # include TIMEVAL_INCLUDE
 #endif
 #else
-# if STORE_TIME
+# if LOG_PNT_TIME
 #  ifdef TIME_INCLUDE
 #   include TIME_INCLUDE
 #  endif
@@ -999,11 +999,11 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
   buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%#lx",
 			(unsigned long)user_pnt);
   
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|s%lu", alloc_p->sa_seen_c);
 #endif
   
-#if STORE_ITERATION_COUNT
+#if LOG_PNT_ITERATION
   buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|i%lu",
 			alloc_p->sa_iteration);
 #endif
@@ -1015,7 +1015,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
     elapsed_b = 0;
   }
   if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
     {
       char	time_buf[64];
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
@@ -1023,7 +1023,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
 					      sizeof(time_buf), elapsed_b));
     }
 #else
-#if STORE_TIME
+#if LOG_PNT_TIME
     {
       char	time_buf[64];
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
@@ -1034,7 +1034,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
 #endif
   }
   
-#if LOG_THREAD_ID
+#if LOG_PNT_THREAD_ID
   {
     char	thread_id[256];
     
@@ -1689,7 +1689,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
   }
 #endif
   
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   /*
    * We divide by 2 here because realloc which returns the same
    * pointer will seen_c += 2.  However, it will never be more than
@@ -1740,7 +1740,7 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
     }
   }
   
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   /*
    * We divide by 2 here because realloc which returns the same
    * pointer will seen_c += 2.  However, it will never be more than
@@ -2012,7 +2012,7 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   else {
     SET_POINTER(ret_attr_p, NULL);
   }
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   SET_POINTER(seen_cp, &slot_p->sa_seen_c);
 #else
   SET_POINTER(seen_cp, NULL);
@@ -2407,24 +2407,24 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   slot_p->sa_file = file;
   slot_p->sa_line = line;
   slot_p->sa_use_iter = _dmalloc_iter_c;
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   slot_p->sa_seen_c++;
 #endif
-#if STORE_ITERATION_COUNT
+#if LOG_PNT_ITERATION
   slot_p->sa_iteration = _dmalloc_iter_c;
 #endif
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
       || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
     GET_TIMEVAL(slot_p->sa_timeval);
 #else
-#if STORE_TIME
+#if LOG_PNT_TIME
     slot_p->sa_time = time(NULL);
 #endif
 #endif
   }
   
-#if LOG_THREAD_ID
+#if LOG_PNT_THREAD_ID
   slot_p->sa_thread_id = THREAD_GET_ID();
 #endif
   
@@ -2561,7 +2561,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   alloc_cur_pnts--;
   
   slot_p->sa_use_iter = _dmalloc_iter_c;
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
   slot_p->sa_seen_c++;
 #endif
   
@@ -2768,7 +2768,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
     clear_alloc(&pnt_info, old_size, func_id);
     
     slot_p->sa_use_iter = _dmalloc_iter_c;
-#if STORE_SEEN_COUNT
+#if LOG_PNT_SEEN_COUNT
     /* we see in inbound and outbound so we need to increment by 2 */
     slot_p->sa_seen_c += 2;
 #endif

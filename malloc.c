@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.169 2003/06/08 05:54:12 gray Exp $
+ * $Id: malloc.c,v 1.170 2003/06/09 23:15:06 gray Exp $
  */
 
 /*
@@ -40,12 +40,12 @@
 
 #include "conf.h"				/* up here for _INCLUDE */
 
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
 # ifdef TIMEVAL_INCLUDE
 #  include TIMEVAL_INCLUDE
 # endif
 #else
-# if HAVE_TIME /* NOT STORE_TIME */
+# if HAVE_TIME /* NOT LOG_PNT_TIME */
 #  ifdef TIME_INCLUDE
 #   include TIME_INCLUDE
 #  endif
@@ -326,10 +326,10 @@ static	int	dmalloc_startup(const char *debug_str)
     /* set this up here so if an error occurs below, it will not try again */
     some_up_b = 1;
     
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
     GET_TIMEVAL(_dmalloc_start);
 #else
-#if HAVE_TIME /* NOT STORE_TIME */
+#if HAVE_TIME /* NOT LOG_PNT_TIME */
     _dmalloc_start = time(NULL);
 #endif
 #endif
@@ -591,7 +591,7 @@ void	dmalloc_shutdown(void)
 		       );
   }
   
-#if STORE_TIMEVAL
+#if LOG_PNT_TIMEVAL
   {
     TIMEVAL_TYPE	now;
     char		time_buf1[64], time_buf2[64];
@@ -601,7 +601,7 @@ void	dmalloc_shutdown(void)
 		    _dmalloc_ptimeval(&now, time_buf2, sizeof(time_buf2), 1));
   }
 #else
-#if HAVE_TIME /* NOT STORE_TIME */
+#if HAVE_TIME /* NOT LOG_PNT_TIME */
   {
     TIME_TYPE	now;
     char	time_buf1[64], time_buf2[64];
