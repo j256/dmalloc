@@ -1,6 +1,17 @@
 Mon May 15 11:46:21 2000  Gray Watson  <gray@256.com>
 
-	* Added mprotoect support to the library.  About time.
+	* Moved to 'make cxx' and 'make installcxx' for building and
+ 	installing the C++ version of the library.
+
+	* Added autoconfiguration of the presence of a C++ compiler so it
+ 	will attempt to build and install libdmallocxx.a if it can.
+
+	* Removed DMALLOC_VERIFY_[NO]ERROR and replaced with
+	DMALLOC_[NO]ERROR.
+
+	* dmalloc_examine now returns DMALLOC_[NO]ERROR not [NO]ERROR.
+
+ 	* Added initial mprotoect support to the library.  About time.
 
 Mon May  8 08:19:45 2000  Gray Watson  <gray@256.com>
 
@@ -1593,5 +1604,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.247 2000/05/15 15:46:39 gray Exp $
+$Id: ChangeLog,v 1.248 2000/05/15 22:30:45 gray Exp $
 -------------------------------------------------------------------------------
