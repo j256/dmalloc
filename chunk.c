@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.207 2004/10/19 14:50:43 gray Exp $
+ * $Id: chunk.c,v 1.208 2004/10/20 13:15:52 gray Exp $
  */
 
 /*
@@ -1010,8 +1010,6 @@ static	void	log_error_info(const char *now_file,
   pnt_info_t	pnt_info;
   int		out_len, dump_size, offset;
   
-  dmalloc_error(where);
-
   if (slot_p == NULL) {
     prev_file = NULL;
     prev_line = 0;
@@ -1035,6 +1033,7 @@ static	void	log_error_info(const char *now_file,
   if (reason != NULL) {
     dmalloc_message("  error details: %s", reason);
   }
+  
   /* dump the pointer information */
   if (start_user == NULL) {
     dmalloc_message("  from '%s' prev access '%s'",
@@ -1060,6 +1059,8 @@ static	void	log_error_info(const char *now_file,
       || (dmalloc_errno != ERROR_UNDER_FENCE
 	  && dmalloc_errno != ERROR_OVER_FENCE
 	  && dmalloc_errno != ERROR_FREE_OVERWRITTEN)) {
+    /* we call the error function after writing more info to the logfile */
+    dmalloc_error(where);
     return;
   }
   
@@ -1147,6 +1148,9 @@ static	void	log_error_info(const char *now_file,
 					      other_p->sa_line));
     }
   }
+  
+  /* we call the error function after writing more info to the logfile */
+  dmalloc_error(where);
 }
 
 /*
