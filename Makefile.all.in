@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.90 2000/05/15 15:46:39 gray Exp $
+# $Id: Makefile.all.in,v 1.91 2000/05/15 22:21:01 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -23,29 +23,33 @@ DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
 	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ \
+	-DHAVE_SYS_MMAN_H=@HAVE_SYS_MMAN_H@ \
+	-DHAVE_SYS_TYPES_H=@HAVE_SYS_TYPES_H@ \
 	$(DEFINES)
 INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@
 
-LIBNAME	= dmalloc
+MODULE	= dmalloc
 
-LIBRARY	= lib$(LIBNAME).a
-SHLIBRARY = lib$(LIBNAME).so
+LIBRARY	= lib$(MODULE).a
+SHLIBRARY = lib$(MODULE).so
 
 # thread version of the library
-LIB_TH	= lib$(LIBNAME)th.a
-SHLIB_TH = lib$(LIBNAME)th.so
+LIB_TH	= lib$(MODULE)th.a
+SHLIB_TH = lib$(MODULE)th.so
 
 # C++ version of the library
-LIB_CC	= lib$(LIBNAME)++.a
-SHLIB_CC = lib$(LIBNAME)++.so
+LIB_CXX	= lib$(MODULE)xx.a
+SHLIB_CXX = lib$(MODULE)xx.so
+@CXX_ON@BUILD_CXX = $(LIB_CXX)
+@CXX_ON@INSTALL_CXX = $(LIB_CXX)
 
 # library with dmalloc disabled
-LIB_DIS	= lib$(LIBNAME)lp.a
-SHLIB_DIS = lib$(LIBNAME)lp.so
+LIB_DIS	= lib$(MODULE)lp.a
+SHLIB_DIS = lib$(MODULE)lp.so
 
-UTIL = dmalloc
-INFOFILE = dmalloc.info
+UTIL = $(MODULE)
+INFOFILE = $(MODULE).info
 
 CCFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -64,18 +68,18 @@ HFLS = dmalloc.h
 OBJS = arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o protect.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
-CC_OBJS = dmallocc.o
+CXX_OBJS = dmallocc.o
 
 CFLAGS = $(CCFLAGS)
-TEST = dmalloc_t
+TEST = $(MODULE)_t
 
-all : dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL)
+all : dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX)
+@CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
 	@echo "To make the thread version of the library type 'make threads'"
-	@echo "To make the C++ version of the library type 'make cc'"
 
 clean :
 	rm -f a.out core *.o *.t
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CC) $(LIB_DIS) $(TEST) $(UTIL)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f dmalloc.h
 
 realclean : clean
@@ -100,21 +104,21 @@ installlib : installincs $(LIBRARY) $(LIB_DIS)
 	$(INSTALL_DATA) $(LIB_DIS) $(libdir)
 	@RANLIB@ $(libdir)/$(LIB_DIS)
 
-install : installdirs installlib $(UTIL)
+installcxx : $(LIB_CXX)
+	$(srcdir)/mkinstalldirs $(libdir)
+	$(INSTALL_DATA) $(LIB_CXX) $(libdir)
+
+install : installdirs installlib $(UTIL) $(INSTALL_CXX)
 	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
-	@echo "Enter 'make installth' to install thread library version"
-	@echo "Enter 'make installcc' to install the C++ library version"
 	@echo "Enter 'make installshlib' to install $(SHLIBRARY) in $(shlibdir)"
+@CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
+	@echo "Enter 'make installth' to install thread library"
 
 installth : $(LIB_TH)
 	$(srcdir)/mkinstalldirs $(libdir)
 	$(INSTALL_DATA) $(LIB_TH) $(libdir)
-
-installcc : $(LIB_CC)
-	$(srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL_DATA) $(LIB_CC) $(libdir)
 
 installinfo : $(INFOFILE)
 	$(srcdir)/mkinstalldirs $(infodir)
@@ -151,7 +155,7 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
-$(LIB_CC) : $(OBJS) $(NORMAL_OBJS) $(CC_OBJS)
+$(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
@@ -161,7 +165,7 @@ $(LIB_DIS) : dmalloc_lp.o
 
 threads : $(LIB_TH)
 
-cc : $(LIB_CC)
+cxx : $(LIB_CXX)
 
 utils : $(UTIL)
 
@@ -190,7 +194,7 @@ tests : $(TEST)
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
-	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) -l$(LIBNAME)
+	$(CC) $(LDFLAGS) $(TEST).o dmalloc_argv.o $(LIBS) -l$(MODULE)
 	mv a.out $@
 
 check light : $(TEST)
@@ -261,6 +265,8 @@ heap.o: heap.c dmalloc.h conf.h settings.h chunk.h compat.h \
 malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
  debug_val.h dmalloc_loc.h env.h error.h error_str.h error_val.h \
  heap.h dmalloc_lp.h malloc.h return.h
+protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
+ protect.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
  dmalloc_loc.h compat.h debug_val.h dmalloc_tab.h error.h error_val.h \
  heap.h

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.135 2000/05/15 15:46:40 gray Exp $
+# $Id: Makefile.in,v 1.136 2000/05/15 22:21:01 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -12,28 +12,45 @@ OBJS	= arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o \
 	protect.o
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
-CC_OBJS	= dmallocc.o
+CXX_OBJS = dmallocc.o
 
 DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
 	-DHAVE_STRING_H=@HAVE_STRING_H@ \
 	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ \
+	-DHAVE_SYS_MMAN_H=@HAVE_SYS_MMAN_H@ \
+	-DHAVE_SYS_TYPES_H=@HAVE_SYS_TYPES_H@ \
 	$(DEFINES)
 INCS	= -I. -I$(srcdir) $(INCLUDES)
 LIBS	= $(LIBRARIES)
+
+MODULE	= dmalloc
+
+LIBRARY	= lib$(MODULE).a
+SHLIBRARY = lib$(MODULE).so
+
+# thread version of the library
+LIB_TH	= lib$(MODULE)th.a
+SHLIB_TH = lib$(MODULE)th.so
+
+# C++ version of the library
+LIB_CXX	= lib$(MODULE)xx.a
+SHLIB_CXX = lib$(MODULE)xx.so
+@CXX_ON@BUILD_CXX = $(LIB_CXX)
+
+# library with dmalloc disabled
+LIB_DIS	= lib$(MODULE)lp.a
+SHLIB_DIS = lib$(MODULE)lp.so
+
 CFLAGS	= -g $(CCFLS) -Wall -Wpointer-arith -Wshadow -Waggregate-return \
 	-Wmissing-prototypes
 
 LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= /usr/local/local
 WWWDIR	= /var/httpd/root/dmalloc.com
-TEST	= dmalloc_t
-LIBRARY	= libdmalloc.a
-LIB_TH	= libdmallocth.a
-LIB_CC	= libdmalloc++.a
-LIB_DIS	= libdmalloclp.a
-UTIL	= dmalloc
-INFOFILE= dmalloc.info
+TEST	= $(MODULE)_t
+UTIL	= $(MODULE)
+INFOFILE= $(MODULE).info
 
 #
 # WARNING: be careful about the order of this list some files are at
@@ -61,11 +78,13 @@ DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi texinfo.tex
 # NOTE: the wc level should be below 90k due to shar overhead
 SHARSIZE= 85k
 
-all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL)
+all :: dmalloc.h $(LIBRARY) $(LIB_DIS) $(UTIL) $(BUILD_CXX)
+@CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
+	@echo "To make the thread version of the library type 'make threads'"
 
 clean ::
 	$(CLEAN)
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CC) $(LIB_DIS) $(TEST) $(UTIL)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_DIS) $(TEST) $(UTIL)
 	rm -f dmalloc.h
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
 
@@ -77,21 +96,21 @@ distclean :: clean
 installincs :: $(HFLS)
 	install -cev -m 444 $(HFLS) $(DESTDIR)/inc
 
-installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INFOFILE)
+installcxx :: $(LIB_CXX)
+	install -cevr -m 644 $(LIB_CXX) $(DESTDIR)/lib
+
+installlibs :: installincs $(LIBRARY) $(LIB_DIS) $(INSTALL_CXX)
 	install -cevr -m 644 $(LIBRARY) $(DESTDIR)/lib
 	install -cevr -m 644 $(LIB_DIS) $(DESTDIR)/lib
-	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
+@CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
+	@echo "Enter 'make installth' to install thread library"
 
-install :: installlibs $(UTIL)
+install :: installlibs $(UTIL) $(INFOFILE)
 	install -cev $(UTIL) $(DESTDIR)/bin
-	@ echo "To install thread version of library type 'make installth'"
-	@ echo "To install C++ version of library type 'make installcc'"
+	install -cev -m 444 $(INFOFILE) $(DESTDIR)/info
 
 installth :: $(LIB_TH)
 	install -cevr -m 644 $(LIB_TH) $(DESTDIR)/lib
-
-installcc :: $(LIB_CC)
-	install -cevr -m 644 $(LIB_CC) $(DESTDIR)/lib
 
 installdocs :: $(DOCS)
 	install -cev -m 444 $(DOCS) $(WWWDIR)/docs
@@ -123,7 +142,7 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
-$(LIB_CC) : $(OBJS) $(NORMAL_OBJS) $(CC_OBJS)
+$(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
 	ranlib $@
 
@@ -138,7 +157,7 @@ $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 
 threads : $(LIB_TH)
 
-cc : $(LIB_CC)
+cxx : $(LIB_CXX)
 
 # special _th versions of objects with the LOCK_THREADS variable defined to 1
 chunk_th.o : chunk.c
@@ -259,7 +278,7 @@ $(srcdir)/configure : $(srcdir)/configure.in
 depend ::
 	@ echo ""
 	@ echo "WARNING: you should be running ${MAKE} depend2"
-	@ echo ""
+	@ false
 
 depend2 ::
 	rm -f $(DEPEND).t
