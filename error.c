@@ -41,7 +41,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.44 1994/09/20 17:59:49 gray Exp $";
+  "$Id: error.c,v 1.45 1994/09/26 16:09:23 gray Exp $";
 #endif
 
 /*
@@ -72,7 +72,7 @@ EXPORT	void	_dmalloc_message(const char * format, ...)
 #if HAVE_TIME
   /* maybe dump a time stamp */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STAMP)) {
-    (void)sprintf(strp, "%ld: ", time(NULL));
+    (void)sprintf(strp, "%ld: ", (long)time(NULL));
     for (; *strp != NULLC; strp++);
   }
 #endif
