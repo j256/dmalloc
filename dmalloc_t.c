@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.103 2003/09/05 21:42:52 gray Exp $
+ * $Id: dmalloc_t.c,v 1.104 2003/09/05 22:34:30 gray Exp $
  */
 
 /*
@@ -1401,6 +1401,35 @@ static	int	check_special(void)
       if (! silent_b) {
 	(void)printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s\n",
 		     dmalloc_strerror(dmalloc_errno));
+      }
+      final = 0;
+    }
+    
+    dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that string tokens work in the processing program.
+   */
+  {
+    unsigned int	old_flags, new_flags;
+    
+    if (! silent_b) {
+      (void)printf("  Checking string tokens in dmalloc_debug_setup\n");
+    }
+    
+    old_flags = dmalloc_debug_current();
+    dmalloc_debug(0);
+    dmalloc_debug_setup("log-stats,log-non-free,log-bad-space");
+    new_flags = dmalloc_debug_current();
+    
+    if (! (new_flags & DEBUG_LOG_STATS
+	   && new_flags & DEBUG_LOG_NONFREE
+	   && new_flags & DEBUG_LOG_BAD_SPACE)) {
+      if (! silent_b) {
+	(void)printf("   ERROR: dmalloc_debug_setup didn't process comma separated tokens.\n");
       }
       final = 0;
     }
