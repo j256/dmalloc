@@ -1,6 +1,6 @@
 ###############################################################################
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.44 1994/08/29 15:09:39 gray Exp $
+# $Id: Makefile.all.in,v 1.45 1994/09/12 17:17:42 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -71,8 +71,8 @@ installlib : installincs $(LIBRARY) $(OBJS_IN) $(INFOFILE)
 	$(INSTALL_DATA) $(LIBRARY) $(libdir)
 	@RANLIB@ $(libdir)/$(LIBRARY)
 	@ echo 'Please install $(OBJS_IN) and $(INFOFILE) by hand if needed.'
-#	$(INSTALL_DATA) $(OBJS_IN) $(libdir)
-#	$(INSTALL_DATA) $(INFOFILE) $(infodir)
+	$(INSTALL_DATA) $(OBJS_IN) $(libdir)
+	$(INSTALL_DATA) $(INFOFILE) $(infodir)
 
 # .PHONY : install
 install : installlib $(UTIL)
