@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.89 1995/05/05 16:51:07 gray Exp $";
+  "$Id: chunk.c,v 1.90 1995/05/12 20:46:58 gray Exp $";
 #endif
 
 /*
@@ -272,33 +272,41 @@ LOCAL	char	*chunk_display_where2(const char * file,
 /*
  * display a pointer PNT and information about it.
  */
-LOCAL	char	*display_pnt(const void * pnt, const int seenc,
-			     const int iter, const long when,
-			     const int thread_id)
+LOCAL	char	*display_pnt(const void * pnt, const overhead_t * overp)
 {
   static char	buf[256];
   char		buf2[64];
   
   (void)sprintf(buf, "%#lx", (long)pnt);
   
-#if STORE_POINTER_COUNT
-  (void)sprintf(buf2, ":c%d", seenc);
+#if STORE_SEEN_COUNT
+  (void)sprintf(buf2, "|c%d", overp->ov_seenc);
   (void)strcat(buf, buf2);
 #endif
   
 #if STORE_ITERATION_COUNT
-  (void)sprintf(buf2, ":i%d", iter);
+  (void)sprintf(buf2, "|i%ld", overp->ov_iteration);
   (void)strcat(buf, buf2);
 #endif
   
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-  (void)sprintf(buf2, ":w%ld", when);
-  (void)strcat(buf, buf2);
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
+#if STORE_TIME
+    (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&overp->ov_time, FALSE));
+    (void)strcat(buf, buf2);
 #endif
+#if STORE_TIMEVAL
+    (void)sprintf(buf2, "|w%s", _dmalloc_ptime(&overp->ov_timeval, FALSE));
+    (void)strcat(buf, buf2);
+#endif
+  }
   
 #if STORE_THREAD_ID
-  (void)sprintf(buf2, ":t%d", thread_id);
-  (void)strcat(buf, buf2);
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
+    (void)strcat(buf, "|t");
+    THREAD_ID_TO_STRING(buf2, overp->ov_thread_id);
+    (void)strcat(buf, buf2);
+  }
 #endif
   
   return buf;
@@ -633,8 +641,8 @@ LOCAL	bblock_t	*get_bblocks(const int many, const char extend)
     for (bblockp = admp->ba_blocks; bblockp < admp->ba_blocks + BB_PER_ADMIN;
 	 bblockp++) {
       bblockp->bb_flags = 0;
-#if STORE_POINTER_COUNT
-      bblockp->bb_seenc = 0;
+#if STORE_SEEN_COUNT
+      bblockp->bb_overhead.ov_seenc = 0;
 #endif
     }
     
@@ -889,8 +897,7 @@ LOCAL	dblock_t	*get_dblock_admin(const int many, bblock_t ** nextp)
  */
 LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
 			    const char * file, const unsigned short line,
-			    int * seenc, int * iter, long * when,
-			    int * thread_id)
+			    overhead_t ** overp)
 {
   bblock_t	*bblockp;
   dblock_t	*dblockp, *firstp, *freep;
@@ -939,8 +946,8 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
     for (; dblockp < firstp + (1 << (BASIC_BLOCK - bitn)) - 1; dblockp++) {
       dblockp->db_next = dblockp + 1;
       dblockp->db_bblock = bblockp;
-#if STORE_POINTER_COUNT
-      dblockp->db_seenc = 0;
+#if STORE_SEEN_COUNT
+      dblockp->db_overhead.ov_seenc = 0;
 #endif
       free_space_count	+= 1 << bitn;
     }
@@ -955,9 +962,9 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
       (void)memset((char *)pnt + (1 << bitn), BLANK_CHAR,
 		   BLOCK_SIZE - (1 << bitn));
     
-#if STORE_POINTER_COUNT
+#if STORE_SEEN_COUNT
     /* the first pointer in the block inherits the counter of the bblock */
-    firstp->db_seenc = bblockp->bb_seenc;
+    firstp->db_overhead.ov_seenc = bblockp->bb_overhead.ov_seenc;
 #endif
     
     dblockp = firstp;
@@ -967,28 +974,31 @@ LOCAL	void	*get_dblock(const int bitn, const unsigned short byten,
   dblockp->db_size = byten;
   dblockp->db_file = file;
   
-#if STORE_POINTER_COUNT
-  dblockp->db_seenc++;
-  *seenc = dblockp->db_seenc;
+#if STORE_SEEN_COUNT
+  dblockp->db_overhead.ov_seenc++;
 #endif
 #if STORE_ITERATION_COUNT
-  dblockp->db_iter = _dmalloc_iterc;
-  *iter = dblockp->db_iter;
+  dblockp->db_overhead.ov_iteration = _dmalloc_iterc;
 #endif
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
 #if HAVE_TIME
-#if STORE_CURRENT_TIME
-  dblockp->db_time = time(NULL);
-  *when = dblockp->db_time;
-#endif
-#if STORE_ELAPSED_TIME
-  dblockp->db_time = time(NULL) - _dmalloc_start;
-  *when = dblockp->db_time;
+#if STORE_TIME
+    dblockp->db_overhead.ov_time = time(NULL);
 #endif
 #endif
+#if STORE_TIMEVAL
+    GET_TIMEVAL(dblockp->db_overhead.ov_timeval);
+#endif
+  }
+
 #if STORE_THREAD_ID
-  dblockp->db_thread_id = GET_THREAD_ID;
-  *thread_id = dblockp->db_thread_id;
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
+    dblockp->db_overhead.ov_thread_id = GET_THREAD_ID;
+  }
 #endif
+  
+  *overp = &dblockp->db_overhead;
   
   return pnt;
 }
@@ -1843,9 +1853,9 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
 	*ret_attr = (char *)dblockp->db_file;
       else
 	*ret_attr = NULL;
-#if STORE_POINTER_COUNT
+#if STORE_SEEN_COUNT
       if (seencp != NULL)
-	*seencp = &dblockp->db_seenc;
+	*seencp = &dblockp->db_overhead.ov_seenc;
 #endif
     }
   }
@@ -1879,9 +1889,9 @@ EXPORT	int	_chunk_read_info(const void * pnt, unsigned int * size,
       else
 	*ret_attr = NULL;
     }
-#if STORE_POINTER_COUNT
+#if STORE_SEEN_COUNT
     if (seencp != NULL)
-      *seencp = &bblockp->bb_seenc;
+      *seencp = &bblockp->bb_overhead.ov_seenc;
 #endif
   }
   
@@ -2120,9 +2130,8 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
 {
   unsigned int	bitn, byten = size;
   bblock_t	*bblockp;
+  overhead_t	*overp;
   void		*pnt;
-  int		seenc = 0, iter = 0, thread_id = 0;
-  long		when = 0;
   
   /* counts calls to malloc */
   malloc_count++;
@@ -2172,8 +2181,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   
   /* allocate divided block if small */
   if (bitn < BASIC_BLOCK) {
-    pnt = get_dblock(bitn, byten, file, line, &seenc, &iter, &when,
-		     &thread_id);
+    pnt = get_dblock(bitn, byten, file, line, &overp);
     if (pnt == NULL)
       return MALLOC_ERROR;
     
@@ -2210,28 +2218,31 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOC_BLANK))
       (void)memset(pnt, BLANK_CHAR, given);
     
-#if STORE_POINTER_COUNT
-    bblockp->bb_seenc++;
-    seenc = bblockp->bb_seenc;
+#if STORE_SEEN_COUNT
+    bblockp->bb_overhead.ov_seenc++;
 #endif
 #if STORE_ITERATION_COUNT
-    bblockp->bb_iter = _dmalloc_iterc;
-    iter = bblockp->bb_iter;
+    bblockp->bb_overhead.ov_iteration = _dmalloc_iterc;
 #endif
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ELAPSED_TIME)
+	|| BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_CURRENT_TIME)) {
 #if HAVE_TIME
-#if STORE_CURRENT_TIME
-    bblockp->bb_time = time(NULL);
-    when = bblockp->bb_time;
-#endif
-#if STORE_ELAPSED_TIME
-    bblockp->bb_time = time(NULL) - _dmalloc_start;
-    when = bblockp->bb_time;
+#if STORE_TIME
+      bblockp->bb_overhead.ov_time = time(NULL);
 #endif
 #endif
+#if STORE_TIMEVAL
+      GET_TIMEVAL(bblockp->bb_overhead.ov_timeval);
+#endif
+    }
+    
 #if STORE_THREAD_ID
-    bblockp->bb_thread_id = GET_THREAD_ID;
-    thread_id = bblockp->bb_thread_id;
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_THREAD_ID)) {
+      bblockp->bb_overhead.ov_thread_id = GET_THREAD_ID;
+    }
 #endif
+    
+    overp = &bblockp->bb_overhead;
   }
   
   /* write fence post info if needed */
@@ -2244,7 +2255,7 @@ EXPORT	void	*_chunk_malloc(const char * file, const unsigned int line,
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
     _dmalloc_message("*** alloc: at '%s' for %d bytes, got '%s'",
 		     _chunk_display_where(file, line), byten - pnt_total_adm,
-		     display_pnt(pnt, seenc, iter, when, thread_id));
+		     display_pnt(pnt, overp));
   
   return pnt;
 }
@@ -2310,36 +2321,15 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
       return FREE_ERROR;
     }
     
-#if STORE_POINTER_COUNT
-    dblockp->db_seenc++;
+#if STORE_SEEN_COUNT
+    dblockp->db_overhead.ov_seenc++;
 #endif
     
     /* print transaction info? */
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
       _dmalloc_message("*** free: at '%s' pnt '%s': size %d, alloced at '%s'",
 		       _chunk_display_where(file, line),
-		       display_pnt(CHUNK_TO_USER(pnt),
-#if STORE_POINTER_COUNT
-				   dblockp->db_seenc,
-#else
-				   0,
-#endif
-#if STORE_ITERATION_COUNT
-				   dblockp->db_iter,
-#else
-				   0,
-#endif
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-				   dblockp->db_time,
-#else
-				   0,
-#endif
-#if STORE_THREAD_ID
-				   dblockp->db_thread_id
-#else
-				   0
-#endif
-				   ),
+		       display_pnt(CHUNK_TO_USER(pnt), &dblockp->db_overhead),
 		       dblockp->db_size - pnt_total_adm,
 		       chunk_display_where2(dblockp->db_file,
 					    dblockp->db_line));
@@ -2387,36 +2377,15 @@ EXPORT	int	_chunk_free(const char * file, const unsigned int line,
     return FREE_ERROR;
   }
   
-#if STORE_POINTER_COUNT
-  bblockp->bb_seenc++;
+#if STORE_SEEN_COUNT
+  bblockp->bb_overhead.ov_seenc++;
 #endif
   
   /* do we need to print transaction info? */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
     _dmalloc_message("*** free: at '%s' pnt '%s': size %d, alloced at '%s'",
 		     _chunk_display_where(file, line),
-		     display_pnt(CHUNK_TO_USER(pnt),
-#if STORE_POINTER_COUNT
-				 bblockp->bb_seenc,
-#else
-				 0,
-#endif
-#if STORE_ITERATION_COUNT
-				 bblockp->bb_iter,
-#else
-				 0,
-#endif
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-				 bblockp->bb_time,
-#else
-				 0,
-#endif
-#if STORE_THREAD_ID
-				 bblockp->bb_thread_id
-#else
-				 0
-#endif
-				 ),
+		     display_pnt(CHUNK_TO_USER(pnt), &bblockp->bb_overhead),
 		     bblockp->bb_size - pnt_total_adm,
 		     chunk_display_where2(bblockp->bb_file, bblockp->bb_line));
   
@@ -2647,7 +2616,7 @@ EXPORT	void	*_chunk_realloc(const char * file, const unsigned int line,
     old_size -= pnt_total_adm;
     new_size -= pnt_total_adm;
     
-#if STORE_POINTER_COUNT
+#if STORE_SEEN_COUNT
     /* we see in inbound and outbound so we need to increment by 2 */
     *seencp += 2;
 #endif
@@ -2815,27 +2784,7 @@ EXPORT	void	_chunk_dump_unfreed(void)
       if (! unknown || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	_dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			 display_pnt(CHUNK_TO_USER(pnt),
-#if STORE_POINTER_COUNT
-				     bblockp->bb_seenc,
-#else
-				     0,
-#endif
-#if STORE_ITERATION_COUNT
-				     bblockp->bb_iter,
-#else
-				     0,
-#endif
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-				     bblockp->bb_time,
-#else
-				     0,
-#endif
-#if STORE_THREAD_ID
-				     bblockp->bb_thread_id
-#else
-				     0
-#endif
-				     ),
+				     &bblockp->bb_overhead),
 			 bblockp->bb_size - pnt_total_adm,
 			 _chunk_display_where(bblockp->bb_file,
 					      bblockp->bb_line));
@@ -2920,27 +2869,7 @@ EXPORT	void	_chunk_dump_unfreed(void)
 	if (! unknown || BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_UNKNOWN)) {
 	  _dmalloc_message("not freed: '%s' (%d bytes) from '%s'",
 			   display_pnt(CHUNK_TO_USER(pnt),
-#if STORE_POINTER_COUNT
-				       dblockp->db_seenc,
-#else
-				       0,
-#endif
-#if STORE_ITERATION_COUNT
-				       dblockp->db_iter,
-#else
-				       0,
-#endif
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-				       dblockp->db_time,
-#else
-				       0,
-#endif
-#if STORE_THREAD_ID
-				       dblockp->db_thread_id
-#else
-				       0
-#endif
-				       ),
+				       &dblockp->db_overhead),
 			   dblockp->db_size - pnt_total_adm,
 			   _chunk_display_where(dblockp->db_file,
 						dblockp->db_line));

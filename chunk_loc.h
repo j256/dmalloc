@@ -18,11 +18,25 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: chunk_loc.h,v 1.31 1995/05/05 16:50:34 gray Exp $
+ * $Id: chunk_loc.h,v 1.32 1995/05/12 20:46:59 gray Exp $
  */
 
 #ifndef __CHUNK_LOC_H__
 #define __CHUNK_LOC_H__
+
+/* for thread-id types -- see conf.h */
+#if STORE_THREAD_ID
+#ifdef THREAD_INCLUDE
+#include THREAD_INCLUDE
+#endif
+#endif
+
+/* for timeval type -- see conf.h */
+#if STORE_TIMEVAL
+#ifdef TIMEVAL_INCLUDE
+#include TIMEVAL_INCLUDE
+#endif
+#endif
 
 /* defines for the malloc subsystem */
 
@@ -104,7 +118,7 @@
 #define CHUNK_MAGIC_BOTTOM	0xDEA007	/* bottom magic number */
 #define CHUNK_MAGIC_TOP		0x976DEAD	/* top magic number */
 
-/* bb_flags values */
+/* bb_flags values (short) */
 #define BBLOCK_ALLOCATED	0x00FF		/* block has been allocated */
 #define BBLOCK_START_USER	0x0001		/* start of some user space */
 #define BBLOCK_USER		0x0002		/* allocated by user space */
@@ -114,6 +128,34 @@
 #define BBLOCK_FREE		0x0020		/* block is free */
 #define BBLOCK_EXTERNAL		0x0040		/* externally used block */
 #define BBLOCK_ADMIN_FREE	0x0080		/* ba_freen pnt to free slot */
+#define BBLOCK_STRING		0x0100		/* block is a string (unused)*/
+
+/*
+ * some overhead fields for recording information about the pointer
+ */
+typedef struct {
+#if STORE_SEEN_COUNT
+  int		ov_seenc;		/* times pointer was seen */
+#endif
+#if STORE_ITERATION_COUNT
+  long		ov_iteration;		/* interation when pointer alloced */
+#endif
+#if HAVE_TIME
+#if STORE_TIME
+  long		ov_time;		/* time when pointer alloced */
+#endif
+#endif
+#if STORE_TIMEVAL
+  struct timeval  ov_timeval;		/* time when pointer alloced */
+#endif
+#if STORE_THREAD_ID
+  THREAD_TYPE	ov_thread_id;		/* thread id which allocaed pnt */
+#endif
+
+#if STORE_SEEN_COUNT == 0 && STORE_ITERATION_COUNT == 0 && STORE_TIME == 0 && STORE_THREAD_ID == 0
+  int		ov_junk;		/* for compilers that hate 0 structs */
+#endif
+} overhead_t;
 
 /*
  * single divided-block administrative structure
@@ -129,9 +171,9 @@ struct dblock_st {
   } db_info;
   
   /* to reference union and struct elements as db elements */
-#define db_bblock	db_info.in_bblock	/* Free */
 #define db_size		db_info.in_nums.nu_size	/* Used */
 #define db_line		db_info.in_nums.nu_line	/* Used */
+#define db_bblock	db_info.in_bblock	/* Free */
   
   union {
     struct dblock_st	*pn_next;		/* next in the free list */
@@ -142,21 +184,7 @@ struct dblock_st {
 #define db_next		db_pnt.pn_next		/* Free */
 #define db_file		db_pnt.pn_file		/* Used */
   
-  /*
-   * configured overhead additions
-   */
-#if STORE_POINTER_COUNT
-  int		db_seenc;		/* times pointer was seen */
-#endif
-#if STORE_ITERATION_COUNT
-  long		db_iter;		/* interation when pointer alloced */
-#endif
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-  long		db_time;		/* time when pointer alloced */
-#endif
-#if STORE_THREAD_ID
-  int		db_thread_id;		/* thread id which allocaed pnt */
-#endif
+  overhead_t	db_overhead;			/* configured overhead adds */
 };
 typedef struct dblock_st	dblock_t;
 
@@ -203,23 +231,7 @@ struct bblock_st {
 #define	bb_next		bb_pnt.pn_next		/* Free */
 #define	bb_file		bb_pnt.pn_file		/* User-bblock */
   
-  /*
-   * configured overhead additions
-   */
-#if STORE_POINTER_COUNT
-  int		bb_seenc;		/* times pointer was seen */
-#endif
-#if STORE_ITERATION_COUNT
-  long		bb_iter;		/* interation when pointer alloced */
-#endif
-#if HAVE_TIME
-#if STORE_CURRENT_TIME == 1 || STORE_ELAPSED_TIME == 1
-  long		bb_time;		/* time when pointer alloced */
-#endif
-#endif
-#if STORE_THREAD_ID
-  int		bb_thread_id;		/* thread id which allocaed pnt */
-#endif
+  overhead_t	bb_overhead;			/* configured overhead adds */
 };
 typedef struct bblock_st	bblock_t;
 
