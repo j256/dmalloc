@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.119 2004/12/03 13:44:33 gray Exp $
+ * $Id: dmalloc_t.c,v 1.120 2005/03/18 23:42:11 gray Exp $
  */
 
 /*
@@ -811,8 +811,8 @@ static	int	check_special(void)
       }
       else {
 	if (! silent_b) {
-	  (void)printf("   ERROR: verify of overwritten memory returned: %s\n",
-		       dmalloc_strerror(dmalloc_errno));
+	  (void)printf("   ERROR: verify of overwritten memory returned: %s (err %d)\n",
+		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -897,8 +897,8 @@ static	int	check_special(void)
       }
       else {
 	if (! silent_b) {
-	  (void)printf("   ERROR: verify of overwritten above allocated memory returned: %s\n",
-		       dmalloc_strerror(dmalloc_errno));
+	  (void)printf("   ERROR: verify of overwritten above allocated memory returned: %s (err %d)\n",
+		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -945,8 +945,8 @@ static	int	check_special(void)
 	}
 	else {
 	  if (! silent_b) {
-	    (void)printf("   ERROR: free bad pointer produced: %s\n",
-			 dmalloc_strerror(dmalloc_errno));
+	    (void)printf("   ERROR: free bad pointer produced: %s (err %d)\n",
+			 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	  }
 	  final = 0;
 	}
@@ -1431,8 +1431,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1464,8 +1464,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1527,8 +1527,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1788,8 +1788,8 @@ static	int	check_special(void)
       if (dmalloc_free(__FILE__, __LINE__, new_pnt,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free bad pointer produced: %s\n",
-		       dmalloc_strerror(dmalloc_errno));
+	  (void)printf("   ERROR: free bad pointer produced: %s (err %d)\n",
+		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -1851,8 +1851,8 @@ static	int	check_special(void)
       if (dmalloc_free(__FILE__, __LINE__, new_pnt,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free bad pointer produced: %s\n",
-		       dmalloc_strerror(dmalloc_errno));
+	  (void)printf("   ERROR: free bad pointer produced: %s (err %d)\n",
+		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -1881,8 +1881,8 @@ static	int	check_special(void)
     _dmalloc_memset(buf, 0, sizeof(buf));
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2232,8 +2232,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2669,12 +2669,12 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Initial tests failed.  Last dmalloc error: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("ERROR: Initial tests failed.  Last dmalloc error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       else {
-	(void)printf("  Failed.  Last dmalloc error: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("  Failed.  Last dmalloc error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 1;
     }
@@ -2699,12 +2699,12 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Random tests failed.  Last dmalloc error: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("ERROR: Random tests failed.  Last dmalloc error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       else {
-	(void)printf("  Failed.  Last dmalloc error: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("  Failed.  Last dmalloc error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 1;
     }
@@ -2726,12 +2726,12 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Running special tests failed.  Last dmalloc error: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("ERROR: Running special tests failed.  Last dmalloc error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       else {
-	(void)printf("  Failed.  Last dmalloc error: %s\n",
-		     dmalloc_strerror(dmalloc_errno));
+	(void)printf("  Failed.  Last dmalloc error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 1;
     }
@@ -2747,12 +2747,12 @@ int	main(int argc, char **argv)
      * the only way we can reproduce the problem.
      */
     if (silent_b) {
-      (void)printf("Random seed is %u.  Final dmalloc error: %s (%d)\n",
+      (void)printf("Random seed is %u.  Final dmalloc error: %s (err %d)\n",
 		   seed_random, dmalloc_strerror(dmalloc_errno),
 		   dmalloc_errno);
     }
     else {
-      (void)printf("Final dmalloc error: %s (%d)\n",
+      (void)printf("Final dmalloc error: %s (err %d)\n",
 		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }
@@ -2762,7 +2762,7 @@ int	main(int argc, char **argv)
   /* last thing is to verify the heap */
   ret = dmalloc_verify(NULL /* check all heap */);
   if (ret != DMALLOC_NOERROR) {
-    (void)printf("Final dmalloc_verify returned failure: %s (%d)\n",
+    (void)printf("Final dmalloc_verify returned failure: %s (err %d)\n",
 		 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
   }
   
