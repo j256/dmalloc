@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.112 2004/01/14 16:17:57 gray Exp $
+ * $Id: dmalloc.c,v 1.113 2004/01/16 14:04:53 gray Exp $
  */
 
 /*
@@ -866,10 +866,10 @@ int	main(int argc, char **argv)
   char		*log_path, *loc_start_file;
   const char	*env_str;
   DMALLOC_PNT	addr;
-  unsigned long	inter, limit_val, loc_start_size;
+  unsigned long	inter, limit_val, loc_start_size, loc_start_iter;
   long		addr_count;
   int		lock_on;
-  int		loc_start_line, loc_start_iter;
+  int		loc_start_line;
   unsigned int	flags;
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
