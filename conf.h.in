@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: conf.h.in,v 1.61 1998/09/17 15:22:43 gray Exp $
+ * $Id: conf.h.in,v 1.62 1998/09/17 16:08:25 gray Exp $
  */
 
 #ifndef __CONF_H__
@@ -103,10 +103,17 @@
 #define RETSIGTYPE void
 
 /*
- * While pthread include file to use.
+ * Which pthread include file to use.
  */
 #define HAVE_PTHREAD_H 0
 #define HAVE_PTHREADS_H 0
+
+/*
+ * What pthread functions do we have?
+ */
+#define HAVE_PTHREAD_MUTEX_INIT 0
+#define HAVE_PTHREAD_MUTEX_LOCK 0
+#define HAVE_PTHREAD_MUTEX_UNLOCK 0
 
 /*
  * What is the pthread mutex type?  Usually (always?) it is
