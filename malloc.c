@@ -12,7 +12,7 @@
  * advertising or publicity pertaining to distribution of the document
  * or software without specific, written prior permission.
  *
- * Please see the LICENSE file or contact the author for information
+ * Please see the PERMISSIONS file or contact the author for information
  * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
@@ -55,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.79 1995/06/20 22:37:30 gray Exp $";
+  "$Id: malloc.c,v 1.80 1995/06/21 18:20:08 gray Exp $";
 #endif
 
 /*

@@ -12,7 +12,7 @@
  * advertising or publicity pertaining to distribution of the document
  * or software without specific, written prior permission.
  *
- * Please see the LICENSE file or contact the author for information
+ * Please see the PERMISSIONS file or contact the author for information
  * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
@@ -37,7 +37,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: compat.c,v 1.31 1995/06/20 22:37:16 gray Exp $";
+  "$Id: compat.c,v 1.32 1995/06/21 18:20:02 gray Exp $";
 #endif
 
 #if HAVE_BCOPY == 0

@@ -12,7 +12,7 @@
  * advertising or publicity pertaining to distribution of the document
  * or software without specific, written prior permission.
  *
- * Please see the LICENSE file or contact the author for information
+ * Please see the PERMISSIONS file or contact the author for information
  * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: env.h,v 1.6 1995/06/20 22:35:17 gray Exp $
+ * $Id: env.h,v 1.7 1995/06/21 18:19:05 gray Exp $
  */
 
 #ifndef __ENV_H__

@@ -12,7 +12,7 @@
  * advertising or publicity pertaining to distribution of the document
  * or software without specific, written prior permission.
  *
- * Please see the LICENSE file or contact the author for information
+ * Please see the PERMISSIONS file or contact the author for information
  * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: debug_tok.h,v 1.18 1995/06/20 22:35:14 gray Exp $
+ * $Id: debug_tok.h,v 1.19 1995/06/21 18:19:02 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__

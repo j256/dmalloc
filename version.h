@@ -12,7 +12,7 @@
  * advertising or publicity pertaining to distribution of the document
  * or software without specific, written prior permission.
  *
- * Please see the LICENSE file or contact the author for information
+ * Please see the PERMISSIONS file or contact the author for information
  * about commercial licenses.
  *
  * Gray Watson makes no representations about the suitability of the
@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: version.h,v 1.55 1995/06/21 16:50:49 gray Exp $
+ * $Id: version.h,v 1.56 1995/06/21 18:19:11 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -39,6 +39,6 @@
  */
 LOCAL	char	*dmalloc_version = "3.1.0";
 
-/* Version Date: $Date: 1995/06/21 16:50:49 $ */
+/* Version Date: $Date: 1995/06/21 18:19:11 $ */
 
 #endif /* ! __VERSION_H__ */
