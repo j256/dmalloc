@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.165 1999/03/09 23:20:52 gray Exp $
+@c $Id: dmalloc.texi,v 1.166 1999/04/15 12:54:46 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -624,13 +624,16 @@ This causes the memory statistics and unfreed information to be dumped
 to the log file.  However, if your system has neither, you will need to
 call @code{dmalloc_shutdown} yourself before your program exits.
 
-@item Add an alias for dmalloc to your shell's rc file.  Bourne, bash,
-ksh, and zsh users should add the following to their @file{.bashrc} or
-@file{.zshrc} file respectively (notice the -b option for bourne shell
-output):
+@item Add an alias for dmalloc to your shell's rc file if supported.
+Bash, ksh, and zsh users should add the following to their
+@file{.bashrc}, @file{.profile}, or @file{.zshrc} file respectively
+(notice the -b option for bourne shell output):
 
 @example
-function dmalloc @{ eval `command dmalloc -b $*` @}
+function dmalloc
+@{
+        eval `command dmalloc -b $*`
+@}
 @end example
 
 By the way, if you are looking for a shell, I heartily recommend trying
