@@ -1,3 +1,8 @@
+Thu May  6 11:26:03 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Added new fix-patch script for myself.  Fixed malloc_t by
+	removing LOCAL/EXPORT, etc.
+
 Fri Apr 30 15:26:12 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Removed some heap checks in malloc.c per bali's comments and
