@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.48 1994/05/18 04:28:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.49 1994/07/21 18:38:45 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -520,6 +520,10 @@ setting of the @samp{MALLOC_DEBUG} environmental variable
 Each token, when specified, enables a specific debugging feature.  For
 instance, if you have the log-stats token enabled, the library will log
 general statistics to the logfile.
+
+To get this information on the fly, use @samp{malloc_dbg -TV}.  This
+will print out the Tokens in Very-verbose mode @xref{Malloc_dbg
+Program}.
 
 @table @samp
 @item none
@@ -1195,6 +1199,12 @@ malloc -c runtime
 # enable basic settings (1) plus (-p) the logging of
 # transactions (log-trans) to file 'malloc'
 malloc 1 -p log-trans -l malloc
+
+# print out the current settings with Very-verbose output
+malloc -V
+
+# list the available malloc debug tokens with Very-verbose output
+malloc -TV
 @end example
 
 @node RC File, Debugging with the Library, Malloc_dbg Program, Running
