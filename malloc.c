@@ -55,7 +55,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.84 1995/09/02 21:38:07 gray Exp $";
+  "$Id: malloc.c,v 1.85 1995/09/03 16:35:49 gray Exp $";
 #endif
 
 /*
@@ -343,6 +343,7 @@ EXPORT	void	_dmalloc_shutdown(void)
 /*
  * allocate and return a SIZE block of bytes.  returns 0L on error.
  */
+#undef malloc
 EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
 {
   void		*newp;
@@ -379,6 +380,7 @@ EXPORT	DMALLOC_PNT	malloc(DMALLOC_SIZE size)
  * NUM_ELEMENTS, each element contains SIZE bytes.  returns 0L on
  * error.
  */
+#undef calloc
 EXPORT	DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
 {
   void		*newp;
@@ -401,6 +403,7 @@ EXPORT	DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size)
  * either copying all of OLD_PNT to the new area or truncating.
  * returns 0L on error.
  */
+#undef realloc
 EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
 {
   void		*newp;
@@ -444,6 +447,7 @@ EXPORT	DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size)
  * release PNT in the heap, returning FREE_ERROR, FREE_NOERROR or void
  * depending on whether STDC is defined by your compiler.
  */
+#undef free
 EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 {
   int		ret;
@@ -492,6 +496,7 @@ EXPORT	DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 /*
  * same as free(PNT)
  */
+#undef cfree
 EXPORT	DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 {
   SET_RET_ADDR(_dmalloc_file, _dmalloc_line);
