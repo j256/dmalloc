@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: chunk.c,v 1.53 1993/09/25 20:37:53 gray Exp $";
+  "$Id: chunk.c,v 1.54 1993/09/26 19:28:56 gray Exp $";
 #endif
 
 /* checking information */
@@ -2260,13 +2260,12 @@ EXPORT	void	_chunk_stats(void)
   _malloc_message("  max base 2 alloc loss: %ld bytes (%d%%)",
 		  alloc_max_given - alloc_maximum,
 		  (alloc_max_given == 0 ? 0 :
-		   100 - ((alloc_max_given - alloc_maximum) * 100) /
+		   ((alloc_max_given - alloc_maximum) * 100) /
 		   alloc_max_given));
-  
   _malloc_message("max memory space wasted: %ld bytes (%d%%)",
 		  tot_space - alloc_maximum,
 		  (tot_space == 0 ? 0 :
-		   100 - (((tot_space - alloc_maximum) * 100) / tot_space)));
+		   (((tot_space - alloc_maximum) * 100) / tot_space)));
   
   /* final stats */
   _malloc_message("final user memory space: basic %d, divided %d, %ld bytes",
