@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.129 2000/03/21 01:56:20 gray Exp $
+# $Id: Makefile.in,v 1.130 2000/03/21 19:21:55 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -46,7 +46,7 @@ FLS	=  conf.h.in configure.in config.help \
 	dmalloc_tab.[ch] dmalloc_tab_loc.h dmalloc_t.c malloc.h return.h \
 	version.h \
 	settings.dist dmalloc_argv.[ch] dmalloc_argv_loc.h dmalloc.cc \
-	install-sh mkinstalldirs Deansify.pl \
+	install-sh mkinstalldirs Deansify.pl rpm.spec \
 	configure
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dmalloc.gdb \
