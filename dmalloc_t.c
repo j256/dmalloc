@@ -36,7 +36,7 @@
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
-  "$Id: dmalloc_t.c,v 1.37 1994/05/11 19:28:15 gray Exp $";
+  "$Id: dmalloc_t.c,v 1.38 1994/08/09 02:30:54 gray Exp $";
 #endif
 
 #define INTER_CHAR		'i'
@@ -61,6 +61,7 @@ static	pnt_info_t	*pointer_grid;
 /* argument variables */
 static	int		default_itern = DEFAULT_ITERATIONS; /* # of iters */
 static	char		interactive = ARGV_FALSE;	/* interactive flag */
+static	char		no_special = ARGV_FALSE;	/* no-special flag */
 static	int		max_alloc = MAX_ALLOC;		/* amt of mem to use */
 static	int		max_pointers = MAX_POINTERS;	/* # of pnts to use */
 static	char		random_debug = ARGV_FALSE;	/* random flag */
@@ -72,6 +73,8 @@ static	argv_t		arg_list[] = {
       NULL,			"turn on interactive mode" },
   { 'm',	"max-alloc",		ARGV_INT,		&max_alloc,
       "bytes",			"maximum allocation to test" },
+  { 'n',	"no-special",		ARGV_BOOL,		&no_special,
+      NULL,			"do not run special tests" },
   { 'p',	"max-pointers",		ARGV_INT,		&max_pointers,
       "pointers",		"number of pointers to test" },
   { 'r',	"random-debug",		ARGV_BOOL,		&random_debug,
@@ -164,7 +167,7 @@ static	int	do_random(const int itern)
     int		which;
     
     if (malloc_errno != last && ! silent) {
-      (void)printf("ERROR: iter %d: %s(%d)\n",
+      (void)printf("ERROR: iter %d: %s (err %d)\n",
 		   iterc, malloc_strerror(malloc_errno), malloc_errno);
       last = malloc_errno;
     }
@@ -566,11 +569,13 @@ int	main(int argc, char ** argv)
       (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
   }
   
-  if (! silent)
-    (void)printf("Running special tests...\n");
-  ret = check_special();
-  if (! silent)
-    (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
+  if (! no_special) {
+    if (! silent)
+      (void)printf("Running special tests...\n");
+    ret = check_special();
+    if (! silent)
+      (void)printf("   %s.\n", (ret == 1 ? "Succeeded" : "Failed"));
+  }
   
   /* you will need to uncomment this if you can't auto-shutdown */
 #if 0
