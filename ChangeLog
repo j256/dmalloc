@@ -1,3 +1,10 @@
+Thu May 13 00:56:39 1993  Gray Watson  (gray at toaster.antaire.com)
+
+	* Released version 1.2.4.
+
+	* Pretty stable now for a while.  Trying to get access to a ftp
+	for distribution ease.
+
 Thu May  6 11:26:03 1993  Gray Watson  (gray at toaster.antaire.com)
 
 	* Added new fix-patch script for myself.  Fixed malloc_t by
@@ -58,7 +65,7 @@ Thu Apr  8 17:41:59 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Tue Apr  6 00:46:45 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* version 1.2.0 posted to comp.sources.unix.
+	* Released version 1.2.0 to comp.sources.unix.
 
 	* Upgraded to version 1.2.0.  Ready for 2nd release to
 	comp.sources.unix.  Lots of work on the manual.
@@ -101,7 +108,7 @@ Fri Mar 26 04:00:14 1993  Gray Watson  (gray at toaster.antaire.com)
 	the fact that the checks were not being made on dblock fence posts
 	before?
 
-	* Upgraded to 1.1.6
+	* Released version 1.1.6
 
 	* Found some problems with malloc debug codes.  Use of DB_FENCE
 	and CHECK_LISTS and some others were improper.  A MALLOC_DEBUG
@@ -112,7 +119,7 @@ Fri Mar 26 04:00:14 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Fri Mar 12 18:35:02 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Upgraded to 1.1.5.
+	* Released version 1.1.5.
 
 Sat Feb 13 17:25:43 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -121,15 +128,15 @@ Sat Feb 13 17:25:43 1993  Gray Watson  (gray at toaster.antaire.com)
 
 Sat Jan 30 12:33:43 1993  Gray Watson  (gray at toaster.antaire.com)
 
+	* Released version 1.1.4
+
 	* Took out the check_vars call inside of malloc_strerror since
 	_malloc_perror calls malloc_strerror which would go quickly
 	recursive.  Thanks scott.
 
-	* Changed to version 1.1.4
-
 Tue Jan  5 00:00:00 1993  Gray Watson  (gray at toaster.antaire.com)
 
-	* Sent off 1.1.3 shar files to comp.sources.unix.
+	* Posted version 1.1.3 shar files to comp.sources.unix.
 
 Sat Jan  2 00:16:58 1993  Gray Watson  (gray at toaster.antaire.com)
 
@@ -142,7 +149,7 @@ Sun Dec 27 20:28:19 1992  Gray Watson  (gray at toaster.antaire.com)
 	reseting the in_alloc flag.  Also removed some testing of unsigned
 	variables < 0 in chunk.c per gcc 2.3.3 warnings.
 
-	* Changed version to 1.1.3.
+	* Released version 1.1.3.
 
 Mon Dec 21 15:31:50 1992  Gray Watson  (gray at toaster.antaire.com)
 
@@ -278,7 +285,9 @@ Tue Jul 21 16:06:13 1992  Gray Watson  (gray at toaster)
 
 Mon Mar 23 10:49:25 1992  Gray Watson  (gray at toaster)
 
-	* Released version 0.04 with new env variable features.
+	* Released version 0.04
+
+	* New env variable features.
 
 Thu Mar 12 19:28:34 1992  Gray Watson  (gray at toaster)
 
