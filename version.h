@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: version.h,v 1.60 1995/09/02 21:40:11 gray Exp $
+ * $Id: version.h,v 1.61 1995/10/10 22:44:02 gray Exp $
  */
 
 #ifndef __VERSION_H__
@@ -37,8 +37,8 @@
  *	News
  *	dmalloc.texi (2 places)
  */
-LOCAL	char	*dmalloc_version = "3.1.2a";
+LOCAL	char	*dmalloc_version = "3.1.2";
 
-/* Version Date: $Date: 1995/09/02 21:40:11 $ */
+/* Version Date: $Date: 1995/10/10 22:44:02 $ */
 
 #endif /* ! __VERSION_H__ */

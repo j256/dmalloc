@@ -1,3 +1,7 @@
+Tue Oct 10 18:43:09 1995  Gray Watson  <gray@burger.letters.com>
+
+	* Releasing version 3.1.2.
+
 Mon Sep 18 10:14:36 1995  Gray Watson  <gray@burger.letters.com>
 
 	* Finally tested fore myself the configure --srcdir option.  Found
@@ -1110,5 +1114,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.164 1995/09/18 14:15:43 gray Exp $
+$Id: ChangeLog,v 1.165 1995/10/10 22:43:59 gray Exp $
 -------------------------------------------------------------------------------
