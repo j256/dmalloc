@@ -1,3 +1,7 @@
+Fri Dec 16 15:07:29 1994  Gray Watson  (gray@blender.antaire.com)
+
+	* Fixed some old references to malloc in docs.  Thanks Dave.
+
 Thu Dec 15 10:25:59 1994  Gray Watson  (gray@blender.antaire.com)
 
 	* Released version 3.0.4.
@@ -906,5 +910,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.137 1994/12/15 15:26:29 gray Exp $
+$Id: ChangeLog,v 1.138 1994/12/21 20:11:15 gray Exp $
 -------------------------------------------------------------------------------
