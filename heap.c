@@ -42,7 +42,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: heap.c,v 1.43 1995/08/18 18:31:45 gray Exp $";
+  "$Id: heap.c,v 1.44 1995/09/06 17:37:00 gray Exp $";
 #endif
 
 /* external routines */
@@ -55,132 +55,121 @@ IMPORT	char		*sbrk(const int incr);	/* to extend the heap */
 EXPORT	void		*_heap_base = NULL;	/* base of our heap */
 EXPORT	void		*_heap_last = NULL;	/* end of our heap */
 
+/****************************** local functions ******************************/
+
 /*
- * function to get SIZE memory bytes from the end of the heap
+ * increment the heap INCR bytes with sbrk
  */
-EXPORT	void	*_heap_alloc(const unsigned int size)
+LOCAL	void	*heap_extend(const int incr)
 {
-  void		*ret = HEAP_ALLOC_ERROR;
-  char		str[128];
+  void	*ret = SBRK_ERROR;
   
 #if HAVE_SBRK
-  ret = sbrk(size);
-  if (ret == SBRK_ERROR)
-    ret = HEAP_ALLOC_ERROR;
-#endif
-  
-  /* did we not successfully allocate any heap space? */
-  if (ret == HEAP_ALLOC_ERROR) {
+  ret = sbrk(incr);
+  if (ret == SBRK_ERROR) {
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
-      (void)sprintf(str, "\r\ndmalloc: critical error: could not allocate %u more bytes from heap\r\n",
-		    size);
+      char	str[128];
+      (void)sprintf(str, "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
       (void)write(STDERR, str, strlen(str));
       _dmalloc_die(FALSE);
     }
     dmalloc_errno = ERROR_ALLOC_FAILED;
-    dmalloc_error("_heap_alloc");
-    return HEAP_ALLOC_ERROR;
+    dmalloc_error("heap_extend");
   }
-  
-  /* did someone else use sbrk in the meantime? */
-  if (ret != _heap_last) {
-    int		diff, blockn;
-    
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
-      _dmalloc_message("correcting non-linear heap");
-    
-    /* if we went down then this is a real error! */
-    if (ret < _heap_last
-	|| ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
-      dmalloc_errno = ERROR_ALLOC_NONLINEAR;
-      dmalloc_error("_heap_alloc");
-      return HEAP_ALLOC_ERROR;
-    }
-    
-    /* adjust chunk admin information to align to blocksize */
-    blockn = ((char *)ret - (char *)_heap_last) / BLOCK_SIZE;
-    
-    /* align back to correct values */
-    diff = BLOCK_SIZE - ((long)ret % BLOCK_SIZE);
-    if (diff == BLOCK_SIZE)
-      diff = 0;
-    
-    if (diff > 0) {
-      ret = (char *)ret + diff;
-      _heap_last = ret;
-      blockn++;
-    }
-    
-    /* correct non-linear space with sbrk and note external blocks */
-    if ((diff > 0 && sbrk(diff) == SBRK_ERROR)
-	|| _chunk_note_external(blockn, ret) != NOERROR) {
-      if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
-	(void)sprintf(str, "\r\ndmalloc: critical error: could not adjust heap to achieve linear space\r\n");
-	(void)write(STDERR, str, strlen(str));
-	_dmalloc_die(FALSE);
-      }
-      dmalloc_errno = ERROR_ALLOC_FAILED;
-      dmalloc_error("_heap_alloc");
-      return HEAP_ALLOC_ERROR;
-    }
-  }
-  
-  /* increment last pointer */
-  _heap_last = (char *)ret + size;
+#endif
   
   return ret;
 }
 
-/*
- * return a pointer to the current end of the heap
- */
-EXPORT	void	*_heap_end(void)
-{
-  void		*ret = HEAP_ALLOC_ERROR;
-  
-#if HAVE_SBRK
-  ret = sbrk(0);
-  if (ret == SBRK_ERROR) {
-    dmalloc_errno = ERROR_ALLOC_FAILED;
-    dmalloc_error("_heap_end");
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
-      char	str[128];
-      (void)sprintf(str, "\r\ndmalloc: critical error: could not find the end of the heap\r\n");
-      (void)write(STDERR, str, strlen(str));
-      _dmalloc_die(FALSE);
-    }
-    ret = HEAP_ALLOC_ERROR;
-  }
-#endif
-  
-  return ret;
-}
+/**************************** exported functions *****************************/
 
 /*
  * initialize heap pointers.  returns [NO]ERROR
  */
 EXPORT	int	_heap_startup(void)
 {
-  _heap_base = _heap_end();
-  if (_heap_base == HEAP_ALLOC_ERROR)
+  long		diff;
+  
+  _heap_base = heap_extend(0);
+  if (_heap_base == SBRK_ERROR)
     return ERROR;
   
+  /* align the heap-base */
+  diff = BLOCK_SIZE - ((long)_heap_base % BLOCK_SIZE);
+  if (diff == BLOCK_SIZE)
+    diff = 0;
+  
+  if (diff > 0) {
+    if (heap_extend(diff) == SBRK_ERROR)
+      return ERROR;
+    _heap_base = (char *)HEAP_INCR(_heap_base, diff);
+  }
+  
   _heap_last = _heap_base;
-  if (_heap_last == HEAP_ALLOC_ERROR)
-    return ERROR;
   
   return NOERROR;
 }
 
 /*
- * align (by extending) _heap_base to block_size byte boundary
+ * function to get SIZE memory bytes from the end of the heap.  it
+ * returns a pointer to any external blocks in EXTERNP and the number
+ * of blocks in EXTERNCP.
  */
-EXPORT	void	*_heap_align_base(void)
+EXPORT	void	*_heap_alloc(const unsigned int size, void ** externp,
+			     int * externcp)
 {
-  long	diff;
+  void		*ret;
+  long		diff;
+  int		blockn;
   
-  diff = BLOCK_SIZE - ((long)_heap_base % BLOCK_SIZE);
-  _heap_base = (char *)_heap_base + diff;
+  ret = heap_extend(size);
+  if (ret == SBRK_ERROR)
+    return HEAP_ALLOC_ERROR;
   
-  return _heap_alloc(diff);
+  /* is the heap linear? */
+  if (ret == _heap_last) {
+    _heap_last = HEAP_INCR(ret, size);
+    if (externp != NULL)
+      *externp = NULL;
+    if (externcp != NULL)
+      *externcp = 0;
+    return ret;
+  }
+  
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS))
+    _dmalloc_message("correcting non-linear heap");
+  
+  /* if we went down then this is a real error! */
+  if (! IS_GROWTH(ret, _heap_last)
+      || ! BIT_IS_SET(_dmalloc_flags, DEBUG_ALLOW_NONLINEAR)) {
+    dmalloc_errno = ERROR_ALLOC_NONLINEAR;
+    dmalloc_error("_heap_alloc");
+    return HEAP_ALLOC_ERROR;
+  }
+  
+  /* adjust chunk admin information to align to blocksize */
+  blockn = ((char *)ret - (char *)_heap_last) / BLOCK_SIZE;
+  
+  /* align back to correct values */
+  diff = BLOCK_SIZE - ((long)ret % BLOCK_SIZE);
+  if (diff == BLOCK_SIZE)
+    diff = 0;
+  
+  /* do we need to correct non-linear space with sbrk */
+  if (diff > 0) {
+    if (heap_extend(diff) == SBRK_ERROR)
+      return HEAP_ALLOC_ERROR;
+    
+    ret = HEAP_INCR(ret, diff);
+    blockn++;
+  }
+  
+  if (externp != NULL)
+    *externp = _heap_last;
+  if (externcp != NULL)
+    *externcp = blockn;
+  
+  _heap_last = HEAP_INCR(ret, size);
+  
+  return ret;
 }

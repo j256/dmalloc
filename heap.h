@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: heap.h,v 1.28 1995/09/05 16:39:24 gray Exp $
+ * $Id: heap.h,v 1.29 1995/09/06 17:37:02 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -39,55 +39,55 @@
  */
 #if HEAP_GROWS_UP
 
-/* test whether pointer P is in the heap space */
-#define IS_IN_HEAP(p)		\
-  ((char *)(p) >= (char *)_heap_base && (char *)(p) < (char *)_heap_last)
+/* test whether pointer PNT is in the heap space */
+#define IS_IN_HEAP(pnt)		\
+  ((char *)(pnt) >= (char *)_heap_base && (char *)(pnt) < (char *)_heap_last)
 
-/* turn pointer P into a block index */
-#define WHICH_BLOCK(p)		\
-  (((char *)(p) - (char *)_heap_base) / BLOCK_SIZE)
+/* turn pointer PNT into a block index */
+#define WHICH_BLOCK(pnt)	\
+  (((char *)(pnt) - (char *)_heap_base) / BLOCK_SIZE)
 
-/* get a pointer to the memory block number C */
-#define BLOCK_POINTER(c)	((char *)_heap_base + (c) * BLOCK_SIZE)
+/* get a pointer to the memory block number BLOCKN */
+#define BLOCK_POINTER(blockn)	((char *)_heap_base + (blockn) * BLOCK_SIZE)
 
-/* test whether pointer P is on a block boundary */
-#define ON_BLOCK(p)		\
-  (((char *)(p) - (char *)_heap_base) % BLOCK_SIZE == 0)
+/* test whether pointer PNT is on a block boundary */
+#define ON_BLOCK(pnt)		\
+  (((char *)(pnt) - (char *)_heap_base) % BLOCK_SIZE == 0)
 
 /* calculate the size of heap */
-#define HEAP_SIZE		((char *)_heap_last - (char *)_heap_base)
+#define HEAP_SIZE	((char *)_heap_last - (char *)_heap_base)
 
-/* is the heap growing? */
-#define IS_GROWTH(o, n)		((char *)(n) > (char *)(o))
+/* is the heap growing?  is the NEW pointer ahead of the OLD */
+#define IS_GROWTH(new, old)	((char *)(new) > (char *)(old))
 
-/* is the heap growing? */
-#define HEAP_INCR(h, n)		((char *)(h) + (n))
+/* increment the heap point PNT by SIZE */
+#define HEAP_INCR(pnt, size)	((char *)(pnt) + (size))
 
 #else /* ! HEAP_GROWS_UP */
 
-/* test whether pointer P is in the heap space */
-#define IS_IN_HEAP(p)		\
-  ((char *)(p) <= (char *)_heap_base && (char *)(p) > (char *)_heap_last)
+/* test whether pointer PNT is in the heap space */
+#define IS_IN_HEAP(pnt)		\
+  ((char *)(pnt) <= (char *)_heap_base && (char *)(pnt) > (char *)_heap_last)
 
-/* turn pointer P into a block index */
-#define WHICH_BLOCK(p)		\
-  (((char *)(_heap_base) - (char *)p) / BLOCK_SIZE)
+/* turn pointer PNT into a block index */
+#define WHICH_BLOCK(pnt)		\
+  (((char *)(_heap_base) - (char *)pnt) / BLOCK_SIZE)
 
-/* get a pointer to the memory block number C */
-#define BLOCK_POINTER(c)	((char *)_heap_base - (c) * BLOCK_SIZE)
+/* get a pointer to the memory block number BLOCKN */
+#define BLOCK_POINTER(blockn)	((char *)_heap_base - (blockn) * BLOCK_SIZE)
 
 /* test whether pointer P is on a block boundary */
-#define ON_BLOCK(p)		\
-  (((char *)(_heap_base) - (char *)p) % BLOCK_SIZE == 0)
+#define ON_BLOCK(pnt)		\
+  (((char *)(_heap_base) - (char *)(pnt)) % BLOCK_SIZE == 0)
 
-/* calculate the size of heap */
-#define HEAP_SIZE		((char *)_heap_base - (char *)_heap_last)
-
-/* is the heap growing? */
-#define IS_GROWTH(o, n)		((char *)(n) < (char *)(o))
+/* is the heap growing?  is the NEW pointer ahead of the OLD */
+#define HEAP_SIZE	((char *)_heap_base - (char *)_heap_last)
 
 /* is the heap growing? */
-#define HEAP_INCR(h, n)		((char *)(h) - (n))
+#define IS_GROWTH(new, old)	((char *)(new) < (char *)(old))
+
+/* increment the heap point PNT by SIZE */
+#define HEAP_INCR(pnt, size)	((char *)(pnt) - (size))
 
 #endif /* ! HEAP_GROWS_UP */
 
@@ -103,9 +103,12 @@ IMPORT	void		*_heap_last;  /* end of our heap */
 IMPORT	int	_heap_startup(void);
 
 /*
- * function to get SIZE memory bytes from the end of the heap
+ * function to get SIZE memory bytes from the end of the heap.  it
+ * returns a pointer to any external blocks in EXTERNP and the number
+ * of blocks in EXTERNCP.
  */
-IMPORT	void	*_heap_alloc(const unsigned int size);
+IMPORT	void	*_heap_alloc(const unsigned int size, void ** externp,
+			     int * externcp);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
