@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.226 2003/06/10 17:17:17 gray Exp $
+@c $Id: dmalloc.texi,v 1.227 2003/06/10 17:34:02 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -2377,7 +2377,7 @@ Have the heap complain when additional program functionality seems to
 have made use of the system's heap-allocation routine @code{sbrk}
 directly behind the dmalloc library's back.  This is disabled by default
 since an increasing number of operating system functions seem to be
-doing this, especially pthreads packages.
+doing this -- especially pthread libraries.
 
 @cindex catch-signals
 @item catch-signals
@@ -2632,22 +2632,12 @@ General portability issues center around:
 
 @itemize @bullet
 @item
-@cindex sbrk
+@cindex sbrk, usage without
+@cindex preallocated memory heap
 @cindex INTERNAL_MEMORY_SPACE
 sbrk or compatible function usages.  The library does support a
-preallocated memory chunk heap.  See the INTERNAL_MEMORY_SPACE define in
-the @file{settings.dist} file.
-
-@item
-@cindex heap growing
-@cindex growing the heap
-Whether the systems' heap grows towards high or low memory.  The chunk.c
-code is designed (loosely) around the fact that consecutive calls to
-sbrk should give higher memory addresses.
-
-The library has not been tested on a system whose heap grows towards low
-memory.  If you are trying to run the library on such a system please
-contact the author.
+preallocated memory chunk heap.  See the @code{INTERNAL_MEMORY_SPACE}
+define in the @file{settings.dist} file.
 
 @item
 @cindex return-address
