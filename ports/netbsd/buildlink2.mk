@@ -5,7 +5,7 @@
 DMALLOC_BUILDLINK2_MK=	# defined
 
 BUILDLINK_PACKAGES+=			dmalloc
-BUILDLINK_DEPENDS.dmalloc?=		dmalloc>=5.0.2nb1
+BUILDLINK_DEPENDS.dmalloc?=		dmalloc>=5.2.3nb1
 BUILDLINK_PKGSRCDIR.dmalloc?=		../../devel/dmalloc
 
 BUILDLINK_DEPMETHOD.dmalloc?=		build
