@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://www.dmalloc.com/
  *
- * $Id: chunk.c,v 1.149 1999/03/10 22:22:17 gray Exp $
+ * $Id: chunk.c,v 1.150 1999/03/12 16:53:54 gray Exp $
  */
 
 /*
@@ -62,10 +62,10 @@
 
 #if INCLUDE_RCS_IDS
 #ifdef __GNUC__
-#ident "$Id: chunk.c,v 1.149 1999/03/10 22:22:17 gray Exp $";
+#ident "$Id: chunk.c,v 1.150 1999/03/12 16:53:54 gray Exp $";
 #else
 static	char	*rcs_id =
-  "$Id: chunk.c,v 1.149 1999/03/10 22:22:17 gray Exp $";
+  "$Id: chunk.c,v 1.150 1999/03/12 16:53:54 gray Exp $";
 #endif
 #endif
 
@@ -3253,7 +3253,12 @@ void	_chunk_stats(void)
   
   tot_space = alloc_current + free_space_count;
   overhead = (bblock_adm_count + dblock_adm_count) * BLOCK_SIZE;
-  wasted = tot_space - alloc_max_given;
+  if (alloc_max_given >= tot_space) {
+    wasted = 0;
+  }
+  else {
+    wasted = tot_space - alloc_max_given;
+  }
   
   /* version information */
   _dmalloc_message("basic-block %d bytes, alignment %d bytes, heap grows %s",
@@ -3284,15 +3289,9 @@ void	_chunk_stats(void)
 		  (alloc_max_given == 0 ? 0 :
 		   ((alloc_max_given - alloc_maximum) * 100) /
 		   alloc_max_given));
-  /* wasted could be < 0 */
-  if (wasted <= 0) {
-    _dmalloc_message("max memory space wasted: 0 bytes (0%%)");
-  }
-  else {
-    _dmalloc_message("max memory space wasted: %lu bytes (%lu%%)",
-		    wasted,
-		    (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
-  }
+  _dmalloc_message("max memory space wasted: %lu bytes (%lu%%)",
+		   wasted,
+		   (tot_space == 0 ? 0 : ((wasted * 100) / tot_space)));
   
   /* final stats */
   _dmalloc_message("final user memory space: basic %ld, divided %ld, %ld bytes",
