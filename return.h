@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: return.h,v 1.12 1995/06/21 18:19:09 gray Exp $
+ * $Id: return.h,v 1.13 1995/07/04 02:05:11 gray Exp $
  */
 
 /*
@@ -45,7 +45,8 @@
 #ifndef __RETURN_H__
 #define __RETURN_H__
 
-/* from conf.h */
+#include "conf.h"			/* for USE_RET_ADDRESS */
+
 #if USE_RET_ADDRESS
 
 /* for Sun SparcStations with GCC */
@@ -88,6 +89,34 @@
   } while(0)
 
 #endif /* __i386 */
+
+/*
+ * For DEC Mips machines running Ultrix
+ */
+#if __mips
+
+/*
+ * I have no idea how to get inline assembly with the default cc.
+ * Anyone know how?
+ */
+
+#if 0
+
+/*
+ * NOTE: we assume here that file is global.
+ *
+ * $31 is the frame pointer.  $2 looks to be the return address but maybe
+ * not consistently.
+ */
+#define SET_RET_ADDR(file, line)        \
+  do { \
+    if (file == DMALLOC_DEFAULT_FILE) \
+      asm("sw $2, file"); \
+  } while(0)
+
+#endif
+
+#endif /* __mips */
 
 /******************************* contributions *******************************/
 
