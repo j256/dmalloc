@@ -1,5 +1,8 @@
 Tue Oct 10 19:03:14 2000  Gray Watson  <gray@whopper.be.256.com>
 
+	* Releasing dmalloc version 4.7.2 with just the ident
+ 	autoconfigure handling for VA Linux release.  Thanks guys.
+
 	* Reorged dmalloc.h.3.  Ugh.
 
 	* malloc_verify and dmalloc_verify now return
@@ -1686,5 +1689,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.261 2000/10/11 16:50:27 gray Exp $
+$Id: ChangeLog,v 1.262 2000/10/11 18:10:14 gray Exp $
 -------------------------------------------------------------------------------

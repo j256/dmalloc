@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.140 2000/07/24 19:47:04 gray Exp $
+# $Id: Makefile.in,v 1.141 2000/10/11 18:10:14 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -13,6 +13,7 @@ OBJS	= arg_check.o compat.o dmalloc_lp.o dmalloc_tab.o env.o heap.o \
 NORMAL_OBJS = chunk.o error.o malloc.o
 THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
 CXX_OBJS = dmallocc.o
+VERSION	!= sed -e '/dmalloc_version/s/^.*\([0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*\).*$$/\1/p' -e d version.h
 
 DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
@@ -218,8 +219,10 @@ port :: $(FLS) $(CONTFLS) Makefile.all.in
 	cp $(FLS) Makefile.all.in $@
 	cp $(CONTFLS) $@/contrib
 	mv $@/Makefile.all.in $@/Makefile.in
-	@ echo ''
-	@ echo 'Please rename $@ to dmalloc-version and tar up file'
+	mv $@ dmalloc-$(VERSION)
+	rm -f dmalloc-$(VERSION).tgz dmalloc-$(VERSION).tgz.t
+	tar -czf dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION)
+	mv dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION).tgz
 
 dmalloc.ps : dmalloc.texi
 	rm -rf work

@@ -14,7 +14,7 @@ library gets released.
 
 5) cvs tag the release with dmalloc_release_X_X_X[_bX]
 
-6) make port
+6) make distclean ; autoconf ; configure ; make port
 
 7) Rename the port directory to be dmalloc-X.X.X[-betaX]
 
