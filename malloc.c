@@ -43,7 +43,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.44 1993/09/21 00:38:04 gray Exp $";
+  "$Id: malloc.c,v 1.45 1993/09/22 02:51:23 gray Exp $";
 #endif
 
 /*
@@ -483,20 +483,17 @@ EXPORT	int	malloc_verify(void * pnt)
  */
 EXPORT	int	malloc_debug(const int debug)
 {
-  int	hold, dbg;
-  
   /* should not check the heap here since we are setting the debug variable */
   
   /* if we've not started up then set the variable */
   if (! malloc_enabled)
     _malloc_debug = debug;
   else {
-    /* make sure that the not-changeable flags' values are preserved */
-    hold = _malloc_debug & DEBUG_NOT_CHANGEABLE;
-    /* make sure that the not-addable flags' are not... added */
-    dbg = debug & ~DEBUG_NOT_ADDABLE;
+    /* make sure that the not-changeable flag values are preserved */
+    _malloc_debug &= DEBUG_NOT_CHANGEABLE;
     
-    _malloc_debug = dbg | hold;
+    /* add the new flags - the not-addable ones */
+    _malloc_debug |= debug & ~DEBUG_NOT_ADDABLE;
   }
   
   return NOERROR;
