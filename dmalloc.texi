@@ -14,7 +14,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.77 1994/11/12 23:52:15 gray Exp $
+@c $Id: dmalloc.texi,v 1.78 1994/12/12 21:26:25 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -90,7 +90,7 @@ providing powerful debugging facilities.
 
 The library is reasonably portable having been run successfully on at
 least the following operating systems: AIX, BSDI, DG/UX, HPUX, Irix,
-MS-DOG, OSF, Solaris, SunOS, and Ultrix.
+Linux, MS-DOG, OSF, Solaris, SunOS, and Ultrix.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and extensive documentation (formats: text,
@@ -472,7 +472,7 @@ it did its job correctly.  Examine the manual settings section of
 @item Typing @kbd{make} should be enough to build @file{libdmalloc.a},
 @file{libdmalloclp.a}, and @file{dmalloc} program.
 
-@emph{NOTE}: non-ansi folks see the GENERAL section of the README
+@emph{NOTE}: non-ANSI folks see the GENERAL section of the README
 file for more information.
 
 @emph{WARNING}: I was unable to auto-configure to my satisfaction the
