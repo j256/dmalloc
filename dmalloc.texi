@@ -16,7 +16,7 @@
 @c ================================================================
 
 @c ================================================================
-@c $Id: dmalloc.texi,v 1.136 1998/09/28 15:03:30 gray Exp $
+@c $Id: dmalloc.texi,v 1.137 1998/09/29 13:33:10 gray Exp $
 @c ================================================================
 
 @ifinfo
@@ -925,11 +925,9 @@ xstrdup, and xfree with associated _leap calls.
 
 Valloc is like malloc by insures that the returned pointer will be
 aligned to a page boundary.  This may or may not be supported natively
-by your operating system.  It also may require the disabling of the
-@samp{check-fence} debug token to work correctly.  Future versions will
-not require this.  Strdup is a string duplicating routine which takes in
-a null terminated string pointer and returns an allocated copy of the
-string that will need to be passed to free later to deallocate.
+by your operating system.  Strdup is a string duplicating routine which
+takes in a null terminated string pointer and returns an allocated copy
+of the string that will need to be passed to free later to deallocate.
 Recalloc is a routine like realloc that reallocates previously allocated
 memory to a new size.  If the new memory size is larger than the old,
 recalloc initializes the new space to all zeros.  This may or may not be
