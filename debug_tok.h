@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: debug_tok.h,v 1.38 2003/06/08 19:30:56 gray Exp $
+ * $Id: debug_tok.h,v 1.39 2004/01/14 16:17:57 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__
@@ -53,7 +53,7 @@
 /* 12 available - 20030608 */
 #define DEBUG_CHECK_BLANK	BIT_FLAG(13)	/* check blank sections */
 #define DEBUG_CHECK_FUNCS	BIT_FLAG(14)	/* check functions */
-/* 15 available - 20001107 */
+#define DEBUG_CHECK_SHUTDOWN	BIT_FLAG(15)	/* check pointers on shutdown*/
 
 /* misc */
 #define DEBUG_FORCE_LINEAR	BIT_FLAG(16)	/* force linear heap */
@@ -108,6 +108,7 @@ __attribute__ ((unused))
   { "check-blank",	DEBUG_CHECK_BLANK,
     "check mem overwritten by alloc-blank, free-blank" },
   { "check-funcs",	DEBUG_CHECK_FUNCS,	"check functions" },
+  { "check-shutdown",	DEBUG_CHECK_SHUTDOWN,	"check heap on shutdown" },
   
   { "force-linear",	DEBUG_FORCE_LINEAR,
     "force heap space to be linear" },

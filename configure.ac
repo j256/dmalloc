@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.22 2003/11/18 15:28:29 gray Exp $
+# $Id: configure.ac,v 1.23 2004/01/14 16:17:57 gray Exp $
 #
-AC_REVISION($Revision: 1.22 $)
+AC_REVISION($Revision: 1.23 $)
 AC_INIT(dmalloc, 5.2.4, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -507,9 +507,15 @@ static void loc_decon() __attribute__((destructor));
 static void loc_decon() { exit(0); }
 int main() { return 1; }
 ]],
-[ AC_DEFINE(DESTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ],
-[ AC_DEFINE(DESTRUCTOR_WORKS, 0) AC_MSG_RESULT([no]) ],
-[ AC_DEFINE(DESTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ]
+[ AC_DEFINE(DESTRUCTOR_WORKS, 1)
+  AC_MSG_RESULT([yes])
+  destructor_works=yes ],
+[ AC_DEFINE(DESTRUCTOR_WORKS, 0)
+  AC_MSG_RESULT([no])
+  destructor_works=no ],
+[ AC_DEFINE(DESTRUCTOR_WORKS, 1)
+  AC_MSG_RESULT([yes])
+  destructor_works=yes ],
 )
 
 ##############################################################################
@@ -550,7 +556,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.22 2003/11/18 15:28:29 gray Exp $"
+#ident "$Id: configure.ac,v 1.23 2004/01/14 16:17:57 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -607,12 +613,14 @@ AC_MSG_NOTICE([functions])
 
 # auto-shutdown functions
 AC_CHECK_FUNCS(atexit on_exit)
-if test $ac_cv_func_atexit = no && test $ac_cv_func_on_exit = no; then
+if test $ac_cv_func_atexit = no \
+   && test $ac_cv_func_on_exit = no \
+   && test $destructor_works = no; then
 	AC_MSG_WARN()
-	AC_MSG_WARN(WARNING: The library cannot automatically shut itself)
-	AC_MSG_WARN(down without atexit or on_exit.  You will need to call)
-	AC_MSG_WARN(dmalloc_shutdown directly before exit to get the final)
-	AC_MSG_WARN(statistics and unfreed memory information.)
+	AC_MSG_WARN(WARNING: The library cannot automatically shut itself down)
+	AC_MSG_WARN(without atexit, on_exit, or destructor support.  You will)
+	AC_MSG_WARN(need to call dmalloc_shutdown directly before exit to get)
+	AC_MSG_WARN(get the final statistics and unfreed memory information.)
 	AC_MSG_WARN()
 fi
 

@@ -21,7 +21,7 @@
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.248 2003/11/23 18:54:16 gray Exp $
+@c $Id: dmalloc.texi,v 1.249 2004/01/14 16:17:58 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -321,14 +321,18 @@ make, and install the library (i.e. type: @kbd{make install}).
 
 @cindex automatic shutdown
 @cindex shutdown, automatic
+@cindex on_exit
+@cindex atexit
+@cindex destructor
 
 @item You need to make sure that the dmalloc building process
-above was able to locate one of the the @code{on_exit} or @code{atexit}
-functions.  If so, then the dmalloc library should be able to
-automatically call @code{dmalloc_shutdown} when @code{exit} is called.
-This causes the memory statistics and unfreed information to be dumped
-to the log file.  However, if your system has neither, you will need to
-call @code{dmalloc_shutdown} yourself before your program exits.
+above was able to locate one of the @code{on_exit} function,
+@code{atexit} function, or compiler destructor support.  If so, then the
+dmalloc library should be able to automatically call
+@code{dmalloc_shutdown} when @code{exit} is called.  This causes the
+memory statistics and unfreed information to be dumped to the log file.
+However if your system has none of the above, then you will need to call
+@code{dmalloc_shutdown} yourself before your program exits.
 
 @cindex alias, shell
 @cindex bash shell
@@ -768,6 +772,9 @@ heap to be checked before every 3rd call to a memory function.  Values
 of 100 or even 1000 for high memory usage programs are more useful than
 smaller ones.
 
+@cindex LOG_ITERATION_COUNT
+@cindex iteration count
+@cindex memory transaction count
 You can also cause the program to start doing detailed heap checking
 after a certain point.  For instance, with 'dmalloc -s 1000' option, you
 can tell the dmalloc library to enable the heap checks after the 1000th
@@ -995,7 +1002,7 @@ architecture/compilers.  @xref{Portability}.
 
 @cindex assembly hacks
 
-The library attempts to use some assembly hacks to get the the
+The library attempts to use some assembly hacks to get the
 return-address or the address of the line that called the dmalloc
 function.  If you have unfreed memory that does not have associated file
 and line information, you might see the following non-freed memory
@@ -1124,10 +1131,11 @@ void dmalloc_shutdown ( void )
 
 This function shuts the library down and logs the final statistics and
 information especially the non-freed memory pointers.  The library has
-code to support auto-shutdown if your system has @code{on_exit()} or
-@code{atexit()} calls (see @file{conf.h}).  If you do not have these
-routines, then @code{dmalloc_shutdown} should be called right before
-@code{exit()} or as the last function in @code{main()}.
+code to support auto-shutdown if your system has the @code{on_exit()}
+call, @code{atexit()} call, or compiler destructor support (see
+@file{conf.h}).  If you do not have these, then @code{dmalloc_shutdown}
+should be called right before @code{exit()} or as the last function in
+@code{main()}.
 
 @example
 main()
@@ -1278,6 +1286,9 @@ dmalloc.h.
 @cindex mark memory position
 @cindex using with servers
 @cindex servers, using with
+@cindex LOG_ITERATION
+@cindex interaction count
+@cindex transaction count
 
 @deftypefun
 unsigned unsigned long dmalloc_mark ( void )
@@ -1291,6 +1302,27 @@ This is very useful when using the library with a server which does not
 exit.  You can then save a mark before a transaction or event happens
 and then check to see what has changed using the
 @code{dmalloc_log_changed} function below.
+
+If you @code{LOG_ITERATION} enabled in your @file{settings.h} file then
+the entries in the log file will be prepended with the number of memory
+transactions that the library has handled so far.  You can also enable
+@code{LOG_PNT_ITERATION} in @file{settings.h} to store the memory
+transaction number with each pointer.
+
+@end deftypefun
+
+@c --------------------------------
+
+@cindex dmalloc_memory_allocated function
+@cindex memory allocated function
+@cindex number of bytes allocated
+
+@deftypefun
+unsigned unsigned long dmalloc_memory_allocated ( void )
+
+Return to the caller the total number of bytes that have been allocated
+by the library.  This is not the current in use but the total number of
+bytes returned by allocation functions.
 
 @end deftypefun
 
@@ -2627,13 +2659,42 @@ are returning to a standard development tag and want the logfile,
 address, and interval settings to be cleared automatically.  If you want
 this behavior by default, this can be put into the dmalloc alias.
 
-@item -s number
+@cindex delay heap checking
+@cindex start heap check later
+@item -s file:line
 Set the @samp{start} part of the @samp{DMALLOC_OPTIONS} env variable to
-number (alternatively @samp{file:line}).
+a file-name and line-number location in the source where the library
+should begin more extensive heap checking.  The file and line numbers
+for heap transactions must be working for this option to be obeyed.
+This is used if you are trying to locate a problem and you want the
+extensive checking to not happen initially because it's too slow.
 
-@item -S
-Output the debug-value not in hex but by individual debug-tokens in short
-form.
+@cindex delay heap checking
+@cindex start heap check later
+@cindex LOG_ITERATION
+@cindex interaction count
+@cindex transaction count
+@cindex mark count
+@cindex memory transaction count
+@item -S number
+Set the @samp{start} part of the @samp{DMALLOC_OPTIONS} env variable to
+an dmalloc mark number.  The library will begin more extensive heap
+checking after this number of memory transactions.  If you
+@code{LOG_ITERATION} enabled in your @file{settings.h} file then
+the entries in the log file will be prepended with the number of memory
+transactions that the library has handled so far.  This number can be
+used to delay the start of the fine grained heap checking which can be
+very slow.
+
+@cindex delay heap checking
+@cindex start heap check later
+@item --start-size size
+Set the @samp{start} part of the @samp{DMALLOC_OPTIONS} env variable to
+a number of bytes.  The library will begin more extensive heap checking
+after this amount of memory has been allocated by the library.  This
+allows you to start the slow and detailed checking of the library later
+in the program execution.  You can use patterns like 250m, 1g, or 102k
+to mean 250 megabytes, 1 gigabyte, and 102 kilobytes respectively.
 
 @item -t
 List all of the tags in the rc-file.  Use with @kbd{-v} or @kbd{-V}
@@ -2767,10 +2828,10 @@ both used, the token values will be added to the debug value.
 @item lockon
 @cindex lockon setting
 Set this to a number which is the ``lock-on'' period.  This dictates
-with the threaded version of the the library to not initialize or lock
-the mutex lock around the library until after a certain number of
-allocation calls have been made.  See the ``Using With Threads'' section
-for more information about the operation of the library with threads.
+with the threaded version of the library to not initialize or lock the
+mutex lock around the library until after a certain number of allocation
+calls have been made.  See the ``Using With Threads'' section for more
+information about the operation of the library with threads.
 @xref{Using With Threads}.
 
 @item log
@@ -2933,6 +2994,10 @@ alloc-blank automatically.
 Check the arguments of some functions (mostly string operations) looking
 for bad pointers.
 
+@cindex check-shutdown
+@item check-shutdown
+Check all of the pointers in the heap when the program exits.
+
 @cindex force-linear
 @cindex sbrk
 @cindex ERROR_ALLOC_NONLINEAR
@@ -2946,6 +3011,14 @@ non-linear memory is returned, the @code{ERROR_ALLOC_NONLINEAR} error
 will be triggered.
 
 @cindex catch-signals
+@cindex signal shutdown
+@cindex shutdown on signal
+@cindex SIGHUP
+@cindex SIGINT
+@cindex SIGTERM
+@cindex HUP signal
+@cindex INT signal
+@cindex TERM signal
 @item catch-signals
 Shutdown the library automatically on SIGHUP, SIGINT, or SIGTERM.  This
 will cause the library to dump its statistics (if requested) when you

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.199 2003/11/23 18:54:15 gray Exp $
+ * $Id: chunk.c,v 1.200 2004/01/14 16:17:56 gray Exp $
  */
 
 /*
@@ -91,6 +91,9 @@ static char *information = "@(#) $Information: lock-threads is enabled $";
 /* limit in how much memory we are allowed to allocate */
 unsigned long		_dmalloc_memory_limit = 0;
 
+/* total number of bytes that the heap has allocated */
+unsigned long		_dmalloc_alloc_total = 0;
+
 /*
  * local variables
  */
@@ -136,14 +139,13 @@ static	unsigned long	alloc_current = 0;	/* current memory usage */
 static	unsigned long	alloc_maximum = 0;	/* maximum memory usage  */
 static	unsigned long	alloc_cur_given = 0;	/* current mem given */
 static	unsigned long	alloc_max_given = 0;	/* maximum mem given  */
-static	unsigned long	alloc_total = 0;	/* total allocation */
 static	unsigned long	alloc_one_max = 0;	/* maximum at once */
 static	unsigned long	free_space_bytes = 0;	/* count the free bytes */
 
 /* pointer stats */
 static	unsigned long	alloc_cur_pnts = 0;	/* current pointers */
 static	unsigned long	alloc_max_pnts = 0;	/* maximum pointers */
-static	unsigned long	alloc_tot_pnts = 0;	/* current pointers */
+static	unsigned long	alloc_tot_pnts = 0;	/* total pointers */
 
 /* admin counts */
 static	unsigned long	heap_check_c = 0;	/* count of heap-checks */
@@ -2458,7 +2460,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   /* monitor current allocation level */
   alloc_current += size;
   alloc_maximum = MAX(alloc_maximum, alloc_current);
-  alloc_total += size;
+  _dmalloc_alloc_total += size;
   alloc_one_max = MAX(alloc_one_max, size);
   
   /* monitor pointer usage */
@@ -2762,7 +2764,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
      */
     alloc_current += new_size - old_size;
     alloc_maximum = MAX(alloc_maximum, alloc_current);
-    alloc_total += new_size;
+    _dmalloc_alloc_total += new_size;
     alloc_one_max = MAX(alloc_one_max, new_size);
     
     /* monitor pointer usage */
@@ -2880,7 +2882,7 @@ void	_dmalloc_chunk_log_stats(void)
   dmalloc_message("  current memory in use: %lu bytes (%lu pnts)",
 		  alloc_current, alloc_cur_pnts);
   dmalloc_message(" total memory allocated: %lu bytes (%lu pnts)",
-		  alloc_total, alloc_tot_pnts);
+		  _dmalloc_alloc_total, alloc_tot_pnts);
   
   /* maximum stats */
   dmalloc_message(" max in use at one time: %lu bytes (%lu pnts)",

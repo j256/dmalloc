@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.109 2003/11/23 18:54:16 gray Exp $
+ * $Id: dmalloc_t.c,v 1.110 2004/01/14 16:17:58 gray Exp $
  */
 
 /*
@@ -1087,7 +1087,352 @@ static	int	check_special(void)
     
     dmalloc_debug(old_flags);
   }
- 
+  
+  /********************/
+  
+  /*
+   * Make sure that the start file:line works.
+   */
+  {
+    unsigned int	old_flags = dmalloc_debug_current();
+    int			our_errno_hold = dmalloc_errno;
+    char		*loc_file, save_ch;
+    int			iter_c, loc_line;
+    void		*pnts[2];
+    char		setup[128];
+    
+    /* turn on fence post checking */
+    dmalloc_debug(DEBUG_CHECK_FENCE);
+    dmalloc_errno = 0;
+    
+    if (! silent_b) {
+      (void)printf("  Checking heap check start at file:line\n");
+    }
+    
+#define BUF_SIZE	64
+    
+    /* make an allocation */
+    pnts[0] = malloc(BUF_SIZE);
+    if (pnts[0] == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* overwrite the high fence post */
+    save_ch = *((char *)pnts[0] + BUF_SIZE);
+    *((char *)pnts[0] + BUF_SIZE) = '\0';
+    
+    /* make another allocation */
+    pnts[1] = malloc(BUF_SIZE);
+    if (pnts[1] == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* it shouldn't generate an error */
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
+      }
+      return 0;
+    }
+    
+    /* restore the overwritten character otherwise we can't free the pointer */
+    *((char *)pnts[0] + BUF_SIZE) = save_ch;
+    free(pnts[0]);
+    free(pnts[1]);
+    
+    for (iter_c = 0; iter_c < 2; iter_c++) {
+      /*
+       * we have to do this hack here because we need to know the
+       * __FILE__ and __LINE__ of a certain location to set the
+       * variable so then we need to run it again.
+       */
+      
+      /*
+       * Make an allocation recording where we did it.
+       *
+       * NOTE: This all needs to be on the same line.
+       */
+      loc_file= __FILE__; loc_line = __LINE__; pnts[iter_c] = malloc(BUF_SIZE);
+      if (pnts[iter_c] == NULL) {
+	if (! silent_b) {
+	  (void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	}
+	return 0;
+      }
+      
+      if (iter_c == 0) {
+	/* first time through the loop */
+	
+	/* overwrite the high fence post */
+	save_ch = *((char *)pnts[0] + BUF_SIZE);
+	*((char *)pnts[0] + BUF_SIZE) = '\0';
+	
+	/*
+	 * build and enable an options string turning on checking at
+	 * the above allocation
+	 */
+	(void)sprintf(setup, "debug=%#x,start=%s:%d",
+		      DEBUG_CHECK_FENCE, loc_file, loc_line);
+	dmalloc_debug_setup(setup);	
+      }
+      else {
+	/*
+	 * now the 2nd time through the loop we should have seen an
+	 * error because the 2nd allocation should have checked the
+	 * heap and seen the problem with the 1st allocation
+	 */
+	if (dmalloc_errno != ERROR_OVER_FENCE) {
+	  if (! silent_b) {
+	    (void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
+	  }
+	  return 0;
+	}
+	
+	/*
+	 * restore the overwritten character otherwise we can't free
+	 * the pointer
+	 */
+	*((char *)pnts[0] + BUF_SIZE) = save_ch;
+      }
+    }
+    
+    free(pnts[0]);
+    free(pnts[1]);
+    
+    /* reset the debug flags and errno */
+    dmalloc_debug(old_flags);
+    dmalloc_errno = our_errno_hold;
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that the start iteration count works.
+   */
+  {
+    unsigned int	old_flags = dmalloc_debug_current();
+    int			our_errno_hold = dmalloc_errno;
+    char		save_ch;
+    void		*pnt2;
+    char		setup[128];
+    
+    /* turn on fence post checking */
+    dmalloc_debug(DEBUG_CHECK_FENCE);
+    dmalloc_errno = 0;
+    
+    if (! silent_b) {
+      (void)printf("  Checking heap check start at iteration count\n");
+    }
+    
+#define BUF_SIZE	64
+    
+    /* make an allocation */
+    pnt = malloc(BUF_SIZE);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* overwrite the high fence post */
+    save_ch = *((char *)pnt + BUF_SIZE);
+    *((char *)pnt + BUF_SIZE) = '\0';
+    
+    /* make another allocation */
+    pnt2 = malloc(BUF_SIZE);
+    if (pnt2 == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* it shouldn't generate an error */
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
+      }
+      return 0;
+    }
+    
+    /* restore the overwritten character otherwise we can't free the pointer */
+    *((char *)pnt + BUF_SIZE) = save_ch;
+    free(pnt);
+    free(pnt2);
+    
+    /*
+     * Make an allocation recording where we did it.
+     *
+     * NOTE: This all needs to be on the same line.
+     */
+    pnt = malloc(BUF_SIZE);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* overwrite the high fence post */
+    save_ch = *((char *)pnt + BUF_SIZE);
+    *((char *)pnt + BUF_SIZE) = '\0';
+    
+    /*
+     * build and enable an options string turning on checking at the
+     * next transaction
+     */
+    (void)sprintf(setup, "debug=%#x,start=c1", DEBUG_CHECK_FENCE);
+    dmalloc_debug_setup(setup);	
+    
+    /*
+     * make another allocation which should enable heap checking and
+     * notice the above pointer overwrite
+     */
+    pnt2 = malloc(BUF_SIZE);
+    if (pnt2 == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* now we should see the error */
+    if (dmalloc_errno != ERROR_OVER_FENCE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
+      }
+      return 0;
+    }
+    
+    /* restore the overwritten character otherwise we can't free the pointer */
+    *((char *)pnt + BUF_SIZE) = save_ch;
+    free(pnt);
+    free(pnt2);
+    
+    /* reset the debug flags and errno */
+    dmalloc_debug(old_flags);
+    dmalloc_errno = our_errno_hold;
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that the start after memory size allocated.
+   */
+  {
+    unsigned int	old_flags = dmalloc_debug_current();
+    int			our_errno_hold = dmalloc_errno;
+    char		save_ch;
+    void		*pnt2;
+    char		setup[128];
+    
+    /* turn on fence post checking */
+    dmalloc_debug(DEBUG_CHECK_FENCE);
+    dmalloc_errno = 0;
+    
+    if (! silent_b) {
+      (void)printf("  Checking heap check start at memory size\n");
+    }
+    
+#define BUF_SIZE	64
+    
+    /* make an allocation */
+    pnt = malloc(BUF_SIZE);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* overwrite the high fence post */
+    save_ch = *((char *)pnt + BUF_SIZE);
+    *((char *)pnt + BUF_SIZE) = '\0';
+    
+    /* make another allocation */
+    pnt2 = malloc(BUF_SIZE);
+    if (pnt2 == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* it shouldn't generate an error */
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
+      }
+      return 0;
+    }
+    
+    /* restore the overwritten character otherwise we can't free the pointer */
+    *((char *)pnt + BUF_SIZE) = save_ch;
+    free(pnt);
+    free(pnt2);
+    
+    /*
+     * Make an allocation recording where we did it.
+     *
+     * NOTE: This all needs to be on the same line.
+     */
+    pnt = malloc(BUF_SIZE);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* overwrite the high fence post */
+    save_ch = *((char *)pnt + BUF_SIZE);
+    *((char *)pnt + BUF_SIZE) = '\0';
+    
+    /*
+     * build and enable an options string turning on checking at the
+     * next transaction
+     */
+    (void)sprintf(setup, "debug=%#x,start=s%lu",
+		  DEBUG_CHECK_FENCE, dmalloc_memory_allocated());
+    dmalloc_debug_setup(setup);	
+    
+    /*
+     * make another allocation which should enable heap checking and
+     * notice the above pointer overwrite
+     */
+    pnt2 = malloc(BUF_SIZE);
+    if (pnt2 == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+      }
+      return 0;
+    }
+    
+    /* now we should see the error */
+    if (dmalloc_errno != ERROR_OVER_FENCE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
+      }
+      return 0;
+    }
+    
+    /* restore the overwritten character otherwise we can't free the pointer */
+    *((char *)pnt + BUF_SIZE) = save_ch;
+    free(pnt);
+    free(pnt2);
+    
+    /* reset the debug flags and errno */
+    dmalloc_debug(old_flags);
+    dmalloc_errno = our_errno_hold;
+  }
+  
   /********************/
  
   dmalloc_message("NOTE: ignore the errors from the above ----- to here.\n");
@@ -1631,6 +1976,16 @@ static	int	check_special(void)
       }
       return 0;
     }
+    /* make sure that we see non-freed pointer with non-fred + freed flags */
+    mem_count = dmalloc_count_changed(loc_mark, 1 /* not-freed */,
+				      1 /* no freed */);
+    if (mem_count != size) {
+      if (! silent_b) {
+	(void)printf("   ERROR: count-changed reported %lu bytes changed not %lu.\n",
+		     mem_count, size);
+      }
+      return 0;
+    }
     
     /* now free it */
     free(pnt);
@@ -1656,8 +2011,18 @@ static	int	check_special(void)
       }
       return 0;
     }
+    /* make sure that we see the freed pointer with both flags */
+    mem_count = dmalloc_count_changed(loc_mark, 1 /* no not-freed */,
+				      1 /* no freed */);
+    if (mem_count != size) {
+      if (! silent_b) {
+	(void)printf("   ERROR: count-changed report %lu bytes changed not %lu.\n",
+		     mem_count, size);
+      }
+      return 0;
+    }
   }
-  
+ 
   /********************/
   
   /*

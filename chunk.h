@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.69 2003/11/23 18:54:15 gray Exp $
+ * $Id: chunk.h,v 1.70 2004/01/14 16:17:57 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -29,6 +29,10 @@
 /* limit in how much memory we are allowed to allocate */
 extern
 unsigned long		_dmalloc_memory_limit;
+
+/* total number of bytes that the heap has allocated */
+extern
+unsigned long		_dmalloc_alloc_total;
 
 /*
  * int _dmalloc_chunk_startup

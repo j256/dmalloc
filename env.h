@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.23 2003/05/13 18:16:48 gray Exp $
+ * $Id: env.h,v 1.24 2004/01/14 16:17:59 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -37,8 +37,9 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
  * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
  */
 extern
-void	_dmalloc_start_break(const char *start_all, char **sfile_p,
-			     int *sline_p, int *scount_p);
+void	_dmalloc_start_break(char *start_all, char **start_file_p,
+			     int *start_line_p, unsigned long *start_iter_p,
+			     unsigned long *start_size_p);
 
 /*
  * Process the values of dmalloc environ variable(s) from ENVIRON
@@ -48,8 +49,10 @@ extern
 void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 				 long *addr_count_p, unsigned int *debug_p,
 				 unsigned long *interval_p, int *lock_on_p,
-				 char **logpath_p, char **sfile_p,
-				 int *sline_p, int *scount_p,
+				 char **logpath_p, char **start_file_p,
+				 int *start_line_p,
+				 unsigned long *start_iter_p,
+				 unsigned long *start_size_p,
 				 unsigned long *limit_p);
 
 /*
@@ -64,7 +67,9 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const unsigned int debug,
 			     const unsigned long interval, const int lock_on,
 			     const char *logpath, const char *start_file_p,
-			     const int start_line, const int start_count,
+			     const int start_line,
+			     const unsigned long start_iter,
+			     const unsigned long start_size,
 			     const unsigned long limit_val);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */

@@ -1,3 +1,21 @@
+2004-01-14  Gray Watson  <gray@outside.256.com>
+
+	* Added a dmalloc_memory_allocated function to assist with the
+	checking of the memory size start feature.
+
+	* Added automatic checking of the start at file:line, iteration,
+	and memory size features.
+
+	* Added a --start-size argument to dmalloc to start the library
+	checking the heap after we allocate a certain size of memory.
+	Thanks to andyc_2k.
+
+	* Added some more documentation about destructors.
+
+	* Added a check-shutdown token and support to check the pointers
+	heap when we shutdown the library.  Thanks to Charles for the
+	idea.
+
 2003-11-23  Gray Watson  <gray@outside.256.com>
 
 	* Added dmalloc_count_changed function plus tests.  Thanks to
@@ -2120,5 +2138,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.314 2003/11/23 18:54:15 gray Exp $
+$Id: ChangeLog,v 1.315 2004/01/14 16:17:56 gray Exp $
 -------------------------------------------------------------------------------

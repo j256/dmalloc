@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.176 2003/11/23 18:54:16 gray Exp $
+ * $Id: malloc.c,v 1.177 2004/01/14 16:17:59 gray Exp $
  */
 
 /*
@@ -122,7 +122,8 @@ static	dmalloc_track_t	tracking_func = NULL;	/* memory trxn tracking func */
 /* debug variables */
 static	char		*start_file = NULL;	/* file to start at */
 static	int		start_line = 0;		/* line to start */
-static	int		start_count = 0;	/* start after X */
+static	unsigned long	start_iter = 0;		/* start after X iterations */
+static	unsigned long	start_size = 0;		/* start after X bytes */
 static	int		thread_lock_c = 0;	/* lock counter */
 
 /****************************** thread locking *******************************/
@@ -286,11 +287,11 @@ static	void	process_environ(const char *option_str)
 			   (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
 			   &_dmalloc_check_interval, &_dmalloc_lock_on,
 			   &dmalloc_logpath, &start_file, &start_line,
-			   &start_count, &_dmalloc_memory_limit);
+			   &start_iter, &start_size, &_dmalloc_memory_limit);
   thread_lock_c = _dmalloc_lock_on;
   
   /* if we set the start stuff, then check-heap comes on later */
-  if (start_count > 0) {
+  if (start_iter > 0 || start_size > 0) {
     BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
   }
   
@@ -382,7 +383,8 @@ static	int	dmalloc_startup(const char *debug_str)
      * flag is cleared.
      */ 
     if (start_file != NULL
-	|| start_count > 0
+	|| start_iter > 0
+	|| start_size > 0
 	|| _dmalloc_check_interval > 0) {
       BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
     }
@@ -512,10 +514,20 @@ static	int	dmalloc_in(const char *file, const int line,
   }
   
   /* start checking heap after X times */
-  else if (start_count > 0) {
-    if (--start_count == 0) {
+  else if (start_iter > 0) {
+    if (--start_iter == 0) {
       BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+      /*
+       * this is automatically disabled since it goes to 0 so the
+       * interval can go on/off
+       */
     }
+  }
+  
+  else if (start_size > 0 && start_size >= _dmalloc_alloc_total) {
+    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    start_size = 0;
+    /* disable this check so the interval can go on/off */
   }
   
   /* checking heap every X times */
@@ -610,7 +622,8 @@ void	dmalloc_shutdown(void)
    * not been overwritten.  Thanks Randell.
    */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)) {
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)
+      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_SHUTDOWN)) {
     (void)_dmalloc_chunk_heap_check();
   }
   
@@ -1563,6 +1576,11 @@ void	dmalloc_track(const dmalloc_track_t track_func)
  * dmalloc_log_changed to log the changed pointers since this point.
  * Multiple marks can be saved and used.
  *
+ * This is also the iteration number and can be logged at the front of
+ * each memory transaction in the logfile with the LOG_ITERATION
+ * define in settings.h and can be logged with each pointer with the
+ * LOG_PNT_ITERATION define in settings.h.
+ *
  * RETURNS:
  *
  * Current mark value
@@ -1578,6 +1596,30 @@ unsigned long	dmalloc_mark(void)
   }
   
   return _dmalloc_iter_c;
+}
+
+/*
+ * unsigned long dmalloc_memory_allocated
+ *
+ * DESCRIPTION:
+ *
+ * Return the total number of bytes allocated by the program so far.
+ *
+ * RETURNS:
+ *
+ * Total number of bytes allocated by the program so far.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+unsigned long	dmalloc_memory_allocated(void)
+{
+  if (! enabled_b) {
+    (void)dmalloc_startup(NULL /* no options string */);
+  }
+  
+  return _dmalloc_alloc_total;
 }
 
 /*

@@ -572,6 +572,11 @@ void	dmalloc_track(const dmalloc_track_t track_func);
  * dmalloc_log_changed to log the changed pointers since this point.
  * Multiple marks can be saved and used.
  *
+ * This is also the iteration number and can be logged at the front of
+ * each memory transaction in the logfile with the LOG_ITERATION
+ * define in settings.h and can be logged with each pointer with the
+ * LOG_PNT_ITERATION define in settings.h.
+ *
  * RETURNS:
  *
  * Current mark value
@@ -582,6 +587,24 @@ void	dmalloc_track(const dmalloc_track_t track_func);
  */
 extern
 unsigned long	dmalloc_mark(void);
+
+/*
+ * unsigned long dmalloc_memory_allocated
+ *
+ * DESCRIPTION:
+ *
+ * Return the total number of bytes allocated by the program so far.
+ *
+ * RETURNS:
+ *
+ * Total number of bytes allocated by the program so far.
+ *
+ * ARGUMENTS:
+ *
+ * None.
+ */
+extern
+unsigned long	dmalloc_memory_allocated(void);
 
 /*
  * unsigned int dmalloc_page_size

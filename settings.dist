@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.63 2003/11/20 17:04:00 gray Exp $
+ * $Id: settings.dist,v 1.64 2004/01/14 16:18:00 gray Exp $
  */
 
 /*
@@ -226,7 +226,8 @@
 /*
  * Write the iteration count at the start of every log entry.  This is
  * handy when you are using the DMALLOC_START variable and want to
- * begin the tough debugging at a certain point.
+ * begin the tough debugging at a certain point.  This is also returned
+ * by the dmalloc_mark() function.
  */
 #define LOG_ITERATION 1
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.111 2003/11/17 22:25:31 gray Exp $
+ * $Id: dmalloc.c,v 1.112 2004/01/14 16:17:57 gray Exp $
  */
 
 /*
@@ -86,6 +86,7 @@ typedef struct {
 			 DEBUG_CATCH_NULL)
 #define LOW_FLAGS	(RUNTIME_FLAGS | \
 			 DEBUG_LOG_ELAPSED_TIME | \
+			 DEBUG_CHECK_SHUTDOWN | \
 			 DEBUG_FREE_BLANK | DEBUG_ERROR_ABORT | \
 			 DEBUG_ALLOC_BLANK)
 #define MEDIUM_FLAGS	(LOW_FLAGS | \
@@ -134,7 +135,9 @@ static	unsigned long limit_arg = 0;		/* memory limit */
 static	int	make_changes_b = 1;		/* make no changes to env */
 static	argv_array_t	plus;			/* tokens to add */
 static	int	remove_auto_b = 0;		/* auto-remove settings */
-static	char	*start = NULL;			/* for START settings */
+static	char	*start_file = NULL;		/* for START settings */
+static	unsigned long start_iter = 0;		/* for START settings */
+static	unsigned long start_size = 0;		/* for START settings */
 static	int	usage_b = 0;			/* usage messages */
 static	int	verbose_b = 0;			/* verbose flag */
 static	int	very_verbose_b = 0;		/* very-verbose flag */
@@ -188,8 +191,16 @@ static	argv_t	args[] = {
     "token(s)",			"add tokens to current debug" },
   { 'r',	"remove",	ARGV_BOOL_INT,	&remove_auto_b,
     NULL,			"remove other settings if tag" },
-  { 's',	"start",	ARGV_CHAR_P,	&start,
-    "file:line",		"start check heap after this" },
+  
+  { 's',	"start-file",	ARGV_CHAR_P,	&start_file,
+    "file:line",		"check heap after this location" },
+  { ARGV_OR },
+  { 'S',	"start-iter",	ARGV_U_LONG,	&start_iter,
+    "number",			"check heap after this iteration" },
+  { ARGV_OR },
+  { '\0',	"start-size",	ARGV_U_SIZE,	&start_size,
+    "size",			"check heap after this mem size" },
+  
   { 't',	"list-tags",	ARGV_BOOL_INT,	&list_tags_b,
     NULL,			"list tags in rc file" },
   { 'u',	"usage",	ARGV_BOOL_INT,	&usage_b,
@@ -684,12 +695,12 @@ static	void	list_tags(void)
  */
 static	void	dump_current(void)
 {
-  char		*lpath, *start_file, token[64];
+  char		*log_path, *loc_start_file, token[64];
   const char	*env_str;
   DMALLOC_PNT	addr;
-  unsigned long	inter, limit_val;
+  unsigned long	inter, limit_val, loc_start_size, loc_start_iter;
   long		addr_count;
-  int		lock_on, start_line, start_count;
+  int		lock_on, loc_start_line;
   unsigned int	flags;
   
   /* get the options flag */
@@ -698,8 +709,9 @@ static	void	dump_current(void)
     env_str = "";
   }
   _dmalloc_environ_process(env_str, &addr, &addr_count, &flags,
-			   &inter, &lock_on, &lpath,
-			   &start_file, &start_line, &start_count, &limit_val);
+			   &inter, &lock_on, &log_path,
+			   &loc_start_file, &loc_start_line, &loc_start_iter,
+			   &loc_start_size, &limit_val);
   
   if (flags == 0) {
     (void)fprintf(stderr, "Debug-Flags  not-set\n");
@@ -740,11 +752,11 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Lock-On      %d\n", lock_on);
   }
   
-  if (lpath == NULL) {
+  if (log_path == NULL) {
     (void)fprintf(stderr, "Logpath      not-set\n");
   }
   else {
-    (void)fprintf(stderr, "Logpath      '%s'\n", lpath);
+    (void)fprintf(stderr, "Logpath      '%s'\n", log_path);
   }
   
   if (limit_val == 0) {
@@ -754,15 +766,18 @@ static	void	dump_current(void)
     (void)fprintf(stderr, "Mem-Limit    %lu\n", limit_val);
   }
   
-  if (start_file == NULL && start_count == 0) {
-    (void)fprintf(stderr, "Start-File   not-set\n");
+  if (loc_start_file != NULL) {
+    (void)fprintf(stderr, "Start-File   '%s', line = %d\n",
+		  loc_start_file, loc_start_line);
   }
-  else if (start_count > 0) {
-    (void)fprintf(stderr, "Start-Count  %d\n", start_count);
+  else if (loc_start_iter > 0) {
+    (void)fprintf(stderr, "Start-Count  %lu\n", loc_start_iter);
+  }
+  else if (loc_start_size > 0) {
+    (void)fprintf(stderr, "Start-Size   %lu\n", loc_start_size);
   }
   else {
-    (void)fprintf(stderr, "Start-File   '%s', line = %d\n",
-		  start_file, start_line);
+    (void)fprintf(stderr, "Start        not-set\n");
   }
   
   (void)fprintf(stderr, "\n");
@@ -848,13 +863,13 @@ int	main(int argc, char **argv)
 {
   char		buf[1024];
   int		set_b = 0;
-  char		*lpath, *sfile;
+  char		*log_path, *loc_start_file;
   const char	*env_str;
   DMALLOC_PNT	addr;
-  unsigned long	inter, limit_val;
+  unsigned long	inter, limit_val, loc_start_size;
   long		addr_count;
   int		lock_on;
-  int		sline, scount;
+  int		loc_start_line, loc_start_iter;
   unsigned int	flags;
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
@@ -890,7 +905,8 @@ int	main(int argc, char **argv)
     env_str = "";
   }
   _dmalloc_environ_process(env_str, &addr, &addr_count, &flags, &inter,
-			   &lock_on, &lpath, &sfile, &sline, &scount,
+			   &lock_on, &log_path, &loc_start_file,
+			   &loc_start_line, &loc_start_iter, &loc_start_size,
 			   &limit_val);
   
   /*
@@ -973,21 +989,37 @@ int	main(int argc, char **argv)
   }
   
   if (logpath != NULL) {
-    lpath = logpath;
+    log_path = logpath;
     set_b = 1;
   }
   else if (clear_b) {
-    lpath = NULL;
+    log_path = NULL;
   }
   
-  if (start != NULL) {
-    _dmalloc_start_break(start, &sfile, &sline, &scount);
+  if (start_file != NULL) {
+    _dmalloc_start_break(start_file, &loc_start_file, &loc_start_line,
+			 &loc_start_iter, &loc_start_size);
+    set_b = 1;
+  }
+  else if (start_iter > 0) {
+    loc_start_file = NULL;
+    loc_start_line = 0;
+    loc_start_iter = start_iter;
+    loc_start_size = 0;
+    set_b = 1;
+  }
+  else if (start_size > 0) {
+    loc_start_file = NULL;
+    loc_start_line = 0;
+    loc_start_iter = 0;
+    loc_start_size = start_size;
     set_b = 1;
   }
   else if (clear_b) {
-    sfile = NULL;
-    sline = 0;
-    scount = 0;
+    loc_start_file = NULL;
+    loc_start_line = 0;
+    loc_start_iter = 0;
+    loc_start_size = 0;
   }
   
   if (argv_was_used(args, LIMIT_ARG)) {
@@ -1036,7 +1068,8 @@ int	main(int argc, char **argv)
   
   if (clear_b || set_b) {
     _dmalloc_environ_set(buf, sizeof(buf), long_tokens_b, addr, addr_count,
-			 debug, inter, lock_on, lpath, sfile, sline, scount,
+			 debug, inter, lock_on, log_path, loc_start_file,
+			 loc_start_line, loc_start_iter, loc_start_size,
 			 limit_val);
     set_variable(OPTIONS_ENVIRON, buf);
   }

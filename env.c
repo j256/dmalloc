@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.34 2003/06/10 00:25:00 gray Exp $
+ * $Id: env.c,v 1.35 2004/01/14 16:17:59 gray Exp $
  */
 
 /*
@@ -125,8 +125,9 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
 /*
  * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
  */
-void	_dmalloc_start_break(const char *start_all, char **sfile_p,
-			     int *sline_p, int *scount_p)
+void	_dmalloc_start_break(char *start_all, char **start_file_p,
+			     int *start_line_p, unsigned long *start_iter_p,
+			     unsigned long *start_size_p)
 {
   char	*start_p;
   
@@ -134,13 +135,29 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
   if (start_p != NULL) {
     (void)strncpy(start_file, start_all, sizeof(start_file));
     start_file[sizeof(start_file) - 1] = '\0';
-    SET_POINTER(sfile_p, start_file);
+    SET_POINTER(start_file_p, start_file);
     start_p = start_file + (start_p - start_all);
     *start_p = '\0';
-    SET_POINTER(sline_p, atoi(start_p + 1));
+    SET_POINTER(start_line_p, atoi(start_p + 1));
+    SET_POINTER(start_iter_p, 0);
+    SET_POINTER(start_size_p, 0);
+  }
+  else if (start_all[0] == 's') {
+    SET_POINTER(start_file_p, NULL);
+    SET_POINTER(start_line_p, 0);
+    SET_POINTER(start_iter_p, 0);
+    SET_POINTER(start_size_p, (unsigned long)atol(start_all + 1));
   }
   else {
-    SET_POINTER(scount_p, atoi(start_all));
+    SET_POINTER(start_file_p, NULL);
+    SET_POINTER(start_line_p, 0);
+    if (start_all[0] == 'c') {
+      SET_POINTER(start_iter_p, (unsigned long)atol(start_all + 1));
+    }
+    else {
+      SET_POINTER(start_iter_p, (unsigned long)atol(start_all));
+    }
+    SET_POINTER(start_size_p, 0);
   }
 }
 
@@ -151,8 +168,10 @@ void	_dmalloc_start_break(const char *start_all, char **sfile_p,
 void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 				 long *addr_count_p, unsigned int *debug_p,
 				 unsigned long *interval_p, int *lock_on_p,
-				 char **logpath_p, char **sfile_p,
-				 int *sline_p, int *scount_p,
+				 char **logpath_p, char **start_file_p,
+				 int *start_line_p,
+				 unsigned long *start_iter_p,
+				 unsigned long *start_size_p,
 				 unsigned long *limit_p)
 {
   char		*env_p, *this_p;
@@ -167,9 +186,10 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
   SET_POINTER(interval_p, 0);
   SET_POINTER(lock_on_p, 0);
   SET_POINTER(logpath_p, NULL);
-  SET_POINTER(sfile_p, NULL);
-  SET_POINTER(sline_p, 0);
-  SET_POINTER(scount_p, 0);
+  SET_POINTER(start_file_p, NULL);
+  SET_POINTER(start_line_p, 0);
+  SET_POINTER(start_iter_p, 0);
+  SET_POINTER(start_size_p, 0);
   SET_POINTER(limit_p, 0);
   
   /* make a copy */
@@ -249,7 +269,8 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, START_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      _dmalloc_start_break(this_p, sfile_p, sline_p, scount_p);
+      _dmalloc_start_break(this_p, start_file_p, start_line_p, start_iter_p,
+			   start_size_p);
       continue;
     }
     
@@ -296,7 +317,9 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
 			     const unsigned int debug,
 			     const unsigned long interval, const int lock_on,
 			     const char *logpath, const char *start_file_p,
-			     const int start_line, const int start_count,
+			     const int start_line,
+			     const unsigned long start_iter,
+			     const unsigned long start_size,
 			     const unsigned long limit_val)
 {
   char	*buf_p = buf, *bounds_p = buf + buf_size;
@@ -351,9 +374,15 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
 			    START_LABEL, ASSIGNMENT_CHAR, start_file_p);
     }
   }
-  else if (start_count > 0) {
-    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%d,",
-			  START_LABEL, ASSIGNMENT_CHAR, start_count);
+  else if (start_iter > 0) {
+    /* NOTE: there is an 'c' (for count) before the iter variable here */
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%cc%lu,",
+			  START_LABEL, ASSIGNMENT_CHAR, start_iter);
+  }
+  else if (start_size > 0) {
+    /* NOTE: there is an 's' before the size variable here */
+    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%cs%lu,",
+			  START_LABEL, ASSIGNMENT_CHAR, start_size);
   }
   if (limit_val > 0) {
     buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%lu,",
