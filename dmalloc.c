@@ -48,7 +48,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.54 1995/03/31 21:58:14 gray Exp $";
+  "$Id: dmalloc.c,v 1.55 1995/04/01 00:00:56 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -303,6 +303,9 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   infile = fopen(inpath, "r");
   /* do not test for error here */
   
+  if (list_tags && infile != NULL)
+    (void)fprintf(stderr, "Tags available from '%s':\n", inpath);
+  
   /* read each of the lines looking for the tag */
   found = FALSE;
   cont = FALSE;
@@ -379,30 +382,43 @@ LOCAL	long	process(const long debug_value, const char * tag_find,
   if (found)
     return new_debug;
   
-  if (tag_find == NULL) {
+  if (! list_tags && tag_find == NULL) {
     if (strp != NULL)
       *strp = "unknown";
   }
   else {
     default_t	*defp;
     
+    if (list_tags)
+      (void)fprintf(stderr, "Tags available by default:\n");
+    
     for (defp = defaults; defp->de_string != NULL; defp++) {
-      if (strcmp(tag_find, defp->de_string) == 0)
+      if (list_tags) {
+	if (verbose) {
+	  (void)fprintf(stderr, "%s:\n", defp->de_string);
+	  dump_debug(defp->de_flags);
+	}
+	else
+	  (void)fprintf(stderr, "%s\n", defp->de_string);
+      }
+      if (tag_find != NULL && strcmp(tag_find, defp->de_string) == 0)
 	break;
     }
-    if (defp->de_string == NULL) {
-      if (infile == NULL) {
-	(void)fprintf(stderr, "%s: could not read '%s': ",
-		      argv_program, inpath);
-	perror("");
+    if (! list_tags) {
+      if (defp->de_string == NULL) {
+	if (infile == NULL) {
+	  (void)fprintf(stderr, "%s: could not read '%s': ",
+			argv_program, inpath);
+	  perror("");
+	}
+	else {
+	  (void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
+			argv_program, tag_find, inpath);
+	}
+	exit(1);
       }
-      else {
-	(void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		      argv_program, tag_find, inpath);
-      }
-      exit(1);
+      new_debug = defp->de_flags;
     }
-    new_debug = defp->de_flags;
   }
   
   return new_debug;
@@ -607,10 +623,8 @@ EXPORT	int	main(int argc, char ** argv)
     (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
   }
   
-  if (list_tags) {
-    (void)fprintf(stderr, "Available Tags:\n");
+  if (list_tags)
     process(0L, NULL, NULL);
-  }
   
   if (debug_tokens) {
     attr_t	*attrp;
