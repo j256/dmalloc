@@ -21,15 +21,11 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: dmalloc_loc.h,v 1.16 1993/04/08 21:46:49 gray Exp $
+ * $Id: dmalloc_loc.h,v 1.17 1993/04/09 06:34:45 gray Exp $
  */
 
 #ifndef __MALLOC_LOC_H__
 #define __MALLOC_LOC_H__
-
-/* internal free error since it is void externally */
-#define FREE_ERROR		0		/* error from free */
-#define FREE_NOERROR		1		/* no error from free */
 
 /* fence post checking defines */
 #define FENCE_BOTTOM		(1 << ALLOCATION_ALIGNMENT_IN_BITS)

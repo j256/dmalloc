@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: malloc.c,v 1.23 1993/04/08 21:46:40 gray Exp $";
+  "$Id: malloc.c,v 1.24 1993/04/09 06:34:38 gray Exp $";
 #endif
 
 /*
@@ -169,7 +169,7 @@ LOCAL	void	check_var(const char * file, const int line, char * pnt)
     return;
   
   if (BIT_IS_SET(_malloc_debug, DEBUG_LOG_BAD_POINTER))
-    _malloc_message("found address '0x%x' after %d pass%s from '%s:%u'",
+    _malloc_message("found address '%#lx' after %d pass%s from '%s:%u'",
 		    pnt, addc, (addc == 1 ? "" : "es"), file, line);
   malloc_errno = MALLOC_POINTER_FOUND;
   _malloc_perror("check_var");
@@ -237,7 +237,7 @@ LOCAL	void	get_environ(void)
   }
 }
 
-/*************************** startup/shutdown calls **************************/
+/************************** startup/shutdown calls ***************************/
 
 /*
  * startup the memory-allocation module
@@ -288,10 +288,10 @@ EXPORT	void	malloc_shutdown(void)
   /* NOTE: do not set malloc_enabled to false here */
 }
 
-/******************************** memory calls *******************************/
+/******************************* memory calls ********************************/
 
 /*
- * allocate and return a SIZE block of bytes
+ * allocate and return a SIZE block of bytes.  returns NULL on error.
  */
 EXPORT	void	*malloc(MALLOC_SIZE size)
 {
@@ -310,7 +310,7 @@ EXPORT	void	*malloc(MALLOC_SIZE size)
 
 /*
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
- * of SIZE bytes and zero the block
+ * of SIZE bytes and zero the block.  returns NULL on error.
  */
 EXPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size)
 {
@@ -336,7 +336,7 @@ EXPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size)
 
 /*
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
- * all of OLD_PNT to the new area or truncating
+ * all of OLD_PNT to the new area or truncating.  returns NULL on error.
  */
 EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
 {
@@ -360,7 +360,7 @@ EXPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size)
 }
 
 /*
- * release PNT in the heap, returning FREE_[NO]ERROR
+ * release PNT in the heap, returning FREE_[NO]ERROR or void
  */
 #if __STDC__
 EXPORT	void	free(void * pnt)
@@ -388,7 +388,7 @@ EXPORT	int	free(void * pnt)
 #endif
 }
 
-/******************************** utility calls ******************************/
+/******************************* utility calls *******************************/
 
 /*
  * call through to _heap_map function, returns [NO]ERROR

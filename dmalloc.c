@@ -45,7 +45,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: dmalloc.c,v 1.7 1993/04/08 21:46:47 gray Exp $";
+  "$Id: dmalloc.c,v 1.8 1993/04/09 06:34:43 gray Exp $";
 #endif
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
@@ -106,27 +106,27 @@ LOCAL	int	hex_to_int(char * str)
 LOCAL	void	usage(void)
 {
   (void)fprintf(stderr,	"Usage: %s\n", program);
-  (void)fprintf(stderr,	"  [-a address:#]    = stop when malloc sees address "
-		"[for #th time] %%s\n");
-  (void)fprintf(stderr,	"  [-b]              = set the output for bourne "
-		"shells (sh, ksh) %%t\n");
-  (void)fprintf(stderr,	"  [-c]              = clear all variables not "
-		"specified %%t\n");
-  (void)fprintf(stderr,	"  [-d bitmask]      = hex flag to directly set debug "
-		"mask %%x\n");
-  (void)fprintf(stderr,	"  [-e errno]        = print the error string for "
-		"errno %%d\n");
-  (void)fprintf(stderr,	"  [-f file]         = config file to read from when "
-		"not ~/.mallocrc %%s\n");
-  (void)fprintf(stderr, "  [-i number]       = check heap every number times "
-		"%%d\n");
+  (void)fprintf(stderr,	"  [-a address:#]    = stop when malloc sees ");
+  (void)fprintf(stderr,   "address [for #th time] %%s\n");
+  (void)fprintf(stderr,	"  [-b]              = set the output for bourne ");
+  (void)fprintf(stderr,   "shells (sh, ksh) %%t\n");
+  (void)fprintf(stderr,	"  [-c]              = clear all variables not ");
+  (void)fprintf(stderr,   "specified %%t\n");
+  (void)fprintf(stderr,	"  [-d bitmask]      = hex flag to directly set ");
+  (void)fprintf(stderr,   "debug mask %%x\n");
+  (void)fprintf(stderr,	"  [-e errno]        = print the error string for ");
+  (void)fprintf(stderr,    "errno %%d\n");
+  (void)fprintf(stderr,	"  [-f file]         = config file to read from ");
+  (void)fprintf(stderr,    "when not ~/.mallocrc %%s\n");
+  (void)fprintf(stderr, "  [-i number]       = check heap every number ");
+  (void)fprintf(stderr,    "times %%d\n");
   (void)fprintf(stderr,	"  [-l file]         = file to log messages to %%s\n");
-  (void)fprintf(stderr, "  [-s file:line]    = start checking heap after "
-		"seeing file [and line] %%s\n");
-  (void)fprintf(stderr, "  [tag]             = debug token to find in mallocrc"
-		"\n");
-  (void)fprintf(stderr, "if no arguments are specified then it dumps the "
-		"current env setings.\n");
+  (void)fprintf(stderr, "  [-s file:line]    = start checking heap after ");
+  (void)fprintf(stderr,    "seeing file [and line] %%s\n");
+  (void)fprintf(stderr, "  [tag]             = debug token to find in ");
+  (void)fprintf(stderr,    "mallocrc\n");
+  (void)fprintf(stderr, "if no arguments are specified then it dumps the ");
+  (void)fprintf(stderr,    "current env setings.\n");
 }
 
 /*
@@ -398,7 +398,7 @@ LOCAL	void	dump_current(void)
   else {
     num = hex_to_int(str);
     (void)process(num, &str);
-    (void)fprintf(stderr, "%s == '0x%x' (%s)\n", DEBUG_ENVIRON, num, str);
+    (void)fprintf(stderr, "%s == '%#lx' (%s)\n", DEBUG_ENVIRON, num, str);
   }
   
   str = (char *)getenv(ADDRESS_ENVIRON);
@@ -478,7 +478,7 @@ EXPORT	int	main(int argc, char ** argv)
   }
   
   if (tag != NULL || debug != NO_VALUE)
-    set_variable(DEBUG_ENVIRON, "0x%x", debug);
+    set_variable(DEBUG_ENVIRON, "%#lx", debug);
   
   if (address != NULL)
     set_variable(ADDRESS_ENVIRON, "%s", address);

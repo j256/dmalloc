@@ -44,7 +44,7 @@
 
 #if INCLUDE_RCS_IDS
 LOCAL	char	*rcs_id =
-  "$Id: error.c,v 1.19 1993/04/05 22:30:07 gray Exp $";
+  "$Id: error.c,v 1.20 1993/04/09 06:34:36 gray Exp $";
 #endif
 
 /*
@@ -59,11 +59,11 @@ EXPORT	int		_malloc_debug = 0;
 EXPORT	void	_malloc_message(const char * format, ...)
 {
   static int	outfile = -1;
+  static char	str[1024];
   int		len;
-  char		str[1024];
   va_list	args;
   
-  /* no logpath then no workie */
+  /* no logpath and no print then no workie */
   if (malloc_logpath == NULL
       && ! BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR))
     return;
@@ -105,9 +105,8 @@ EXPORT	void	_malloc_message(const char * format, ...)
   }
   
   /* do we need to print the message? */
-  if (BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR)) {
-    (void)write(STDERR, str, strlen(str));
-  }
+  if (BIT_IS_SET(_malloc_debug, DEBUG_PRINT_PERROR))
+    (void)write(STDERR, str, len);
 }
 
 /*

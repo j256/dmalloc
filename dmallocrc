@@ -3,7 +3,7 @@
 # Rename this to .mallocrc and place in your home directory to activate.
 # See malloc.info for more information
 #
-# $Id: dmallocrc,v 1.8 1993/04/08 21:46:56 gray Exp $
+# $Id: dmallocrc,v 1.9 1993/04/09 06:34:49 gray Exp $
 #
 
 #
@@ -11,10 +11,12 @@
 #
 #	tag	token1, token2, ...
 #
-# The above 'tag' is then passed to the 'malloc' alias to set the current
-# debugging functionality to token1, token2, ...
+# The above 'tag' is then passed to the 'malloc_dbg' program which sets
+# the MALLOC_DEBUG environment variable to token1 and 2's corresponding
+# values.  You must pass the malloc_dbg output through your shell's eval
+# command to change your environment.  See malloc.info for more information.
 #
-# Tag lines can be finished with a \ meaning it continues onto the next line.
+# Lines can be finished with a \ meaning it continues onto the next line.
 # Lines begining with '#' or empty lines are ignored
 #
 
@@ -54,7 +56,7 @@ none	none
 # basic production
 production	log-stats, log-non-free, log-perror, log-bad-pnt
 
-# basic runtime
+# basic runtime development
 runtime		log-stats, log-non-free, log-perror, log-bad-pnt, \
 		check-fence
 
@@ -77,7 +79,7 @@ runtime		log-stats, log-non-free, log-perror, log-bad-pnt, \
 		check-dblock-fence, check-funcs, \
 		realloc-copy, free-blank, alloc-blank, error-abort
 
-# ultra-extensive checking
+# ultra-extensive checking (the whole ball of wax)
 5		log-stats, log-non-free, log-perror, log-trans, log-bad-pnt, \
 		log-admin, log-blocks, \
 		check-fence, check-heap, check-lists, check-dblock, \

@@ -21,7 +21,7 @@
  *
  * The author of the program may be contacted at gray.watson@antaire.com
  *
- * $Id: malloc.h,v 1.22 1993/04/08 21:46:42 gray Exp $
+ * $Id: malloc.h,v 1.23 1993/04/09 06:34:41 gray Exp $
  */
 
 #ifndef __MALLOC_H__
@@ -32,7 +32,8 @@
  * an unsigned long instead of the traditional unsigned int.
  */
 
-#if defined(SIZE_T) || defined(_SIZE_T_) || defined(__SIZE_T__)
+#if defined(SIZE_T) || defined(_SIZE_T) || defined(_SIZE_T_) \
+  || defined(__SIZE_T__)
 
 #define MALLOC_SIZE	size_t
 
@@ -48,6 +49,10 @@
 #define CALLOC_ERROR		0		/* error from calloc */
 #define MALLOC_ERROR		0		/* error from malloc */
 #define REALLOC_ERROR		0		/* error from realloc */
+
+/* NOTE: this if for non- __STDC__ systems only */
+#define FREE_ERROR		0		/* error from free */
+#define FREE_NOERROR		1		/* no error from free */
 
 #define MALLOC_VERIFY_ERROR	0		/* checks failed, error */
 #define MALLOC_VERIFY_NOERROR	1		/* checks passed, no error */
@@ -200,7 +205,7 @@ IMPORT	int		malloc_errno;
 IMPORT	void	malloc_shutdown(void);
 
 /*
- * allocate and return a SIZE block of bytes
+ * allocate and return a SIZE block of bytes.  returns NULL on error.
  */
 #if __STDC__
 IMPORT	void	*malloc(MALLOC_SIZE size);
@@ -210,7 +215,7 @@ IMPORT	char	*malloc(MALLOC_SIZE size);
 
 /*
  * allocate and return a block of bytes able to hold NUM_ELEMENTS of elements
- * of SIZE bytes and zero the block
+ * of SIZE bytes and zero the block.  returns NULL on error.
  */
 #if __STDC__
 IMPORT	void	*calloc(unsigned int num_elements, MALLOC_SIZE size);
@@ -220,7 +225,7 @@ IMPORT	char	*calloc(unsigned int num_elements, MALLOC_SIZE size);
 
 /*
  * resizes OLD_PNT to SIZE bytes and return the new space after either copying
- * all of OLD_PNT to the new area or truncating
+ * all of OLD_PNT to the new area or truncating.  returns NULL on error.
  */
 #if __STDC__
 IMPORT	void	*realloc(void * old_pnt, MALLOC_SIZE new_size);
@@ -229,7 +234,7 @@ IMPORT	char	*realloc(char * old_pnt, MALLOC_SIZE new_size);
 #endif
 
 /*
- * release PNT in the heap, returning FREE_[NO]ERROR
+ * release PNT in the heap, returning FREE_[NO]ERROR or void
  */
 #if __STDC__
 IMPORT	void	free(void * pnt);
@@ -384,25 +389,44 @@ IMPORT	unsigned int	_malloc_line;
 /*
  * leap routine to calloc
  */
+#if __STDC__
+IMPORT	void	*_calloc_leap(const char * file, const int line,
+			      unsigned int elen, MALLOC_SIZE size);
+#else
 IMPORT	char	*_calloc_leap(const char * file, const int line,
 			      unsigned int elen, MALLOC_SIZE size);
+#endif
 
 /*
  * leap routine to free
  */
+#if __STDC__
+IMPORT	void	_free_leap(const char * file, const int line, void * pnt);
+#else
 IMPORT	int	_free_leap(const char * file, const int line, char * pnt);
+#endif
 
 /*
  * leap routine to malloc
  */
+#if __STDC__
+IMPORT	void	*_malloc_leap(const char * file, const int line,
+			      MALLOC_SIZE size);
+#else
 IMPORT	char	*_malloc_leap(const char * file, const int line,
 			      MALLOC_SIZE size);
+#endif
 
 /*
  * leap routine to realloc
  */
+#if __STDC__
+IMPORT	void	*_realloc_leap(const char * file, const int line, void * oldp,
+			       MALLOC_SIZE new_size);
+#else
 IMPORT	char	*_realloc_leap(const char * file, const int line, char * oldp,
 			       MALLOC_SIZE new_size);
+#endif
 
 #endif /* ! MALLOC_DEBUG_DISABLE */
 

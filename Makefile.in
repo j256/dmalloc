@@ -1,10 +1,12 @@
 #
-# $Id: Makefile.in,v 1.12 1993/04/02 10:50:41 gray Exp $
+# $Id: Makefile.in,v 1.13 1993/04/09 06:34:30 gray Exp $
 #
 
 HFLS	= malloc.h
 OBJS	= chunk.o compat.o error.o heap.o malloc.o malloc_lp.o malloc_str.o
 OBJS_IN	= malloc_lp.o 
+FILLFLS	= chunk.c error.c heap.c malloc_dbg.c malloc_lp.c malloc_str.c \
+	malloc_t.c sample.c
 
 DEFS	= $(DEFINES)
 INCS	= -I. $(INCLUDES)
@@ -13,7 +15,9 @@ LIBS	= -L. -lmalloc $(LIBRARIES)
 PARTS	= 1 2 3 4 5
 MAXPART	= 5
 
-CFLAGS	= -g
+CFLAGS	= -g -W -Wreturn-type -Wunused -Wpointer-arith -Wshadow \
+	-Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts \
+	-Wuninitialized -Wparentheses -Waggregate-return
 DESTDIR	= /usr/antaire
 TESTS	= malloc_t
 LIBRARY	= libmalloc.a
@@ -71,6 +75,10 @@ port : malloc.info
 	mv $@/Makefile.all.in $@/Makefile.in
 	@ echo ''
 	@ echo 'Please rename $@ to malloc-version and tar up file'
+
+.PHONY : localfill
+localfill : $(FILLFLS)
+	fillproto $(FILLFLS)
 
 tests : $(TESTS)
 
