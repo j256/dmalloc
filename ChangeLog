@@ -1,3 +1,7 @@
+2003-07-23  Gray Watson  <gray@outside.256.com>
+
+	* Changed the installing of libraries to install-data. 
+
 2003-07-08  Gray Watson  <gray@outside.256.com>
 
 	* Releasing version 5.2.1.
@@ -2013,5 +2017,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.301 2003/07/08 18:09:50 gray Exp $
+$Id: ChangeLog,v 1.302 2003/07/24 00:26:18 gray Exp $
 -------------------------------------------------------------------------------
