@@ -21,7 +21,7 @@
  *
  * The author may be contacted at gray.watson@letters.com
  *
- * $Id: heap.h,v 1.26 1995/06/21 18:19:08 gray Exp $
+ * $Id: heap.h,v 1.27 1995/08/30 18:04:57 gray Exp $
  */
 
 #ifndef __HEAP_H__
@@ -84,12 +84,6 @@
 IMPORT	void		*_heap_base;  /* base of our heap */
 
 IMPORT	void		*_heap_last;  /* end of our heap */
-
-/*
- * check to make sure the heap is still linear.  avoids race conditions
- * returns [NO]ERROR
- */
-IMPORT	int	_heap_check(void);
 
 /*
  * function to get SIZE memory bytes from the end of the heap
