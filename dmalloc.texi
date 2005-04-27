@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.275 2005/03/18 23:42:23 gray Exp $
+@c $Id: dmalloc.texi,v 1.276 2005/04/27 13:12:34 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -237,10 +237,11 @@ and you figure your problem out, please send me some notes so future
 users can profit from your experiences.
 
 @emph{NOTE}: You may experience some errors compiling some of the
-return.h assembly macros which attempt to determine the callers address
-for logging purposes.  You may want to first try disabling any compiler
-optimization flags.  If this doesn't work then you may need to disable
-the @samp{USE_RETURN_MACROS} variable in the @file{settings.h} file.
+@file{return.h} assembly macros which attempt to determine the callers
+address for logging purposes.  @xref{Portability}.  You may want to
+first try disabling any compiler optimization flags.  If this doesn't
+work then you may need to disable the @samp{USE_RETURN_MACROS}
+variable in the @file{settings.h} file.
 
 @cindex ANSI-C compiler
 
@@ -3508,6 +3509,8 @@ release can be published before people encounter them.
 @cindex slow running
 @cindex why running slow
 @cindex too slow
+@cindex why hanging
+@cindex hanging program
 @item Why does my program run so slow?
 
 @cindex check-heap
@@ -3515,13 +3518,15 @@ This library has never been (and maybe never will be) optimized for
 space nor speed.  Some of its features make it unable to use some of
 the organizational methods of other more efficient heap libraries.
 
-If you have the @code{check-heap} token enabled, you can have the
-library check itself less frequently by using the @kbd{-i} option to
-the dmalloc utility.  @xref{Dmalloc Program}.  If you are using the
-@kbd{high} token and you need your program to run faster, try the
-@kbd{medium} or @kbd{low} tokens which don't check as many heap
-features and so run faster although they will not catch as many
-problems. @xref{RC File}.
+If you have the @code{check-heap} token enabled, your program might
+run slow or seem to hang.  This is because by default, the library
+will run a full check of the heap with every memory allocation or
+free.  You can have the library check itself less frequently by using
+the @kbd{-i} option to the dmalloc utility.  @xref{Dmalloc Program}.
+If you are using the @kbd{high} token and you need your program to run
+faster, try the @kbd{medium} or @kbd{low} tokens which don't check as
+many heap features and so run faster although they will not catch as
+many problems. @xref{RC File}.
 
 @cindex logfile not produced
 @cindex no logfile produced
