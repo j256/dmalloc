@@ -1,3 +1,13 @@
+2005-06-05  Gray Watson  <gray@outside.256.com>
+
+	* Improved the usage output for dmalloc.  Thanks to murf.
+
+	* Improved some of the error values to better identify internal
+	dmalloc errors.
+
+	* Fixed problem where if LARGEST_ALLOCATION is set to 0 the test
+	program still checks it.  Whoops.  Thanks to sbied.
+
 2005-03-18  Gray Watson  <gray@outside.256.com>
 
 	* Increased the basic block default to 32k.
@@ -2269,5 +2279,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.330 2005/03/19 00:06:20 gray Exp $
+$Id: ChangeLog,v 1.331 2005/06/05 05:25:26 gray Exp $
 -------------------------------------------------------------------------------

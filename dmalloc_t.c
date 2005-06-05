@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.120 2005/03/18 23:42:11 gray Exp $
+ * $Id: dmalloc_t.c,v 1.121 2005/06/05 05:25:26 gray Exp $
  */
 
 /*
@@ -746,6 +746,7 @@ static	int	check_special(void)
    * Check to make sure that large mallocs are handled correctly.
    */
   
+#if LARGEST_ALLOCATION
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
   }
@@ -760,6 +761,7 @@ static	int	check_special(void)
     free(pnt);
     final = 0;
   }
+#endif
   
   /********************/
   
