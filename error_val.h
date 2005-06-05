@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: error_val.h,v 1.34 2004/10/20 14:04:04 gray Exp $
+ * $Id: error_val.h,v 1.35 2005/06/05 05:22:28 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__
@@ -88,9 +88,9 @@ __attribute__ ((unused))
   { ERROR_NONE,			"no error" },
   
   /* administrative errors */
-  { ERROR_BAD_SETUP,		"initialization and setup failed" },
-  { ERROR_IN_TWICE,		"malloc library has gone recursive" },
-  { ERROR_LOCK_NOT_CONFIG,	"thread locking has not been configured" },
+  { ERROR_BAD_SETUP,		"dmalloc initialization and setup failed" },
+  { ERROR_IN_TWICE,		"dmalloc library has gone recursive" },
+  { ERROR_LOCK_NOT_CONFIG,  "dmalloc thread locking has not been configured" },
   
   /* pointer verification errors */
   { ERROR_IS_NULL,		"pointer is null" },
@@ -116,9 +116,9 @@ __attribute__ ((unused))
   { ERROR_FREE_OVERWRITTEN,	"free space has been overwritten" },
   
   /* administrative errors */
-  { ERROR_ADMIN_LIST,		"bad admin structure list" },
-  { ERROR_ADDRESS_LIST,		"internal address list corruption" },
-  { ERROR_SLOT_CORRUPT,		"internal memory slot corruption" },
+  { ERROR_ADMIN_LIST,		"dmalloc bad admin structure list" },
+  { ERROR_ADDRESS_LIST,		"dmalloc internal address list corruption" },
+  { ERROR_SLOT_CORRUPT,		"dmalloc internal memory slot corruption" },
   
   { 0 }
 };
