@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_argv.h,v 1.10 2005/01/11 19:31:09 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.11 2005/06/05 04:52:40 gray Exp $
  */
 
 #ifndef __ARGV_H__
@@ -31,14 +31,14 @@
  * NEWS entries *must* be entered and 2 entries in argv.texi must be
  * updated.
  *
- * ARGV LIBRARY VERSION -- 2.4.0
+ * ARGV LIBRARY VERSION -- 2.5.0
  */
 
 /* produced by configure, inserted into argv.h */
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.10 2005/01/11 19:31:09 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.11 2005/06/05 04:52:40 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments
@@ -52,7 +52,7 @@
 #include <stdio.h>			/* have to for FILE * below */
 
 /* this defines what type the standard void memory-pointer is */
-#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS)
+#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus)
 #define ARGV_PNT	void *
 #else
 #define ARGV_PNT	char *
@@ -75,12 +75,14 @@ typedef struct {
 } argv_t;
 
 /*
- * argument array type.  when ARGV_ARRAY is |'d with the ar_type in the above
- * structure then multiple instances of the option are allowed and each
- * instance is stored into the following structure that MUST be in ar_variable
- * in the above arg_t structure.
- * NOTE: after the arguments have been processed, if aa_entryn is > 0 then
- * aa_entries needs to be free'd by user. argv_cleanup() can be used for this
+ * Argument array type.  when ARGV_FLAG_ARRAY is |'d with the ar_type
+ * in the above structure then multiple instances of the option are
+ * allowed and each instance is stored into the following structure
+ * that MUST be in ar_variable in the above arg_t structure.
+ *
+ * NOTE: after the arguments have been processed, if aa_entryn is > 0
+ * then aa_entries needs to be free'd by user. argv_cleanup() can be
+ * used for this
  */
 typedef struct {
   int		aa_entry_n;		/* number of elements in aa_entrees */
@@ -215,12 +217,16 @@ extern
 FILE 	*argv_error_stream;
 
 /*
+ * This is the error code to exit with when we have a usage error and
+ * we are in interactive mode.
+ */
+extern
+int	argv_error_code;
+
+/*
  * Set to 1 (the default) to enable the handling of -l=foo or
  * --logfile=foo type of arguments.  Set to 0 to disable.  This allows
  * you to specifically assign a value to an argument.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 extern
 int	argv_close_enable_b;
@@ -231,9 +237,6 @@ int	argv_close_enable_b;
  * additional "--" arguments to reenable (basically toggle on then
  * off) argument processing.  Set to 0 (the default) to disable this
  * behavior.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 extern
 int	argv_last_toggle_b;
@@ -242,9 +245,6 @@ int	argv_last_toggle_b;
  * Set to 1 (the default) to have the library accept multiple usage of
  * the same argument.  Set to 0 to have the library generate an error
  * if you use an argument twice.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 extern
 int	argv_multi_accept_b;
@@ -253,9 +253,6 @@ int	argv_multi_accept_b;
  * Set to one of the ARGV_USAGE_ defines in the argv.h file.  This
  * tell the library what usage information to display when --usage is
  * specified by the user.  Default is ARGV_USAGE_LONG.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 extern
 int	argv_usage_type;
@@ -265,9 +262,6 @@ int	argv_usage_type;
  * tell the library what usage information to display when an error is
  * encountered.  The usage information accompanies the error message.
  * Default is ARGV_USAGE_SEE.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 extern
 int	argv_error_type;
@@ -294,9 +288,6 @@ int	argv_process_env_b;
  * command line.  If set the 0 (the default) then they will be
  * inserted before those specified on the command line.  See
  * argv_process_env_b for more information.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 extern
 int	argv_env_after_b;

@@ -69,6 +69,12 @@ int 	argv_interactive = ARGV_TRUE;
 FILE 	*argv_error_stream = ERROR_STREAM_INIT;
 
 /*
+ * This is the error code to exit with when we have a usage error and
+ * we are in interactive mode.
+ */
+int	argv_error_code = EXIT_CODE;
+
+/*
  * global settings
  */
 
@@ -76,9 +82,6 @@ FILE 	*argv_error_stream = ERROR_STREAM_INIT;
  * Set to 1 (the default) to enable the handling of -l=foo or
  * --logfile=foo type of arguments.  Set to 0 to disable.  This allows
  * you to specifically assign a value to an argument.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 int	argv_close_enable_b = 1;
 
@@ -88,9 +91,6 @@ int	argv_close_enable_b = 1;
  * additional "--" arguments to reenable (basically toggle on then
  * off) argument processing.  Set to 0 (the default) to disable this
  * behavior.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 int	argv_last_toggle_b = 0;
 
@@ -98,9 +98,6 @@ int	argv_last_toggle_b = 0;
  * Set to 1 (the default) to have the library accept multiple usage of
  * the same argument.  Set to 0 to have the library generate an error
  * if you use an argument twice.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 int	argv_multi_accept_b = 1;
 
@@ -108,9 +105,6 @@ int	argv_multi_accept_b = 1;
  * Set to one of the ARGV_USAGE_ defines in the argv.h file.  This
  * tell the library what usage information to display when --usage is
  * specified by the user.  Default is ARGV_USAGE_LONG.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 int	argv_usage_type = ARGV_USAGE_LONG;
 
@@ -119,9 +113,6 @@ int	argv_usage_type = ARGV_USAGE_LONG;
  * tell the library what usage information to display when an error is
  * encountered.  The usage information accompanies the error message.
  * Default is ARGV_USAGE_SEE.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 int	argv_error_type = ARGV_USAGE_SEE;
 
@@ -146,14 +137,15 @@ int	argv_process_env_b = 1;
  * command line.  If set the 0 (the default) then they will be
  * inserted before those specified on the command line.  See
  * argv_process_env_b for more information.
- *
- * NOTE: this is set by argv_process automatically.  If you do not
- * want this behavior, you should use argv_process_no_env.
  */
 int	argv_env_after_b = 0;
 
-/* local variables */
-static	argv_t	empty[] = {{ ARGV_LAST }};	/* empty argument array */
+/*
+ * local variables
+ */
+
+/* empty argument array */
+static	argv_t	empty[] = {{ ARGV_LAST, NULL, 0, NULL, NULL, NULL }};
 static	int	enabled_b = ARGV_FALSE;		/* are the lights on? */
 
 /****************************** startup routine ******************************/
@@ -327,7 +319,7 @@ static	char	*string_copy(const char *str)
 		    argv_program);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return NULL;
   }
@@ -407,7 +399,7 @@ static	char	**vectorize(char *str, const char *tok, int *num_tok_p)
 		    argv_program);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return NULL;
   }
@@ -420,7 +412,7 @@ static	char	**vectorize(char *str, const char *tok, int *num_tok_p)
       break;
     }
     if (*tok_p != '\0') {
-      vect_p[0] = tok_p;
+      vect_p[tok_c] = tok_p;
       tok_c++;
     }
   }
@@ -1062,7 +1054,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1073,7 +1065,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1092,7 +1084,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1114,7 +1106,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1125,7 +1117,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1142,7 +1134,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 		      argv_program, INTERNAL_ERROR_NAME);
       }
       if (argv_interactive) {
-	(void)exit(EXIT_CODE);
+	(void)exit(argv_error_code);
       }
       return ERROR;
     }
@@ -1159,7 +1151,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1173,7 +1165,7 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 			argv_program, INTERNAL_ERROR_NAME);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return ERROR;
       }
@@ -1247,7 +1239,7 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
 		      argv_program);
       }
       if (argv_interactive) {
-	(void)exit(EXIT_CODE);
+	(void)exit(argv_error_code);
       }
       return ERROR;
     }
@@ -1574,14 +1566,14 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
   case ARGV_BIN:
     {
       int	bit_c, bit, first_b = ARGV_FALSE;
-      char	binary[2 + 128 + 1], *bounds, *bin_p;
+      char	binary[2 + 128 + 1], *bin_bounds_p, *bin_p = binary;
       
       if (*(int *)var == 0) {
 	strncpy(buf, "0", buf_size);
       }
       else {
-	bin_p = binary;
-	bounds = binary + sizeof(binary);
+	
+	bin_bounds_p = binary + sizeof(binary);
 	
 	/* initially write binary number into tmp buffer, then copy into out */
 	*bin_p++ = '0';
@@ -1602,7 +1594,7 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
 	}
 	
 	/* add on the decimal equivalent */ 
-	(void)loc_snprintf(bin_p, bounds - bin_p, " (%d)", *(int *)var);
+	(void)loc_snprintf(bin_p, bin_bounds_p - bin_p, " (%d)", *(int *)var);
 	/* find the \0 at end */ 
 	for (; *bin_p != '\0'; bin_p++) {
 	}
@@ -2174,10 +2166,15 @@ static	void	file_args(const char *path, argv_t *grid,
   char	**argv, **argv_p;
   int	arg_c, max;
   FILE	*infile;
-  char	line[FILE_LINE_SIZE + 1], *line_p;
+  char	line[FILE_LINE_SIZE], *line_p;
   
   /* open the input file */
-  infile = fopen(path, "r");
+  if (strcmp(path, "-") == 0) {
+    infile = stdin;
+  }
+  else {
+    infile = fopen(path, "r");
+  }
   if (infile == NULL) {
     *okay_bp = ARGV_FALSE;
     if (argv_error_stream != NULL) {
@@ -2186,7 +2183,7 @@ static	void	file_args(const char *path, argv_t *grid,
 		    argv_program, path);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return;
   }
@@ -2197,25 +2194,32 @@ static	void	file_args(const char *path, argv_t *grid,
   argv = malloc(sizeof(char *) * max);
   if (argv == NULL) {
     *okay_bp = ARGV_FALSE;
-    (void)fclose(infile);
+    if (infile != stdin) {
+      (void)fclose(infile);
+    }
     if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: memory error during argument processing\n",
 		    argv_program);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return;
   }
   argv_p = argv;
   
   /* read in the file lines */
-  while (fgets(line, FILE_LINE_SIZE, infile) != NULL) {
+  while (fgets(line, sizeof(line), infile) != NULL) {
     /* punch the \n at end of line */
     for (line_p = line; *line_p != '\n' && *line_p != '\0'; line_p++) {
     }
     *line_p = '\0';
+    
+    /* skip blank lines */
+    if (line_p == line) {
+      continue;
+    }
     
     *argv_p = string_copy(line);
     if (*argv_p == NULL) {
@@ -2225,19 +2229,23 @@ static	void	file_args(const char *path, argv_t *grid,
     
     argv_p++;
     arg_c++;
+    
+    /* do we need to grow the array of pointers? */
     if (arg_c == max) {
       max += ARRAY_INCR;
       argv = realloc(argv, sizeof(char *) * max);
       if (argv == NULL) {
 	*okay_bp = ARGV_FALSE;
-	(void)fclose(infile);
+	if (infile != stdin) {
+	  (void)fclose(infile);
+	}
 	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: memory error during argument processing\n",
 			argv_program);
 	}
 	if (argv_interactive) {
-	  (void)exit(EXIT_CODE);
+	  (void)exit(argv_error_code);
 	}
 	return;
       }
@@ -2254,7 +2262,9 @@ static	void	file_args(const char *path, argv_t *grid,
   }
   free(argv);
   
-  (void)fclose(infile);
+  if (infile != stdin) {
+    (void)fclose(infile);
+  }
 }
 
 /*
@@ -3114,13 +3124,13 @@ static	int	process_env(void)
  *
  * args - Array of argv_t structures.
  *
- * arg_c - Number of arguments in the argv array.
+ * arg_n - Number of arguments in the argv array.
  *
  * argv - Array of character pointers terminated by 0L.
  */
-int	argv_process_no_env(argv_t *args, const int arg_c, char **argv)
+int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
 {
-  int		arg_n;
+  int		entry_c;
   const char	*prog_p;
   int		okay_b = ARGV_TRUE;
   argv_t	*arg_p;
@@ -3131,14 +3141,14 @@ int	argv_process_no_env(argv_t *args, const int arg_c, char **argv)
     args = empty;
   }
   
-  if (arg_c < 0) {
+  if (arg_n < 0) {
     if (argv_error_stream != NULL) {
       (void)fprintf(argv_error_stream,
 		    "%s: %s, argc argument to argv_process is %d\n",
-		    __FILE__, INTERNAL_ERROR_NAME, arg_c);
+		    __FILE__, INTERNAL_ERROR_NAME, arg_n);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return ERROR;
   }
@@ -3150,14 +3160,14 @@ int	argv_process_no_env(argv_t *args, const int arg_c, char **argv)
 		    __FILE__, INTERNAL_ERROR_NAME);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return ERROR;
   }
   
   /* set global variables */
   argv_argv = argv;
-  argv_argc = arg_c;
+  argv_argc = arg_n;
   
   /* build the program name from the argv[0] path */
   {
@@ -3175,13 +3185,13 @@ int	argv_process_no_env(argv_t *args, const int arg_c, char **argv)
   (void)strncpy(argv_program, prog_p, PROGRAM_NAME);
   
   /* count the args */
-  arg_n = 0;
+  entry_c = 0;
   for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
-    arg_n++;
+    entry_c++;
   }
   
   /* verify the argument array */
-  if (preprocess_array(args, arg_n) != NOERROR) {
+  if (preprocess_array(args, entry_c) != NOERROR) {
     return ERROR;
   }
   
@@ -3205,7 +3215,7 @@ int	argv_process_no_env(argv_t *args, const int arg_c, char **argv)
   }
   
   /* do the external args */
-  do_list(args, arg_c - 1, argv + 1, queue_list, &queue_head, &queue_tail,
+  do_list(args, arg_n - 1, argv + 1, queue_list, &queue_head, &queue_tail,
 	  &okay_b);
   
   /* DO the env args after? */
@@ -3238,7 +3248,7 @@ int	argv_process_no_env(argv_t *args, const int arg_c, char **argv)
       do_usage(args, argv_error_type);
     }
     if (argv_interactive) {
-      (void)exit(EXIT_CODE);
+      (void)exit(argv_error_code);
     }
     return ERROR;
   }
@@ -3325,11 +3335,10 @@ int	argv_usage(const argv_t *args, const int which)
     args = empty;
   }
   
-  if (which == ARGV_USAGE_SHORT) {
-    usage_short(args, 0);
-  }
-  else if (which == ARGV_USAGE_LONG) {
-    usage_long(args);
+  if (which == ARGV_USAGE_SHORT
+      || which == ARGV_USAGE_LONG
+      || which == ARGV_USAGE_ALL) {
+    do_usage(args, which);
   }
   else {
     /* default/env settings */
