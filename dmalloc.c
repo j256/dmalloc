@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.116 2005/01/11 19:29:22 gray Exp $
+ * $Id: dmalloc.c,v 1.117 2005/06/05 05:21:54 gray Exp $
  */
 
 /*
@@ -140,6 +140,7 @@ static	unsigned long start_size = 0;		/* for START settings */
 static	int	usage_b = 0;			/* usage messages */
 static	int	verbose_b = 0;			/* verbose flag */
 static	int	very_verbose_b = 0;		/* very-verbose flag */
+static	int	version_b = 0;			/* print version string */
 static	char	*tag = NULL;			/* maybe a tag argument */
 
 static	argv_t	args[] = {
@@ -207,6 +208,8 @@ static	argv_t	args[] = {
     NULL,			"turn on verbose output" },
   { 'V',	"very-verbose",	ARGV_BOOL_INT,	&very_verbose_b,
     NULL,			"turn on very-verbose output" },
+  { '\0',	"version",	ARGV_BOOL_INT,	&version_b,
+    NULL,			"display version string" },
   { ARGV_MAYBE,	NULL,		ARGV_CHAR_P,	&tag,
     "tag",			"debug token to find in rc" },
   { ARGV_LAST }
@@ -872,6 +875,8 @@ int	main(int argc, char **argv)
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
   argv_version_string = dmalloc_version;
+  argv_usage_type = ARGV_USAGE_LONG;
+  argv_error_type = ARGV_USAGE_SHORT_REM;
   
   argv_process(args, argc, argv);
   
@@ -885,6 +890,15 @@ int	main(int argc, char **argv)
   if (usage_b) {
     header();
     argv_usage(args, ARGV_USAGE_ALL);
+    exit(0);
+  }
+  if (version_b) {
+    (void)fprintf(stderr, "Dmalloc utility version string is: %s\n",
+		  argv_version_string);
+    (void)fprintf(stderr,
+		  "  NOTE: Library linked with your application may be a different version.\n");
+    (void)fprintf(stderr,
+		  "        Check top of logfile after application is run for library version.\n");
     exit(0);
   }
   
