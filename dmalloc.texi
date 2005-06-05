@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.276 2005/04/27 13:12:34 gray Exp $
+@c $Id: dmalloc.texi,v 1.277 2005/06/05 04:57:29 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -2477,6 +2477,7 @@ etc..  You can convert the epoch seconds to a date from the command
 line with the following perl code: @code{perl -e 'print
 localtime($ARGV[0])."\n";' 1098918225}
 
+@cindex version of library
 The first 5 lines of the sample logfile contain header information for
 all logfiles.  They show the version number and URL for the library as
 well as all of the settings that the library is currently using.
@@ -2604,6 +2605,7 @@ did not work.
 @section How to Use the Dmalloc Program
 
 @cindex utility usage
+@cindex usage of the utility
 
 The most basic usage for the program is @samp{dmalloc [-bC] tag}.  The
 @samp{-b} or @samp{-C} (either but not both flags used at a time) are
@@ -2668,7 +2670,7 @@ Use this configuration file instead of the RC file
 @item -g
 Output gdb type commands for using inside of the gdb debugger.
 
-@item -h
+@item -h (or --help)
 Output a help message for the utility.
 
 @item -i number
@@ -2833,7 +2835,7 @@ to mean 250 megabytes, 1 gigabyte, and 102 kilobytes respectively.
 List all of the tags in the rc-file.  Use with @kbd{-v} or @kbd{-V}
 verbose options.
 
-@item -u
+@item -u (or --usage)
 Output the usage information for the utility.
 
 @item -v
@@ -2843,6 +2845,14 @@ listing all of the tags.
 @item -V
 Give very verbose output for outputting even more details about
 settings.
+
+@cindex utility version
+@cindex library version
+@cindex version of utility
+@item --version
+Output the version string for the utility.  @emph{Please note} that
+the version of the library that is installed or has been linked into
+your application may be different from the utility version.
 
 @end table
 
