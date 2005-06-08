@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.117 2005/06/05 05:21:54 gray Exp $
+ * $Id: dmalloc.c,v 1.118 2005/06/08 02:11:30 gray Exp $
  */
 
 /*
@@ -889,7 +889,7 @@ int	main(int argc, char **argv)
   }
   if (usage_b) {
     header();
-    argv_usage(args, ARGV_USAGE_ALL);
+    argv_usage(args, argv_usage_type);
     exit(0);
   }
   if (version_b) {
