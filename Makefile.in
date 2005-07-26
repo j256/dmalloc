@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.180 2004/07/11 14:46:02 gray Exp $
+# $Id: Makefile.in,v 1.181 2005/07/26 21:45:49 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -98,7 +98,7 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/z_os_notes contrib/aix_5l_notes
 
 DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi dmalloc.pdf \
-	dmalloc.dvi texinfo.tex
+	texinfo.tex
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -148,9 +148,9 @@ installhtml ::
 		umask 022 ;\
 		texi2html -menu -number -split_node $$current/dmalloc.texi ;\
 		for f in dmalloc?*.html ; do \
-			sed -e '1,/<BODY>/p' -e d $$f > $$f.t ;\
+			sed -e '1,/<BODY/p' -e d $$f > $$f.t ;\
 			cat $(WWWDIR)/header_script.html >> $$f.t ;\
-			sed -e '1,/<BODY>/d' -e '/<\/BODY>/,$$d' $$f >> $$f.t;\
+			sed -e '1,/<BODY/d' -e '/<\/BODY>/,$$d' $$f >> $$f.t;\
 			cat $(WWWDIR)/footer_script.html >> $$f.t ;\
 			sed -e '/<\/BODY>/,$$p' -e d $$f >> $$f.t ;\
 			mv $$f.t $$f ;\
