@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.280 2005/10/15 14:24:55 gray Exp $
+@c $Id: dmalloc.texi,v 1.281 2005/10/15 14:31:20 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -186,11 +186,11 @@ carefully.
 @item Make sure you have downloaded the latest version of the library
 available from the home page at URL @uref{http://dmalloc.com/}.
 
-@item The @file{.tgz} file extension of the releases stands for
-tar gzip'ed so you will need to ungzip and then untar the release file
-into your source work directory.  You may find that you have to rename
-the file to @file{.tar.gz} to get some old zip programs to handle the
-file correctly.
+@item The release files have a @file{.tgz} file extension which means
+that they are a tar'd gzip'd directory of files.  You will need to
+ungzip and then untar the release file into your source work
+directory.  You may have to rename the file to @file{.tar.gz} to get
+some old zip programs to handle the file correctly.
 
 @cindex settings.dist file
 
