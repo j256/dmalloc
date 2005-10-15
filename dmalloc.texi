@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.279 2005/07/26 21:45:49 gray Exp $
+@c $Id: dmalloc.texi,v 1.280 2005/10/15 14:24:55 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -183,8 +183,14 @@ carefully.
 
 @enumerate
 
-@item Make sure you have the latest version of the library available
-from the home page at URL @uref{http://dmalloc.com/}.
+@item Make sure you have downloaded the latest version of the library
+available from the home page at URL @uref{http://dmalloc.com/}.
+
+@item The @file{.tgz} file extension of the releases stands for
+tar gzip'ed so you will need to ungzip and then untar the release file
+into your source work directory.  You may find that you have to rename
+the file to @file{.tar.gz} to get some old zip programs to handle the
+file correctly.
 
 @cindex settings.dist file
 
@@ -316,8 +322,8 @@ library:
 
 @enumerate
 
-@item Make sure you have the latest version of the library available
-from the home page at URL @uref{http://dmalloc.com/}.
+@item Make sure you have downloaded the latest version of the library
+available from the home page at URL @uref{http://dmalloc.com/}.
 
 @item Follow the installation instructions on how to configure,
 make, and install the library (i.e. type: @kbd{make install}).
@@ -349,14 +355,16 @@ dmalloc to your shell's runtime configuration file if supported.  The
 idea is to have the shell capture the dmalloc program's output and
 adjust the environment.  
 
-After you add the alias to the file you need to log out and log back
-in to have it take effect, or you can execute the above appropriate
-command on the command line.  If you enter @kbd{dmalloc runtime} and
-see any output with DMALLOC_OPTIONS in it then the alias did not work.
+After you add the alias to the shell config file you need to log out
+and log back in to have it take effect, or you can execute the
+appropriate command below on the command line directly.  After you
+setup the alias, if you enter @kbd{dmalloc runtime} and see any output
+with DMALLOC_OPTIONS in it then the alias did not take effect.
 
-Bash, ksh, and zsh users should add the following to their
-@file{.bashrc}, @file{.profile}, or @file{.zshrc} file respectively
-(notice the @kbd{-b} option for bourne shell output):
+Bash, ksh, and zsh (@uref{http://www.zsh.org/}) users should add the
+following to their @file{.bashrc}, @file{.profile}, or @file{.zshrc}
+file respectively (notice the @kbd{-b} option for bourne shell
+output):
 
 @example
 function dmalloc @{ eval `command dmalloc -b $*`; @}
@@ -391,11 +399,6 @@ If you are using rc shell, you should add the following to your
 @example
 fn dmalloc @{eval `@{/usr/local/bin/dmalloc $*@}@}
 @end example
-
-By the way, if you are looking for a shell, I heartily recommend trying
-out zsh at URL @uref{http://www.zsh.org/}.  It is a bourne shell
-written from scratch with much the same features as tcsh without the csh
-crap.
 
 @item Although not necessary, you may want to include @file{dmalloc.h}
 in your C files and recompile.  This will allow the library to report
