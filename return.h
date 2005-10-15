@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: return.h,v 1.36 2004/10/12 13:53:15 gray Exp $
+ * $Id: return.h,v 1.37 2005/10/15 14:44:22 gray Exp $
  */
 
 /*
@@ -298,10 +298,23 @@ static	void	aix_c_get_ret_addr(int i, int *file)
 /*************************************/
 
 /*
- * For ARM based machines with gcc/gas 3.3.3 -- Silvester Erdeg.
+ * For ARM based machines with gcc/gas 3.3.3 -- Silvester Erdeg.  Used
+ * to be =g which may be for various gcc/gas or arm versions.  Please
+ * let the dmalloc author know if there is a better ifdef combination
+ * for this.
  */
 #ifdef __arm__
-#define GET_RET_ADDR(file)  asm("str lr, %0" : "=g" (file) : /* no inputs */ )
+#define GET_RET_ADDR(file)   asm("str lr, %0" : "=m" (file) : /* no inputs */ )
+#endif
+
+/*************************************/
+
+/*
+ * For Analog Device's Blackfin processors with gcc/gas 3.4.1 --
+ * Silvester Erdeg.
+ */
+#ifdef bfin
+#define GET_RET_ADDR(file)   asm("%0 = RETS;" : "=g" (file) : /* no inputs */ )
 #endif
 
 /*************************************/

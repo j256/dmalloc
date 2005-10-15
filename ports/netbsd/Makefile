@@ -1,6 +1,6 @@
 # $NetBSD: Makefile,v 1.5 2003/06/02 01:20:52 jschauma Exp $
 
-DISTNAME=		dmalloc-5.4.2
+DISTNAME=		dmalloc-5.4.3
 PKGREVISION=		1
 CATEGORIES=		devel
 MASTER_SITES=		${MASTER_SITE_SOURCEFORGE:=dmalloc/}

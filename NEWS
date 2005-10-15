@@ -1,6 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.120 2004/10/19 14:50:52 gray Exp $
+$Id: NEWS,v 1.121 2005/10/15 14:44:22 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.4.3 (10/15/2005):
+
+	* Fixed when LARGEST_ALLOCATION was 0 it was still being tested.
+	* Increased the basic block default to 32k.
+	* Improved test program output and small heap area handling.
+	* Fixed the global Makefile to install libs as 755 not 644.
+	* Added some fixes for Compaq's C compiler.
 
 Version 5.4.2 (10/19/2004):
 

@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.4.2 </title>
+<title> Dmalloc Release Notes - 5.4.3 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.4.2 <br />
+Version: Release 5.4.3 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.4.1.html">5.4.1</a> <br />
-Date: October 19, 2004
+Last-Version: <a href="dmalloc-5.4.2.html">5.4.2</a> <br />
+Date: October 15, 2005
 </h4>
 
 <p>
@@ -29,9 +29,10 @@ Date: October 19, 2004
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> Bug fix release to repair a number of problems and issues
-regarding the free-blank and alloc-blank tokens.  See the bugs section
-for more information. </p>
+<p> More of a checkpoint release than anything else.  I probably am
+missing some bugs or issues reported by others but I've not worked on
+this much recently.  Please ping me if I've missed something
+ASAP. </p>
 
 <!--========================================================================-->
 
@@ -45,25 +46,21 @@ None.
 
 <h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> Improved the usage output messages from dmalloc. </li> <li>
+Improved some of the dmalloc error string representations to better
+identify internal errors. </li>
+
+</ul>
 
 <!--========================================================================-->
 
 <h3><a name="tokens"> Changes in the Debug Tokens </a></h3>
 
-<ul>
-
-<li> Just to make clear, when a pointer is allocated (or reallocated)
-with the 'alloc-blank' or 'check-blank' tokens enabled, the library
-clears various parts of the allocation block with the allocation-blank
-character (ALLOC_BLANK_CHAR in settings.h).  If the 'free-blank or
-'check-blank' tokens are enabled, when a pointer is freed, the library
-clears all of the space with the free-blank character (FREE_BLANK_CHAR
-in settings.h). </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <!--========================================================================-->
 
@@ -85,9 +82,15 @@ None.
 
 <h3><a name="programming"> Programming Notes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> I've increased the internal default basic block size to 32k from
+16k.  Most architectures have getpagesize which overrides it. </li>
+
+<li> Improved the dmalloc_t test program.  Added better error code
+output.  Improved it's ability to test small heap areas. </li>
+
+</ul>
 
 <!--========================================================================-->
 
@@ -103,16 +106,14 @@ None.
 
 <ul>
 
-<li> The library was was clearing the user spaces of an allocated
-chunk with the alloc-blank character and the non-user spaces with the
-free-blank character.  This seemed confusing and wrong so now all
-sections of an allocated chunk are cleared with the alloc-blank
-character. </li>
+<li> Made a number of documentation improvements. </li>
 
-<li> Fixed a couple of longer standing stupid bugs.  Basically the
-library was doing some pointer arithmetic assuming that the fence-post
-settings were enabled.  I'm surprised this worked on any
-architectures.  Thanks to Philippe for the feedback. </li>
+<li> Fixed the Makefile to install libs as 755. </li>
+
+<li> Added some fixes for Compaq's C compiler. </li>
+
+<li> Fixed a problem where if the LARGEST_ALLOCATION is set to 0,
+dmalloc_t still checks it. </li>
 
 </ul>
 

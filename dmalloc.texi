@@ -12,11 +12,11 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.281 2005/10/15 14:31:20 gray Exp $
+@c $Id: dmalloc.texi,v 1.282 2005/10/15 14:44:22 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
-@set dmalloc_version Version 5.4.2
+@set dmalloc_version Version 5.4.3
 @set dmalloc_date October 2004
 @set dmalloc_copyright Copyright 1992 to 2004 by Gray Watson.
 @c ----------------------------------------------------------------
@@ -2466,7 +2466,7 @@ sole information source for diagnosing problems in and getting
 statistics for your program.
 
 @example
-1098918225: 3: Dmalloc version '5.4.2' from 'http://dmalloc.com/'
+1098918225: 3: Dmalloc version '@value{dmalloc_version}' from 'http://dmalloc.com/'
 1098918225: 3: flags = 0x4f4e503, logfile '/tmp/dmalloc.log'
 1098918225: 3: interval = 500, addr = 0, seen # = 0, limit = 0
 1098918225: 3: starting time = 1098918225
