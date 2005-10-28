@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.282 2005/10/15 14:44:22 gray Exp $
+@c $Id: dmalloc.texi,v 1.283 2005/10/28 01:35:38 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -228,7 +228,7 @@ file from the @file{settings.dist} file.  Any permanent changes to these
 settings should made to the @file{settings.dist} file.  You then can run
 @file{config.status} to re-create the @file{settings.h} file.
 
-@cindex DMALLOC_SIZE variable
+@cindex DMALLOC_SIZE option
 
 @item The @code{DMALLOC_SIZE} variable gets auto-configured in
 @file{dmalloc.h.2} but it may not generate correct settings for all
@@ -241,6 +241,8 @@ and @file{dmalloc} program.  If it does not work, please see if there
 are any notes in the contrib directory about your system-type.  If not
 and you figure your problem out, please send me some notes so future
 users can profit from your experiences.
+
+@cindex USE_RETURN_MACROS conf.h option
 
 @emph{NOTE}: You may experience some errors compiling some of the
 @file{return.h} assembly macros which attempt to determine the callers
@@ -1027,7 +1029,7 @@ of zero if the library has not detected any problems.
 @item char * dmalloc_logpath
 
 This variable can be used to set the dmalloc log filename.  The env
-variable DMALLOC_LOGFILE overrides this variable.
+variable @code{DMALLOC_LOGFILE} overrides this variable.
 
 @c --------------------------------
 
@@ -1043,6 +1045,9 @@ routines:
 
 @deftypefun
 void dmalloc_shutdown ( void )
+
+@cindex atexit function
+@cindex on_exit function
 
 This function shuts the library down and logs the final statistics and
 information especially the non-freed memory pointers.  The library has
@@ -1666,6 +1671,15 @@ tune system defaults.  The library uses a lot more memory compared to
 the system malloc library because it stores a lot more information
 about the allocated pointers.
 
+@cindex mmap
+@cindex USE_MMAP conf.h option
+
+@emph{NOTE}: This also may be due to an inability of your operating
+system to use the @code{mmap} system call to allocate memory.  You may
+need to force the @code{USE_MMAP} setting to be 0.  Please use the
+forums at URL @uref{http://dmalloc.com/forums/} to report issues with
+this.
+
 @c --------------------------------
 
 @cindex 45, error code
@@ -2021,7 +2035,7 @@ leak -- the routine that called @code{strdup}.  Without a mechanism to
 trace the calling stack, there is no way for the library to see who the
 caller of the caller (so to speak) was.
 
-@cindex STORE_SEEN_COUNT option
+@cindex STORE_SEEN_COUNT conf.h option
 @cindex pointer seen count
 
 However, there is a way to track down unfreed memory in this
@@ -2250,6 +2264,8 @@ environmental variables.  It is looking for the value of the
 function while it is loading its shared libraries, it goes recursive
 when @code{getenv} is called from within @code{malloc} causing a
 segfault.
+
+@cindex GETENV_SAVE conf.h option
 
 To work around this, I have added to the configure script a check to
 make sure that calls to @code{getenv} are okay inside of malloc.  See
@@ -3436,16 +3452,22 @@ Realloc() backwards compatibility with being able to realloc from the
 last freed block is @emph{not} supported.  The author is interested to
 know who is using this (cough, cough) feature and for what reason.
 
-@item
-Realloc() of a NULL pointer is supported in which case the library will
-just make a call to malloc().  This can be disabled with the help of a
-manual compilation option in the @file{conf.h} file.
+@cindex ALLOW_REALLOC_NULL settings.h option
 
 @item
-Some systems allow free(0) to not be an error for some reason.  Since 0
-is not a valid address returned by the malloc call, it is debatable that
-this should be allowed.  See @file{conf.h} for some manual compilation
-options to handle this.
+Realloc() of a NULL pointer is supported in which case the library
+will just make a call to malloc().  This can be disabled with the help
+of the @code{ALLOW_REALLOC_NULL} manual compilation option in the
+@file{settings.h} file to adjust the library's default behavior.
+
+@cindex ALLOW_FREE_NULL settings.h option
+
+@item
+Some systems allow free(0) to not be an error for some reason.  Since
+0 is not a valid address returned by the malloc call, it is debatable
+that this should be allowed.  See @file{settings.h} for the
+@code{ALLOW_FREE_NULL} manual compilation option to adjust the
+library's default behavior.
 
 @item
 Aside from possibly being slower than the system's memory allocation
