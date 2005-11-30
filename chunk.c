@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.208 2004/10/20 13:15:52 gray Exp $
+ * $Id: chunk.c,v 1.209 2005/11/30 15:21:18 gray Exp $
  */
 
 /*
@@ -226,13 +226,16 @@ static	int	random_level(const int max_level)
  *
  * address -> Address we are looking for.
  *
+ * free_b -> Look on the free list otherwise look on the used list.
+ *
  * exact_b -> Set to 1 to find the exact pointer.  If 0 then the
  * address could be inside a block.
  *
  * update_p -> Pointer to the skip_alloc entry we are using to hold
  * the update pointers.
  */
-static	skip_alloc_t	*find_address(const void *address, const int exact_b,
+static	skip_alloc_t	*find_address(const void *address, const int free_b,
+				      const int exact_b,
 				      skip_alloc_t *update_p)
 {
   int		level_c;
@@ -240,7 +243,12 @@ static	skip_alloc_t	*find_address(const void *address, const int exact_b,
   
   /* skip_address_max_level */
   level_c = MAX_SKIP_LEVEL - 1;
-  slot_p = skip_address_list;
+  if (free_b) {
+    slot_p = skip_free_list;
+  }
+  else {
+    slot_p = skip_address_list;
+  }
   
   /* traverse list to smallest entry */
   while (1) {
@@ -407,7 +415,8 @@ static	int	insert_slot(skip_alloc_t *slot_p, const int free_b)
      * the same size which we will be inserting before.
      */
   }
-  else if (find_address(slot_p->sa_mem, 1 /* exact */, update_p) != NULL) {
+  else if (find_address(slot_p->sa_mem, 0 /* used list */, 1 /* exact */,
+			update_p) != NULL) {
     /*
      * we should not have found it since that means that someone has
      * the same size and block-num
@@ -1125,7 +1134,8 @@ static	void	log_error_info(const char *now_file,
   /* find the previous pointer in case it ran over */
   if (dmalloc_errno == ERROR_UNDER_FENCE && start_user != NULL) {
     other_p = find_address((char *)start_user - FENCE_BOTTOM_SIZE - 1,
-			   1 /* not exact pointer */, skip_update);
+			   0 /* used list */, 1 /* not exact pointer */,
+			   skip_update);
     if (other_p != NULL) {
       dmalloc_message("  prev pointer '%#lx' (size %u) may have run over from '%s'",
 		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
@@ -1139,7 +1149,8 @@ static	void	log_error_info(const char *now_file,
 	   && start_user != NULL
 	   && slot_p != NULL) {
     other_p = find_address((char *)slot_p->sa_mem + slot_p->sa_total_size,
-			   1 /* not exact pointer */, skip_update);
+			   0 /* used list */, 1 /* not exact pointer */,
+			   skip_update);
     if (other_p != NULL) {
       dmalloc_message("  next pointer '%#lx' (size %u) may have run under from '%s'",
 		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
@@ -1951,7 +1962,8 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   }
   
   /* find the pointer with loose checking for fence */
-  slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
+  slot_p = find_address(user_pnt, 0 /* used list */, 0 /* not exact pointer */,
+			skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(NULL, 0, user_pnt, NULL, "finding address in heap", where);
@@ -2067,7 +2079,8 @@ int	_dmalloc_chunk_heap_check(void)
       }
       
       /* now we look up the block and make sure it exists and is valid */
-      slot_p = find_address(block_p, 1 /* exact */, skip_update);
+      slot_p = find_address(block_p, 0 /* used list */, 1 /* exact */,
+			    skip_update);
       if (slot_p == NULL) {
 	dmalloc_errno = ERROR_ADMIN_LIST;
 	dmalloc_error("_dmalloc_chunk_heap_check");
@@ -2131,8 +2144,8 @@ int	_dmalloc_chunk_heap_check(void)
      * now we look up the slot pointer itself and make sure it exists
      * in a valid block
      */
-    block_slot_p = find_address(slot_p, 0 /* not exact pointer */,
-				skip_update);
+    block_slot_p = find_address(slot_p, 0 /* used list */,
+				0 /* not exact pointer */, skip_update);
     if (block_slot_p == NULL) {
       dmalloc_errno = ERROR_ADMIN_LIST;
       dmalloc_error("_dmalloc_chunk_heap_check");
@@ -2226,7 +2239,8 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   }
   
   /* try to find the address */
-  slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
+  slot_p = find_address(user_pnt, 0 /* used list */, 0 /* not exact pointer */,
+			skip_update);
   if (slot_p == NULL) {
     if (exact_b) {
       dmalloc_errno = ERROR_NOT_FOUND;
@@ -2493,6 +2507,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   char		where_buf2[MAX_FILE_LENGTH + 64], disp_buf[64];
   skip_alloc_t	*slot_p, *update_p;
   
+  
   /* counts calls to free */
   if (func_id == DMALLOC_FUNC_DELETE) {
     func_delete_c++;
@@ -2534,10 +2549,42 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   update_p = skip_update;
   
   /* try to find the address with loose match */
-  slot_p = find_address(user_pnt, 0 /* not exact pointer */, skip_update);
+  slot_p = find_address(user_pnt, 0 /* used list */, 0 /* not exact pointer */,
+			skip_update);
   if (slot_p == NULL) {
-    /* not found */
-    dmalloc_errno = ERROR_NOT_FOUND;
+#if FREED_POINTER_DELAY
+    skip_alloc_t	*del_p;
+    
+    /* search the delay list */
+    for (del_p = free_wait_list_head;
+	 del_p != NULL;
+	 del_p = del_p->sa_next_p[0]) {
+      if (del_p->sa_mem <= user_pnt
+	  && (char *)del_p->sa_mem + del_p->sa_total_size > (char *)user_pnt) {
+	pnt_info_t	info;
+	get_pnt_info(del_p, &info);
+	if (info.pi_user_start == user_pnt) {
+	  dmalloc_errno = ERROR_ALREADY_FREE;
+	}
+	else {
+	  dmalloc_errno = ERROR_NOT_FOUND;
+	}
+	break;
+      }
+    }
+    if (del_p == NULL) {
+#endif
+      /* not in the used list so check the free list */
+      if (find_address(user_pnt, 1 /* free list */, 0 /* not exact pointer */,
+		       skip_update) == NULL) {
+	dmalloc_errno = ERROR_NOT_FOUND;
+      }
+      else {
+	dmalloc_errno = ERROR_ALREADY_FREE;
+      }
+#if FREED_POINTER_DELAY
+    }
+#endif
     log_error_info(file, line, user_pnt, NULL, "finding address in heap",
 		   "free");
     return FREE_ERROR;
@@ -2554,7 +2601,16 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
     /* error set and dumped in remove_slot */
     return FREE_ERROR;
   }
-  slot_p->sa_flags = ALLOC_FLAG_FREE;
+  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE)) {
+    /*
+     * We need to preserve the fence-post flag because we may need to
+     * properly check for previously freed pointers in the future.
+     */
+    slot_p->sa_flags = ALLOC_FLAG_FREE | ALLOC_FLAG_FENCE;
+  }
+  else {
+    slot_p->sa_flags = ALLOC_FLAG_FREE;
+  }
   
   alloc_cur_pnts--;
   
@@ -2693,7 +2749,8 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   }
   
   /* find the old pointer with loose checking for fence post stuff */
-  slot_p = find_address(old_user_pnt, 0 /* not exact pointer */, skip_update);
+  slot_p = find_address(old_user_pnt, 0 /* used list */,
+			0 /* not exact pointer */, skip_update);
   if (slot_p == NULL) {
     dmalloc_errno = ERROR_NOT_FOUND;
     log_error_info(file, line, old_user_pnt, NULL, "finding address in heap",
