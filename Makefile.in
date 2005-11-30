@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.181 2005/07/26 21:45:49 gray Exp $
+# $Id: Makefile.in,v 1.182 2005/11/30 15:22:03 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -90,7 +90,7 @@ FLS	=  conf.h.in configure.ac config.help \
 	dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
 	$(srcdir)/configure
-DOCFLS	= dmalloc.texi $(INFOFILE) dmalloc.html Manifest NOTES TODO
+DOCFLS	= dmalloc.texi dmalloc.html dmalloc.pdf Manifest NOTES TODO
 CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
 	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
