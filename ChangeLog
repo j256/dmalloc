@@ -1,3 +1,15 @@
+2005-11-30  Gray Watson  <gray@outside.256.com>
+
+	* Fixed a problem with double free not reporting
+	ERROR_ALREADY_FREE.  This was confusing.
+
+2005-10-27  Gray Watson  <gray@outside.256.com>
+
+	* Made some changes to the docs to address the possible mmap
+	issues.
+
+	* Added better checking for mmap compatibility during autoconfig.
+
 2005-10-15  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.4.3.
@@ -2291,5 +2303,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.333 2005/10/15 14:44:22 gray Exp $
+$Id: ChangeLog,v 1.334 2005/11/30 15:22:12 gray Exp $
 -------------------------------------------------------------------------------
