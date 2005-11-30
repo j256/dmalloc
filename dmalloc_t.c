@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.121 2005/06/05 05:25:26 gray Exp $
+ * $Id: dmalloc_t.c,v 1.122 2005/11/30 15:21:48 gray Exp $
  */
 
 /*
@@ -1540,6 +1540,50 @@ static	int	check_special(void)
     
     /* restore flags */
     dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Make sure that a free of an existing pointer gets the right error.
+   */
+  {
+    int		our_errno_hold = dmalloc_errno;
+    int		size = 10;
+    
+    if (! silent_b) {
+      (void)printf("  Checking double free error\n");
+    }
+    
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", size);
+      }
+      return 0;
+    }
+    
+    dmalloc_errno = 0;
+    
+    free(pnt);
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: 1st of double free should not fail: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      }
+      final = 0;
+    }
+    
+    free(pnt);
+    if (dmalloc_errno != ERROR_ALREADY_FREE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: 2nd of double free should get ERROR_ALREADY_FREE not: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      }
+      final = 0;
+    }
+    
+    dmalloc_errno = our_errno_hold;
   }
   
   /********************/
