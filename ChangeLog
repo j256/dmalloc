@@ -12,8 +12,6 @@
 
 2005-10-15  Gray Watson  <gray@outside.256.com>
 
-	* Releasing dmalloc version 5.4.3.
-
 	* Added a section to the startup docs about the .tgz file
 	extension.
 
@@ -2303,5 +2301,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.334 2005/11/30 15:22:12 gray Exp $
+$Id: ChangeLog,v 1.335 2005/11/30 15:22:36 gray Exp $
 -------------------------------------------------------------------------------
