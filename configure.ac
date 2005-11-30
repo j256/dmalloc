@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.30 2005/10/15 14:44:22 gray Exp $
+# $Id: configure.ac,v 1.31 2005/11/30 15:20:32 gray Exp $
 #
-AC_REVISION($Revision: 1.30 $)
+AC_REVISION($Revision: 1.31 $)
 AC_INIT(dmalloc, 5.4.3, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -55,10 +55,16 @@ AC_MSG_NOTICE([build utilities])
 AC_PROG_CC
 AC_PROG_CXX
 
+# see if we actually have a CXX program
+if test "$ac_cv_prog_CXX" = "" -o ! -x "$ac_cv_prog_CXX"; then
+    AC_MSG_WARN(could not find C++ compiler $ac_cv_prog_CXX)
+    enable_cxx=no
+fi
+
 # hopefully we have a stdc c-compiler
 if test "$ac_cv_prog_cc_stdc" = "no" ; then
 	AC_MSG_WARN()
-	AC_MSG_WARN(WARNING: no ansi compiler.  this build may fail.)
+	AC_MSG_WARN(no ansi compiler.  this build may fail.)
 	AC_MSG_WARN()
 fi
 AC_PROG_INSTALL
@@ -261,7 +267,7 @@ AC_CHECK_FUNCS(sbrk)
 
 if test x$ac_cv_func_mmap != xyes && x$ac_cv_func_sbrk != xyes; then
 	AC_MSG_WARN()
-	AC_MSG_WARN(WARNING: no mmap nor sbrk function.  See INTERNAL_MEMORY_SPACE in settings.dist.)
+	AC_MSG_WARN(no mmap nor sbrk function.  See INTERNAL_MEMORY_SPACE in settings.dist.)
 	AC_MSG_WARN()
 fi
 
@@ -274,12 +280,20 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #  include <sys/mman.h>
 #endif
 main() {
-  /* so we know here that we could open /dev/zero and map to that but I 
-     did not want the library to open another file-descriptor */
-  void *ret = mmap(0L, 10, PROT_READ | PROT_WRITE | PROT_EXEC,
-	           MAP_PRIVATE | MAP_ANON, -1 /* no fd */, 0 /* no offset */);
-  if (ret == MAP_FAILED) { exit(1); }
-  else { exit(0); }
+  /* we could open /dev/zero and map to that but I did not want the library
+     to open another file-descriptor */
+  char *dest, *src, *src_p, *dest_p;
+  src = "0123456789";
+  dest = (char *)mmap(0L, 10, PROT_READ | PROT_WRITE | PROT_EXEC,
+	              MAP_PRIVATE | MAP_ANON, -1 /* no fd */,
+		      0 /* no offset */);
+  src_p = src; dest_p = dest;
+  while (src_p < src + 10) { *dest_p++ = *src_p++; }
+  src_p = src; dest_p = dest;
+  while (src_p < src + 10) {
+    if (*src_p++ != *dest_p++) { exit(1); }
+  }
+  exit(0);
 }
 ]])],
 [ AC_DEFINE(USE_MMAP, 1) ac_cv_use_mmap=yes],
@@ -571,7 +585,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.30 2005/10/15 14:44:22 gray Exp $"
+#ident "$Id: configure.ac,v 1.31 2005/11/30 15:20:32 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -637,10 +651,10 @@ if test $ac_cv_func_atexit = no \
    && test $ac_cv_func_on_exit = no \
    && test $destructor_works = no; then
 	AC_MSG_WARN()
-	AC_MSG_WARN(WARNING: The library cannot automatically shut itself down)
-	AC_MSG_WARN(without atexit, on_exit, or destructor support.  You will)
-	AC_MSG_WARN(need to call dmalloc_shutdown directly before exit to get)
-	AC_MSG_WARN(get the final statistics and unfreed memory information.)
+	AC_MSG_WARN(The library cannot automatically shut itself down without)
+	AC_MSG_WARN(atexit, on_exit, or destructor support.  You will need to)
+	AC_MSG_WARN(call dmalloc_shutdown directly before exit to get get the)
+	AC_MSG_WARN(final statistics and unfreed memory information.)
 	AC_MSG_WARN()
 fi
 
