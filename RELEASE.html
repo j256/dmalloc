@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.4.3 </title>
+<title> Dmalloc Release Notes - 5.5.0 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.4.3 <br />
+Version: Release 5.5.0 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
 Last-Version: <a href="dmalloc-5.4.2.html">5.4.2</a> <br />
-Date: October 15, 2005
+Date: December 18, 2005
 </h4>
 
 <p>
@@ -38,9 +38,12 @@ ASAP. </p>
 
 <h3><a name="func"> New Functionality </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> Added the dmalloc_get_stats() function to report on internal heap
+statistics. </li>
+
+</ul>
 
 <!--========================================================================-->
 
@@ -74,9 +77,13 @@ None.
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<blockquote>
-None.
-</blockquote>
+<ul>
+
+<li> Added better checking for mmap compatibility during autoconfig. </li>
+
+<li> Added patches to [hopefully] improve the building under Mac OSX. </li>
+
+</ul>
 
 <!--========================================================================-->
 
@@ -89,6 +96,13 @@ None.
 
 <li> Improved the dmalloc_t test program.  Added better error code
 output.  Improved it's ability to test small heap areas. </li>
+
+<li> Improved some of the error values to better identify internal
+errors. </li>
+
+<li> I've added the dmalloc_get_stats() function which allows the
+caller to get a number of internal heap statistics such as current and
+maximum allocations and number of pointers. </li>
 
 </ul>
 
@@ -114,6 +128,8 @@ None.
 
 <li> Fixed a problem where if the LARGEST_ALLOCATION is set to 0,
 dmalloc_t still checks it. </li>
+
+<li> Fixed a problem with double free not reporting ERROR_ALREADY_FREE. </li>
 
 </ul>
 

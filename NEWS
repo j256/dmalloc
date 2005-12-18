@@ -1,9 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.121 2005/10/15 14:44:22 gray Exp $
+$Id: NEWS,v 1.122 2005/12/18 15:15:00 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 5.4.3 (10/15/2005):
+Version 5.5.0 (12/18/2005):
 
+	* Added patches to [hopefully] improve the building under Mac OSX.
+	* Added dmalloc_get_stats function to report on internal heap stats.
+	* Fixed a problem with double free not reporting ERROR_ALREADY_FREE.
+	* Added better checking for mmap compatibility during autoconfig.
+	* Improved the usage output for dmalloc.
+	* Improved some of the error values to better identify internal errors.
 	* Fixed when LARGEST_ALLOCATION was 0 it was still being tested.
 	* Increased the basic block default to 32k.
 	* Improved test program output and small heap area handling.
