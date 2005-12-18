@@ -18,10 +18,10 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.31 2005/11/30 15:20:32 gray Exp $
+# $Id: configure.ac,v 1.32 2005/12/18 15:14:46 gray Exp $
 #
-AC_REVISION($Revision: 1.31 $)
-AC_INIT(dmalloc, 5.4.3, [http://dmalloc.com/])
+AC_REVISION($Revision: 1.32 $)
+AC_INIT(dmalloc, 5.5.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
@@ -133,7 +133,30 @@ AC_COMPILE_IFELSE([ int foo(int val) { return val + 1; } ],[
 	# so now we try to create an archive from the compiled .o file
 	(ar cr conftest.a conftest.o) 2>&5
 	# see which shared-library ld commands work
-	if (ld -shared --whole-archive -soname conftest.so -o conftest.so.t conftest.a) 2>&5; then
+	#
+	# Darwin/Mac OS X - Terry Teague
+	# username terry_teague at domain users.sourceforge.net
+	ac_cv_shared_lib_link_objs=no
+	if test `uname` = "Darwin"; then
+          if (ld -dylib -o conftest.so.t -lc conftest.a) 2>&5; then
+            # By convention on some platforms
+            # libLLL.so, libLLL.X.so are symlinks to libLLL.X.Y.Z.so
+            # where X.Y.Z is version # (major.minor.increment) of the library
+	    # (API)
+            # For the moment set the Mac OS X dylib compatibility version # to
+	    # 1.0 and don't create any symlinks or versioned library names.
+            # Perhaps this could be the version of the dmalloc library
+	    # (e.g. 5.4.0)
+            ac_cv_shared_link_args='$(CXX) -dynamiclib -install_name $@ -compatibility_version 1 -current_version 1 -o $@.t'
+            # linking static archives into a dynamic lib doesn't seem to work
+            # explicitly link the object files
+            ac_cv_shared_lib_link_objs=yes
+          else
+            # oh well, toss an error
+            ac_cv_shared_link_args='# Could not configure shlib linking'
+            enable_shlib=no
+          fi
+       elif (ld -shared --whole-archive -soname conftest.so -o conftest.so.t conftest.a) 2>&5; then
 		ac_cv_shared_link_args='ld -shared --whole-archive -soname $@ -o $@.t'
 	elif (ld -shared -o conftest.so.t -all -soname conftest.so.t -none -lc -all conftest.a) 2>&5; then
 		ac_cv_shared_link_args='ld -shared -o $@.t -all -soname $@ -none -lc -all'
@@ -150,8 +173,28 @@ AC_COMPILE_IFELSE([ int foo(int val) { return val + 1; } ],[
 	enable_shlib=no
 ])
 shlinkargs="$ac_cv_shared_link_args"
-AC_MSG_RESULT([$ac_cv_shared_link_args])
 AC_SUBST(shlinkargs)
+if test "$ac_cv_shared_lib_link_objs" = "yes"; then
+       AC_MSG_RESULT([$ac_cv_shared_link_args objectfiles...])
+       AC_SUBST([SL_LINK_OBJS],[])
+else
+       AC_MSG_RESULT([$ac_cv_shared_link_args])
+       AC_SUBST([SL_LINK_OBJS],[#])
+fi
+
+###############################################################################
+
+AC_MSG_CHECKING([shared library extension])
+if test `uname` = "Darwin"; then
+	# Darwin/Mac OS X - Terry Teague
+	# username terry_teague at domain users.sourceforge.net
+	ac_cv_shared_lib_suffix=dylib
+else
+	ac_cv_shared_lib_suffix=so
+fi
+shlibext="$ac_cv_shared_lib_suffix"
+AC_MSG_RESULT([$ac_cv_shared_lib_suffix])
+AC_SUBST(shlibext)
 
 ###############################################################################
 
@@ -585,7 +628,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.31 2005/11/30 15:20:32 gray Exp $"
+#ident "$Id: configure.ac,v 1.32 2005/12/18 15:14:46 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

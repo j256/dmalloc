@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.182 2005/11/30 15:22:03 gray Exp $
+# $Id: Makefile.in,v 1.183 2005/12/18 15:14:46 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -45,20 +45,20 @@ LIBRARY	= lib$(MODULE).a
 
 # thread version of the library
 LIB_TH	= lib$(MODULE)th.a
-SHLIB_TH = lib$(MODULE)th.so
+SHLIB_TH = lib$(MODULE)th.@shlibext@
 @TH_ON@BUILD_TH = $(LIB_TH)
 @TH_ON@INSTALL_TH = installth
 @CXX_ON@@TH_ON@INSTALL_TH_CXX = installthcxx
 
 # C++ version of the library
 LIB_CXX	= lib$(MODULE)xx.a
-SHLIB_CXX = lib$(MODULE)xx.so
+SHLIB_CXX = lib$(MODULE)xx.@shlibext@
 @CXX_ON@BUILD_CXX = $(LIB_CXX)
 @CXX_ON@INSTALL_CXX = installcxx
 @CXX_ON@BUILD_TH_CXX = $(LIB_TH_CXX)
 
 # shared versions of the library
-LIB_SH = lib$(MODULE).so
+LIB_SH = lib$(MODULE).@shlibext@
 
 # threads + C++
 LIB_TH_CXX = lib$(MODULE)thcxx.a
@@ -200,7 +200,7 @@ shlib : $(SHLIBRARY)
 
 $(SHLIBRARY) : $(LIBRARY)
 	rm -f $@ $@.t
-	@shlinkargs@
+	@shlinkargs@ $(LIBRARY) @SL_LINK_OBJS@ $(OBJS) $(NORMAL_OBJS)
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
@@ -211,13 +211,30 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 	ar cr $@ $?
 	@RANLIB@ $@
 
+$(LIB_TH_SL) : $(LIB_TH)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIB_TH) @SL_LINK_OBJS@ $(OBJS) $(THREAD_OBJS)
+	mv $@.t $@
+
 $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
 	@RANLIB@ $@
 
+$(LIB_CXX_SL) : $(LIB_CXX)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIB_CXX) @SL_LINK_OBJS@ $(OBJS) $(NORMAL_OBJS) \
+		$(CXX_OBJS)
+	mv $@.t $@
+
 $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 	ar cr $@ $?
 	@RANLIB@ $@
+
+$(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIB_TH_CXX) @SL_LINK_OBJS@ $(OBJS) $(THREAD_OBJS) \
+		$(CXX_OBJS)
+	mv $@.t $@
 
 $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
 	rm -f $@
