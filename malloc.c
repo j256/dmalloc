@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.183 2004/09/13 22:37:36 gray Exp $
+ * $Id: malloc.c,v 1.184 2005/12/18 14:46:11 gray Exp $
  */
 
 /*
@@ -1927,6 +1927,66 @@ void	dmalloc_message(const char *format, ...)
   va_start(args, format);
   _dmalloc_vmessage(format, args);
   va_end(args);
+}
+
+/*
+ * void dmalloc_get_stats
+ *
+ * DESCRIPTION:
+ *
+ * Return a number of statistics about the current heap.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * heap_low_p <- Pointer to pointer which, if not 0L, will be set to
+ * the low address in the heap.
+ *
+ * heap_high_p <- Pointer to pointer which, if not 0L, will be set to
+ * the high address in the heap.
+ *
+ * total_space_p <- Pointer to an unsigned long which, if not 0L, will
+ * be set to the total space managed by the library including user
+ * space, administrative space, and overhead.
+ *
+ * user_space_p <- Pointer to an unsigned long which, if not 0L, will
+ * be set to the space given to the user process (allocated and free).
+ *
+ * current_allocated_p <- Pointer to an unsigned long which, if not
+ * 0L, will be set to the current allocated space given to the user
+ * process.
+ *
+ * current_pnt_np <- Pointer to an unsigned long which, if not 0L,
+ * will be set to the current number of pointers allocated by the user
+ * process.
+ *
+ * max_allocated_p <- Pointer to an unsigned long which, if not 0L,
+ * will be set to the maximum allocated space given to the user
+ * process.
+ *
+ * max_pnt_np <- Pointer to an unsigned long which, if not 0L, will be
+ * set to the maximum number of pointers allocated by the user
+ * process.
+ *
+ * max_one_p <- Pointer to an unsigned long which, if not 0L, will be
+ * set to the maximum allocated with 1 call by the user process.
+ */
+void	dmalloc_get_stats(DMALLOC_PNT *heap_low_p,
+			  DMALLOC_PNT *heap_high_p,
+			  unsigned long *total_space_p,
+			  unsigned long *user_space_p,
+			  unsigned long *current_allocated_p,
+			  unsigned long *current_pnt_np,
+			  unsigned long *max_allocated_p,
+			  unsigned long *max_pnt_np,
+			  unsigned long *max_one_p)
+{
+  _dmalloc_chunk_get_stats(heap_low_p, heap_high_p, total_space_p,
+			   user_space_p, current_allocated_p, current_pnt_np,
+			   max_allocated_p, max_pnt_np, max_one_p);
 }
 
 /*

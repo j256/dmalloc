@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.209 2005/11/30 15:21:18 gray Exp $
+ * $Id: chunk.c,v 1.210 2005/12/18 14:46:11 gray Exp $
  */
 
 /*
@@ -3192,4 +3192,69 @@ unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
   }
   
   return mem_count;
+}
+
+/*
+ * void _dmalloc_chunk_get_stats
+ *
+ * DESCRIPTION:
+ *
+ * Return a number of statistics about the current heap.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * heap_low_p <- Pointer to pointer which, if not 0L, will be set to
+ * the low address in the heap.
+ *
+ * heap_high_p <- Pointer to pointer which, if not 0L, will be set to
+ * the high address in the heap.
+ *
+ * total_space_p <- Pointer to an unsigned long which, if not 0L, will
+ * be set to the total space managed by the library including user
+ * space, administrative space, and overhead.
+ *
+ * user_space_p <- Pointer to an unsigned long which, if not 0L, will
+ * be set to the space given to the user process (allocated and free).
+ *
+ * current_allocated_p <- Pointer to an unsigned long which, if not
+ * 0L, will be set to the current allocated space given to the user
+ * process.
+ *
+ * current_pnt_np <- Pointer to an unsigned long which, if not 0L,
+ * will be set to the current number of pointers allocated by the user
+ * process.
+ *
+ * max_allocated_p <- Pointer to an unsigned long which, if not 0L,
+ * will be set to the maximum allocated space given to the user
+ * process.
+ *
+ * max_pnt_np <- Pointer to an unsigned long which, if not 0L, will be
+ * set to the maximum number of pointers allocated by the user
+ * process.
+ *
+ * max_one_p <- Pointer to an unsigned long which, if not 0L, will be
+ * set to the maximum allocated with 1 call by the user process.
+ */
+void	_dmalloc_chunk_get_stats(void **heap_low_p, void **heap_high_p,
+				 unsigned long *total_space_p,
+				 unsigned long *user_space_p,
+				 unsigned long *current_allocated_p,
+				 unsigned long *current_pnt_np,
+				 unsigned long *max_allocated_p,
+				 unsigned long *max_pnt_np,
+				 unsigned long *max_one_p)
+{
+  SET_POINTER(heap_low_p, _dmalloc_heap_low);
+  SET_POINTER(heap_high_p, _dmalloc_heap_high);
+  SET_POINTER(total_space_p, (user_block_c + admin_block_c) * BLOCK_SIZE);
+  SET_POINTER(user_space_p, alloc_current + free_space_bytes);
+  SET_POINTER(current_allocated_p, alloc_current);
+  SET_POINTER(current_pnt_np, alloc_cur_pnts);
+  SET_POINTER(max_allocated_p, alloc_maximum);
+  SET_POINTER(max_pnt_np, alloc_max_pnts);
+  SET_POINTER(max_one_p, alloc_one_max);
 }

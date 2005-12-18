@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.70 2004/01/14 16:17:57 gray Exp $
+ * $Id: chunk.h,v 1.71 2005/12/18 14:46:11 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -346,6 +346,61 @@ extern
 unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
 					     const int count_not_freed_b,
 					     const int count_freed_b);
+
+/*
+ * void _dmalloc_chunk_get_stats
+ *
+ * DESCRIPTION:
+ *
+ * Return a number of statistics about the current heap.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * heap_low_p <- Pointer to pointer which, if not 0L, will be set to
+ * the low address in the heap.
+ *
+ * heap_high_p <- Pointer to pointer which, if not 0L, will be set to
+ * the high address in the heap.
+ *
+ * total_space_p <- Pointer to an unsigned long which, if not 0L, will
+ * be set to the total space managed by the library including user
+ * space, administrative space, and overhead.
+ *
+ * user_space_p <- Pointer to an unsigned long which, if not 0L, will
+ * be set to the space given to the user process (allocated and free).
+ *
+ * current_allocated_p <- Pointer to an unsigned long which, if not
+ * 0L, will be set to the current allocated space given to the user
+ * process.
+ *
+ * current_pnt_np <- Pointer to an unsigned long which, if not 0L,
+ * will be set to the current number of pointers allocated by the user
+ * process.
+ *
+ * max_allocated_p <- Pointer to an unsigned long which, if not 0L,
+ * will be set to the maximum allocated space given to the user
+ * process.
+ *
+ * max_pnt_np <- Pointer to an unsigned long which, if not 0L, will be
+ * set to the maximum number of pointers allocated by the user
+ * process.
+ *
+ * max_one_p <- Pointer to an unsigned long which, if not 0L, will be
+ * set to the maximum allocated with 1 call by the user process.
+ */
+extern
+void	_dmalloc_chunk_get_stats(void **heap_low_p, void **heap_high_p,
+				 unsigned long *total_space_p,
+				 unsigned long *user_space_p,
+				 unsigned long *current_allocated_p,
+				 unsigned long *current_pnt_np,
+				 unsigned long *max_allocated_p,
+				 unsigned long *max_pnt_np,
+				 unsigned long *max_one_p);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

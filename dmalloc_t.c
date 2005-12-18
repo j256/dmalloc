@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.122 2005/11/30 15:21:48 gray Exp $
+ * $Id: dmalloc_t.c,v 1.123 2005/12/18 14:46:41 gray Exp $
  */
 
 /*
@@ -2288,6 +2288,63 @@ static	int	check_special(void)
     
     /* restore flags */
     dmalloc_debug(old_flags);
+  }
+  
+  /********************/
+  
+  /*
+   * Check the dmalloc_get_stats function
+   */
+  {
+    unsigned long	current_allocated, current_pnt_n;
+    unsigned long	current_allocated2, current_pnt_n2;
+    int			amount;
+    
+    if (! silent_b) {
+      (void)printf("  Checking the dmalloc_get_stats function\n");
+    }
+    
+    dmalloc_get_stats(NULL, NULL, NULL, NULL, &current_allocated,
+		      &current_pnt_n, NULL, NULL, NULL);
+    
+    amount = 12;
+    pnt = malloc(amount);
+    
+    dmalloc_get_stats(NULL, NULL, NULL, NULL, &current_allocated2,
+		      &current_pnt_n2, NULL, NULL, NULL);
+    
+    if (current_allocated2 != current_allocated + amount) {
+      if (! silent_b) {
+	(void)printf("   ERROR: dmalloc_get_stats did not count alloc of %d\n",
+		     amount);
+      }
+      final = 0;
+    }
+    if (current_pnt_n2 != current_pnt_n + 1) {
+      if (! silent_b) {
+	(void)printf("   ERROR: dmalloc_get_stats did not count pnt alloc\n");
+      }
+      final = 0;
+    }
+    
+    free(pnt);
+    
+    dmalloc_get_stats(NULL, NULL, NULL, NULL, &current_allocated2,
+		      &current_pnt_n2, NULL, NULL, NULL);
+    
+    if (current_allocated2 != current_allocated) {
+      if (! silent_b) {
+	(void)printf("   ERROR: dmalloc_get_stats did not count free of %d\n",
+		     amount);
+      }
+      final = 0;
+    }
+    if (current_pnt_n2 != current_pnt_n) {
+      if (! silent_b) {
+	(void)printf("   ERROR: dmalloc_get_stats did not count pnt free\n");
+      }
+      final = 0;
+    }
   }
   
   /********************/
