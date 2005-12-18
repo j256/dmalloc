@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.283 2005/10/28 01:35:38 gray Exp $
+@c $Id: dmalloc.texi,v 1.284 2005/12/18 14:46:29 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1353,6 +1353,39 @@ Write a message into the dmalloc logfile using vprintf-like arguments.
 void dmalloc_message ( const char * @var{format}, @var{...} )
 
 Write a message into the dmalloc logfile using printf-like arguments.
+
+@end deftypefun
+
+@c --------------------------------
+
+@cindex dmalloc_get_stats function
+@cindex get heap statistics
+@cindex heap statistics function
+@cindex report heap statistics
+
+@deftypefun
+
+void dmalloc_get_stats ( DMALLOC_PNT * @var{heap_low_p}, DMALLOC_PNT *
+@var{heap_high_p}, unsigned long * @var{total_space_p}, unsigned long
+* @var{user_space_p}, unsigned long * @var{current_allocated_p},
+unsigned long * @var{current_pnt_np}, unsigned long *
+@var{max_allocated_p}, unsigned long * @var{max_pnt_np}, unsigned long
+* @var{max_one_p})
+
+This function return a number of statistics about the current heap.
+The pointers @code{heap_low_p} and @code{heap_high_p} will be set to
+the low and high spots in the heap.  @code{total_space_p} will be set
+to the total space in the heap including user space, administrative
+space, and overhead.  @code{user_space_p} will be set to the space
+given to the user process (allocated and free space).
+@code{current_allocated_p} will be set to the current allocated space
+given to the user process.  @code{current_pnt_np} will be set to the
+current number of pointers allocated by the user process.
+@code{max_allocated_p} will be set to the maximum allocated space
+given to the user process.  @code{max_pnt_np} will be set to the
+maximum number of pointers allocated by the user process.
+@code{max_on_p} will be set to the maximum space allocated with one
+call by the user process.
 
 @end deftypefun
 
@@ -3226,6 +3259,16 @@ then @code{ERROR_FREE_OVERWRITTEN} is triggered.  @xref{Error Codes}.
 @cindex error-abort
 @item error-abort
 Abort the program (and dump core) on errors.  See @code{error-dump} below.
+
+@cindex no core dump
+@cindex core dump, none
+@cindex missing core dump
+@emph{NOTE}: The library uses the @code{abort} function to dump core.
+If you are not getting a @file{core} file, make sure that your program
+has not changed to a new directory and that it has write privileges
+over the directory it is in.  You will also want to check your user
+and system's core dump size ulimit settings.  If you program name is
+@file{foo}, then your system may dump core as @file{foo.core}.
 
 @cindex blank space
 @cindex blanking memory
