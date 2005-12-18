@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.285 2005/12/18 15:03:25 gray Exp $
+@c $Id: dmalloc.texi,v 1.286 2005/12/18 18:08:54 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -588,9 +588,8 @@ include @dfn{malloc}, @dfn{calloc}, @dfn{realloc}, and @dfn{free}.  For
 more information about their capabilities, check your system's manual
 pages -- in unix, do a @code{man 3 malloc}.
 
-@deftypefun
-void *malloc ( unsigned int @var{size} )
 @cindex malloc
+@deftypefun void *malloc ( unsigned int @var{size} )
 
 Usage: @code{pnt = (type *)malloc(size)}
 
@@ -599,9 +598,7 @@ an area of @code{size} bytes.  It will return a pointer to the space
 requested.
 
 @end deftypefun
-@deftypefun
-void *calloc ( unsigned int @var{number}, unsigned int
-@var{size} )
+@deftypefun void *calloc ( unsigned int @var{number}, unsigned int@var{size} )
 @cindex calloc
 @cindex Allocation of zeros
 @cindex zeros, allocation of
@@ -616,9 +613,7 @@ Also, calloc nulls the space that it returns, assuring that the memory
 is all zeros.
 
 @end deftypefun
-@deftypefun
-void *realloc ( void *@var{old_pnt}, unsigned int
-@var{new_size} )
+@deftypefun void *realloc ( void *@var{old_pnt}, unsigned int @var{new_size} )
 @cindex realloc
 
 Usage: @code{new_pnt = (type *)realloc(old_pnt, new_size)}
@@ -635,8 +630,7 @@ not 0L, then it will do the equivalent of @code{free(old_pnt)} and will
 return 0L.
 
 @end deftypefun
-@deftypefun
-void free ( void *@var{pnt} )
+@deftypefun void free ( void *@var{pnt} )
 @cindex free
 
 Usage: @code{free(pnt)}
@@ -1043,8 +1037,7 @@ routines:
 @cindex dmalloc_shutdown function
 @cindex shutdown the library
 
-@deftypefun
-void dmalloc_shutdown ( void )
+@deftypefun void dmalloc_shutdown ( void )
 
 @cindex atexit function
 @cindex on_exit function
@@ -1073,8 +1066,7 @@ main()
 @cindex verify pointers
 @cindex verify the heap
 
-@deftypefun
-int dmalloc_verify ( char * @var{pnt} )
+@deftypefun int dmalloc_verify ( char * @var{pnt} )
 
 This function verifies individual memory pointers that are suspect of
 memory problems.  To check the entire heap pass in a NULL or 0 pointer.
@@ -1092,8 +1084,7 @@ areas in the heap.
 @cindex override debug settings
 @cindex set debug functionality flags
 
-@deftypefun
-unsigned int dmalloc_debug ( const unsigned int @var{flags} )
+@deftypefun unsigned int dmalloc_debug ( const unsigned int @var{flags} )
 
 This routine sets the debug functionality flags and returns the
 previous flag value.  It is helpful in server or cgi-bin programs
@@ -1115,8 +1106,7 @@ handlers since they are setup at initialization time only.
 @cindex dmalloc_debug_current function
 @cindex current debug value
 
-@deftypefun
-unsigned int dmalloc_debug_current ( void )
+@deftypefun unsigned int dmalloc_debug_current ( void )
 
 This routine returns the current debug functionality value value.  This
 allows you to save a copy of the debug dmalloc settings to be changed
@@ -1132,8 +1122,7 @@ and then restored later.
 @cindex setup debug flags
 @cindex string of debug tokens
 
-@deftypefun
-void dmalloc_debug_setup ( const char * @var{options_str} )
+@deftypefun void dmalloc_debug_setup ( const char * @var{options_str} )
 
 This routine sets the global debugging functionality as an option
 string.  Normally this would be passed in in the DMALLOC_OPTIONS
@@ -1145,11 +1134,18 @@ Server}.
 Some examples:
 
 @example
-/* debug tokens high, threaded lock-on at 20, log to dmalloc.%p (pid) */
+/*
+ * debug tokens high, threaded lock-on at 20,
+ * log to dmalloc.%p (pid)
+ */
 dmalloc_debug_setup("debug=0x4f46d03,lockon=20,log=dmalloc.%p");
 
-/* turn on some debug tokens directly and log to the file 'logfile' */
-dmalloc_debug_setup("log-stats,log-non-free,check-fence,log=logfile");
+/*
+ * turn on some debug tokens directly and log to the
+ * file 'logfile'
+ */
+dmalloc_debug_setup(
+  "log-stats,log-non-free,check-fence,log=logfile");
 @end example
 
 @end deftypefun
@@ -1160,11 +1156,7 @@ dmalloc_debug_setup("log-stats,log-non-free,check-fence,log=logfile");
 @cindex examine a pointer
 @cindex pointer information
 
-@deftypefun
-int dmalloc_examine ( const DMALLOC_PNT @var{pnt}, DMALLOC_SIZE *
-@var{user_size_p}, DMALLOC_SIZE * @var{total_size_p}, char **
-@var{file_p}, int * @var{line_p}, DMALLOC_PNT * @var{ret_addr_p},
-unsigned long * @var{user_mark_p}, unsigned long * @var{seen_p} )
+@deftypefun int dmalloc_examine ( const DMALLOC_PNT @var{pnt}, DMALLOC_SIZE * @var{user_size_p}, DMALLOC_SIZE * @var{total_size_p}, char ** @var{file_p}, int * @var{line_p}, DMALLOC_PNT * @var{ret_addr_p}, unsigned long * @var{user_mark_p}, unsigned long * @var{seen_p} )
 
 This function returns the size of a pointer's allocation as well as the
 total size given including administrative overhead, file and line or the
@@ -1183,8 +1175,7 @@ not all other malloc libraries.
 @cindex dmalloc_track function
 @cindex track memory calls
 
-@deftypefun
-void dmalloc_track ( const dmalloc_track_t @var{track_func} )
+@deftypefun void dmalloc_track ( const dmalloc_track_t @var{track_func} )
 
 Register an allocation tracking function which will be called each time
 an allocation occurs.  Pass in NULL to disable.  To take a look at what
@@ -1202,8 +1193,7 @@ dmalloc.h.
 @cindex interaction count
 @cindex transaction count
 
-@deftypefun
-unsigned unsigned long dmalloc_mark ( void )
+@deftypefun unsigned long dmalloc_mark ( void )
 
 Return to the caller the current "mark" which can be used later to log
 the pointers which have changed since this mark with the
@@ -1229,8 +1219,7 @@ transaction number with each pointer.
 @cindex memory allocated function
 @cindex number of bytes allocated
 
-@deftypefun
-unsigned unsigned long dmalloc_memory_allocated ( void )
+@deftypefun unsigned long dmalloc_memory_allocated ( void )
 
 Return to the caller the total number of bytes that have been allocated
 by the library.  This is not the current in use but the total number of
@@ -1243,8 +1232,7 @@ bytes returned by allocation functions.
 @cindex page size
 @cindex size of memory pages
 
-@deftypefun
-unsigned unsigned int dmalloc_page_size ( void )
+@deftypefun unsigned int dmalloc_page_size ( void )
 
 Return to the caller the memory page-size being used by the library.
 This should be the same value as the one returned by the
@@ -1258,9 +1246,7 @@ This should be the same value as the one returned by the
 @cindex count number of bytes changed since mark
 @cindex number bytes changed since mark
 
-@deftypefun
-unsigned unsigned long dmalloc_count_changed ( const unsigned long @var{mark},
-const int @var{not_freed_b}, const int @var{free_b} )
+@deftypefun unsigned long dmalloc_count_changed ( const unsigned long @var{mark}, const int @var{not_freed_b}, const int @var{free_b} )
 
 Count the pointers that have changed since the mark which was returned by
 @code{dmalloc_mark}.  If @code{not_freed_b} is set to non-0 then count the
@@ -1285,8 +1271,7 @@ assert(dmalloc_count_changed(mark, 1, 0) == 0) ;
 @cindex log statistics
 @cindex statistics logging
 
-@deftypefun
-void dmalloc_log_stats ( void )
+@deftypefun void dmalloc_log_stats ( void )
 
 This routine outputs the current dmalloc statistics to the log file.
 @end deftypefun
@@ -1297,8 +1282,7 @@ This routine outputs the current dmalloc statistics to the log file.
 @cindex log unfreed memory
 @cindex unfreed memory log
 
-@deftypefun
-void dmalloc_log_unfreed( void )
+@deftypefun void dmalloc_log_unfreed ( void )
 
 This function logs the unfreed-memory information to the log file.
 This is also useful to log the currently allocated points to the log
@@ -1313,9 +1297,7 @@ file to be compared against another dump later on.
 @cindex checkpoint memory usage
 @cindex log memory changes
 
-@deftypefun
-void dmalloc_log_changed ( const unsigned long @var{mark}, const int
-@var{not_freed_b}, const int @var{freed_b}, const int @var{details_b} )
+@deftypefun void dmalloc_log_changed ( const unsigned long @var{mark}, const int @var{not_freed_b}, const int @var{freed_b}, const int @var{details_b} )
 
 Log the pointers that have changed since the mark which was returned by
 @code{dmalloc_mark}.  If @code{not_freed_b} is set to non-0 then log the
@@ -1336,8 +1318,7 @@ which are leaking memory.  @xref{Debugging A Server}.
 @cindex write message to logfile
 @cindex logfile message writer
 
-@deftypefun
-void dmalloc_vmessage ( const char * @var{format}, va_list @var{args} )
+@deftypefun void dmalloc_vmessage ( const char * @var{format}, va_list @var{args} )
 
 Write a message into the dmalloc logfile using vprintf-like arguments.
 
@@ -1349,8 +1330,7 @@ Write a message into the dmalloc logfile using vprintf-like arguments.
 @cindex write message to logfile
 @cindex logfile message writer
 
-@deftypefun
-void dmalloc_message ( const char * @var{format}, @var{...} )
+@deftypefun void dmalloc_message ( const char * @var{format}, @var{...} )
 
 Write a message into the dmalloc logfile using printf-like arguments.
 
@@ -1363,14 +1343,7 @@ Write a message into the dmalloc logfile using printf-like arguments.
 @cindex heap statistics function
 @cindex report heap statistics
 
-@deftypefun
-
-void dmalloc_get_stats ( DMALLOC_PNT * @var{heap_low_p}, DMALLOC_PNT *
-@var{heap_high_p}, unsigned long * @var{total_space_p}, unsigned long
-* @var{user_space_p}, unsigned long * @var{current_allocated_p},
-unsigned long * @var{current_pnt_np}, unsigned long *
-@var{max_allocated_p}, unsigned long * @var{max_pnt_np}, unsigned long
-* @var{max_one_p})
+@deftypefun void dmalloc_get_stats ( DMALLOC_PNT * @var{heap_low_p}, DMALLOC_PNT * @var{heap_high_p}, unsigned long * @var{total_space_p}, unsigned long * @var{user_space_p}, unsigned long * @var{current_allocated_p}, unsigned long * @var{current_pnt_np}, unsigned long * @var{max_allocated_p}, unsigned long * @var{max_pnt_np}, unsigned long * @var{max_one_p})
 
 This function return a number of statistics about the current heap.
 The pointers @code{heap_low_p} and @code{heap_high_p} will be set to
@@ -1395,8 +1368,7 @@ call by the user process.
 @cindex string error message
 @cindex error message
 
-@deftypefun
-const char * dmalloc_strerror ( const int @var{error_number} )
+@deftypefun const char * dmalloc_strerror ( const int @var{error_number} )
 
 This function returns the string representation of the error value in
 @code{error_number} (which probably should be dmalloc_errno).  This
@@ -1453,10 +1425,9 @@ non-0 value because it forces you to set it explicitly.
 @cindex INVALID_ERROR
 
 @item 2 (INVALID_ERROR)
-Invalid error number.  If the library outputs this error however the
-dmalloc utility says that it is invalid then your dmalloc utility may be
-out of date with the library you linked against.  This will be returned
-with all error codes not listed here.
+Invalid error number.  If the library outputs this error then your
+dmalloc utility may be out of date with the library you linked
+against.  This will be returned with all error codes not listed here.
 
 @c --------------------------------
 
@@ -2476,11 +2447,14 @@ main()
         break;
       @}
 #ifdef DMALLOC
-      /* log unfreed pointers that have been added to the heap since mark */
+      /*
+       * log unfreed pointers that have been added to
+       * the heap since mark
+       */
       dmalloc_log_changed(mark,
                           1 /* log unfreed pointers */,
                           0 /* do not log freed pointers */,
-                          1 /* log individual pointers otherwise a summary */);
+                          1 /* log each pnt otherwise summary */);
 #endif
     @}
     /* close the connection with the client */
@@ -2515,15 +2489,15 @@ sole information source for diagnosing problems in and getting
 statistics for your program.
 
 @example
-1098918225: 3: Dmalloc version '@value{dmalloc_version}' from 'http://dmalloc.com/'
+1098918225: 3: Dmalloc version '@value{dmalloc_version}'
 1098918225: 3: flags = 0x4f4e503, logfile '/tmp/dmalloc.log'
 1098918225: 3: interval = 500, addr = 0, seen # = 0, limit = 0
 1098918225: 3: starting time = 1098918225
 1098918225: 3: process pid = 32406
 1098918225: 3: WARNING: tried to free(0) from foo.c:708'
-1098918230: 100: ERROR: heap_check: free space has been overwritten (err 67)
-1098918230: 100:   error details: checking free pointer
-1098918230: 100:   pointer '0x291c5' from 'unknown' prev access 'foo.c:787'
+1098918230: 50: ERROR: heap_check: free space was overwritten (err 67)
+1098918230: 50: error details: checking free pointer
+1098918230: 50: pointer '0x291c5' from 'unknown' prev access 'foo.c:787'
 @end example
 
 Here is a short example of some logfile information.  Each of the
@@ -2556,7 +2530,7 @@ in @file{settings.dist}.
 
 Lines 7-9 is the next problem that the library caught and this one is
 an error.  It happened 5 seconds after the previous one (1098918230)
-and at the 100th call into the library.  It shows that an allocation
+and at the 50th call into the library.  It shows that an allocation
 that had been freed then was overwritten.  This may imply that someone
 tried to use memory after it was freed or that there was a loose
 pointer reference.  The last two lines give more details about when
@@ -2798,10 +2772,12 @@ available.
 Some examples:
 
 @example
-# logfile produced with pid extension:   logfile.8412  or  logfile.31451
+# logfile produced with pid extension:
+#   logfile.8412  or  logfile.31451
 dmalloc -l logfile.%p
 
-# hostname and time extensions:  dmalloc-box1.foo.com-1055213240
+# hostname and time extensions:
+#   dmalloc-box1.foo.com-1055213240
 dmalloc -l dmalloc-%h-%t
 
 # if threads enabled, have thread-id extension:  log.thread32
@@ -3113,15 +3089,17 @@ routine or file has been reached in the program.
 Some examples are:
 
 @example
-# turn on transaction and stats logging and set 'logfile' as the log-file
+# turn on transaction and stats logging and set
+# 'logfile' as the log-file
 setenv DMALLOC_OPTIONS log-trans,log-stats,log=logfile
 
-# enable debug flags 0x1f as well as heap-checking and set the interval
-# to be 100
+# enable debug flags 0x1f as well as heap-checking and
+# set the interval to be 100
 setenv DMALLOC_OPTIONS debug=0x1f,check-heap,inter=100
 
-# enable 'logfile' as the log-file, watch for address '0x1234', and start
-# checking when we see file.c line 123
+# enable 'logfile' as the log-file, watch for
+# address '0x1234', and start checking when we see
+# file.c line 123
 setenv DMALLOC_OPTIONS log=logfile,addr=0x1234,start=file.c:123
 @end example
 
@@ -3267,8 +3245,18 @@ Abort the program (and dump core) on errors.  See @code{error-dump} below.
 If you are not getting a @file{core} file, make sure that your program
 has not changed to a new directory and that it has write privileges
 over the directory it is in.  You will also want to check your user
-and system's core dump size ulimit settings.  If you program name is
-@file{foo}, then your system may dump core as @file{foo.core}.
+and system's core dump size ulimit settings.  If your program name is
+@file{foo}, then your system may dump core as @file{foo.core}.  Core
+dumps are often security problems since they contain all program
+memory so systems often block their being produced.  If the following
+program does not dump core then this may be the problem.
+
+@example
+main()
+@{
+  abort();
+@}
+@end example
 
 @cindex blank space
 @cindex blanking memory
