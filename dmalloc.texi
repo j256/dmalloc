@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.286 2005/12/18 18:08:54 gray Exp $
+@c $Id: dmalloc.texi,v 1.287 2005/12/18 18:32:18 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1000,34 +1000,34 @@ it is ignored since dmalloc does not know anything about it.
 The library has a number of variables that are not a standard part of
 most malloc libraries:
 
-@table @code
-
 @c --------------------------------
 
 @cindex dmalloc_errno number
 @cindex internal error number
 @cindex error number
 
-@item int dmalloc_errno
+@deftypevar int dmalloc_errno
 
 This variable stores the internal dmalloc library error number like errno
 does for the system calls.  It can be passed to @code{dmalloc_strerror()}
 (see below) to get a string version of the error.  It will have a value
 of zero if the library has not detected any problems.
 
+@end deftypevar
+
 @c --------------------------------
 
 @cindex dmalloc_logpath variable
 @cindex logfile name
 
-@item char * dmalloc_logpath
+@deftypevar char* dmalloc_logpath
 
 This variable can be used to set the dmalloc log filename.  The env
 variable @code{DMALLOC_LOGFILE} overrides this variable.
 
 @c --------------------------------
 
-@end table
+@end deftypevar
 
 Additionally the library provides a number of non-standard malloc
 routines:
@@ -1084,7 +1084,7 @@ areas in the heap.
 @cindex override debug settings
 @cindex set debug functionality flags
 
-@deftypefun unsigned int dmalloc_debug ( const unsigned int @var{flags} )
+@deftypefun unsigned-int dmalloc_debug ( const unsigned int @var{flags} )
 
 This routine sets the debug functionality flags and returns the
 previous flag value.  It is helpful in server or cgi-bin programs
@@ -1106,7 +1106,7 @@ handlers since they are setup at initialization time only.
 @cindex dmalloc_debug_current function
 @cindex current debug value
 
-@deftypefun unsigned int dmalloc_debug_current ( void )
+@deftypefun unsigned-int dmalloc_debug_current ( void )
 
 This routine returns the current debug functionality value value.  This
 allows you to save a copy of the debug dmalloc settings to be changed
@@ -1193,7 +1193,7 @@ dmalloc.h.
 @cindex interaction count
 @cindex transaction count
 
-@deftypefun unsigned long dmalloc_mark ( void )
+@deftypefun unsigned-long dmalloc_mark ( void )
 
 Return to the caller the current "mark" which can be used later to log
 the pointers which have changed since this mark with the
@@ -1219,7 +1219,7 @@ transaction number with each pointer.
 @cindex memory allocated function
 @cindex number of bytes allocated
 
-@deftypefun unsigned long dmalloc_memory_allocated ( void )
+@deftypefun unsigned-long dmalloc_memory_allocated ( void )
 
 Return to the caller the total number of bytes that have been allocated
 by the library.  This is not the current in use but the total number of
@@ -1232,7 +1232,7 @@ bytes returned by allocation functions.
 @cindex page size
 @cindex size of memory pages
 
-@deftypefun unsigned int dmalloc_page_size ( void )
+@deftypefun unsigned-int dmalloc_page_size ( void )
 
 Return to the caller the memory page-size being used by the library.
 This should be the same value as the one returned by the
@@ -1246,7 +1246,7 @@ This should be the same value as the one returned by the
 @cindex count number of bytes changed since mark
 @cindex number bytes changed since mark
 
-@deftypefun unsigned long dmalloc_count_changed ( const unsigned long @var{mark}, const int @var{not_freed_b}, const int @var{free_b} )
+@deftypefun unsigned-long dmalloc_count_changed ( const unsigned long @var{mark}, const int @var{not_freed_b}, const int @var{free_b} )
 
 Count the pointers that have changed since the mark which was returned by
 @code{dmalloc_mark}.  If @code{not_freed_b} is set to non-0 then count the
@@ -1368,7 +1368,7 @@ call by the user process.
 @cindex string error message
 @cindex error message
 
-@deftypefun const char * dmalloc_strerror ( const int @var{error_number} )
+@deftypefun const-char* dmalloc_strerror ( const int @var{error_number} )
 
 This function returns the string representation of the error value in
 @code{error_number} (which probably should be dmalloc_errno).  This
