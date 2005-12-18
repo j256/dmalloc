@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_argv.h,v 1.11 2005/06/05 04:52:40 gray Exp $
+ * $Id: dmalloc_argv.h,v 1.12 2005/12/18 14:47:02 gray Exp $
  */
 
 #ifndef __ARGV_H__
@@ -38,7 +38,7 @@
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.11 2005/06/05 04:52:40 gray Exp $ */
+/* NOTE: start of $Id: dmalloc_argv.h,v 1.12 2005/12/18 14:47:02 gray Exp $ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments
@@ -311,12 +311,12 @@ int	argv_env_after_b;
  *
  * args - Array of argv_t structures.
  *
- * arg_c - Number of arguments in the argv array.
+ * arg_n - Number of arguments in the argv array.
  *
  * argv - Array of character pointers terminated by 0L.
  */
 extern
-int	argv_process_no_env(argv_t *args, const int arg_c, char **argv);
+int	argv_process_no_env(argv_t *args, const int arg_n, char **argv);
 
 /*
  * int argv_process
