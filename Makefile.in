@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.183 2005/12/18 15:14:46 gray Exp $
+# $Id: Makefile.in,v 1.184 2005/12/18 18:11:47 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -148,11 +148,11 @@ installhtml ::
 		umask 022 ;\
 		texi2html -menu -number -split_node $$current/dmalloc.texi ;\
 		for f in dmalloc?*.html ; do \
-			sed -e '1,/<BODY/p' -e d $$f > $$f.t ;\
+			sed -e '1,/<body/p' -e d $$f > $$f.t ;\
 			cat $(WWWDIR)/header_script.html >> $$f.t ;\
-			sed -e '1,/<BODY/d' -e '/<\/BODY>/,$$d' $$f >> $$f.t;\
+			sed -e '1,/<body/d' -e '/<\/body>/,$$d' $$f >> $$f.t;\
 			cat $(WWWDIR)/footer_script.html >> $$f.t ;\
-			sed -e '/<\/BODY>/,$$p' -e d $$f >> $$f.t ;\
+			sed -e '/<\/body>/,$$p' -e d $$f >> $$f.t ;\
 			mv $$f.t $$f ;\
 		done
 
