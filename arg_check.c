@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.37 2005/12/21 13:40:55 gray Exp $
+ * $Id: arg_check.c,v 1.38 2005/12/21 14:27:28 gray Exp $
  */
 
 /*
@@ -164,6 +164,7 @@ void	*_dmalloc_memccpy(const char *file, const int line,
     /* so we have to figure out the max length of the buffer directly here */
     for (src_p = (char *)src; src_p < (char *)src + len; src_p++) {
       if (*src_p == ch) {
+	src_p++;
 	break;
       }
     }
@@ -446,6 +447,7 @@ int	_dmalloc_strncasecmp(const char *file, const int line,
     /* so we have to figure out the max length of the buffers directly here */
     for (s1_p = s1, s2_p = s2; s1_p < s1 + len; s1_p++, s2_p++) {
       if (*s1_p == '\0' || *s2_p == '\0') {
+	s1_p++;
 	break;
       }
     }
@@ -476,6 +478,7 @@ char	*_dmalloc_strncat(const char *file, const int line,
     /* so we have to figure out the max length of the buffers directly here */
     for (from_p = from; from_p < from + len; from_p++) {
       if (*from_p == '\0') {
+	/* no need to do ++ here because we +1 for the \0 anyway */
 	break;
       }
     }
@@ -508,6 +511,7 @@ int	_dmalloc_strncmp(const char *file, const int line,
     /* so we have to figure out the max length of the buffers directly here */
     for (s1_p = s1, s2_p = s2; s1_p < s1 + len; s1_p++, s2_p++) {
       if (*s1_p == '\0' || *s2_p == '\0') {
+	s1_p++;
 	break;
       }
     }
@@ -539,6 +543,7 @@ char	*_dmalloc_strncpy(const char *file, const int line,
     /* so we have to figure out the max length of the buffers directly here */
     for (from_p = from; from_p < from + len; from_p++) {
       if (*from_p == '\0') {
+	from_p++;
 	break;
       }
     }
