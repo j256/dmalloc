@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.123 2005/12/18 14:46:41 gray Exp $
+ * $Id: dmalloc_t.c,v 1.124 2005/12/21 14:27:07 gray Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
 #include "dmalloc.h"
 #include "dmalloc_argv.h"
 #include "dmalloc_rand.h"
+#include "arg_check.h"
 
 /*
  * NOTE: these are only needed to test certain features of the library.
@@ -213,6 +214,7 @@ static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
  */
 static	int	do_random(const int iter_n)
 {
+  unsigned int	old_flags = dmalloc_debug_current();
   unsigned int	flags;
   int		iter_c, prev_errno, amount, max_avail, free_c;
   int		final = 1;
@@ -314,7 +316,7 @@ static	int	do_random(const int iter_n)
     }
 #endif
     
-    which_func = _dmalloc_rand() % 7;
+    which_func = _dmalloc_rand() % 9;
     
     switch (which_func) {
       
@@ -482,6 +484,48 @@ static	int	do_random(const int iter_n)
       continue;
       break;
       
+#if HAVE_STRDUP
+      /* strdup */
+    case 7:
+      {
+	char	str[] = "this is a test of the emergency broadcasting system, the broadcasters in your area would like you to know that this system has really never been fully tested so we have no idea if it would actually work in the advent of a real disaster.";
+	
+	amount = _dmalloc_rand() % strlen(str);
+	str[amount] = '\0';
+	
+	pnt_p = free_p;
+	pnt_p->pi_pnt = strdup(str);
+	
+	if (verbose_b) {
+	  /* the amount includes the \0 */
+	  (void)printf("%d: strdup %d of max %d into slot %d.  got %#lx\n",
+		       iter_c + 1, amount + 1, max_avail, pnt_p - pointer_grid,
+		       (long)pnt_p->pi_pnt);
+	}
+      }
+      break;
+#endif
+      
+#if HAVE_STRNDUP
+      /* strndup */
+    case 8:
+      {
+	char	str[] = "this is a test of the emergency broadcasting system, the broadcasters in your area would like you to know that this system has really never been fully tested so we have no idea if it would actually work in the advent of a real disaster.";
+	
+	amount = _dmalloc_rand() % strlen(str);
+	
+	pnt_p = free_p;
+	pnt_p->pi_pnt = strndup(str, amount);
+	
+	if (verbose_b) {
+	  (void)printf("%d: strdup %d of max %d into slot %d.  got %#lx\n",
+		       iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		       (long)pnt_p->pi_pnt);
+	}
+      }
+      break;
+#endif      
+      
     default:
       continue;
       break;
@@ -520,6 +564,7 @@ static	int	do_random(const int iter_n)
   }
   
   free(pointer_grid);
+  dmalloc_debug(old_flags);
   
   return final;
 }
@@ -681,6 +726,614 @@ static	int	check_initial_special(void)
 
   /********************/
 
+  return final;
+}
+
+/*
+ * Make sure that some of the arg check stuff works.
+ */
+static	int	check_arg_check(void)
+{
+  unsigned int	old_flags = dmalloc_debug_current();
+  char		*func;
+  int		our_errno_hold = dmalloc_errno;
+  int		size, final = 1;
+  char		*pnt, *pnt2;
+  
+  if (! silent_b) {
+    (void)printf("  Checking arg-check functions\n");
+  }
+  
+  /* enable alloc blanking without fence-posts */
+  dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
+  
+  size = 5;
+  pnt = malloc(size);
+  if (pnt == NULL) {
+    if (! silent_b) {
+      (void)printf("     ERROR: could not malloc %d bytes.\n", size);
+    }
+    return 0;
+  }
+  pnt2 = malloc(size * 2);
+  if (pnt2 == NULL) {
+    if (! silent_b) {
+      (void)printf("     ERROR: could not malloc %d bytes.\n", size * 2);
+    }
+    return 0;
+  }
+  
+  /*********/
+  
+#if HAVE_BCMP
+  func = "bcmp";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 1, size);
+  memset(pnt2, 1, size);
+  if (_dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 1, size);
+  memset(pnt2, 2, size);
+  if (_dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size) == 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  dmalloc_errno = 0;
+  _dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload did not register overwrite\n",
+		   func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_BCOPY
+  func = "bcopy";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 2, size);
+  _dmalloc_bcopy(__FILE__, __LINE__, pnt, pnt2, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  /* check to see if it worked */
+  if (memcmp(pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 2, size);
+  _dmalloc_bcopy(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_BZERO
+  func = "bzero";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  _dmalloc_bzero(__FILE__, __LINE__, pnt, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  _dmalloc_bzero(__FILE__, __LINE__, pnt, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_MEMCCPY
+  func = "memccpy";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 3, size);
+  _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_MEMCHR
+  func = "memchr";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 4, size);
+  if (_dmalloc_memchr(__FILE__, __LINE__, pnt, 0, size) != NULL) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s should have failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  (void)_dmalloc_memchr(__FILE__, __LINE__, pnt, 0, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_MEMCMP
+  func = "memcmp";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 5, size);
+  memset(pnt2, 5, size);
+  if (_dmalloc_memcmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s should have passed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  (void)_dmalloc_memcmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_MEMCPY
+  func = "memcpy";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 6, size);
+  _dmalloc_memcpy(__FILE__, __LINE__, pnt2, pnt, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  if (memcmp(pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  (void)_dmalloc_memcpy(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_MEMMOVE
+  func = "memmove";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 7, size);
+  _dmalloc_memmove(__FILE__, __LINE__, pnt2, pnt, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  if (memcmp(pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  (void)_dmalloc_memmove(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_MEMSET
+  func = "memset";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRDUP
+#ifdef DMALLOC_STRDUP_MACRO
+  func = "strdup";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  {
+    char	*new_pnt;
+    
+    /* this copies characters into buffer */
+    dmalloc_errno = 0;
+    memset(pnt, 3, size);
+    memset(pnt + size - 1, 0, 1);
+    new_pnt = strdup(pnt);
+    if (new_pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("     ERROR: %s overload failed\n", func);
+      }
+      final = 0;
+    }
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("     ERROR: %s overload should not get error\n", func);
+      }
+      final = 0;
+    }
+    
+    /* this copies too many characters into buffer */
+    dmalloc_errno = 0;
+    memset(pnt, 3, size);
+    new_pnt = strdup(pnt);
+    if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+      if (! silent_b) {
+	(void)printf("     ERROR: %s overload should get error\n", func);
+      }
+      final = 0;
+    }
+  }
+#endif
+#endif
+  
+  /*********/
+  
+#if HAVE_STRNCASECMP
+  func = "strncasecmp";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 'a', size);
+  memset(pnt2, 'A', size);
+  if (_dmalloc_strncasecmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  (void)_dmalloc_strncasecmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRNCAT
+  func = "strncat";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  /* sanity check */
+  if (size <= 2) {
+    abort();
+  }
+  memset(pnt, 8, size);
+  /* remove 2 chars from end of pnt to fit 1 from pnt2 and \0 */
+  pnt[size - 2] = '\0';
+  memset(pnt2, 8, size);
+  pnt2[1] = '\0';
+  _dmalloc_strncat(__FILE__, __LINE__, pnt, pnt2, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 8, size);
+  /* now just remove one so the \0 would overwrite */
+  pnt[size - 1] = '\0';
+  _dmalloc_strncat(__FILE__, __LINE__, pnt, pnt2, size);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRNCMP
+  func = "strncat";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 9, size);
+  memset(pnt2, 9, size);
+  if (_dmalloc_strncmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  (void)_dmalloc_strncmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRNCPY
+  func = "strncpy";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  memset(pnt, 9, size);
+  _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size);
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  if (memcmp(pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  
+  /* this copies too many characters into buffer */
+  dmalloc_errno = 0;
+  _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size + 1);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRNDUP
+  func = "strndup";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  {
+    void	*new_pnt;
+    
+    /* this copies too many characters into buffer */
+    dmalloc_errno = 0;
+    new_pnt = strndup(pnt, size);
+    if (new_pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("     ERROR: %s overload failed\n", func);
+      }
+      final = 0;
+    }
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("     ERROR: %s overload should not get error\n", func);
+      }
+      final = 0;
+    }
+    free(new_pnt);
+      
+    dmalloc_errno = 0;
+    memset(pnt, 1, size);
+    new_pnt = strndup(pnt, size + 1);
+    if (new_pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("     ERROR: strndup failed\n");
+      }
+      final = 0;
+    }
+    if (dmalloc_errno != 0) {
+      if (! silent_b) {
+	(void)printf("     ERROR: %s overload should not get error\n", func);
+      }
+      final = 0;
+    }
+    free(new_pnt);
+  }
+#endif
+  
+  /*********/
+    
+  free(pnt);
+  free(pnt2);
+
+  /* restore flags */
+  dmalloc_debug(old_flags);
+  dmalloc_errno = our_errno_hold;
+  
   return final;
 }
 
@@ -1588,6 +2241,13 @@ static	int	check_special(void)
   
   /********************/
   
+  /* check all of the arg check routines */
+  if (! check_arg_check()) {
+    final = 0;
+  }
+  
+  /********************/
+  
   dmalloc_message("NOTE: ignore the errors from the above ----- to here.\n");
   dmalloc_message("-------------------------------------------------------\n");
   
@@ -1924,7 +2584,7 @@ static	int	check_special(void)
     old_flags = dmalloc_debug_current();
     dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
     
-    _dmalloc_memset(buf, 0, sizeof(buf));
+    _dmalloc_memset(__FILE__, __LINE__, buf, 0, sizeof(buf));
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
 	(void)printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s (err %d)\n",
@@ -2040,7 +2700,7 @@ static	int	check_special(void)
     }
     
     dmalloc_errno = ERROR_NONE;
-    _dmalloc_memset(pnt, 0, BUF_SIZE);
+    _dmalloc_memset(__FILE__, __LINE__, pnt, 0, BUF_SIZE);
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
 	(void)printf("   ERROR: memset on buf of %d bytes failed.\n",
@@ -2063,7 +2723,7 @@ static	int	check_special(void)
     }
     
     dmalloc_errno = ERROR_NONE;
-    _dmalloc_memset(pnt, 0, BUF_SIZE);
+    _dmalloc_memset(__FILE__, __LINE__, pnt, 0, BUF_SIZE);
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
 	(void)printf("   ERROR: memset of %d bytes with check-fence failed.\n",
