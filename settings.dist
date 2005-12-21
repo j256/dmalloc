@@ -5,12 +5,12 @@
  *
  * This file is part of the dmalloc package.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose and without fee is hereby granted, provided
- * that the above copyright notice and this permission notice appear
- * in all copies, and that the name of Gray Watson not be used in
- * advertising or publicity pertaining to distribution of the document
- * or software without specific, written prior permission.
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
  *
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.68 2004/09/13 05:14:04 gray Exp $
+ * $Id: settings.dist,v 1.69 2005/12/21 14:35:47 gray Exp $
  */
 
 /*
@@ -145,13 +145,14 @@
  * a look at atexit.c in the contrib directory which may provide this
  * useful functionality for your system.
  *
- * NOTE: If you are having problems with the library going recursive (see
- * LOCK_THREADS below if you are using pthreads), you might want to
- * try setting this to 0.  Because the library makes a call to on_exit
- * or atexit to register itself, it may cause memory transactions by
- * the system causing the dreaded recursive message.  You may then be
- * forced to register dmalloc_shutdown yourself via on_exit or atexit
- * in main() or call dmalloc_shutdown directly before you exit().
+ * NOTE: If you are having problems with the library going recursive
+ * (see LOCK_THREADS below if you are using pthreads), you might want
+ * to try setting this to 0.  Because the library makes a call to
+ * on_exit or atexit to register itself, it may cause memory
+ * transactions by the system causing the dreaded recursive message.
+ * You may then be forced to register dmalloc_shutdown yourself via
+ * on_exit or atexit in main() or call dmalloc_shutdown directly
+ * before you exit().
  */
 #define AUTO_SHUTDOWN 1
 
@@ -162,8 +163,8 @@
  * recursive when it is aborting.  See ABORT_OKAY in the conf.h file
  * for more information.
  *
- * If you need to override it or if ABORT_OKAY is 0, set KILL_PROCESS to
- * the proper way to stop the program.  Killing the current process
+ * If you need to override it or if ABORT_OKAY is 0, set KILL_PROCESS
+ * to the proper way to stop the program.  Killing the current process
  * (id 0) with SIGABRT works on a number of Unix systems.  You may
  * have to define some include file to get the value for the signal
  * that is used.
@@ -389,8 +390,8 @@
 #endif
 
 /*
- * The default smallest allowable allocations in bytes.  Any blocks asked 
- * for that are smaller will be rounded up to this size.
+ * The default smallest allowable allocations in bytes.  Any blocks
+ * asked for that are smaller will be rounded up to this size.
  */
 #define DEFAULT_SMALLEST_ALLOCATION	8
 
