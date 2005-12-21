@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: settings.dist,v 1.69 2005/12/21 14:35:47 gray Exp $
+ * $Id: settings.dist,v 1.70 2005/12/21 15:06:56 gray Exp $
  */
 
 /*
@@ -168,6 +168,10 @@
  * (id 0) with SIGABRT works on a number of Unix systems.  You may
  * have to define some include file to get the value for the signal
  * that is used.
+ *
+ * Alternatives might be:
+ *
+ *      #define KILL_PROCESS    { int *_int_p = NULL; *_int_p = 1; }
  */
 #if ABORT_OKAY
 #define USE_ABORT		1

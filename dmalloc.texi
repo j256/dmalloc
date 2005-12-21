@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.287 2005/12/18 18:32:18 gray Exp $
+@c $Id: dmalloc.texi,v 1.288 2005/12/21 15:06:56 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -266,9 +266,9 @@ library.  This may or may not work depending on the configuration
 scripts ability to detect your local thread functionality.  Feel free to
 send me mail with improvements.
 
-See the ``Using With Threads'' section for more information about the
-operation of the library with your threaded program.  @xref{Using With
-Threads}.
+See the section of the manual on threads for more information about
+the operation of the library with your threaded program.  @xref{Using
+With Threads}.
 
 @item If you have a C++ compiler installed, the library should have
 automatically built @file{libdmallocxx.a} which is the C++ version of
@@ -441,11 +441,10 @@ also try @kbd{runtime} for minimal checking or @kbd{medium} or
 
 @item By default, the low, medium, and high values enable the
 @code{error-abort} token which will cause the library to abort and
-usually dump core immediately upon seeing an error.  This is useful if
-you are running your program in a debugger.  @xref{Using With a
-Debugger}.  You can disable this feature by entering @kbd{dmalloc -m
-error-abort} (-m for minus) and your program will just log errors and
-continue.
+usually dump core immediately upon seeing an error.  @xref{Dumping
+Core}.  You can disable this feature by entering @kbd{dmalloc -m
+error-abort} (-m for minus) to remove the @code{error-abort} token and
+your program will just log errors and continue.
 
 @end itemize
 
@@ -749,9 +748,10 @@ of the heap has been corrupted.
 @cindex dump core
 @cindex core dump
 The library can be configured to quit immediately when an error is
-detected and to dump a core file or memory-image.  This can be examined
-with a debugger to determine the source of the problem.  The library can
-either stop after dumping core or continue running.
+detected and to dump a core file or memory-image.  This can be
+examined with a debugger to determine the source of the problem.  The
+library can either stop after dumping core or continue running.
+@xref{Dumping Core}.
 
 @cindex system memory problems
 @cindex memory problems in system functions
@@ -837,6 +837,7 @@ checking the heap after it sees a call from anywhere in the
 * Allocation Macros::          Macros providing file and line information.
 * Return Address::             Getting caller address information.
 * Argument Checking::          Checking of function arguments.
+* Dumping Core::               Generating a core file on errors for debugging.
 * Extensions::                 Additional non-standard routines.
 * Error Codes::                Description of the internal error numbers.
 * Disabling the Library::      How to disable the library.
@@ -949,7 +950,7 @@ return-address location.  @xref{Translate Return Addresses}.
 
 @c --------------------------------
 
-@node Argument Checking, Extensions, Return Address, Programming
+@node Argument Checking, Dumping Core, Return Address, Programming
 @section Checking of Function Arguments
 
 @cindex argument checking
@@ -992,7 +993,74 @@ it is ignored since dmalloc does not know anything about it.
 
 @c --------------------------------
 
-@node Extensions, Error Codes, Argument Checking, Programming
+@node Dumping Core, Extensions, Argument Checking, Programming
+@section Generating a Core File on Errors
+
+@cindex dump core
+@cindex core dump
+@cindex generating core dump
+@cindex error-abort
+@cindex error-dump
+@cindex debugger
+
+If the @code{error-abort} debug token has been enabled, when the
+library detects any problems with the heap memory, it will immediately
+attempt to dump a core file.  @xref{Debug Tokens}.  Core files are a
+complete copy of the program and it's state and can be used by a
+debugger to see specifically what is going on when the error occurred.
+@xref{Using With a Debugger}.  By default, the low, medium, and high
+arguments to the library utility enable the @code{error-abort} token.
+You can disable this feature by entering @kbd{dmalloc -m error-abort}
+(-m for minus) to remove the @code{error-abort} token and your program
+will just log errors and continue.  You can also use the
+@code{error-dump} token which tries to dump core when it sees an error
+but still continue running.  @xref{Debug Tokens}.
+
+@cindex core file
+@cindex program core
+@cindex no core dump
+@cindex core dump, none
+@cindex missing core dump
+
+When a program dumps core, the system writes the program and all of
+its memory to a file on disk usually named @file{core}.  If your
+program is called @file{foo} then your system may dump core as
+@file{foo.core}.  If you are not getting a @file{core} file, make sure
+that your program has not changed to a new directory meaning that it
+may have written the core file in a different location.  Also insure
+that your program has write privileges over the directory that it is
+in otherwise it will not be able to dump a core file.  Core dumps are
+often security problems since they contain all program memory so
+systems often block their being produced.  You will want to check your
+user and system's core dump size ulimit settings.
+
+@cindex abort
+@cindex kill process
+@cindex KILL_PROCESS
+
+The library by default uses the @code{abort} function to dump core
+which may or may not work depending on your operating system.  If the
+following program does not dump core then this may be the problem.
+See @code{KILL_PROCESS} definition in @file{settings.dist}.
+
+@example
+main()
+@{
+  abort();
+@}
+@end example
+
+If @code{abort} does work then you may want to try the following
+setting in @file{settings.dist}.  This code tries to generate a
+segmentation fault by dereferencing a @code{NULL} pointer.
+
+@example
+#define KILL_PROCESS    @{ int *_int_p = NULL; *_int_p = 1; @}
+@end example
+
+@c --------------------------------
+
+@node Extensions, Error Codes, Dumping Core, Programming
 @section Additional Non-standard Routines
 
 @cindex extensions
@@ -3236,27 +3304,8 @@ then @code{ERROR_FREE_OVERWRITTEN} is triggered.  @xref{Error Codes}.
 @cindex core dump
 @cindex error-abort
 @item error-abort
-Abort the program (and dump core) on errors.  See @code{error-dump} below.
-
-@cindex no core dump
-@cindex core dump, none
-@cindex missing core dump
-@emph{NOTE}: The library uses the @code{abort} function to dump core.
-If you are not getting a @file{core} file, make sure that your program
-has not changed to a new directory and that it has write privileges
-over the directory it is in.  You will also want to check your user
-and system's core dump size ulimit settings.  If your program name is
-@file{foo}, then your system may dump core as @file{foo.core}.  Core
-dumps are often security problems since they contain all program
-memory so systems often block their being produced.  If the following
-program does not dump core then this may be the problem.
-
-@example
-main()
-@{
-  abort();
-@}
-@end example
+Abort the program (and dump core) on errors.  See @code{error-dump}
+below.  @xref{Dumping Core}.
 
 @cindex blank space
 @cindex blanking memory
@@ -3306,7 +3355,7 @@ since you may run out of heap space.
 @item error-dump
 Dump core on error and then continue.  Later core dumps overwrite
 earlier ones if the program encounters more than one error.  See
-@code{error-abort} above.
+@code{error-abort} above.  @xref{Dumping Core}.
 
 @emph{NOTE}: This will only work if your system supports the @code{fork}
 system call and the configuration utility was able to fork without going
