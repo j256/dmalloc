@@ -1,9 +1,14 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.122 2005/12/18 15:15:00 gray Exp $
+$Id: NEWS,v 1.123 2005/12/21 15:07:39 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 5.5.0 (12/18/2005):
+Version 5.5.0 (12/19/2005):
 
+	* Improved regression tests on argument checking functions.
+	* Fixed some problems with function argument checking and length args.
+	* Added handling of strndup function.
+	* Added overlapping memory check for memcpy if memmove exists.
+	* Added __FILE__ and __LINE__ arguments to function checks.
 	* Added patches to [hopefully] improve the building under Mac OSX.
 	* Added dmalloc_get_stats function to report on internal heap stats.
 	* Fixed a problem with double free not reporting ERROR_ALREADY_FREE.
@@ -12,9 +17,10 @@ Version 5.5.0 (12/18/2005):
 	* Improved some of the error values to better identify internal errors.
 	* Fixed when LARGEST_ALLOCATION was 0 it was still being tested.
 	* Increased the basic block default to 32k.
-	* Improved test program output and small heap area handling.
+	* Improved test program output;
 	* Fixed the global Makefile to install libs as 755 not 644.
 	* Added some fixes for Compaq's C compiler.
+	* Improved testing of small heap areas.
 
 Version 5.4.2 (10/19/2004):
 

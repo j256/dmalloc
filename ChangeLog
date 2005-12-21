@@ -1,6 +1,23 @@
-2005-12-18  Gray Watson  <gray@outside.256.com>
+2005-12-21  Gray Watson  <gray@outside.256.com>
 
-	* Releasing dmalloc version 5.5.0.
+	* Added a section on dumping core in the manual.
+
+	* Added a number of regression tests for the arg-check code.
+
+2005-12-19  Gray Watson  <gray@outside.256.com>
+
+	* Fixed some problems with function argument checking and length
+	arguments.  The library was not handling strncmp correctly for
+	example.
+
+	* Added handling of strndup function.
+
+	* Added overlapping memory check for memcpy if memmove exists.
+
+	* Added __FILE__ and __LINE__ arguments to function checks.  Not
+	sure why they weren't there earlier.
+
+2005-12-18  Gray Watson  <gray@outside.256.com>
 
 	* Added patches to [hopefully] improve the building under Mac OSX.
 	Thanks to Terry.
@@ -9,8 +26,6 @@
 	stats.  Thanks to Sam.
 
 2005-12-17  Gray Watson  <gray@outside.256.com>
-
-	* Releasing dmalloc version 5.4.3.
 
 	* Fixed a problem with the RPM .spec file.
 
@@ -2317,5 +2332,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.336 2005/12/18 15:15:08 gray Exp $
+$Id: ChangeLog,v 1.337 2005/12/21 15:07:39 gray Exp $
 -------------------------------------------------------------------------------

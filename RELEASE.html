@@ -29,10 +29,9 @@ Date: December 18, 2005
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> More of a checkpoint release than anything else.  I probably am
-missing some bugs or issues reported by others but I've not worked on
-this much recently.  Please ping me if I've missed something
-ASAP. </p>
+<p> A number of features and bug fixes in this release.  I'm sure I've
+mised some patch or bug fix.  Please ping me if I've missed
+something. </p>
 
 <!--========================================================================-->
 
@@ -42,6 +41,10 @@ ASAP. </p>
 
 <li> Added the dmalloc_get_stats() function to report on internal heap
 statistics. </li>
+
+<li> Added file/line number reporting for the function argument
+checking features.  <b>WARNING</b>: this requires a recompilation of
+all code compiled with <tt>-DDMALLOC_FUNC_CHECK</tt>. </li>
 
 </ul>
 
@@ -104,6 +107,14 @@ errors. </li>
 caller to get a number of internal heap statistics such as current and
 maximum allocations and number of pointers. </li>
 
+<li> I've added support for overloading the strndup function. </li>
+
+<li> I've added file and line number information for the overloading
+of the functions for argument checking. </li>
+
+<li> I've added warning if memcpy is copying overlapping memory and
+the memmove fucntion is available. </li>
+
 </ul>
 
 <!--========================================================================-->
@@ -130,6 +141,10 @@ None.
 dmalloc_t still checks it. </li>
 
 <li> Fixed a problem with double free not reporting ERROR_ALREADY_FREE. </li>
+
+<li> Fixed some problems with function argument checking and length
+arguments.  The library was not handling strncmp correctly for
+example. </li>
 
 </ul>
 
