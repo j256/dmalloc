@@ -32,8 +32,11 @@
 #ifndef DMALLOC_STRDUP_MACRO
 #undef strdup
 #define strdup(str) \
-  dmalloc_strdup(__FILE__, __LINE__, (str), 0)
+  dmalloc_strndup(__FILE__, __LINE__, (str), -1, 0)
 #endif
+#undef strndup
+#define strndup(str, len) \
+  dmalloc_strndup(__FILE__, __LINE__, (str), (len), 0)
 #undef free
 #define free(ptr) \
   dmalloc_free(__FILE__, __LINE__, (ptr), DMALLOC_FUNC_FREE)
@@ -59,7 +62,10 @@
   dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_VALLOC, 0, 1)
 #undef xstrdup
 #define xstrdup(str) \
-  dmalloc_strdup(__FILE__, __LINE__, (str), 1)
+  dmalloc_strndup(__FILE__, __LINE__, (str), -1, 1)
+#undef xstrndup
+#define xstrndup(str, len) \
+  dmalloc_strndup(__FILE__, __LINE__, (str), (len), 1)
 #undef xfree
 #define xfree(ptr) \
   dmalloc_free(__FILE__, __LINE__, (ptr), DMALLOC_FUNC_FREE)

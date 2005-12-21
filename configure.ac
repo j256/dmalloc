@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.32 2005/12/18 15:14:46 gray Exp $
+# $Id: configure.ac,v 1.33 2005/12/21 13:40:27 gray Exp $
 #
-AC_REVISION($Revision: 1.32 $)
+AC_REVISION($Revision: 1.33 $)
 AC_INIT(dmalloc, 5.5.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -628,7 +628,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.32 2005/12/18 15:14:46 gray Exp $"
+#ident "$Id: configure.ac,v 1.33 2005/12/21 13:40:27 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
@@ -727,8 +727,8 @@ AC_CHECK_FUNCS(bcmp bcopy bzero)
 AC_CHECK_FUNCS([[index]])
 AC_CHECK_FUNCS(memccpy memchr memcmp memcpy memmove memset)
 AC_CHECK_FUNCS(rindex)
-AC_CHECK_FUNCS(strcasecmp strcat strchr strcmp strcpy strcspn strlen)
-AC_CHECK_FUNCS(strncasecmp strncat strncmp strncpy)
+AC_CHECK_FUNCS(strcasecmp strcat strchr strcmp strcpy strcspn strdup strlen)
+AC_CHECK_FUNCS(strncasecmp strncat strncmp strncpy strndup)
 AC_CHECK_FUNCS(strpbrk strrchr strspn strstr strtok)
 
 AC_CONFIG_FILES(Makefile)

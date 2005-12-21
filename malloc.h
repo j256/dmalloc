@@ -159,12 +159,12 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
 		     const int func_id);
 
 /*
- * DMALLOC_PNT dmalloc_strdup
+ * DMALLOC_PNT dmalloc_strndup
  *
  * DESCRIPTION:
  *
  * Allocate and return an allocated block of memory holding a copy of
- * a string.
+ * a string of a certain number of characters.
  *
  * RETURNS:
  *
@@ -180,12 +180,15 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
  *
  * string -> String we are duplicating.
  *
+ * len -> Length of the string we are duplicating.
+ *
  * xalloc_b -> If set to 1 then print an error and exit if we run out
  * of memory.
  */
 extern
-char	*dmalloc_strdup(const char *file, const int line,
-			const char *string, const int xalloc_b);
+char	*dmalloc_strndup(const char *file, const int line,
+			 const char *string, const int len,
+			 const int xalloc_b);
 
 /*
  * DMALLOC_PNT malloc
@@ -209,7 +212,7 @@ extern
 DMALLOC_PNT	malloc(DMALLOC_SIZE size);
 
 /*
- * DMALLOC_PNT malloc
+ * DMALLOC_PNT calloc
  *
  * DESCRIPTION:
  *
@@ -349,6 +352,29 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size);
 extern
 char	*strdup(const char *string);
 #endif /* ifndef DMALLOC_STRDUP_MACRO */
+
+/*
+ * DMALLOC_PNT strndup
+ *
+ * DESCRIPTION:
+ *
+ * Overload of strndup(3).  Allocate and return an allocated block of
+ * memory holding a copy of a string with a maximum length.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * string -> String we are duplicating.
+ *
+ * len -> Length of the string to duplicate.
+ */
+extern
+char	*strndup(const char *string, const DMALLOC_SIZE len);
 
 /*
  * DMALLOC_FREE_RET free

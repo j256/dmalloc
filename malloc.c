@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.184 2005/12/18 14:46:11 gray Exp $
+ * $Id: malloc.c,v 1.185 2005/12/21 13:39:58 gray Exp $
  */
 
 /*
@@ -983,12 +983,12 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
 }
 
 /*
- * DMALLOC_PNT dmalloc_strdup
+ * DMALLOC_PNT dmalloc_strndup
  *
  * DESCRIPTION:
  *
  * Allocate and return an allocated block of memory holding a copy of
- * a string.
+ * a string of a certain number of characters.
  *
  * RETURNS:
  *
@@ -1004,30 +1004,47 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
  *
  * string -> String we are duplicating.
  *
+ * len -> Length of the string we are duplicating.
+ *
  * xalloc_b -> If set to 1 then print an error and exit if we run out
  * of memory.
  */
-char	*dmalloc_strdup(const char *file, const int line,
-			const char *string, const int xalloc_b)
+char	*dmalloc_strndup(const char *file, const int line,
+			 const char *string, const int len,
+			 const int xalloc_b)
 {
-  DMALLOC_SIZE	len;
+  DMALLOC_SIZE	size;
   char		*new_string;
+  const char	*string_p;
+  
+  /* so we have to figure out the max length of the string directly */
+  if (len < 0) {
+    size = strlen(string);
+  }
+  else {
+    for (string_p = string; string_p < string + len; string_p++) {
+      if (*string_p == '\0') {
+	break;
+      }
+    }
+    size = string_p - string;
+  }
   
   /* check the arguments */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    /* we check for pointer plus \0 */
     if (! dmalloc_verify_pnt(file, line, "strdup", string,
-			     0 /* not exact */, -1)) {
+			     0 /* not exact */, size + 1)) {
       dmalloc_message("bad pointer argument found in strdup");
     }
   }
   
-  len = strlen(string) + 1;
-  
-  new_string = dmalloc_malloc(file, line, len, DMALLOC_FUNC_STRDUP,
+  /* allocate space for the \0 */
+  new_string = dmalloc_malloc(file, line, size + 1, DMALLOC_FUNC_STRDUP,
 			      0 /* no alignment */, xalloc_b);
   if (new_string != NULL) {
-    strncpy(new_string, string, len - 1);
-    new_string[len - 1] = '\0';
+    strncpy(new_string, string, size);
+    new_string[size] = '\0';
   }
   
   return new_string;
@@ -1064,7 +1081,7 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size)
 }
 
 /*
- * DMALLOC_PNT malloc
+ * DMALLOC_PNT calloc
  *
  * DESCRIPTION:
  *
@@ -1266,6 +1283,63 @@ char	*strdup(const char *string)
   return buf;
 }
 #endif
+
+/*
+ * DMALLOC_PNT strndup
+ *
+ * DESCRIPTION:
+ *
+ * Overload of strndup(3).  Allocate and return an allocated block of
+ * memory holding a copy of a string with a maximum length.
+ *
+ * RETURNS:
+ *
+ * Success - Valid pointer.
+ *
+ * Failure - 0L
+ *
+ * ARGUMENTS:
+ *
+ * string -> String we are duplicating.
+ *
+ * len -> Length of the string to duplicate.
+ */
+#undef strndup
+char	*strndup(const char *string, const DMALLOC_SIZE len)
+{
+  int		size;
+  char		*buf, *file;
+  const char	*string_p;
+  
+  GET_RET_ADDR(file);
+  
+  /* so we have to figure out the max length of the string directly */
+  for (string_p = string; string_p < string + len; string_p++) {
+    if (*string_p == '\0') {
+      break;
+    }
+  }
+  size = string_p - string;
+  
+  /* check the arguments */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    if (! dmalloc_verify_pnt(file, 0 /* no line */, "strdup", string,
+			     0 /* not exact */, size)) {
+      dmalloc_message("bad pointer argument found in strdup");
+    }
+  }
+  
+  /* at 1 for null */
+  buf = dmalloc_malloc(file, DMALLOC_DEFAULT_LINE, size + 1,
+		       DMALLOC_FUNC_STRDUP, 0 /* no alignment */,
+		       0 /* no xalloc messages */);
+  if (buf != NULL) {
+    (void)memcpy(buf, string, size);
+    buf[size] = '\0';
+  }
+  
+  return buf;
+}
 
 /*
  * DMALLOC_FREE_RET free
