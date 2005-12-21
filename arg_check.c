@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.36 2005/01/11 18:27:05 gray Exp $
+ * $Id: arg_check.c,v 1.37 2005/12/21 13:40:55 gray Exp $
  */
 
 /*
@@ -49,10 +49,10 @@
 /*
  * Dummy function for checking atoi's arguments.
  */
-int	_dmalloc_atoi(const char *str)
+int	_dmalloc_atoi(const char *file, const int line, const char *str)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "atoi", str,
+    if (! dmalloc_verify_pnt(file, line, "atoi", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in atoi");
     }
@@ -65,10 +65,10 @@ int	_dmalloc_atoi(const char *str)
 /*
  * Dummy function for checking atol's arguments.
  */
-long	_dmalloc_atol(const char *str)
+long	_dmalloc_atol(const char *file, const int line, const char *str)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "atol", str,
+    if (! dmalloc_verify_pnt(file, line, "atol", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in atol");
     }
@@ -81,12 +81,13 @@ long	_dmalloc_atol(const char *str)
 /*
  * Dummy function for checking bcmp's arguments.
  */
-int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len)
+int	_dmalloc_bcmp(const char *file, const int line,
+		      const void *b1, const void *b2, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "bcmp", b1,
+    if ((! dmalloc_verify_pnt(file, line, "bcmp", b1,
 			      0 /* not exact */, len))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "bcmp", b2,
+	|| (! dmalloc_verify_pnt(file, line, "bcmp", b2,
 				 0 /* not exact */, len))) {
       dmalloc_message("bad pointer argument found in bcmp");
     }
@@ -99,12 +100,13 @@ int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking bcopy's arguments.
  */
-void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len)
+void	_dmalloc_bcopy(const char *file, const int line,
+		       const void *from, void *to, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "bcopy", from,
+    if ((! dmalloc_verify_pnt(file, line, "bcopy", from,
 			      0 /* not exact */, len))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "bcopy", to,
+	|| (! dmalloc_verify_pnt(file, line, "bcopy", to,
 				 0 /* not exact */, len))) {
       dmalloc_message("bad pointer argument found in bcopy");
     }
@@ -117,10 +119,11 @@ void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking bzero's arguments.
  */
-void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len)
+void	_dmalloc_bzero(const char *file, const int line,
+		       void *buf, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "bzero", buf,
+    if (! dmalloc_verify_pnt(file, line, "bzero", buf,
 			     0 /* not exact */, len)) {
       dmalloc_message("bad pointer argument found in bzero");
     }
@@ -133,10 +136,11 @@ void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking index's arguments.
  */
-char	*_dmalloc_index(const char *str, const char ch)
+char	*_dmalloc_index(const char *file, const int line,
+			const char *str, const char ch)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "index", str,
+    if (! dmalloc_verify_pnt(file, line, "index", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in index");
     }
@@ -149,19 +153,31 @@ char	*_dmalloc_index(const char *str, const char ch)
 /*
  * Dummy function for checking memccpy's arguments.
  */
-void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
+void	*_dmalloc_memccpy(const char *file, const int line,
+			  void *dest, const void *src, const int ch,
 			  const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    const char	*src_p;
+    int		min_size;
+    
+    /* so we have to figure out the max length of the buffer directly here */
+    for (src_p = (char *)src; src_p < (char *)src + len; src_p++) {
+      if (*src_p == ch) {
+	break;
+      }
+    }
+    min_size = src_p - (char *)src;
+    
     /* maybe len maybe first ch */
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "memccpy", s1,
-			      0 /* not exact */, 0))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "memccpy", s2,
-				 0 /* not exact */, 0))) {
+    if ((! dmalloc_verify_pnt(file, line, "memccpy", dest,
+			      0 /* not exact */, min_size))
+	|| (! dmalloc_verify_pnt(file, line, "memccpy", src,
+				 0 /* not exact */, min_size))) {
       dmalloc_message("bad pointer argument found in memccpy");
     }
   }
-  return (void *)memccpy(s1, s2, ch, len);
+  return (void *)memccpy(dest, src, ch, len);
 }
 #endif /* HAVE_MEMCCPY */
 
@@ -169,10 +185,11 @@ void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
 /*
  * Dummy function for checking memchr's arguments.
  */
-void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len)
+void	*_dmalloc_memchr(const char *file, const int line,
+			 const void *s1, const int ch, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "memchr", s1,
+    if (! dmalloc_verify_pnt(file, line, "memchr", s1,
 			     0 /* not exact */, len)) {
       dmalloc_message("bad pointer argument found in memchr");
     }
@@ -185,12 +202,13 @@ void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memcmp's arguments.
  */
-int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len)
+int	_dmalloc_memcmp(const char *file, const int line,
+			const void *b1, const void *b2, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "memcmp", b1,
+    if ((! dmalloc_verify_pnt(file, line, "memcmp", b1,
 			      0 /* not exact */, len))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "memcmp", b2,
+	|| (! dmalloc_verify_pnt(file, line, "memcmp", b2,
 				 0 /* not exact */, len))) {
       dmalloc_message("bad pointer argument found in memcmp");
     }
@@ -203,15 +221,28 @@ int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memcpy's arguments.
  */
-void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len)
+void	*_dmalloc_memcpy(const char *file, const int line,
+			 void *to, const void *from, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "memcpy", to,
+    if ((! dmalloc_verify_pnt(file, line, "memcpy", to,
 			      0 /* not exact */, len))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "memcpy", from,
+	|| (! dmalloc_verify_pnt(file, line, "memcpy", from,
 				 0 /* not exact */, len))) {
       dmalloc_message("bad pointer argument found in memcpy");
     }
+    
+#if HAVE_MEMMOVE
+    /*
+     * If memmove exists, dump out a warning if memcpy is being used
+     * for overlapping memory segments.
+     */
+    if (((char *)from < (char *)to && (char *)from + len > (char *)to)
+	|| ((char *)to < (char *)from && (char *)to + len > (char *)from)) {
+      dmalloc_message("%s:%d: WARNING: memory overlap in memcpy, should use memmove",
+		      file, line);
+    }
+#endif
   }
   return (void *)memcpy(to, from, len);
 }
@@ -221,12 +252,13 @@ void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memcpy's arguments.
  */
-void	*_dmalloc_memmove(void *to, const void *from, const DMALLOC_SIZE len)
+void	*_dmalloc_memmove(const char *file, const int line,
+			  void *to, const void *from, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "memmove", to,
+    if ((! dmalloc_verify_pnt(file, line, "memmove", to,
 			      0 /* not exact */, len))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "memmove", from,
+	|| (! dmalloc_verify_pnt(file, line, "memmove", from,
 				 0 /* not exact */, len))) {
       dmalloc_message("bad pointer argument found in memmove");
     }
@@ -239,10 +271,11 @@ void	*_dmalloc_memmove(void *to, const void *from, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking memset's arguments.
  */
-void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len)
+void	*_dmalloc_memset(const char *file, const int line, void *buf,
+			 const int ch, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "memset", buf,
+    if (! dmalloc_verify_pnt(file, line, "memset", buf,
 			     0 /* not exact */, len)) {
       dmalloc_message("bad pointer argument found in memset");
     }
@@ -255,10 +288,11 @@ void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking rindex's arguments.
  */
-char	*_dmalloc_rindex(const char *str, const char ch)
+char	*_dmalloc_rindex(const char *file, const int line,
+			 const char *str, const char ch)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "rindex", str,
+    if (! dmalloc_verify_pnt(file, line, "rindex", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in rindex");
     }
@@ -271,12 +305,13 @@ char	*_dmalloc_rindex(const char *str, const char ch)
 /*
  * Dummy function for checking strcasecmp's arguments.
  */
-int	_dmalloc_strcasecmp(const char *s1, const char *s2)
+int	_dmalloc_strcasecmp(const char *file, const int line,
+			    const char *s1, const char *s2)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strcasecmp", s1,
+    if ((! dmalloc_verify_pnt(file, line, "strcasecmp", s1,
 			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strcasecmp", s2,
+	|| (! dmalloc_verify_pnt(file, line, "strcasecmp", s2,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcasecmp");
     }
@@ -289,13 +324,14 @@ int	_dmalloc_strcasecmp(const char *s1, const char *s2)
 /*
  * Dummy function for checking strcat's arguments.
  */
-char	*_dmalloc_strcat(char *to, const char *from)
+char	*_dmalloc_strcat(const char *file, const int line,
+			 char *to, const char *from)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strcat", to,
+    if ((! dmalloc_verify_pnt(file, line, "strcat", to,
 			      0 /* not exact */,
 			      strlen(to) + strlen(from) + 1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strcat", from,
+	|| (! dmalloc_verify_pnt(file, line, "strcat", from,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcat");
     }
@@ -308,10 +344,11 @@ char	*_dmalloc_strcat(char *to, const char *from)
 /*
  * Dummy function for checking strchr's arguments.
  */
-char	*_dmalloc_strchr(const char *str, const int ch)
+char	*_dmalloc_strchr(const char *file, const int line,
+			 const char *str, const int ch)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "strchr", str,
+    if (! dmalloc_verify_pnt(file, line, "strchr", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in strchr");
     }
@@ -324,12 +361,13 @@ char	*_dmalloc_strchr(const char *str, const int ch)
 /*
  * Dummy function for checking strcmp's arguments.
  */
-int	_dmalloc_strcmp(const char *s1, const char *s2)
+int	_dmalloc_strcmp(const char *file, const int line,
+			const char *s1, const char *s2)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strcmp", s1,
+    if ((! dmalloc_verify_pnt(file, line, "strcmp", s1,
 			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strcmp", s2,
+	|| (! dmalloc_verify_pnt(file, line, "strcmp", s2,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcmp");
     }
@@ -342,12 +380,13 @@ int	_dmalloc_strcmp(const char *s1, const char *s2)
 /*
  * Dummy function for checking strcpy's arguments.
  */
-char	*_dmalloc_strcpy(char *to, const char *from)
+char	*_dmalloc_strcpy(const char *file, const int line,
+			 char *to, const char *from)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strcpy", to,
+    if ((! dmalloc_verify_pnt(file, line, "strcpy", to,
 			      0 /* not exact */, strlen(from) + 1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strcpy", from,
+	|| (! dmalloc_verify_pnt(file, line, "strcpy", from,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcpy");
     }
@@ -360,12 +399,13 @@ char	*_dmalloc_strcpy(char *to, const char *from)
 /*
  * Dummy function for checking strcspn's arguments.
  */
-int	_dmalloc_strcspn(const char *str, const char *list)
+int	_dmalloc_strcspn(const char *file, const int line,
+			 const char *str, const char *list)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strcspn", str,
+    if ((! dmalloc_verify_pnt(file, line, "strcspn", str,
 			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strcspn", list,
+	|| (! dmalloc_verify_pnt(file, line, "strcspn", list,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcspn");
     }
@@ -378,10 +418,11 @@ int	_dmalloc_strcspn(const char *str, const char *list)
 /*
  * Dummy function for checking strlen's arguments.
  */
-DMALLOC_SIZE	_dmalloc_strlen(const char *str)
+DMALLOC_SIZE	_dmalloc_strlen(const char *file, const int line,
+				const char *str)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "strlen", str,
+    if (! dmalloc_verify_pnt(file, line, "strlen", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in strlen");
     }
@@ -394,15 +435,26 @@ DMALLOC_SIZE	_dmalloc_strlen(const char *str)
 /*
  * Dummy function for checking strncasecmp's arguments.
  */
-int	_dmalloc_strncasecmp(const char *s1, const char *s2,
+int	_dmalloc_strncasecmp(const char *file, const int line,
+			     const char *s1, const char *s2,
 			     const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    /* len or until nullc */
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strncasecmp", s1,
-			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strncasecmp", s2,
-				 0 /* not exact */, -1))) {
+    const char	*s1_p, *s2_p;
+    int		min_size;
+    
+    /* so we have to figure out the max length of the buffers directly here */
+    for (s1_p = s1, s2_p = s2; s1_p < s1 + len; s1_p++, s2_p++) {
+      if (*s1_p == '\0' || *s2_p == '\0') {
+	break;
+      }
+    }
+    min_size = s1_p - s1;
+    
+    if ((! dmalloc_verify_pnt(file, line, "strncasecmp", s1,
+			      0 /* not exact */, min_size))
+	|| (! dmalloc_verify_pnt(file, line, "strncasecmp", s2,
+				 0 /* not exact */, min_size))) {
       dmalloc_message("bad pointer argument found in strncasecmp");
     }
   }
@@ -414,14 +466,26 @@ int	_dmalloc_strncasecmp(const char *s1, const char *s2,
 /*
  * Dummy function for checking strncat's arguments.
  */
-char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len)
+char	*_dmalloc_strncat(const char *file, const int line,
+			  char *to, const char *from, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    const char	*from_p;
+    int		min_size;
+    
+    /* so we have to figure out the max length of the buffers directly here */
+    for (from_p = from; from_p < from + len; from_p++) {
+      if (*from_p == '\0') {
+	break;
+      }
+    }
+    min_size = from_p - from;
+    
     /* either len or nullc */
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strncat", to,
-			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strncat", from,
-				 0 /* not exact */, -1))) {
+    if ((! dmalloc_verify_pnt(file, line, "strncat", to,
+			      0 /* not exact */, strlen(to) + min_size + 1))
+	|| (! dmalloc_verify_pnt(file, line, "strncat", from,
+				 0 /* not exact */, min_size))) {
       dmalloc_message("bad pointer argument found in strncat");
     }
   }
@@ -433,15 +497,27 @@ char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking strncmp's arguments.
  */
-int	_dmalloc_strncmp(const char *s1, const char *s2,
+int	_dmalloc_strncmp(const char *file, const int line,
+			 const char *s1, const char *s2,
 			 const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    const char	*s1_p, *s2_p;
+    int		min_size;
+    
+    /* so we have to figure out the max length of the buffers directly here */
+    for (s1_p = s1, s2_p = s2; s1_p < s1 + len; s1_p++, s2_p++) {
+      if (*s1_p == '\0' || *s2_p == '\0') {
+	break;
+      }
+    }
+    min_size = s1_p - s1;
+    
     /* either len or nullc */
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strncmp", s1,
-			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strncmp", s2,
-				 0 /* not exact */, -1))) {
+    if ((! dmalloc_verify_pnt(file, line, "strncmp", s1,
+			      0 /* not exact */, min_size))
+	|| (! dmalloc_verify_pnt(file, line, "strncmp", s2,
+				 0 /* not exact */, min_size))) {
       dmalloc_message("bad pointer argument found in strncmp");
     }
   }
@@ -453,14 +529,26 @@ int	_dmalloc_strncmp(const char *s1, const char *s2,
 /*
  * Dummy function for checking strncpy's arguments.
  */
-char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len)
+char	*_dmalloc_strncpy(const char *file, const int line,
+			  char *to, const char *from, const DMALLOC_SIZE len)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    const char	*from_p;
+    int		min_size;
+    
+    /* so we have to figure out the max length of the buffers directly here */
+    for (from_p = from; from_p < from + len; from_p++) {
+      if (*from_p == '\0') {
+	break;
+      }
+    }
+    min_size = from_p - from;
+    
     /* len or until nullc */
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strncpy", to,
-			      0 /* not exact */, 0))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strncpy", from,
-				 0 /* not exact */, -1))) {
+    if ((! dmalloc_verify_pnt(file, line, "strncpy", to,
+			      0 /* not exact */, min_size))
+	|| (! dmalloc_verify_pnt(file, line, "strncpy", from,
+				 0 /* not exact */, min_size))) {
       dmalloc_message("bad pointer argument found in strncpy");
     }
   }
@@ -472,12 +560,13 @@ char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len)
 /*
  * Dummy function for checking strpbrk's arguments.
  */
-char	*_dmalloc_strpbrk(const char *str, const char *list)
+char	*_dmalloc_strpbrk(const char *file, const int line,
+			  const char *str, const char *list)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strpbrk", str,
+    if ((! dmalloc_verify_pnt(file, line, "strpbrk", str,
 			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strpbrk", list,
+	|| (! dmalloc_verify_pnt(file, line, "strpbrk", list,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strpbrk");
     }
@@ -490,10 +579,11 @@ char	*_dmalloc_strpbrk(const char *str, const char *list)
 /*
  * Dummy function for checking strrchr's arguments.
  */
-char	*_dmalloc_strrchr(const char *str, const int ch)
+char	*_dmalloc_strrchr(const char *file, const int line,
+			  const char *str, const int ch)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(__FILE__, __LINE__, "strrchr", str,
+    if (! dmalloc_verify_pnt(file, line, "strrchr", str,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in strrchr");
     }
@@ -506,12 +596,13 @@ char	*_dmalloc_strrchr(const char *str, const int ch)
 /*
  * Dummy function for checking strspn's arguments.
  */
-int	_dmalloc_strspn(const char *str, const char *list)
+int	_dmalloc_strspn(const char *file, const int line,
+			const char *str, const char *list)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strspn", str,
+    if ((! dmalloc_verify_pnt(file, line, "strspn", str,
 			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strspn", list,
+	|| (! dmalloc_verify_pnt(file, line, "strspn", list,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strspn");
     }
@@ -524,12 +615,13 @@ int	_dmalloc_strspn(const char *str, const char *list)
 /*
  * Dummy function for checking strstr's arguments.
  */
-char	*_dmalloc_strstr(const char *str, const char *pat)
+char	*_dmalloc_strstr(const char *file, const int line,
+			 const char *str, const char *pat)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if ((! dmalloc_verify_pnt(__FILE__, __LINE__, "strstr", str,
+    if ((! dmalloc_verify_pnt(file, line, "strstr", str,
 			      0 /* not exact */, -1))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strstr", pat,
+	|| (! dmalloc_verify_pnt(file, line, "strstr", pat,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strstr");
     }
@@ -542,13 +634,14 @@ char	*_dmalloc_strstr(const char *str, const char *pat)
 /*
  * Dummy function for checking strtok's arguments.
  */
-char	*_dmalloc_strtok(char *str, const char *sep)
+char	*_dmalloc_strtok(const char *file, const int line,
+			 char *str, const char *sep)
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if ((str != NULL
-	 && (! dmalloc_verify_pnt(__FILE__, __LINE__, "strtok", str,
+	 && (! dmalloc_verify_pnt(file, line, "strtok", str,
 				  0 /* not exact */, -1)))
-	|| (! dmalloc_verify_pnt(__FILE__, __LINE__, "strtok", sep,
+	|| (! dmalloc_verify_pnt(file, line, "strtok", sep,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strtok");
     }

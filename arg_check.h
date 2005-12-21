@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.h,v 1.23 2005/01/11 19:29:22 gray Exp $
+ * $Id: arg_check.h,v 1.24 2005/12/21 13:40:56 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -34,7 +34,7 @@
  * Dummy function for checking atoi's arguments.
  */
 extern
-int	_dmalloc_atoi(const char *str);
+int	_dmalloc_atoi(const char *file, const int line, const char *str);
 #endif /* if HAVE_ATOI */
 
 #if HAVE_ATOL
@@ -42,7 +42,7 @@ int	_dmalloc_atoi(const char *str);
  * Dummy function for checking atol's arguments.
  */
 extern
-long	_dmalloc_atol(const char *str);
+long	_dmalloc_atol(const char *file, const int line, const char *str);
 #endif /* if HAVE_ATOL */
 
 #if HAVE_BCMP
@@ -50,7 +50,8 @@ long	_dmalloc_atol(const char *str);
  * Dummy function for checking bcmp's arguments.
  */
 extern
-int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
+int	_dmalloc_bcmp(const char *file, const int line,
+		      const void *b1, const void *b2, const DMALLOC_SIZE len);
 #endif /* if HAVE_BCMP */
 
 #if HAVE_BCOPY
@@ -58,7 +59,8 @@ int	_dmalloc_bcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
  * Dummy function for checking bcopy's arguments.
  */
 extern
-void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len);
+void	_dmalloc_bcopy(const char *file, const int line,
+		       const void *from, void *to, const DMALLOC_SIZE len);
 #endif /* if HAVE_BCOPY */
 
 #if HAVE_BZERO
@@ -66,7 +68,8 @@ void	_dmalloc_bcopy(const void *from, void *to, const DMALLOC_SIZE len);
  * Dummy function for checking bzero's arguments.
  */
 extern
-void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
+void	_dmalloc_bzero(const char *file, const int line,
+		       void *buf, const DMALLOC_SIZE len);
 #endif /* if HAVE_BZERO */
 
 #if HAVE_INDEX
@@ -74,7 +77,8 @@ void	_dmalloc_bzero(void *buf, const DMALLOC_SIZE len);
  * Dummy function for checking index's arguments.
  */
 extern
-char	*_dmalloc_index(const char *str, const char ch);
+char	*_dmalloc_index(const char *file, const int line,
+			const char *str, const char ch);
 #endif /* if HAVE_INDEX */
 
 #if HAVE_MEMCCPY
@@ -82,7 +86,8 @@ char	*_dmalloc_index(const char *str, const char ch);
  * Dummy function for checking memccpy's arguments.
  */
 extern
-void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
+void	*_dmalloc_memccpy(const char *file, const int line,
+			  void *dest, const void *src, const int ch,
 			  const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCCPY */
 
@@ -91,7 +96,8 @@ void	*_dmalloc_memccpy(void *s1, const void *s2, const int ch,
  * Dummy function for checking memchr's arguments.
  */
 extern
-void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len);
+void	*_dmalloc_memchr(const char *file, const int line,
+			 const void *s1, const int ch, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCHR */
 
 #if HAVE_MEMCMP
@@ -99,7 +105,8 @@ void	*_dmalloc_memchr(const void *s1, const int ch, const DMALLOC_SIZE len);
  * Dummy function for checking memcmp's arguments.
  */
 extern
-int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
+int	_dmalloc_memcmp(const char *file, const int line,
+			const void *b1, const void *b2, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCMP */
 
 #if HAVE_MEMCPY
@@ -107,7 +114,8 @@ int	_dmalloc_memcmp(const void *b1, const void *b2, const DMALLOC_SIZE len);
  * Dummy function for checking memcpy's arguments.
  */
 extern
-void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len);
+void	*_dmalloc_memcpy(const char *file, const int line,
+			 void *to, const void *from, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMCPY */
 
 #if HAVE_MEMMOVE
@@ -115,7 +123,8 @@ void	*_dmalloc_memcpy(void *to, const void *from, const DMALLOC_SIZE len);
  * Dummy function for checking memcpy's arguments.
  */
 extern
-void	*_dmalloc_memmove(void *to, const void *from, const DMALLOC_SIZE len);
+void	*_dmalloc_memmove(const char *file, const int line,
+			  void *to, const void *from, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMMOVE */
 
 #if HAVE_MEMSET
@@ -123,7 +132,8 @@ void	*_dmalloc_memmove(void *to, const void *from, const DMALLOC_SIZE len);
  * Dummy function for checking memset's arguments.
  */
 extern
-void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len);
+void	*_dmalloc_memset(const char *file, const int line, void *buf,
+			 const int ch, const DMALLOC_SIZE len);
 #endif /* if HAVE_MEMSET */
 
 #if HAVE_RINDEX
@@ -131,7 +141,8 @@ void	*_dmalloc_memset(void *buf, const int ch, const DMALLOC_SIZE len);
  * Dummy function for checking rindex's arguments.
  */
 extern
-char	*_dmalloc_rindex(const char *str, const char ch);
+char	*_dmalloc_rindex(const char *file, const int line,
+			 const char *str, const char ch);
 #endif /* if HAVE_RINDEX */
 
 #if HAVE_STRCASECMP
@@ -139,7 +150,8 @@ char	*_dmalloc_rindex(const char *str, const char ch);
  * Dummy function for checking strcasecmp's arguments.
  */
 extern
-int	_dmalloc_strcasecmp(const char *s1, const char *s2);
+int	_dmalloc_strcasecmp(const char *file, const int line,
+			    const char *s1, const char *s2);
 #endif /* if HAVE_STRCASECMP */
 
 #if HAVE_STRCAT
@@ -147,7 +159,8 @@ int	_dmalloc_strcasecmp(const char *s1, const char *s2);
  * Dummy function for checking strcat's arguments.
  */
 extern
-char	*_dmalloc_strcat(char *to, const char *from);
+char	*_dmalloc_strcat(const char *file, const int line,
+			 char *to, const char *from);
 #endif /* if HAVE_STRCAT */
 
 #if HAVE_STRCHR
@@ -155,7 +168,8 @@ char	*_dmalloc_strcat(char *to, const char *from);
  * Dummy function for checking strchr's arguments.
  */
 extern
-char	*_dmalloc_strchr(const char *str, const int ch);
+char	*_dmalloc_strchr(const char *file, const int line,
+			 const char *str, const int ch);
 #endif /* if HAVE_STRCHR */
 
 #if HAVE_STRCMP
@@ -163,7 +177,8 @@ char	*_dmalloc_strchr(const char *str, const int ch);
  * Dummy function for checking strcmp's arguments.
  */
 extern
-int	_dmalloc_strcmp(const char *s1, const char *s2);
+int	_dmalloc_strcmp(const char *file, const int line,
+			const char *s1, const char *s2);
 #endif /* if HAVE_STRCMP */
 
 #if HAVE_STRCPY
@@ -171,7 +186,8 @@ int	_dmalloc_strcmp(const char *s1, const char *s2);
  * Dummy function for checking strcpy's arguments.
  */
 extern
-char	*_dmalloc_strcpy(char *to, const char *from);
+char	*_dmalloc_strcpy(const char *file, const int line,
+			 char *to, const char *from);
 #endif /* if HAVE_STRCPY */
 
 #if HAVE_STRCSPN
@@ -179,7 +195,8 @@ char	*_dmalloc_strcpy(char *to, const char *from);
  * Dummy function for checking strcspn's arguments.
  */
 extern
-int	_dmalloc_strcspn(const char *str, const char *list);
+int	_dmalloc_strcspn(const char *file, const int line,
+			 const char *str, const char *list);
 #endif /* if HAVE_STRCSPN */
 
 #if HAVE_STRLEN
@@ -187,7 +204,8 @@ int	_dmalloc_strcspn(const char *str, const char *list);
  * Dummy function for checking strlen's arguments.
  */
 extern
-DMALLOC_SIZE	_dmalloc_strlen(const char *str);
+DMALLOC_SIZE	_dmalloc_strlen(const char *file, const int line,
+				const char *str);
 #endif /* if HAVE_STRLEN */
 
 #if HAVE_STRNCASECMP
@@ -195,7 +213,8 @@ DMALLOC_SIZE	_dmalloc_strlen(const char *str);
  * Dummy function for checking strncasecmp's arguments.
  */
 extern
-int	_dmalloc_strncasecmp(const char *s1, const char *s2,
+int	_dmalloc_strncasecmp(const char *file, const int line,
+			     const char *s1, const char *s2,
 			     const DMALLOC_SIZE len);
 #endif /* if HAVE_STRNCASECMP */
 
@@ -204,7 +223,8 @@ int	_dmalloc_strncasecmp(const char *s1, const char *s2,
  * Dummy function for checking strncat's arguments.
  */
 extern
-char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len);
+char	*_dmalloc_strncat(const char *file, const int line,
+			  char *to, const char *from, const DMALLOC_SIZE len);
 #endif /* if HAVE_STRNCAT */
 
 #if HAVE_STRNCMP
@@ -212,7 +232,8 @@ char	*_dmalloc_strncat(char *to, const char *from, const DMALLOC_SIZE len);
  * Dummy function for checking strncmp's arguments.
  */
 extern
-int	_dmalloc_strncmp(const char *s1, const char *s2,
+int	_dmalloc_strncmp(const char *file, const int line,
+			 const char *s1, const char *s2,
 			 const DMALLOC_SIZE len);
 #endif /* if HAVE_STRNCMP */
 
@@ -221,7 +242,8 @@ int	_dmalloc_strncmp(const char *s1, const char *s2,
  * Dummy function for checking strncpy's arguments.
  */
 extern
-char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len);
+char	*_dmalloc_strncpy(const char *file, const int line,
+			  char *to, const char *from, const DMALLOC_SIZE len);
 #endif /* if HAVE_STRNCPY */
 
 #if HAVE_STRPBRK
@@ -229,7 +251,8 @@ char	*_dmalloc_strncpy(char *to, const char *from, const DMALLOC_SIZE len);
  * Dummy function for checking strpbrk's arguments.
  */
 extern
-char	*_dmalloc_strpbrk(const char *str, const char *list);
+char	*_dmalloc_strpbrk(const char *file, const int line,
+			  const char *str, const char *list);
 #endif /* if HAVE_STRPBRK */
 
 #if HAVE_STRRCHR
@@ -237,7 +260,8 @@ char	*_dmalloc_strpbrk(const char *str, const char *list);
  * Dummy function for checking strrchr's arguments.
  */
 extern
-char	*_dmalloc_strrchr(const char *str, const int ch);
+char	*_dmalloc_strrchr(const char *file, const int line,
+			  const char *str, const int ch);
 #endif /* if HAVE_STRRCHR */
 
 #if HAVE_STRSPN
@@ -245,7 +269,8 @@ char	*_dmalloc_strrchr(const char *str, const int ch);
  * Dummy function for checking strspn's arguments.
  */
 extern
-int	_dmalloc_strspn(const char *str, const char *list);
+int	_dmalloc_strspn(const char *file, const int line,
+			const char *str, const char *list);
 #endif /* if HAVE_STRSPN */
 
 #if HAVE_STRSTR
@@ -253,7 +278,8 @@ int	_dmalloc_strspn(const char *str, const char *list);
  * Dummy function for checking strstr's arguments.
  */
 extern
-char	*_dmalloc_strstr(const char *str, const char *pat);
+char	*_dmalloc_strstr(const char *file, const int line,
+			 const char *str, const char *pat);
 #endif /* if HAVE_STRSTR */
 
 #if HAVE_STRTOK
@@ -261,7 +287,8 @@ char	*_dmalloc_strstr(const char *str, const char *pat);
  * Dummy function for checking strtok's arguments.
  */
 extern
-char	*_dmalloc_strtok(char *str, const char *sep);
+char	*_dmalloc_strtok(const char *file, const int line,
+			 char *str, const char *sep);
 #endif /* if HAVE_STRTOK */
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
