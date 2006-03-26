@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.118 2005/06/08 02:11:30 gray Exp $
+ * $Id: dmalloc.c,v 1.119 2006/03/26 18:29:39 gray Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ static	argv_t	args[] = {
   { '\0',	"version",	ARGV_BOOL_INT,	&version_b,
     NULL,			"display version string" },
   { ARGV_MAYBE,	NULL,		ARGV_CHAR_P,	&tag,
-    "tag",			"debug token to find in rc" },
+    "tag",			"debug token, internal or from rc file" },
   { ARGV_LAST }
 };
 
