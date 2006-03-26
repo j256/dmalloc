@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.185 2005/12/21 13:39:58 gray Exp $
+ * $Id: malloc.c,v 1.186 2006/03/26 18:29:22 gray Exp $
  */
 
 /*
@@ -371,11 +371,13 @@ static	int	dmalloc_startup(const char *debug_str)
     else {
       env_str = debug_str;
     }
-    
-    /* process the environmental variable(s) */
-    process_environ(env_str);
+#else
+    /* oh, well.  no idea how to get the environmental variables */
+    env_str = "";
 #endif /* GETENV_SAFE */
 #endif /* ! __CYGWIN__ */
+    /* process the environmental variable(s) */
+    process_environ(env_str);
     
     /*
      * Tune the environment here.  If we have a start-file,
