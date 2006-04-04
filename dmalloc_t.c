@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.124 2005/12/21 14:27:07 gray Exp $
+ * $Id: dmalloc_t.c,v 1.125 2006/04/04 06:13:50 gray Exp $
  */
 
 /*
@@ -738,14 +738,17 @@ static	int	check_arg_check(void)
   char		*func;
   int		our_errno_hold = dmalloc_errno;
   int		size, final = 1;
-  char		*pnt, *pnt2;
+  char		*pnt, *pnt2, hold_ch;
   
   if (! silent_b) {
     (void)printf("  Checking arg-check functions\n");
   }
   
-  /* enable alloc blanking without fence-posts */
-  dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
+  /*
+   * enable function checking and remove check-fence which caused
+   * extra errors
+   */
+  dmalloc_debug((old_flags | DEBUG_CHECK_FUNCS) & (~DEBUG_CHECK_FENCE));
   
   size = 5;
   pnt = malloc(size);
@@ -765,13 +768,95 @@ static	int	check_arg_check(void)
   
   /*********/
   
+#if HAVE_ATOI
+  func = "atoi";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "1234", size);
+  if (_dmalloc_atoi(__FILE__, __LINE__, pnt) != 1234) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "12345", size);
+  if (_dmalloc_atoi(__FILE__, __LINE__, pnt) != 12345) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_ATOL
+  func = "atol";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "1234", size);
+  if (_dmalloc_atol(__FILE__, __LINE__, pnt) != 1234) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "12345", size);
+  if (_dmalloc_atol(__FILE__, __LINE__, pnt) != 12345) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
 #if HAVE_BCMP
   func = "bcmp";
   if (! silent_b) {
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* they should be the same */
   dmalloc_errno = 0;
   memset(pnt, 1, size);
   memset(pnt2, 1, size);
@@ -788,7 +873,7 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
-  /* this copies too many characters into buffer */
+  /* they should be different */
   dmalloc_errno = 0;
   memset(pnt, 1, size);
   memset(pnt2, 2, size);
@@ -805,6 +890,7 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
+  /* this should cause an error */
   dmalloc_errno = 0;
   _dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
@@ -824,7 +910,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this copies the right number of characters into buffer */
   dmalloc_errno = 0;
   memset(pnt, 2, size);
   _dmalloc_bcopy(__FILE__, __LINE__, pnt, pnt2, size);
@@ -862,7 +948,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this copies enough characters into buffer */
   dmalloc_errno = 0;
   _dmalloc_bzero(__FILE__, __LINE__, pnt, size);
   if (dmalloc_errno != 0) {
@@ -874,6 +960,7 @@ static	int	check_arg_check(void)
   
   /* this copies too many characters into buffer */
   dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
   _dmalloc_bzero(__FILE__, __LINE__, pnt, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -881,6 +968,50 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
+#endif
+  
+  /*********/
+  
+#if HAVE_INDEX
+  func = "index";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "1234", size);
+  if (_dmalloc_index(__FILE__, __LINE__, pnt, '4') != pnt + 3) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
+  memcpy(pnt, "12345", size);
+  if (_dmalloc_index(__FILE__, __LINE__, pnt, '5') != pnt + 4) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -891,7 +1022,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this copies the right number of characters into buffer */
   dmalloc_errno = 0;
   memset(pnt, 3, size);
   _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size);
@@ -904,6 +1035,7 @@ static	int	check_arg_check(void)
   
   /* this copies too many characters into buffer */
   dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
   _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -911,6 +1043,7 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -921,7 +1054,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this looks at the right number of characters in buffer */
   dmalloc_errno = 0;
   memset(pnt, 4, size);
   if (_dmalloc_memchr(__FILE__, __LINE__, pnt, 0, size) != NULL) {
@@ -937,7 +1070,7 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
-  /* this copies too many characters into buffer */
+  /* this looks at too many characters in buffer */
   dmalloc_errno = 0;
   (void)_dmalloc_memchr(__FILE__, __LINE__, pnt, 0, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
@@ -956,7 +1089,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this checks the right number of characters in buffer */
   dmalloc_errno = 0;
   memset(pnt, 5, size);
   memset(pnt2, 5, size);
@@ -973,7 +1106,7 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
-  /* this copies too many characters into buffer */
+  /* this checks too many characters from buffer */
   dmalloc_errno = 0;
   (void)_dmalloc_memcmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
@@ -992,7 +1125,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this copies enough characters into buffer */
   dmalloc_errno = 0;
   memset(pnt, 6, size);
   _dmalloc_memcpy(__FILE__, __LINE__, pnt2, pnt, size);
@@ -1011,6 +1144,7 @@ static	int	check_arg_check(void)
   
   /* this copies too many characters into buffer */
   dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
   (void)_dmalloc_memcpy(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -1018,6 +1152,7 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -1028,7 +1163,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this copies enough characters into buffer */
   dmalloc_errno = 0;
   memset(pnt, 7, size);
   _dmalloc_memmove(__FILE__, __LINE__, pnt2, pnt, size);
@@ -1047,6 +1182,7 @@ static	int	check_arg_check(void)
   
   /* this copies too many characters into buffer */
   dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
   (void)_dmalloc_memmove(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -1054,6 +1190,7 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -1064,7 +1201,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this sets the right number of characters in buffer */
   dmalloc_errno = 0;
   _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size);
   if (dmalloc_errno != 0) {
@@ -1074,8 +1211,9 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
-  /* this copies too many characters into buffer */
+  /* this sets too many characters in buffer */
   dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
   _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -1083,6 +1221,296 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
+#endif
+  
+  /*********/
+  
+#if HAVE_RINDEX
+  func = "rindex";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "1234", size);
+  if (_dmalloc_rindex(__FILE__, __LINE__, pnt, '1') != pnt) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "12345", size);
+  if (_dmalloc_rindex(__FILE__, __LINE__, pnt, '1') != pnt) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRCASECMP
+  func = "strcasecmp";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "abcd", size);
+  memcpy(pnt2, "ABCD", size);
+  if (_dmalloc_strcasecmp(__FILE__, __LINE__, pnt, pnt2) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "abcde", size);
+  memcpy(pnt2, "ABCDE", size);
+  /* unknown results */
+  (void)_dmalloc_strcasecmp(__FILE__, __LINE__, pnt, pnt2);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRCAT
+  func = "strcat";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "ab", 3);
+  memcpy(pnt2, "cd", 3);
+  if (_dmalloc_strcat(__FILE__, __LINE__, pnt, pnt2) != pnt) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "ab", 3);
+  memcpy(pnt2, "abc", 4);
+  hold_ch = *(pnt + size);
+  if (_dmalloc_strcat(__FILE__, __LINE__, pnt, pnt2) != pnt) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+  *(pnt + size) = hold_ch;
+#endif
+  
+  /*********/
+  
+#if HAVE_STRCHR
+  func = "strchr";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "1234", size);
+  if (_dmalloc_strchr(__FILE__, __LINE__, pnt, '4') != pnt + 3) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "12345", size);
+  if (_dmalloc_strchr(__FILE__, __LINE__, pnt, '5') != pnt + 4) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRCMP
+  func = "strcmp";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "abcd", size);
+  memcpy(pnt2, "abcd", size);
+  if (_dmalloc_strcmp(__FILE__, __LINE__, pnt, pnt2) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  memcpy(pnt, "abcde", size);
+  memcpy(pnt2, "abcde", size);
+  /* unknown results */
+  (void)_dmalloc_strcmp(__FILE__, __LINE__, pnt, pnt2);
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+#endif
+  
+  /*********/
+  
+#if HAVE_STRCPY
+  func = "strcpy";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt2, "abcd", size);
+  _dmalloc_strcpy(__FILE__, __LINE__, pnt, pnt2);
+  if (memcmp(pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
+  memcpy(pnt2, "abcde", size + 1);
+  _dmalloc_strcpy(__FILE__, __LINE__, pnt, pnt2);
+  if (memcmp(pnt, pnt2, size) != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+  *(pnt + size) = hold_ch;
+#endif
+  
+  /*********/
+  
+#if HAVE_STRCSPN
+  func = "strcspn";
+  if (! silent_b) {
+    (void)printf("    Checking %s\n", func);
+  }
+  
+  /* they should be the same */
+  dmalloc_errno = 0;
+  memcpy(pnt, "abcd", size);
+  if (_dmalloc_strcspn(__FILE__, __LINE__, pnt, ".") != 4) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload failed\n", func);
+    }
+    final = 0;
+  }
+  if (dmalloc_errno != 0) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should not get error\n", func);
+    }
+    final = 0;
+  }
+  
+  /* they should be different */
+  dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
+  memcpy(pnt, "abcde", size);
+  /* unknown results */
+  (void)_dmalloc_strcspn(__FILE__, __LINE__, pnt, ".");
+  if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+    if (! silent_b) {
+      (void)printf("     ERROR: %s overload should get error\n", func);
+    }
+    final = 0;
+  }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -1115,7 +1543,7 @@ static	int	check_arg_check(void)
       final = 0;
     }
     
-    /* this copies too many characters into buffer */
+    /* this looks at too many characters from buffer */
     dmalloc_errno = 0;
     memset(pnt, 3, size);
     new_pnt = strdup(pnt);
@@ -1137,7 +1565,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this compares enough characters from buffer */
   dmalloc_errno = 0;
   memset(pnt, 'a', size);
   memset(pnt2, 'A', size);
@@ -1154,7 +1582,7 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
-  /* this copies too many characters into buffer */
+  /* this compares too many characters from buffer */
   dmalloc_errno = 0;
   (void)_dmalloc_strncasecmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
@@ -1173,7 +1601,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this copies enough characters into buffer */
   dmalloc_errno = 0;
   /* sanity check */
   if (size <= 2) {
@@ -1197,6 +1625,7 @@ static	int	check_arg_check(void)
   memset(pnt, 8, size);
   /* now just remove one so the \0 would overwrite */
   pnt[size - 1] = '\0';
+  hold_ch = *(pnt + size);
   _dmalloc_strncat(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -1204,6 +1633,7 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -1214,7 +1644,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this compares too many characters from buffer */
   dmalloc_errno = 0;
   memset(pnt, 9, size);
   memset(pnt2, 9, size);
@@ -1231,7 +1661,7 @@ static	int	check_arg_check(void)
     final = 0;
   }
   
-  /* this copies too many characters into buffer */
+  /* this compares too many characters from buffer */
   dmalloc_errno = 0;
   (void)_dmalloc_strncmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
@@ -1250,7 +1680,7 @@ static	int	check_arg_check(void)
     (void)printf("    Checking %s\n", func);
   }
   
-  /* this copies too many characters into buffer */
+  /* this looks at enough characters into buffer */
   dmalloc_errno = 0;
   memset(pnt, 9, size);
   _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size);
@@ -1289,7 +1719,7 @@ static	int	check_arg_check(void)
   {
     void	*new_pnt;
     
-    /* this copies too many characters into buffer */
+    /* this looks at enough characters in buffer */
     dmalloc_errno = 0;
     new_pnt = strndup(pnt, size);
     if (new_pnt == NULL) {
@@ -1399,6 +1829,7 @@ static	int	check_special(void)
    * Check to make sure that large mallocs are handled correctly.
    */
   
+#if 0
 #if LARGEST_ALLOCATION
   if (! silent_b) {
     (void)printf("  Allocating a block of too-many bytes.\n");
@@ -1414,6 +1845,7 @@ static	int	check_special(void)
     free(pnt);
     final = 0;
   }
+#endif
 #endif
   
   /********************/
@@ -2119,7 +2551,7 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+	(void)printf("   ERROR: per-pointer blanking flags should have failed: %s (err %d)\n",
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
@@ -2182,7 +2614,7 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+	(void)printf("   ERROR: per-pointer alloc flags failed: %s (err %d)\n",
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
@@ -2938,7 +3370,7 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+	(void)printf("   ERROR: per-pointer alloc flags failed: %s (err %d)\n",
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
