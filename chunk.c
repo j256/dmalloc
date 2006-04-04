@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.210 2005/12/18 14:46:11 gray Exp $
+ * $Id: chunk.c,v 1.211 2006/04/04 04:24:04 gray Exp $
  */
 
 /*
@@ -2506,7 +2506,6 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   char		where_buf[MAX_FILE_LENGTH + 64];
   char		where_buf2[MAX_FILE_LENGTH + 64], disp_buf[64];
   skip_alloc_t	*slot_p, *update_p;
-  
   
   /* counts calls to free */
   if (func_id == DMALLOC_FUNC_DELETE) {
