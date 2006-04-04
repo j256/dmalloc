@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.212 2006/04/04 06:14:54 gray Exp $
+ * $Id: chunk.c,v 1.213 2006/04/04 14:09:44 gray Exp $
  */
 
 /*
@@ -373,6 +373,7 @@ static	skip_alloc_t	*find_free_size(const unsigned int size,
   
   /* space should be free */
   if (found_p != NULL && (! BIT_IS_SET(found_p->sa_flags, ALLOC_FLAG_FREE))) {
+    /* sanity check */
     dmalloc_errno = ERROR_ADDRESS_LIST;
     dmalloc_error("find_free_size");
     return NULL;
@@ -418,8 +419,8 @@ static	int	insert_slot(skip_alloc_t *slot_p, const int free_b)
   else if (find_address(slot_p->sa_mem, 0 /* used list */, 1 /* exact */,
 			update_p) != NULL) {
     /*
-     * we should not have found it since that means that someone has
-     * the same size and block-num
+     * Sanity check.  We should not have found it since that means
+     * that someone has the same size and block-num.
      */
     dmalloc_errno = ERROR_ADDRESS_LIST;
     dmalloc_error("insert_slot");
@@ -477,7 +478,10 @@ static	void	*alloc_slots(const int level_n)
   /* we need to allocate a new block of the slots of this level */
   block_p = _dmalloc_heap_alloc(BLOCK_SIZE);
   if (block_p == NULL) {
-    /* error code set in _dmalloc_heap_alloc */
+    /*
+     * Sanity check.  Out of heap memory.  Error code set in
+     * _dmalloc_heap_alloc().
+     */
     return NULL;
   }
   memset(block_p, 0, BLOCK_SIZE);
@@ -639,7 +643,7 @@ static	skip_alloc_t	*get_slot(void)
   /* add in all of the unused slots to the linked list */
   admin_mem = alloc_slots(level_n);
   if (admin_mem == NULL) {
-    /* error code set in alloc_slots */
+    /* Sanity check.  Error code set in alloc_slots(). */
     return NULL;
   }
   
@@ -647,8 +651,8 @@ static	skip_alloc_t	*get_slot(void)
   new_p = entry_free_list[level_n];
   if (new_p == NULL) {
     /*
-     * HUH?  This isn't right.  We should have created a whole bunch
-     * of addresses
+     * Sanity check. We should have created a whole bunch of
+     * addresses.
      */
     dmalloc_errno = ERROR_ADDRESS_LIST;
     dmalloc_error("get_slot");
@@ -663,7 +667,7 @@ static	skip_alloc_t	*get_slot(void)
   
   /* now put it in the used list */
   if (! insert_slot(new_p, 0 /* used list */)) {
-    /* error reported above */
+    /* Sanity check.  error code set in insert_slot(). */
     return NULL;
   }
   
@@ -671,8 +675,8 @@ static	skip_alloc_t	*get_slot(void)
   new_p = entry_free_list[level_n];
   if (new_p == NULL) {
     /*
-     * HUH?  This isn't right.  We should have created a whole bunch
-     * of addresses
+     * Sanity check.  We should have created a whole bunch of
+     * addresses.
      */
     dmalloc_errno = ERROR_ADDRESS_LIST;
     dmalloc_error("get_slot");
@@ -731,7 +735,7 @@ static	skip_alloc_t	*insert_address(void *address, const int free_b,
   
   /* now try and insert the slot into the skip-list */
   if (! insert_slot(new_p, free_b)) {
-    /* error code set in insert_slot */
+    /* Sanity check.  error code set in insert_slot(). */
     return NULL;
   }
   
@@ -770,7 +774,6 @@ static	skip_alloc_t	*insert_address(void *address, const int free_b,
 static	int	expand_chars(const void *buf, const int buf_size,
 			     char *out, const int out_size)
 {
-  int			buf_c;
   const unsigned char	*buf_p, *spec_p;
   char	 		*out_p = out, *bounds_p;
   
@@ -778,19 +781,9 @@ static	int	expand_chars(const void *buf, const int buf_size,
   bounds_p = out + out_size;
   
   /* run through the input buffer, counting the characters as we go */
-  for (buf_c = 0, buf_p = (const unsigned char *)buf;; buf_c++, buf_p++) {
-    
-    /* did we reach the end of the buffer? */
-    if (buf_size < 0) {
-      if (*buf_p == '\0') {
-	break;
-      }
-    }
-    else {
-      if (buf_c >= buf_size) {
-	break;
-      }
-    }
+  for (buf_p = (const unsigned char *)buf;
+       buf_p < (const unsigned char *)buf + buf_size;
+       buf_p++) {
     
     /* search for special characters */
     for (spec_p = (unsigned char *)SPECIAL_CHARS + 1;
