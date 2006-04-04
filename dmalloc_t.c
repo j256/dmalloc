@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.125 2006/04/04 06:13:50 gray Exp $
+ * $Id: dmalloc_t.c,v 1.126 2006/04/04 06:37:50 gray Exp $
  */
 
 /*
@@ -1699,6 +1699,7 @@ static	int	check_arg_check(void)
   
   /* this copies too many characters into buffer */
   dmalloc_errno = 0;
+  hold_ch = *(pnt + size);
   _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
@@ -1706,6 +1707,7 @@ static	int	check_arg_check(void)
     }
     final = 0;
   }
+  *(pnt + size) = hold_ch;
 #endif
   
   /*********/
@@ -1770,7 +1772,7 @@ static	int	check_arg_check(void)
 /*
  * Do some special tests, returns 1 on success else 0
  */
-static	int	check_special(void)
+static	int	do_special(void)
 {
   void	*pnt;
   int	errno_hold = dmalloc_errno, page_size;
@@ -3370,7 +3372,7 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer alloc flags failed: %s (err %d)\n",
+	(void)printf("   ERROR: free versus alloc flags failed: %s (err %d)\n",
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
@@ -3446,6 +3448,46 @@ static	int	check_special(void)
    * message above
    */
   
+  return final;
+}
+
+/*
+ * Do some special tests, returns 1 on success else 0
+ */
+static	int	check_special(void)
+{
+  int		final = 1;
+  unsigned int	old_flags = dmalloc_debug_current();
+  
+  /* try it plain first */
+  if (! do_special()) {
+    final = 0;
+  }
+  
+  /* now try some flags which caused some problems */
+  
+  /* now add in fence and blank */
+  dmalloc_debug(old_flags | DEBUG_CHECK_FENCE | DEBUG_CHECK_BLANK
+		| DEBUG_ALLOC_BLANK | DEBUG_FREE_BLANK);
+  if (! do_special()) {
+    final = 0;
+  }
+  
+  /* now disable check-fence but leave on check-blank */
+  dmalloc_debug((old_flags & (~DEBUG_CHECK_FENCE))  | DEBUG_CHECK_BLANK
+		| DEBUG_ALLOC_BLANK | DEBUG_FREE_BLANK);
+  if (! check_arg_check()) {
+    final = 0;
+  }
+  
+  /* now disable check-fence but leave on check-blank */
+  dmalloc_debug(old_flags | DEBUG_CHECK_FENCE | DEBUG_REALLOC_COPY);
+  if (! check_arg_check()) {
+    final = 0;
+  }
+  
+  /* restore flags */
+  dmalloc_debug(old_flags);
   return final;
 }
 
