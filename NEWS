@@ -1,9 +1,10 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.123 2005/12/21 15:07:39 gray Exp $
+$Id: NEWS,v 1.124 2006/04/04 06:37:57 gray Exp $
 -------------------------------------------------------------------------------
 
 Version 5.5.0 (12/19/2005):
 
+	* Fixed a problem with Cygwin env parsing.
 	* Improved regression tests on argument checking functions.
 	* Fixed some problems with function argument checking and length args.
 	* Added handling of strndup function.

@@ -1,3 +1,14 @@
+2006-03-27  Gray Watson  <gray@outside.256.com>
+
+	* Fixed a problem with arg-check dmalloc code and check-fence.
+
+2006-03-23  Gray Watson  <gray@outside.256.com>
+
+	* Fixed a section of the manual about Cygwin thanks to Pierre.
+
+	* Fixed a problem with Cygwin env parsing.  Thanks to Pierre and
+	others.
+
 2005-12-21  Gray Watson  <gray@outside.256.com>
 
 	* Added a section on dumping core in the manual.
@@ -2332,5 +2343,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.337 2005/12/21 15:07:39 gray Exp $
+$Id: ChangeLog,v 1.338 2006/04/04 06:37:56 gray Exp $
 -------------------------------------------------------------------------------
