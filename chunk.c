@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.211 2006/04/04 04:24:04 gray Exp $
+ * $Id: chunk.c,v 1.212 2006/04/04 06:14:54 gray Exp $
  */
 
 /*
@@ -2248,7 +2248,6 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
       return 0;
     }
     else {
-      dmalloc_errno = ERROR_NONE;
       return 1;
     }
   }
