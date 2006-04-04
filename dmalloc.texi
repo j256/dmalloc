@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.288 2005/12/21 15:06:56 gray Exp $
+@c $Id: dmalloc.texi,v 1.289 2006/04/04 06:14:07 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -847,6 +847,7 @@ checking the heap after it sees a call from anywhere in the
 * Using With Cygwin::          Using the library with Cygwin environment.
 * Debugging A Server::         Debugging memory in a server or cgi-bin process.
 * Logfile Details::            Explanation of the Logfile Output.
+* Other Hints::                Various other hints that may help.
 @end menu
 
 @c --------------------------------
@@ -2327,23 +2328,26 @@ URL @uref{http://www.cygwin.com/} for more details.
 
 @cindex reading environment, problems with
 @cindex getenv, problems with
+@cindex GetEnvironmentVariableA, using with
 
-The challenge with using dmalloc to debug Cygwin programs is that when
-it initializes, dmalloc makes a call to @code{getenv} to read the
-environmental variables.  It is looking for the value of the
-@samp{DMALLOC_OPTIONS} variable which sets the debugging options.
-@xref{Environment Variable}.  Because Cygwin calls a memory allocation
-function while it is loading its shared libraries, it goes recursive
-when @code{getenv} is called from within @code{malloc} causing a
-segfault.
+Cygwin uses the @code{GetEnvironmentVariableA} function to read in
+environmental variables instead of @code{getenv}.  This functions are
+used to get the value of the @samp{DMALLOC_OPTIONS} variable which
+sets the debugging options.  @xref{Environment Variable}.
 
+@cindex HAVE_GETENVIRONMENTVARIABLEA
 @cindex GETENV_SAVE conf.h option
 
-To work around this, I have added to the configure script a check to
-make sure that calls to @code{getenv} are okay inside of malloc.  See
-@code{GETENV_SAFE} in @file{conf.h}.  If they are not then you are going
-to have to add some code into the @code{main} function in your program
-to initialize the dmalloc flags yourself.  Here is a code sample:
+As of right now, dmalloc is not detecting the
+@code{GetEnvironmentVariableA} function correctly so you may need to
+tune the @file{conf.h} file to get it to work.  See the sections on
+@code{HAVE_GETENVIRONMENTVARIABLEA} and @code{GETENV_SAVE} settings.
+Feedback is welcome here.
+
+If you still have problems reading in the environmental variables, you
+can work around this issue.  You can add some code into the
+@code{main} function in your program to initialize the dmalloc flags
+yourself.  Here is a code sample:
 
 @cindex dmalloc_debug_setup usage
 
@@ -2368,9 +2372,7 @@ dmalloc you need to compile your code with @code{-DDMALLOC}.  When you
 are done debugging you can remove the flag and the call to
 @code{dmalloc_debug_setup} will be removed.
 
-Please let me know if there is a different way to read the environment
-in Cygwin without calling @code{getenv} or if there is a better way to
-do this.
+Please let me know if there is a better way to do this.
 
 @c --------------------------------
 
@@ -2547,7 +2549,7 @@ problems.  @xref{Extensions}.
 
 @c --------------------------------
 
-@node Logfile Details,, Debugging A Server, Programming
+@node Logfile Details, Other Hints, Debugging A Server, Programming
 @section Explanation of the Logfile Output
 
 @cindex logfile format
@@ -2606,6 +2608,41 @@ the error was discovered, the address of the offending pointer, and
 when the pointer was previous accessed, in this case freed.  To
 discover where this problem is happening, you can use a debugger.
 @xref{Using With a Debugger}.
+
+@c --------------------------------
+
+@node Other Hints,, Logfile Details, Programming
+@section Various Other Hints That May Help
+
+@cindex other hints
+@cindex hints that may help
+@cindex various hints
+
+One of the problems that is often seen is that a program crashes in
+the @code{libc} memory code and you suspect a heap memory problem but
+both dmalloc and maybe valgrind don't show any problems.  One of the
+big problems with debugging is that it is very difficult to do it
+without effecting how the program is run.  Sometimes errors are due to
+subtle race conditions that are only seen when the program is running
+at full speed -- not slowed down by debugging code.
+
+This is especially true with threaded code which is often heavily
+affected when used with dmalloc and valgrind.  Older versions of
+valgrid (maybe current) forced all threads into a single virtual
+system by design, which often masks reentrance bugs.
+
+One way to work through these issues is to run with the library with
+very few debugging flags enabled.  Many memory problems are fence-post
+areas so start with dmalloc checking just the fence post and error
+logging enabled:
+
+@example
+dmalloc -d 0 -l dmalloc.log -p log-stats -p log-non-free -p check-fence -p check-funcs 
+@end example
+
+This enabled a small number of checks and should cause your program to
+run at close to full speed.  The library has never been optimized for
+speed so some performance penalties will be felt.
 
 @c ----------------------------------------------------------------------------
 
