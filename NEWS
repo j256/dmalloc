@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.124 2006/04/04 06:37:57 gray Exp $
+$Id: NEWS,v 1.125 2007/02/08 06:44:41 gray Exp $
 -------------------------------------------------------------------------------
 
-Version 5.5.0 (12/19/2005):
+Version 5.5.0 (2/8/2007):
 
 	* Fixed a problem with Cygwin env parsing.
 	* Improved regression tests on argument checking functions.

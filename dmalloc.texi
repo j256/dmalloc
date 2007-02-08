@@ -12,13 +12,13 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.289 2006/04/04 06:14:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.290 2007/02/08 06:44:42 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
 @set dmalloc_version Version 5.5.0
-@set dmalloc_date December 2005
-@set dmalloc_copyright Copyright 1992 to 2005 by Gray Watson.
+@set dmalloc_date February 2007
+@set dmalloc_copyright Copyright 1992 to 2007 by Gray Watson.
 @c ----------------------------------------------------------------
 
 @ifinfo
