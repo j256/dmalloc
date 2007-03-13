@@ -1,3 +1,7 @@
+2007-03-12  Gray Watson  <gray@outside.256.com>
+
+	* Improved some documents after user feedback. Thanks Renny.
+
 2007-02-08  Gray Watson  <gray@outside.256.com>
 
 	* Releasing dmalloc version 5.5.0.
@@ -2347,5 +2351,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.339 2007/02/08 06:44:41 gray Exp $
+$Id: ChangeLog,v 1.340 2007/03/13 01:14:28 gray Exp $
 -------------------------------------------------------------------------------
