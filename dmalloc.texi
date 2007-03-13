@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.291 2007/03/13 01:07:28 gray Exp $
+@c $Id: dmalloc.texi,v 1.292 2007/03/13 01:11:25 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -1056,7 +1056,7 @@ setting in @file{settings.dist}.  This code tries to generate a
 segmentation fault by dereferencing a @code{NULL} pointer.
 
 @example
-#define KILL_PROCESS    @{ int *_int_p = NULL; *_int_p = 1; @}
+#define KILL_PROCESS    @{ int *_int_p = 0L; *_int_p = 1; @}
 @end example
 
 @c --------------------------------
