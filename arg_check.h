@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.h,v 1.24 2005/12/21 13:40:56 gray Exp $
+ * $Id: arg_check.h,v 1.25 2007/03/22 19:40:52 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__
@@ -120,7 +120,7 @@ void	*_dmalloc_memcpy(const char *file, const int line,
 
 #if HAVE_MEMMOVE
 /*
- * Dummy function for checking memcpy's arguments.
+ * Dummy function for checking memmove's arguments.
  */
 extern
 void	*_dmalloc_memmove(const char *file, const int line,
