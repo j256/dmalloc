@@ -487,10 +487,55 @@ int	malloc_verify(const DMALLOC_PNT pnt);
  * a memory allocation.  If set to 0 then this pointer can be inside
  * another allocation or outside the heap altogether.
  *
+ * strlen_b -> Set to 1 to make sure that this pointer can handle
+ * strlen(pnt) + 1 bytes up to the maximum specified by min_size.  If
+ * this is 1 and min_size > 0 then it is in effect a strnlen.
+ *
+ * min_size -> Make sure that pointer can hold at least that many
+ * bytes if inside of the heap.  If 0 then don't check the size.
+ */
+extern
+int	dmalloc_verify_pnt_strsize(const char *file, const int line,
+				   const char *func, const void *pnt,
+				   const int exact_b, const int strlen_b,
+				   const int min_size);
+
+/*
+ * int dmalloc_verify_pnt
+ *
+ * DESCRIPTION:
+ *
+ * This function is mainly used by the arg_check.c functions to verify
+ * specific pointers.  This can be used by users to provide more fine
+ * grained tests on pointers.
+ *
+ * RETURNS:
+ *
+ * Success - MALLOC_VERIFY_NOERROR
+ *
+ * Failure - MALLOC_VERIFY_ERROR
+ *
+ * ARGUMENTS:
+ *
+ * file -> File-name or return-address of the caller.  You can use
+ * __FILE__ for this argument or 0L for none.
+ *
+ * line -> Line-number of the caller.  You can use __LINE__ for this
+ * argument or 0 for none.
+ *
+ * func -> Function string which is checking the pointer.  0L if none.
+ *
+ * pnt -> Pointer we are checking.
+ *
+ * exact_b -> Set to 1 if this pointer was definitely handed back from
+ * a memory allocation.  If set to 0 then this pointer can be inside
+ * another allocation or outside the heap altogether.
+ *
  * min_size -> Make sure that pointer can hold at least that many
  * bytes if inside of the heap.  If -1 then make sure it can handle
  * strlen(pnt) + 1 bytes (+1 for the \0).  If 0 then don't check the
- * size.
+ * size.  If you need strnlen functionality with a maximum on the
+ * strlen, see dmalloc_verify_pnt_strsize.
  */
 extern
 int	dmalloc_verify_pnt(const char *file, const int line, const char *func,
