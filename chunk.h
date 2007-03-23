@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.h,v 1.71 2005/12/18 14:46:11 gray Exp $
+ * $Id: chunk.h,v 1.72 2007/03/23 13:33:06 gray Exp $
  */
 
 #ifndef __CHUNK_H__
@@ -178,12 +178,16 @@ int	_dmalloc_chunk_heap_check(void);
  * exact_b -> Set to 1 to find the pointer specifically.  Otherwise we
  * can find the pointer inside of an allocation.
  *
+ * strlen_b -> Make sure that pnt can hold at least a strlen + 1
+ * bytes.  If 0 then ignore.
+ *
  * min_size -> Make sure that pnt can hold at least that many bytes.
- * If -1 then do a strlen + 1 for the \0.  If 0 then ignore.
+ * If 0 then ignore.
  */
 extern
 int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
-				 const int exact_b, const int min_size);
+				 const int exact_b, const int strlen_b,
+				 const int min_size);
 
 /*
  * void *_dmalloc_chunk_malloc

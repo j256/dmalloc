@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.213 2006/04/04 14:09:44 gray Exp $
+ * $Id: chunk.c,v 1.214 2007/03/23 13:33:06 gray Exp $
  */
 
 /*
@@ -1597,9 +1597,16 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
  *
  * exact_b -> Set to 1 to find the pointer specifically.  Otherwise we
  * can find the pointer inside of an allocation.
+ *
+ * strlen_b -> Make sure that pnt can hold at least a strlen + 1
+ * bytes.  If 0 then ignore.
+ *
+ * min_size -> Make sure that pnt can hold at least that many bytes.
+ * If 0 then ignore.
  */
 static	int	check_used_slot(const skip_alloc_t *slot_p,
-				const void *user_pnt, const int exact_b)
+				const void *user_pnt, const int exact_b,
+				const int strlen_b, const int min_size)
 {
   const char	*file, *name_p, *bounds_p, *mem_p;
   unsigned int	line, num;
@@ -1614,6 +1621,12 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
   
   /* get pointer info */
   get_pnt_info(slot_p, &pnt_info);
+  
+  /* the user pointer needs to be within the user space */
+  if (user_pnt != NULL && (char *)user_pnt < (char *)pnt_info.pi_user_start) {
+    dmalloc_errno = ERROR_WOULD_OVERWRITE;
+    return 0;
+  }
   
   /* if we need the exact pointer, make sure that the user_pnt agrees */
   if (exact_b && user_pnt != pnt_info.pi_user_start) {
@@ -1732,6 +1745,34 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
     return 0;
   }
 #endif
+  
+  if (strlen_b) {
+    mem_p = (char *)user_pnt;
+    if (min_size > 0) {
+      bounds_p = mem_p + min_size;
+      /* min_size can be out of bounds as long as we find a \0 beforehand */
+      if (bounds_p > (char *)pnt_info.pi_user_bounds) {
+	bounds_p = (char *)pnt_info.pi_user_bounds;
+      }
+    } else {
+      bounds_p = (char *)pnt_info.pi_user_bounds;
+    }
+    for (; mem_p < bounds_p; mem_p++) {
+      if (*mem_p == '\0') {
+	break;
+      }
+    }
+    /* mem_p can == bounds_p if we hit the min_size but can't >= user_bounds*/ 
+    if (mem_p >= (char *)pnt_info.pi_user_bounds) {
+      dmalloc_errno = ERROR_WOULD_OVERWRITE;
+      return 0;
+    }
+  } else if (min_size > 0) {
+    if ((char *)user_pnt + min_size > (char *)pnt_info.pi_user_bounds) {
+      dmalloc_errno = ERROR_WOULD_OVERWRITE;
+      return 0;
+    }
+  }
   
   return 1;
 }
@@ -1964,7 +2005,8 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   }
   
   /* might as well check the pointer now */
-  if (! check_used_slot(slot_p, user_pnt, 1 /* exact */)) {
+  if (! check_used_slot(slot_p, user_pnt, 1 /* exact */, 0 /* no strlen */,
+			0 /* no min-size */)) {
     /* errno set in check_slot */
     log_error_info(NULL, 0, user_pnt, slot_p, "checking pointer admin", where);
     return 0;
@@ -2165,7 +2207,8 @@ int	_dmalloc_chunk_heap_check(void)
     /* now check the allocation */
     if (checking_list_c == 0) {
       ret = check_used_slot(slot_p, NULL /* no user pnt */,
-			    0 /* loose pnt checking */);
+			    0 /* loose pnt checking */, 0 /* no strlen */,
+			    0 /* no min-size */);
       if (! ret) {
 	/* error set in check_slot */
 	log_error_info(NULL, 0, NULL, slot_p, "checking user pointer",
@@ -2211,15 +2254,17 @@ int	_dmalloc_chunk_heap_check(void)
  * exact_b -> Set to 1 to find the pointer specifically.  Otherwise we
  * can find the pointer inside of an allocation.
  *
+ * strlen_b -> Make sure that pnt can hold at least a strlen + 1
+ * bytes.  If 0 then ignore.
+ *
  * min_size -> Make sure that pnt can hold at least that many bytes.
- * If -1 then do a strlen + 1 for the \0.  If 0 then ignore.
+ * If 0 then ignore.
  */
 int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
-				 const int exact_b, const int min_size)
+				 const int exact_b, const int strlen_b,
+				 const int min_size)
 {
   skip_alloc_t	*slot_p;
-  unsigned int	min;
-  pnt_info_t	pnt_info;
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
     if (func == NULL) {
@@ -2246,32 +2291,10 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   }
   
   /* now make sure that the user slot is valid */
-  if (! check_used_slot(slot_p, user_pnt, exact_b)) {
+  if (! check_used_slot(slot_p, user_pnt, exact_b, strlen_b, min_size)) {
     /* dmalloc_error set in check_used_slot */
     log_error_info(NULL, 0, user_pnt, slot_p, "pointer-check", func);
     return 0;
-  }
-  
-  /* if min_size is < 0 then do a strlen and take into account the \0 */
-  if (min_size != 0) {
-    if (min_size > 0) {
-      min = min_size;
-    }
-    else {
-      /* length of the string + 1 for the \0 */
-      min = strlen((char *)user_pnt) + 1;
-    }
-    
-    /* get info about the pointer */
-    get_pnt_info(slot_p, &pnt_info);
-    
-    /* are we within bounds on the user pointer and size */
-    if ((char *)user_pnt < (char *)pnt_info.pi_user_start
-	|| (char *)user_pnt + min > (char *)pnt_info.pi_user_bounds) {
-      dmalloc_errno = ERROR_WOULD_OVERWRITE;
-      log_error_info(NULL, 0, user_pnt, slot_p, "pointer-check", func);
-      return 0;
-    }
   }
   
   return 1;
@@ -2581,7 +2604,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
     return FREE_ERROR;
   }
   
-  if (! check_used_slot(slot_p, user_pnt, 1 /* exact pnt */)) {
+  if (! check_used_slot(slot_p, user_pnt, 1 /* exact pnt */, 0 /* no strlen */,
+			0 /* no min-size */)) {
     /* error set in check slot */
     log_error_info(file, line, user_pnt, slot_p, "checking pointer admin",
 		   "free");
