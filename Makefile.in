@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.184 2005/12/18 18:11:47 gray Exp $
+# $Id: Makefile.in,v 1.185 2007/03/23 16:20:42 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -70,6 +70,7 @@ LDFLAGS	= $(LLDFLAGS)
 DESTDIR	= /usr/local
 WWWDIR	= /var/httpd/root/dmalloc.com
 TEST	= $(MODULE)_t
+TEST_FC	= $(MODULE)_fc_t
 UTIL	= $(MODULE)
 INFOFILE= $(MODULE).info
 
@@ -110,7 +111,8 @@ all :: dmalloc.h $(LIBRARY) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
 
 clean ::
 	$(CLEAN)
-	rm -f $(A_OUT) $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
+	rm -f $(A_OUT) $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX)
+	rm -f $(TEST) $(TEST_FC)
 	rm -f $(UTIL) dmalloc.h dmalloc.h.3
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
 	rm -f dmalloc.ps dmalloc.dvi dmalloc.pdf
@@ -262,10 +264,10 @@ malloc_th.o : malloc.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
 		-c $(srcdir)/malloc.c -o $@
 
-tests :: $(TEST)
+tests :: $(TEST) $(TEST_FC)
 	@echo "To run compile tests type 'make testsall'"
 
-testsall :: $(TEST) compile_test
+testsall :: $(TEST) $(TEST_FC) compile_test
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
@@ -273,7 +275,14 @@ $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 		$(LIBS) $(LIBRARY)
 	mv $(A_OUT) $@
 
-check light :: $(TEST)
+$(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
+	rm -f $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST_FC).o dmalloc_argv.o \
+		$(LIBS) $(LIBRARY)
+	mv $(A_OUT) $@
+
+check light :: $(TEST) $(TEST_FC)
+	$(TEST_FC)
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000

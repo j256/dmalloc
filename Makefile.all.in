@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.129 2005/12/21 13:41:21 gray Exp $
+# $Id: Makefile.all.in,v 1.130 2007/03/23 16:20:42 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -152,6 +152,7 @@ CXX_OBJS = dmallocc.o
 
 CFLAGS = $(CCFLAGS)
 TEST = $(MODULE)_t
+TEST_FC = $(MODULE)_fc_t
 
 all : $(BUILD_ALL)
 @TH_OFF@	@echo "To make the thread version of the library type 'make threads'"
@@ -160,7 +161,7 @@ all : $(BUILD_ALL)
 
 clean :
 	rm -f $(A_OUT) core *.o *.t
-	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST)
+	rm -f $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX) $(TEST) $(TEST_FC)
 	rm -f $(LIB_TH_SL) $(LIB_CXX_SL) $(LIB_TH_CXX_SL) $(LIB_SL)
 	rm -f $(UTIL) dmalloc.h
 
@@ -336,14 +337,20 @@ malloc_th.o : $(srcdir)/malloc.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
 		-c $(srcdir)/malloc.c -o ./$@
 
-tests : $(TEST)
+tests : $(TEST) $(TEST_FC)
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@
 	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST).o dmalloc_argv.o $(LIBRARY)
 	mv $(A_OUT) $@
 
+$(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
+	rm -f $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
+	mv $(A_OUT) $@
+
 check light : $(TEST)
+	./$(TEST_FC)
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
