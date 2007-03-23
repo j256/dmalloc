@@ -76,65 +76,100 @@
  * do debugging on the following functions.  this may cause compilation or
  * other problems depending on your architecture.
  */
+#undef atoi
+#define atoi(str) \
+  _dmalloc_atoi(__FILE__, __LINE__, (str))
+#undef atol
+#define atol(str) \
+  _dmalloc_atol(__FILE__, __LINE__, (str))
+
 #undef bcmp
-#define bcmp(b1, b2, len)		_dmalloc_bcmp((b1), (b2), (len))
+#define bcmp(b1, b2, len) \
+  _dmalloc_bcmp(__FILE__, __LINE__, (b1), (b2), (len))
 #undef bcopy
-#define bcopy(from, to, len)		_dmalloc_bcopy((from), (to), (len))
+#define bcopy(from, to, len) \
+  _dmalloc_bcopy(__FILE__, __LINE__, (from), (to), (len))
+#undef bzero
+#define bzero(buf, len) \
+  _dmalloc_bzero(__FILE__, __LINE__, (buf), (len))
 
 #undef memcmp
-#define memcmp(b1, b2, len)		_dmalloc_memcmp((b1), (b2), (len))
+#define memcmp(b1, b2, len) \
+  _dmalloc_memcmp(__FILE__, __LINE__, (b1), (b2), (len))
 #undef memcpy
-#define memcpy(to, from, len)		_dmalloc_memcpy((to), (from), (len))
+#define memcpy(to, from, len) \
+  _dmalloc_memcpy(__FILE__, __LINE__, (to), (from), (len))
+#undef memmove
+#define memmove(to, from, len) \
+  _dmalloc_memmove(__FILE__, __LINE__, (to), (from), (len))
 #undef memset
-#define memset(buf, ch, len)		_dmalloc_memset((buf), (ch), (len))
+#define memset(buf, ch, len) \
+  _dmalloc_memset(__FILE__, __LINE__, (buf), (ch), (len))
 
 #undef index
-#define index(str, ch)			_dmalloc_index((str), (ch))
+#define index(str, ch) \
+  _dmalloc_index(__FILE__, __LINE__, (str), (ch))
 #undef rindex
-#define rindex(str, ch)			_dmalloc_rindex((str), (ch))
+#define rindex(str, ch) \
+  _dmalloc_rindex(__FILE__, __LINE__, (str), (ch))
 
 #undef strcat
-#define strcat(to, from)		_dmalloc_strcat((to), (from))
+#define strcat(to, from) \
+  _dmalloc_strcat(__FILE__, __LINE__, (to), (from))
 #undef strcmp
-#define strcmp(s1, s2)			_dmalloc_strcmp((s1), (s2))
+#define strcmp(s1, s2) \
+  _dmalloc_strcmp(__FILE__, __LINE__, (s1), (s2))
 #undef strlen
-#define strlen(str)			_dmalloc_strlen((str))
+#define strlen(str) \
+  _dmalloc_strlen(__FILE__, __LINE__, (str))
 #undef strtok
-#define strtok(str, sep)		_dmalloc_strtok((str), (sep))
-
-#undef bzero
-#define bzero(buf, len)			_dmalloc_bzero((buf), (len))
+#define strtok(str, sep) \
+  _dmalloc_strtok(__FILE__, __LINE__, (str), (sep))
 
 #undef memccpy
-#define memccpy(s1, s2, ch, len)	_dmalloc_memccpy((s1), (s2),(ch),(len))
+#define memccpy(s1, s2, ch, len) \
+  _dmalloc_memccpy(__FILE__, __LINE__, (s1), (s2),(ch),(len))
 #undef memchr
-#define memchr(s1, ch, len)		_dmalloc_memchr((s1), (ch), (len))
+#define memchr(s1, ch, len) \
+  _dmalloc_memchr(__FILE__, __LINE__, (s1), (ch), (len))
 
 #undef strchr
-#define strchr(str, ch)			_dmalloc_strchr((str), (ch))
+#define strchr(str, ch) \
+  _dmalloc_strchr(__FILE__, __LINE__, (str), (ch))
 #undef strrchr
-#define strrchr(str, ch)		_dmalloc_strrchr((str), (ch))
+#define strrchr(str, ch) \
+  _dmalloc_strrchr(__FILE__, __LINE__, (str), (ch))
 
 #undef strcpy
-#define strcpy(to, from)		_dmalloc_strcpy((to), (from))
+#define strcpy(to, from) \
+  _dmalloc_strcpy(__FILE__, __LINE__, (to), (from))
 #undef strncpy
-#define strncpy(to, from, len)		_dmalloc_strncpy((to), (from), (len))
+#define strncpy(to, from, len) \
+  _dmalloc_strncpy(__FILE__, __LINE__, (to), (from), (len))
 #undef strcasecmp
-#define strcasecmp(s1, s2)		_dmalloc_strcasecmp((s1), (s2))
+#define strcasecmp(s1, s2) \
+  _dmalloc_strcasecmp(__FILE__, __LINE__, (s1), (s2))
 #undef strncasecmp
-#define strncasecmp(s1, s2, len)	_dmalloc_strncasecmp((s1), (s2), (len))
+#define strncasecmp(s1, s2, len) \
+  _dmalloc_strncasecmp(__FILE__, __LINE__, (s1), (s2), (len))
 #undef strspn
-#define strspn(str, list)		_dmalloc_strspn((str), (list))
+#define strspn(str, list) \
+  _dmalloc_strspn(__FILE__, __LINE__, (str), (list))
 #undef strcspn
-#define strcspn(str, list)		_dmalloc_strcspn((str), (list))
+#define strcspn(str, list) \
+  _dmalloc_strcspn(__FILE__, __LINE__, (str), (list))
 #undef strncat
-#define strncat(to, from, len)		_dmalloc_strncat((to), (from), (len))
+#define strncat(to, from, len) \
+  _dmalloc_strncat(__FILE__, __LINE__, (to), (from), (len))
 #undef strncmp
-#define strncmp(s1, s2, len)		_dmalloc_strncmp((s1), (s2), (len))
+#define strncmp(s1, s2, len) \
+  _dmalloc_strncmp(__FILE__, __LINE__, (s1), (s2), (len))
 #undef strpbrk
-#define strpbrk(str, list)		_dmalloc_strpbrk((str), (list))
+#define strpbrk(str, list) \
+  _dmalloc_strpbrk(__FILE__, __LINE__, (str), (list))
 #undef strstr
-#define strstr(str, pat)		_dmalloc_strstr((str), (pat))
+#define strstr(str, pat) \
+  _dmalloc_strstr(__FILE__, __LINE__, (str), (pat))
 
 #endif /* DMALLOC_FUNC_CHECK */
 #endif /* ! DMALLOC_DISABLE */
