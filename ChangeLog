@@ -1,3 +1,7 @@
+2007-03-25  Gray Watson  <gray@outside.256.com>
+
+	* Fixed some problems with str[n]dup argument checking.
+
 2007-03-24  Gray Watson  <gray@outside.256.com>
 
 	* Fixed bug where LOG_PNT_SEEN_COUNT set to 0 caused segfault in
@@ -2375,5 +2379,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.343 2007/03/25 06:09:10 gray Exp $
+$Id: ChangeLog,v 1.344 2007/03/25 18:57:31 gray Exp $
 -------------------------------------------------------------------------------
