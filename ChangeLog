@@ -1,13 +1,18 @@
+2007-03-24  Gray Watson  <gray@outside.256.com>
+
+	* Fixed bug with the checking of the MAX_FILE_LENGTH. 
+
 2007-03-23  Gray Watson  <gray@outside.256.com>
 
-	* Revamped the what chunk tests user_pnt space.  Added support for
-	strnlen sizing.  Added better checking of non-exact user pointers.
+	* Revamped the chunk.c tests for user_pnt space.  Added support
+	for strnlen sizing.  Added better checking of non-exact user
+	pointers.
 
 	* Added dmalloc_verify_pnt_strsize to support strnlen size testing.
 
 2007-03-22  Gray Watson  <gray@outside.256.com>
 
-	* Added missing DMALLOC_FUNC_CHECK tests: atoi, atol, memmove
+	* Added missing DMALLOC_FUNC_CHECK routines: atoi, atol, memmove
 
 	* Added a number of special checks for DMALLOC_FUNC_CHECK stuff.
 
@@ -2366,5 +2371,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.341 2007/03/25 03:06:55 gray Exp $
+$Id: ChangeLog,v 1.342 2007/03/25 03:16:06 gray Exp $
 -------------------------------------------------------------------------------

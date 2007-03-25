@@ -1,6 +1,15 @@
 -------------------------------------------------------------------------------
-$Id: NEWS,v 1.125 2007/02/08 06:44:41 gray Exp $
+$Id: NEWS,v 1.126 2007/03/25 03:16:06 gray Exp $
 -------------------------------------------------------------------------------
+
+Version 5.5.1 (3/24/2007):
+
+	* Fixed bug with the checking of the MAX_FILE_LENGTH. 
+	* Revamped the tests for user pointers. Added better support for sizes.
+	* Added dmalloc_verify_pnt_strsize to support strnlen size testing.
+	* Added missing DMALLOC_FUNC_CHECK routines: atoi, atol, memmove
+	* Added a number of special checks for DMALLOC_FUNC_CHECK stuff.
+	* Fixed all of the DMALLOC_FUNC_CHECK arguments.
 
 Version 5.5.0 (2/8/2007):
 

@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.215 2007/03/25 03:06:11 gray Exp $
+ * $Id: chunk.c,v 1.216 2007/03/25 03:16:06 gray Exp $
  */
 
 /*
@@ -68,11 +68,11 @@
  * Library Copyright and URL information for ident and what programs
  */
 #if IDENT_WORKS
-#ident "@(#) $Copyright: Dmalloc package Copyright 2000 by Gray Watson $"
+#ident "@(#) $Copyright: Dmalloc package Copyright 2007 by Gray Watson $"
 #ident "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $"
 #else
 static	char	*copyright =
-  "@(#) $Copyright: Dmalloc package Copyright 2000 by Gray Watson $";
+  "@(#) $Copyright: Dmalloc package Copyright 2007 by Gray Watson $";
 static	char	*source_url =
   "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $";
 #endif

@@ -1,16 +1,16 @@
 <html>
 <head>
 <!-- $id: RELEASE.html,v 1.16 2000/11/14 20:10:56 gray Exp $ -->
-<title> Dmalloc Release Notes - 5.5.0 </title>
+<title> Dmalloc Release Notes - 5.5.1 </title>
 </head>
 <body>
 
 <h1> Debug Malloc (Dmalloc) Library Release Notes </h1>
 <h4>
-Version: Release 5.5.0 <br />
+Version: Release 5.5.1 <br />
 <!-- fix the TITLE ^^^above^^^ too -->
-Last-Version: <a href="dmalloc-5.4.2.html">5.4.2</a> <br />
-Date: February 8, 2007
+Last-Version: <a href="dmalloc-5.5.0.html">5.5.0</a> <br />
+Date: March 24, 2007
 </h4>
 
 <p>
@@ -29,9 +29,8 @@ Date: February 8, 2007
 
 <h3><a name="overview"> Overview </a></h3>
 
-<p> A number of features and bug fixes in this release.  I'm sure I've
-mised some patch or bug fix.  Please ping me if I've missed
-something. </p>
+<p> Bug fix release mostly to correct the bugs in 5.5.0 which broke
+the DMALLOC_FUNC_CHECK compile flag. </p>
 
 <!--========================================================================-->
 
@@ -39,12 +38,8 @@ something. </p>
 
 <ul>
 
-<li> Added the dmalloc_get_stats() function to report on internal heap
-statistics. </li>
-
-<li> Added file/line number reporting for the function argument
-checking features.  <b>WARNING</b>: this requires a recompilation of
-all code compiled with <tt>-DDMALLOC_FUNC_CHECK</tt>. </li>
+<li> Improved the testing of user pointers used in DMALLOC_FUNC_CHECK
+function pointers. </li>
 
 </ul>
 
@@ -52,13 +47,9 @@ all code compiled with <tt>-DDMALLOC_FUNC_CHECK</tt>. </li>
 
 <h3><a name="dmalloc"> Dmalloc Utility Changes </a></h3>
 
-<ul>
-
-<li> Improved the usage output messages from dmalloc. </li> <li>
-Improved some of the dmalloc error string representations to better
-identify internal errors. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <!--========================================================================-->
 
@@ -80,13 +71,9 @@ None.
 
 <h3><a name="install"> Installation Changes </a></h3>
 
-<ul>
-
-<li> Added better checking for mmap compatibility during autoconfig. </li>
-
-<li> Added patches to [hopefully] improve the building under Mac OSX. </li>
-
-</ul>
+<blockquote>
+None.
+</blockquote>
 
 <!--========================================================================-->
 
@@ -94,26 +81,15 @@ None.
 
 <ul>
 
-<li> I've increased the internal default basic block size to 32k from
-16k.  Most architectures have getpagesize which overrides it. </li>
+<li> Added the dmalloc_verify_pnt_strsize() routine which allows you
+to verify a pointer with both a strlen flag and a max-size
+argument. </li>
 
-<li> Improved the dmalloc_t test program.  Added better error code
-output.  Improved it's ability to test small heap areas. </li>
+<li> Improved the way the library tests user pointers in the
+DMALLOC_FUNC_CHECK routines. </li>
 
-<li> Improved some of the error values to better identify internal
-errors. </li>
-
-<li> I've added the dmalloc_get_stats() function which allows the
-caller to get a number of internal heap statistics such as current and
-maximum allocations and number of pointers. </li>
-
-<li> I've added support for overloading the strndup function. </li>
-
-<li> I've added file and line number information for the overloading
-of the functions for argument checking. </li>
-
-<li> I've added warning if memcpy is copying overlapping memory and
-the memmove fucntion is available. </li>
+<li> Added missing DMALLOC_FUNC_CHECK routines: atoi, atol, and
+memmove. </li>
 
 </ul>
 
@@ -131,27 +107,18 @@ None.
 
 <ul>
 
-<li> Made a number of documentation improvements. </li>
+<li> Fixed a problem which broke the usage of the DMALLOC_FUNC_CHECK
+compilation flag.  Added test code for this to not happen in the
+future. </li>
 
-<li> Fixed the Makefile to install libs as 755. </li>
-
-<li> Added some fixes for Compaq's C compiler. </li>
-
-<li> Fixed a problem where if the LARGEST_ALLOCATION is set to 0,
-dmalloc_t still checks it. </li>
-
-<li> Fixed a problem with double free not reporting ERROR_ALREADY_FREE. </li>
-
-<li> Fixed some problems with function argument checking and length
-arguments.  The library was not handling strncmp correctly for
-example. </li>
+<li> Fixed a small bug with the checking of the MAX_FILE_LENGTH. </li>
 
 </ul>
 
 <p>
 <font size="-1">
 <a href="http://dmalloc.com/">Dmalloc Home Page</a>.
-Copyright 2004 <a href="http://256.com/gray/">Gray Watson</a>.
+Copyright 2007 <a href="http://256.com/gray/">Gray Watson</a>.
 </font>
 </p>
 
