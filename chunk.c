@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.214 2007/03/23 13:33:06 gray Exp $
+ * $Id: chunk.c,v 1.215 2007/03/25 03:06:11 gray Exp $
  */
 
 /*
@@ -1723,9 +1723,9 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
   if (file != DMALLOC_DEFAULT_FILE && line != DMALLOC_DEFAULT_LINE) {
     /* NOTE: we don't use strlen here because we might check too far */
     bounds_p = file + MAX_FILE_LENGTH;
-    for (name_p = file; name_p < bounds_p && *name_p != '\0'; name_p++) {
+    for (name_p = file; name_p <= bounds_p && *name_p != '\0'; name_p++) {
     }
-    if (name_p >= bounds_p
+    if (name_p > bounds_p
 	|| name_p < file + MIN_FILE_LENGTH) {
       dmalloc_errno = ERROR_BAD_FILE;
       return 0;
