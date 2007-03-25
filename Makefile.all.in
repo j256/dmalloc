@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.130 2007/03/23 16:20:42 gray Exp $
+# $Id: Makefile.all.in,v 1.131 2007/03/25 06:24:51 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -349,7 +349,7 @@ $(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 	mv $(A_OUT) $@
 
-check light : $(TEST)
+check light : $(TEST) $(TEST_FC)
 	./$(TEST_FC)
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
@@ -412,6 +412,8 @@ dmalloc.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h compat.h \
   debug_tok.h dmalloc_loc.h env.h error_val.h version.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
   dmalloc_argv_loc.h compat.h
+dmalloc_fc_t.o: dmalloc_fc_t.c conf.h settings.h dmalloc.h dmalloc_argv.h \
+  dmalloc_rand.h debug_tok.h dmalloc_loc.h error_val.h
 dmalloc_rand.o: dmalloc_rand.c dmalloc_rand.h
 dmalloc_t.o: dmalloc_t.c conf.h settings.h compat.h dmalloc.h \
   dmalloc_argv.h dmalloc_rand.h arg_check.h debug_tok.h dmalloc_loc.h \
@@ -437,4 +439,3 @@ error_th.o: error.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
 malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
   malloc_funcs.h return.h
-

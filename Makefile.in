@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.186 2007/03/25 06:09:16 gray Exp $
+# $Id: Makefile.in,v 1.187 2007/03/25 06:24:51 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -85,8 +85,8 @@ FLS	=  conf.h.in configure.ac config.help \
 	compat.c compat.h debug_tok.h env.c env.h error.c error.h error_val.h \
 	heap.c heap.h malloc.c dmalloc.c dmalloc.h.1 dmalloc.h.3 \
 	dmalloc_loc.h dmalloc_rand.c dmalloc_rand.h dmalloc_tab.c \
-	dmalloc_tab.h dmalloc_tab_loc.h dmalloc_t.c malloc_funcs.h return.h \
-	version.h \
+	dmalloc_tab.h dmalloc_tab_loc.h dmalloc_t.c dmalloc_fc_t.c \
+	malloc_funcs.h return.h version.h \
 	settings.dist dmalloc_argv.c dmalloc_argv.h dmalloc_argv_loc.h \
 	dmallocc.cc \
 	install-sh mkinstalldirs dmalloc.spec \
