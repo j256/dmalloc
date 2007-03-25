@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.188 2007/03/25 06:09:09 gray Exp $
+ * $Id: malloc.c,v 1.189 2007/03/25 18:53:41 gray Exp $
  */
 
 /*
@@ -1019,6 +1019,15 @@ char	*dmalloc_strndup(const char *file, const int line,
   char		*new_string;
   const char	*string_p;
   
+  /* check the arguments */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    /* we check for pointer plus \0 */
+    if (! dmalloc_verify_pnt_strsize(file, line, "strdup", string,
+				     0 /* not exact */, 1 /* strlen */, len)) {
+      dmalloc_message("bad pointer argument found in strdup");
+    }
+  }
+  
   /* so we have to figure out the max length of the string directly */
   if (len < 0) {
     size = strlen(string);
@@ -1030,15 +1039,6 @@ char	*dmalloc_strndup(const char *file, const int line,
       }
     }
     size = string_p - string;
-  }
-  
-  /* check the arguments */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    /* we check for pointer plus \0 */
-    if (! dmalloc_verify_pnt(file, line, "strdup", string,
-			     0 /* not exact */, size + 1)) {
-      dmalloc_message("bad pointer argument found in strdup");
-    }
   }
   
   /* allocate space for the \0 */
@@ -1315,6 +1315,15 @@ char	*strndup(const char *string, const DMALLOC_SIZE len)
   
   GET_RET_ADDR(file);
   
+  /* check the arguments */
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    if (! dmalloc_verify_pnt_strsize(file, 0 /* no line */, "strdup", string,
+				     0 /* not exact */, 1 /* strlen */,
+				     size)) {
+      dmalloc_message("bad pointer argument found in strdup");
+    }
+  }
+  
   /* so we have to figure out the max length of the string directly */
   for (string_p = string; string_p < string + len; string_p++) {
     if (*string_p == '\0') {
@@ -1322,14 +1331,6 @@ char	*strndup(const char *string, const DMALLOC_SIZE len)
     }
   }
   size = string_p - string;
-  
-  /* check the arguments */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt(file, 0 /* no line */, "strdup", string,
-			     0 /* not exact */, size)) {
-      dmalloc_message("bad pointer argument found in strdup");
-    }
-  }
   
   /* at 1 for null */
   buf = dmalloc_malloc(file, DMALLOC_DEFAULT_LINE, size + 1,

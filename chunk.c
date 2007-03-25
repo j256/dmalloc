@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.216 2007/03/25 03:16:06 gray Exp $
+ * $Id: chunk.c,v 1.217 2007/03/25 18:53:41 gray Exp $
  */
 
 /*
@@ -1747,12 +1747,16 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
 #endif
   
   if (strlen_b) {
+    int	equals_okay_b = 0;
     mem_p = (char *)user_pnt;
     if (min_size > 0) {
       bounds_p = mem_p + min_size;
       /* min_size can be out of bounds as long as we find a \0 beforehand */
       if (bounds_p > (char *)pnt_info.pi_user_bounds) {
 	bounds_p = (char *)pnt_info.pi_user_bounds;
+      } else {
+	/* we can equals our boundary if our min_size <= user_bounds */
+	equals_okay_b = 1;
       }
     } else {
       bounds_p = (char *)pnt_info.pi_user_bounds;
@@ -1763,7 +1767,8 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
       }
     }
     /* mem_p can == bounds_p if we hit the min_size but can't >= user_bounds*/ 
-    if (mem_p >= (char *)pnt_info.pi_user_bounds) {
+    if (mem_p > (char *)pnt_info.pi_user_bounds
+	|| ((! equals_okay_b) && mem_p == (char *)pnt_info.pi_user_bounds)) {
       dmalloc_errno = ERROR_WOULD_OVERWRITE;
       return 0;
     }

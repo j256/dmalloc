@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.128 2007/03/25 06:09:10 gray Exp $
+ * $Id: dmalloc_t.c,v 1.129 2007/03/25 18:53:41 gray Exp $
  */
 
 /*
@@ -2762,6 +2762,99 @@ static	int	check_special(void)
   
   /********************/
 
+  /*
+   * Test strndup.
+   */
+  {
+    int		errno_hold = dmalloc_errno;
+    int		size = 5;
+    char	*str, *ret;
+    unsigned int old_flags = dmalloc_debug_current();
+  
+    if (! silent_b) {
+      (void)printf("  Checking strndup\n");
+    }
+    
+    dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
+    
+    pnt = malloc(size);
+    if (pnt == NULL) {
+      if (! silent_b) {
+	(void)printf("   ERROR: could not malloc %d bytes.\n", size);
+      }
+      return 0;
+    }
+    str = "1234";
+    memmove(pnt, str, size);
+    
+    dmalloc_errno = ERROR_NONE;
+    ret = strndup(pnt, size);
+    
+    if (dmalloc_errno != ERROR_NONE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      }
+      final = 0;
+    } else if (strcmp(pnt, str) != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup should have copied string\n");
+      }
+      final = 0;
+    }
+    
+    dmalloc_errno = ERROR_NONE;
+    ret = strndup(pnt, size + 1);
+    
+    if (dmalloc_errno != ERROR_NONE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      }
+      final = 0;
+    } else if (strcmp(pnt, str) != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup should have copied string\n");
+      }
+      final = 0;
+    }
+    
+    str = "12345";
+    memmove(pnt, str, size);
+    
+    dmalloc_errno = ERROR_NONE;
+    strndup(pnt, size);
+    
+    if (dmalloc_errno != ERROR_NONE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      }
+      final = 0;
+    } else if (strcmp(pnt, str) != 0) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup should have copied string\n");
+      }
+      final = 0;
+    }
+
+    dmalloc_errno = ERROR_NONE;
+    strndup(pnt, size + 1);
+    
+    if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
+      if (! silent_b) {
+	(void)printf("   ERROR: strndup should produce overwrite error not: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      }
+      final = 0;
+    }
+    
+    dmalloc_debug(old_flags);
+    dmalloc_errno = errno_hold;
+  }
+  
+  /********************/
+  
   /* check all of the arg check routines */
   if (! check_arg_check()) {
     final = 0;
