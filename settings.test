@@ -8,7 +8,7 @@ ALLOC_BLANK_CHAR '\001'
 FREE_BLANK_CHAR '\002'
 # must be <= dmalloc_t.c
 MIN_FILE_LENGTH 11
-# must be >= dmalloc_argv.c
+# must be >= dmalloc_argv.c, dmalloc_fc_t.c
 MAX_FILE_LENGTH 14
 # wc -l dmalloc_t.c
 MAX_LINE_NUMBER 2000
