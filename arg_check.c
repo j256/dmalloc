@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: arg_check.c,v 1.39 2007/03/22 19:40:52 gray Exp $
+ * $Id: arg_check.c,v 1.40 2007/03/25 03:06:35 gray Exp $
  */
 
 /*
@@ -44,6 +44,28 @@
 #include "error.h"
 #include "dmalloc_loc.h"
 #include "arg_check.h"
+
+/*
+ * Dummy function for checking strlen's arguments.
+ */
+static	int	loc_strlen(const char *file, const int line,
+			   const char *func, const char *str)
+{
+  int		len = 0;
+  const	char	*str_p;
+  
+  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+    if (! dmalloc_verify_pnt(file, line, func, str, 0 /* not exact */, -1)) {
+      dmalloc_message("bad pointer argument found in %s", func);
+    }
+  }
+  
+  for (str_p = str; *str_p != '\0'; str_p++) {
+    len++;
+  }
+  
+  return len;
+}
 
 #if HAVE_ATOI
 /*
@@ -331,7 +353,8 @@ char	*_dmalloc_strcat(const char *file, const int line,
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if ((! dmalloc_verify_pnt(file, line, "strcat", to,
 			      0 /* not exact */,
-			      strlen(to) + strlen(from) + 1))
+			      loc_strlen(file, line, "strcat", to)
+			      + loc_strlen(file, line, "strcat", from) + 1))
 	|| (! dmalloc_verify_pnt(file, line, "strcat", from,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcat");
@@ -386,7 +409,8 @@ char	*_dmalloc_strcpy(const char *file, const int line,
 {
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if ((! dmalloc_verify_pnt(file, line, "strcpy", to,
-			      0 /* not exact */, strlen(from) + 1))
+			      0 /* not exact */,
+			      loc_strlen(file, line, "strcpy", from) + 1))
 	|| (! dmalloc_verify_pnt(file, line, "strcpy", from,
 				 0 /* not exact */, -1))) {
       dmalloc_message("bad pointer argument found in strcpy");
@@ -428,9 +452,10 @@ DMALLOC_SIZE	_dmalloc_strlen(const char *file, const int line,
       dmalloc_message("bad pointer argument found in strlen");
     }
   }
-  return strlen(str);
+  
+  return loc_strlen(file, line, "strlen", str);
 }
-#endif /* HAVE_STRLEN */
+#endif
 
 #if HAVE_STRNCASECMP
 /*
@@ -444,11 +469,11 @@ int	_dmalloc_strncasecmp(const char *file, const int line,
     const char	*s1_p, *s2_p;
     int		min_size;
     
-    /* so we have to figure out the max length of the buffers directly here */
+    /* we go through both pointers up to the length characters */
     for (s1_p = s1, s2_p = s2; s1_p < s1 + len; s1_p++, s2_p++) {
       if (*s1_p == '\0' || *s2_p == '\0') {
 	s1_p++;
-	break;
+ 	break;
       }
     }
     min_size = s1_p - s1;
@@ -486,7 +511,9 @@ char	*_dmalloc_strncat(const char *file, const int line,
     
     /* either len or nullc */
     if ((! dmalloc_verify_pnt(file, line, "strncat", to,
-			      0 /* not exact */, strlen(to) + min_size + 1))
+			      0 /* not exact */,
+			      loc_strlen(file, line, "strncat", to) + min_size
+			      + 1))
 	|| (! dmalloc_verify_pnt(file, line, "strncat", from,
 				 0 /* not exact */, min_size))) {
       dmalloc_message("bad pointer argument found in strncat");
