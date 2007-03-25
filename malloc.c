@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.187 2007/03/23 13:27:39 gray Exp $
+ * $Id: malloc.c,v 1.188 2007/03/25 06:09:09 gray Exp $
  */
 
 /*
@@ -1728,7 +1728,8 @@ void	dmalloc_debug_setup(const char *options_str)
  *
  * seen_p <- Poiner to an unsigned long which, if not NULL, will be
  * set to the number of times that this pointer has been allocated,
- * realloced, or freed.
+ * realloced, or freed.  NOTE: LOG_PNT_SEEN_COUNT must be set to 1
+ * otherwise no seen information is available and it will be set to 0.
  */
 int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
 			DMALLOC_SIZE *total_size_p, char **file_p,
@@ -1759,7 +1760,11 @@ int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
   if (ret) {
     SET_POINTER(user_size_p, user_size_map);
     SET_POINTER(total_size_p, tot_size_map);
-    SET_POINTER(seen_p, *loc_seen_p);
+    if (loc_seen_p == NULL) {
+      SET_POINTER(seen_p, 0);
+    } else {
+      SET_POINTER(seen_p, *loc_seen_p);
+    }
     return DMALLOC_NOERROR;
   }
   else {

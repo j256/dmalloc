@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_t.c,v 1.127 2006/04/04 14:10:07 gray Exp $
+ * $Id: dmalloc_t.c,v 1.128 2007/03/25 06:09:10 gray Exp $
  */
 
 /*
@@ -2116,7 +2116,10 @@ static	int	check_special(void)
 	       || ex_mark <= 0
 	       || ex_mark != loc_mark
 	       || ex_tot_size < ex_user_size
-	       || ex_seen < 1) {
+#if LOG_PNT_SEEN_COUNT
+	       || ex_seen < 1
+#endif
+	       ) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: examined pointer info invalid.\n");
 	}
@@ -2162,8 +2165,11 @@ static	int	check_special(void)
       else if (ex_user_size != amount - 1
 	       /* +2 on the mark because of the examine */
 	       || ex_mark != loc_mark + 2
+#if LOG_PNT_SEEN_COUNT
 	       /* +2 on seen because realloc counts it in and out */
-	       || ex_seen != old_seen + 2) {
+	       || ex_seen != old_seen + 2
+#endif
+	       ) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: examined realloced pointer info invalid.\n");
 	}

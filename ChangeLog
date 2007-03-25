@@ -1,5 +1,9 @@
 2007-03-24  Gray Watson  <gray@outside.256.com>
 
+	* Fixed bug where LOG_PNT_SEEN_COUNT set to 0 caused segfault in
+	dmalloc_examine.  dmalloc_t was also not handling the setting
+	appropriated.
+
 	* Fixed bug with the checking of the MAX_FILE_LENGTH. 
 
 2007-03-23  Gray Watson  <gray@outside.256.com>
@@ -2371,5 +2375,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.342 2007/03/25 03:16:06 gray Exp $
+$Id: ChangeLog,v 1.343 2007/03/25 06:09:10 gray Exp $
 -------------------------------------------------------------------------------
