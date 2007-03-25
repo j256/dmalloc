@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.293 2007/03/25 03:16:07 gray Exp $
+@c $Id: dmalloc.texi,v 1.294 2007/03/25 19:16:01 gray Exp $
 @c ----------------------------------------------------------------
 
 @c ----------------------------------------------------------------
@@ -415,6 +415,16 @@ as well and compile with @kbd{cc -DDMALLOC @dots{}}:
 #ifdef DMALLOC
 #include "dmalloc.h"
 #endif
+@end example
+
+@cindex DMALLOC_FUNC_CHECK
+@item Another optional task is to compile all of your source with the
+@file{dmalloc.h} with the @code{DMALLOC_FUNC_CHECK} compilation flag.
+This willallow the library to check all of the arguments of a number
+of common string and utility routines.  @xref{Argument Checking}.
+
+@example
+cc -DDMALLOC -DDMALLOC_FUNC_CHECK file.c
 @end example
 
 @item Link the dmalloc library into your program.  The dmalloc library
@@ -965,7 +975,7 @@ your source code with the @code{DMALLOC_FUNC_CHECK} flag defined and
 enable the @code{check-funcs} token.  @xref{Debug Tokens}.
 
 @example
-cc -DDMALLOC_FUNC_CHECK file.c
+cc -DDMALLOC -DDMALLOC_FUNC_CHECK file.c
 @end example
 
 @emph{NOTE}: Once you have compiled your source with DMALLOC_FUNC_CHECK
@@ -1900,7 +1910,7 @@ defining @code{DMALLOC_DISABLE}.  This will cause the dmalloc macros to
 not be applied.  @xref{Allocation Macros}.
 
 @example
-cc -g -DDMALLOC_DISABLE main.c
+cc -g -DDMALLOC_DISABLE file.c
 @end example
 
 An alternative is to surround the @code{dmalloc.h} inclusion or any
@@ -1925,7 +1935,7 @@ main()
 
 @example
 // to get dmalloc information
-$ cc -Ddmalloc main.c
+$ cc -DDMALLOC main.c
 
 // without dmalloc information
 $ cc main.c
