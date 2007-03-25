@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.185 2007/03/23 16:20:42 gray Exp $
+# $Id: Makefile.in,v 1.186 2007/03/25 06:09:16 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -318,7 +318,7 @@ compile_test :: settings.h
 		make $(TEST) > /dev/null ;\
 		make light ;\
 	done
-	rm -f settings.h.t
+	rm -f settings.h.t settings.h
 
 release :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
 	@ test ! -d dmalloc-$(VERSION) || \
