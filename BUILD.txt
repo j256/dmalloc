@@ -8,7 +8,7 @@ library gets released.
 3) Update the RELEASE.html file.
 4) Check in all files.
 5) cvs tag the release with dmalloc_release_X_X_X
-6) make distclean ; autoconf ; configure ; make port
+6) make distclean ; autoconf ; configure ; make release
 
 7) Copy down to OpenBSD, Linux, OSF, FreeBSD, other operation systems
 and run tests.
