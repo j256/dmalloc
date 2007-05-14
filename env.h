@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.h,v 1.24 2004/01/14 16:17:59 gray Exp $
+ * $Id: env.h,v 1.25 2007/05/14 17:09:20 gray Exp $
  */
 
 #ifndef __ENV_H__
@@ -31,7 +31,7 @@
  */
 extern
 void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
-			       long *addr_count_p);
+			       unsigned long *addr_count_p);
 
 /*
  * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
@@ -47,7 +47,8 @@ void	_dmalloc_start_break(char *start_all, char **start_file_p,
  */
 extern
 void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
-				 long *addr_count_p, unsigned int *debug_p,
+				 unsigned long *addr_count_p,
+				 unsigned int *debug_p,
 				 unsigned long *interval_p, int *lock_on_p,
 				 char **logpath_p, char **start_file_p,
 				 int *start_line_p,

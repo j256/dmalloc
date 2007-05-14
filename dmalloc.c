@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc.c,v 1.119 2006/03/26 18:29:39 gray Exp $
+ * $Id: dmalloc.c,v 1.120 2007/05/14 17:09:20 gray Exp $
  */
 
 /*
@@ -734,7 +734,7 @@ static	void	dump_current(void)
       (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
     }
     else {
-      (void)fprintf(stderr, "Address      %#lx, count = %ld\n",
+      (void)fprintf(stderr, "Address      %#lx, count = %lu\n",
 		    (long)addr, addr_count);
     }
   }
@@ -868,7 +868,7 @@ int	main(int argc, char **argv)
   const char	*env_str;
   DMALLOC_PNT	addr;
   unsigned long	inter, limit_val, loc_start_size, loc_start_iter;
-  long		addr_count;
+  unsigned long	addr_count;
   int		lock_on;
   int		loc_start_line;
   unsigned int	flags;

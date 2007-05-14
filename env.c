@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.36 2007/05/14 15:53:19 gray Exp $
+ * $Id: env.c,v 1.37 2007/05/14 17:09:20 gray Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ static	long	hex_to_long(const char *str)
  * Break up ADDR_ALL into ADDR_P and ADDR_COUNT_P
  */
 void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
-			       long *addr_count_p)
+			       unsigned long *addr_count_p)
 {
   char	*colon_p;
   
@@ -117,7 +117,7 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
   if (addr_count_p != NULL) {
     colon_p = strchr(addr_all, ':');
     if (colon_p != NULL) {
-      *addr_count_p = atoi(colon_p + 1);
+      *addr_count_p = loc_atoul(colon_p + 1);
     }
   }
 }
@@ -166,7 +166,8 @@ void	_dmalloc_start_break(char *start_all, char **start_file_p,
  * string.
  */
 void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
-				 long *addr_count_p, unsigned int *debug_p,
+				 unsigned long *addr_count_p,
+				 unsigned int *debug_p,
 				 unsigned long *interval_p, int *lock_on_p,
 				 char **logpath_p, char **start_file_p,
 				 int *start_line_p,
@@ -342,7 +343,7 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
   }
   if (address != NULL) {
     if (addr_count > 0) {
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx:%ld,",
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx:%lu,",
 			    ADDRESS_LABEL, ASSIGNMENT_CHAR, (long)address,
 			    addr_count);
     }
