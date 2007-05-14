@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.189 2007/05/14 17:13:45 gray Exp $
+# $Id: Makefile.in,v 1.190 2007/05/14 17:49:28 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -98,8 +98,7 @@ CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
 	contrib/ra_info.pl contrib/stratus_ftx_notes contrib/tsecs \
 	contrib/z_os_notes contrib/aix_5l_notes
 
-DOCS	= $(INFOFILE) dmalloc.html dmalloc.ps dmalloc.texi dmalloc.pdf \
-	texinfo.tex
+DOCS	= $(INFOFILE) dmalloc.html dmalloc.texi dmalloc.pdf texinfo.tex
 
 # Shar file maximum size
 # NOTE: the wc level should be below 90k due to shar overhead
@@ -115,7 +114,7 @@ clean ::
 	rm -f $(TEST) $(TEST_FC)
 	rm -f $(UTIL) dmalloc.h dmalloc.h.3
 	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
-	rm -f dmalloc.ps dmalloc.dvi dmalloc.pdf
+	rm -f dmalloc.pdf
 	rm -f ChangeLog.1
 
 distclean :: clean
@@ -339,22 +338,9 @@ ChangeLog.1 : ChangeLog
 	perl -n -e 's/[\w\.+-]+@[\w.+-]+//; print $$_;' < ChangeLog > $@.t
 	mv $@.t $@
 
-dmalloc.ps : $(srcdir)/dmalloc.texi
-	rm -rf work
-	mkdir work
-	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ;\
-		dvips -o ../$@ dmalloc.dvi )
-	rm -rf work
-
 dmalloc.html : $(srcdir)/dmalloc.texi
 	rm -f $@
 	texi2html -number -monolithic $(srcdir)/dmalloc.texi
-
-dmalloc.dvi : $(srcdir)/dmalloc.texi
-	rm -rf work
-	mkdir work
-	( cd work ; texi2dvi ../$(srcdir)/dmalloc.texi ; mv dmalloc.dvi .. )
-	rm -rf work
 
 dmalloc.pdf : $(srcdir)/dmalloc.texi
 	rm -rf work
