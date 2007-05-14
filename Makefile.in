@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.188 2007/05/14 15:53:55 gray Exp $
+# $Id: Makefile.in,v 1.189 2007/05/14 17:13:45 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -280,7 +280,7 @@ $(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 	mv $(A_OUT) $@
 
 check light :: $(TEST) $(TEST_FC)
-	$(TEST_FC)
+	$(TEST_FC) -s
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000
 	$(TEST) -s -t 10000

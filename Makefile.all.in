@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.132 2007/05/14 15:54:05 gray Exp $
+# $Id: Makefile.all.in,v 1.133 2007/05/14 17:13:45 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -344,7 +344,7 @@ $(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 	mv $(A_OUT) $@
 
 check light : $(TEST) $(TEST_FC)
-	./$(TEST_FC)
+	./$(TEST_FC) -s
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
 	./$(TEST) -s -t 10000
