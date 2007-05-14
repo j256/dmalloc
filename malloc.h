@@ -647,7 +647,8 @@ void	dmalloc_debug_setup(const char *options_str);
  *
  * seen_p <- Poiner to an unsigned long which, if not NULL, will be
  * set to the number of times that this pointer has been allocated,
- * realloced, or freed.
+ * realloced, or freed.  NOTE: LOG_PNT_SEEN_COUNT must be set to 1
+ * otherwise no seen information is available and it will be set to 0.
  */
 extern
 int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
