@@ -5,7 +5,7 @@
 # $FreeBSD: ports/devel/dmalloc/Makefile,v 1.8 2004/02/23 17:50:05 krion Exp $
 
 PORTNAME=	dmalloc
-PORTVERSION=	5.5.1
+PORTVERSION=	5.5.2
 CATEGORIES=	devel
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	dmalloc

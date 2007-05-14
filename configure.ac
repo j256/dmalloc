@@ -18,10 +18,10 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.36 2007/05/14 15:53:55 gray Exp $
+# $Id: configure.ac,v 1.37 2007/05/14 17:23:37 gray Exp $
 #
-AC_REVISION($Revision: 1.36 $)
-AC_INIT(dmalloc, 5.5.1, [http://dmalloc.com/])
+AC_REVISION($Revision: 1.37 $)
+AC_INIT(dmalloc, 5.5.2, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
@@ -626,7 +626,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.36 2007/05/14 15:53:55 gray Exp $"
+#ident "$Id: configure.ac,v 1.37 2007/05/14 17:23:37 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

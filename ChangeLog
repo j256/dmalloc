@@ -1,6 +1,20 @@
+2007-05-14  Gray Watson  <gray@outside.256.com>
+
+	* Removed some left-over references to the dmalloc.info file.
+	Thanks Bernard.
+
+	* Fixed some unsigned/signed issues in one of the dmalloc_t tests.
+	Thanks Bernard.
+
+	* Fixed problems with configure and SL_LINK_OBJS.  Thanks Bernard.
+
+	* Releasing dmalloc version 5.5.2.
+
 2007-03-25  Gray Watson  <gray@outside.256.com>
 
 	* Fixed some problems with str[n]dup argument checking.
+
+	* Releasing dmalloc version 5.5.1.
 
 2007-03-24  Gray Watson  <gray@outside.256.com>
 
@@ -2379,5 +2393,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.344 2007/03/25 18:57:31 gray Exp $
+$Id: ChangeLog,v 1.345 2007/05/14 17:23:42 gray Exp $
 -------------------------------------------------------------------------------
