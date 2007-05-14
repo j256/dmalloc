@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: env.c,v 1.35 2004/01/14 16:17:59 gray Exp $
+ * $Id: env.c,v 1.36 2007/05/14 15:53:19 gray Exp $
  */
 
 /*
@@ -146,16 +146,16 @@ void	_dmalloc_start_break(char *start_all, char **start_file_p,
     SET_POINTER(start_file_p, NULL);
     SET_POINTER(start_line_p, 0);
     SET_POINTER(start_iter_p, 0);
-    SET_POINTER(start_size_p, (unsigned long)atol(start_all + 1));
+    SET_POINTER(start_size_p, loc_atoul(start_all + 1));
   }
   else {
     SET_POINTER(start_file_p, NULL);
     SET_POINTER(start_line_p, 0);
     if (start_all[0] == 'c') {
-      SET_POINTER(start_iter_p, (unsigned long)atol(start_all + 1));
+      SET_POINTER(start_iter_p, loc_atoul(start_all + 1));
     }
     else {
-      SET_POINTER(start_iter_p, (unsigned long)atol(start_all));
+      SET_POINTER(start_iter_p, loc_atoul(start_all));
     }
     SET_POINTER(start_size_p, 0);
   }
@@ -238,7 +238,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, INTERVAL_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      SET_POINTER(interval_p, (unsigned long)atol(this_p));
+      SET_POINTER(interval_p, loc_atoul(this_p));
       continue;
     }
     
@@ -279,7 +279,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, LIMIT_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      SET_POINTER(limit_p, (unsigned long)atol(this_p));
+      SET_POINTER(limit_p, loc_atoul(this_p));
       continue;
     }
     

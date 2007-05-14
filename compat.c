@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.c,v 1.56 2005/01/11 18:27:05 gray Exp $
+ * $Id: compat.c,v 1.57 2007/05/14 15:53:11 gray Exp $
  */
 
 /*
@@ -111,6 +111,26 @@ long	atol(const char *str)
   return result * sign;
 }
 #endif /* HAVE_ATOL == 0 */
+
+/*
+ * Local ascii to unsigned long function
+ */
+unsigned long	loc_atoul(const char *str)
+{
+  const char	*str_p;
+  unsigned long	result = 0;
+  
+  /* skip opening white space */
+  for (str_p = str; *str_p == ' ' || *str_p == '\t'; str_p++) {
+  }
+  
+  /* now add up all digits */
+  for (; *str_p >= '0' && *str_p <= '9'; str_p++) {
+    result = result * (unsigned long)10 + (unsigned long)(*str_p - '0');
+  }
+  
+  return result;
+}
 
 /*
  * Local vsnprintf which handles the buffer-size or not.  Returns the

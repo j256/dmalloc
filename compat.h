@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: compat.h,v 1.41 2004/01/31 16:19:47 gray Exp $
+ * $Id: compat.h,v 1.42 2007/05/14 15:53:11 gray Exp $
  */
 
 #ifndef __COMPAT_H__
@@ -47,6 +47,12 @@ int	atoi(const char *str);
 extern
 long	atol(const char *str);
 #endif /* if HAVE_ATOL == 0 */
+
+/*
+ * Local ascii to unsigned long function
+ */
+extern
+unsigned long	loc_atoul(const char *str);
 
 /*
  * Local vsnprintf which handles the buffer-size or not.  Returns the
