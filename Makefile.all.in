@@ -1,7 +1,7 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.131 2007/03/25 06:24:51 gray Exp $
+# $Id: Makefile.all.in,v 1.132 2007/05/14 15:54:05 gray Exp $
 ###############################################################################
 
 # default root installation directory
@@ -15,7 +15,6 @@ bindir = @bindir@
 libdir = @libdir@
 shlibdir = @shlibdir@
 includedir = @includedir@
-infodir = @infodir@
 docdir = $(prefix)/share/doc/$(MODULE)
 
 # default c-compiler
@@ -126,10 +125,10 @@ INSTALL_SL = $(LIB_SL) \
 	$(INSTALL_SL_9)
 
 UTIL = $(MODULE)
-INFOFILE = $(MODULE).info
 HTMLFILE = $(MODULE).html
 TEXIFILE = $(MODULE).texi
-DOCFILES = $(HTMLFILE) $(TEXIFILE)
+PDFFILE = $(MODULE).pdf
+DOCFILES = $(HTMLFILE) $(TEXIFILE) $(PDFFILE)
 
 CCFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -224,19 +223,16 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installinfo : $(srcdir)/docs/$(INFOFILE)
-	$(srcdir)/mkinstalldirs $(infodir)
-	$(INSTALL_DATA) $(srcdir)/docs/$(INFOFILE) $(infodir)
-
-installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE)
+installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE) \
+		$(srcdir)/docs/$(PDFFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
 	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(docdir)
 	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(docdir)
+	$(INSTALL_DATA) $(srcdir)/docs/$(PDFFILE) $(docdir)
 
 install : installincs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
-	@echo "Enter 'make installinfo' to install $(INFOFILE) in $(infodir)"
 	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(docdir)"
 
 dmalloc.h.2 : $(srcdir)/configure
@@ -261,7 +257,7 @@ shlib : $(BUILD_SL)
 # via: http://256.com/gray/email.html
 $(LIB_SL) : $(LIBRARY)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIBRARY) @SL_LINK_OBJS@ $(OBJS) $(NORMAL_OBJS)
+	@shlinkargs@ $(LIBRARY) $(OBJS) $(NORMAL_OBJS)
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
@@ -274,7 +270,7 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 
 $(LIB_TH_SL) : $(LIB_TH)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIB_TH) @SL_LINK_OBJS@ $(OBJS) $(THREAD_OBJS)
+	@shlinkargs@ $(LIB_TH) $(OBJS) $(THREAD_OBJS)
 	mv $@.t $@
 
 $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
@@ -283,8 +279,7 @@ $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 
 $(LIB_CXX_SL) : $(LIB_CXX)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIB_CXX) @SL_LINK_OBJS@ $(OBJS) $(NORMAL_OBJS) \
-		$(CXX_OBJS)
+	@shlinkargs@ $(LIB_CXX) $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	mv $@.t $@
 
 $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
@@ -293,8 +288,7 @@ $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 
 $(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIB_TH_CXX) @SL_LINK_OBJS@ $(OBJS) $(THREAD_OBJS) \
-		$(CXX_OBJS)
+	@shlinkargs@ $(LIB_TH_CXX) $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 	mv $@.t $@
 
 threadssl : $(LIB_TH_SL)
@@ -376,9 +370,6 @@ dmallocc.o : $(srcdir)/dmallocc.cc
 	rm -f $@
 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $(srcdir)/dmallocc.cc \
 		-o ./$@
-
-.texi.info :
-	makeinfo --no-split $<
 
 #
 # auto configure settings - uncomment if you are doing configure
