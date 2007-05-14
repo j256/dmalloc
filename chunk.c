@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: chunk.c,v 1.217 2007/03/25 18:53:41 gray Exp $
+ * $Id: chunk.c,v 1.218 2007/05/14 22:10:04 gray Exp $
  */
 
 /*
@@ -129,10 +129,10 @@ static	char		fence_top[FENCE_TOP_SIZE];
 static	int		bit_sizes[BASIC_BLOCK]; /* number bits for div-blocks*/
 
 /* memory tables */
-static	mem_table_t	mem_table_alloc[MEM_ALLOC_ENTRIES];
-static	int		mem_table_alloc_c = 0;
-static	mem_table_t	mem_table_changed[MEM_CHANGED_ENTRIES];
-static	int		mem_table_changed_c = 0;
+static	mem_table_t	mem_table_alloc;
+static	mem_entry_t	mem_table_alloc_entries[MEM_ALLOC_ENTRIES];
+static	mem_table_t	mem_table_changed;
+static	mem_entry_t	mem_table_changed_entries[MEM_ALLOC_ENTRIES];
 
 /* memory stats */
 static	unsigned long	alloc_current = 0;	/* current memory usage */
@@ -1894,6 +1894,13 @@ int	_dmalloc_chunk_startup(void)
   skip_free_list->sa_flags = ALLOC_FLAG_ADMIN;
   skip_address_list->sa_flags = ALLOC_FLAG_ADMIN;
   
+  _dmalloc_table_init(&mem_table_alloc, mem_table_alloc_entries,
+		      sizeof(mem_table_alloc_entries) /
+		      sizeof(*mem_table_alloc_entries));
+  _dmalloc_table_init(&mem_table_changed, mem_table_changed_entries,
+		      sizeof(mem_table_changed_entries) /
+		      sizeof(*mem_table_changed_entries));
+  
   return 1;
 }
 
@@ -2479,8 +2486,7 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   }
   
 #if MEMORY_TABLE_TOP_LOG
-  _dmalloc_table_insert(mem_table_alloc, MEM_ALLOC_ENTRIES, file, line,
-			size, &mem_table_alloc_c);
+  _dmalloc_table_insert(&mem_table_alloc, file, line, size);
 #endif
   
   /* monitor current allocation level */
@@ -2651,8 +2657,8 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
   }
   
 #if MEMORY_TABLE_TOP_LOG
-  _dmalloc_table_delete(mem_table_alloc, MEM_ALLOC_ENTRIES, slot_p->sa_file,
-			slot_p->sa_line, slot_p->sa_user_size);
+  _dmalloc_table_delete(&mem_table_alloc, slot_p->sa_file, slot_p->sa_line,
+			slot_p->sa_user_size);
 #endif
   
   /* update the file/line -- must be after _dmalloc_table_delete */
@@ -2846,10 +2852,9 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
 #endif
     
 #if MEMORY_TABLE_TOP_LOG
-    _dmalloc_table_delete(mem_table_alloc, MEM_ALLOC_ENTRIES,
-			  slot_p->sa_file, slot_p->sa_line, old_size);
-    _dmalloc_table_insert(mem_table_alloc, MEM_ALLOC_ENTRIES, file, line,
-			  new_size, &mem_table_alloc_c);
+    _dmalloc_table_delete(&mem_table_alloc, slot_p->sa_file, slot_p->sa_line,
+			  old_size);
+    _dmalloc_table_insert(&mem_table_alloc, file, line, new_size);
 #endif
   
     /*
@@ -2957,8 +2962,7 @@ void	_dmalloc_chunk_log_stats(void)
   
 #if MEMORY_TABLE_TOP_LOG
   dmalloc_message("top %d allocations:", MEMORY_TABLE_TOP_LOG);
-  _dmalloc_table_log_info(mem_table_alloc, mem_table_alloc_c,
-			  MEM_ALLOC_ENTRIES, MEMORY_TABLE_TOP_LOG,
+  _dmalloc_table_log_info(&mem_table_alloc, MEMORY_TABLE_TOP_LOG,
 			  1 /* have in-use column */);
 #endif
 }
@@ -3021,8 +3025,9 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
   }
   
   /* clear out our memory table so we can fill it with pointer info */
-  _dmalloc_table_clear(mem_table_changed, MEM_CHANGED_ENTRIES,
-		       &mem_table_changed_c);
+  _dmalloc_table_init(&mem_table_changed, mem_table_changed_entries,
+		      sizeof(mem_table_changed_entries) /
+		      sizeof(*mem_table_changed_entries));
   
   /* run through the blocks */
   for (slot_p = skip_address_list->sa_next_p[0];
@@ -3103,15 +3108,13 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 			  (unsigned long)pnt_info.pi_user_start, out_len, out);
 	}
       }
-      _dmalloc_table_insert(mem_table_changed, MEM_CHANGED_ENTRIES,
-			    slot_p->sa_file, slot_p->sa_line,
-			    slot_p->sa_user_size, &mem_table_changed_c);
+      _dmalloc_table_insert(&mem_table_changed, slot_p->sa_file,
+			    slot_p->sa_line, slot_p->sa_user_size);
     }
   }
   
   /* dump the summary from the table table */
-  _dmalloc_table_log_info(mem_table_changed, mem_table_changed_c,
-			  MEM_CHANGED_ENTRIES, 0 /* log all entries */,
+  _dmalloc_table_log_info(&mem_table_changed, 0 /* log all entries */,
 			  0 /* no in-use column */);
   
   /* copy out size of pointers */

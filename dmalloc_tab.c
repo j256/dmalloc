@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.19 2003/06/08 05:53:44 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.20 2007/05/14 22:10:04 gray Exp $
  */
 
 /*
@@ -209,22 +209,22 @@ static	unsigned int	which_bucket(const int entry_n, const char *file,
 static	int	entry_cmp(const void *entry1_p, const void *entry2_p)
 {
   unsigned long		size1, size2;
-  const mem_table_t	*tab1_p = entry1_p, *tab2_p = entry2_p;
+  const mem_entry_t	*tab1_p = entry1_p, *tab2_p = entry2_p;
   
   /* if the entry is blank then force the size to be 0 */
-  if (tab1_p->mt_file == NULL) {
+  if (tab1_p->me_file == NULL) {
     size1 = 0;
   }
   else {
-    size1 = tab1_p->mt_total_size;
+    size1 = tab1_p->me_total_size;
   }
   
   /* if the entry is blank then force the size to be 0 */
-  if (tab2_p->mt_file == NULL) {
+  if (tab2_p->me_file == NULL) {
     size2 = 0;
   }
   else {
-    size2 = tab2_p->mt_total_size;
+    size2 = tab2_p->me_total_size;
   }
   
   /* NOTE: we want the top entries to be ahead so we reverse the sort */
@@ -499,23 +499,23 @@ static	void	split(unsigned char *first_p, unsigned char *last_p,
  *
  * ARGUMENTS:
  *
- * tab_p -> Pointer to the memory table entry we are dumping.
+ * entry_p -> Pointer to the memory table entry we are dumping.
  *
  * in_use_column_b -> Display the in-use numbers in a column.
  *
  * source -> Source description string.
  */
-static	void	log_entry(const mem_table_t *tab_p, const int in_use_column_b,
-			  const char *source)
+static	void	log_entry(const mem_entry_t *entry_p,
+			  const int in_use_column_b, const char *source)
 {
   if (in_use_column_b) {
     dmalloc_message("%11lu %6lu %11lu %6lu  %s\n",
-		     tab_p->mt_total_size, tab_p->mt_total_c,
-		     tab_p->mt_in_use_size, tab_p->mt_in_use_c, source);
+		    entry_p->me_total_size, entry_p->me_total_c,
+		    entry_p->me_in_use_size, entry_p->me_in_use_c, source);
   }
   else {
     dmalloc_message("%11lu %6lu  %s\n",
-		     tab_p->mt_total_size, tab_p->mt_total_c, source);
+		     entry_p->me_total_size, entry_p->me_total_c, source);
   }
 }
 
@@ -535,18 +535,18 @@ static	void	log_entry(const mem_table_t *tab_p, const int in_use_column_b,
  * total_p <-> Pointer to the memory table entry we are using to total
  * our used size.
 
- * tab_p -> Pointer to the memory table entry we are adding into our total.
+ * entry_p -> Pointer to the memory table entry we are adding into our total.
  */
-static	void	add_entry(mem_table_t *total_p, const mem_table_t *tab_p)
+static	void	add_entry(mem_entry_t *total_p, const mem_entry_t *entry_p)
 {
-  total_p->mt_total_size += tab_p->mt_total_size;
-  total_p->mt_total_c += tab_p->mt_total_c;
-  total_p->mt_in_use_size += tab_p->mt_in_use_size;
-  total_p->mt_in_use_c += tab_p->mt_in_use_c;
+  total_p->me_total_size += entry_p->me_total_size;
+  total_p->me_total_c += entry_p->me_total_c;
+  total_p->me_in_use_size += entry_p->me_in_use_size;
+  total_p->me_in_use_c += entry_p->me_in_use_c;
 }
 
 /*
- * void _dmalloc_table_clear
+ * void _dmalloc_table_init
  *
  * DESCRIPTION:
  *
@@ -561,17 +561,70 @@ static	void	add_entry(mem_table_t *total_p, const mem_table_t *tab_p)
  *
  * mem_table -> Memory table we are working on.
  *
- * entry_n -> Number of entries in the memory table.
+ * mem_entries -> Entries to associate with the table.
  *
- * entry_cp <-> Pointer to an integer which records how many entries
- * are in the table.
+ * entry_n -> Number of entries in the mem_entries array.
  */
-void	_dmalloc_table_clear(mem_table_t *mem_table, const int entry_n,
-			     int *entry_cp)
+void	_dmalloc_table_init(mem_table_t *mem_table, mem_entry_t *mem_entries,
+			    const int entry_n)
 {
   /* clear out our memory table */
-  memset(mem_table, 0, sizeof(mem_table[0]) * entry_n);
-  SET_POINTER(entry_cp, 0);
+  memset(mem_table, 0, sizeof(*mem_table));
+  memset(mem_entries, 0, sizeof(*mem_entries) * entry_n);
+  
+  mem_table->mt_entries = mem_entries;
+  mem_table->mt_entry_n = entry_n;
+  mem_table->mt_bounds_p = mem_entries + mem_table->mt_entry_n;
+}
+
+/*
+ * static mem_entry_t *table_find
+ *
+ * DESCRIPTION:
+ *
+ * Find an extry in the table.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * mem_table -> Memory table we are working on.
+ *
+ * old_file -> File name or return address of the allocation to
+ * delete.
+ *
+ * old_line -> Line number of the allocation to delete.
+ */
+static mem_entry_t	*table_find(mem_table_t *mem_table,
+				    const char *old_file,
+				    const unsigned int old_line)
+{
+  unsigned int	bucket;
+  mem_entry_t	*entry_p, *tab_end_p;
+  
+  bucket = which_bucket(mem_table->mt_entry_n, old_file, old_line);
+  entry_p = mem_table->mt_entries + bucket;
+  
+  /* the end is if we come around to the start again */
+  tab_end_p = entry_p;
+  
+  do {
+    if (entry_p->me_file == old_file && entry_p->me_line == old_line) {
+      return entry_p;
+    }
+    else if (entry_p->me_file == NULL) {
+      /* blank entry */
+      return entry_p;
+    }
+    entry_p++;
+    if (entry_p == mem_table->mt_bounds_p) {
+      entry_p = mem_table->mt_entries;
+    }
+  } while (entry_p != tab_end_p);
+  
+  return &mem_table->mt_other_pointers;
 }
 
 /*
@@ -589,73 +642,34 @@ void	_dmalloc_table_clear(mem_table_t *mem_table, const int entry_n,
  *
  * mem_table -> Memory table we are working on.
  *
- * entry_n -> Number of entries in the memory table.
- *
  * file -> File name or return address of the allocation.
  *
  * line -> Line number of the allocation.
  *
  * size -> Size in bytes of the allocation.
- *
- * entry_cp <-> Pointer to an integer which records how many entries
- * are in the table.
  */
-void	_dmalloc_table_insert(mem_table_t *mem_table, const int entry_n,
+void	_dmalloc_table_insert(mem_table_t *mem_table,
 			      const char *file, const unsigned int line,
-			      const unsigned long size, int *entry_cp)
+			      const unsigned long size)
 {
-  unsigned int	bucket;
-  mem_table_t	*tab_p, *tab_end_p, *tab_bounds_p, *tab_other_p;
+  mem_entry_t	*entry_p;
   
-  bucket = which_bucket(entry_n, file, line);
-  tab_p = mem_table + bucket;
-  
-  /* the end is if we come around to the start again */
-  tab_end_p = tab_p;
-  tab_other_p = mem_table + entry_n - 1;
-  /* our boundary for our hash table is the other slot */
-  tab_bounds_p = tab_other_p;
-  
-  while (1) {
-    if (tab_p->mt_file == file && tab_p->mt_line == line) {
-      /* we found it */
-      break;
-    }
-    else if (tab_p->mt_file == NULL) {
-      /* we didn't find it */
-      break;
-    }
-    tab_p++;
-    if (tab_p == tab_bounds_p) {
-      tab_p = mem_table;
-    }
-    /* we shouldn't have gone through the entire table */
-    if (tab_p == tab_end_p) {
-    }
-  }
-  
-  /* did we not find the pointer? */
-  if (tab_p->mt_file == NULL) {
-    
-    if (*entry_cp >= MEMORY_TABLE_SIZE) {
-      /* if the table is too full then add info into other_pointers bucket */
-      tab_p = tab_other_p;
-    }
-    else {
-      /* we found an open slot */
-      tab_p->mt_file = file;
-      tab_p->mt_line = line;
-      /* remember its position in the table so we can unsort it later */
-      tab_p->mt_entry_pos_p = tab_p;
-      (*entry_cp)++;
-    }
+  entry_p = table_find(mem_table, file, line);
+  if (entry_p->me_file == NULL
+      && mem_table->mt_in_use_c > mem_table->mt_entry_n / 2) {
+    /* do we have too many entries in the table?  then put in other bucket. */
+    entry_p = &mem_table->mt_other_pointers;
+  } else if (entry_p != &mem_table->mt_other_pointers) {
+    /* we found an open slot so update the file/line */
+    entry_p->me_file = file;
+    entry_p->me_line = line;
   }
   
   /* update the info for the entry */
-  tab_p->mt_total_size += size;
-  tab_p->mt_total_c++;
-  tab_p->mt_in_use_size += size;
-  tab_p->mt_in_use_c++;
+  entry_p->me_total_size += size;
+  entry_p->me_total_c++;
+  entry_p->me_in_use_size += size;
+  entry_p->me_in_use_c++;
 }
 
 /*
@@ -673,8 +687,6 @@ void	_dmalloc_table_insert(mem_table_t *mem_table, const int entry_n,
  *
  * mem_table -> Memory table we are working on.
  *
- * entry_n -> Number of entries in the memory table.
- *
  * old_file -> File name or return address of the allocation to
  * delete.
  *
@@ -682,50 +694,21 @@ void	_dmalloc_table_insert(mem_table_t *mem_table, const int entry_n,
  *
  * size -> Size in bytes of the allocation.
  */
-void	_dmalloc_table_delete(mem_table_t *mem_table, const int entry_n,
-			      const char *old_file,
+void	_dmalloc_table_delete(mem_table_t *mem_table, const char *old_file,
 			      const unsigned int old_line,
 			      const DMALLOC_SIZE size)
 {
-  unsigned int	bucket;
-  int		found_b = 0;
-  mem_table_t	*tab_p, *tab_end_p, *tab_other_p, *tab_bounds_p;
+  mem_entry_t	*entry_p;
   
-  bucket = which_bucket(entry_n, old_file, old_line);
-  tab_p = mem_table + bucket;
-  
-  /* the end is if we come around to the start again */
-  tab_end_p = tab_p;
-  tab_other_p = mem_table + entry_n - 1;
-  /* our boundary for our hash table is the other slot */
-  tab_bounds_p = tab_other_p;
-  
-  do {
-    if (tab_p->mt_file == old_file && tab_p->mt_line == old_line) {
-      /* we found it */
-      found_b = 1;
-      break;
-    }
-    else if (tab_p->mt_file == NULL) {
-      /* we didn't find it */
-      break;
-    }
-    tab_p++;
-    if (tab_p == tab_bounds_p) {
-      tab_p = mem_table;
-    }
-  } while (tab_p != tab_end_p);
-  
-  /* did we find the pointer? */
-  if (! found_b) {
-    /* assume that we should take it out of the other_pointers bucket */
-    tab_p = tab_other_p;
+  entry_p = table_find(mem_table, old_file, old_line);
+  if (entry_p->me_file == NULL) {
+    /* if we didn't find it, account for it in the other_pointers?? */
+    entry_p = &mem_table->mt_other_pointers;
   }
-  
   /* update our pointer info if we can */
-  if (tab_p->mt_in_use_size >= size && tab_p->mt_in_use_c > 0) {
-    tab_p->mt_in_use_size -= size;
-    tab_p->mt_in_use_c--;
+  if (entry_p->me_in_use_size >= size && entry_p->me_in_use_c > 0) {
+    entry_p->me_in_use_size -= size;
+    entry_p->me_in_use_c--;
   }
 }
 
@@ -744,33 +727,28 @@ void	_dmalloc_table_delete(mem_table_t *mem_table, const int entry_n,
  *
  * mem_table -> Memory table we are working on.
  *
- * current_n -> Number of current entries in the memory table.
- *
- * entry_n -> Number of total possible entries in the memory table.
- *
  * log_n -> Number of entries to log to the file.  Set to 0 to
  * display all entries in the table.
  *
  * in_use_column_b -> Display the in-use numbers in a column.
  */
-void	_dmalloc_table_log_info(mem_table_t *mem_table, const int current_n,
-				const int entry_n, const int log_n,
+void	_dmalloc_table_log_info(mem_table_t *mem_table, const int log_n,
 				const int in_use_column_b)
 {
-  mem_table_t	*tab_p, *tab_other_p, *tab_bounds_p, total;
+  mem_entry_t	*entry_p, total;
   int		entry_c;
   char		source[64];
   
   /* is the table empty */
-  if (current_n == 0) {
+  if (mem_table->mt_in_use_c == 0) {
     dmalloc_message(" memory table is empty");
     return;
   }
   
   /* sort the entries by their total-size */
-  split((unsigned char *)mem_table,
-	(unsigned char *)(mem_table + entry_n - 2),
-	sizeof(mem_table[0]));
+  split((unsigned char *)mem_table->mt_entries,
+	(unsigned char *)(mem_table->mt_bounds_p - 1),
+	sizeof(*mem_table->mt_entries));
   
   /* display the column headers */  
   if (in_use_column_b) {
@@ -782,28 +760,26 @@ void	_dmalloc_table_log_info(mem_table_t *mem_table, const int current_n,
   
   memset(&total, 0, sizeof(total));
   
-  tab_other_p = mem_table + entry_n - 1;
-  /* our boundary for our hash table is the other slot */
-  tab_bounds_p = tab_other_p;
-  
   entry_c = 0;
-  for (tab_p = mem_table; tab_p < tab_bounds_p; tab_p++) {
-    if (tab_p->mt_file != NULL) {
+  for (entry_p = mem_table->mt_entries;
+       entry_p < mem_table->mt_bounds_p;
+       entry_p++) {
+    if (entry_p->me_file != NULL) {
       entry_c++;
       /* can we still print the pointer information? */
       if (log_n == 0 || entry_c < log_n) {
 	(void)_dmalloc_chunk_desc_pnt(source, sizeof(source),
-				      tab_p->mt_file, tab_p->mt_line);
-	log_entry(tab_p, in_use_column_b, source);
+				      entry_p->me_file, entry_p->me_line);
+	log_entry(entry_p, in_use_column_b, source);
       }
-      add_entry(&total, tab_p);
+      add_entry(&total, entry_p);
     }
   }
-  if (current_n >= MEMORY_TABLE_SIZE) {
+  if (mem_table->mt_in_use_c >= MEMORY_TABLE_SIZE) {
     strncpy(source, "Other pointers", sizeof(source));
     source[sizeof(source) - 1] = '\0';
-    log_entry(tab_other_p, in_use_column_b, source);
-    add_entry(&total, tab_other_p);
+    log_entry(&mem_table->mt_other_pointers, in_use_column_b, source);
+    add_entry(&total, &mem_table->mt_other_pointers);
   }
   
   /* dump our total */
@@ -815,23 +791,22 @@ void	_dmalloc_table_log_info(mem_table_t *mem_table, const int current_n,
    * we want to continue and handle memory transactions.  We should be
    * able to do this in O(N).
    */
-  tab_bounds_p = mem_table + entry_n - 1;
-  for (tab_p = mem_table; tab_p < tab_bounds_p;) {
-    mem_table_t		swap_entry;
+  for (entry_p = mem_table->mt_entries; entry_p < mem_table->mt_bounds_p;) {
+    mem_entry_t		swap_entry;
     
     /*
      * If we have a blank slot or if the entry is in the right
      * position then we can move on to the next one
      */
-    if (tab_p->mt_file == NULL
-	|| tab_p->mt_entry_pos_p == tab_p) {
-      tab_p++;
+    if (entry_p->me_file == NULL
+	|| entry_p->me_entry_pos_p == entry_p) {
+      entry_p++;
       continue;
     }
     
-    /* swap this entry for where it should go and do _not_ increment tab_p */
-    swap_entry = *tab_p->mt_entry_pos_p;
-    *tab_p->mt_entry_pos_p = *tab_p;
-    *tab_p = swap_entry;
+    /* swap this entry for where it should go and do _not_ increment entry_p */
+    swap_entry = *entry_p->me_entry_pos_p;
+    *entry_p->me_entry_pos_p = *entry_p;
+    *entry_p = swap_entry;
   }
 }
