@@ -18,9 +18,9 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-# $Id: configure.ac,v 1.35 2007/03/25 06:24:51 gray Exp $
+# $Id: configure.ac,v 1.36 2007/05/14 15:53:55 gray Exp $
 #
-AC_REVISION($Revision: 1.35 $)
+AC_REVISION($Revision: 1.36 $)
 AC_INIT(dmalloc, 5.5.1, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
@@ -176,10 +176,8 @@ shlinkargs="$ac_cv_shared_link_args"
 AC_SUBST(shlinkargs)
 if test "$ac_cv_shared_lib_link_objs" = "yes"; then
        AC_MSG_RESULT([$ac_cv_shared_link_args objectfiles...])
-       AC_SUBST([SL_LINK_OBJS],[])
 else
        AC_MSG_RESULT([$ac_cv_shared_link_args])
-       AC_SUBST([SL_LINK_OBJS],[#])
 fi
 
 ###############################################################################
@@ -628,7 +626,7 @@ main()
 #
 AC_MSG_CHECKING([if ident works])
 AC_COMPILE_IFELSE([
-#ident "$Id: configure.ac,v 1.35 2007/03/25 06:24:51 gray Exp $"
+#ident "$Id: configure.ac,v 1.36 2007/05/14 15:53:55 gray Exp $"
 static void foo (void) { }
 ],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],

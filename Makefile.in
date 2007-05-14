@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.187 2007/03/25 06:24:51 gray Exp $
+# $Id: Makefile.in,v 1.188 2007/05/14 15:53:55 gray Exp $
 #
 
 SHELL	= /bin/sh
@@ -202,7 +202,7 @@ shlib : $(SHLIBRARY)
 
 $(SHLIBRARY) : $(LIBRARY)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIBRARY) @SL_LINK_OBJS@ $(OBJS) $(NORMAL_OBJS)
+	@shlinkargs@ $(LIBRARY) $(OBJS) $(NORMAL_OBJS)
 	mv $@.t $@
 
 $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
@@ -215,7 +215,7 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
 
 $(LIB_TH_SL) : $(LIB_TH)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIB_TH) @SL_LINK_OBJS@ $(OBJS) $(THREAD_OBJS)
+	@shlinkargs@ $(LIB_TH) $(OBJS) $(THREAD_OBJS)
 	mv $@.t $@
 
 $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
@@ -224,8 +224,7 @@ $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 
 $(LIB_CXX_SL) : $(LIB_CXX)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIB_CXX) @SL_LINK_OBJS@ $(OBJS) $(NORMAL_OBJS) \
-		$(CXX_OBJS)
+	@shlinkargs@ $(LIB_CXX) $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
 	mv $@.t $@
 
 $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
@@ -234,8 +233,7 @@ $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 
 $(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
 	rm -f $@ $@.t
-	@shlinkargs@ $(LIB_TH_CXX) @SL_LINK_OBJS@ $(OBJS) $(THREAD_OBJS) \
-		$(CXX_OBJS)
+	@shlinkargs@ $(LIB_TH_CXX) $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
 	mv $@.t $@
 
 $(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
