@@ -1,3 +1,13 @@
+2007-05-16  Gray Watson  <gray@outside.256.com>
+
+	* Fixed problem in dmalloc_fc_t.c that caused false failures.
+
+	* Fixed bug in malloc.c with size/len conflict.  Thanks Bernard.
+
+2007-05-14  Gray Watson  <gray@outside.256.com>
+
+	* Improvements to dmalloc_tab to improve code.
+
 2007-05-14  Gray Watson  <gray@outside.256.com>
 
 	* Removed some left-over references to the dmalloc.info file.
@@ -2393,5 +2403,5 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	* Started ChangeLog.
 
 -------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.345 2007/05/14 17:23:42 gray Exp $
+$Id: ChangeLog,v 1.346 2007/05/16 05:30:06 gray Exp $
 -------------------------------------------------------------------------------
