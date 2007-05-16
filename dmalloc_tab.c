@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_tab.c,v 1.20 2007/05/14 22:10:04 gray Exp $
+ * $Id: dmalloc_tab.c,v 1.21 2007/05/16 05:05:34 gray Exp $
  */
 
 /*
@@ -40,8 +40,6 @@
 #include "compat.h"
 #include "dmalloc.h"
 #include "dmalloc_loc.h"
-#include "error.h"
-#include "error_val.h"
 
 #include "dmalloc_tab.h"
 #include "dmalloc_tab_loc.h"
@@ -71,12 +69,12 @@
  *
  * ARGUMENTS:
  *
- * key - Key (the unaligned variable-length array of bytes) that we
+ * key -> Key (the unaligned variable-length array of bytes) that we
  * are hashing.
  *
- * length - Length of the key in bytes.
+ * length -> Length of the key in bytes.
  *
- * init_val - Initialization value of the hash if you need to hash a
+ * init_val -> Initialization value of the hash if you need to hash a
  * number of strings together.  For instance, if you are hashing N
  * strings (unsigned char **)keys, do it like this:
  *
@@ -184,7 +182,7 @@ static	unsigned int	which_bucket(const int entry_n, const char *file,
     bucket = hash((unsigned char *)&line, sizeof(line), bucket);
   }
   
-  bucket %= entry_n - 1;
+  bucket %= entry_n;
   return bucket;
 }
 
@@ -663,6 +661,7 @@ void	_dmalloc_table_insert(mem_table_t *mem_table,
     /* we found an open slot so update the file/line */
     entry_p->me_file = file;
     entry_p->me_line = line;
+    mem_table->mt_in_use_c++;
   }
   
   /* update the info for the entry */
@@ -670,6 +669,7 @@ void	_dmalloc_table_insert(mem_table_t *mem_table,
   entry_p->me_total_c++;
   entry_p->me_in_use_size += size;
   entry_p->me_in_use_c++;
+  entry_p->me_entry_pos_p = entry_p;
 }
 
 /*
