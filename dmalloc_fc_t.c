@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: dmalloc_fc_t.c,v 1.1 2007/03/23 16:20:42 gray Exp $
+ * $Id: dmalloc_fc_t.c,v 1.2 2007/05/16 05:04:54 gray Exp $
  */
 
 #include <stdio.h>				/* for stdin */
@@ -143,7 +143,9 @@ static	int	do_atoi(void) {
   
   memmove(pnt, "12345", 5);
   atoi(pnt);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -172,7 +174,9 @@ static	int	do_atol(void) {
   
   memmove(pnt, "12345", 5);
   atol(pnt);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -202,7 +206,9 @@ static	int	do_bcmp(void) {
   val = "123456";
   memmove(pnt, val, strlen(val));
   bcmp(pnt, val, 6);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -210,7 +216,8 @@ static	int	do_bcmp(void) {
 static	int	do_bcopy(void) {
   char	*pnt, *val;
   char	*func_name = "bcopy";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "12345";
   
@@ -228,7 +235,9 @@ static	int	do_bcopy(void) {
   
   val = "123456";
   bcopy(val, pnt, strlen(val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -237,7 +246,7 @@ static	int	do_bzero(void) {
   char	*pnt;
   char	*func_name = "bzero";
   char	*zeros = "\000\000\000\000\000";
-  int	size = 5;
+  int	size = 5, ret;
   
   pnt = malloc(size);
   strcpy(pnt, "foo");
@@ -263,25 +272,28 @@ static	int	do_bzero(void) {
   }
   
   bzero(pnt, size + 1);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_INDEX
 static	int	do_index(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "index";
+  int	ret;
   
   pnt = malloc(5);
   val = "foot";
   strcpy(pnt, val);
   
-  ret = index(pnt, 't');
+  loc = index(pnt, 't');
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (*ret != 't') {
+  if (*loc != 't') {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the t\n", func_name);
     }
@@ -291,24 +303,27 @@ static	int	do_index(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   index(pnt, 'u');
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_MEMCCPY
 static	int	do_memccpy(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "memccpy";
+  int	ret;
   
   pnt = malloc(5);
   val = "footy";
   
-  ret = memccpy(pnt, val, 'z', strlen(val));
+  loc = memccpy(pnt, val, 'z', strlen(val));
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (ret != 0L) {
+  if (loc != 0L) {
     if (! silent_b) {
       (void)printf("   ERROR: %s pointer should have returned 0L\n",
 		   func_name);
@@ -324,25 +339,28 @@ static	int	do_memccpy(void) {
   
   val = "footies";
   memccpy(pnt, val, 'z', strlen(val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_MEMCHR
 static	int	do_memchr(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "memchr";
+  int	ret;
   
   pnt = malloc(5);
   val = "footy";
   memmove(pnt, val, strlen(val));
   
-  ret = memchr(pnt, 't', strlen(val));
+  loc = memchr(pnt, 't', strlen(val));
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (*ret != 't') {
+  if (*loc != 't') {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the t\n", func_name);
     }
@@ -350,7 +368,9 @@ static	int	do_memchr(void) {
   }
   
   memchr(pnt, 'u', strlen(val) + 1);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -380,7 +400,9 @@ static	int	do_memcmp(void) {
   val = "123456";
   memmove(pnt, val, strlen(val));
   memcmp(pnt, val, 6);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -388,7 +410,8 @@ static	int	do_memcmp(void) {
 static	int	do_memcpy(void) {
   char	*pnt, *val;
   char	*func_name = "memcpy";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "12345";
   
@@ -406,7 +429,9 @@ static	int	do_memcpy(void) {
   
   val = "123456";
   memcpy(pnt, val, strlen(val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -414,7 +439,8 @@ static	int	do_memcpy(void) {
 static	int	do_memmove(void) {
   char	*pnt, *val;
   char	*func_name = "memmove";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "12345";
   
@@ -432,7 +458,9 @@ static	int	do_memmove(void) {
   
   val = "123456";
   memmove(pnt, val, strlen(val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -441,7 +469,7 @@ static	int	do_memset(void) {
   char	*pnt;
   char	*func_name = "memset";
   char	*zeros = "\000\000\000\000\000";
-  int	size = 5;
+  int	size = 5, ret;
   
   pnt = malloc(size);
   strcpy(pnt, "foo");
@@ -467,25 +495,28 @@ static	int	do_memset(void) {
   }
   
   memset(pnt, 0, size + 1);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_RINDEX
 static	int	do_rindex(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "rindex";
+  int	ret;
   
   pnt = malloc(5);
   val = "foot";
   strcpy(pnt, val);
   
-  ret = index(pnt, *val);
+  loc = index(pnt, *val);
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (ret != pnt) {
+  if (loc != pnt) {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the f\n", func_name);
     }
@@ -495,7 +526,9 @@ static	int	do_rindex(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   rindex(pnt, *val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -527,7 +560,9 @@ static	int	do_strcasecmp(void) {
   big_val = "ABCDEF";
   memmove(pnt, big_val, strlen(big_val));
   strcasecmp(pnt, val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -535,7 +570,8 @@ static	int	do_strcasecmp(void) {
 static	int	do_strcat(void) {
   char	*pnt, *val;
   char	*func_name = "strcat";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "ab";
   strcpy(pnt, val);
@@ -559,25 +595,28 @@ static	int	do_strcat(void) {
   }
   
   strcat(pnt, val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_STRCHR
 static	int	do_strchr(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "strchr";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "foot";
   strcpy(pnt, val);
 
-  ret = strchr(pnt, 't');
+  loc = strchr(pnt, 't');
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (*ret != 't') {
+  if (*loc != 't') {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the t\n", func_name);
     }
@@ -587,7 +626,9 @@ static	int	do_strchr(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strchr(pnt, 'y');
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -617,7 +658,9 @@ static	int	do_strcmp(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strcmp(pnt, val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -625,7 +668,8 @@ static	int	do_strcmp(void) {
 static	int	do_strcpy(void) {
   char	*pnt, *val;
   char	*func_name = "strcpy";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "1234";
   
@@ -643,7 +687,9 @@ static	int	do_strcpy(void) {
   
   val = "12345";
   strcpy(pnt, val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -655,6 +701,7 @@ static	int	do_strcspn(void) {
   
   pnt = malloc(5);
   val = "1234";
+  strcpy(pnt, val);
   
   ret = strcspn(pnt, val);
   if (! check_ok(func_name)) {
@@ -699,7 +746,9 @@ static	int	do_strlen(void) {
   memmove(pnt, val, strlen(val));
   
   strlen(pnt);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -729,7 +778,9 @@ static	int	do_strncasecmp(void) {
   
   big_val = "ABCDEF";
   strncasecmp(pnt, big_val, strlen(big_val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -737,7 +788,8 @@ static	int	do_strncasecmp(void) {
 static	int	do_strncat(void) {
   char	*pnt, *val;
   char	*func_name = "strncat";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "ab";
   strcpy(pnt, val);
@@ -761,7 +813,9 @@ static	int	do_strncat(void) {
   }
   
   strncat(pnt, val, strlen(val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -789,7 +843,9 @@ static	int	do_strncmp(void) {
   }
   
   strncmp(pnt, val, strlen(val) + 1);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -797,7 +853,8 @@ static	int	do_strncmp(void) {
 static	int	do_strncpy(void) {
   char	*pnt, *val;
   char	*func_name = "strncpy";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "12345";
   
@@ -815,25 +872,28 @@ static	int	do_strncpy(void) {
   
   val = "123456";
   strncpy(pnt, val, strlen(val));
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_STRPBRK
 static	int	do_strpbrk(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "strpbrk";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "foot";
   strcpy(pnt, val);
 
-  ret = strpbrk(pnt, "t");
+  loc = strpbrk(pnt, "t");
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (*ret != 't') {
+  if (*loc != 't') {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the t\n", func_name);
     }
@@ -843,25 +903,28 @@ static	int	do_strpbrk(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strpbrk(pnt, "y");
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_STRRCHR
 static	int	do_strrchr(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "rindex";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "foot";
   strcpy(pnt, val);
   
-  ret = strrchr(pnt, *val);
+  loc = strrchr(pnt, *val);
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (ret != pnt) {
+  if (loc != pnt) {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the f\n", func_name);
     }
@@ -871,7 +934,9 @@ static	int	do_strrchr(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strrchr(pnt, *val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
@@ -900,25 +965,28 @@ static	int	do_strspn(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strspn(pnt, val);
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_STRSTR
 static	int	do_strstr(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "strstr";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "foot";
   strcpy(pnt, val);
 
-  ret = strstr(pnt, "ot");
+  loc = strstr(pnt, "ot");
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (ret - pnt != 2) {
+  if (loc - pnt != 2) {
     if (! silent_b) {
       (void)printf("   ERROR: %s should have found the ot\n", func_name);
     }
@@ -928,25 +996,28 @@ static	int	do_strstr(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strstr(pnt, "none");
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
 #if HAVE_STRTOK
 static	int	do_strtok(void) {
-  char	*pnt, *val, *ret;
+  char	*pnt, *val, *loc;
   char	*func_name = "strtok";
-  
+  int	ret;
+
   pnt = malloc(5);
   val = "a,b,";
   strcpy(pnt, val);
 
-  ret = strtok(pnt, ",");
+  loc = strtok(pnt, ",");
   if (! check_ok(func_name)) {
     return 0;
   }
   
-  if (ret != pnt) {
+  if (loc != pnt) {
     if (! silent_b) {
       (void)printf("   ERROR: %s first token should be start of pnt\n",
 		   func_name);
@@ -957,7 +1028,9 @@ static	int	do_strtok(void) {
   val = "a,b,c";
   memmove(pnt, val, strlen(val));
   strtok(pnt, ",");
-  return check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  free(pnt);
+  return ret;
 }
 #endif
 
