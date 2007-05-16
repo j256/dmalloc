@@ -18,7 +18,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: malloc.c,v 1.189 2007/03/25 18:53:41 gray Exp $
+ * $Id: malloc.c,v 1.190 2007/05/16 05:04:19 gray Exp $
  */
 
 /*
@@ -1319,7 +1319,7 @@ char	*strndup(const char *string, const DMALLOC_SIZE len)
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     if (! dmalloc_verify_pnt_strsize(file, 0 /* no line */, "strdup", string,
 				     0 /* not exact */, 1 /* strlen */,
-				     size)) {
+				     len)) {
       dmalloc_message("bad pointer argument found in strdup");
     }
   }
