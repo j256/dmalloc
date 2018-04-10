@@ -52,4 +52,4 @@ Many net folk contributed to the design, development, and overall library and my
 
 If you have any questions, comments, or problems feel free to send me mail.
 
-Gray Watson, http://256stuff.com/gray/
+[Gray Watson](http://256stuff.com/gray/)
