@@ -1,0 +1,425 @@
+#
+# @configure_input@
+#
+# $Id: Makefile.in,v 1.191 2007/05/16 05:05:08 gray Exp $
+#
+
+SHELL	= /bin/sh
+
+# default root installation directory
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+shlibdir = @shlibdir@
+
+CC = @CC@
+CXX = @CXX@
+
+HFLS	= dmalloc.h
+OBJS	= arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
+NORMAL_OBJS = chunk.o error.o malloc.o
+THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
+CXX_OBJS = dmallocc.o
+VERSION	!= sed -e '/dmalloc_version/s/^.*\([0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*\(-b[0-9]\)*\(-beta\)*\).*$$/\1/p' -e d version.h
+
+DEFS	= -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
+	-DHAVE_STDLIB_H=@HAVE_STDLIB_H@ \
+	-DHAVE_STRING_H=@HAVE_STRING_H@ \
+	-DHAVE_UNISTD_H=@HAVE_UNISTD_H@ \
+	-DHAVE_SYS_MMAN_H=@HAVE_SYS_MMAN_H@ \
+	-DHAVE_SYS_TYPES_H=@HAVE_SYS_TYPES_H@ \
+	-DHAVE_W32API_WINBASE_H=@HAVE_W32API_WINBASE_H@ \
+	-DHAVE_W32API_WINDEF_H=@HAVE_W32API_WINDEF_H@ \
+	-DHAVE_SYS_CYGWIN_H=@HAVE_SYS_CYGWIN_H@ \
+	-DHAVE_SIGNAL_H=@HAVE_SIGNAL_H@ \
+	$(DEFINES)
+INCS	= -I. -I$(srcdir) $(INCLUDES)
+LIBS	= $(LIBRARIES)
+A_OUT	= aout@EXEEXT@
+
+MODULE	= dmalloc
+
+LIBRARY	= lib$(MODULE).a
+
+# thread version of the library
+LIB_TH	= lib$(MODULE)th.a
+SHLIB_TH = lib$(MODULE)th.@shlibext@
+@TH_ON@BUILD_TH = $(LIB_TH)
+@TH_ON@INSTALL_TH = installth
+@CXX_ON@@TH_ON@INSTALL_TH_CXX = installthcxx
+
+# C++ version of the library
+LIB_CXX	= lib$(MODULE)xx.a
+SHLIB_CXX = lib$(MODULE)xx.@shlibext@
+@CXX_ON@BUILD_CXX = $(LIB_CXX)
+@CXX_ON@INSTALL_CXX = installcxx
+@CXX_ON@BUILD_TH_CXX = $(LIB_TH_CXX)
+
+# shared versions of the library
+LIB_SH = lib$(MODULE).@shlibext@
+
+# threads + C++
+LIB_TH_CXX = lib$(MODULE)thcxx.a
+
+CFLAGS	= -g $(CCFLS) -Wall -Wpointer-arith -Wshadow -Waggregate-return \
+	-Wmissing-prototypes
+
+LDFLAGS	= $(LLDFLAGS)
+DESTDIR	= /usr/local
+WWWDIR	= /var/httpd/root/dmalloc.com
+TEST	= $(MODULE)_t
+TEST_FC	= $(MODULE)_fc_t
+UTIL	= $(MODULE)
+INFOFILE= $(MODULE).info
+
+#
+# WARNING: be careful about the order of this list some files are at
+# the end on purpose
+#
+FLS	=  conf.h.in configure.ac config.help \
+	ChangeLog.1 INSTALL NEWS README RELEASE.html \
+	dmallocrc \
+	arg_check.c arg_check.h chunk.c chunk.h chunk_loc.h \
+	compat.c compat.h debug_tok.h env.c env.h error.c error.h error_val.h \
+	heap.c heap.h malloc.c dmalloc.c dmalloc.h.1 dmalloc.h.3 \
+	dmalloc_loc.h dmalloc_rand.c dmalloc_rand.h dmalloc_tab.c \
+	dmalloc_tab.h dmalloc_tab_loc.h dmalloc_t.c dmalloc_fc_t.c \
+	malloc_funcs.h return.h version.h \
+	settings.dist dmalloc_argv.c dmalloc_argv.h dmalloc_argv_loc.h \
+	dmallocc.cc \
+	install-sh mkinstalldirs dmalloc.spec \
+	$(srcdir)/configure
+DOCFLS	= dmalloc.texi dmalloc.html dmalloc.pdf Manifest NOTES TODO
+CONTFLS	= contrib/README contrib/Xmalloc.c contrib/aix_notes \
+	contrib/atexit.c contrib/dec_notes contrib/dgux_notes \
+	contrib/dmalloc.gdb contrib/dmalloc_summarize.pl contrib/next_notes \
+	contrib/ra_info.pl contrib/stratus_ftx_notes contrib/tsecs \
+	contrib/z_os_notes contrib/aix_5l_notes
+
+DOCS	= $(INFOFILE) dmalloc.html dmalloc.texi dmalloc.pdf texinfo.tex
+
+# Shar file maximum size
+# NOTE: the wc level should be below 90k due to shar overhead
+SHARSIZE= 85k
+
+all :: dmalloc.h $(LIBRARY) $(UTIL) $(BUILD_CXX) $(BUILD_TH)
+@CXX_OFF@	@echo "To make the C++ version of the library type 'make cxx'"
+@TH_OFF@	@echo "To make the thread version of the library type 'make threads'"
+
+clean ::
+	$(CLEAN)
+	rm -f $(A_OUT) $(LIBRARY) $(LIB_TH) $(LIB_CXX) $(LIB_TH_CXX)
+	rm -f $(TEST) $(TEST_FC)
+	rm -f $(UTIL) dmalloc.h dmalloc.h.3
+	rm -f INSTALL README $(INFOFILE) dmalloc.html dmalloc_[0-9].html
+	rm -f dmalloc.pdf
+	rm -f ChangeLog.1
+
+distclean :: clean
+	rm -f confdefs.h configure configure.lineno config.status config.log
+	rm -f config.cache conf.h
+	rm -f Makefile dmalloc.h.2 settings.h
+	rm -rf autom4te.cache
+	rm -rf release
+
+installincs :: $(HFLS)
+	install -Cv -m 444 $(HFLS) $(DESTDIR)/include
+
+installcxx :: $(LIB_CXX)
+	install -Cv -m 644 $(LIB_CXX) $(DESTDIR)/lib
+
+installthcxx :: $(LIB_THCXX)
+	install -Cv -m 644 $(LIB_THCXX) $(DESTDIR)/lib
+
+installth :: $(LIB_TH) $(INSTALL_TH_CXX)
+	install -Cv -m 644 $(LIB_TH) $(DESTDIR)/lib
+@CXX_OFF@	@echo "Enter 'make installthcxx' to install the C++ library"
+
+installlibs :: installincs $(LIBRARY) $(INSTALL_CXX) $(INSTALL_TH)
+	install -Cv -m 644 $(LIBRARY) $(DESTDIR)/lib
+@CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
+@TH_OFF@	@echo "Enter 'make installth' to install thread library"
+
+installhtml ::
+	-mkdir $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
+	-current=`pwd` ;\
+		cd $(WWWDIR)/docs/$(VERSION)/online ;\
+		umask 022 ;\
+		texi2html -menu -number -split_node $$current/dmalloc.texi ;\
+		for f in dmalloc?*.html ; do \
+			sed -e '/<title>/d' -e '1,/<title/p' -e d $(WWWDIR)/header_script.html > $$f.t;\
+			sed -e '/<title/p' -e d $$f >> $$f.t;\
+			sed -e '/<title/d' -e '/<title/,$$p' -e d $(WWWDIR)/header_script.html >> $$f.t;\
+			sed -e '1,/<body/d' -e '/<\/body>/,$$d' $$f >> $$f.t;\
+			cat $(WWWDIR)/footer_script.html >> $$f.t ;\
+			sed -e '/<\/body>/,$$p' -e d $$f >> $$f.t ;\
+			mv $$f.t $$f ;\
+		done
+
+installdocs :: $(DOCS) installhtml
+	-mkdir $(WWWDIR)/docs/$(VERSION)
+	-chmod 755 $(WWWDIR)/docs/$(VERSION) $(WWWDIR)/docs/$(VERSION)/online
+	install -Cv -m 444 $(DOCS) $(WWWDIR)/docs/$(VERSION)
+	cd $(WWWDIR)/docs/$(VERSION) ; for file in $(DOCS) ;\
+		do gzip -9f $$file ; done
+
+installshlib : $(SHLIBRARY)
+	install -Cv -m 644 $(srcdir)/$(SHLIBRARY) $(shlibdir)
+
+install :: installlibs $(UTIL) $(INFOFILE)
+	install -Cv $(UTIL) $(DESTDIR)/bin
+	install -Cv -m 444 $(INFOFILE) $(DESTDIR)/info
+
+# put situation specific lines here
+dmalloc.h.2 : config.status
+	$(SHELL) config.status
+	touch $@
+
+settings.h : $(srcdir)/settings.dist config.status
+	$(SHELL) config.status
+	touch $@
+
+dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
+	$(srcdir)/arg_check.h $(srcdir)/dmalloc.h.6
+	rm -f $@ $@.t malloc.h.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/malloc.h \
+		> malloc.h.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' \
+		-e '/^#endif/d' $(srcdir)/arg_check.h > arg_check.h.t
+	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 \
+		arg_check.h.t $(srcdir)/dmalloc.h.6 > $@.t
+	mv $@.t $@
+	rm -f malloc.h.t arg_check.h.t
+
+dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
+	rm -f $@ $@.t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
+	mv $@.t $@
+
+shlib : $(SHLIBRARY)
+
+$(SHLIBRARY) : $(LIBRARY)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIBRARY) $(OBJS) $(NORMAL_OBJS)
+	mv $@.t $@
+
+$(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
+	ar cr $@ $?
+	@RANLIB@ $@
+
+$(LIB_TH) : $(OBJS) $(THREAD_OBJS)
+	ar cr $@ $?
+	@RANLIB@ $@
+
+$(LIB_TH_SL) : $(LIB_TH)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIB_TH) $(OBJS) $(THREAD_OBJS)
+	mv $@.t $@
+
+$(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
+	ar cr $@ $?
+	@RANLIB@ $@
+
+$(LIB_CXX_SL) : $(LIB_CXX)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIB_CXX) $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
+	mv $@.t $@
+
+$(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
+	ar cr $@ $?
+	@RANLIB@ $@
+
+$(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
+	rm -f $@ $@.t
+	@shlinkargs@ $(LIB_TH_CXX) $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
+	mv $@.t $@
+
+$(UTIL) : dmalloc.o dmalloc_argv.o compat.o env.o
+	rm -f $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(UTIL).o dmalloc_argv.o compat.o \
+		env.o $(LIBS)
+	mv $(A_OUT) $@
+
+threads : $(LIB_TH) $(BUILD_TH_CXX)
+
+cxx : $(LIB_CXX)
+
+# special _th versions of objects with the LOCK_THREADS variable defined to 1
+chunk_th.o : chunk.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
+		-c $(srcdir)/chunk.c -o ./$@
+
+error_th.o : error.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
+		-c $(srcdir)/error.c -o $@
+
+malloc_th.o : malloc.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREAD=1 \
+		-c $(srcdir)/malloc.c -o $@
+
+tests :: $(TEST) $(TEST_FC)
+	@echo "To run compile tests type 'make testsall'"
+
+testsall :: $(TEST) $(TEST_FC) compile_test
+
+$(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
+	rm -f $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST).o dmalloc_argv.o \
+		$(LIBS) $(LIBRARY)
+	mv $(A_OUT) $@
+
+$(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
+	rm -f $@
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST_FC).o dmalloc_argv.o \
+		$(LIBS) $(LIBRARY)
+	mv $(A_OUT) $@
+
+check light :: $(TEST) $(TEST_FC)
+	$(TEST_FC) -s
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	$(TEST) -s -t 10000
+	@echo light tests have passed
+
+heavy :: $(TEST) light
+	$(TEST) -s -t 100000
+	$(TEST) -s -t 100000
+	$(TEST) -s -t 100000
+	@echo heavy tests have passed
+
+continuous :: $(TEST)
+	while $(TEST) -n -t 100000 ;\
+		do  \
+			echo '' ;\
+		done
+
+compile_test :: settings.h
+	rm -f settings.h.t
+	for setting in `grep -v '^#' settings.test | cut -f1 -d' ' ` ;\
+	do \
+		val=`grep "^$$setting " settings.test | cut -f2 -d' '` ;\
+		echo "$$setting -> $$val" ;\
+		perl -n -e "s/(#define[ \t]$$setting[ \t]+[^ \t]+$$)/#define $$setting $$val\n/; print;" \
+			settings.dist > settings.h.t ;\
+		mv settings.h.t settings.h ;\
+		perl -n -e 'print "$$1$$_" if '"s/(#define[ \t]$$setting[ \t]+[^ \t]+$$)/#define $$setting $$val\n/;" \
+			settings.dist ;\
+		rm -f $(TEST) ;\
+		echo "Making $(TEST)" ;\
+		make $(TEST) > /dev/null ;\
+		make light ;\
+	done
+	rm -f settings.h.t settings.h
+
+release :: $(FLS) $(DOCFLS) $(CONTFLS) Makefile.all.in
+	@ test ! -d dmalloc-$(VERSION) || \
+		answer 'Is it okay to remove the dmalloc-$(VERSION) dir? '
+	rm -rf dmalloc-$(VERSION).t dmalloc-$(VERSION)
+	mkdir dmalloc-$(VERSION).t dmalloc-$(VERSION).t/contrib \
+		dmalloc-$(VERSION).t/docs
+	cp $(FLS) Makefile.all.in dmalloc-$(VERSION).t
+	cp $(CONTFLS) dmalloc-$(VERSION).t/contrib
+	cp $(DOCFLS) dmalloc-$(VERSION).t/docs
+	mv dmalloc-$(VERSION).t/Makefile.all.in \
+		dmalloc-$(VERSION).t/Makefile.in
+	mv dmalloc-$(VERSION).t dmalloc-$(VERSION)
+	rm -f dmalloc-$(VERSION).tgz dmalloc-$(VERSION).tgz.t
+	tar -czf dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION)
+	mv dmalloc-$(VERSION).tgz.t dmalloc-$(VERSION).tgz
+
+ChangeLog.1 : ChangeLog
+	rm -f $@ $@.t
+	perl -n -e 's/[\w\.+-]+@[\w.+-]+//; print $$_;' < ChangeLog > $@.t
+	mv $@.t $@
+
+dmalloc.html : $(srcdir)/dmalloc.texi
+	rm -f $@
+	texi2html -number -monolithic $(srcdir)/dmalloc.texi
+
+dmalloc.pdf : $(srcdir)/dmalloc.texi
+	rm -rf work
+	mkdir work
+	( cd work ; texi2pdf ../$(srcdir)/dmalloc.texi ; mv dmalloc.pdf .. )
+	rm -rf work
+
+INSTALL : $(INFOFILE)
+	rm -f $@ $@.t
+	echo ------------------------------------------------------------------------------- \
+		> $@.t
+	sed -e '1,/,  Node: Installation/d' \
+		-e '/,  Node: Getting Started/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: Getting Started/d' \
+		-e '/,  Node: Troubleshooting/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: Troubleshooting/d' \
+		-e '/,  Node: Programming/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	mv $@.t $@
+
+README : $(srcdir)/README.1 $(INFOFILE)
+	rm -f $@ $@.t
+	echo ------------------------------------------------------------------------------- \
+		> $@.t
+	sed -e '1,/,  Node: Top/d' -e '/\* Menu:/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	cat $(srcdir)/README.1 >> $@.t
+	mv $@.t $@
+
+$(INFOFILE) : $(srcdir)/dmalloc.texi
+	rm -f $@
+	makeinfo --no-split $(.OODATE)
+
+#
+# auto configure settings
+#
+Makefile : $(srcdir)/Makefile.in config.status
+	$(SHELL) config.status
+	touch $@
+
+conf.h : $(srcdir)/conf.h.in config.status
+	$(SHELL) config.status
+	touch $@
+
+config.status : $(srcdir)/configure
+	$(SHELL) config.status --recheck
+
+$(srcdir)/configure : $(srcdir)/configure.ac
+	cd $(srcdir); autoconf
+
+#
+# Special .c dependency creation which handles the _th.o cases.
+#
+depend ::
+	@ echo ""
+	@ echo "WARNING: you should be running $(MAKE) depend2"
+	@ false
+
+depend2 ::
+	rm -f $(DEPEND).t
+	@ echo '#' > $(DEPEND).t
+	@ echo '# This file contains dependencies that are automatically generated by make' >> $(DEPEND).t
+	@ echo '# depend.  Please do not edit by hand.' >> $(DEPEND).t
+	@ echo '#' >> $(DEPEND).t
+	@ echo '' >> $(DEPEND).t
+	- gcc $(INCS) -MM $(CFLS) >> $(DEPEND).t
+	- gcc $(INCS) -MM chunk.c | sed -e 's/^chunk.o/chunk_th.o/' >> $(DEPEND).t
+	- gcc $(INCS) -MM error.c | sed -e 's/^error.o/error_th.o/' >> $(DEPEND).t
+	- gcc $(INCS) -MM malloc.c | sed -e 's/^malloc.o/malloc_th.o/' >> $(DEPEND).t
+	rm -f $(DEPEND)
+	mv $(DEPEND).t $(DEPEND)
+
+.include <local.mk>

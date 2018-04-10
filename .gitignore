@@ -2,14 +2,11 @@ ChangeLog.1
 INSTALL
 Makefile
 PERMISSIONS
-README
-README_ftp
 autom4te.cache
 conf.h
 config.cache
 config.log
 config.status
-configure
 configure.lineno
 dmalloc
 dmalloc.dvi
@@ -25,3 +22,5 @@ dmalloc_t
 dmalloc_toc.html
 settings.h
 dmalloc_fc_t
+*.o
+*.a
