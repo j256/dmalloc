@@ -379,7 +379,7 @@ README : $(srcdir)/README.1 $(INFOFILE)
 
 $(INFOFILE) : $(srcdir)/dmalloc.texi
 	rm -f $@
-	makeinfo --no-split $(.OODATE)
+	makeinfo --fill-column=100 --no-split $(.OODATE)
 
 #
 # auto configure settings
