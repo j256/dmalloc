@@ -35,6 +35,7 @@ INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@
 A_OUT = aout@EXEEXT@
 INFOFILE = dmalloc.info
+DOCS = INSTALL dmalloc.info dmalloc.html
 
 MODULE	= dmalloc
 LIBRARY	= lib$(MODULE).a
@@ -89,7 +90,7 @@ LIB_SL = lib$(MODULE).@shlibext@
 @TH_ON@@CXX_ON@INSTALL_SL_9 = installthcxxsl
 
 # now construct our build and install targets
-BUILD_ALL = dmalloc.h $(LIBRARY) $(UTIL) \
+BUILD_ALL = dmalloc.h $(LIBRARY) $(UTIL) $(DOCS) \
 	$(BUILD_ALL_1) $(BUILD_ALL_2) $(BUILD_ALL_3) $(BUILD_ALL_4) \
 	$(BUILD_ALL_5) $(BUILD_ALL_6) $(BUILD_ALL_7) $(BUILD_ALL_8)
 INSTALL_LIB = $(LIBRARY) \
@@ -171,6 +172,7 @@ distclean : clean
 	rm -f configure.lineno
 	rm -rf autom4te.cache
 	rm -f Makefile settings.h dmalloc.h.2
+	rm -f INSTALL dmalloc.info dmalloc.html
 #	rm -f configure
 
 installdirs :
