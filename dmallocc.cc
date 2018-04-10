@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmallocc.cc,v 1.3 2003/05/15 20:08:46 gray Exp $
  */
 
 /*

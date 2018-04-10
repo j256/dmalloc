@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: protect.c,v 1.8 2003/05/23 03:03:16 gray Exp $
  */
 
 /*

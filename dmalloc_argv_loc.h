@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmalloc_argv_loc.h,v 1.10 2003/05/15 02:42:21 gray Exp $
  */
 
 #ifndef __ARGV_LOC_H__

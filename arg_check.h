@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: arg_check.h,v 1.25 2007/03/22 19:40:52 gray Exp $
  */
 
 #ifndef __ARG_CHECK_H__

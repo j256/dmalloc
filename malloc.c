@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: malloc.c,v 1.190 2007/05/16 05:04:19 gray Exp $
  */
 
 /*

@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: version.h,v 1.132 2007/05/14 17:23:37 gray Exp $
  */
 
 #ifndef __VERSION_H__

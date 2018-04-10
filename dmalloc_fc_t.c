@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmalloc_fc_t.c,v 1.2 2007/05/16 05:04:54 gray Exp $
  */
 
 #include <stdio.h>				/* for stdin */

@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmalloc_loc.h,v 1.46 2000/05/16 18:35:57 gray Exp $
  */
 
 #ifndef __DMALLOC_LOC_H__

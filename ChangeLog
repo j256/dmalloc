@@ -2401,7 +2401,3 @@ Thu Mar 12 19:28:34 1992  Gray Watson  (gray@toaster.antaire.com)
 	when MALLOC_ADDRESS was not working correctly.
 
 	* Started ChangeLog.
-
--------------------------------------------------------------------------------
-$Id: ChangeLog,v 1.346 2007/05/16 05:30:06 gray Exp $
--------------------------------------------------------------------------------

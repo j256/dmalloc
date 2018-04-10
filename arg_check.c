@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: arg_check.c,v 1.40 2007/03/25 03:06:35 gray Exp $
  */
 
 /*

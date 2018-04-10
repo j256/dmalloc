@@ -7175,7 +7175,7 @@ echo "$as_me:$LINENO: checking if ident works" >&5
 echo $ECHO_N "checking if ident works... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 
-#ident "$Id: configure.ac,v 1.37 2007/05/14 17:23:37 gray Exp $"
+#ident "configure.ac"
 static void foo (void) { }
 
 _ACEOF

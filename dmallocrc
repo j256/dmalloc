@@ -3,8 +3,6 @@
 # Rename this to .dmallocrc and place in your $HOME directory to
 # activate.  See dmalloc.info for more information.
 #
-# $Id: dmallocrc,v 1.32 1998/11/12 21:42:31 gray Exp $
-#
 
 #
 # This file maps tags to certain combinations of debug tokens.  The 

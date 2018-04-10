@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: return.h,v 1.37 2005/10/15 14:44:22 gray Exp $
  */
 
 /*

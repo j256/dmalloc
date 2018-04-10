@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: debug_tok.h,v 1.41 2004/09/13 05:13:29 gray Exp $
  */
 
 #ifndef __DEBUG_TOK_H__

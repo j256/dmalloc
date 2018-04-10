@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: compat.c,v 1.57 2007/05/14 15:53:11 gray Exp $
  */
 
 /*

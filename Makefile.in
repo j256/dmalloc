@@ -1,7 +1,6 @@
 ###############################################################################
 # @configure_input@
 # Makefile for the DMalloc library.
-# $Id: Makefile.all.in,v 1.133 2007/05/14 17:13:45 gray Exp $
 ###############################################################################
 
 # default root installation directory

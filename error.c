@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: error.c,v 1.114 2004/08/13 21:26:27 gray Exp $
  */
 
 /*

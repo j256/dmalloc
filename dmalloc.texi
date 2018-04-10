@@ -12,10 +12,6 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@c $Id: dmalloc.texi,v 1.295 2007/05/14 17:23:37 gray Exp $
-@c ----------------------------------------------------------------
-
-@c ----------------------------------------------------------------
 @set dmalloc_version Version 5.5.2
 @set dmalloc_date May 2007
 @set dmalloc_copyright Copyright 1992 to 2007 by Gray Watson.

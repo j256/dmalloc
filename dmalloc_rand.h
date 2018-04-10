@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmalloc_rand.h,v 1.1 2003/06/04 23:43:45 gray Exp $
  */
 
 #ifndef __DMALLOC_RAND_H__

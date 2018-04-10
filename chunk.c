@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: chunk.c,v 1.218 2007/05/14 22:10:04 gray Exp $
  */
 
 /*

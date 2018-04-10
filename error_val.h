@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: error_val.h,v 1.35 2005/06/05 05:22:28 gray Exp $
  */
 
 #ifndef __ERROR_VAL_H__

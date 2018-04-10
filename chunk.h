@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: chunk.h,v 1.72 2007/03/23 13:33:06 gray Exp $
  */
 
 #ifndef __CHUNK_H__

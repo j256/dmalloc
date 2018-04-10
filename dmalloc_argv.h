@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmalloc_argv.h,v 1.12 2005/12/18 14:47:02 gray Exp $
  */
 
 #ifndef __ARGV_H__
@@ -38,7 +36,7 @@
 /* used to handle the const operator */
 /* const is available */
 
-/* NOTE: start of $Id: dmalloc_argv.h,v 1.12 2005/12/18 14:47:02 gray Exp $ */
+/* NOTE: start of dmalloc_argv.h */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments

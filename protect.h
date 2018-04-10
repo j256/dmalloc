@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: protect.h,v 1.4 2003/05/23 03:03:17 gray Exp $
  */
 
 #ifndef __PROTECT_H__

@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: heap.c,v 1.69 2005/01/11 18:27:05 gray Exp $
  */
 
 /*

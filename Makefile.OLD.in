@@ -1,8 +1,6 @@
 #
 # @configure_input@
 #
-# $Id: Makefile.in,v 1.191 2007/05/16 05:05:08 gray Exp $
-#
 
 SHELL	= /bin/sh
 

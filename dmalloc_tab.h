@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: dmalloc_tab.h,v 1.6 2007/05/14 22:10:04 gray Exp $
  */
 
 #ifndef __DMALLOC_TAB_H__

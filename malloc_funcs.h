@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://www.dmalloc.com/
- *
- * $Id: malloc_funcs.h,v 1.1 2000/11/07 17:33:03 gray Exp $
  */
 
 #ifndef __MALLOC_H__

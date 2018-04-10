@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://dmalloc.com/
- *
- * $Id: heap.h,v 1.44 2004/07/10 03:49:52 gray Exp $
  */
 
 #ifndef __HEAP_H__
