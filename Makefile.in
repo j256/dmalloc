@@ -251,6 +251,11 @@ dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
 	mv $@.t $@
 	rm -f malloc.h.t arg_check.h.t
 
+$(INFOFILE) : $(srcdir)/dmalloc.texi
+	rm -f $@ $@.t
+	makeinfo -o $@.t --fill-column=100 --no-split $<
+	mv $@.t $@
+
 INSTALL : $(INFOFILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
@@ -270,6 +275,11 @@ INSTALL : $(INFOFILE)
 		< $(INFOFILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- \
 		>> $@.t
+	mv $@.t $@
+
+dmalloc.html : $(srcdir)/dmalloc.texi
+	rm -f $@ $@.t
+	texi2html  --output=$@.t -number -monolithic $(srcdir)/dmalloc.texi
 	mv $@.t $@
 
 settings.h : $(srcdir)/settings.dist $(srcdir)/configure
