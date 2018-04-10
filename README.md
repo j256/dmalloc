@@ -14,10 +14,10 @@ Unixware, MS Windows, and Unicos on a Cray T3E.  It also provides support for th
 programs.
 
 The package includes the library, configuration scripts, debug utility application, test program, and
-documentation.  Online documentation as well as the full source is available at URL `http://dmalloc.com/'.
-Details on the library's mailing list are available there as well.
+documentation.  Online documentation as well as the full source is available at the [dmalloc home
+page](http://dmalloc.com/).   Details on the library's mailing list are available there as well.
 
-The author can be reached via his home page at URL `http://256stuff.com/gray/' with questions or feedback.
+The author can be reached via [his home page](http://256stuff.com/gray/) with questions or feedback.
 Please include the version number of the library that you are using, your machine and operating system types,
 and the value of the DMALLOC_OPTIONS environment variable.
 
@@ -32,9 +32,7 @@ an dmalloc.info file which can be installed in the emacs info directory and read
 program available from the texinfo package at GNU archive sites.  It is also suitable for reading as text.
 The source of all documation is the dmalloc.texi texinfo file which also can generate postscript or TeX
 hardcopy output with the help of the texinfo.tex file.  You can download the full documentation package or
-read it online from the repository.
-
-http://dmalloc.com/
+read it [online from the repository](http://dmalloc.com/).
 
 ## Argv Library
 
@@ -44,7 +42,7 @@ arguments.  However, that is where the similarity ends.  You have to write no C 
 processing, it handles short -l and long --logfile style options, gives standard short and long usage
 messages, and many other features while trying to comply with POSIX specs.
 
-The newest versions of the argv library are available on the web: http://256.com/sources/argv/
+The newest versions of the [argv library are available online](http://256stuff.com/sources/argv/).
 
 ## Thanks
 
