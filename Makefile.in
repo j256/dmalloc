@@ -34,6 +34,7 @@ DEFS = -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@
 A_OUT = aout@EXEEXT@
+INFOFILE = dmalloc.info
 
 MODULE	= dmalloc
 LIBRARY	= lib$(MODULE).a
@@ -249,6 +250,27 @@ dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
 		arg_check.h.t $(srcdir)/dmalloc.h.6 > $@.t
 	mv $@.t $@
 	rm -f malloc.h.t arg_check.h.t
+
+INSTALL : $(INFOFILE)
+	rm -f $@ $@.t
+	echo ------------------------------------------------------------------------------- \
+		> $@.t
+	sed -e '1,/,  Node: Installation/d' \
+		-e '/,  Node: Getting Started/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: Getting Started/d' \
+		-e '/,  Node: Allocation Basics/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	sed -e '1,/,  Node: Troubleshooting/d' \
+		-e '/,  Node: Index of Concepts/,$$d' \
+		< $(INFOFILE) | tr -d '\037'  >> $@.t
+	echo ------------------------------------------------------------------------------- \
+		>> $@.t
+	mv $@.t $@
 
 settings.h : $(srcdir)/settings.dist $(srcdir)/configure
 	$(SHELL) $(srcdir)/configure

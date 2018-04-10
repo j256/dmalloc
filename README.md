@@ -1,7 +1,7 @@
 Debug Malloc Library
 ====================
 
-Version 5.5.2 - May 2007
+Version 5.5.2
 
 The debug memory allocation or "dmalloc" library has been designed as a drop in replacement for the system's
 `malloc`, `realloc`, `calloc`, `free` and other memory management routines while providing powerful debugging
