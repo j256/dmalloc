@@ -351,7 +351,6 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size);
  */
 extern
 char	*strdup(const char *string);
-#endif /* ifndef DMALLOC_STRDUP_MACRO */
 
 /*
  * DMALLOC_PNT strndup
@@ -375,6 +374,7 @@ char	*strdup(const char *string);
  */
 extern
 char	*strndup(const char *string, const DMALLOC_SIZE len);
+#endif /* ifndef DMALLOC_STRDUP_MACRO */
 
 /*
  * DMALLOC_FREE_RET free
