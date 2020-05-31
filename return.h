@@ -103,6 +103,18 @@
 
 /*************************************/
 
+/* for x86-64 machines with GCC */
+#if __x86_64__ && __GNUC__ > 1
+
+#define GET_RET_ADDR(file)	asm("movq 8(%%rbp),%%rax ; movq %%rax,%0" : \
+				    "=g" (file) : \
+				    /* no inputs */  : \
+				    "rax")
+
+#endif /* __x86_64__ */
+
+/*************************************/
+
 /*
  * For DEC Mips machines running Ultrix
  */
