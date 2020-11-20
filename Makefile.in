@@ -299,7 +299,6 @@ shlib : $(BUILD_SL)
 
 # NOTE: you may have to edit the configure.ac script to get this to
 # work on your operating system.  Please send feedback to the author
-# via: http://256.com/gray/email.html
 $(LIB_SL) : $(LIBRARY)
 	rm -f $@ $@.t
 	@shlinkargs@ $(LIBRARY) $(OBJS) $(NORMAL_OBJS)

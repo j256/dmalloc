@@ -108,7 +108,7 @@ Details on the library's mailing list are available there as well.
 Please use the forums at URL @uref{http://dmalloc.com/} to discuss any
 problems or to request features.  If you are still having problems,
 the author can be reached via his home page at URL
-@uref{http://256.com/gray/} with questions or feedback.  Please
+@uref{http://256stuff.com/gray/} with questions or feedback.  Please
 include the version number of the library that you are using, your
 machine and operating system types, and the value of the
 DMALLOC_OPTIONS environment variable.
@@ -2786,7 +2786,7 @@ To find out the usage for the debug malloc program try @samp{dmalloc
 --usage-long}.  The standardized usage message that will be displayed is
 one of the many features of the argv library included with this package.
 
-It is available on the web at URL @uref{http://256.com/sources/argv/}.
+It is available on the web at URL @uref{http://256stuff.com/sources/argv/}.
 See the documentation there for more information.
 
 Here is a detailed list of the flags that can passed to dmalloc:

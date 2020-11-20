@@ -46,7 +46,7 @@ program, and documentation.  Online documentation as well as the full source is 
 
    Please use the forums at URL `http://dmalloc.com/' to discuss any problems or to request
 features.  If you are still having problems, the author can be reached via his home page at URL
-`http://256.com/gray/' with questions or feedback.  Please include the version number of the
+`http://256stuff.com/gray/' with questions or feedback.  Please include the version number of the
 library that you are using, your machine and operating system types, and the value of the
 DMALLOC_OPTIONS environment variable.
 
@@ -1746,8 +1746,8 @@ useful to specify one of the verbose options when doing this.
 usage message that will be displayed is one of the many features of the argv library included with
 this package.
 
-   It is available on the web at URL `http://256.com/sources/argv/'.  See the documentation there
-for more information.
+   It is available on the web at URL `http://256stuff.com/sources/argv/'.  See the documentation
+there for more information.
 
    Here is a detailed list of the flags that can passed to dmalloc:
 
@@ -2989,45 +2989,45 @@ Index of Concepts
 
 Tag Table:
 Node: Top1132
-Node: Copying3248
-Node: Overview4007
-Node: Installation4537
-Node: Getting Started10231
-Node: Allocation Basics15869
-Node: Basic Definitions16219
-Node: Malloc Functions18925
-Node: Features21295
-Node: How It Works25785
-Node: Programming29089
-Node: Allocation Macros30228
-Node: Return Address32853
-Node: Argument Checking34279
-Node: Dumping Core35966
-Node: Extensions38183
-Node: Error Codes48061
-Node: Disabling the Library57466
-Node: Using With C++60076
-Node: Using With a Debugger61076
-Node: General Errors62805
-Node: Memory Leaks64746
-Node: Fence-Post Overruns68327
-Node: Translate Return Addresses70060
-Node: Using With Threads71330
-Node: Using With Cygwin75672
-Node: Debugging A Server77487
-Node: Logfile Details83439
-Node: Other Hints87206
-Node: Dmalloc Program88601
-Node: Shell Alias89510
-Node: Utility Usage91665
-Node: Environment Variable101480
-Node: Debug Tokens106643
-Node: RC File111474
-Node: Source Code114246
-Node: Definitions114638
-Node: Compatibility115497
-Node: Portability116696
-Node: Troubleshooting117781
-Node: Index of Concepts122806
+Node: Copying3253
+Node: Overview4012
+Node: Installation4542
+Node: Getting Started10236
+Node: Allocation Basics15874
+Node: Basic Definitions16224
+Node: Malloc Functions18930
+Node: Features21300
+Node: How It Works25790
+Node: Programming29094
+Node: Allocation Macros30233
+Node: Return Address32858
+Node: Argument Checking34284
+Node: Dumping Core35971
+Node: Extensions38188
+Node: Error Codes48066
+Node: Disabling the Library57471
+Node: Using With C++60081
+Node: Using With a Debugger61081
+Node: General Errors62810
+Node: Memory Leaks64751
+Node: Fence-Post Overruns68332
+Node: Translate Return Addresses70065
+Node: Using With Threads71335
+Node: Using With Cygwin75677
+Node: Debugging A Server77492
+Node: Logfile Details83444
+Node: Other Hints87211
+Node: Dmalloc Program88606
+Node: Shell Alias89515
+Node: Utility Usage91670
+Node: Environment Variable101490
+Node: Debug Tokens106653
+Node: RC File111484
+Node: Source Code114256
+Node: Definitions114648
+Node: Compatibility115507
+Node: Portability116706
+Node: Troubleshooting117791
+Node: Index of Concepts122816
 
 End Tag Table
