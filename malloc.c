@@ -282,7 +282,7 @@ static	void	process_environ(const char *option_str)
   }
   
   _dmalloc_environ_process(options, &_dmalloc_address,
-			   (long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
+			   (unsigned long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
 			   &_dmalloc_check_interval, &_dmalloc_lock_on,
 			   &dmalloc_logpath, &start_file, &start_line,
 			   &start_iter, &start_size, &_dmalloc_memory_limit);

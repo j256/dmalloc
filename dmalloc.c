@@ -698,7 +698,7 @@ static	void	dump_current(void)
   const char	*env_str;
   DMALLOC_PNT	addr;
   unsigned long	inter, limit_val, loc_start_size, loc_start_iter;
-  long		addr_count;
+  unsigned long	addr_count;
   int		lock_on, loc_start_line;
   unsigned int	flags;
   
