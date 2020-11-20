@@ -182,7 +182,7 @@ static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
   
   if (verbose_b) {
     (void)printf("%d: free'd %d bytes from slot %ld (%#lx)\n",
-		 iter_c + 1, slot_p->pi_size, slot_p - pointer_grid,
+		 iter_c + 1, slot_p->pi_size, (long)(slot_p - pointer_grid),
 		 (long)slot_p->pi_pnt);
   }
   
@@ -290,7 +290,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	(void)printf("%d: free'd %d bytes from slot %ld (%#lx)\n",
-		     iter_c + 1, pnt_p->pi_size, pnt_p - pointer_grid,
+		     iter_c + 1, pnt_p->pi_size, (long)(pnt_p - pointer_grid),
 		     (long)pnt_p->pi_pnt);
       }
       
@@ -325,7 +325,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	(void)printf("%d: malloc %d of max %d into slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
 		     (long)pnt_p->pi_pnt);
       }
       break;
@@ -337,7 +337,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	(void)printf("%d: calloc %d of max %d into slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
 		     (long)pnt_p->pi_pnt);
       }
       
@@ -378,7 +378,7 @@ static	int	do_random(const int iter_n)
       if (verbose_b) {
 	(void)printf("%d: realloc %d from %d of max %d slot %ld.  got %#lx\n",
 		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
-		     pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
+		     (long)(pnt_p - pointer_grid), (long)pnt_p->pi_pnt);
       }
       
       if (amount == 0) {
@@ -410,7 +410,7 @@ static	int	do_random(const int iter_n)
       if (verbose_b) {
 	(void)printf("%d: recalloc %d from %d of max %d slot %ld.  got %#lx\n",
 		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
-		     pnt_p - pointer_grid, (long)pnt_p->pi_pnt);
+		     (long)(pnt_p - pointer_grid), (long)pnt_p->pi_pnt);
       }
       
       /* test the returned block to make sure that is has been cleared */
@@ -443,7 +443,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	(void)printf("%d: valloc %d of max %d into slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
 		     (long)pnt_p->pi_pnt);
       }
       break;
@@ -497,7 +497,7 @@ static	int	do_random(const int iter_n)
 	if (verbose_b) {
 	  /* the amount includes the \0 */
 	  (void)printf("%d: strdup %d of max %d into slot %ld.  got %#lx\n",
-		       iter_c + 1, amount + 1, max_avail, pnt_p - pointer_grid,
+		       iter_c + 1, amount + 1, max_avail, (long)(pnt_p - pointer_grid),
 		       (long)pnt_p->pi_pnt);
 	}
       }
@@ -517,7 +517,7 @@ static	int	do_random(const int iter_n)
 	
 	if (verbose_b) {
 	  (void)printf("%d: strdup %d of max %d into slot %ld.  got %#lx\n",
-		       iter_c + 1, amount, max_avail, pnt_p - pointer_grid,
+		       iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
 		       (long)pnt_p->pi_pnt);
 	}
       }
