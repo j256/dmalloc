@@ -185,6 +185,9 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  * Message writer with vprintf like arguments which adds a line to the
  * dmalloc logfile.
  *
+ * NOTE: An internal snprintf has been implemented which doesn't support all
+ * formats.  This was done to stop dmalloc from going recursive.  YMMV.
+ *
  * RETURNS:
  *
  * None.
