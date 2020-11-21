@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: configure
-          command: configure
+          command: ./configure
       - run:
           name: make clean tests
           command: make clean tests
