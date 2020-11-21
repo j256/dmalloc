@@ -61,14 +61,13 @@ typedef struct {
  *
  * mem_table -> Memory table we are working on.
  *
- * entry_n -> Number of entries in the memory table.
+ * mem_entries -> Entries to associate with the table.
  *
- * entry_cp <-> Pointer to an integer which records how many entries
- * are in the table.
+ * entry_n -> Number of entries in the mem_entries array.
  */
 extern
 void	_dmalloc_table_init(mem_table_t *mem_table, mem_entry_t *mem_entries,
-			    const int mem_entries_byte_size);
+			    const int entry_n);
 
 /*
  * void _dmalloc_table_insert
@@ -84,8 +83,6 @@ void	_dmalloc_table_init(mem_table_t *mem_table, mem_entry_t *mem_entries,
  * ARGUMENTS:
  *
  * mem_table -> Memory table we are working on.
- *
- * entry_n -> Number of entries in the memory table.
  *
  * file -> File name or return address of the allocation.
  *

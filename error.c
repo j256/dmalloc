@@ -62,6 +62,7 @@
 
 #include "dmalloc.h"
 
+#include "append.h"
 #include "chunk.h"				/* for _dmalloc_memory_limit */
 #include "compat.h"
 #include "debug_tok.h"
@@ -177,9 +178,9 @@ static	void	build_logfile_path(char *buf, const int buf_len)
 #if HAVE_GETHOSTNAME
       char	our_host[128];
       gethostname(our_host, sizeof(our_host));
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", our_host);
+      buf_p = append_string(buf_p, bounds_p, our_host);
 #else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "not-gethostname");
+      buf_p = append_string(buf_p, bounds_p, "not-gethostname");
 #endif
     }
     /* dump the thread-id */
@@ -190,9 +191,9 @@ static	void	build_logfile_path(char *buf, const int buf_len)
       
       id = THREAD_GET_ID();
       THREAD_ID_TO_STRING(id_str, sizeof(id_str), id);
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", id_str);
+      buf_p = append_string(buf_p, bounds_p, id_str);
 #else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-thread-id");
+      buf_p = append_string(buf_p, bounds_p, "no-thread-id");
 #endif
     }
     /* dump the pid -- also support backwards compatibility with %d */
@@ -200,9 +201,9 @@ static	void	build_logfile_path(char *buf, const int buf_len)
 #if HAVE_GETPID
       /* we make it long in case it's big and we hope it will promote if not */
       long	our_pid = getpid();
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", our_pid);
+      buf_p = append_long(buf_p, bounds_p, our_pid, 10);
 #else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-getpid");
+      buf_p = append_string(buf_p, bounds_p, "no-getpid");
 #endif
     }
     /* dump the time value */
@@ -211,9 +212,9 @@ static	void	build_logfile_path(char *buf, const int buf_len)
       /* we make time a long here so it will promote */
       long	now;
       now = time(NULL);
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", now);
+      buf_p = append_long(buf_p, bounds_p, now, 10);
 #else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-time");
+      buf_p = append_string(buf_p, bounds_p, "no-time");
 #endif
     }
     /* dump the user-id */
@@ -221,9 +222,9 @@ static	void	build_logfile_path(char *buf, const int buf_len)
 #if HAVE_GETUID
       /* we make it long in case it's big and we hope it will promote if not */
       long	our_uid = getuid();
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%ld", our_uid);
+      buf_p = append_long(buf_p, bounds_p, our_uid, 10);
 #else
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "no-uid");
+      buf_p = append_string(buf_p, bounds_p, "no-uid");
 #endif
     }
   }
@@ -236,7 +237,7 @@ static	void	build_logfile_path(char *buf, const int buf_len)
     (void)write(STDERR, error_str, len);
   }
   
-  *buf_p = '\0';
+  append_null(buf_p, bounds_p);
 }
 
 /*
@@ -473,6 +474,9 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  * Message writer with vprintf like arguments which adds a line to the
  * dmalloc logfile.
  *
+ * NOTE: An internal snprintf has been implemented which doesn't support all
+ * formats.  This was done to stop dmalloc from going recursive.  YMMV.
+ *
  * RETURNS:
  *
  * None.
@@ -641,10 +645,7 @@ void	_dmalloc_die(const int silent_b)
     }
   }
   
-  /*
-   * set this in case the following generates a recursive call for
-   * some dumb reason
-   */
+  /* set this in case the following generates a recursive call for some reason */
   _dmalloc_aborting_b = 1;
   
   /* do I need to drop core? */

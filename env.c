@@ -39,6 +39,7 @@
 #include "conf.h"
 #include "dmalloc.h"
 
+#include "append.h"
 #include "compat.h"
 #include "dmalloc_loc.h"
 #include "debug_tok.h"

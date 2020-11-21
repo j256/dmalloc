@@ -83,6 +83,7 @@
 
 #include "dmalloc.h"
 
+#include "append.h"
 #include "chunk.h"
 #include "compat.h"
 #include "debug_tok.h"

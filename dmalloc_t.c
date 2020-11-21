@@ -37,6 +37,7 @@
 #endif
 
 #include "conf.h"
+#include "append.h"
 #include "compat.h"				/* for loc_snprintf */
 
 #if HAVE_TIME
@@ -1768,6 +1769,29 @@ static	int	check_arg_check(void)
 }
 
 /*
+ * Check the append buffer to see if it is correct.
+ */
+static	int	check_append_buf(char *buf, char *buf_p, char *expected, int expected_size,
+				 int final,
+				 char *label) {
+  if (buf_p != buf + expected_size) {
+    if (! silent_b) {
+      (void)printf("   ERROR: %s: expecting buf_p to be %d chars ahead but was %d: %s\n",
+		   label, expected_size, (int)(buf_p - buf), buf);
+    }
+    return 0;
+  }
+  if (expected != 0L && strncmp(buf, expected, expected_size) != 0) {
+    if (! silent_b) {
+      (void)printf("   ERROR: %s: expecting string '%s' but got '%.*s'\n",
+		   label, expected, (int)(buf_p - buf), buf);
+    }
+    return 0;
+  }
+  return final;
+}
+
+/*
  * Do some special tests, returns 1 on success else 0
  */
 static	int	check_special(void)
@@ -1775,7 +1799,7 @@ static	int	check_special(void)
   void	*pnt;
   int	page_size;
   int	final = 1;
-  
+
   /* get our page size */
   page_size = dmalloc_page_size();
   
@@ -1823,7 +1847,7 @@ static	int	check_special(void)
   }
 
   /********************/
-
+  
   /*
    * Check to make sure that large mallocs are handled correctly.
    */
@@ -2055,7 +2079,7 @@ static	int	check_special(void)
   }
   
   /********************/
-
+  
   /*
    * Saw a number of problems where the used_iter value was not being
    * set and the proper flags were not being set on the slots.
@@ -2466,6 +2490,7 @@ static	int	check_special(void)
      */
     (void)loc_snprintf(setup, sizeof(setup), "debug=%#x,start=s%lu",
 		       DEBUG_CHECK_FENCE, dmalloc_memory_allocated());
+
     dmalloc_debug_setup(setup);	
     
     /*
@@ -2759,7 +2784,7 @@ static	int	check_special(void)
 #endif
   
   /********************/
-
+  
   /*
    * Test strndup.
    */
@@ -2835,7 +2860,7 @@ static	int	check_special(void)
       }
       final = 0;
     }
-
+    
     dmalloc_errno = ERROR_NONE;
     strndup(pnt, size + 1);
     
@@ -3172,7 +3197,7 @@ static	int	check_special(void)
     
     dmalloc_debug(old_flags);
   }
-
+  
   /********************/
   
   /*
@@ -3481,7 +3506,7 @@ static	int	check_special(void)
      * allocator and it should return a good pointer.  In the future
      * it should re-align the heap.
      */
-
+    
     size = 10;
     pnt = _dmalloc_heap_alloc(size);
     if (pnt == NULL) {
@@ -3614,6 +3639,156 @@ static	int	check_special(void)
       }
       final = 0;
     }
+  }
+  
+  /********************/
+  
+  if (! silent_b) {
+    (void)printf("  Checking append_string and friends\n");
+  }
+  
+  {
+    char buf[10];
+    char *max = buf + sizeof(buf);
+    char *buf_p = buf;
+    
+    buf_p = append_string(buf_p, max, "hello");
+    final = check_append_buf(buf, buf_p, "hello", 5, final, "append hello");
+    
+    buf_p = append_long(buf_p, max, 1234, 10);
+    final = check_append_buf(buf, buf_p, "hello1234", 9, final, "append 1234");
+    
+    // initially this adds the 'h' at the end tha will become \0 below
+    buf_p = append_string(buf_p, max, "hello");
+    final = check_append_buf(buf, buf_p, "hello1234h", 10, final, "append h");
+    
+    // this should add nothing
+    buf_p = append_string(buf_p, max, "hello");
+    final = check_append_buf(buf, buf_p, "hello1234h", 10, final, "append no string");
+    
+    // this should add nothing
+    buf_p = append_long(buf_p, max, 100, 10);
+    final = check_append_buf(buf, buf_p, "hello1234h", 10, final, "append no int");
+    
+    buf_p = append_null(buf_p, max);
+    final = check_append_buf(buf, buf_p, "hello1234", 10, final, "append null");
+    
+    // check out the negative values
+    buf_p = buf;
+    buf_p = append_long(buf_p, max, -87654, 10);
+    final = check_append_buf(buf, buf_p, "-87654", 6, final, "append neg int");
+    buf_p = append_null(buf_p, max);
+    final = check_append_buf(buf, buf_p, "-87654", 7, final, "append neg int null");
+  }
+  
+  /********************/
+  
+  {
+    char buf[30];
+    char *max = buf + sizeof(buf);
+    char *buf_p = buf;
+    
+    buf_p = append_format(buf, max, "wow");
+    final = check_append_buf(buf, buf_p, "wow", 3, final, "format wow");
+    
+    buf_p = append_format(buf, max, "100%%");
+    final = check_append_buf(buf, buf_p, "100%", 4, final, "format 100%");
+    
+    buf_p = append_format(buf, max, "%s", "wow");
+    final = check_append_buf(buf, buf_p, "wow", 3, final, "format %s wow");
+    
+    buf_p = append_format(buf, max, "%10s", "wow");
+    final = check_append_buf(buf, buf_p, "       wow", 10, final, "format %10s wow");
+    
+    buf_p = append_format(buf, max, "%-10s", "wow");
+    final = check_append_buf(buf, buf_p, "wow       ", 10, final, "format %-10s wow");
+    
+    buf_p = append_format(buf, max, "%.2s", "wow");
+    final = check_append_buf(buf, buf_p, "wo", 2, final, "format %.2s wow");
+    
+    buf_p = append_format(buf, max, "%4.3s", "howdy");
+    final = check_append_buf(buf, buf_p, " how", 4, final, "format %4.3s howdy");
+    
+    buf_p = append_format(buf, max, "%-4.3s", "howdy");
+    final = check_append_buf(buf, buf_p, "how ", 4, final, "format %-4.3s howdy");
+    
+    buf_p = append_format(buf, max, "%*s", 11, "how");
+    final = check_append_buf(buf, buf_p, "        how", 11, final, "format %*s 11 how");
+    
+    buf_p = append_format(buf, max, "%-*s", 11, "how");
+    final = check_append_buf(buf, buf_p, "how        ", 11, final, "format %-*s 11 how");
+    
+    buf_p = append_format(buf, max, "%.*s", 3, "howdy");
+    final = check_append_buf(buf, buf_p, "how", 3, final, "format %.*s 3 howdy");
+    
+    buf_p = append_format(buf, max, "%-.*s", 3, "howdy");
+    final = check_append_buf(buf, buf_p, "how", 3, final, "format %-.*s 3 howdy");
+    
+    buf_p = append_format(buf, max, "%*.*s", 4, 3, "howdy");
+    final = check_append_buf(buf, buf_p, " how", 4, final, "format %*.*s 4 3 howdy");
+    
+    buf_p = append_format(buf, max, "%-*.*s", 4, 3, "howdy");
+    final = check_append_buf(buf, buf_p, "how ", 4, final, "format %-*.*s 4 3 howdy");
+    
+    buf_p = append_format(buf, max, "%d", 10);
+    final = check_append_buf(buf, buf_p, "10", 2, final, "format %d");
+    
+    buf_p = append_format(buf, max, "%ld", 3014);
+    final = check_append_buf(buf, buf_p, "3014", 4, final, "format %ld");
+    
+    buf_p = append_format(buf, max, "%03d", 10);
+    final = check_append_buf(buf, buf_p, "010", 3, final, "format %d");
+    
+    buf_p = append_format(buf, max, "%o", 10);
+    final = check_append_buf(buf, buf_p, "12", 2, final, "format %o");
+    
+    buf_p = append_format(buf, max, "%#o", 10);
+    final = check_append_buf(buf, buf_p, "012", 3, final, "format %#o");
+    
+    buf_p = append_format(buf, max, "%05o", 10);
+    final = check_append_buf(buf, buf_p, "00012", 5, final, "format %05o");
+    
+    buf_p = append_format(buf, max, "%u", 1012);
+    final = check_append_buf(buf, buf_p, "1012", 4, final, "format %u");
+    
+    buf_p = append_format(buf, max, "%lu", 1012);
+    final = check_append_buf(buf, buf_p, "1012", 4, final, "format %lu");
+    
+    buf_p = append_format(buf, max, "%x", 1012);
+    final = check_append_buf(buf, buf_p, "3f4", 3, final, "format %x");
+    
+    buf_p = append_format(buf, max, "%04x", 1012);
+    final = check_append_buf(buf, buf_p, "03f4", 4, final, "format %04x");
+    
+    buf_p = append_format(buf, max, "%04lx", 1012);
+    final = check_append_buf(buf, buf_p, "03f4", 4, final, "format %04x");
+    
+    buf_p = append_format(buf, max, "%#06x", 1012);
+    final = check_append_buf(buf, buf_p, "0x03f4", 6, final, "format %#06x");
+    
+    buf_p = append_format(buf, max, "%-#06x", 1012);
+    final = check_append_buf(buf, buf_p, "0x3f4 ", 6, final, "format %-#06x");
+    
+    buf_p = append_format(buf, max, "%lx", 1012);
+    final = check_append_buf(buf, buf_p, "3f4", 3, final, "format %lx");
+    
+    buf_p = append_format(buf, max, "Hi %s=%d%c", "jim", 10, '!');
+    final = check_append_buf(buf, buf_p, "Hi jim=10!", 10, final, "format 1");
+
+    buf_p = append_format(buf, max, "%f%% correct", 100.0);
+    final = check_append_buf(buf, buf_p, "100% correct", 12, final, "%f%% correct");
+
+    buf_p = append_format(buf, max, "%.5f", 99.00001);
+    final = check_append_buf(buf, buf_p, "99.00001", 8, final, "%.5f");
+
+    buf_p = append_format(buf, max, "%12.5f", 99.00001);
+    final = check_append_buf(buf, buf_p, "    99.00001", 12, final, "%12.5f");
+
+    buf_p = append_format(buf, max, "%-12.5f", 99.00001);
+    final = check_append_buf(buf, buf_p, "99.00001    ", 12, final, "%-12.5f");
+
+    buf_p = append_format(buf, max, "%f", 99.00001);
+    final = check_append_buf(buf, buf_p, "99.00001    ", 12, final, "%f");
   }
   
   /********************/
