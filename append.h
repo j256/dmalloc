@@ -82,7 +82,8 @@ char    *append_null(char *dest, char *limit);
  * causing the library to go recursive.
  */
 extern
-int	loc_vsnprintf(char *buf, const int size, char *format, va_list args);
+int	loc_vsnprintf(char *buf, const int size, const char *format,
+		      va_list args);
 
 /*
  * Local implementation of snprintf.  We are doing this trying to not
@@ -90,7 +91,7 @@ int	loc_vsnprintf(char *buf, const int size, char *format, va_list args);
  * causing the library to go recursive.
  */
 extern
-int	loc_snprintf(char *buf, const int size, char *format, ...);
+int	loc_snprintf(char *buf, const int size, const char *format, ...);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 

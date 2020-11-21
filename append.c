@@ -422,7 +422,8 @@ char    *append_null(char *dest, char *limit)
  * use the system version which often can allocate memory itself
  * causing the library to go recursive.
  */
-int	loc_vsnprintf(char *buf, const int size, char *format, va_list args)
+int	loc_vsnprintf(char *buf, const int size, const char *format,
+		      va_list args)
 {
   char *limit, *buf_p;
   limit = buf + size;
@@ -436,7 +437,7 @@ int	loc_vsnprintf(char *buf, const int size, char *format, va_list args)
  * use the system version which often can allocate memory itself
  * causing the library to go recursive.
  */
-int	loc_snprintf(char *buf, const int size, char *format, ...)
+int	loc_snprintf(char *buf, const int size, const char *format, ...)
 {
   va_list args;  
   int len;
