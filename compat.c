@@ -130,50 +130,6 @@ unsigned long	loc_atoul(const char *str)
   return result;
 }
 
-/*
- * Local vsnprintf which handles the buffer-size or not.  Returns the
- * number of characters copied into BUF.
- */
-int	loc_vsnprintf(char *buf, const int buf_size, const char *format,
-		      va_list args)
-{
-  char	*buf_p;
-  
-#if HAVE_VSNPRINTF
-  (void)vsnprintf(buf, buf_size, format, args);
-#else
-#if HAVE_VPRINTF
-  (void)vsprintf(buf, format, args);
-#else
-  /* Oh well.  Just do a strcpy of the format */
-  (void)strncpy(buf, format, buf_size - 1);
-  buf[buf_size - 1] = '\0';
-#endif
-#endif
-  
-  /* now find the end of the buffer */
-  for (buf_p = buf; *buf_p != '\0'; buf_p++) {
-  }
-  
-  return buf_p - buf;
-}
-
-/*
- * Local snprintf which handles the buf-size not.  Returns the number
- * of characters copied into BUF.
- */
-int	loc_snprintf(char *buf, const int buf_size, const char *format, ...)
-{
-  va_list	args;  
-  int		len;
-  
-  va_start(args, format);
-  len = loc_vsnprintf(buf, buf_size, format, args);
-  va_end(args);
-  
-  return len;
-}
-
 #if HAVE_MEMCMP == 0
 /*
  * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
@@ -348,6 +304,21 @@ int	strlen(const char *str)
   return len;
 }
 #endif /* HAVE_STRLEN == 0 */
+
+#if HAVE_STRNLEN == 0
+/*
+ * Return the length in characters of STR limited by MAX_LENGTH.
+ */
+int	strnlen(const char *str, const int max_length)
+{
+  const char *str_p = str;
+  int len = 0;
+  while (len < max_length && *str_p++ != '\0') {
+    len++;
+  }
+  return len;
+}
+#endif /* HAVE_STRNLEN == 0 */
 
 #if HAVE_STRNCMP == 0
 /*
