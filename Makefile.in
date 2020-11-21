@@ -415,6 +415,17 @@ dmallocc.o : $(srcdir)/dmallocc.cc
 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $(srcdir)/dmallocc.cc \
 		-o ./$@
 
+depend :
+	rm -f Makefile.t
+	sed -e '/dependencies ''are ''automatically/,$$d' Makefile > Makefile.t
+	@ echo '# These dependencies ''are ''automatically ''generated.  Do not edit by hand.' >> Makefile.t
+	@ echo '' >> Makefile.t
+	- $(CC) $(INCS) -MM *.c >> Makefile.t
+	- $(CC) $(INCS) -MM chunk.c | sed -e 's/^chunk.o/chunk_th.o/' >> Makefile.t
+	- $(CC) $(INCS) -MM error.c | sed -e 's/^error.o/error_th.o/' >> Makefile.t
+	- $(CC) $(INCS) -MM malloc.c | sed -e 's/^malloc.o/malloc_th.o/' >> Makefile.t
+	@ echo 'Dependencies in Makefile.t'
+
 #
 # auto configure settings - uncomment if you are doing configure
 # development on the library
@@ -435,7 +446,6 @@ dmallocc.o : $(srcdir)/dmallocc.cc
 ###############################################################################
 #
 # These dependencies are automatically generated.  Do not edit by hand.
-#
 
 append.o: append.c conf.h settings.h dmalloc.h append.h compat.h \
   dmalloc_loc.h
@@ -468,11 +478,11 @@ malloc.o: malloc.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   malloc_funcs.h return.h
 protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
   heap.h protect.h
-chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
-  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h error.h \
-  error_val.h heap.h
-error_th.o: error.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-  dmalloc_loc.h env.h error.h error_val.h version.h
-malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
+chunk_th.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
+  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
+  error.h error_val.h heap.h
+error_th.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
+  debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
+malloc_th.o: malloc.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
   malloc_funcs.h return.h
