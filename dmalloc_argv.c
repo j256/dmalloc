@@ -31,6 +31,7 @@
 
 #include "conf.h"
 
+#include "append.h"
 #include "dmalloc_argv.h"
 #include "dmalloc_argv_loc.h"
 #include "compat.h"

@@ -52,21 +52,6 @@ long	atol(const char *str);
 extern
 unsigned long	loc_atoul(const char *str);
 
-/*
- * Local vsnprintf which handles the buffer-size or not.  Returns the
- * number of characters copied into BUF.
- */
-extern
-int	loc_vsnprintf(char *buf, const int buf_size, const char *format,
-		      va_list args);
-
-/*
- * Local snprintf which handles the buf-size not.  Returns the number
- * of characters copied into BUF.
- */
-extern
-int	loc_snprintf(char *buf, const int buf_size, const char *format, ...);
-
 #if HAVE_MEMCMP == 0
 /*
  * Compare LEN characters, return -1,0,1 if STR1 is <,==,> STR2
@@ -130,6 +115,14 @@ char	*strcpy(char *str1, const char *str2);
 extern
 int	strlen(const char *str);
 #endif /* if HAVE_STRLEN == 0 */
+
+#if HAVE_STRNLEN == 0
+/*
+ * Return the length in characters of STR limited by MAX_LENGTH.
+ */
+extern
+int	strnlen(const char *str, const int max_length);
+#endif /* if HAVE_STRNLEN == 0 */
 
 #if HAVE_STRNCMP == 0
 /*

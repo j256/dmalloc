@@ -106,8 +106,8 @@ AC_CHECK_HEADER([sys/mman.h],
 # We first try and find the true directory where we are
 # installing.
 #
-if test "x$exec_prefix" = xNONE; then
-	if test "x$prefix" = xNONE; then
+if test "x$exec_prefix" = "xNONE"; then
+	if test "x$prefix" = "xNONE"; then
 		shlibprefix="$ac_default_prefix"
 	else
 		shlibprefix="$prefix"
@@ -118,7 +118,7 @@ fi
 #
 # Then we see if there is a special shlib directory to use.
 #
-if test -d $shlibprefix/shlib; then
+if test -d "$shlibprefix/shlib"; then
 	shlibdir='${exec_prefix}/shlib'
 else
 	shlibdir="$libdir"
@@ -127,7 +127,7 @@ AC_SUBST(shlibdir)
 
 # see how the local system builds shared libraries
 AC_MSG_CHECKING([shared library link args])
-AC_COMPILE_IFELSE([ int foo(int val) { return val + 1; } ],[
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([ int foo(int val) { return val + 1; } ])],[
 	# so now we try to create an archive from the compiled .o file
 	(ar cr conftest.a conftest.o) 2>&5
 	# see which shared-library ld commands work
@@ -304,7 +304,7 @@ AC_MSG_NOTICE([important functionality])
 AC_CHECK_FUNCS(mmap)
 AC_CHECK_FUNCS(sbrk)
 
-if test x$ac_cv_func_mmap != xyes && x$ac_cv_func_sbrk != xyes; then
+if test "x$ac_cv_func_mmap" != "xyes" && test "x$ac_cv_func_sbrk" != "xyes"; then
 	AC_MSG_WARN()
 	AC_MSG_WARN(no mmap nor sbrk function.  See INTERNAL_MEMORY_SPACE in settings.dist.)
 	AC_MSG_WARN()
@@ -312,6 +312,9 @@ fi
 
 AC_MSG_CHECKING([mmap usage])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#if HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
 #if HAVE_SYS_TYPES_H
 #  include <sys/types.h>
 #endif
@@ -348,19 +351,19 @@ AC_CHECK_FUNCS(getpagesize)
 AC_MSG_CHECKING([basic-block size])
 ac_cv_page_size=0
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([main() { if (getpagesize()<=2048) exit(0); else exit(1); }],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=2048) exit(0); else exit(1); }])],
 	[ ac_cv_page_size=11 ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([main() { if (getpagesize()<=4096) exit(0); else exit(1); }],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=4096) exit(0); else exit(1); }])],
 	[ ac_cv_page_size=12 ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([main() { if (getpagesize()<=8192) exit(0); else exit(1); }],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=8192) exit(0); else exit(1); }])],
 	[ ac_cv_page_size=13 ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([main() { if (getpagesize()<=16384) exit(0); else exit(1); }],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=16384) exit(0); else exit(1); }])],
 	[ ac_cv_page_size=14 ] )
 fi
 if test $ac_cv_page_size = 0; then
@@ -388,7 +391,7 @@ AC_MSG_RESULT([$ac_cv_data_align])
 #
 AC_CHECK_FUNCS(abort)
 AC_MSG_CHECKING([abort safe])
-AC_RUN_IFELSE([[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 static int main_b = 0;
 static char heap_mem[102400], *heap_p = heap_mem;
 free () { if (main_b) _exit(0); }
@@ -419,7 +422,7 @@ char *realloc (char *old_pnt, int new_size) {
   return start;
 }
 main() { main_b = 1; abort(); _exit(1); }
-]],
+]])],
 # NOTE: this is reversed because abort core dumps and doesn't exit with
 # 0 which means that it should fail
 [ AC_DEFINE(ABORT_OKAY, 0) AC_MSG_RESULT([no]) ],
@@ -429,10 +432,10 @@ main() { main_b = 1; abort(); _exit(1); }
 )
 
 AC_TYPE_SIGNAL
-AC_MSG_CHECKING([signal works])
 AC_CHECK_HEADER([signal.h],
 		[AC_DEFINE(HAVE_SIGNAL_H,1) AC_SUBST([HAVE_SIGNAL_H],1)],
 		[AC_DEFINE(HAVE_SIGNAL_H,0) AC_SUBST([HAVE_SIGNAL_H],0)])
+AC_MSG_CHECKING([signal works])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_SIGNAL_H
   #include <signal.h>
@@ -451,7 +454,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #
 AC_CHECK_FUNCS(getenv)
 AC_MSG_CHECKING([getenv safe])
-AC_RUN_IFELSE([[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 static char heap_mem[102400], *heap_p = heap_mem;
 free (char *pnt) {
 }
@@ -482,7 +485,7 @@ char *realloc (char *old_pnt, int new_size) {
   return start;
 }
 main() { malloc(10); _exit(0); }
-]],
+]])],
 [ AC_DEFINE(GETENV_SAFE, 1)
   AC_MSG_RESULT([yes])
   getenv_safe=yes ],
@@ -510,7 +513,7 @@ AC_CHECK_HEADER([w32api/winbase.h],
 # include <w32api/windef.h>
 #endif]])
 AC_MSG_CHECKING([for GetEnvironmentVariableA])
-AC_RUN_IFELSE([[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_SYS_CYGWIN_H
 # include <sys/cygwin.h>
 #endif
@@ -527,7 +530,7 @@ main() {
   char env_buf[256];
   GetEnvironmentVariableA("PATH", env_buf, sizeof(env_buf));
 }
-]],
+]])],
 [ AC_DEFINE(HAVE_GETENVIRONMENTVARIABLEA, 1)
   AC_MSG_RESULT([yes])
   have_getenvironmentvariablea=yes ],
@@ -539,7 +542,7 @@ main() {
   have_getenvironmentvariablea=yes ]
 )
 
-if test x$getenv_safe != xyes && x$have_getenvironmentvariablea != xyes ; then
+if test "x$getenv_safe" != "xyes" && test "x$have_getenvironmentvariablea" != "xyes" ; then
   AC_MSG_WARN([Since getenv is not safe, you MUST add the following])
   AC_MSG_WARN([code to the front of main():])
   AC_MSG_WARN([[  #ifdef DMALLOC]])
@@ -554,12 +557,12 @@ fi
 # check for constructor attribute support
 #
 AC_MSG_CHECKING([constructor attribute])
-AC_RUN_IFELSE([[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /* if we call the loc_con constructor then exit with error code 0 */
 static void loc_con() __attribute__((constructor));
 static void loc_con() { exit(0); }
 int main() { exit(1); }
-]],
+]])],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 0) AC_MSG_RESULT([no]) ],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ]
@@ -569,12 +572,12 @@ int main() { exit(1); }
 # check for destructor attribute support
 #
 AC_MSG_CHECKING([destructor attribute])
-AC_RUN_IFELSE([[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /* if we call the loc_decon destructor then exit with error code 0 */
 static void loc_decon() __attribute__((destructor));
 static void loc_decon() { exit(0); }
 int main() { return 1; }
-]],
+]])],
 [ AC_DEFINE(DESTRUCTOR_WORKS, 1)
   AC_MSG_RESULT([yes])
   destructor_works=yes ],
@@ -592,7 +595,7 @@ int main() { return 1; }
 # check if the return.h macros work
 #
 AC_MSG_CHECKING([return.h macros work])
-AC_RUN_IFELSE([
+AC_RUN_IFELSE([AC_LANG_SOURCE([
 
 #define __CONF_H__
 #define USE_RETURN_MACROS 1
@@ -611,7 +614,7 @@ main()
   foo();
   exit(0);
 }
-],
+])],
 [ AC_DEFINE(RETURN_MACROS_WORK, 1) AC_MSG_RESULT([yes]) ],
 [ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ],
 [ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ]
@@ -623,10 +626,10 @@ main()
 # check to see if ident workds
 #
 AC_MSG_CHECKING([if ident works])
-AC_COMPILE_IFELSE([
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 #ident "configure.ac"
 static void foo (void) { }
-],
+])],
 [AC_DEFINE(IDENT_WORKS, 1) AC_MSG_RESULT([yes])],
 [AC_DEFINE(IDENT_WORKS, 0) AC_MSG_RESULT([no])]
 )
@@ -686,9 +689,9 @@ AC_MSG_NOTICE([functions])
 
 # auto-shutdown functions
 AC_CHECK_FUNCS(atexit on_exit)
-if test $ac_cv_func_atexit = no \
-   && test $ac_cv_func_on_exit = no \
-   && test $destructor_works = no; then
+if test "$ac_cv_func_atexit" = "no" \
+   && test "$ac_cv_func_on_exit" = "no" \
+   && test "$destructor_works" = "no"; then
 	AC_MSG_WARN()
 	AC_MSG_WARN(The library cannot automatically shut itself down without)
 	AC_MSG_WARN(atexit, on_exit, or destructor support.  You will need to)
@@ -705,7 +708,7 @@ AC_CHECK_FUNCS(recalloc memalign valloc)
 # required although we have code for them in compat.c
 AC_CHECK_FUNCS(memcmp memcpy memmove memset)
 AC_CHECK_FUNCS(strchr strrchr)
-AC_CHECK_FUNCS(strlen strcmp strcpy strsep)
+AC_CHECK_FUNCS(strlen strnlen strcmp strcpy strsep)
 
 ##############################################################################
 AC_MSG_NOTICE([various functions for argv files])

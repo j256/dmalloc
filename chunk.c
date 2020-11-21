@@ -51,6 +51,7 @@
 
 #include "dmalloc.h"
 
+#include "append.h"
 #include "chunk.h"
 #include "chunk_loc.h"
 #include "compat.h"

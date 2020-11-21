@@ -45,6 +45,7 @@
 #include "dmalloc_argv.h"			/* for argument processing */
 #include "dmalloc.h"
 
+#include "append.h"
 #include "compat.h"
 #include "debug_tok.h"
 #include "debug_tok.h"

@@ -253,6 +253,7 @@
 #define HAVE_STRCSPN 0
 #define HAVE_STRDUP 0
 #define HAVE_STRLEN 0
+#define HAVE_STRNLEN 0
 #define HAVE_STRNCASECMP 0
 #define HAVE_STRNCAT 0
 #define HAVE_STRNCMP 0

@@ -34,6 +34,7 @@
 #endif
 
 #include "conf.h"
+#include "append.h"
 #include "chunk.h"
 #include "compat.h"
 #include "dmalloc.h"
