@@ -1,30 +1,17 @@
 # config file for circleci
-version: 2 
+version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: circleci/buildpack-deps:stable
     steps:
       - checkout
-      - restore_cache:
-          key: j256-simplejmx-{{ checksum "pom.xml" }}
       - run:
-          name: Get maven project dependencies
-          command: mvn -U dependency:go-offline compile
-      # save the project dependencies
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: j256-simplejmx-{{ checksum "pom.xml" }}
+          name: configure
+          command: configure
       - run:
-          name: mvn package
-          command: mvn package
-      # uploads the test metadata from the `target/surefire-reports` directory so that it can show up in the CircleCI dashboard. 
-      - store_test_results: 
-          path: target/surefire-reports
+          name: make clean tests
+          command: make clean tests
       - run:
-          name: Generate coverage report using jacoco
-          command: mvn jacoco:report
-      - run:
-          name: Upload coverage report to CodeCov
-          command: bash <(curl -s https://codecov.io/bash)
+          name: run tests
+          command: make light heavy
