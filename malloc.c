@@ -1267,8 +1267,9 @@ char	*strdup(const char *string)
   
   return buf;
 }
-#endif
+#endif /* ifndef DMALLOC_STRDUP_MACRO */
 
+#ifndef DMALLOC_STRNDUP_MACRO
 /*
  * DMALLOC_PNT strndup
  *
@@ -1326,6 +1327,7 @@ char	*strndup(const char *string, const DMALLOC_SIZE len)
   
   return buf;
 }
+#endif /* ifndef DMALLOC_STRNDUP_MACRO */
 
 /*
  * DMALLOC_FREE_RET free
