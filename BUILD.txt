@@ -5,14 +5,11 @@ The following set of tasks should be performed when the dmalloc library gets rel
 1) Update the version number in version.h and where else it lists.
 2) Update the ChangeLog files.
 3) Update release number in version.h and the files listed there.
-4) Update doc files: make INSTALL.txt dmalloc.html
+4) Update doc files: make docs
 5) Consider updating the copyright heads in all files and in chunk.c strings.
 6) Run autoconf to make sure configure up to date.
 7) Check in all files.
-8) git clone into subdir: git clone git@github.com:j256/dmalloc.git
-8) git tag the release with dmalloc_release_X_X_X
-9) make distclean ; autoconf ; configure ; make
-10) Run tests:
+8) Run tests:
 	- [ maybe mkdir x ; cd x ]
 	- ./configure or ../configure
 	- make all heavy
@@ -21,9 +18,10 @@ The following set of tasks should be performed when the dmalloc library gets rel
 	- make heavy
 	- examine the log file, check version, look for exceptions
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
-
-11) Install the tgz file and html file in the dmalloc.com repo
-12) Edit releases/index.html to include the new version
-13) Installed the updated doc files into the dmalloc.com repo.
+9) Run release.sh script.  It will run tests on repo.
+11) git tag the release with dmalloc_release_X_X_X
+12) Install the tgz file and html file in the dmalloc.com repo
+13) Edit releases/index.html to include the new version
+14) Installed the updated doc files into the dmalloc.com repo.
 
 -------------------------------------------------------------------------------
