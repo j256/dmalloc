@@ -288,9 +288,9 @@ settings.h : $(srcdir)/settings.dist $(srcdir)/configure
 	$(SHELL) $(srcdir)/configure
 	-touch $@
 
-dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3
+dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
-	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > $@.t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
 	mv $@.t $@
 
 shlib : $(BUILD_SL)

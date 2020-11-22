@@ -141,7 +141,7 @@ static	void	*heap_extend(const int incr)
 }
 
 /*
- * static void *heap_release
+ * static void heap_release
  *
  * DESCRIPTION:
  *
@@ -156,7 +156,7 @@ static	void	*heap_extend(const int incr)
  * addr -> Previously used memory.
  * size -> Size of memory.
  */
-static	void	*heap_release(void *addr, const int size)
+static	void	heap_release(void *addr, const int size)
 {
 #if INTERNAL_MEMORY_SPACE
   /* no-op */
