@@ -132,12 +132,49 @@ static	void	*heap_extend(const int incr)
   }
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
-    dmalloc_message("extended heap space by %d bytes [%#lx, %#lx]",
-		    incr, (unsigned long)_dmalloc_heap_low,
+    dmalloc_message("extended heap space by %d bytes returned %#lx [%#lx, %#lx]",
+		    incr, (unsigned long)ret, (unsigned long)_dmalloc_heap_low,
 		    (unsigned long)_dmalloc_heap_high);
   }
   
   return ret;
+}
+
+/*
+ * static void *heap_release
+ *
+ * DESCRIPTION:
+ *
+ * Release a memory chunk back to the sytem.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * addr -> Previously used memory.
+ * size -> Size of memory.
+ */
+static	void	*heap_release(void *addr, const int size)
+{
+#if INTERNAL_MEMORY_SPACE
+  /* no-op */
+#else
+#if HAVE_MUNMAP && USE_MMAP
+  if (munmap(addr, size) == 0) {
+    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
+      dmalloc_message("releasing heap memory %#lx, size %d",
+		      (unsigned long)addr, size);
+    }
+  } else {
+    dmalloc_message("munmap failed to release heap memory %#lx, size %d",
+		    (unsigned long)addr, size);
+  }
+#else
+  /* no-op */
+#endif /* if not HAVE_MMAP && USE_MMAP */
+#endif /* if not INTERNAL_MEMORY_SPACE */
 }
 
 /**************************** exported functions *****************************/
@@ -184,7 +221,7 @@ int	_dmalloc_heap_startup(void)
 void	*_dmalloc_heap_alloc(const unsigned int size)
 {
   void	*heap_new, *heap_diff;
-  long	diff;
+  long	diff_size;
   
   if (size == 0) {
     dmalloc_errno = ERROR_BAD_SIZE;
@@ -192,47 +229,59 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
     return HEAP_ALLOC_ERROR;
   }
   
-  while (1) {
-    
-    /* extend the heap by our size */
-    heap_new = heap_extend(size);
-    if (heap_new == SBRK_ERROR) {
-      return HEAP_ALLOC_ERROR;
-    }
-    
-    /* calculate bytes needed to align to block boundary */
-    diff = (long)heap_new % BLOCK_SIZE;
-    if (diff == 0) {
-      /* if we are already aligned then we are all set */
-      break;
-    }
-    diff = BLOCK_SIZE - diff;
-    
-    /* shift the heap a bit to account for non block alignment */
-    heap_diff = heap_extend(diff);
-    if (heap_diff == SBRK_ERROR) {
-      return HEAP_ALLOC_ERROR;
-    }
-    
-    /* if heap-diff went down then our stack grows down */
-    if ((char *)heap_diff + diff == (char *)heap_new) {
-      heap_new = heap_diff;
-      break;
-    }
-    else if ((char *)heap_new + size == (char *)heap_diff) {
-      /* shift up our heap to align with the block */
-      heap_new = (char *)heap_new + diff;
-      break;
-    }
-    
-    /*
-     * We may have a wierd sbrk race condition here.  We hope that we
-     * are not just majorly confused which may mean that we sbrk till
-     * the cows come home and die from lack of memory.
-     */
-    
-    /* start over again */
+  /* extend the heap by our size */
+  heap_new = heap_extend(size);
+  if (heap_new == SBRK_ERROR) {
+    return HEAP_ALLOC_ERROR;
   }
   
-  return heap_new;
+  /* calculate bytes needed to align to block boundary */
+  diff_size = (long)heap_new % BLOCK_SIZE;
+  if (diff_size == 0) {
+    /* if we are already aligned then we are all set */
+    return heap_new;
+  }
+  diff_size = BLOCK_SIZE - diff_size;
+  
+  /* shift the heap a bit to account for non block alignment */
+  heap_diff = heap_extend(diff_size);
+  if (heap_diff == SBRK_ERROR) {
+    return HEAP_ALLOC_ERROR;
+  }
+  
+  /* if heap-diff went down then probably using sbrk and stack grows down */
+  if ((char *)heap_diff + diff_size == (char *)heap_new) {
+    return heap_diff;
+  }
+  else if ((char *)heap_new + size == (char *)heap_diff) {
+    /* shift up our heap to align with the block */
+    return (char *)heap_new + diff_size;
+  }
+  
+  /*
+   * We got non-contiguous memory regions.  This may indicate that
+   * mmap does not return page-size chunks or that we didn't determine
+   * the page size right.  In any case we do the unfortunate thing to
+   * allocate size + BLOCK_SIZE and then we are guaranteed a page-size
+   * aligned chunk in there while wasting a page-size of extra memory.
+   * Blah.
+   */
+  heap_release(heap_new, size);
+  heap_release(heap_diff, diff_size);
+  
+  int new_size = size + BLOCK_SIZE;
+  heap_new = heap_extend(new_size);
+  if (heap_new == SBRK_ERROR) {
+    return HEAP_ALLOC_ERROR;
+  }
+  
+  dmalloc_message("WARNING: had to extend heap by %d more bytes to get page aligned %#lx",
+		  new_size, (unsigned long)heap_new);
+  
+  diff_size = (long)heap_new % BLOCK_SIZE;
+  if (diff_size == 0) {
+    return heap_new;
+  } else {
+    return heap_new + diff_size;
+  }
 }

@@ -4483,7 +4483,7 @@ else
 #if HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif
-main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
+int main() { DMALLOC_SIZE x = -1; if (x >= 0) return 0; else return 1; }
 
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
@@ -4517,9 +4517,9 @@ else
 #endif
 
 #ifdef strdup
-main() { exit(0); }
+int main() { return 0; }
 #else
-main() { exit(1); }
+int main() { return 1; }
 #endif
 
 _ACEOF
@@ -4552,9 +4552,9 @@ else
 #endif
 
 #ifdef strndup
-main() { exit(0); }
+int main() { return 0; }
 #else
-main() { exit(1); }
+int main() { return 1; }
 #endif
 
 _ACEOF
@@ -4624,23 +4624,13 @@ rm -f core conftest.err conftest.$ac_objext \
 { $as_echo "$as_me:${as_lineno-$LINENO}: important functionality" >&5
 $as_echo "$as_me: important functionality" >&6;}
 
-for ac_func in mmap
+for ac_func in mmap munmap sbrk
 do :
-  ac_fn_c_check_func "$LINENO" "mmap" "ac_cv_func_mmap"
-if test "x$ac_cv_func_mmap" = xyes; then :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_MMAP 1
-_ACEOF
-
-fi
-done
-
-for ac_func in sbrk
-do :
-  ac_fn_c_check_func "$LINENO" "sbrk" "ac_cv_func_sbrk"
-if test "x$ac_cv_func_sbrk" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_SBRK 1
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 _ACEOF
 
 fi
@@ -4675,7 +4665,7 @@ else
 #if HAVE_SYS_MMAN_H
 #  include <sys/mman.h>
 #endif
-main() {
+int main() {
   /* we could open /dev/zero and map to that but I did not want the library
      to open another file-descriptor */
   char *dest, *src, *src_p, *dest_p;
@@ -4687,9 +4677,9 @@ main() {
   while (src_p < src + 10) { *dest_p++ = *src_p++; }
   src_p = src; dest_p = dest;
   while (src_p < src + 10) {
-    if (*src_p++ != *dest_p++) { exit(1); }
+    if (*src_p++ != *dest_p++) { return 1; }
   }
-  exit(0);
+  return 0;
 }
 
 _ACEOF
@@ -4733,7 +4723,12 @@ See \`config.log' for more details" "$LINENO" 5; }
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-main() { if (getpagesize()<=2048) exit(0); else exit(1); }
+
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=2048) return 0; else return 1; }
+
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=11
@@ -4752,7 +4747,12 @@ See \`config.log' for more details" "$LINENO" 5; }
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-main() { if (getpagesize()<=4096) exit(0); else exit(1); }
+
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=4096) return 0; else return 1; }
+
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=12
@@ -4771,7 +4771,12 @@ See \`config.log' for more details" "$LINENO" 5; }
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-main() { if (getpagesize()<=8192) exit(0); else exit(1); }
+
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=8192) return 0; else return 1; }
+
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=13
@@ -4790,7 +4795,12 @@ See \`config.log' for more details" "$LINENO" 5; }
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-main() { if (getpagesize()<=16384) exit(0); else exit(1); }
+
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=16384) return 0; else return 1; }
+
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=14
@@ -4915,7 +4925,7 @@ char *realloc (char *old_pnt, int new_size) {
   while (pnt < end) { *pnt++ = *old_pnt++; }
   return start;
 }
-main() { main_b = 1; abort(); _exit(1); }
+int main() { main_b = 1; abort(); return 1; }
 
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
@@ -5070,7 +5080,7 @@ char *realloc (char *old_pnt, int new_size) {
   while (pnt < end) { *pnt++ = *old_pnt++; }
   return start;
 }
-main() { malloc(10); _exit(0); }
+int main() { malloc(10); return 0; }
 
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
@@ -5158,7 +5168,7 @@ else
 #if HAVE_W32API_WINBASE_H
 # include <w32api/winbase.h>
 #endif
-main() {
+int main() {
   char env_buf[256];
   GetEnvironmentVariableA("PATH", env_buf, sizeof(env_buf));
 }
@@ -5216,7 +5226,7 @@ else
 /* if we call the loc_con constructor then exit with error code 0 */
 static void loc_con() __attribute__((constructor));
 static void loc_con() { exit(0); }
-int main() { exit(1); }
+int main() { return 1; }
 
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
@@ -5301,10 +5311,10 @@ static void foo (void)
   GET_RET_ADDR(ret_addr);
 }
 
-main()
+int main()
 {
   foo();
-  exit(0);
+  return 0;
 }
 
 _ACEOF
@@ -5720,6 +5730,18 @@ do :
 if test "x$ac_cv_func_rindex" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_RINDEX 1
+_ACEOF
+
+fi
+done
+
+for ac_func in strdup strndup
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 _ACEOF
 
 fi
