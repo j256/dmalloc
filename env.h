@@ -1,7 +1,7 @@
 /*
  * Defines for the env routines
  *
- * Copyright 2000 by Gray Watson
+ * Copyright 2020 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *

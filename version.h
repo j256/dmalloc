@@ -1,7 +1,7 @@
 /*
  * Version string for the library
  *
- * Copyright 2000 by Gray Watson
+ * Copyright 2020 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -27,18 +27,15 @@
  * should be entered in:
  *
  *	Changlog
- *	NEWS
- *	RELEASE.html
  *	configure.ac (in AC_INIT)
  *	dmalloc.spec
  *	dmalloc.texi
  *	dmalloc.h.4 (DMALLOC_VERSION defines at top of file)
- *      ports/.../Makefile and ports/.../distfile files
  *
- * Make sure to also cvs tag the release.  dmalloc_release_X_X_X
+ * Make sure to also git tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.5.2" ;
+static	char	*dmalloc_version = "5.6.0" ;
 
-/* Version Date: $Date: 2007/05/14 17:23:37 $ */
+/* Version Date: $Date: 2020/11/22 16:16:37 $ */
 
 #endif /* ! __VERSION_H__ */

@@ -1,7 +1,7 @@
 /*
  * Local definitions for the user allocation level
  *
- * Copyright 2000 by Gray Watson
+ * Copyright 2020 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
