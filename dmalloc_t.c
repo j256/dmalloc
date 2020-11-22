@@ -790,7 +790,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -831,7 +832,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -873,7 +875,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -890,7 +893,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -921,7 +925,8 @@ static	int	check_arg_check(void)
   _dmalloc_bcopy(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -958,7 +963,8 @@ static	int	check_arg_check(void)
   _dmalloc_bzero(__FILE__, __LINE__, pnt, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -995,7 +1001,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1033,7 +1040,8 @@ static	int	check_arg_check(void)
   _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1070,7 +1078,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1106,7 +1115,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1136,7 +1146,8 @@ static	int	check_arg_check(void)
   _dmalloc_memcpy(__FILE__, __LINE__, pnt2, pnt, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1174,7 +1185,8 @@ static	int	check_arg_check(void)
   _dmalloc_memmove(__FILE__, __LINE__, pnt2, pnt, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1211,7 +1223,8 @@ static	int	check_arg_check(void)
   _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1248,7 +1261,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1290,7 +1304,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1329,7 +1344,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1373,7 +1389,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1415,7 +1432,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1454,7 +1472,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1498,7 +1517,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1543,7 +1563,8 @@ static	int	check_arg_check(void)
     }
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should not get error\n", func);
+	(void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		     func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1582,7 +1603,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1620,7 +1642,8 @@ static	int	check_arg_check(void)
   _dmalloc_strncat(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1661,7 +1684,8 @@ static	int	check_arg_check(void)
   }
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1691,7 +1715,8 @@ static	int	check_arg_check(void)
   _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error\n", func);
+      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1725,7 +1750,9 @@ static	int	check_arg_check(void)
   
   {
     void	*new_pnt;
-    
+
+    pnt = "12345";
+    size = 5;
     /* this looks at enough characters in buffer */
     dmalloc_errno = ERROR_NONE;
     new_pnt = strndup(pnt, size);
@@ -1737,14 +1764,14 @@ static	int	check_arg_check(void)
     }
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should not get error\n", func);
+	(void)printf("     ERROR: %s overload should not get error (size): %s (%d)\n",
+		     func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
     free(new_pnt);
       
     dmalloc_errno = ERROR_NONE;
-    memset(pnt, 1, size);
     new_pnt = strndup(pnt, size + 1);
     if (new_pnt == NULL) {
       if (! silent_b) {
@@ -1754,7 +1781,8 @@ static	int	check_arg_check(void)
     }
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should not get error\n", func);
+	(void)printf("     ERROR: %s overload should not get error (size ++ 1): %s (%d)\n",
+		     func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2832,6 +2860,7 @@ static	int	check_special(void)
   
   /********************/
   
+#if HAVE_STRNDUP
   /*
    * Test strndup.
    */
@@ -2857,6 +2886,7 @@ static	int	check_special(void)
       return 0;
     }
     str = "1234";
+    memset(pnt, 1, size);
     memmove(pnt, str, size);
     
     dmalloc_errno = ERROR_NONE;
@@ -2868,13 +2898,16 @@ static	int	check_special(void)
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
-    } else if (strcmp(pnt, str) != 0) {
+    } else if (strcmp(ret, str) != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should have copied string\n");
+	(void)printf("   ERROR: strndup should have copied string: '%s' != '%s'\n",
+		     ret, str);
       }
       final = 0;
     }
-    
+    free(ret);
+
+    /* test size greater than strlen */
     dmalloc_errno = ERROR_NONE;
     ret = strndup(pnt, size + 1);
     
@@ -2884,18 +2917,22 @@ static	int	check_special(void)
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
-    } else if (strcmp(pnt, str) != 0) {
+    } else if (strcmp(ret, str) != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should have copied string\n");
+	(void)printf("   ERROR: strndup should have copied string (size + 1): '%s' != '%s'\n",
+		     ret, str);
       }
       final = 0;
     }
-    
+    free(ret);
+
+    /* test not \0 terminated */
     str = "12345";
+    memset(pnt, 1, size);
     memmove(pnt, str, size);
     
     dmalloc_errno = ERROR_NONE;
-    strndup(pnt, size);
+    ret = strndup(pnt, size);
     
     if (dmalloc_errno != ERROR_NONE) {
       if (! silent_b) {
@@ -2903,15 +2940,17 @@ static	int	check_special(void)
 		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
-    } else if (strcmp(pnt, str) != 0) {
+    } else if (strcmp(ret, str) != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should have copied string\n");
+	(void)printf("   ERROR: strndup should have copied string: '%s' != '%s'\n",
+		     ret, str);
       }
       final = 0;
     }
+    free(ret);
     
     dmalloc_errno = ERROR_NONE;
-    strndup(pnt, size + 1);
+    ret = strndup(pnt, size + 1);
     
     if (dmalloc_errno != ERROR_WOULD_OVERWRITE) {
       if (! silent_b) {
@@ -2920,10 +2959,12 @@ static	int	check_special(void)
       }
       final = 0;
     }
+    free(ret);
     
     dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
+#endif
   
   /********************/
   
@@ -3715,22 +3756,22 @@ static	int	check_special(void)
     buf_p = append_long(buf_p, max, 1234, 10);
     final = check_append_buf(buf, buf_p, "hello1234", 9, final, "append 1234");
     
-    // initially this adds the 'h' at the end tha will become \0 below
+    /* initially this adds the 'h' at the end tha will become \0 below */
     buf_p = append_string(buf_p, max, "hello");
     final = check_append_buf(buf, buf_p, "hello1234h", 10, final, "append h");
     
-    // this should add nothing
+    /* this should add nothing */
     buf_p = append_string(buf_p, max, "hello");
     final = check_append_buf(buf, buf_p, "hello1234h", 10, final, "append no string");
     
-    // this should add nothing
+    /* this should add nothing */
     buf_p = append_long(buf_p, max, 100, 10);
     final = check_append_buf(buf, buf_p, "hello1234h", 10, final, "append no int");
     
     buf_p = append_null(buf_p, max);
     final = check_append_buf(buf, buf_p, "hello1234", 10, final, "append null");
     
-    // check out the negative values
+    /* check out the negative values */
     buf_p = buf;
     buf_p = append_long(buf_p, max, -87654, 10);
     final = check_append_buf(buf, buf_p, "-87654", 6, final, "append neg int");
@@ -4287,12 +4328,20 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Initial tests failed.  Last dmalloc error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	(void)printf("ERROR: Initial tests failed.  ");
+	if (dmalloc_errno == ERROR_NONE) {
+	  (void)printf("No dmalloc errno set.\n");
+	} else {
+	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	}
       }
       else {
-	(void)printf("  Failed.  Last dmalloc error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	(void)printf("  Failed.  ");
+	if (dmalloc_errno == ERROR_NONE) {
+	  (void)printf("No dmalloc errno set.\n");
+	} else {
+	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	}
       }
       final = 1;
     }
@@ -4317,12 +4366,20 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Random tests failed.  Last dmalloc error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	(void)printf("ERROR: Random tests failed.  ");
+	if (dmalloc_errno == ERROR_NONE) {
+	  (void)printf("No dmalloc errno set.\n");
+	} else {
+	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	}
       }
       else {
-	(void)printf("  Failed.  Last dmalloc error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	(void)printf("  Failed.  ");
+	if (dmalloc_errno == ERROR_NONE) {
+	  (void)printf("No dmalloc errno set.\n");
+	} else {
+	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	}
       }
       final = 1;
     }
@@ -4344,12 +4401,20 @@ int	main(int argc, char **argv)
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Running special tests failed.  Last dmalloc error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	(void)printf("ERROR: Running special tests failed.  ");
+	if (dmalloc_errno == ERROR_NONE) {
+	  (void)printf("No dmalloc errno set.\n");
+	} else {
+	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	}
       }
       else {
-	(void)printf("  Failed.  Last dmalloc error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	(void)printf("  Failed.  ");
+	if (dmalloc_errno == ERROR_NONE) {
+	  (void)printf("No dmalloc errno set.\n");
+	} else {
+	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	}
       }
       final = 1;
     }
@@ -4365,11 +4430,11 @@ int	main(int argc, char **argv)
      * the only way we can reproduce the problem.
      */
     if (silent_b) {
-      (void)printf("Random seed is %u.  Final dmalloc error: %s (err %d)\n",
-		   seed_random, dmalloc_strerror(dmalloc_errno),
-		   dmalloc_errno);
+      (void)printf("Random seed is %u.  ", seed_random);
     }
-    else {
+    if (dmalloc_errno == ERROR_NONE) {
+      (void)printf("No final dmalloc errno set.\n");
+    } else {
       (void)printf("Final dmalloc error: %s (err %d)\n",
 		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
