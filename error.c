@@ -411,8 +411,7 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 		       hrs, mins, secs, usecs);
   }
   else {
-    (void)loc_snprintf(buf, buf_size, "%lu.%06lu",
-		       secs, usecs);
+    (void)loc_snprintf(buf, buf_size, "%lu.%06lu", secs, usecs);
   }
   
   return buf;
@@ -543,7 +542,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   {
     long	now;
     now = time(NULL);
-    str_p += loc_snprintf(str_p, bounds_p - str_p, "%ld: ", now);
+    str_p = append_format(str_p, bounds_p, "%ld: ", now);
   }
 #endif /* LOG_TIME_NUMBER */
 #if HAVE_CTIME
@@ -551,7 +550,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   {
     TIME_TYPE	now;
     now = time(NULL);
-    str_p += loc_snprintf(str_p, bounds_p - str_p, "%.24s: ", ctime(&now));
+    str_p = append_format(str_p, bounds_p, "%.24s: ", ctime(&now));
   }
 #endif /* LOG_CTIME_STRING */
 #endif /* HAVE_CTIME */
@@ -559,7 +558,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   
 #if LOG_ITERATION
   /* add the iteration number */
-  str_p += loc_snprintf(str_p, bounds_p - str_p, "%lu: ", _dmalloc_iter_c);
+  str_p = append_format(str_p, bounds_p, "%lu: ", _dmalloc_iter_c);
 #endif
 #if LOG_PID && HAVE_GETPID
   {
@@ -567,7 +566,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
     long	our_pid = getpid();
     
     /* add the pid to the log file */
-    str_p += loc_snprintf(str_p, bounds_p - str_p, "p%ld: ", our_pid);
+    str_p = append_format(str_p, bounds_p, "p%ld: ", our_pid);
   }
 #endif
   
@@ -578,13 +577,13 @@ void	_dmalloc_vmessage(const char *format, va_list args)
    */
   
   /* write the format + info into str */
-  len = loc_vsnprintf(str_p, bounds_p - str_p, format, args);
+  char *start_p = str_p;
+  str_p = append_vformat(str_p, bounds_p, format, args);
   
   /* was it an empty format? */
-  if (len == 0) {
+  if (str_p == start_p) {
     return;
   }
-  str_p += len;
   
   /* tack on a '\n' if necessary */
   if (*(str_p - 1) != '\n') {
