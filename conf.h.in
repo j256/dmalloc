@@ -58,6 +58,7 @@
  */
 #define HAVE_MMAP 0
 #define USE_MMAP 0
+#define HAVE_MUNMAP 0
 
 /*
  * This is the basic block size in bits.  If possible, the configure
