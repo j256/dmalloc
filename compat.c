@@ -30,6 +30,10 @@
 # include <stdarg.h>				/* for ... */
 #endif
 
+#if HAVE_STDLIB_H
+# include <stdlib.h>				/* for getenv */
+#endif
+
 #define DMALLOC_DISABLE
 
 #include "conf.h"
@@ -461,3 +465,25 @@ char	*strsep(char **string_p, const char *delim)
   return tok;
 }
 #endif /* HAVE_STRSEP == 0 */
+
+/*
+ * Local getenv which handles some portability stuff.
+ */
+char	*loc_getenv(const char *var, char *buf, const int buf_size,
+		    const int stay_safe)
+{
+#if defined(__CYGWIN__) && HAVE_GETENVIRONMENTVARIABLEA
+  /* use this function instead of getenv */
+  GetEnvironmentVariableA(var, buf, buf_size);
+  return buf;
+#else /* ! __CYGWIN__ */
+#if GETENV_SAFE == 0
+  if (stay_safe) {
+    /* oh, well.  no idea how to get the environmental variables */
+    return "";
+  }
+#endif /* GETENV_SAFE == 0 */
+  /* get the options flag */
+  return getenv(var);
+#endif /* ! __CYGWIN__ */
+}
