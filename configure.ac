@@ -1,7 +1,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# Copyright 2003 by Gray Watson
+# Copyright 2020 by Gray Watson
 #
 # This file is part of the dmalloc package.
 #
@@ -19,7 +19,7 @@
 # The author may be contacted via http://dmalloc.com/
 #
 AC_REVISION($Revision: 1.37 $)
-AC_INIT(dmalloc, 5.5.2, [http://dmalloc.com/])
+AC_INIT(dmalloc, 5.6.0, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
