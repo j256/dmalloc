@@ -67,11 +67,11 @@
  * Library Copyright and URL information for ident and what programs
  */
 #if IDENT_WORKS
-#ident "@(#) $Copyright: Dmalloc package Copyright 2007 by Gray Watson $"
+#ident "@(#) $Copyright: Dmalloc package Copyright 2020 by Gray Watson $"
 #ident "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $"
 #else
 static	char	*copyright =
-  "@(#) $Copyright: Dmalloc package Copyright 2007 by Gray Watson $";
+  "@(#) $Copyright: Dmalloc package Copyright 2020 by Gray Watson $";
 static	char	*source_url =
   "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $";
 #endif

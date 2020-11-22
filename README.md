@@ -1,7 +1,7 @@
 Debug Malloc Library
 ====================
 
-Version 5.5.2
+Version 5.6.0
 
 The debug memory allocation or "dmalloc" library has been designed as a drop in replacement for the system's
 `malloc`, `realloc`, `calloc`, `free` and other memory management routines while providing powerful debugging
@@ -27,12 +27,10 @@ Enjoy, Gray Watson
 
 See the INSTALL file for building, installation, and quick-start notes.
 
-Examine the dmalloc.html file which contains the user-documentation for the dmalloc subsystem.  There also is
-an dmalloc.info file which can be installed in the emacs info directory and read with emacs/info or the info
-program available from the texinfo package at GNU archive sites.  It is also suitable for reading as text.
-The source of all documation is the dmalloc.texi texinfo file which also can generate postscript or TeX
-hardcopy output with the help of the texinfo.tex file.  You can download the full documentation package or
-read it [online from the repository](http://dmalloc.com/).
+Examine the dmalloc.html file which contains the user-documentation for the dmalloc subsystem.  The source of
+all documation is the dmalloc.texi texinfo file which also can generate PDF hardcopy output with the help of
+the texinfo.tex file.  You can download the full documentation package or read it
+[online from the repository](http://dmalloc.com/).
 
 ## Argv Library
 
@@ -50,6 +48,6 @@ Many net folk contributed to the design, development, and overall library and my
 
 ## Author
 
-If you have any questions, comments, or problems feel free to send me mail.
+If you have any questions, comments, or problems, please use github issues to submit a question.
 
 [Gray Watson](http://256stuff.com/gray/)
