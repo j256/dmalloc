@@ -199,6 +199,13 @@ extern
 char	*strsep(char **string_p, const char *delim);
 #endif /* if HAVE_STRSEP == 0 */
 
+/*
+ * Local getenv which handles some portability stuff.
+ */
+extern
+char	*loc_getenv(const char *var, char *buf, const int buf_size,
+		    const int stay_safe);
+
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
 #endif /* ! __COMPAT_H__ */

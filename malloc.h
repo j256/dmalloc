@@ -565,7 +565,7 @@ extern
 unsigned int	dmalloc_debug(const unsigned int flags);
 
 /*
- * unsigned int dmalloc_debug_current
+ * char *dmalloc_debug_current
  *
  * DESCRIPTION:
  *
@@ -582,6 +582,28 @@ unsigned int	dmalloc_debug(const unsigned int flags);
  */
 extern
 unsigned int	dmalloc_debug_current(void);
+
+/*
+ * char *dmalloc_debug_current_env
+ *
+ * DESCRIPTION:
+ *
+ * Returns the current debug environment.  This allows you to save a
+ * dmalloc library state to be restored later with a call to
+ * dmalloc_debug_setup().
+ *
+ * RETURNS:
+ *
+ * Current debug environment.
+ *
+ * ARGUMENTS:
+ *
+ * env_buf -> Buffer to use for getting the environment.
+ *
+ * env_buf_size -> Size of the buffer.
+ */
+extern
+char	*dmalloc_debug_current_env(char *env_buf, const int env_buf_size);
 
 /*
  * void dmalloc_debug_setup

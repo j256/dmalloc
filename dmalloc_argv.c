@@ -2851,6 +2851,7 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
 {
   int	env_c, env_n;
   char	**vect_p, env_name[1024], *environ_p;
+  char	env_buf[256];
   
   /* create the env variable */
   (void)loc_snprintf(env_name, sizeof(env_name), ENVIRON_FORMAT, argv_program);
@@ -2862,7 +2863,7 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
     }
   }
   
-  environ_p = getenv(env_name);
+  environ_p = loc_getenv(env_name, env_buf, sizeof(env_buf), 0);
   if (environ_p == NULL) {
     return NOERROR;
   }
@@ -2911,6 +2912,7 @@ static	int	process_env(void)
   static int	done_b = ARGV_FALSE;
   char		*env_val, *tok_p, *env_p;
   int		len;
+  char		env_buf[256];
   
   /* make sure we only do this once */
   if (done_b) {
@@ -2920,7 +2922,7 @@ static	int	process_env(void)
   done_b = ARGV_TRUE;
   
   /* get the argv information */
-  env_val = getenv(GLOBAL_NAME);
+  env_val = loc_getenv(GLOBAL_NAME, env_buf, sizeof(env_buf), 0);
   if (env_val == NULL) {
     return NOERROR;
   }
