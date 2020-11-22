@@ -3,12 +3,14 @@
 The following set of tasks should be performed when the dmalloc library gets released.
 
 1) Update the version number in version.h and where else it lists.
-2) Update the ChangeLog and NEWS files.
-3) Update the RELEASE.html file.
-4) Check in all files.
-5) cvs tag the release with dmalloc_release_X_X_X
-6) make distclean ; autoconf ; configure ; make release
-7) Run tests:
+2) Update the ChangeLog files.
+3) Update release number in version.h and the files listed there.
+4) Update release number and date in dmalloc.texi and build doc files.
+5) Run autoconf to make sure configure up to date.
+6) Check in all files.
+7) git tag the release with dmalloc_release_X_X_X
+8) make distclean ; autoconf ; configure ; make release
+9) Run tests:
 	- [ maybe mkdir x ; cd x ]
 	- ./configure or ../configure
 	- make all heavy
@@ -18,12 +20,8 @@ The following set of tasks should be performed when the dmalloc library gets rel
 	- examine the log file, check version, look for exceptions
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
 
-8) md5 the tarball and adjust the various version and distinfo files in the ports/ subdirectory.
-9) Install the tgz file and html file in the repository
-10) Ftp the new version files over to upload.sourceforge.net/incoming
+10) Install the tgz file and html file in the dmalloc.com repo
 11) Edit releases/index.html to include the new version
-12) Copy the .tgz file to /usr/ports/distfiles
-13) Update the /usr/ports/devel/dmalloc directory files from the
-    ports/ subdir, and run 'make package'.  Install the package.
+12) Installed the updated doc files into the dmalloc.com repo.
 
 -------------------------------------------------------------------------------

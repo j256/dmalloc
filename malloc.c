@@ -1,7 +1,7 @@
 /*
  * user-level memory-allocation routines
  *
- * Copyright 2000 by Gray Watson
+ * Copyright 2020 by Gray Watson
  *
  * This file is part of the dmalloc package.
  *
@@ -989,13 +989,13 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
  *
  * string -> String we are duplicating.
  *
- * len -> Length of the string we are duplicating.
+ * max_len -> Max length of the string we are duplicating.  Set to -1 for none.
  *
  * xalloc_b -> If set to 1 then print an error and exit if we run out
  * of memory.
  */
 char	*dmalloc_strndup(const char *file, const int line,
-			 const char *string, const int len,
+			 const char *string, const int max_len,
 			 const int xalloc_b)
 {
   DMALLOC_SIZE	size;
@@ -1005,18 +1005,19 @@ char	*dmalloc_strndup(const char *file, const int line,
   /* check the arguments */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
     /* we check for pointer plus \0 */
-    if (! dmalloc_verify_pnt_strsize(file, line, "strdup", string,
-				     0 /* not exact */, 1 /* strlen */, len)) {
+    if (! dmalloc_verify_pnt_strsize(file, line, "strndup", string,
+				     0 /* not exact */, 1 /* strlen */,
+				     (max_len < 0 ? 0 : max_len))) {
       dmalloc_message("bad pointer argument found in strdup");
     }
   }
   
   /* so we have to figure out the max length of the string directly */
-  if (len < 0) {
+  if (max_len < 0) {
     size = strlen(string);
   }
   else {
-    for (string_p = string; string_p < string + len; string_p++) {
+    for (string_p = string; string_p < string + max_len; string_p++) {
       if (*string_p == '\0') {
 	break;
       }
@@ -1288,10 +1289,10 @@ char	*strdup(const char *string)
  *
  * string -> String we are duplicating.
  *
- * len -> Length of the string to duplicate.
+ * max_len -> Max length of the string to duplicate.
  */
 #undef strndup
-char	*strndup(const char *string, const DMALLOC_SIZE len)
+char	*strndup(const char *string, const DMALLOC_SIZE max_len)
 {
   int		size;
   char		*buf, *file;
@@ -1301,15 +1302,14 @@ char	*strndup(const char *string, const DMALLOC_SIZE len)
   
   /* check the arguments */
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
-    if (! dmalloc_verify_pnt_strsize(file, 0 /* no line */, "strdup", string,
-				     0 /* not exact */, 1 /* strlen */,
-				     len)) {
+    if (! dmalloc_verify_pnt_strsize(file, 0 /* no line */, "strndup", string,
+				     0 /* not exact */, 1 /* strlen */, max_len)) {
       dmalloc_message("bad pointer argument found in strdup");
     }
   }
   
   /* so we have to figure out the max length of the string directly */
-  for (string_p = string; string_p < string + len; string_p++) {
+  for (string_p = string; string_p < string + max_len; string_p++) {
     if (*string_p == '\0') {
       break;
     }

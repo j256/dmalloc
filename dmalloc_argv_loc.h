@@ -1,7 +1,7 @@
 /*
  * Local defines for the argv module
  *
- * Copyright 1995 by Gray Watson
+ * Copyright 2020 by Gray Watson
  *
  * This file is part of the argv library.
  *
