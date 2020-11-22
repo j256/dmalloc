@@ -213,7 +213,7 @@ static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
  */
 static	int	do_random(const int iter_n)
 {
-  unsigned int	old_flags = dmalloc_debug_current();
+  char		*old_env, env_buf[256];
   unsigned int	flags;
   int		iter_c, prev_errno, amount, max_avail, free_c;
   int		final = 1;
@@ -223,6 +223,7 @@ static	int	do_random(const int iter_n)
   
   max_avail = max_alloc;
   
+  old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
   flags = dmalloc_debug_current();
   
   pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
@@ -563,7 +564,7 @@ static	int	do_random(const int iter_n)
   }
   
   free(pointer_grid);
-  dmalloc_debug(old_flags);
+  dmalloc_debug_setup(old_env);
   
   return final;
 }
@@ -576,6 +577,7 @@ static	int	check_initial_special(void)
 {
   void	*pnt;
   int	final = 1, iter_c;
+  char	*old_env, env_buf[256];
   
   /********************/
   
@@ -657,6 +659,7 @@ static	int	check_initial_special(void)
       (void)printf("  Checking never-reuse token\n");
     }
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     old_flags = dmalloc_debug_current();
     dmalloc_debug(old_flags | DEBUG_NEVER_REUSE);
     
@@ -720,7 +723,7 @@ static	int	check_initial_special(void)
       }
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -733,12 +736,15 @@ static	int	check_initial_special(void)
  */
 static	int	check_arg_check(void)
 {
-  unsigned int	old_flags = dmalloc_debug_current();
+  char		*old_env, env_buf[256];
+  unsigned int	old_flags;
   char		*func;
   int		our_errno_hold = dmalloc_errno;
   int		size, final = 1;
   char		*pnt, *pnt2, hold_ch;
   
+  old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
+  old_flags = dmalloc_debug_current();
   if (! silent_b) {
     (void)printf("  Checking arg-check functions\n");
   }
@@ -1797,7 +1803,7 @@ static	int	check_arg_check(void)
   free(pnt2);
   
   /* restore flags */
-  dmalloc_debug(old_flags);
+  dmalloc_debug_setup(old_env);
   dmalloc_errno = our_errno_hold;
   
   return final;
@@ -1834,6 +1840,7 @@ static	int	check_special(void)
   void	*pnt;
   int	page_size;
   int	final = 1;
+  char	*old_env, env_buf[256];
   
   /* get our page size */
   page_size = dmalloc_page_size();
@@ -1919,9 +1926,10 @@ static	int	check_special(void)
   if (dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
     int			iter_c, amount, where;
     int			errno_hold = dmalloc_errno;
-    unsigned int	old_flags = dmalloc_debug_current();
     unsigned char	ch_hold;
+    unsigned int	old_flags = dmalloc_debug_current();
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(old_flags | DEBUG_FREE_BLANK);
     
     if (! silent_b) {
@@ -1968,7 +1976,7 @@ static	int	check_special(void)
       *((char *)pnt + where) = ch_hold;
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -1981,11 +1989,11 @@ static	int	check_special(void)
   {
     int			iter_c, amount, where;
     int			errno_hold = dmalloc_errno;
-    unsigned int	old_flags;
     DMALLOC_SIZE	tot_size;
     unsigned char	ch_hold;
+    unsigned int	old_flags = dmalloc_debug_current();
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     
     /* sure on free-blank on and check-fence off */
     dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
@@ -2056,7 +2064,7 @@ static	int	check_special(void)
       free(pnt);
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2124,16 +2132,17 @@ static	int	check_special(void)
     char		*loc_file, *ex_file;
     void		*new_pnt;
     int			errno_hold = dmalloc_errno;
-    unsigned int	amount, loc_line, ex_line, old_flags;
+    unsigned int	amount, loc_line, ex_line;
     unsigned long	loc_mark, ex_mark, old_seen, ex_seen;
     DMALLOC_SIZE	ex_user_size, ex_tot_size;
     int			iter_c;
+    unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
       (void)printf("  Checking dmalloc_examine information\n");
     }
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     /*
      * We have to turn off the realloc-copy and new-reuse flags
      * otherwise this won't work.
@@ -2246,7 +2255,7 @@ static	int	check_special(void)
       }
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2256,7 +2265,6 @@ static	int	check_special(void)
    * Make sure that the start file:line works.
    */
   {
-    unsigned int	old_flags = dmalloc_debug_current();
     int			errno_hold = dmalloc_errno;
     char		*loc_file, save_ch;
     int			iter_c, loc_line;
@@ -2264,6 +2272,7 @@ static	int	check_special(void)
     char		setup[128];
     
     /* turn on fence post checking */
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(DEBUG_CHECK_FENCE);
     dmalloc_errno = ERROR_NONE;
     
@@ -2368,7 +2377,7 @@ static	int	check_special(void)
     free(pnts[1]);
     
     /* reset the debug flags and errno */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2378,13 +2387,13 @@ static	int	check_special(void)
    * Make sure that the start iteration count works.
    */
   {
-    unsigned int	old_flags = dmalloc_debug_current();
     int			errno_hold = dmalloc_errno;
     char		save_ch;
     void		*pnt2;
     char		setup[128];
     
     /* turn on fence post checking */
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(DEBUG_CHECK_FENCE);
     dmalloc_errno = ERROR_NONE;
     
@@ -2461,7 +2470,7 @@ static	int	check_special(void)
     free(pnt2);
     
     /* reset the debug flags and errno */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2471,13 +2480,13 @@ static	int	check_special(void)
    * Make sure that the start after memory size allocated.
    */
   {
-    unsigned int	old_flags = dmalloc_debug_current();
     int			errno_hold = dmalloc_errno;
     char		save_ch;
     void		*pnt2;
     char		setup[128];
     
     /* turn on fence post checking */
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(DEBUG_CHECK_FENCE);
     dmalloc_errno = ERROR_NONE;
     
@@ -2525,7 +2534,6 @@ static	int	check_special(void)
      */
     (void)loc_snprintf(setup, sizeof(setup), "debug=%#x,start=s%lu",
 		       DEBUG_CHECK_FENCE, dmalloc_memory_allocated());
-    
     dmalloc_debug_setup(setup);	
     
     /*
@@ -2554,7 +2562,7 @@ static	int	check_special(void)
     free(pnt2);
     
     /* reset the debug flags and errno */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2566,9 +2574,11 @@ static	int	check_special(void)
   {
     int			errno_hold = dmalloc_errno;
     unsigned long	size;
-    unsigned int	old_flags = dmalloc_debug_current();
     char		save_ch;
+    unsigned int	old_flags = dmalloc_debug_current();
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
+
     if (! silent_b) {
       (void)printf("  Checking per-pointer blanking flags\n");
     }
@@ -2635,7 +2645,7 @@ static	int	check_special(void)
     *((char *)pnt + size) = save_ch;
     
     /* restore flags */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2648,9 +2658,11 @@ static	int	check_special(void)
   {
     int			errno_hold = dmalloc_errno;
     unsigned long	size;
-    unsigned int	old_flags = dmalloc_debug_current();
     char		save_ch;
+    unsigned int	old_flags = dmalloc_debug_current();
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
+
     if (! silent_b) {
       (void)printf("  Checking per-pointer alloc flags and realloc\n");
     }
@@ -2701,7 +2713,7 @@ static	int	check_special(void)
     *((char *)pnt + size - 1) = save_ch;
     
     /* restore flags */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2824,11 +2836,13 @@ static	int	check_special(void)
    * Test strndup.
    */
   {
-    int		errno_hold = dmalloc_errno;
-    int		size = 5;
-    char	*str, *ret;
-    unsigned int old_flags = dmalloc_debug_current();
+    int			errno_hold = dmalloc_errno;
+    int			size = 5;
+    char		*str, *ret;
+    unsigned int	old_flags = dmalloc_debug_current();
   
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
+
     if (! silent_b) {
       (void)printf("  Checking strndup\n");
     }
@@ -2907,7 +2921,7 @@ static	int	check_special(void)
       final = 0;
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -2974,6 +2988,8 @@ static	int	check_special(void)
     int			iter_c, amount;
     unsigned int	old_flags = dmalloc_debug_current();
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
+    
     if (! silent_b) {
       (void)printf("  Testing valloc()\n");
     }
@@ -3032,7 +3048,7 @@ static	int	check_special(void)
       free(pnt);
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -3044,13 +3060,14 @@ static	int	check_special(void)
   
   {
     char		*alloc_p;
-    unsigned int	old_flags, iter_c, amount;
+    unsigned int	iter_c, amount;
+    unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
       (void)printf("  Checking alloc blanking\n");
     }
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     /* turn on alloc blanking without fence posts */
     dmalloc_debug((old_flags | DEBUG_ALLOC_BLANK) & (~DEBUG_CHECK_FENCE));
     
@@ -3104,7 +3121,7 @@ static	int	check_special(void)
       free(pnt);
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -3115,14 +3132,15 @@ static	int	check_special(void)
   
   {
     void		*new_pnt;
-    unsigned int	amount, old_flags;
+    unsigned int	amount;
     int			iter_c;
+    unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
       (void)printf("  Checking realloc_copy token\n");
     }
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(old_flags | DEBUG_REALLOC_COPY);
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
@@ -3167,7 +3185,7 @@ static	int	check_special(void)
       }
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -3178,14 +3196,15 @@ static	int	check_special(void)
   
   {
     void		*new_pnt;
-    unsigned int	amount, old_flags;
+    unsigned int	amount;
     int			iter_c;
+    unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
       (void)printf("  Checking never-reuse token\n");
     }
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(old_flags | DEBUG_NEVER_REUSE);
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
@@ -3230,7 +3249,7 @@ static	int	check_special(void)
       }
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -3241,14 +3260,14 @@ static	int	check_special(void)
    */
   {
     int			errno_hold = dmalloc_errno;
-    unsigned int	old_flags;
     char		buf[20];
+    unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
       (void)printf("  Checking function checking of non-heap pointers\n");
     }
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
     
     dmalloc_errno = ERROR_NONE;
@@ -3261,7 +3280,7 @@ static	int	check_special(void)
       final = 0;
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
   
@@ -3271,13 +3290,14 @@ static	int	check_special(void)
    * Make sure that string tokens work in the processing program.
    */
   {
-    unsigned int	old_flags, new_flags;
+    unsigned int	old_flags = dmalloc_debug_current();
+    unsigned int	new_flags;
     
     if (! silent_b) {
       (void)printf("  Checking string tokens in dmalloc_debug_setup\n");
     }
     
-    old_flags = dmalloc_debug_current();
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(0);
     dmalloc_debug_setup("log-stats,log-non-free,log-bad-space");
     new_flags = dmalloc_debug_current();
@@ -3291,7 +3311,7 @@ static	int	check_special(void)
       final = 0;
     }
     
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -3349,9 +3369,9 @@ static	int	check_special(void)
    * John Hetherington for reporting this.
    */
   {
-    unsigned int	old_flags = dmalloc_debug_current();
-    int			errno_hold = dmalloc_errno;
+    int	errno_hold = dmalloc_errno;
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     dmalloc_debug(DEBUG_CHECK_FUNCS);
     
     if (! silent_b) {
@@ -3402,7 +3422,7 @@ static	int	check_special(void)
     }
     
     free(pnt);
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
     
     /* recover the errno if necessary */
     if (dmalloc_errno == ERROR_NONE) {
@@ -3512,6 +3532,7 @@ static	int	check_special(void)
     unsigned long	size;
     unsigned int	old_flags = dmalloc_debug_current();
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     if (! silent_b) {
       (void)printf("  Checking block-size alignment rounding\n");
     }
@@ -3569,7 +3590,7 @@ static	int	check_special(void)
     free(pnt);
     
     /* restore flags */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/
@@ -3581,6 +3602,7 @@ static	int	check_special(void)
     unsigned long	size;
     unsigned int	old_flags = dmalloc_debug_current();
     
+    old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     if (! silent_b) {
       (void)printf("  Checking free versus alloc blank\n");
     }
@@ -3616,7 +3638,7 @@ static	int	check_special(void)
     /* NOTE: no restoring of overwritten chars here because of free-blank */
     
     /* restore flags */
-    dmalloc_debug(old_flags);
+    dmalloc_debug_setup(old_env);
   }
   
   /********************/

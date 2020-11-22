@@ -262,9 +262,6 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   }
 }
 
-/*
- * process the values of dmalloc environ variables
- */
 static	void	process_environ(const char *option_str)
 {
   /*
@@ -282,6 +279,7 @@ static	void	process_environ(const char *option_str)
     options[sizeof(options) - 1] = '\0';
   }
   
+  char *previous_logpath = dmalloc_logpath;
   _dmalloc_environ_process(options, &_dmalloc_address,
 			   (unsigned long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
 			   &_dmalloc_check_interval, &_dmalloc_lock_on,
@@ -295,7 +293,10 @@ static	void	process_environ(const char *option_str)
   }
   
   /* indicate that we should reopen the logfile if we need to */
-  _dmalloc_reopen_log();
+  if (previous_logpath == 0L || dmalloc_logpath == 0L
+      || strcmp(previous_logpath, dmalloc_logpath) != 0) {
+    _dmalloc_reopen_log();
+  }
   
 #if LOCK_THREADS == 0
   /* was thread-lock-on specified but not configured? */
@@ -332,9 +333,7 @@ static	int	dmalloc_startup(const char *debug_str)
 {
   static int	some_up_b = 0;
   const char	*env_str;
-#ifdef __CYGWIN__
   char		env_buf[256];
-#endif
   
   /* have we started already? */
   if (enabled_b) {
@@ -353,28 +352,13 @@ static	int	dmalloc_startup(const char *debug_str)
 #endif
 #endif
     
-    /*
-     * If we are running under Cygwin then getenv may not be safe.  We
-     * try to use the GetEnvironmentVariableA function instead.
-     */
-#if defined(__CYGWIN__) && HAVE_GETENVIRONMENTVARIABLEA
-    /* use this function instead of getenv */
-    GetEnvironmentVariableA(OPTIONS_ENVIRON, env_buf, sizeof(env_buf));
-    env_str = env_buf;
-#else /* ! __CYGWIN__ */
-#if GETENV_SAFE
-    /* get the options flag */
     if (debug_str == NULL) {
-      env_str = getenv(OPTIONS_ENVIRON);
+      env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf),
+			   1 /* stay safe */);
     }
     else {
       env_str = debug_str;
     }
-#else
-    /* oh, well.  no idea how to get the environmental variables */
-    env_str = "";
-#endif /* GETENV_SAFE */
-#endif /* ! __CYGWIN__ */
     /* process the environmental variable(s) */
     process_environ(env_str);
     
@@ -1624,7 +1608,7 @@ unsigned int	dmalloc_debug(const unsigned int flags)
 }
 
 /*
- * unsigned int dmalloc_debug_current
+ * char *dmalloc_debug_current
  *
  * DESCRIPTION:
  *
@@ -1647,6 +1631,33 @@ unsigned int	dmalloc_debug_current(void)
   
   /* should not check the heap here since we are dumping the debug variable */
   return _dmalloc_flags;
+}
+
+/*
+ * char *dmalloc_debug_current_env
+ *
+ * DESCRIPTION:
+ *
+ * Returns the current debug environment.  This allows you to save a
+ * dmalloc library state to be restored later with a call to
+ * dmalloc_debug_setup().
+ *
+ * RETURNS:
+ *
+ * Current debug environment.
+ *
+ * ARGUMENTS:
+ *
+ * env_buf -> Buffer to use for getting the environment.
+ *
+ * env_buf_size -> Size of the buffer.
+ */
+char	*dmalloc_debug_current_env(char *env_buf, const int env_buf_size)
+{
+  if (! enabled_b) {
+    (void)dmalloc_startup(NULL /* no options string */);
+  }
+  return loc_getenv(OPTIONS_ENVIRON, env_buf, env_buf_size, 0);
 }
 
 /*
