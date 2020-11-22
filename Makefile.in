@@ -35,7 +35,7 @@ INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@
 A_OUT = aout@EXEEXT@
 INFOFILE = dmalloc.info
-DOCS = INSTALL dmalloc.info dmalloc.html
+DOCS = INSTALL.txt dmalloc.info dmalloc.html
 
 MODULE	= dmalloc
 LIBRARY	= lib$(MODULE).a
@@ -172,7 +172,7 @@ distclean : clean
 	rm -f configure.lineno
 	rm -rf autom4te.cache
 	rm -f Makefile settings.h dmalloc.h.2
-	rm -f INSTALL dmalloc.info dmalloc.html
+	rm -f INSTALL.txt dmalloc.info dmalloc.html
 #	rm -f configure
 
 installdirs :
@@ -258,7 +258,7 @@ $(INFOFILE) : $(srcdir)/dmalloc.texi
 	makeinfo -o $@.t --fill-column=100 --no-split $<
 	mv $@.t $@
 
-INSTALL : $(INFOFILE)
+INSTALL.txt : $(INFOFILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- \
 		> $@.t
