@@ -104,7 +104,8 @@
 /*************************************/
 
 /* for x86-64 machines with GCC */
-#if __x86_64__ && __GNUC__ > 1
+/* this doesn't seem to work for: __x86_64__ && __GNUC__ > 1 */
+#if 0
 
 #define GET_RET_ADDR(file)	asm("movq 8(%%rbp),%%rax ; movq %%rax,%0" : \
 				    "=g" (file) : \
