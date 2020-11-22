@@ -1541,7 +1541,8 @@ static	int	check_arg_check(void)
   /*********/
   
 #if HAVE_STRDUP
-#ifdef DMALLOC_STRDUP_MACRO
+#ifndef DMALLOC_STRDUP_MACRO
+  /* check strdup if it is running dmalloc code and isn't a macro */
   func = "strdup";
   if (! silent_b) {
     (void)printf("    Checking %s\n", func);
