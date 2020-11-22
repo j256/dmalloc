@@ -250,7 +250,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif
-main() { DMALLOC_SIZE x = -1; if (x >= 0) exit(0); else exit(1); }
+int main() { DMALLOC_SIZE x = -1; if (x >= 0) return 0; else return 1; }
 ]])],
 [AC_DEFINE(DMALLOC_SIZE_UNSIGNED,1)  AC_MSG_RESULT([yes])],
 [AC_DEFINE(DMALLOC_SIZE_UNSIGNED,0)  AC_MSG_RESULT([no])],
@@ -267,9 +267,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #endif
 
 #ifdef strdup
-main() { exit(0); }
+int main() { return 0; }
 #else
-main() { exit(1); }
+int main() { return 1; }
 #endif
 ]])],
 [ac_cv_strdup_macro=yes],
@@ -288,9 +288,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #endif
 
 #ifdef strndup
-main() { exit(0); }
+int main() { return 0; }
 #else
-main() { exit(1); }
+int main() { return 1; }
 #endif
 ]])],
 [ac_cv_strndup_macro=yes],
@@ -322,8 +322,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 ##############################################################################
 AC_MSG_NOTICE([important functionality])
 
-AC_CHECK_FUNCS(mmap)
-AC_CHECK_FUNCS(sbrk)
+AC_CHECK_FUNCS(mmap munmap sbrk)
 
 if test "x$ac_cv_func_mmap" != "xyes" && test "x$ac_cv_func_sbrk" != "xyes"; then
 	AC_MSG_WARN()
@@ -342,7 +341,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_SYS_MMAN_H
 #  include <sys/mman.h>
 #endif
-main() {
+int main() {
   /* we could open /dev/zero and map to that but I did not want the library
      to open another file-descriptor */
   char *dest, *src, *src_p, *dest_p;
@@ -354,9 +353,9 @@ main() {
   while (src_p < src + 10) { *dest_p++ = *src_p++; }
   src_p = src; dest_p = dest;
   while (src_p < src + 10) {
-    if (*src_p++ != *dest_p++) { exit(1); }
+    if (*src_p++ != *dest_p++) { return 1; }
   }
-  exit(0);
+  return 0;
 }
 ]])],
 [ AC_DEFINE(USE_MMAP, 1) ac_cv_use_mmap=yes],
@@ -372,19 +371,39 @@ AC_CHECK_FUNCS(getpagesize)
 AC_MSG_CHECKING([basic-block size])
 ac_cv_page_size=0
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=2048) exit(0); else exit(1); }])],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=2048) return 0; else return 1; }
+])],
 	[ ac_cv_page_size=11 ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=4096) exit(0); else exit(1); }])],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=4096) return 0; else return 1; }
+])],
 	[ ac_cv_page_size=12 ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=8192) exit(0); else exit(1); }])],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=8192) return 0; else return 1; }
+])],
 	[ ac_cv_page_size=13 ] )
 fi
 if test $ac_cv_page_size = 0; then
-   AC_RUN_IFELSE([AC_LANG_SOURCE([main() { if (getpagesize()<=16384) exit(0); else exit(1); }])],
+   AC_RUN_IFELSE([AC_LANG_SOURCE([
+#if HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
+int main() { if (getpagesize()<=16384) return 0; else return 1; }
+])],
 	[ ac_cv_page_size=14 ] )
 fi
 if test $ac_cv_page_size = 0; then
@@ -442,7 +461,7 @@ char *realloc (char *old_pnt, int new_size) {
   while (pnt < end) { *pnt++ = *old_pnt++; }
   return start;
 }
-main() { main_b = 1; abort(); _exit(1); }
+int main() { main_b = 1; abort(); return 1; }
 ]])],
 # NOTE: this is reversed because abort core dumps and doesn't exit with
 # 0 which means that it should fail
@@ -505,7 +524,7 @@ char *realloc (char *old_pnt, int new_size) {
   while (pnt < end) { *pnt++ = *old_pnt++; }
   return start;
 }
-main() { malloc(10); _exit(0); }
+int main() { malloc(10); return 0; }
 ]])],
 [ AC_DEFINE(GETENV_SAFE, 1)
   AC_MSG_RESULT([yes])
@@ -547,7 +566,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_W32API_WINBASE_H
 # include <w32api/winbase.h>
 #endif
-main() {
+int main() {
   char env_buf[256];
   GetEnvironmentVariableA("PATH", env_buf, sizeof(env_buf));
 }
@@ -582,7 +601,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /* if we call the loc_con constructor then exit with error code 0 */
 static void loc_con() __attribute__((constructor));
 static void loc_con() { exit(0); }
-int main() { exit(1); }
+int main() { return 1; }
 ]])],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 1) AC_MSG_RESULT([yes]) ],
 [ AC_DEFINE(CONSTRUCTOR_WORKS, 0) AC_MSG_RESULT([no]) ],
@@ -630,10 +649,10 @@ static void foo (void)
   GET_RET_ADDR(ret_addr);
 }
 
-main()
+int main()
 {
   foo();
-  exit(0);
+  return 0;
 }
 ])],
 [ AC_DEFINE(RETURN_MACROS_WORK, 1) AC_MSG_RESULT([yes]) ],
@@ -747,6 +766,7 @@ AC_CHECK_FUNCS(bcmp bcopy bzero)
 AC_CHECK_FUNCS([[index]])
 AC_CHECK_FUNCS(memccpy memchr memcmp memcpy memmove memset)
 AC_CHECK_FUNCS(rindex)
+AC_CHECK_FUNCS(strdup strndup)
 AC_CHECK_FUNCS(strcasecmp strcat strchr strcmp strcpy strcspn strlen)
 AC_CHECK_FUNCS(strncasecmp strncat strncmp strncpy)
 AC_CHECK_FUNCS(strpbrk strrchr strspn strstr strtok)
