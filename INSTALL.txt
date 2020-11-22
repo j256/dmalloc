@@ -3,112 +3,89 @@
 2.1 How to Install the Library
 ==============================
 
-To configure, compile, and install the library, follow these steps
-carefully.
+To configure, compile, and install the library, follow these steps carefully.
 
-  1. Make sure you have downloaded the latest version of the library
-     available from the home page at URL `http://dmalloc.com/'.
+  1. Make sure you have downloaded the latest version of the library available from the home page
+     at URL `http://dmalloc.com/'.
 
-  2. The release files have a `.tgz' file extension which means that
-     they are a tar'd gzip'd directory of files.  You will need to
-     ungzip and then untar the release file into your source work
-     directory.  You may have to rename the file to `.tar.gz' to get
-     some old zip programs to handle the file correctly.
+  2. The release files have a `.tgz' file extension which means that they are a tar'd gzip'd
+     directory of files.  You will need to ungzip and then untar the release file into your source
+     work directory.  You may have to rename the file to `.tar.gz' to get some old zip programs to
+     handle the file correctly.
 
-  3. You may want to edit or at least review the settings in
-     `settings.dist' to tune specific features of the library.  The
-     `configure' script will copy this file to `settings.h' which is
+  3. You may want to edit or at least review the settings in `settings.dist' to tune specific
+     features of the library.  The `configure' script will copy this file to `settings.h' which is
      where you should be adding per-architecture settings.
 
-  4. Type `sh ./configure' to configure the library.  You may want to
-     first examine the `config.help' file for some information about
-     configure.  You may want to use the `--disable-cxx' option if you
-     do not want the Makefile to build the C++ version of dmalloc.  You
-     may want to use the `--enable-threads' option to build the
-     threaded version of dmalloc.  You may want to use the
-     `--enable-shlib' option to build the shared versions of the
-     dmalloc libraries.  `sh ./configure --help' lists the available
-     options to configure.  Configure should generate the `Makefile'
-     and configuration files automatically.
+  4. Type `sh ./configure' to configure the library.  You may want to first examine the
+     `config.help' file for some information about configure.  You may want to use the
+     `--disable-cxx' option if you do not want the Makefile to build the C++ version of dmalloc.
+     You may want to use the `--enable-threads' option to build the threaded version of dmalloc.
+     You may want to use the `--enable-shlib' option to build the shared versions of the dmalloc
+     libraries.  `sh ./configure --help' lists the available options to configure.  Configure should
+     generate the `Makefile' and configuration files automatically.
 
-  5. You may want to examine the `Makefile' and `conf.h' files created
-     by configure to make sure it did its job correctly.
+  5. You may want to examine the `Makefile' and `conf.h' files created by configure to make sure it
+     did its job correctly.
 
-  6. You might want to tune the settings in `settings.h' file to tune
-     the library to the local architecture.  This file contains relevant
-     settings if you are using pthreads or another thread library.
-     *Note Using With Threads::.  The `configure' script created this
-     file from the `settings.dist' file.  Any permanent changes to these
-     settings should made to the `settings.dist' file.  You then can run
-     `config.status' to re-create the `settings.h' file.
+  6. You might want to tune the settings in `settings.h' file to tune the library to the local
+     architecture.  This file contains relevant settings if you are using pthreads or another
+     thread library.  *Note Using With Threads::.  The `configure' script created this file from
+     the `settings.dist' file.  Any permanent changes to these settings should made to the
+     `settings.dist' file.  You then can run `config.status' to re-create the `settings.h' file.
 
-  7. The `DMALLOC_SIZE' variable gets auto-configured in `dmalloc.h.2'
-     but it may not generate correct settings for all systems.  You may
-     have to alter the definitions in this file to get things to stop
-     complaining when you go to compile about the size arguments to
-     malloc routines.  Comments on this please.
+  7. The `DMALLOC_SIZE' variable gets auto-configured in `dmalloc.h.2' but it may not generate
+     correct settings for all systems.  You may have to alter the definitions in this file to get
+     things to stop complaining when you go to compile about the size arguments to malloc routines.
+     Comments on this please.
 
-  8. Typing `make' should be enough to build `libdmalloc.a', and
-     `dmalloc' program.  If it does not work, please see if there are
-     any notes in the contrib directory about your system-type.  If not
-     and you figure your problem out, please send me some notes so
-     future users can profit from your experiences.
+  8. Typing `make' should be enough to build `libdmalloc.a', and `dmalloc' program.  If it does not
+     work, please see if there are any notes in the contrib directory about your system-type.  If
+     not and you figure your problem out, please send me some notes so future users can profit from
+     your experiences.
 
-     _NOTE_: You may experience some errors compiling some of the
-     `return.h' assembly macros which attempt to determine the callers
-     address for logging purposes.  *Note Portability::.  You may want
-     to first try disabling any compiler optimization flags.  If this
-     doesn't work then you may need to disable the `USE_RETURN_MACROS'
-     variable in the `settings.h' file.
+     _NOTE_: You may experience some errors compiling some of the `return.h' assembly macros which
+     attempt to determine the callers address for logging purposes.  *Note Portability::.  You may
+     want to first try disabling any compiler optimization flags.  If this doesn't work then you
+     may need to disable the `USE_RETURN_MACROS' variable in the `settings.h' file.
 
-     _NOTE_: The code is dependent on an ANSI-C compiler.  If the
-     configure script gives the `WARNING' that you do not have an ANSI-C
-     compiler, you may still be able to add some sort of option to your
-     compiler to make it ANSI.  If there such is an option, please send
-     it to the author so it can be added to the configure script.
+     _NOTE_: The code is dependent on an ANSI-C compiler.  If the configure script gives the
+     `WARNING' that you do not have an ANSI-C compiler, you may still be able to add some sort of
+     option to your compiler to make it ANSI.  If there such is an option, please send it to the
+     author so it can be added to the configure script.
 
-  9. If you use threads and did not add the `--enable-threads' argument
-     to configure, typing `make threads' should be enough to build
-     `libdmallocth.a' which is the threaded version of the library.
-     This may or may not work depending on the configuration scripts
-     ability to detect your local thread functionality.  Feel free to
-     send me mail with improvements.
+  9. If you use threads and did not add the `--enable-threads' argument to configure, typing `make
+     threads' should be enough to build `libdmallocth.a' which is the threaded version of the
+     library.  This may or may not work depending on the configuration scripts ability to detect
+     your local thread functionality.  Feel free to send me mail with improvements.
 
-     See the section of the manual on threads for more information about
-     the operation of the library with your threaded program.  *Note
-     Using With Threads::.
+     See the section of the manual on threads for more information about the operation of the
+     library with your threaded program.  *Note Using With Threads::.
 
- 10. If you have a C++ compiler installed, the library should have
-     automatically built `libdmallocxx.a' which is the C++ version of
-     the library.  If it was not done automatically, you can build it by
-     typing `make cxx'.  You should link this library into your C++
-     programs instead of `libdmalloc.a'.  See the `dmallocc.cc' C++
-     file which contains basic code to overload the `new', `new[]',
-     `delete', and `delete[]' C++ operators.  My apologies on the
-     minimal C++ support.  I am still living in a mostly C world.  Any
-     help improving this interface without sacrificing portability
-     would be appreciated.
+ 10. If you have a C++ compiler installed, the library should have automatically built
+     `libdmallocxx.a' which is the C++ version of the library.  If it was not done automatically,
+     you can build it by typing `make cxx'.  You should link this library into your C++ programs
+     instead of `libdmalloc.a'.  See the `dmallocc.cc' C++ file which contains basic code to
+     overload the `new', `new[]', `delete', and `delete[]' C++ operators.  My apologies on the
+     minimal C++ support.  I am still living in a mostly C world.  Any help improving this
+     interface without sacrificing portability would be appreciated.
 
- 11. Typing `make light' should build and run the `dmalloc_t' test
-     program through a set of light trials.  By default this will
-     execute `dmalloc_t' 5 times - each time will execute 10,000 malloc
-     operations in a very random manner.  Anal folks can type `make
-     heavy' to up the ante.  Use `dmalloc_t --usage' for the list of all
-     `dmalloc_t' options.
+ 11. Typing `make light' should build and run the `dmalloc_t' test program through a set of light
+     trials.  By default this will execute `dmalloc_t' 5 times - each time will execute 10,000
+     malloc operations in a very random manner.  Anal folks can type `make heavy' to up the ante.
+     Use `dmalloc_t --usage' for the list of all `dmalloc_t' options.
 
- 12. Typing `make install' should install the `libdmalloc.a' library in
-     `/usr/local/lib', the `dmalloc.h' include file in
-     `/usr/local/include', and the `dmalloc' utility in
-     `/usr/local/bin'.  You may also want to type `make installth' to
-     install the thread library into place and/or `make installcc' to
-     install the C++ library into place.
+ 12. Typing `make install' should install the `libdmalloc.a' library in `/usr/local/lib', the
+     `dmalloc.h' include file in `/usr/local/include', and the `dmalloc' utility in
+     `/usr/local/bin'.  You may also want to type `make installth' to install the thread library
+     into place and/or `make installcc' to install the C++ library into place.
 
-     You may have specified a `--prefix=PATH' option to configure in
-     which case `/usr/local' will have been replaced with `PATH'.
+     You may have specified a `--prefix=PATH' option to configure in which case `/usr/local' will
+     have been replaced with `PATH'.
 
 
-   See the "Getting Started" section to get up and running with the
-library.  *Note Getting Started::.
+   See the "Getting Started" section to get up and running with the library.  *Note Getting
+Started::.
 
 
 -------------------------------------------------------------------------------
@@ -116,41 +93,33 @@ library.  *Note Getting Started::.
 2.2 Getting Started with the Library
 ====================================
 
-This section should give you a quick idea on how to get going.
-Basically, you need to do the following things to make use of the
-library:
+This section should give you a quick idea on how to get going.  Basically, you need to do the
+following things to make use of the library:
 
-  1. Make sure you have downloaded the latest version of the library
-     available from the home page at URL `http://dmalloc.com/'.
+  1. Make sure you have downloaded the latest version of the library available from the home page
+     at URL `http://dmalloc.com/'.
 
-  2. Follow the installation instructions on how to configure, make,
-     and install the library (i.e. type: `make install').  *Note
-     Installation::.
+  2. Follow the installation instructions on how to configure, make, and install the library (i.e.
+     type: `make install').  *Note Installation::.
 
-  3. You need to make sure that the library configuration and build
-     process above was able to locate one of the `on_exit' function,
-     `atexit' function, or had compiler destructor support.  If one of
-     these functions or support is available then the dmalloc library
-     should be able to automatically shut itself down when the program
-     exits.  This causes the memory statistics and unfreed information
-     to be dumped to the log file.  However, if your system has none of
-     the above, then you will need to call `dmalloc_shutdown' yourself
-     before your program exits.
+  3. You need to make sure that the library configuration and build process above was able to
+     locate one of the `on_exit' function, `atexit' function, or had compiler destructor support.
+     If one of these functions or support is available then the dmalloc library should be able to
+     automatically shut itself down when the program exits.  This causes the memory statistics and
+     unfreed information to be dumped to the log file.  However, if your system has none of the
+     above, then you will need to call `dmalloc_shutdown' yourself before your program exits.
 
-  4. To get the dmalloc utility to work you need to add an alias for
-     dmalloc to your shell's runtime configuration file if supported.
-     The idea is to have the shell capture the dmalloc program's output
-     and adjust the environment.
+  4. To get the dmalloc utility to work you need to add an alias for dmalloc to your shell's
+     runtime configuration file if supported.  The idea is to have the shell capture the dmalloc
+     program's output and adjust the environment.
 
-     After you add the alias to the shell config file you need to log
-     out and log back in to have it take effect, or you can execute the
-     appropriate command below on the command line directly.  After you
-     setup the alias, if you enter `dmalloc runtime' and see any output
-     with DMALLOC_OPTIONS in it then the alias did not take effect.
+     After you add the alias to the shell config file you need to log out and log back in to have
+     it take effect, or you can execute the appropriate command below on the command line directly.
+     After you setup the alias, if you enter `dmalloc runtime' and see any output with
+     DMALLOC_OPTIONS in it then the alias did not take effect.
 
-     Bash, ksh, and zsh (`http://www.zsh.org/') users should add the
-     following to their `.bashrc', `.profile', or `.zshrc' file
-     respectively (notice the `-b' option for bourne shell output):
+     Bash, ksh, and zsh (`http://www.zsh.org/') users should add the following to their `.bashrc',
+     `.profile', or `.zshrc' file respectively (notice the `-b' option for bourne shell output):
 
           function dmalloc { eval `command dmalloc -b $*`; }
 
@@ -160,22 +129,21 @@ library:
      or
           function dmalloc { eval `/usr/local/bin/dmalloc -b $*`; }
 
-     If you are still using csh or tcsh, you should add the following to
-     your `.cshrc' file (notice the `-C' option for c-shell output):
+     If you are still using csh or tcsh, you should add the following to your `.cshrc' file (notice
+     the `-C' option for c-shell output):
 
           alias dmalloc 'eval `\dmalloc -C \!*`'
 
-     If you are using rc shell, you should add the following to your
-     `.rcrc' file (notice the `-R' option for rc-shell output):
+     If you are using rc shell, you should add the following to your `.rcrc' file (notice the `-R'
+     option for rc-shell output):
 
           fn dmalloc {eval `{/usr/local/bin/dmalloc $*}}
 
-  5. Although not necessary, you may want to include `dmalloc.h' in
-     your C files and recompile.  This will allow the library to report
-     the file/line numbers of calls that generate problems.  *Note
-     Allocation Macros::.  It should be inserted at the _bottom_ of
-     your include files as to not conflict with wother includes.  You
-     may want to ifdef it as well and compile with `cc -DDMALLOC ...':
+  5. Although not necessary, you may want to include `dmalloc.h' in your C files and recompile.
+     This will allow the library to report the file/line numbers of calls that generate problems.
+     *Note Allocation Macros::.  It should be inserted at the _bottom_ of your include files as to
+     not conflict with wother includes.  You may want to ifdef it as well and compile with `cc
+     -DDMALLOC ...':
 
           /* other includes above ^^^ */
 
@@ -183,58 +151,48 @@ library:
           #include "dmalloc.h"
           #endif
 
-  6. Another optional task is to compile all of your source with the
-     `dmalloc.h' with the `DMALLOC_FUNC_CHECK' compilation flag.  This
-     willallow the library to check all of the arguments of a number of
-     common string and utility routines.  *Note Argument Checking::.
+  6. Another optional task is to compile all of your source with the `dmalloc.h' with the
+     `DMALLOC_FUNC_CHECK' compilation flag.  This willallow the library to check all of the
+     arguments of a number of common string and utility routines.  *Note Argument Checking::.
 
           cc -DDMALLOC -DDMALLOC_FUNC_CHECK file.c
 
-  7. Link the dmalloc library into your program.  The dmalloc library
-     should probably be placed at or near the end of the library list.
+  7. Link the dmalloc library into your program.  The dmalloc library should probably be placed at
+     or near the end of the library list.
 
-  8. Enable the debugging features by typing `dmalloc -l logfile -i 100
-     low' (for example).  You should not see any messages printed by
-     the dmalloc utility (see NOTE below).  This will:
+  8. Enable the debugging features by typing `dmalloc -l logfile -i 100 low' (for example).  You
+     should not see any messages printed by the dmalloc utility (see NOTE below).  This will:
 
-        * Set the malloc logfile name to `logfile' (`-l logfile').  For
-          programs which change directories, you may want to specify the
-          full path to your logfile.
+        * Set the malloc logfile name to `logfile' (`-l logfile').  For programs which change
+          directories, you may want to specify the full path to your logfile.
 
-        * Have the library check itself every 100 iterations (`-i 100').
-          This controls how fast your program will run.  Larger numbers
-          check the heap less and so it will run faster.  Lower numbers
-          will be more likely to catch memory problems.
+        * Have the library check itself every 100 iterations (`-i 100').  This controls how fast
+          your program will run.  Larger numbers check the heap less and so it will run faster.
+          Lower numbers will be more likely to catch memory problems.
 
-        * Enable a number of debug features (`low').  You can also try
-          `runtime' for minimal checking or `medium' or `high' for more
-          extensive heap verification.
+        * Enable a number of debug features (`low').  You can also try `runtime' for minimal
+          checking or `medium' or `high' for more extensive heap verification.
 
-        * By default, the low, medium, and high values enable the
-          `error-abort' token which will cause the library to abort and
-          usually dump core immediately upon seeing an error.  *Note
-          Dumping Core::.  You can disable this feature by entering
-          `dmalloc -m error-abort' (-m for minus) to remove the
-          `error-abort' token and your program will just log errors and
+        * By default, the low, medium, and high values enable the `error-abort' token which will
+          cause the library to abort and usually dump core immediately upon seeing an error.  *Note
+          Dumping Core::.  You can disable this feature by entering `dmalloc -m error-abort' (-m
+          for minus) to remove the `error-abort' token and your program will just log errors and
           continue.
 
 
-     `dmalloc --usage' will provide verbose usage info for the dmalloc
-     program.  *Note Dmalloc Program::.
+     `dmalloc --usage' will provide verbose usage info for the dmalloc program.  *Note Dmalloc
+     Program::.
 
-     You may also want to install the `dmallocrc' file in your home
-     directory as `.dmallocrc'.  This allows you to add your own
-     combination of debug tokens.  *Note RC File::.
+     You may also want to install the `dmallocrc' file in your home directory as `.dmallocrc'.
+     This allows you to add your own combination of debug tokens.  *Note RC File::.
 
-     _NOTE_: The output from the dmalloc utility should be captured by
-     your shell.  If you see a bunch of stuff which includes the string
-     `DMALLOC_OPTIONS' then the alias you should have created above is
-     not working and he environmental variables are not being set.  Make
-     sure you've logged out and back in to have the alias take effect.
+     _NOTE_: The output from the dmalloc utility should be captured by your shell.  If you see a
+     bunch of stuff which includes the string `DMALLOC_OPTIONS' then the alias you should have
+     created above is not working and he environmental variables are not being set.  Make sure
+     you've logged out and back in to have the alias take effect.
 
-  9. Run your program, examine the logfile that should have been
-     created by `dmalloc_shutdown', and use its information to help
-     debug your program.
+  9. Run your program, examine the logfile that should have been created by `dmalloc_shutdown', and
+     use its information to help debug your program.
 
 
 
@@ -243,101 +201,81 @@ library:
 6 Some Solutions to Common Problems
 ***********************************
 
-This section provides some answers to some common problems and
-questions.  Please send me mail with any additions to this list -
-either problems you are still having or tips that you would like to
+This section provides some answers to some common problems and questions.  Please send me mail with
+any additions to this list - either problems you are still having or tips that you would like to
 pass on.
 
-   When diagnosing a problem, if possible, always make sure you are
-running the most up to date version of Dmalloc available from the home
-page at URL `http://dmalloc.com/'.  Problems are often fixed and a new
-release can be published before people encounter them.
+   When diagnosing a problem, if possible, always make sure you are running the most up to date
+version of Dmalloc available from the home page at URL `http://dmalloc.com/'.  Problems are often
+fixed and a new release can be published before people encounter them.
 
 `Why does my program run so slow?'
-     This library has never been (and maybe never will be) optimized for
-     space nor speed.  Some of its features make it unable to use some
-     of the organizational methods of other more efficient heap
-     libraries.
+     This library has never been (and maybe never will be) optimized for space nor speed.  Some of
+     its features make it unable to use some of the organizational methods of other more efficient
+     heap libraries.
 
-     If you have the `check-heap' token enabled, your program might run
-     slow or seem to hang.  This is because by default, the library
-     will run a full check of the heap with every memory allocation or
-     free.  You can have the library check itself less frequently by
-     using the `-i' option to the dmalloc utility.  *Note Dmalloc
-     Program::.  If you are using the `high' token and you need your
-     program to run faster, try the `medium' or `low' tokens which
-     don't check as many heap features and so run faster although they
-     will not catch as many problems. *Note RC File::.
+     If you have the `check-heap' token enabled, your program might run slow or seem to hang.  This
+     is because by default, the library will run a full check of the heap with every memory
+     allocation or free.  You can have the library check itself less frequently by using the `-i'
+     option to the dmalloc utility.  *Note Dmalloc Program::.  If you are using the `high' token
+     and you need your program to run faster, try the `medium' or `low' tokens which don't check as
+     many heap features and so run faster although they will not catch as many problems. *Note RC
+     File::.
 
 `Why was a log-file not produced after I ran my program?'
      This could be caused by a number of different problems.
 
-       1. Are you sure you followed all of the items in the "Getting
-          Started" section?  Please review them if there is any doubt.
-          *Note Getting Started::.
+       1. Are you sure you followed all of the items in the "Getting Started" section?  Please
+          review them if there is any doubt.  *Note Getting Started::.
 
-       2. Use the `env' or `printenv' commands to make sure that the
-          `DMALLOC_OPTIONS' variable is set in your exported
-          environment.  *Note Environment Variable::.
+       2. Use the `env' or `printenv' commands to make sure that the `DMALLOC_OPTIONS' variable is
+          set in your exported environment.  *Note Environment Variable::.
 
-       3. Make sure that your program has been compiled correctly with
-          the dmalloc library.  The `ident' program should show chunk.c
-          and other dmalloc files compiled into your program.  You can
-          also do `strings -a your-program | grep chunk.c' and look for
-          something like `$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray
-          Exp $' with different versions and date information.  If this
-          doesn't show up then chances are dmalloc was not linked into
-          your program.
+       3. Make sure that your program has been compiled correctly with the dmalloc library.  The
+          `ident' program should show chunk.c and other dmalloc files compiled into your program.
+          You can also do `strings -a your-program | grep chunk.c' and look for something like `$Id:
+          chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $' with different versions and date
+          information.  If this doesn't show up then chances are dmalloc was not linked into your
+          program.
 
-       4. If your program changes its working directory, it may write
-          the dmalloc log-file somewhere else in the filesystem.  You
-          will need to check both where the program was started and to
-          where it might change directory.
+       4. If your program changes its working directory, it may write the dmalloc log-file
+          somewhere else in the filesystem.  You will need to check both where the program was
+          started and to where it might change directory.
 
-       5. The logfile is only produced when `dmalloc_shutdown()' is
-          called.  By default it will be called when `exit()' gets
-          called.  If you are running your program and press
-          `Control-C' under Unix the program will stop immediately and
-          `dmalloc_shutdown()' will not get called.  You can either
-          setup a signal handler for `SIGINTR' and call exit yourself,
-          or you can enable the `catch-signals' token.  *Note Debug
-          Tokens::.
+       5. The logfile is only produced when `dmalloc_shutdown()' is called.  By default it will be
+          called when `exit()' gets called.  If you are running your program and press `Control-C'
+          under Unix the program will stop immediately and `dmalloc_shutdown()' will not get
+          called.  You can either setup a signal handler for `SIGINTR' and call exit yourself, or
+          you can enable the `catch-signals' token.  *Note Debug Tokens::.
 
-       6. If your program is segfaulting or otherwise crashing when it
-          exits, the `exit()' routine may not being called.  You will
-          have to resolve these issues so the dmalloc library can
+       6. If your program is segfaulting or otherwise crashing when it exits, the `exit()' routine
+          may not being called.  You will have to resolve these issues so the dmalloc library can
           gracefully exit and write its log file.
 
-       7. You may want to call `dmalloc_log_stats()' and
-          `dmalloc_log_unfreed()' (or `dmalloc_log_changed()') directly
-          to have the library write its log file.  Some system modules
-          may not have shutdown if you call this before `exit()' so
-          extra unfreed memory may be reported.
+       7. You may want to call `dmalloc_log_stats()' and `dmalloc_log_unfreed()' (or
+          `dmalloc_log_changed()') directly to have the library write its log file.  Some system
+          modules may not have shutdown if you call this before `exit()' so extra unfreed memory
+          may be reported.
 
 
 `I don't see any information about my non-freed (leaked) memory?'
-     The library will not (by default) report on "unknown" non-freed
-     memory.  Unknown means memory that does not have associated file
-     and line information.
+     The library will not (by default) report on "unknown" non-freed memory.  Unknown means memory
+     that does not have associated file and line information.
 
-     This will be necessary if you are _not_ including `dmalloc.h' in
-     all of your C files or if you are interested in tracking leaks in
-     system functions.
+     This will be necessary if you are _not_ including `dmalloc.h' in all of your C files or if you
+     are interested in tracking leaks in system functions.
 
 `Dmalloc is returning the error "malloc library has gone recursive"'
-     This most likely indicates that you are using the Dmalloc library
-     within a threaded application and two threads are trying to use
-     the dmalloc library at once.  Please see the section of the manual
-     about threads for more information about properly configuring the
+     This most likely indicates that you are using the Dmalloc library within a threaded
+     application and two threads are trying to use the dmalloc library at once.  Please see the
+     section of the manual about threads for more information about properly configuring the
      library.  *Note Using With Threads::.
 
-     If you are not using threads, then your program could have caught a
-     signal while within Dmalloc, which then in turn called a memory
-     allocation routine.  It is unwise to allocate memory on the heap
-     in most signal handlers.  Lastly, some functions called by the
-     library may call memory routines that it does not anticipate.  If
-     you think this the case, please report the problem and include a
-     stack trace, operating system version/type, and the version of
+     If you are not using threads, then your program could have caught a signal while within
+     Dmalloc, which then in turn called a memory allocation routine.  It is unwise to allocate
+     memory on the heap in most signal handlers.  Lastly, some functions called by the library may
+     call memory routines that it does not anticipate.  If you think this the case, please report
+     the problem and include a stack trace, operating system version/type, and the version of
      Dmalloc you are using.
 
 
