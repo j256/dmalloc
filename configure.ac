@@ -279,6 +279,27 @@ main() { exit(1); }
 AC_MSG_RESULT([$ac_cv_strdup_macro])
 
 #
+# check for strndup macro (linux)
+#
+AC_MSG_CHECKING([strndup macro])
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#if HAVE_STDLIB_H
+#  include <string.h>
+#endif
+
+#ifdef strndup
+main() { exit(0); }
+#else
+main() { exit(1); }
+#endif
+]])],
+[ac_cv_strndup_macro=yes],
+[ac_cv_strndup_macro=no],
+[ac_cv_strndup_macro=no]
+)
+AC_MSG_RESULT([$ac_cv_strndup_macro])
+
+#
 # check for existance of mprotect and associated defines
 #
 AC_CHECK_FUNCS(mprotect)
@@ -755,6 +776,13 @@ if test "$ac_cv_strdup_macro" = "yes"; then
 else
 	echo '/* strdup is not a macro */' >> $newfile.t
 	echo '#undef DMALLOC_STRDUP_MACRO' >> $newfile.t
+fi
+if test "$ac_cv_strndup_macro" = "yes"; then
+	echo '/* strndup is a macro */' >> $newfile.t
+	echo '#define DMALLOC_STRNDUP_MACRO' >> $newfile.t
+else
+	echo '/* strndup is not a macro */' >> $newfile.t
+	echo '#undef DMALLOC_STRNDUP_MACRO' >> $newfile.t
 fi
 echo '' >> $newfile.t
 
