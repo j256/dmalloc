@@ -10,8 +10,11 @@ jobs:
           name: configure
           command: ./configure
       - run:
-          name: make clean tests
-          command: make clean tests
+          name: make
+          command: make clean all tests
+      - run:
+          name: run utility
+          command: ./dmalloc
       - run:
           name: run tests
           command: make light heavy
