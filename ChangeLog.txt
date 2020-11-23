@@ -6,7 +6,6 @@ Version 5.6.0 (11/22/2020):
 	* Added append_string and friends for better string output.
 	* Fixed strndup handling when it is a macro.  Thanks to danielgora.
 	* Fixed strndup configuration and handling in general.
-	* Added x86-64 return-address code.  Thanks to Vyacheslav Tyrtov.
 	* Added better getenv handling.
 	* Fixed issues around page-size detection and heap extension.
 	* Added circleci to github.

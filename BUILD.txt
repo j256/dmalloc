@@ -21,8 +21,10 @@ The following set of tasks should be performed when the dmalloc library gets rel
 9) Clone on linux and others and run tests: git clone git@github.com:j256/dmalloc.git
 10) Run release.sh script.  It will run tests on repo.
 11) git tag the release with dmalloc_release_X_X_X
-12) Install the tgz file and html file in the dmalloc.com repo
-13) Edit releases/index.html to include the new version
-14) Installed the updated doc files into the dmalloc.com repo.
+12) create release on github for X.X.X.
+13) Upload tar.gz file as part of that release
+14) Install the tgz file and html file in the dmalloc.com repo
+15) Edit releases/index.html to include the new version
+16) Go to the /docs dir and run the explode-docs.sh script.
 
 -------------------------------------------------------------------------------

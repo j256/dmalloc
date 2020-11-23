@@ -171,8 +171,7 @@ distclean : clean
 	rm -f confdefs.h config.status config.log config.cache conf.h
 	rm -f configure.lineno
 	rm -rf autom4te.cache
-	rm -f Makefile settings.h dmalloc.h.2
-	rm -f INSTALL.txt dmalloc.info dmalloc.html
+	rm -f Makefile settings.h dmalloc.h dmalloc.h.2 dmalloc.h.3
 #	rm -f configure
 
 docs : $(DOCS)
@@ -227,8 +226,7 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE) \
-		$(srcdir)/docs/$(PDFFILE)
+installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE) $(srcdir)/docs/$(PDFFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
 	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(docdir)
 	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(docdir)
@@ -239,21 +237,23 @@ install : installincs installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(docdir)"
 
-dmalloc.h.2 : $(srcdir)/configure
+dmalloc.h.2 conf.h settings.h : $(srcdir)/configure $(srcdir)/settings.dist $(srcdir)/conf.h.in
 	$(SHELL) $(srcdir)/configure
 	-touch $@
 
 dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
-	$(srcdir)/arg_check.h $(srcdir)/dmalloc.h.6
-	rm -f $@ $@.t malloc.h.t
-	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/malloc.h \
-		> malloc.h.t
-	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' \
-		-e '/^#endif/d' $(srcdir)/arg_check.h > arg_check.h.t
-	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 \
-		arg_check.h.t $(srcdir)/dmalloc.h.6 > $@.t
+		$(srcdir)/arg_check.h $(srcdir)/dmalloc.h.6
+	rm -f $@ $@.t malloc.h.t arg_check.h.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/malloc.h > malloc.h.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' -e '/^#endif/d' $(srcdir)/arg_check.h > arg_check.h.t
+	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 arg_check.h.t $(srcdir)/dmalloc.h.6 > $@.t
 	mv $@.t $@
 	rm -f malloc.h.t arg_check.h.t
+
+dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
+	rm -f $@ $@.t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
+	mv $@.t $@
 
 $(INFOFILE) : $(srcdir)/dmalloc.texi
 	rm -f $@ $@.t
@@ -262,37 +262,24 @@ $(INFOFILE) : $(srcdir)/dmalloc.texi
 
 INSTALL.txt : $(INFOFILE)
 	rm -f $@ $@.t
-	echo ------------------------------------------------------------------------------- \
-		> $@.t
+	echo ------------------------------------------------------------------------------- > $@.t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $@.t
-	echo ------------------------------------------------------------------------------- \
-		>> $@.t
+	echo ------------------------------------------------------------------------------- >> $@.t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Node: Allocation Basics/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $@.t
-	echo ------------------------------------------------------------------------------- \
-		>> $@.t
+	echo ------------------------------------------------------------------------------- >> $@.t
 	sed -e '1,/,  Node: Troubleshooting/d' \
 		-e '/,  Node: Index of Concepts/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $@.t
-	echo ------------------------------------------------------------------------------- \
-		>> $@.t
+	echo ------------------------------------------------------------------------------- >> $@.t
 	mv $@.t $@
 
 dmalloc.html : $(srcdir)/dmalloc.texi
 	rm -f $@ $@.t
 	texi2html  --output=$@.t -number -monolithic $(srcdir)/dmalloc.texi
-	mv $@.t $@
-
-settings.h : $(srcdir)/settings.dist $(srcdir)/configure
-	$(SHELL) $(srcdir)/configure
-	-touch $@
-
-dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
-	rm -f $@ $@.t
-	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3 > $@.t
 	mv $@.t $@
 
 shlib : $(BUILD_SL)
@@ -357,25 +344,21 @@ utils : $(UTIL)
 
 $(UTIL) : $(UTIL).o dmalloc_argv.o compat.o env.o append.o
 	rm -f $@
-	$(CC) $(LDFLAGS) -o $(A_OUT) $(UTIL).o dmalloc_argv.o compat.o env.o append.o \
-		$(LIBS)
+	$(CC) $(LDFLAGS) -o $(A_OUT) $(UTIL).o dmalloc_argv.o compat.o env.o append.o $(LIBS)
 	mv $(A_OUT) $@
 
 # special _th versions of objects with the LOCK_THREADS variable defined to 1
 chunk_th.o : $(srcdir)/chunk.c
 	rm -f $@
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c $(srcdir)/chunk.c -o ./$@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/chunk.c -o ./$@
 
 error_th.o : $(srcdir)/error.c
 	rm -f $@
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c $(srcdir)/error.c -o ./$@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/error.c -o ./$@
 
 malloc_th.o : $(srcdir)/malloc.c
 	rm -f $@
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 \
-		-c $(srcdir)/malloc.c -o ./$@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/malloc.c -o ./$@
 
 tests : $(TEST) $(TEST_FC)
 
@@ -414,8 +397,7 @@ heavy : $(TEST) light
 #
 dmallocc.o : $(srcdir)/dmallocc.cc
 	rm -f $@
-	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $(srcdir)/dmallocc.cc \
-		-o ./$@
+	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $(srcdir)/dmallocc.cc -o ./$@
 
 depend :
 	rm -f Makefile.t
@@ -427,23 +409,7 @@ depend :
 	- $(CC) $(INCS) -MM error.c | sed -e 's/^error.o/error_th.o/' >> Makefile.t
 	- $(CC) $(INCS) -MM malloc.c | sed -e 's/^malloc.o/malloc_th.o/' >> Makefile.t
 	@ echo 'Dependencies in Makefile.t'
-
-#
-# auto configure settings - uncomment if you are doing configure
-# development on the library
-#
-
-#Makefile : $(srcdir)/Makefile.in config.status
-#	$(SHELL) config.status
-
-#conf.h : $(srcdir)/conf.h.in config.status
-#	$(SHELL) config.status
-
-#config.status : $(srcdir)/configure
-#	$(SHELL) config.status --recheck
-
-# $(srcdir)/configure : $(srcdir)/configure.ac
-#	cd $(srcdir); autoconf
+	diff Makefile Makefile.t
 
 ###############################################################################
 #
