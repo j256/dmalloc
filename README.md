@@ -9,17 +9,13 @@ facilities configurable at runtime.  These facilities include such things as mem
 write detection, file/line number reporting, and general logging of statistics.
 
 The library is reasonably portable having been run successfully on at least the following operating systems:
-AIX, DGUX, Free/Net/OpenBSD, GNU/Hurd, HPUX, Irix, Linux, Mac OSX, NeXT, OSF/DUX, SCO, Solaris, Ultrix,
+AIX, DGUX, Free/Net/OpenBSD, GNU/Hurd, HPUX, Irix, Linux, OSX, NeXT, OSF/DUX, SCO, Solaris, Sunos, Ultrix,
 Unixware, MS Windows, and Unicos on a Cray T3E.  It also provides support for the debugging of threaded
 programs.
 
 The package includes the library, configuration scripts, debug utility application, test program, and
 documentation.  Online documentation as well as the full source is available at the [dmalloc home
 page](http://dmalloc.com/).   Details on the library's mailing list are available there as well.
-
-The author can be reached via [his home page](http://256stuff.com/gray/) with questions or feedback.
-Please include the version number of the library that you are using, your machine and operating system types,
-and the value of the DMALLOC_OPTIONS environment variable.
 
 Enjoy, Gray Watson
 
@@ -44,7 +40,8 @@ The newest versions of the [argv library are available online](http://256stuff.c
 
 ## Thanks
 
-Many net folk contributed to the design, development, and overall library and my thanks goes out to them all.
+The initial idea of this library came from Doug Balog.  He and many other net folk contributed to the design,
+development, and overall library and my thanks goes out to them all.
 
 ## Author
 
