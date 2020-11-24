@@ -12,7 +12,7 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@set dmalloc_version Version 5.6.0
+@set dmalloc_version Version 5.6.1
 @set dmalloc_date November 2020
 @set dmalloc_copyright Copyright 1992 to 2020 by Gray Watson.
 @c ----------------------------------------------------------------

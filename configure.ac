@@ -18,8 +18,7 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
-AC_REVISION($Revision: 1.37 $)
-AC_INIT(dmalloc, 5.6.0, [http://dmalloc.com/])
+AC_INIT(dmalloc, 5.6.1, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 

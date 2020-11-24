@@ -3,7 +3,7 @@
 #
 Summary: Debug Malloc (Dmalloc)
 Name: dmalloc
-Version: 5.6.0
+Version: 5.6.1
 Release: 1
 Group: Development/Libraries
 Copyright: public domain

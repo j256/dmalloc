@@ -1,5 +1,9 @@
 -------------------------------------------------------------------------------
 
+Version 5.6.1 (11/24/2020):
+
+	* Fixed the installdocs target.  Thanks to matthewluckie.
+
 Version 5.6.0 (11/22/2020):
 
 	* Implemented a snprintf to [hopefully] stop recursion.  Thanks to drok.
