@@ -105,13 +105,11 @@ application, test program, and documentation.  Online documentation as
 well as the full source is available at URL @uref{http://dmalloc.com/}.
 Details on the library's mailing list are available there as well.
 
-Please use the forums at URL @uref{http://dmalloc.com/} to discuss any
-problems or to request features.  If you are still having problems,
-the author can be reached via his home page at URL
-@uref{http://256stuff.com/gray/} with questions or feedback.  Please
-include the version number of the library that you are using, your
-machine and operating system types, and the value of the
-DMALLOC_OPTIONS environment variable.
+Please use the github issues URL
+@uref{https://github.com/j256/dmalloc/issues} if you have any problems
+or to request features.  Please include the version number of the
+library that you are using, your machine and operating system types,
+and the value of the DMALLOC_OPTIONS environment variable.
 
 Gray Watson.
 
