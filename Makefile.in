@@ -226,11 +226,10 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE) $(srcdir)/docs/$(PDFFILE)
+installdocs : $(srcdir)/$(HTMLFILE) $(srcdir)/$(INFOFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
-	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(docdir)
-	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(docdir)
-	$(INSTALL_DATA) $(srcdir)/docs/$(PDFFILE) $(docdir)
+	$(INSTALL_DATA) $(srcdir)/$(HTMLFILE) $(docdir)
+	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(docdir)
 
 install : installincs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
@@ -374,17 +373,17 @@ $(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 
 check light : $(TEST) $(TEST_FC)
 	./$(TEST_FC) -s
-	./$(TEST) -s -t 10000
-	./$(TEST) -s -t 10000
-	./$(TEST) -s -t 10000
-	./$(TEST) -s -t 10000
-	./$(TEST) -s -t 10000
+	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 100000
 	@echo tests have passed
 
 heavy : $(TEST) light
-	./$(TEST) -s -t 100000
-	./$(TEST) -s -t 100000
-	./$(TEST) -s -t 100000
+	./$(TEST) -s -t 1000000
+	./$(TEST) -s -t 1000000
+	./$(TEST) -s -t 1000000
 	@echo heavy tests have passed
 
 .c.o :
