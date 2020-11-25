@@ -3332,7 +3332,6 @@ static	int	check_special(void)
    * Make sure that string tokens work in the processing program.
    */
   {
-    unsigned int	old_flags = dmalloc_debug_current();
     unsigned int	new_flags;
     
     if (! silent_b) {

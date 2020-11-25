@@ -2344,11 +2344,13 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
 			       const unsigned int alignment)
 {
   unsigned long	needed_size;
-  int		valloc_b = 0, memalign_b = 0, fence_b = 0;
+  int		valloc_b = 0, fence_b = 0;
   char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
   skip_alloc_t	*slot_p;
   pnt_info_t	pnt_info;
   const char	*trans_log;
+  
+  // TOTO: is alignment used here appropriately?
   
   /* counts calls to malloc */
   if (func_id == DMALLOC_FUNC_CALLOC) {
@@ -2360,7 +2362,6 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
   }
   else if (alignment > 0) {
     func_memalign_c++;
-    memalign_b = 1;
   }
   else if (func_id == DMALLOC_FUNC_NEW) {
     func_new_c++;
