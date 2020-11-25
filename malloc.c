@@ -103,6 +103,8 @@ static char *information = "@(#) $Information: lock-threads is enabled $";
 #endif
 #endif
 
+#define INT_TYPE	int
+
 /* exported variables */
 
 /* internal dmalloc error number for reference purposes only */
@@ -1349,17 +1351,17 @@ char	*strndup(const char *string, const DMALLOC_SIZE max_len)
 DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 {
   char	*file;
-#if DMALLOC_FREE_RET == int
+#ifdef DMALLOC_FREE_RET_INT
   int	ret;
 #endif
   
   GET_RET_ADDR(file);
-#if DMALLOC_FREE_RET == int
+#ifdef DMALLOC_FREE_RET_INT
   ret =
 #endif
     dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_FREE);
   
-#if DMALLOC_FREE_RET == int
+#ifdef DMALLOC_FREE_RET_INT
   return ret;
 #endif
 }
@@ -1384,17 +1386,17 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 {
   char	*file;
-#if DMALLOC_FREE_RET == int
+#ifdef DMALLOC_FREE_RET_INT
   int	ret;
 #endif
   
   GET_RET_ADDR(file);
-#if DMALLOC_FREE_RET == int
+#ifdef DMALLOC_FREE_RET_INT
   ret =
 #endif
     dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_CFREE);
   
-#if DMALLOC_FREE_RET == int
+#ifdef DMALLOC_FREE_RET_INT
   return ret;
 #endif
 }
