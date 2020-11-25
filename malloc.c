@@ -1349,13 +1349,17 @@ char	*strndup(const char *string, const DMALLOC_SIZE max_len)
 DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 {
   char	*file;
+#if DMALLOC_FREE_RET == int
   int	ret;
+#endif
   
   GET_RET_ADDR(file);
-  ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_FREE);
+#if DMALLOC_FREE_RET == int
+  ret =
+#endif
+    dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_FREE);
   
-#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS)
-#else
+#if DMALLOC_FREE_RET == int
   return ret;
 #endif
 }
@@ -1380,13 +1384,17 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt)
 DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt)
 {
   char	*file;
+#if DMALLOC_FREE_RET == int
   int	ret;
+#endif
   
   GET_RET_ADDR(file);
-  ret = dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_CFREE);
+#if DMALLOC_FREE_RET == int
+  ret =
+#endif
+    dmalloc_free(file, DMALLOC_DEFAULT_LINE, pnt, DMALLOC_FUNC_CFREE);
   
-#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS)
-#else
+#if DMALLOC_FREE_RET == int
   return ret;
 #endif
 }

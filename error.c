@@ -147,8 +147,7 @@ static	char	message_str[1024];		/* message string buffer */
  */
 static	void	build_logfile_path(char *buf, const int buf_len)
 {
-  char	*bounds_p;
-  char	*path_p, *buf_p, *start_p;
+  char	*bounds_p, *path_p, *buf_p;
   int	len;
   
   if (dmalloc_logpath == NULL) {
@@ -159,7 +158,6 @@ static	void	build_logfile_path(char *buf, const int buf_len)
   buf_p = buf;
   bounds_p = buf + buf_len;
   
-  start_p = dmalloc_logpath;
   for (path_p = dmalloc_logpath; *path_p != '\0'; path_p++) {
     
     /* if we don't have to do anything special then just continue */
