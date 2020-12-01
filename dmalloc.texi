@@ -13,65 +13,45 @@
 
 @c ----------------------------------------------------------------
 @set dmalloc_version Version 5.6.1
-@set dmalloc_date November 2020
-@set dmalloc_copyright Copyright 1992 to 2020 by Gray Watson.
+@set dmalloc_month November
+@set dmalloc_year 2020
+@set dmalloc_date @value{dmalloc_month} @value{dmalloc_year}
+@set dmalloc_copyright Copyright 1992 to @value{dmalloc_year} by Gray Watson.
 @c ----------------------------------------------------------------
 
 @ifinfo
-This file is an introduction to the Dmalloc library which handles general
-memory heap management.
+This manual is licensed by Gray Watson under the Creative Commons Attribution-Share Alike 3.0 License.
 
-@value{dmalloc_copyright}
-
-Permission is granted to make and distribute verbatim copies of this
-manual provided the copyright notice and this permission notice are
-preserved on all copies.
-
-@ignore
-Permission is granted to process this file through TeX and print the
-results, provided the printed document carries a copying permission
-notice identical to this one except for the removal of this paragraph
-(this paragraph not being relevant to the printed manual).
-
-@end ignore
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided also that the
-chapter entitled ``Copying'' are included exactly as in the original,
-and provided that the entire resulting derived work is distributed under
-the terms of a permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions,
-except that the chapter entitled ``Copying'' may be included in a
-translation approved by the author instead of in the original English.
+Permission is granted to make and distribute verbatim copies of this manual provided this license
+notice and this permission notice are preserved on all copies.
 @end ifinfo
 
 @titlepage
+@headings off
 @title Debug Malloc Library
-@subtitle @value{dmalloc_version}
+@subtitle Version @value{dmalloc_version}
 @subtitle @value{dmalloc_date}
 @author Gray Watson
 
 @page
-@value{dmalloc_copyright}
+@setfilename dmalloc.info
+@settitle Dmalloc Documentation
+@headings double
+@c %**end of header
 
-Published by Gray Watson
+@page
+This manual is licensed by Gray Watson under the Creative Commons Attribution-Share Alike 3.0 License.
 
-Permission is granted to make and distribute verbatim copies of this
-manual provided the copyright notice and this permission notice are
-preserved on all copies.
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided also that the
-chapter entitled ``Copying'' are included exactly as in the original,
-and provided that the entire resulting derived work is distributed under
-the terms of a permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions,
-except that the chapter entitled ``Copying'' may be included in a
-translation approved by the author instead of in the original English.
+Permission is granted to make and distribute verbatim copies of this manual provided this license
+notice and this permission notice are preserved on all copies.
 @end titlepage
+
+@c ----------------------------------------------------------------
+
+@c In the printed manual, we put the contents at the front.  For the digital manuals it is at the end. 
+@iftex
+@contents
+@end iftex
 
 @c --------------------------------
 
@@ -79,7 +59,7 @@ translation approved by the author instead of in the original English.
 @top Debug Malloc Library
 
 @ifinfo
-@value{dmalloc_version} -- @value{dmalloc_date}
+Version @value{dmalloc_version} -- @value{dmalloc_date}
 @end ifinfo
 
 @cindex introduction
@@ -130,21 +110,24 @@ Gray Watson.
 
 @cindex copying
 @cindex license
+@cindex isc license
+@cindex open source license
 @cindex library permissions
 @cindex permissions of the library
 
 @value{dmalloc_copyright}
 
-Permission to use, copy, modify, and distribute this software for any
-purpose and without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies, and
-that the name of Gray Watson not be used in advertising or publicity
-pertaining to distribution of the document or software without specific,
-written prior permission.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
 
-Gray Watson makes no representations about the suitability of the
-software described herein for any purpose.  It is provided ``as is''
-without express or implied warranty.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 @c ----------------------------------------------------------------------------
 
