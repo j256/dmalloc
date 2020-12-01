@@ -371,14 +371,18 @@ $(TEST_FC) : $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 	$(CC) $(LDFLAGS) -o $(A_OUT) $(TEST_FC).o dmalloc_argv.o $(LIBRARY)
 	mv $(A_OUT) $@
 
-check light : $(TEST) $(TEST_FC)
+check : $(TEST) $(TEST_FC)
 	./$(TEST_FC) -s
+	./$(TEST) -s -t 0
+	@echo checks have passed
+
+light : $(TEST) $(TEST_FC) check
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
 	./$(TEST) -s -t 100000
-	@echo tests have passed
+	@echo light tests have passed
 
 heavy : $(TEST) light
 	./$(TEST) -s -t 1000000
