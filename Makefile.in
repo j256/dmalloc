@@ -238,7 +238,7 @@ install : installincs installlib $(UTIL)
 
 dmalloc.h.2 conf.h settings.h : $(srcdir)/configure $(srcdir)/settings.dist $(srcdir)/conf.h.in
 	$(SHELL) $(srcdir)/configure
-	-touch $@
+	-touch dmalloc.h.2 conf.h settings.h
 
 dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
 		$(srcdir)/arg_check.h $(srcdir)/dmalloc.h.6

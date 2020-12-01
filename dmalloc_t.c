@@ -255,7 +255,7 @@ static	int	do_random(const int iter_n)
       final = 0;
     }
     
-    /* special case when doing non-linear stuff, sbrk took all memory */
+    /* special case when doing non-linear stuff, no memory available */
     if (max_avail < MIN_AVAIL && free_p == NULL) {
       break;
     }
@@ -450,7 +450,7 @@ static	int	do_random(const int iter_n)
       }
       break;
       
-      /* sbrk */
+      /* heap alloc */
     case 5:
       /* do it less often then the other functions */
       which = _dmalloc_rand() % 5;
@@ -3959,9 +3959,6 @@ static	void	do_interactive(void)
       
       (void)printf("\tverify    - check out a memory address (or all heap)\n");
       (void)printf("\toverwrite - overwrite some memory to test errors\n");
-#if HAVE_SBRK
-      (void)printf("\tsbrk       - call sbrk to test external areas\n\n");
-#endif
       
       (void)printf("\trandom    - randomly execute a number of [de] allocs\n");
       (void)printf("\tspecial   - run some special tests\n\n");
@@ -4113,21 +4110,6 @@ static	void	do_interactive(void)
       (void)printf("Done.\n");
       continue;
     }
-    
-#if HAVE_SBRK
-    /* call sbrk directly */
-    if (strncmp(line, "sbrk", len) == 0) {
-      int	size;
-      
-      (void)printf("How much to sbrk: ");
-      if (fgets(line, sizeof(line), stdin) == NULL) {
-	break;
-      }
-      size = atoi(line);
-      (void)printf("sbrk(%d) returned '%#lx'\n", size, (long)sbrk(size));
-      continue;
-    }
-#endif
     
     /* do random heap hits */
     if (strncmp(line, "random", len) == 0) {
