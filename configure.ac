@@ -376,7 +376,9 @@ if test $ac_cv_page_size = 0; then
 #endif
 int main() { if (getpagesize()<=2048) return 0; else return 1; }
 ])],
-	[ ac_cv_page_size=11 ] )
+	[ ac_cv_page_size=11 ],
+	[ ac_cv_page_size=0  ],
+	[ ac_cv_page_size=0  ] )
 fi
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([AC_LANG_SOURCE([
@@ -385,7 +387,9 @@ if test $ac_cv_page_size = 0; then
 #endif
 int main() { if (getpagesize()<=4096) return 0; else return 1; }
 ])],
-	[ ac_cv_page_size=12 ] )
+	[ ac_cv_page_size=12 ],
+	[ ac_cv_page_size=0  ],
+	[ ac_cv_page_size=0  ] )
 fi
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([AC_LANG_SOURCE([
@@ -394,7 +398,9 @@ if test $ac_cv_page_size = 0; then
 #endif
 int main() { if (getpagesize()<=8192) return 0; else return 1; }
 ])],
-	[ ac_cv_page_size=13 ] )
+	[ ac_cv_page_size=13 ],
+	[ ac_cv_page_size=0  ],
+	[ ac_cv_page_size=0  ] )
 fi
 if test $ac_cv_page_size = 0; then
    AC_RUN_IFELSE([AC_LANG_SOURCE([
@@ -403,7 +409,9 @@ if test $ac_cv_page_size = 0; then
 #endif
 int main() { if (getpagesize()<=16384) return 0; else return 1; }
 ])],
-	[ ac_cv_page_size=14 ] )
+	[ ac_cv_page_size=14 ],
+	[ ac_cv_page_size=0  ],
+	[ ac_cv_page_size=0  ] )
 fi
 if test $ac_cv_page_size = 0; then
     ac_cv_page_size=15
