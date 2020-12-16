@@ -1744,6 +1744,7 @@ static	int	check_arg_check(void)
   /*********/
   
 #if HAVE_STRNDUP
+#ifndef DMALLOC_STRNDUP_MACRO
   func = "strndup";
   if (! silent_b) {
     (void)printf("    Checking %s\n", func);
@@ -1789,6 +1790,7 @@ static	int	check_arg_check(void)
     }
     free(new_pnt);
   }
+#endif
 #endif
   
   /*********/
@@ -2862,6 +2864,7 @@ static	int	check_special(void)
   /********************/
   
 #if HAVE_STRNDUP
+#ifndef DMALLOC_STRNDUP_MACRO
   /*
    * Test strndup.
    */
@@ -2965,6 +2968,7 @@ static	int	check_special(void)
     dmalloc_debug_setup(old_env);
     dmalloc_errno = errno_hold;
   }
+#endif
 #endif
   
   /********************/

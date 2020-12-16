@@ -845,6 +845,7 @@ fi
 # initialization commands
 ac_cv_c_const=$ac_cv_c_const
 ac_cv_strdup_macro=$ac_cv_strdup_macro
+ac_cv_strndup_macro=$ac_cv_strndup_macro
 ac_cv_type_size_t=$ac_cv_type_size_t
 ac_cv_header_stdarg_h=$ac_cv_header_stdarg_h
 ])
