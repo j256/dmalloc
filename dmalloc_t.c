@@ -61,7 +61,7 @@
 #define INTER_CHAR		'i'
 #define DEFAULT_ITERATIONS	10000
 #define MAX_POINTERS		1024
-#if HAVE_SBRK == 0 && HAVE_MMAP == 0
+#if HAVE_SBRK == 0 && HAVE_MMAP == 0 && (HAVE_DECL_VIRTUALALLOC == 0 || HAVE_DECL_VIRTUALFREE == 0)
 /* if we have a small memory area then just take 1/10 of the internal space */
 #define MAX_ALLOC		(INTERNAL_MEMORY_SPACE / 10)
 #else
