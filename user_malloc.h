@@ -180,14 +180,14 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
  *
  * string -> String we are duplicating.
  *
- * len -> Length of the string we are duplicating.
+ * max_len -> Max length of the string we are duplicating.  Set to -1 for none.
  *
  * xalloc_b -> If set to 1 then print an error and exit if we run out
  * of memory.
  */
 extern
 char	*dmalloc_strndup(const char *file, const int line,
-			 const char *string, const int len,
+			 const char *string, const int max_len,
 			 const int xalloc_b);
 
 /*
@@ -372,10 +372,10 @@ char	*strdup(const char *string);
  *
  * string -> String we are duplicating.
  *
- * len -> Length of the string to duplicate.
+ * max_len -> Max length of the string to duplicate.
  */
 extern
-char	*strndup(const char *string, const DMALLOC_SIZE len);
+char	*strndup(const char *string, const DMALLOC_SIZE max_len);
 #endif /* ifndef DMALLOC_STRNDUP_MACRO */
 
 /*

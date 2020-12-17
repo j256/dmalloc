@@ -71,7 +71,8 @@ char	*append_format(char *dest, char *limit, const char *format, ...);
 
 /*
  * Append \0 character to destination.  If dest is => limit then \0
- * will be writtern one character before the limit.
+ * will be written one character before the limit.  Pointer past the
+ * end of the \0 character will be returned.
  */
 extern
 char    *append_null(char *dest, char *limit);
