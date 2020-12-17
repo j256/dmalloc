@@ -108,7 +108,7 @@ static char *information = "@(#) $Information: lock-threads is enabled $";
 /* exported variables */
 
 /* internal dmalloc error number for reference purposes only */
-int		dmalloc_errno = ERROR_NONE;
+int		dmalloc_errno = DMALLOC_ERROR_NONE;
 
 /* logfile for dumping dmalloc info, DMALLOC_LOGFILE env var overrides this */
 char		*dmalloc_logpath = NULL;
@@ -168,8 +168,8 @@ static THREAD_MUTEX_T dmalloc_mutex;
  * controlled by lock-on dmalloc program environmental setting (set
  * with ``dmalloc -o X'').  You will have to play with the value.  Too
  * many will cause two threads to march into the dmalloc code at the
- * same time generating a ERROR_IN_TWICE error.  Too few and you will
- * get a core dump in the pthreads initialization code.
+ * same time generating a DMALLOC_ERROR_IN_TWICE error.  Too few and
+ * you will get a core dump in the pthreads initialization code.
  *
  * The second place where we might go recursive is when we go to
  * actually initialize our mutex-lock before we can use it.  The
@@ -259,7 +259,7 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   
   /* NOTE: if address_seen_n == 0 then never quit */
   if (_dmalloc_address_seen_n > 0 && addr_c >= _dmalloc_address_seen_n) {
-    dmalloc_errno = ERROR_IS_FOUND;
+    dmalloc_errno = DMALLOC_ERROR_IS_FOUND;
     dmalloc_error("check_pnt");
   }
 }
@@ -291,7 +291,7 @@ static	void	process_environ(const char *option_str)
   
   /* if we set the start stuff, then check-heap comes on later */
   if (start_iter > 0 || start_size > 0) {
-    BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    BIT_CLEAR(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
   }
   
   /* indicate that we should reopen the logfile if we need to */
@@ -303,7 +303,7 @@ static	void	process_environ(const char *option_str)
 #if LOCK_THREADS == 0
   /* was thread-lock-on specified but not configured? */
   if (_dmalloc_lock_on > 0) {
-    dmalloc_errno = ERROR_LOCK_NOT_CONFIG;
+    dmalloc_errno = DMALLOC_ERROR_LOCK_NOT_CONFIG;
     _dmalloc_die(0);
   }
 #endif
@@ -373,7 +373,7 @@ static	int	dmalloc_startup(const char *debug_str)
 	|| start_iter > 0
 	|| start_size > 0
 	|| _dmalloc_check_interval > 0) {
-      BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
+      BIT_CLEAR(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
     }
     
     /* startup heap code */
@@ -419,7 +419,7 @@ static	int	dmalloc_startup(const char *debug_str)
 #endif /* AUTO_SHUTDOWN */
   
 #if SIGNAL_OKAY
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_SIGNALS)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CATCH_SIGNALS)) {
 #ifdef SIGNAL1
     (void)signal(SIGNAL1, signal_handler);
 #endif
@@ -491,7 +491,7 @@ static	int	dmalloc_in(const char *file, const int line,
 #endif
   
   if (in_alloc_b) {
-    dmalloc_errno = ERROR_IN_TWICE;
+    dmalloc_errno = DMALLOC_ERROR_IN_TWICE;
     dmalloc_error("dmalloc_in");
     /* NOTE: dmalloc_error may die already */
     _dmalloc_die(0);
@@ -504,13 +504,13 @@ static	int	dmalloc_in(const char *file, const int line,
   _dmalloc_iter_c++;
   
   /* check start file/line specifications */
-  if ((! BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP))
+  if ((! BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP))
       && start_file != NULL
       && file != DMALLOC_DEFAULT_FILE
       && line != DMALLOC_DEFAULT_LINE
       && strcmp(start_file, file) == 0
       && (start_line == 0 || start_line == line)) {
-    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    BIT_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
     /*
      * we disable the start file so we won't check this again and the
      * interval can go on/off
@@ -521,7 +521,7 @@ static	int	dmalloc_in(const char *file, const int line,
   /* start checking heap after X times */
   else if (start_iter > 0) {
     if (--start_iter == 0) {
-      BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+      BIT_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
       /*
        * this is automatically disabled since it goes to 0 so the
        * interval can go on/off
@@ -530,7 +530,7 @@ static	int	dmalloc_in(const char *file, const int line,
   }
   
   else if (start_size > 0 && start_size >= _dmalloc_alloc_total) {
-    BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+    BIT_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
     start_size = 0;
     /* disable this check so the interval can go on/off */
   }
@@ -538,15 +538,15 @@ static	int	dmalloc_in(const char *file, const int line,
   /* checking heap every X times */
   else if (_dmalloc_check_interval > 0) {
     if (_dmalloc_iter_c % _dmalloc_check_interval == 0) {
-      BIT_SET(_dmalloc_flags, DEBUG_CHECK_HEAP);
+      BIT_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
     }
     else { 
-      BIT_CLEAR(_dmalloc_flags, DEBUG_CHECK_HEAP);
+      BIT_CLEAR(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
     }
   }
   
   /* after all that, do we need to check the heap? */
-  if (check_heap_b && BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)) {
+  if (check_heap_b && BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP)) {
     (void)_dmalloc_chunk_heap_check();
   }
   
@@ -626,19 +626,19 @@ void	dmalloc_shutdown(void)
    * when check-blank is enabled do make sure all of the areas have
    * not been overwritten.  Thanks Randell.
    */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_HEAP)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_BLANK)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_SHUTDOWN)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP)
+      || BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_BLANK)
+      || BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_SHUTDOWN)) {
     (void)_dmalloc_chunk_heap_check();
   }
   
   /* dump some statistics to the logfile */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_STATS)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_STATS)) {
     _dmalloc_chunk_log_stats();
   }
   
   /* report on non-freed pointers */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_NONFREE)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_NONFREE)) {
     _dmalloc_chunk_log_changed(0, 1, 0,
 #if DUMP_UNFREED_SUMMARY_ONLY
 		       0
@@ -744,7 +744,7 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
   
 #if DMALLOC_SIZE_UNSIGNED == 0
   if (size < 0) {
-    dmalloc_errno = ERROR_BAD_SIZE;
+    dmalloc_errno = DMALLOC_ERROR_BAD_SIZE;
     dmalloc_error("malloc");
     if (tracking_func != NULL) {
       tracking_func(file, line, func_id, size, alignment, NULL, NULL);
@@ -848,7 +848,7 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
   
 #if DMALLOC_SIZE_UNSIGNED == 0
   if (new_size < 0) {
-    dmalloc_errno = ERROR_BAD_SIZE;
+    dmalloc_errno = DMALLOC_ERROR_BAD_SIZE;
     dmalloc_error("realloc");
     if (tracking_func != NULL) {
       tracking_func(file, line, func_id, new_size, 0, old_pnt, NULL);
@@ -1005,7 +1005,7 @@ char	*dmalloc_strndup(const char *file, const int line,
   const char	*string_p;
   
   /* check the arguments */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_FUNCS)) {
     /* we check for pointer plus \0 */
     if (! dmalloc_verify_pnt_strsize(file, line, "strndup", string,
 				     0 /* not exact */, 1 /* strlen */,
@@ -1252,7 +1252,7 @@ char	*strdup(const char *string)
   GET_RET_ADDR(file);
   
   /* check the arguments */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_FUNCS)) {
     if (! dmalloc_verify_pnt(file, 0 /* no line */, "strdup", string,
 			     0 /* not exact */, -1)) {
       dmalloc_message("bad pointer argument found in strdup");
@@ -1303,7 +1303,7 @@ char	*strndup(const char *string, const DMALLOC_SIZE max_len)
   GET_RET_ADDR(file);
   
   /* check the arguments */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_CHECK_FUNCS)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CHECK_FUNCS)) {
     if (! dmalloc_verify_pnt_strsize(file, 0 /* no line */, "strndup", string,
 				     0 /* not exact */, 1 /* strlen */, max_len)) {
       dmalloc_message("bad pointer argument found in strdup");
@@ -1927,7 +1927,7 @@ unsigned long	dmalloc_count_changed(const unsigned long mark,
     return 0;
   }
   
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
+  if (! BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_TRANS)) {
     dmalloc_message("counting the unfreed memory since mark %lu", mark);
   }
   
@@ -1985,7 +1985,7 @@ void	dmalloc_log_unfreed(void)
     return;
   }
   
-  if (! BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_TRANS)) {
+  if (! BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_TRANS)) {
     dmalloc_message("dumping the unfreed pointers");
   }
   
