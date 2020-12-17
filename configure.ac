@@ -426,7 +426,7 @@ AC_DEFINE_UNQUOTED([ALLOCATION_ALIGNMENT],[$ac_cv_data_align])
 AC_MSG_RESULT([$ac_cv_data_align])
 
 #
-# long versus long long
+# trying to find 64-bit type for pointer arithmatic
 #
 AC_MSG_CHECKING([pointer arithmatic type])
 if test $ac_cv_sizeof_long = 8; then

@@ -374,7 +374,7 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	PNT_ARITH_TYPE num = (PNT_ARITH_TYPE)pnt;
 	handle_pointer(value_buf, value_limit, num, 16);
 	value = value_buf;
-	// because using %#p throws a fit, I've decided that %p has a 0x hex prefix
+	// because %#p throws a gcc warning, I've decided that %p has a default 0x hex prefix
 	prefix = "0x";
 	prefix_len = 2;
       } else if (ch == 's') {
