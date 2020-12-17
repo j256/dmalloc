@@ -1,11 +1,10 @@
--------------------------------------------------------------------------------
+Version 5.6.2 (12/??/2020):
+	* Handle strndup being a macro.  Thanks much to aitap.  
 
 Version 5.6.1 (11/24/2020):
-
 	* Fixed the installdocs target.  Thanks to matthewluckie.
 
 Version 5.6.0 (11/22/2020):
-
 	* Implemented a snprintf to [hopefully] stop recursion.  Thanks to drok.
 	* Added append_string and friends for better string output.
 	* Fixed strndup handling when it is a macro.  Thanks to danielgora.
@@ -18,13 +17,11 @@ Version 5.6.0 (11/22/2020):
 	* Moved to git on April 9, 2018.
 
 Version 5.5.2 (5/14/2007):
-
 	* Removed some left-over references to the dmalloc.info file.
 	* Fixed some unsigned/signed issues in one of the dmalloc_t tests.
 	* Fixed problems with configure and SL_LINK_OBJS.
 
 Version 5.5.1 (3/25/2007):
-
 	* Fixed some problems with str[n]dup argument checking.
 	* Fixed bug where LOG_PNT_SEEN_COUNT=0 caused dmalloc_examine segfault.
 	* Fixed bug with the checking of the MAX_FILE_LENGTH. 
@@ -35,7 +32,6 @@ Version 5.5.1 (3/25/2007):
 	* Fixed all of the DMALLOC_FUNC_CHECK arguments.
 
 Version 5.5.0 (2/8/2007):
-
 	* Fixed a problem with Cygwin env parsing.
 	* Improved regression tests on argument checking functions.
 	* Fixed some problems with function argument checking and length args.
@@ -56,15 +52,12 @@ Version 5.5.0 (2/8/2007):
 	* Improved testing of small heap areas.
 
 Version 5.4.2 (10/19/2004):
-
 	* Fixed a couple of longer standing stupid alloc/free blank bugs.
 
 Version 5.4.1 (10/12/2004):
-
 	* Found and fixed a stupid little testing bug.
 
 Version 5.4.0 (10/12/2004):
-
 	* Added return.h support for ARM processors.
 	* Made allocation of 0 sized chunks the default.
 	* Fixed some missing ; and a int/unsigned-int bug.
@@ -80,7 +73,6 @@ Version 5.4.0 (10/12/2004):
 	* Added arg checking to internal strdup functions.
 
 Version 5.3.0 (01/28/2004):
-
 	* Fixed bad bug where arch_check funcs weren't locking point checks.
 	* Added dmalloc_verify_pnt function for proper external pointer checks.
 	* Added dmalloc_memory_allocated function to help memory size checks.
@@ -90,7 +82,6 @@ Version 5.3.0 (01/28/2004):
 	* Added ability to disable the LARGEST_ALLOCATION setting it to 0.
 
 Version 5.2.4 (11/18/2003):
-
 	* Fixed bug with check-fence and check-funcs interaction.  Thanks John.
 	* Added support for rc shell.  Thanks Michael.
 	* Fixed a logfile NULL pointer printf.  Thanks John.
@@ -100,14 +91,12 @@ Version 5.2.4 (11/18/2003):
 	* Added testing for destructors in configure.
 
 Version 5.2.3 (09/29/2003):
-
 	* Added new GetEnvironmentVariableA Cygwin call.  Thanks to Rolf.
 	* Added quick checks for the constructor attribute.
 	* Changed configure script to define HAVE_... to 0 or 1.  Thanks Brian.
 	* Removed usage of environ from dmalloc_argv.c.  Thanks Brian.
 
 Version 5.2.2 (09/08/2003):
-
 	* Added a Cygwin section to the manual.
 	* Added GETENV_SAFE testing for Cygwin environments.  Feedback needed.
 	* Fixed bug in function args pnt checking.  Thanks TJ and Philippe.
@@ -116,12 +105,10 @@ Version 5.2.2 (09/08/2003):
 	* Changed the installing of libraries to install-data. 
 
 Version 5.2.1 (07/08/2003):
-
 	* Fixed problems with macro arguments not in ().  Thanks Paul.
 	* Fixed problem with strdup not returning char *.  Thanks Dan, Juhani.
 
 Version 5.2.0 (06/10/2003):
-
 	* Renamed the "max memory space wasted" to "max unused memory space".
 	* Added PDF documentation files to the installation.
 	* Fixed a problem with the global Makefile and dmalloc_t.  Thanks Bert.
@@ -142,7 +129,6 @@ Version 5.2.0 (06/10/2003):
 	* Improved the log_stats and log_changed output a bit.
 
 Version 5.1.0 (06/08/2003):
-
 	* Fixed the FREED_POINTER_DELAY functionality.
 	* Removed PROTECT_BLOCKS from settings.dist because was unused.
 	* Added contrib/tsecs perl script which converts epoch secs to ctime.
@@ -155,14 +141,12 @@ Version 5.1.0 (06/08/2003):
 	* Found/fixed bad problem where leaked memory was not being reported.
 
 Version 5.0.2 (06/04/2003):
-
 	* Fixed some problems and improved code in the test utility dmalloc_t.
 	* Integrated an internal random number generator to stop recursion.
 	* Improved some of the configure script internals.
 	* Added support for a.exe and other cc output forms for Windoze.
 
 Version 5.0.1 (05/20/2003):
-
 	* Updated configure.ac script.
 	* Added dmalloc_page_size() function.
 	* Improved the auto-testing in dmalloc_t.
@@ -172,7 +156,6 @@ Version 5.0.1 (05/20/2003):
 	* Compressed the per-pointer admin structure by 8 bytes.
 
 Version 5.0.0 (05/16/2003):
-
 	* Added -M --memory-limit argument to dmalloc to limit allocations.
 	* Deprecated log-blocks and heap-check-map debug tokens.
 	* Added a currently in use stats to log-stats.
@@ -198,21 +181,18 @@ Version 5.0.0 (05/16/2003):
 	* Fixed problem with use of start-count and start-file.
 
 Version 4.8.2 (02/26/2001):
-
 	* Installed new configure script to remove C++ requirement.
 	* Added more information to error messages on freed memory overwrite.
 	* Added heap checking when we shutdown if check-blank is enabled.
 	* Added separate ALLOC_BLANK_CHAR and FREE_BLANK_CHAR to settings.dist.
 
 Version 4.8.1 (11/14/2000):
-
 	* Added --enable-shlib to configure to enable building of shared libs.
 	* Added autoconf handling of the shlibdir for installing shared libs.
 	* Added improvements to the shared library creation in the Makefile.
 	* Fixed the #ident "..."; semi-colon problem.
 
 Version 4.8.0 (11/10/2000):
-
 	* Added OpenBSD port information.  Hopefully Free/Net/... BSD as well.
 	* Renamed malloc.h to malloc_funcs.h to avoid system conflicts.
 	* Made log-unknown the default and depreciated the token.
@@ -225,11 +205,9 @@ Version 4.8.0 (11/10/2000):
 	* Fixed a bug in chunk.c.
 
 Version 4.7.1 (07/25/2000):
-
 	* Fixed problem with check-blank on but not free-blank or alloc-blank.
 
 Version 4.7.0 (07/24/2000):
-
 	* Added support for --disable-cxx and --enable-threads to configure.
 	* Added autoconf code to see if the return macros work for an system.
 	* Renamed USE_RET_ADDRESS to USE_RETURN_MACROS in settings.dist/h.
@@ -238,7 +216,6 @@ Version 4.7.0 (07/24/2000):
 	* Added 'force-linear' and depreciated the 'allow-nonlinear' token.
 
 Version 4.6.0 (05/17/2000):
-
 	* Reworked internal init values for env vars pointed out by Carlton.
 	* Fixed bug found by Mcvey where the 1st dblock alloc in block missed.
 	* Moved to 'make cxx' and 'make installcxx' for building C++ library.
@@ -249,21 +226,17 @@ Version 4.6.0 (05/17/2000):
 	* Revamped rpm.spec and renamed to dmalloc.rpm per Dimitri's comments.
 
 Version 4.5.2 (04/18/2000):
-
 	* Fixed bug in chunk.c pointer checking.  Thanks Ezra.
 	* Cleaned up some of the compat.[ch] headers to better match reality.
 	* Reorganized dmalloc.texi documentation and moved to using makeinfo.
 
 Version 4.5.1 (03/30/2000):
-
 	* Fixed a compilation problem in dmalloc_lp.c.
 
 Version 4.5.0 (03/29/2000):
-
 	* Added new dmalloc_mark() and dmalloc_log_changed() functions.
 
 Version 4.4.0 (03/20/2000):
-
 	* Removed the stupid old Deansify.pl script.
 	* Added rpm.spec file to the distribution.
 	* Added code to fix some recursive problems with open and atexit.
@@ -276,7 +249,6 @@ Version 4.4.0 (03/20/2000):
 	* Added @uref texinfo tags and new texinfo.tex.
 
 Version 4.3.0 (11/08/1999):
-
 	* Fixed problems on Linux with the strdup macro. 
 	* Added copyright and url info for ident and what.
 	* Added support for PTHREAD_MUTEX_INITIALIZER.
@@ -286,7 +258,6 @@ Version 4.3.0 (11/08/1999):
 	* Increased the filename size from 40 to 100 characters.
 
 Version 4.2.0 (03/11/1999):
-
 	* Improved the autoconfig of abort and qsort safety.
 	* Added memory tracking function to be called on each mem transaction.
 	* Added DUMP_UNFREED_SUMMARY_ONLY variable to settings.dist.
@@ -300,15 +271,12 @@ Version 4.2.0 (03/11/1999):
 	* Added dmalloc_message to the exported list of functions.
 
 Version 4.1.2 (12/11/1998):
-
 	* Fixed really bad bug which basically killed pthread support.
 
 Version 4.1.1 (11/16/1998):
-
 	* Fixed signal autoconfiguration.
 
 Version 4.1.0 (11/16/1998):
-
 	* Added HTML versions of the manuals to the releases.
 	* Added FREED_POINTER_DELAY in settings.h.  Delays pointer reuse.
 	* Renamed allow-zero token to be allow-free-null.
@@ -324,22 +292,18 @@ Version 4.1.0 (11/16/1998):
 	* Increased the default max memory size from 16mb to 64mb.
 
 Version 4.0.3 (10/15/1998):
-
 	* Found and fixed a bug when reallocing a previous valloced section.
 
 Version 4.0.2 (10/15/1998):
-
 	* Fixed a problem in return.h and DMALLOC_UNKNOWN_FILE.
 
 Version 4.0.1 (10/08/1998):
-
 	* Added startup messages acknowledging the thread status.
 	* Fixed problem with thread compilation and chunk.c.
 	* Fixed possible race condition with synchronizing with external sbrks.
 	* Migrated in new argv code.
 
 Version 4.0.0 (10/04/1998):
-
 	* Made a small change to the solaris return.h code.
 	* Added recalloc support into the library.
 	* Cleaned up the calloc special handling and accounting.
@@ -350,7 +314,6 @@ Version 4.0.0 (10/04/1998):
 	* Added direct strdup support to the library.
 
 Version 3.3.1 (02/10/1998):
-
 	* Shifted some flags to ints instead of longs.
 	* Improved error string handling.
 	* Removed allocation macros from the docs and the header.
@@ -358,7 +321,6 @@ Version 3.3.1 (02/10/1998):
 	* Reworked log_error_info routine's dumping of the upper fence post.
 
 Version 3.3.0 (12/08/1997):
-
 	* Added THREAD_LOCK_INIT_VAL autoconfigure.
 	* Performed some long overdue major code cleaning.
 	* Renamed argv.[ch] to dmalloc_argv.[ch] to not clash with argv files.
@@ -369,7 +331,6 @@ Version 3.3.0 (12/08/1997):
 	* Added pthread lock_on -o environmental settings.
 
 Version 3.2.1 (03/21/1997):
-
 	* Added to dmalloc the ability to recognize its internal tags.
 	* Added better documentation of auto-dmalloc_shutdown.
 	* Fixed a number of signed/unsigned problems.
@@ -377,7 +338,6 @@ Version 3.2.1 (03/21/1997):
 	* Cleaned up pthreads locking delay code.
 
 Version 3.2.0 (01/17/1997):
-
 	* Added catch-signals debug token.
 	* Improved configure script to use cache and new autoconf macros.
 	* Updated the GNU support scripts and configure.
@@ -385,13 +345,11 @@ Version 3.2.0 (01/17/1997):
 	* Ran new fillproto on h-files.  IMPORT -> extern.
 
 Version 3.1.3 (12/28/1995):
-
 	* Removed silent dumps of test program.
 	* Removed some unresolved references in argv.c: strcasecmp, strdup.
 	* Fixed some porting problems to Unixware.  Unsigned chars!!
 
 Version 3.1.2 (10/10/1995):
-
 	* Changes to basic-block handling in chunk.  Fixed non-linear code.
 	* Added inital thread locking for debugging threaded programs.
 	* Added settings.dist file which is copied to settings.h during config.
@@ -400,22 +358,18 @@ Version 3.1.2 (10/10/1995):
 	* Added new[] C++ function.
 
 Version 3.1.1 (08/18/1995):
-
 	* Added better non-linear processing.
 	* Made non-linear now default behaviour with internal dmalloc tags.
 	* Fixed up dmalloc_t to propogate errors better.
 
 Version 3.1.0 (07/14/1995):
-
 	* pulled manual settings out of conf.h to settings.h.
 	* Added error-dump token for dumping-core and continuing on errors.
 
 Version 3.0.7 (05/31/1995):
-
 	* New release to fix some version problems.
 
 Version 3.0.6 (05/12/1995):
-
 	* Added Web pointers to online documentation.
 	* Added abort() auto-configuration for KILL_PROCESS.
 	* Fixed problem with NEVER_REUSE and realloc same block-size.
@@ -432,18 +386,15 @@ Version 3.0.6 (05/12/1995):
 	* Made all chunk.c global counters longs.
 
 Version 3.0.5 (01/02/1995):
-
 	* Fixed some old references to malloc in docs.
 
 Version 3.0.4 (12/15/1994):
-
 	* Definitions for DMALLOC_PNT and DMALLOC_FREE_RET.
 	* Removed all STRDUP and BDUP macros.  Was anyone using them?
 	* Added a "dying" message when _malloc_die is called.
 	* Reworked the manual a ton.  Added Quick-Start+Installation sections.
 
 Version 3.0.3 (11/03/1994):
-
 	* Added dmalloc.cc C++ file to distribution.
 	* Default is now to build/install a libdmalloclp.a library.
 	* Removed the log-error tag.  If logfile set then errors are logged.
@@ -462,14 +413,12 @@ Version 3.0.3 (11/03/1994):
 	* Added DG/UX code to return.h and atexit.c to contrib.
 
 Version 3.0.2 (09/26/1994):
-
 	* Fixed strtok error in dmallocrc file processing.
 	* Fixed problems with env code when sprintf doesn't returns int.
 	* Library now dumps the proper fence-bottom bytes on 1st pointer error.
 	* Fixed casting problems on OSF.
 
 Version 3.0.1 (09/20/1994):
-
 	* Combined all env variables into DMALLOC_OPTIONS.
 	* Added -n flag to dmalloc program for printing/not-doing actions.
 	* Fixed zsh and [t]csh alias messages in documentation.
@@ -480,17 +429,14 @@ Version 3.0.1 (09/20/1994):
 	* Fixed some include file auto-include messages.
 
 Version 3.0.0 (09/08/1994):
-
 	* Fixed a problem with some list checking.
 	* Fixed possible recursion problem.
 	* Tons of name changes going from malloc_dbg -> dmalloc.
 
 Version 2.2.1 (08/27/1994):
-
 	* Small fix to malloc_dbg.3 to remove IMPORT's.
 
 Version 2.2.0 (08/08/1994):
-
 	* Fixed xmalloc,xrealloc,etc. override functions.
 	* Added xstrdup to the x override function list.
 	* Added ability to combine adjacent free blocks into one.
@@ -502,7 +448,6 @@ Version 2.2.0 (08/08/1994):
 	* Fixed some problems with malloc_errno set after call to error.
 
 Version 2.1.0 (05/11/1994):
-
 	* Fixed problem with never-reuse going on/off and check-lists.
 	* Added -r (random-debug) option to malloc_t.
 	* Fixed nasty bug in realloc with alloc-blank + no realloc-copy token.
@@ -517,13 +462,11 @@ Version 2.1.0 (05/11/1994):
 	* Renamed token 'log-perror' and 'print-perror' to '...-error'.
 
 Version 2.0.1 (02/27/1994):
-
 	* Cleaned up a number of configure/compat functions.
 	* Fixed tons of __STDC__ defines.  Finally I hope.
 	* Added more commands to malloc_t to log information, etc.
 
 Version 2.0.0 (02/18/1994):
-
 	* Lots of changes to add argv files in place of argv subdir.
 	* Added initial support for external block locating.
 	* Added 'allow-nonlinear' token to remove special checks.
@@ -535,11 +478,9 @@ Version 2.0.0 (02/18/1994):
 	* Better free list management with block splitting.
 
 Version 1.3.6 (11/22/1993):
-
 	* Fixed some compilation errors with non-STDC systems.
 
 Version 1.3.5 (11/22/1993):
-
 	* More automatic and comprehensive malloc_t testing facilities.
 	* Added -T (list-tokens) to malloc_dbg: for listing of debug tokens.
 	* Added 'never-reuse' token to never reuse free'd memory.
@@ -555,32 +496,27 @@ Version 1.3.5 (11/22/1993):
 	* Re-added cfree() call.  No reason not to have it.
 
 Version 1.3.4 (09/26/1993):
-
 	* Fixed compat function problems, added checks for -std1 cc flags.
 	* Fixed debug messages to reflect reality.
 	* Added malloc_debug_current and changed #if __STDC__ -> #ifdef
 	* Removed log-bad-pnt.  What an unnecessary token!
 
 Version 1.3.3 (09/20/1993):
-
 	* Fixed configuration problems with memcpy/bcopy and memcmp/bcmp.
 	* Added free's file/line to log_bad_pnt messages.
 	* Renamed all error codes to ERROR_*.
 
 Version 1.3.2 (08/26/1993):
-
 	* Removed MALLOC_TRACE and -t, replaced with MALLOC_ADDRESS:0.
 	* Fixed some const problems.
 	* Added ability of MALLOC_LOGFILE.%d for getpid
 
 Version 1.3.1 (08/24/1993):
-
 	* Added 'log-ra' token to log return-address info (NOTE: later removed)
 	* Added the beginnings of return-address handling
 	* Added -L or --list to malloc_dbg to list all the rc-file tags.
 
 Version 1.3.0 (08/17/1993):
-
 	* Added MALLOC_TRACE variable and malloc_dbg -t (NOTE: later removed)
 	* Added some C++ from Peter Miller to the manual.
 	* Removed LGPL and replaced it with fully free software notices.
@@ -590,32 +526,25 @@ Version 1.3.0 (08/17/1993):
 	* Removed dblock checking tokens 'check-dblock-fence' + 'check-dblock'.
 
 Version 1.2.6 (07/13/1993):
-
 	* Added 'catch-null' token for quitting as soon as we get sbrk failure.
 
 Version 1.2.5 (06/15/1993):
-
 	* Added -r and -k options for auto-unsetting or keeping of variables.
 	* Added 'log-bad-space' token and added expand_buf into chunk.c.
 	* Create log_bad_pnt in chunk.
 
 Version 1.2.4 (05/13/1993):
-
 	* Added -v option to malloc_dbg to provide verbose output.
 
 Version 1.2.3 (04/19/1993):
-
 	* Renamed malloc.h to malloc_dbg.h and libmalloc.a to libmalloc_dbg.a.
 
 Version 1.2.2 (04/14/1993):
-
 	* Added some more point checking tests to malloc_str.
 
 Version 1.2.1 (04/09/1993):
-
 	* Changed to void * internally, put STDC defines in malloc.h for ANSI.
 	* Made a number of changes per suggestions from the net.
 
 Version 1.2.0 (04/06/1993):
-
 	* Uploaded to comp.sources.unix
