@@ -404,10 +404,10 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 char	*append_format(char *dest, char *limit, const char *format, ...)
 {
   va_list args;  
-  char *dest_p = dest;
+  char *dest_p;
   
   va_start(args, format);
-  dest_p = append_vformat(dest_p, limit, format, args);
+  dest_p = append_vformat(dest, limit, format, args);
   va_end(args);
   
   return dest_p;
@@ -415,7 +415,8 @@ char	*append_format(char *dest, char *limit, const char *format, ...)
 
 /*
  * Append \0 character to destination.  If dest is => limit then \0
- * will be writtern one character before the limit.
+ * will be written one character before the limit.  Pointer past the
+ * end of the \0 character will be returned.
  */
 char    *append_null(char *dest, char *limit)
 {
