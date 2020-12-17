@@ -2,6 +2,7 @@ Version 5.6.2 (12/??/2020):
 	* Fixed bug with loc_snprintf use of va_args.  Thanks much to aitap.
 	* Handle strndup being a macro.  Thanks much to aitap.
 	* Renmaed the ERROR_ and DEBUG_ defines to DMALLOC_* to reduce OS overlap.
+	* Fixed issues with cross-compiling and getpagesize.  Thanks to aitap.
 
 Version 5.6.1 (11/24/2020):
 	* Fixed the installdocs target.  Thanks to matthewluckie.

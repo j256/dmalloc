@@ -4715,10 +4715,7 @@ $as_echo_n "checking basic-block size... " >&6; }
 ac_cv_page_size=0
 if test $ac_cv_page_size = 0; then
    if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
+   ac_cv_page_size=0
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -4731,6 +4728,8 @@ int main() { if (getpagesize()<=2048) return 0; else return 1; }
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=11
+else
+   ac_cv_page_size=0
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -4739,10 +4738,7 @@ fi
 fi
 if test $ac_cv_page_size = 0; then
    if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
+   ac_cv_page_size=0
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -4755,6 +4751,8 @@ int main() { if (getpagesize()<=4096) return 0; else return 1; }
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=12
+else
+   ac_cv_page_size=0
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -4763,10 +4761,7 @@ fi
 fi
 if test $ac_cv_page_size = 0; then
    if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
+   ac_cv_page_size=0
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -4779,6 +4774,8 @@ int main() { if (getpagesize()<=8192) return 0; else return 1; }
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=13
+else
+   ac_cv_page_size=0
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -4787,10 +4784,7 @@ fi
 fi
 if test $ac_cv_page_size = 0; then
    if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
+   ac_cv_page_size=0
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -4803,6 +4797,8 @@ int main() { if (getpagesize()<=16384) return 0; else return 1; }
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
    ac_cv_page_size=14
+else
+   ac_cv_page_size=0
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -6484,7 +6480,6 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 # initialization commands
 ac_cv_c_const=$ac_cv_c_const
 ac_cv_strdup_macro=$ac_cv_strdup_macro
-ac_cv_strndup_macro=$ac_cv_strndup_macro
 ac_cv_type_size_t=$ac_cv_type_size_t
 ac_cv_header_stdarg_h=$ac_cv_header_stdarg_h
 
