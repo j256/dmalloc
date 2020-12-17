@@ -18,3 +18,15 @@ jobs:
       - run:
           name: run tests
           command: make light heavy
+      - run:
+          name: make distclean
+          command: make distclean
+      - run:
+          name: configure in subdir
+          command: mkdir x ; cd x ; ../configure
+      - run:
+          name: run utility in subdir
+          command: cd x ; ./dmalloc
+      - run:
+          name: run tests in subdir
+          command: cd x ; make light heavy
