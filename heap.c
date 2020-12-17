@@ -132,9 +132,8 @@ static	void	*heap_extend(const int incr)
   }
   
   if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
-    dmalloc_message("extended heap space by %d bytes returned %#lx [%#lx, %#lx]",
-		    incr, (unsigned long)ret, (unsigned long)_dmalloc_heap_low,
-		    (unsigned long)_dmalloc_heap_high);
+    dmalloc_message("extended heap space by %d bytes returned %p [%p, %p]",
+		    incr, ret, _dmalloc_heap_low, _dmalloc_heap_high);
   }
   
   return ret;
@@ -164,12 +163,11 @@ static	void	heap_release(void *addr, const int size)
 #if HAVE_MUNMAP && USE_MMAP
   if (munmap(addr, size) == 0) {
     if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
-      dmalloc_message("releasing heap memory %#lx, size %d",
-		      (unsigned long)addr, size);
+      dmalloc_message("releasing heap memory %p, size %d", addr, size);
     }
   } else {
-    dmalloc_message("munmap failed to release heap memory %#lx, size %d",
-		    (unsigned long)addr, size);
+    dmalloc_message("munmap failed to release heap memory %p, size %d",
+		    addr, size);
   }
 #else
   /* no-op */
@@ -275,8 +273,8 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
     return HEAP_ALLOC_ERROR;
   }
   
-  dmalloc_message("WARNING: had to extend heap by %d more bytes to get page aligned %#lx",
-		  new_size, (unsigned long)heap_new);
+  dmalloc_message("WARNING: had to extend heap by %d more bytes to get page aligned %p",
+		  new_size, heap_new);
   
   diff_size = (long)heap_new % BLOCK_SIZE;
   if (diff_size == 0) {

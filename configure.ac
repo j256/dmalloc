@@ -426,6 +426,22 @@ AC_DEFINE_UNQUOTED([ALLOCATION_ALIGNMENT],[$ac_cv_data_align])
 AC_MSG_RESULT([$ac_cv_data_align])
 
 #
+# long versus long long
+#
+AC_MSG_CHECKING([pointer arithmatic type])
+if test $ac_cv_sizeof_long = 8; then
+	ac_cv_pnt_arith_type="unsigned long"
+else
+	AC_RUN_IFELSE([AC_LANG_SOURCE([
+int main() { if (sizeof(long long)==8) return 0; else return 1; }
+])],
+	[ ac_cv_pnt_arith_type="long long" ],
+	[ ac_cv_pnt_arith_type="unsigned long" ])
+fi
+AC_DEFINE_UNQUOTED([PNT_ARITH_TYPE],[$ac_cv_pnt_arith_type])
+AC_MSG_RESULT([$ac_cv_pnt_arith_type])
+
+#
 # check the safety of the abort function
 #
 AC_CHECK_FUNCS(abort)

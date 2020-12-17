@@ -74,8 +74,7 @@ void	_dmalloc_protect_set_read_only(void *mem, const int block_n)
   }
   
   if (mprotect(block_pnt, size, PROT_READ) != 0) {
-    dmalloc_message("mprotect on '%#lx' size %d failed",
-		    (unsigned long)block_pnt, size);
+    dmalloc_message("mprotect on '%#p' size %d failed", block_pnt, size);
   }
 #endif
 }
@@ -119,8 +118,7 @@ void	_dmalloc_protect_set_read_write(void *mem, const int block_n)
   prot |= PROT_EXEC;
 #endif
   if (mprotect(block_pnt, size, prot) != 0) {
-    dmalloc_message("mprotect on '%#lx' size %d failed",
-		    (unsigned long)block_pnt, size);
+    dmalloc_message("mprotect on '%#p' size %d failed", block_pnt, size);
   }
 #endif
 }
@@ -156,8 +154,7 @@ void	_dmalloc_protect_set_no_access(void *mem, const int block_n)
   }
   
   if (mprotect(block_pnt, size, PROT_NONE) != 0) {
-    dmalloc_message("mprotect on '%#lx' size %d failed",
-		    (unsigned long)block_pnt, size);
+    dmalloc_message("mprotect on '%#p' size %d failed", block_pnt, size);
   }
 #endif
 }
