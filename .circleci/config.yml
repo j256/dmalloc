@@ -25,6 +25,9 @@ jobs:
           name: configure in subdir
           command: mkdir x ; cd x ; ../configure
       - run:
+          name: make in subdir
+          command: cd x ; make clean all tests
+      - run:
           name: run utility in subdir
           command: cd x ; ./dmalloc
       - run:
