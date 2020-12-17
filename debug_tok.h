@@ -31,43 +31,43 @@
  */
 
 /* logging */
-#define DEBUG_LOG_STATS		BIT_FLAG(0)	/* generally log statistics */
-#define DEBUG_LOG_NONFREE	BIT_FLAG(1)	/* report non-freed pointers */
-#define DEBUG_LOG_KNOWN		BIT_FLAG(2)	/* report only known nonfreed*/
-#define DEBUG_LOG_TRANS		BIT_FLAG(3)	/* log memory transactions */
+#define DMALLOC_DEBUG_LOG_STATS		BIT_FLAG(0)	/* generally log statistics */
+#define DMALLOC_DEBUG_LOG_NONFREE	BIT_FLAG(1)	/* report non-freed pointers */
+#define DMALLOC_DEBUG_LOG_KNOWN		BIT_FLAG(2)	/* report only known nonfreed*/
+#define DMALLOC_DEBUG_LOG_TRANS		BIT_FLAG(3)	/* log memory transactions */
 /* 4 available - 20001107 */
-#define DEBUG_LOG_ADMIN		BIT_FLAG(5)	/* log background admin info */
+#define DMALLOC_DEBUG_LOG_ADMIN		BIT_FLAG(5)	/* log background admin info */
 /* 6 available 20030508 */
 /* 7 available - 20001107 */
-#define DEBUG_LOG_BAD_SPACE	BIT_FLAG(8)	/* dump space from bad pnt */
-#define DEBUG_LOG_NONFREE_SPACE	BIT_FLAG(9)	/* dump space from non-freed */
+#define DMALLOC_DEBUG_LOG_BAD_SPACE	BIT_FLAG(8)	/* dump space from bad pnt */
+#define DMALLOC_DEBUG_LOG_NONFREE_SPACE	BIT_FLAG(9)	/* dump space from non-freed */
 
-#define DEBUG_LOG_ELAPSED_TIME	BIT_FLAG(18)	/* log pnt elapsed time info */
-#define DEBUG_LOG_CURRENT_TIME	BIT_FLAG(19)	/* log pnt current time info */
+#define DMALLOC_DEBUG_LOG_ELAPSED_TIME	BIT_FLAG(18)	/* log pnt elapsed time info */
+#define DMALLOC_DEBUG_LOG_CURRENT_TIME	BIT_FLAG(19)	/* log pnt current time info */
 
 /* checking */
-#define DEBUG_CHECK_FENCE	BIT_FLAG(10)	/* check fence-post errors  */
-#define DEBUG_CHECK_HEAP	BIT_FLAG(11)	/* examine heap adm structs */
+#define DMALLOC_DEBUG_CHECK_FENCE	BIT_FLAG(10)	/* check fence-post errors  */
+#define DMALLOC_DEBUG_CHECK_HEAP	BIT_FLAG(11)	/* examine heap adm structs */
 /* 12 available - 20030608 */
-#define DEBUG_CHECK_BLANK	BIT_FLAG(13)	/* check blank sections */
-#define DEBUG_CHECK_FUNCS	BIT_FLAG(14)	/* check functions */
-#define DEBUG_CHECK_SHUTDOWN	BIT_FLAG(15)	/* check pointers on shutdown*/
+#define DMALLOC_DEBUG_CHECK_BLANK	BIT_FLAG(13)	/* check blank sections */
+#define DMALLOC_DEBUG_CHECK_FUNCS	BIT_FLAG(14)	/* check functions */
+#define DMALLOC_DEBUG_CHECK_SHUTDOWN	BIT_FLAG(15)	/* check pointers on shutdown*/
 
 /* misc */
 /* 16 available - 20040709 */
-#define DEBUG_CATCH_SIGNALS	BIT_FLAG(17)	/* catch HUP, INT, and TERM */
+#define DMALLOC_DEBUG_CATCH_SIGNALS	BIT_FLAG(17)	/* catch HUP, INT, and TERM */
 /* 18,19 used above */
-#define DEBUG_REALLOC_COPY	BIT_FLAG(20)	/* copy all reallocations */
-#define DEBUG_FREE_BLANK	BIT_FLAG(21)	/* write over free'd memory */
-#define DEBUG_ERROR_ABORT	BIT_FLAG(22)	/* abort on error else exit */
-#define DEBUG_ALLOC_BLANK	BIT_FLAG(23)	/* write over to-be-alloced */
+#define DMALLOC_DEBUG_REALLOC_COPY	BIT_FLAG(20)	/* copy all reallocations */
+#define DMALLOC_DEBUG_FREE_BLANK	BIT_FLAG(21)	/* write over free'd memory */
+#define DMALLOC_DEBUG_ERROR_ABORT	BIT_FLAG(22)	/* abort on error else exit */
+#define DMALLOC_DEBUG_ALLOC_BLANK	BIT_FLAG(23)	/* write over to-be-alloced */
 /* 24 available - 20030508 */
-#define DEBUG_PRINT_MESSAGES	BIT_FLAG(25)	/* write messages to STDERR */
-#define DEBUG_CATCH_NULL	BIT_FLAG(26)	/* quit before return null */
-#define DEBUG_NEVER_REUSE	BIT_FLAG(27)	/* never reuse memory */
-#define DEBUG_ERROR_FREE_NULL	BIT_FLAG(28)	/* catch free(0) */
+#define DMALLOC_DEBUG_PRINT_MESSAGES	BIT_FLAG(25)	/* write messages to STDERR */
+#define DMALLOC_DEBUG_CATCH_NULL	BIT_FLAG(26)	/* quit before return null */
+#define DMALLOC_DEBUG_NEVER_REUSE	BIT_FLAG(27)	/* never reuse memory */
+#define DMALLOC_DEBUG_ERROR_FREE_NULL	BIT_FLAG(28)	/* catch free(0) */
 /* 29 available - 20011130 */
-#define DEBUG_ERROR_DUMP	BIT_FLAG(30)	/* dump core on error */
+#define DMALLOC_DEBUG_ERROR_DUMP	BIT_FLAG(30)	/* dump core on error */
 /* 31 is the high bit and off-limits */
 
 /*
@@ -84,44 +84,43 @@ static	attr_t		attributes[]
 __attribute__ ((unused))
 #endif
 = {
-  { "none",		0,
-      "no functionality" },
+  { "none",		0,				"no functionality" },
   
-  { "log-stats",	DEBUG_LOG_STATS,	"log general statistics" },
-  { "log-non-free",	DEBUG_LOG_NONFREE,	"log non-freed pointers" },
-  { "log-known",	DEBUG_LOG_KNOWN,	"log only known non-freed" },
-  { "log-trans",	DEBUG_LOG_TRANS,	"log memory transactions" },
-  { "log-admin",	DEBUG_LOG_ADMIN,	"log administrative info" },
-  { "log-bad-space",	DEBUG_LOG_BAD_SPACE,	"dump space from bad pnt" },
-  { "log-nonfree-space",DEBUG_LOG_NONFREE_SPACE,
+  { "log-stats",	DMALLOC_DEBUG_LOG_STATS,	"log general statistics" },
+  { "log-non-free",	DMALLOC_DEBUG_LOG_NONFREE,	"log non-freed pointers" },
+  { "log-known",	DMALLOC_DEBUG_LOG_KNOWN,	"log only known non-freed" },
+  { "log-trans",	DMALLOC_DEBUG_LOG_TRANS,	"log memory transactions" },
+  { "log-admin",	DMALLOC_DEBUG_LOG_ADMIN,	"log administrative info" },
+  { "log-bad-space",	DMALLOC_DEBUG_LOG_BAD_SPACE,	"dump space from bad pnt" },
+  { "log-nonfree-space", DMALLOC_DEBUG_LOG_NONFREE_SPACE,
     "dump space from non-freed pointers" },
   
-  { "log-elapsed-time",	DEBUG_LOG_ELAPSED_TIME,
+  { "log-elapsed-time",	DMALLOC_DEBUG_LOG_ELAPSED_TIME,
     "log elapsed-time for allocated pointer" },
-  { "log-current-time",	DEBUG_LOG_CURRENT_TIME,
+  { "log-current-time",	DMALLOC_DEBUG_LOG_CURRENT_TIME,
     "log current-time for allocated pointer" },
   
-  { "check-fence",	DEBUG_CHECK_FENCE,	"check fence-post errors" },
-  { "check-heap",	DEBUG_CHECK_HEAP,	"check heap adm structs" },
-  { "check-blank",	DEBUG_CHECK_BLANK,
+  { "check-fence",	DMALLOC_DEBUG_CHECK_FENCE,	"check fence-post errors" },
+  { "check-heap",	DMALLOC_DEBUG_CHECK_HEAP,	"check heap adm structs" },
+  { "check-blank",	DMALLOC_DEBUG_CHECK_BLANK,
     "check mem overwritten by alloc-blank, free-blank" },
-  { "check-funcs",	DEBUG_CHECK_FUNCS,	"check functions" },
-  { "check-shutdown",	DEBUG_CHECK_SHUTDOWN,	"check heap on shutdown" },
+  { "check-funcs",	DMALLOC_DEBUG_CHECK_FUNCS,	"check functions" },
+  { "check-shutdown",	DMALLOC_DEBUG_CHECK_SHUTDOWN,	"check heap on shutdown" },
   
-  { "catch-signals",	DEBUG_CATCH_SIGNALS,
+  { "catch-signals",	DMALLOC_DEBUG_CATCH_SIGNALS,
     "shutdown program on SIGHUP, SIGINT, SIGTERM" },
-  { "realloc-copy",	DEBUG_REALLOC_COPY,	"copy all re-allocations" },
-  { "free-blank",	DEBUG_FREE_BLANK,
+  { "realloc-copy",	DMALLOC_DEBUG_REALLOC_COPY,	"copy all re-allocations" },
+  { "free-blank",	DMALLOC_DEBUG_FREE_BLANK,
     "overwrite freed memory with \\0337 byte (0xdf)" },
-  { "error-abort",	DEBUG_ERROR_ABORT,	"abort immediately on error" },
-  { "alloc-blank",	DEBUG_ALLOC_BLANK,
+  { "error-abort",	DMALLOC_DEBUG_ERROR_ABORT,	"abort immediately on error" },
+  { "alloc-blank",	DMALLOC_DEBUG_ALLOC_BLANK,
     "overwrite allocated memory with \\0332 byte (0xda)" },
-  { "print-messages",	DEBUG_PRINT_MESSAGES,	"write messages to stderr" },
-  { "catch-null",	DEBUG_CATCH_NULL,      "abort if no memory available"},
-  { "never-reuse",	DEBUG_NEVER_REUSE,	"never re-use freed memory" },
-  { "error-dump",	DEBUG_ERROR_DUMP,
+  { "print-messages",	DMALLOC_DEBUG_PRINT_MESSAGES,	"write messages to stderr" },
+  { "catch-null",	DMALLOC_DEBUG_CATCH_NULL,      "abort if no memory available"},
+  { "never-reuse",	DMALLOC_DEBUG_NEVER_REUSE,	"never re-use freed memory" },
+  { "error-dump",	DMALLOC_DEBUG_ERROR_DUMP,
     "dump core on error, then continue" },
-  { "error-free-null",	DEBUG_ERROR_FREE_NULL,
+  { "error-free-null",	DMALLOC_DEBUG_ERROR_FREE_NULL,
     "generate error when a 0L pointer is freed" },
   
   /*

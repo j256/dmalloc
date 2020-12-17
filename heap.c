@@ -111,7 +111,7 @@ static	void	*heap_extend(const int incr)
 #endif /* if not INTERNAL_MEMORY_SPACE */
   
   if (ret == SBRK_ERROR) {
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_CATCH_NULL)) {
+    if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CATCH_NULL)) {
       char	str[128];
       int	len;
       len = loc_snprintf(str, sizeof(str),
@@ -119,7 +119,7 @@ static	void	*heap_extend(const int incr)
       (void)write(STDERR, str, len);
       _dmalloc_die(0);
     }
-    dmalloc_errno = ERROR_ALLOC_FAILED;
+    dmalloc_errno = DMALLOC_ERROR_ALLOC_FAILED;
     dmalloc_error("heap_extend");
   }
   
@@ -131,7 +131,7 @@ static	void	*heap_extend(const int incr)
     _dmalloc_heap_high = high;
   }
   
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_ADMIN)) {
     dmalloc_message("extended heap space by %d bytes returned %#lx [%#lx, %#lx]",
 		    incr, (unsigned long)ret, (unsigned long)_dmalloc_heap_low,
 		    (unsigned long)_dmalloc_heap_high);
@@ -163,7 +163,7 @@ static	void	heap_release(void *addr, const int size)
 #else
 #if HAVE_MUNMAP && USE_MMAP
   if (munmap(addr, size) == 0) {
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_LOG_ADMIN)) {
+    if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_ADMIN)) {
       dmalloc_message("releasing heap memory %#lx, size %d",
 		      (unsigned long)addr, size);
     }
@@ -224,7 +224,7 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
   long	diff_size;
   
   if (size == 0) {
-    dmalloc_errno = ERROR_BAD_SIZE;
+    dmalloc_errno = DMALLOC_ERROR_BAD_SIZE;
     dmalloc_error("_dmalloc_heap_alloc");
     return HEAP_ALLOC_ERROR;
   }

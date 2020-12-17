@@ -494,7 +494,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   
   /* no logpath and no print then no workie */
   if (dmalloc_logpath == NULL
-      && ! BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
+      && ! BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_PRINT_MESSAGES)) {
     return;
   }
   
@@ -596,7 +596,7 @@ void	_dmalloc_vmessage(const char *format, va_list args)
   }
   
   /* do we need to print the message? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_PRINT_MESSAGES)) {
     (void)write(STDERR, message_str, len);
   }
 }
@@ -622,7 +622,7 @@ void	_dmalloc_die(const int silent_b)
   int	len;
   
   if (! silent_b) {
-    if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)) {
+    if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_ERROR_ABORT)) {
       stop_str = "dumping";
     }
     else {
@@ -634,7 +634,7 @@ void	_dmalloc_die(const int silent_b)
 		       "debug-malloc library: %s program, fatal error\r\n",
 		       stop_str);
     (void)write(STDERR, error_str, len);
-    if (dmalloc_errno != ERROR_NONE) {
+    if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       len = loc_snprintf(error_str, sizeof(error_str),
 			 "   Error: %s (err %d)\r\n",
 			 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
@@ -646,8 +646,8 @@ void	_dmalloc_die(const int silent_b)
   _dmalloc_aborting_b = 1;
   
   /* do I need to drop core? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_ERROR_ABORT)
+      || BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_ERROR_DUMP)) {
 #if USE_ABORT
     abort();
 #else
@@ -682,7 +682,7 @@ void	dmalloc_error(const char *func)
 {
   /* do we need to log or print the error? */
   if (dmalloc_logpath != NULL
-      || BIT_IS_SET(_dmalloc_flags, DEBUG_PRINT_MESSAGES)) {
+      || BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_PRINT_MESSAGES)) {
     
     /* default str value */
     if (func == NULL) {
@@ -695,13 +695,13 @@ void	dmalloc_error(const char *func)
   }
   
   /* do I need to abort? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_ABORT)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_ERROR_ABORT)) {
     _dmalloc_die(0);
   }
   
 #if HAVE_FORK
   /* how about just drop core? */
-  if (BIT_IS_SET(_dmalloc_flags, DEBUG_ERROR_DUMP)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_ERROR_DUMP)) {
     if (fork() == 0) {
       _dmalloc_die(1);
     }
