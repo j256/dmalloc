@@ -54,15 +54,8 @@
 /*
  * Internal method to process a long or int number and write into a buffer.
  */
-static	char	*handle_decimal(char *buf, char *limit, va_list args,
-				const int long_arg, const int base)
+static	char	*handle_decimal(char *buf, char *limit, const long num, const int base)
 {
-  long num;
-  if (long_arg) {
-    num = va_arg(args, long);
-  } else {
-    num = va_arg(args, int);
-  }
   char *buf_p = buf;
   buf_p = append_long(buf_p, limit, num, base);
   append_null(buf_p, limit);
@@ -72,10 +65,9 @@ static	char	*handle_decimal(char *buf, char *limit, va_list args,
 /*
  * Internal method to handle floating point numbers.
  */
-static	char	*handle_float(char *buf, char *limit, va_list args, int decimal_precision,
+static	char	*handle_float(char *buf, char *limit, double num, int decimal_precision,
 			      const int no_precision)
 {
-  double num;
   long long_num;
   char *buf_p = buf;
 
@@ -84,7 +76,6 @@ static	char	*handle_float(char *buf, char *limit, va_list args, int decimal_prec
    * exception and causes the program to abort.  Not sure if this is
    * something that we need to autoconf around.
    */
-  num = va_arg(args, double);
   long_num = (long)num;
   buf_p = append_long(buf_p, limit, long_num, 10);
   /* remove the int part */
@@ -297,19 +288,32 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	value_buf[1] = '\0';
 	value = value_buf;
       } else if (ch == 'd') {
-	handle_decimal(value_buf, value_limit, args, long_arg, 10);
+	long num;
+	if (long_arg) {
+	  num = va_arg(args, long);
+	} else {
+	  num = va_arg(args, int);
+	}
+	handle_decimal(value_buf, value_limit, num, 10);
 	value = value_buf;
       } else if (ch == 'f') {
+	double num = va_arg(args, double);
 	if (trunc_len < 0) {
-	  handle_float(value_buf, value_limit, args, DEFAULT_DECIMAL_PRECISION, 1);
+	  handle_float(value_buf, value_limit, num, DEFAULT_DECIMAL_PRECISION, 1);
 	} else {
-	  handle_float(value_buf, value_limit, args, trunc_len, 0);
+	  handle_float(value_buf, value_limit, num, trunc_len, 0);
 	}
 	value = value_buf;
 	/* special case here, the trunc length is really decimal precision */
 	trunc_len = -1;
       } else if (ch == 'o') {
-	handle_decimal(value_buf, value_limit, args, long_arg, 8);
+	long num;
+	if (long_arg) {
+	  num = va_arg(args, long);
+	} else {
+	  num = va_arg(args, int);
+	}
+	handle_decimal(value_buf, value_limit, num, 8);
 	value = value_buf;
 	if (format_prefix) {
 	  prefix = "0";
@@ -329,7 +333,13 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	append_null(value_buf_p, value_limit);
 	value = value_buf;
       } else if (ch == 'x') {
-	handle_decimal(value_buf, value_limit, args, long_arg, 16);
+	long num;
+	if (long_arg) {
+	  num = va_arg(args, long);
+	} else {
+	  num = va_arg(args, int);
+	}
+	handle_decimal(value_buf, value_limit, num, 16);
 	if (format_prefix) {
 	  prefix = "0x";
 	  prefix_len = 2;
