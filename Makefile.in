@@ -444,7 +444,7 @@ protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
   heap.h protect.h
 user_malloc.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
   compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-  malloc_funcs.h return.h
+  user_malloc.h return.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
   error.h error_val.h heap.h
@@ -452,4 +452,4 @@ error_th.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
 user_malloc_th.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
   compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-  malloc_funcs.h return.h
+  user_malloc.h return.h

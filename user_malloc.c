@@ -92,7 +92,7 @@
 #include "error_val.h"
 #include "heap.h"
 #include "dmalloc_loc.h"
-#include "malloc_funcs.h"
+#include "user_malloc.h"
 #include "return.h"
 
 #if LOCK_THREADS
