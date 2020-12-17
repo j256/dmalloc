@@ -146,8 +146,8 @@ SHELL = /bin/sh
 
 HFLS = dmalloc.h
 OBJS = append.o arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
-NORMAL_OBJS = chunk.o error.o malloc.o
-THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
+NORMAL_OBJS = chunk.o error.o user_malloc.o
+THREAD_OBJS = chunk_th.o error_th.o user_malloc_th.o
 CXX_OBJS = dmallocc.o
 
 CFLAGS = $(CCFLAGS)
@@ -240,14 +240,15 @@ dmalloc.h.2 conf.h settings.h : $(srcdir)/configure $(srcdir)/settings.dist $(sr
 	$(SHELL) $(srcdir)/configure
 	-touch dmalloc.h.2 conf.h settings.h
 
-dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/malloc.h $(srcdir)/dmalloc.h.5 \
+dmalloc.h.3 : $(srcdir)/dmalloc.h.4 $(srcdir)/user_malloc.h $(srcdir)/dmalloc.h.5 \
 		$(srcdir)/arg_check.h $(srcdir)/dmalloc.h.6
-	rm -f $@ $@.t malloc.h.t arg_check.h.t
-	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/malloc.h > malloc.h.t
-	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' -e '/^#endif/d' $(srcdir)/arg_check.h > arg_check.h.t
-	cat $(srcdir)/dmalloc.h.4 malloc.h.t $(srcdir)/dmalloc.h.5 arg_check.h.t $(srcdir)/dmalloc.h.6 > $@.t
+	rm -f $@ $@.t
+	cat $(srcdir)/dmalloc.h.4 > $@.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/user_malloc.h >> $@.t
+	cat $(srcdir)/dmalloc.h.5 >> $@.t
+	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' -e '/^#endif/d' $(srcdir)/arg_check.h >> $@.t
+	cat $(srcdir)/dmalloc.h.6 >> $@.t
 	mv $@.t $@
-	rm -f malloc.h.t arg_check.h.t
 
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 dmalloc.h.3
 	rm -f $@ $@.t
@@ -355,9 +356,9 @@ error_th.o : $(srcdir)/error.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/error.c -o ./$@
 
-malloc_th.o : $(srcdir)/malloc.c
+user_malloc_th.o : $(srcdir)/user_malloc.c
 	rm -f $@
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/malloc.c -o ./$@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/user_malloc.c -o ./$@
 
 tests : $(TEST) $(TEST_FC)
 
@@ -410,7 +411,7 @@ depend :
 	- $(CC) $(INCS) -MM *.c >> Makefile.t
 	- $(CC) $(INCS) -MM chunk.c | sed -e 's/^chunk.o/chunk_th.o/' >> Makefile.t
 	- $(CC) $(INCS) -MM error.c | sed -e 's/^error.o/error_th.o/' >> Makefile.t
-	- $(CC) $(INCS) -MM malloc.c | sed -e 's/^malloc.o/malloc_th.o/' >> Makefile.t
+	- $(CC) $(INCS) -MM user_malloc.c | sed -e 's/^user_malloc.o/user_malloc_th.o/' >> Makefile.t
 	@ echo 'Dependencies in Makefile.t'
 	diff Makefile Makefile.t
 
@@ -444,16 +445,16 @@ error.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
 heap.o: heap.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h error.h error_val.h heap.h
-malloc.o: malloc.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
-  debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-  malloc_funcs.h return.h
 protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
   heap.h protect.h
+user_malloc.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
+  compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
+  malloc_funcs.h return.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
   error.h error_val.h heap.h
 error_th.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
-malloc_th.o: malloc.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
-  debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
+user_malloc_th.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
+  compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
   malloc_funcs.h return.h
