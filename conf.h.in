@@ -94,7 +94,7 @@
  * When doing pointer arithmatic and other long value manipulation,
  * what type should we use.  Hopefully we get a 64-bit value here.
  */
-#define PNT_ARITH_TYPE long
+#define PNT_ARITH_TYPE unsigned long
 
 /*
  * This checks to see if the abort routine does extensive cleaning up
