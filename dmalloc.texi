@@ -12,8 +12,8 @@
 @end direntry
 
 @c ----------------------------------------------------------------
-@set dmalloc_version Version 5.6.1
-@set dmalloc_month November
+@set dmalloc_version Version 5.6.2
+@set dmalloc_month December
 @set dmalloc_year 2020
 @set dmalloc_date @value{dmalloc_month} @value{dmalloc_year}
 @set dmalloc_copyright Copyright 1992 to @value{dmalloc_year} by Gray Watson.

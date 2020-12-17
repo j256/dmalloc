@@ -3,13 +3,12 @@
 The following set of tasks should be performed when the dmalloc library gets released.
 
 1) Update the version number in version.h and where else it lists.
-2) Update the ChangeLog files.
-3) Update release number in version.h and the files listed there.
-4) Update doc files: make docs
-5) Consider updating the copyright heads in all files and in chunk.c strings.
-6) Run autoconf to make sure configure up to date.
-7) Check in all files.
-8) Run tests:
+2) Update the ChangeLog file.
+3) Update doc files: make docs
+4) Consider updating the copyright heads in all files and in chunk.c strings.
+5) Run autoconf to make sure configure up to date.
+6) Check in all files.
+7) Run tests:
 	- [ maybe mkdir x ; cd x ]
 	- ./configure or ../configure
 	- make all heavy
@@ -18,8 +17,8 @@ The following set of tasks should be performed when the dmalloc library gets rel
 	- make heavy
 	- examine the log file, check version, look for exceptions
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
-9) Clone on linux and others and run tests: git clone git@github.com:j256/dmalloc.git
-10) Run release.sh script.  It will run tests on repo.
+8) Clone on linux and others and run tests: git clone git@github.com:j256/dmalloc.git
+9) Run release.sh script.  It will run tests on repo.
 11) git tag the release with dmalloc_release_X_X_X
 12) create release on github for X.X.X.
 13) Upload tar.gz file as part of that release

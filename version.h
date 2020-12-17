@@ -31,10 +31,10 @@
  *	configure.ac (in AC_INIT)
  *	dmalloc.spec
  *	dmalloc.texi
- *	dmalloc.h.4 (DMALLOC_VERSION defines at top of file)
+ *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
  *
  * Make sure to also git tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.6.1" ;
+static	char	*dmalloc_version = "5.6.2" ;
 
 #endif /* ! __VERSION_H__ */
