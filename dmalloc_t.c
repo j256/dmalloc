@@ -1844,8 +1844,7 @@ static	int	check_arg_check(void)
  * Check the append buffer to see if it is correct.
  */
 static	int	check_append_buf(char *buf, char *buf_p, char *expected, int expected_size,
-				 int final,
-				 char *label) {
+				 int final, char *label) {
   if (buf_p != buf + expected_size) {
     if (! silent_b) {
       (void)printf("   ERROR: %s: expecting buf_p to be %d chars ahead but was %d: %s\n",
@@ -3905,6 +3904,17 @@ static	int	check_special(void)
     len = loc_snprintf(buf, sizeof(buf), "Zip '%-04x' %5.2f = %#o", 10, 3.81, 20);
     final = check_append_buf(buf, buf + len, "Zip 'a   '  3.81 = 024", 22, final,
 			     "Hi %s=%d%c");
+  }
+
+  /********************/
+
+  {
+    char buf[60];
+    int len;
+
+    len = loc_snprintf(buf, sizeof(buf),     "number %#x, string %s, number %d", 0x400, "X", 10);
+    final = check_append_buf(buf, buf + len, "number 0x400, string X, number 10", 33, final,
+			     "number string number");
   }
 
   /********************/
