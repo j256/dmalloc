@@ -1,65 +1,186 @@
-/* NOTE: start of dmalloc.h.4 */
 
-/* dmalloc version defines */
-#define DMALLOC_VERSION_MAJOR	5	/* X.0.0 */
-#define DMALLOC_VERSION_MINOR	6	/* 0.X.0 */
-#define DMALLOC_VERSION_PATCH	1	/* 0.0.X */
-
-/* this defines what type the standard void memory-pointer is */
-#if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS) || defined(_ISO_STDLIB_ISO_H)
-#define DMALLOC_PNT		void *
-#define DMALLOC_FREE_RET	void
-#else
-#define DMALLOC_PNT		char *
-#define DMALLOC_FREE_RET	int
-#define DMALLOC_FREE_RET_INT
+#ifdef __cplusplus
+}
 #endif
 
 /*
- * Malloc function return codes
+ * alloc macros to provide for memory FILE/LINE debugging information.
  */
-#define CALLOC_ERROR		0L		/* error from calloc */
-#define MALLOC_ERROR		0L		/* error from malloc */
-#define REALLOC_ERROR		0L		/* error from realloc */
 
-/* NOTE: this if for non- __STDC__ systems only */
-#define FREE_ERROR		0		/* error from free */
-#define FREE_NOERROR		1		/* no error from free */
+#ifndef DMALLOC_DISABLE
 
-#define DMALLOC_ERROR		0		/* function failed */
-#define DMALLOC_NOERROR		1		/* function succeeded */
+#undef malloc
+#define malloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_MALLOC, 0, 0)
+#undef calloc
+#define calloc(count, size) \
+  dmalloc_malloc(__FILE__, __LINE__, (count)*(size), DMALLOC_FUNC_CALLOC, 0, 0)
+#undef realloc
+#define realloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, (ptr), (size), DMALLOC_FUNC_REALLOC, 0)
+#undef recalloc
+#define recalloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, (ptr), (size), DMALLOC_FUNC_RECALLOC, 0)
+#undef memalign
+#define memalign(alignment, size) \
+  dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_MEMALIGN, \
+		 (alignment), 0 /* no xalloc */)
+#undef valloc
+#define valloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_VALLOC, \
+		0 /* special case */, 0 /* no xalloc */)
+#ifndef DMALLOC_STRDUP_MACRO
+#undef strdup
+#define strdup(str) \
+  dmalloc_strndup(__FILE__, __LINE__, (str), -1, 0)
+#endif
+#ifndef DMALLOC_STRNDUP_MACRO
+#undef strndup
+#define strndup(str, len) \
+  dmalloc_strndup(__FILE__, __LINE__, (str), (len), 0)
+#endif
+#undef free
+#define free(ptr) \
+  dmalloc_free(__FILE__, __LINE__, (ptr), DMALLOC_FUNC_FREE)
 
-#define DMALLOC_VERIFY_ERROR	0		/* function failed */
-#define DMALLOC_VERIFY_NOERROR	1		/* function succeeded */
-#define MALLOC_VERIFY_ERROR	DMALLOC_VERIFY_ERROR
-#define MALLOC_VERIFY_NOERROR	DMALLOC_VERIFY_NOERROR
+#undef xmalloc
+#define xmalloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_MALLOC, 0, 1)
+#undef xcalloc
+#define xcalloc(count, size) \
+  dmalloc_malloc(__FILE__, __LINE__, (count)*(size), DMALLOC_FUNC_CALLOC, 0, 1)
+#undef xrealloc
+#define xrealloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, (ptr), (size), DMALLOC_FUNC_REALLOC, 1)
+#undef xrecalloc
+#define xrecalloc(ptr, size) \
+  dmalloc_realloc(__FILE__, __LINE__, (ptr), (size), DMALLOC_FUNC_RECALLOC, 1)
+#undef xmemalign
+#define xmemalign(alignment, size) \
+  dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_MEMALIGN, \
+		 (alignment), 1)
+#undef xvalloc
+#define xvalloc(size) \
+  dmalloc_malloc(__FILE__, __LINE__, (size), DMALLOC_FUNC_VALLOC, 0, 1)
+#undef xstrdup
+#define xstrdup(str) \
+  dmalloc_strndup(__FILE__, __LINE__, (str), -1, 1)
+#undef xstrndup
+#define xstrndup(str, len) \
+  dmalloc_strndup(__FILE__, __LINE__, (str), (len), 1)
+#undef xfree
+#define xfree(ptr) \
+  dmalloc_free(__FILE__, __LINE__, (ptr), DMALLOC_FUNC_FREE)
+
+#ifdef DMALLOC_FUNC_CHECK
 
 /*
- * Dmalloc function IDs for the dmalloc_track_t callback function.
+ * do debugging on the following functions.  this may cause compilation or
+ * other problems depending on your architecture.
  */
-#define DMALLOC_FUNC_MALLOC	10	/* malloc function called */
-#define DMALLOC_FUNC_CALLOC	11	/* calloc function called */
-#define DMALLOC_FUNC_REALLOC	12	/* realloc function called */
-#define DMALLOC_FUNC_RECALLOC	13	/* recalloc called */
-#define DMALLOC_FUNC_MEMALIGN	14	/* memalign function called */
-#define DMALLOC_FUNC_VALLOC	15	/* valloc function called */
-#define DMALLOC_FUNC_STRDUP	16	/* strdup function called */
-#define DMALLOC_FUNC_FREE	17	/* free function called */
-#define DMALLOC_FUNC_CFREE	18	/* cfree function called */
+#undef atoi
+#define atoi(str) \
+  _dmalloc_atoi(__FILE__, __LINE__, (str))
+#undef atol
+#define atol(str) \
+  _dmalloc_atol(__FILE__, __LINE__, (str))
 
-#define DMALLOC_FUNC_NEW	20	/* new function called */
-#define DMALLOC_FUNC_NEW_ARRAY	21	/* new[] function called */
-#define DMALLOC_FUNC_DELETE	22	/* delete function called */
-#define DMALLOC_FUNC_DELETE_ARRAY 23	/* delete[] function called */
+#undef bcmp
+#define bcmp(b1, b2, len) \
+  _dmalloc_bcmp(__FILE__, __LINE__, (b1), (b2), (len))
+#undef bcopy
+#define bcopy(from, to, len) \
+  _dmalloc_bcopy(__FILE__, __LINE__, (from), (to), (len))
+#undef bzero
+#define bzero(buf, len) \
+  _dmalloc_bzero(__FILE__, __LINE__, (buf), (len))
+
+#undef memcmp
+#define memcmp(b1, b2, len) \
+  _dmalloc_memcmp(__FILE__, __LINE__, (b1), (b2), (len))
+#undef memcpy
+#define memcpy(to, from, len) \
+  _dmalloc_memcpy(__FILE__, __LINE__, (to), (from), (len))
+#undef memmove
+#define memmove(to, from, len) \
+  _dmalloc_memmove(__FILE__, __LINE__, (to), (from), (len))
+#undef memset
+#define memset(buf, ch, len) \
+  _dmalloc_memset(__FILE__, __LINE__, (buf), (ch), (len))
+
+#undef index
+#define index(str, ch) \
+  _dmalloc_index(__FILE__, __LINE__, (str), (ch))
+#undef rindex
+#define rindex(str, ch) \
+  _dmalloc_rindex(__FILE__, __LINE__, (str), (ch))
+
+#undef strcat
+#define strcat(to, from) \
+  _dmalloc_strcat(__FILE__, __LINE__, (to), (from))
+#undef strcmp
+#define strcmp(s1, s2) \
+  _dmalloc_strcmp(__FILE__, __LINE__, (s1), (s2))
+#undef strlen
+#define strlen(str) \
+  _dmalloc_strlen(__FILE__, __LINE__, (str))
+#undef strtok
+#define strtok(str, sep) \
+  _dmalloc_strtok(__FILE__, __LINE__, (str), (sep))
+
+#undef memccpy
+#define memccpy(s1, s2, ch, len) \
+  _dmalloc_memccpy(__FILE__, __LINE__, (s1), (s2),(ch),(len))
+#undef memchr
+#define memchr(s1, ch, len) \
+  _dmalloc_memchr(__FILE__, __LINE__, (s1), (ch), (len))
+
+#undef strchr
+#define strchr(str, ch) \
+  _dmalloc_strchr(__FILE__, __LINE__, (str), (ch))
+#undef strrchr
+#define strrchr(str, ch) \
+  _dmalloc_strrchr(__FILE__, __LINE__, (str), (ch))
+
+#undef strcpy
+#define strcpy(to, from) \
+  _dmalloc_strcpy(__FILE__, __LINE__, (to), (from))
+#undef strncpy
+#define strncpy(to, from, len) \
+  _dmalloc_strncpy(__FILE__, __LINE__, (to), (from), (len))
+#undef strcasecmp
+#define strcasecmp(s1, s2) \
+  _dmalloc_strcasecmp(__FILE__, __LINE__, (s1), (s2))
+#undef strncasecmp
+#define strncasecmp(s1, s2, len) \
+  _dmalloc_strncasecmp(__FILE__, __LINE__, (s1), (s2), (len))
+#undef strspn
+#define strspn(str, list) \
+  _dmalloc_strspn(__FILE__, __LINE__, (str), (list))
+#undef strcspn
+#define strcspn(str, list) \
+  _dmalloc_strcspn(__FILE__, __LINE__, (str), (list))
+#undef strncat
+#define strncat(to, from, len) \
+  _dmalloc_strncat(__FILE__, __LINE__, (to), (from), (len))
+#undef strncmp
+#define strncmp(s1, s2, len) \
+  _dmalloc_strncmp(__FILE__, __LINE__, (s1), (s2), (len))
+#undef strpbrk
+#define strpbrk(str, list) \
+  _dmalloc_strpbrk(__FILE__, __LINE__, (str), (list))
+#undef strstr
+#define strstr(str, pat) \
+  _dmalloc_strstr(__FILE__, __LINE__, (str), (pat))
+
+#endif /* DMALLOC_FUNC_CHECK */
+#endif /* ! DMALLOC_DISABLE */
+
+/*
+ * feel free to add your favorite functions here and to arg_check.[ch]
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef void  (*dmalloc_track_t)(const char *file, const unsigned int line,
-				 const int func_id,
-				 const DMALLOC_SIZE byte_size,
-				 const DMALLOC_SIZE alignment,
-				 const DMALLOC_PNT old_addr,
-				 const DMALLOC_PNT new_addr);
 
