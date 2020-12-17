@@ -243,8 +243,7 @@ dmalloc.h.2 conf.h settings.h : $(srcdir)/configure $(srcdir)/settings.dist $(sr
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 $(srcdir)/user_malloc.h \
 		$(srcdir)/dmalloc.h.4 $(srcdir)/arg_check.h $(srcdir)/dmalloc.h.5
 	rm -f $@ $@.t
-	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 > $@.t
-	cat $(srcdir)/dmalloc.h.3 >> $@.t
+	cat $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 > $@.t
 	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' $(srcdir)/user_malloc.h >> $@.t
 	cat $(srcdir)/dmalloc.h.4 >> $@.t
 	sed -e '1,/<<<<<<<</d' -e '/<<<<<<<</,$$d' -e '/^#if/d' -e '/^#endif/d' $(srcdir)/arg_check.h >> $@.t
