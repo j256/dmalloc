@@ -76,7 +76,7 @@ static	argv_t		arg_list[] = {
  * Make sure that the last call did not fail.
  */
 static	int	check_ok(const char *what) {
-  if (dmalloc_errno == ERROR_NONE) {
+  if (dmalloc_errno == DMALLOC_ERROR_NONE) {
     return 1;
   } else {
     if (! silent_b) {
@@ -93,7 +93,7 @@ static	int	check_ok(const char *what) {
  * Make sure that the last call failed.
  */
 static	int	check_fail(const char *what, const int expected_errno) {
-  if (dmalloc_errno == ERROR_NONE) {
+  if (dmalloc_errno == DMALLOC_ERROR_NONE) {
     if (! silent_b) {
       (void)printf("   ERROR: %s succeeded but should have failed with %s\n",
 		   what, dmalloc_strerror(expected_errno));
@@ -141,7 +141,7 @@ static	int	do_atoi(void) {
   
   memmove(pnt, "12345", 5);
   atoi(pnt);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -172,7 +172,7 @@ static	int	do_atol(void) {
   
   memmove(pnt, "12345", 5);
   atol(pnt);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -204,7 +204,7 @@ static	int	do_bcmp(void) {
   val = "123456";
   memmove(pnt, val, strlen(val));
   bcmp(pnt, val, 6);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -233,7 +233,7 @@ static	int	do_bcopy(void) {
   
   val = "123456";
   bcopy(val, pnt, strlen(val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -270,7 +270,7 @@ static	int	do_bzero(void) {
   }
   
   bzero(pnt, size + 1);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -301,7 +301,7 @@ static	int	do_index(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   index(pnt, 'u');
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -337,7 +337,7 @@ static	int	do_memccpy(void) {
   
   val = "footies";
   memccpy(pnt, val, 'z', strlen(val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -366,7 +366,7 @@ static	int	do_memchr(void) {
   }
   
   memchr(pnt, 'u', strlen(val) + 1);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -398,7 +398,7 @@ static	int	do_memcmp(void) {
   val = "123456";
   memmove(pnt, val, strlen(val));
   memcmp(pnt, val, 6);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -427,7 +427,7 @@ static	int	do_memcpy(void) {
   
   val = "123456";
   memcpy(pnt, val, strlen(val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -456,7 +456,7 @@ static	int	do_memmove(void) {
   
   val = "123456";
   memmove(pnt, val, strlen(val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -493,7 +493,7 @@ static	int	do_memset(void) {
   }
   
   memset(pnt, 0, size + 1);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -524,7 +524,7 @@ static	int	do_rindex(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   rindex(pnt, *val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -558,7 +558,7 @@ static	int	do_strcasecmp(void) {
   big_val = "ABCDEF";
   memmove(pnt, big_val, strlen(big_val));
   strcasecmp(pnt, val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -593,7 +593,7 @@ static	int	do_strcat(void) {
   }
   
   strcat(pnt, val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -624,7 +624,7 @@ static	int	do_strchr(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strchr(pnt, 'y');
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -656,7 +656,7 @@ static	int	do_strcmp(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strcmp(pnt, val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -685,7 +685,7 @@ static	int	do_strcpy(void) {
   
   val = "12345";
   strcpy(pnt, val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -744,7 +744,7 @@ static	int	do_strlen(void) {
   memmove(pnt, val, strlen(val));
   
   strlen(pnt);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -776,7 +776,7 @@ static	int	do_strncasecmp(void) {
   
   big_val = "ABCDEF";
   strncasecmp(pnt, big_val, strlen(big_val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -811,7 +811,7 @@ static	int	do_strncat(void) {
   }
   
   strncat(pnt, val, strlen(val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -841,7 +841,7 @@ static	int	do_strncmp(void) {
   }
   
   strncmp(pnt, val, strlen(val) + 1);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -870,7 +870,7 @@ static	int	do_strncpy(void) {
   
   val = "123456";
   strncpy(pnt, val, strlen(val));
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -901,7 +901,7 @@ static	int	do_strpbrk(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strpbrk(pnt, "y");
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -932,7 +932,7 @@ static	int	do_strrchr(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strrchr(pnt, *val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -963,7 +963,7 @@ static	int	do_strspn(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strspn(pnt, val);
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -994,7 +994,7 @@ static	int	do_strstr(void) {
   val = "footy";
   memmove(pnt, val, strlen(val));
   strstr(pnt, "none");
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -1026,7 +1026,7 @@ static	int	do_strtok(void) {
   val = "a,b,c";
   memmove(pnt, val, strlen(val));
   strtok(pnt, ",");
-  ret = check_fail(func_name, ERROR_WOULD_OVERWRITE);
+  ret = check_fail(func_name, DMALLOC_ERROR_WOULD_OVERWRITE);
   free(pnt);
   return ret;
 }
@@ -1128,13 +1128,13 @@ static	int	do_tests(void) {
   unsigned int	old_flags;
   
   old_flags = dmalloc_debug_current();
-  dmalloc_debug(old_flags | DEBUG_CHECK_FUNCS);
+  dmalloc_debug(old_flags | DMALLOC_DEBUG_CHECK_FUNCS);
   
   for (test_c = 0; test_funcs[test_c] != 0L; test_c++) {
     prev_errno = dmalloc_errno;
-    dmalloc_errno = ERROR_NONE;
+    dmalloc_errno = DMALLOC_ERROR_NONE;
     final &= test_funcs[test_c]();
-    if (prev_errno != ERROR_NONE) {
+    if (prev_errno != DMALLOC_ERROR_NONE) {
       dmalloc_errno = prev_errno;
     }
   }
