@@ -252,8 +252,8 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
   }
   
   addr_c++;
-  dmalloc_message("address '%#lx' found in '%s' at pass %ld from '%s'",
-		  (unsigned long)pnt, label, addr_c,
+  dmalloc_message("address '%p' found in '%s' at pass %ld from '%s'",
+		  pnt, label, addr_c,
 		  _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf), file,
 					  line));
   

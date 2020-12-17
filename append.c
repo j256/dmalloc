@@ -63,6 +63,17 @@ static	char	*handle_decimal(char *buf, char *limit, const long num, const int ba
 }
 
 /*
+ * Internal method to process a long or int number and write into a buffer.
+ */
+static	char	*handle_pointer(char *buf, char *limit, const PNT_ARITH_TYPE num, const int base)
+{
+  char *buf_p = buf;
+  buf_p = append_pointer(buf_p, limit, num, base);
+  append_null(buf_p, limit);
+  return buf_p;
+}
+
+/*
  * Internal method to handle floating point numbers.
  */
 static	char	*handle_float(char *buf, char *limit, double num, int decimal_precision,
@@ -203,6 +214,45 @@ char	*append_ulong(char *dest, char *limit, unsigned long value, int base)
 }
 
 /*
+ * Append pointer value argument to destination up to limit pointer.
+ * Pointer to the end of the added characters will be returned.  No \0
+ * character will be added.  Variant of itoa() written by Lukas
+ * Chmela which is released under GPLv3.
+ */
+char	*append_pointer(char *dest, char *limit, PNT_ARITH_TYPE value, int base)
+{
+  char buf[30];
+  char *ptr = buf;
+  char *ptr1 = buf;
+  char tmp_char;
+  PNT_ARITH_TYPE tmp_value;
+
+  /* letters that handle both negative and positive values */
+  char *letters =
+    "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz";
+  int mid = 35;
+  /* build the string with low order digits first: 100 => "001" */
+  do {
+    tmp_value = value;
+    value /= base;
+    *ptr++ = letters[mid + tmp_value - (value * base)];
+  } while (value != 0);
+
+  /* apply negative sign */
+  if (tmp_value < 0) {
+    *ptr++ = '-';
+  }
+  *ptr-- = '\0';
+  /* now we swap the characters to move high order digits first */
+  while (ptr1 < ptr) {
+    tmp_char = *ptr;
+    *ptr--= *ptr1;
+    *ptr1++ = tmp_char;
+  }
+  return append_string(dest, limit, buf);
+}
+
+/*
  * Append a varargs format to destination.  Pointer to the end of the
  * characters added will be returned.  No \0 character will be added.
  */
@@ -275,8 +325,8 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	}
       } else if (ch == 'l') {
 	long_arg = 1;
-      } else if (ch != 'c' && ch != 'd' && ch != 'f' && ch != 'o' && ch != 's'
-		 && ch != 'u' && ch != 'x') {
+      } else if (ch != 'c' && ch != 'd' && ch != 'f' && ch != 'o' && ch != 'p'
+		 && ch != 's' && ch != 'u' && ch != 'x') {
 	continue;
       }
       
@@ -319,6 +369,14 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	  prefix = "0";
 	  prefix_len = 1;
 	}
+      } else if (ch == 'p') {
+	DMALLOC_PNT pnt = va_arg(args, DMALLOC_PNT);
+	PNT_ARITH_TYPE num = (PNT_ARITH_TYPE)pnt;
+	handle_pointer(value_buf, value_limit, num, 16);
+	value = value_buf;
+	// because %#p throws a gcc warning, I've decreed that %p has a 0x hex prefix
+	prefix = "0x";
+	prefix_len = 2;
       } else if (ch == 's') {
 	value = va_arg(args, char *);
       } else if (ch == 'u') {

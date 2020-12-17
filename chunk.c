@@ -914,8 +914,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
   buf_p = buf;
   bounds_p = buf_p + buf_size;
   
-  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%#lx",
-			(unsigned long)user_pnt);
+  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%p", user_pnt);
   
 #if LOG_PNT_SEEN_COUNT
   buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|s%lu", alloc_p->sa_seen_c);
@@ -1044,8 +1043,8 @@ static	void	log_error_info(const char *now_file,
 					    prev_file, prev_line));
   }
   else {
-    dmalloc_message("  pointer '%#lx' from '%s' prev access '%s'",
-		    (unsigned long)start_user,
+    dmalloc_message("  pointer '%p' from '%s' prev access '%s'",
+		    start_user,
 		    _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
 					    now_file, now_line),
 		    _dmalloc_chunk_desc_pnt(where_buf2, sizeof(where_buf2),
@@ -1115,12 +1114,11 @@ static	void	log_error_info(const char *now_file,
   dump_pnt = (char *)start_user + offset;
   if (IS_IN_HEAP(dump_pnt)) {
     out_len = expand_chars(dump_pnt, dump_size, out, sizeof(out));
-    dmalloc_message("  dump of '%#lx'%+d: '%.*s'",
-		    (unsigned long)start_user, offset, out_len, out);
+    dmalloc_message("  dump of '%p'%+d: '%.*s'",
+		    start_user, offset, out_len, out);
   }
   else {
-    dmalloc_message("  dump of '%#lx'%+d failed: not in heap",
-		    (unsigned long)start_user, offset);
+    dmalloc_message("  dump of '%p'%+d failed: not in heap", start_user, offset);
   }
   
   /* find the previous pointer in case it ran over */
@@ -1129,8 +1127,8 @@ static	void	log_error_info(const char *now_file,
 			   0 /* used list */, 1 /* not exact pointer */,
 			   skip_update);
     if (other_p != NULL) {
-      dmalloc_message("  prev pointer '%#lx' (size %u) may have run over from '%s'",
-		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
+      dmalloc_message("  prev pointer '%p' (size %u) may have run over from '%s'",
+		      other_p->sa_mem, other_p->sa_user_size,
 		      _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
 					      other_p->sa_file,
 					      other_p->sa_line));
@@ -1144,8 +1142,8 @@ static	void	log_error_info(const char *now_file,
 			   0 /* used list */, 1 /* not exact pointer */,
 			   skip_update);
     if (other_p != NULL) {
-      dmalloc_message("  next pointer '%#lx' (size %u) may have run under from '%s'",
-		      (unsigned long)other_p->sa_mem, other_p->sa_user_size,
+      dmalloc_message("  next pointer '%p' (size %u) may have run under from '%s'",
+		      other_p->sa_mem, other_p->sa_user_size,
 		      _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
 					      other_p->sa_file,
 					      other_p->sa_line));
@@ -1933,7 +1931,7 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
     (void)loc_snprintf(buf, buf_size, "unknown");
   }
   else if (line == DMALLOC_DEFAULT_LINE) {
-    (void)loc_snprintf(buf, buf_size, "ra=%#lx", (unsigned long)file);
+    (void)loc_snprintf(buf, buf_size, "ra=%p", file);
   }
   else if (file == DMALLOC_DEFAULT_FILE) {
     (void)loc_snprintf(buf, buf_size, "ra=ERROR(line=%u)", line);
@@ -2002,8 +2000,7 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   skip_alloc_t	*slot_p;
   
   if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_TRANS)) {
-    dmalloc_message("reading info about pointer '%#lx'",
-		    (unsigned long)user_pnt);
+    dmalloc_message("reading info about pointer '%p'", user_pnt);
   }
   
   /* find the pointer with loose checking for fence */
@@ -2279,11 +2276,10 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   
   if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_TRANS)) {
     if (func == NULL) {
-      dmalloc_message("checking pointer '%#lx'", (unsigned long)user_pnt);
+      dmalloc_message("checking pointer '%p'", user_pnt);
     }
     else {
-      dmalloc_message("checking func '%s' pointer '%#lx'",
-		      func, (unsigned long)user_pnt);
+      dmalloc_message("checking func '%s' pointer '%p'", func, user_pnt);
     }
   }
   
@@ -2876,14 +2872,14 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
     else {
       trans_log = "realloc";
     }
-    dmalloc_message("*** %s: at '%s' from '%#lx' (%u bytes) file '%s' to '%#lx' (%lu bytes)",
+    dmalloc_message("*** %s: at '%s' from '%p' (%u bytes) file '%s' to '%p' (%lu bytes)",
 		    trans_log,
 		    _dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
 					    file, line),
-		    (unsigned long)old_user_pnt, old_size,
+		    old_user_pnt, old_size,
 		    _dmalloc_chunk_desc_pnt(where_buf2, sizeof(where_buf2),
 					    old_file, old_line),
-		    (unsigned long)new_user_pnt, new_size);
+		    new_user_pnt, new_size);
   }
   
   return new_user_pnt;
@@ -2921,9 +2917,8 @@ void	_dmalloc_chunk_log_stats(void)
 		  BLOCK_SIZE, ALLOCATION_ALIGNMENT);
   
   /* general heap information with blocks */
-  dmalloc_message("heap address range: %#lx to %#lx, %ld bytes",
-		  (unsigned long)_dmalloc_heap_low,
-		  (unsigned long)_dmalloc_heap_high,
+  dmalloc_message("heap address range: %p to %p, %ld bytes",
+		  _dmalloc_heap_low, _dmalloc_heap_high,
 		  (unsigned long)_dmalloc_heap_high -
 		  (unsigned long)_dmalloc_heap_low);
   dmalloc_message("    user blocks: %ld blocks, %ld bytes (%ld%%)",
@@ -3104,8 +3099,8 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 	    && BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_NONFREE_SPACE)) {
 	  out_len = expand_chars((char *)pnt_info.pi_user_start, DUMP_SPACE,
 				 out, sizeof(out));
-	  dmalloc_message("  dump of '%#lx': '%.*s'",
-			  (unsigned long)pnt_info.pi_user_start, out_len, out);
+	  dmalloc_message("  dump of '%p': '%.*s'",
+			  pnt_info.pi_user_start, out_len, out);
 	}
       }
       _dmalloc_table_insert(&mem_table_changed, slot_p->sa_file,

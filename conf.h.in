@@ -91,6 +91,12 @@
 #define ALLOCATION_ALIGNMENT 8
 
 /*
+ * When doing pointer arithmatic and other long value manipulation,
+ * what type should we use.  Hopefully we get a 64-bit value here.
+ */
+#define PNT_ARITH_TYPE unsigned long
+
+/*
  * This checks to see if the abort routine does extensive cleaning up
  * before halting a program.  If so then it may call malloc functions
  * making the library go recursive.  If abort is set to not okay then
