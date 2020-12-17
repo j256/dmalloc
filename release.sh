@@ -31,7 +31,7 @@ git clone git@github.com:j256/dmalloc.git $dir
 # clear our dot files not suitable for release
 rm -rf $dir/.git $dir/.gitignore $dir/.circleci
 
-dest=$dir.tar.gz
+dest=$dir.tgz
 rm -f $dest
 tar -cf - $dir | gzip -9 > $dest
 echo "Created $dest"

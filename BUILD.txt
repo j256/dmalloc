@@ -19,9 +19,11 @@ The following set of tasks should be performed when the dmalloc library gets rel
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
 8) Clone on linux and others and run tests: git clone git@github.com:j256/dmalloc.git
 9) Run release.sh script.  It will run tests on repo.
-11) git tag the release with dmalloc_release_X_X_X
-12) create release on github for X.X.X.
-13) Upload tar.gz file as part of that release
+11) git tag the release:
+    git tag dmalloc_release_X_X_X
+    git push origin dmalloc_release_X_X_X
+12) create release on github for X.X.X from that tag
+13) Upload tgz file as part of that release
 14) Install the tgz file and html file in the dmalloc.com repo
 15) Edit releases/index.html to include the new version
 16) Go to the /docs dir and run the explode-docs.sh script.
