@@ -2917,10 +2917,10 @@ void	_dmalloc_chunk_log_stats(void)
 		  BLOCK_SIZE, ALLOCATION_ALIGNMENT);
   
   /* general heap information with blocks */
-  dmalloc_message("heap address range: %p to %p, %ld bytes",
+  dmalloc_message("heap address range: %p to %p, %llu bytes",
 		  _dmalloc_heap_low, _dmalloc_heap_high,
-		  (unsigned long)_dmalloc_heap_high -
-		  (unsigned long)_dmalloc_heap_low);
+		  (unsigned long long)(unsigned PNT_ARITH_TYPE)_dmalloc_heap_high -
+		  (unsigned long long)(unsigned PNT_ARITH_TYPE)_dmalloc_heap_low);
   dmalloc_message("    user blocks: %ld blocks, %ld bytes (%ld%%)",
 		  user_block_c, user_space,
 		  (tot_space < 100 ? 0 : user_space / (tot_space / 100)));
