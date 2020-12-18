@@ -24,10 +24,11 @@
  * function just in case your system does not have them.
  */
 
-#include <stdio.h>				/* for vsprintf */
-
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for ... */
+#endif
+#if HAVE_STDIO_H
+# include <stdio.h>
 #endif
 
 #if HAVE_STDLIB_H
