@@ -154,17 +154,7 @@ static	int	enabled_b = ARGV_FALSE;		/* are the lights on? */
 /*
  * static void argv_startup
  *
- * DESCRIPTION:
- *
  * Turn on the lights.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 static	void	argv_startup(void)
 {
@@ -184,13 +174,9 @@ static	void	argv_startup(void)
 /*
  * static int btoi
  *
- * DESCRIPTION:
- *
  * Binary string to integer translation.
  *
- * RETURNS:
- *
- * Integer converted from the string.
+ * Returns an integer converted from the string.
  *
  * ARGUMENTS:
  *
@@ -215,13 +201,9 @@ static	int	btoi(const char *str)
 /*
  * static int otoi
  *
- * DESCRIPTION:
- *
  * Octal string to integer translation.
  *
- * RETURNS:
- *
- * Integer converted from the string.
+ * Returns an integer converted from the string.
  *
  * ARGUMENTS:
  *
@@ -246,13 +228,9 @@ static	int	otoi(const char *str)
 /*
  * static int htoi
  *
- * DESCRIPTION:
- *
  * Hexadecimal string to integer translation.
  *
- * RETURNS:
- *
- * Integer converted from the string.
+ * Returns an integer converted from the string.
  *
  * ARGUMENTS:
  *
@@ -293,13 +271,9 @@ static	int	htoi(const char *str)
 /*
  * static char *string_copy
  *
- * DESCRIPTION:
- *
  * Basically a strdup for compatibility sake.
  *
- * RETURNS:
- *
- * Character pointer that must be freed later.
+ * Returns a character pointer that must be freed later.
  *
  * ARGUMENTS:
  *
@@ -336,19 +310,13 @@ static	char	*string_copy(const char *str)
 /*
  * static char **vectorize
  *
- * DESCRIPTION:
- *
  * Break a string up into its arguments separated by one of the
  * characters in a token string and return an array of char pointers.
  *
  * NOTE: the string argument should stay around until that time.
  *
- * RETURNS:
- *
- * Success - Allocated list of character poiners into the string
- * argument which must be freed later.
- *
- * Failure - NULL
+ * Returns Allocated list of character poiners into the string
+ * argument which must be freed later or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -424,15 +392,11 @@ static	char	**vectorize(char *str, const char *tok, int *num_tok_p)
 /*
  * static int expand_buf
  *
- * DESCRIPTION:
- *
  * Translates a buffer of bytes into its printable version.
  *
  * NOTE: it does _not_ add a \0 at the end of OUT.
  *
- * RETURNS:
- *
- * Number of characters written in to the output buffer.
+ * Returns a number of characters written in to the output buffer.
  *
  * ARGUMENTS:
  *
@@ -514,13 +478,7 @@ static	int	expand_buf(const void *buf, const int buf_size,
 /*
  * static void usage_short
  *
- * DESCRIPTION:
- *
  * Print a short-format usage message.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -709,14 +667,7 @@ static	void	usage_short(const argv_t *args, const int flag)
 /*
  * static void display_arg
  *
- * DESCRIPTION:
- *
- * Display an argument type while keeping track of the column we are
- * in.
- *
- * RETURNS:
- *
- * None.
+ * Display an argument type while keeping track of the column we are in.
  *
  * ARGUMENTS:
  *
@@ -787,14 +738,7 @@ static	void	display_arg(FILE *stream, const argv_t *arg_p, const int max,
 /*
  * static void display_option
  *
- * DESCRIPTION:
- *
- * Display an option entry while while keeping track of the column we
- * are in.
- *
- * RETURNS:
- *
- * None.
+ * Display an option entry while while keeping track of the column we are in.
  *
  * ARGUMENTS:
  *
@@ -836,13 +780,9 @@ static	void	display_option(FILE *stream, const argv_t *arg_p, int *col_cp)
 /*
  * static void usage_long
  *
- * DESCRIPTION:
- *
  * Print a long-format usage message.
  *
- * RETURNS:
- *
- * None.
+ * ARGUMENTS:
  *
  * ars - Array of argv_t structures whose usage we are printing. 
  */
@@ -945,13 +885,7 @@ static	void	usage_long(const argv_t *args)
 /*
  * static void do_usage
  *
- * DESCRIPTION:
- *
  * Print the usage messages.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -1017,16 +951,9 @@ static	void	do_usage(const argv_t *args, const int flag)
 /*
  * static int preprocess_array
  *
- * DESCRIPTION:
+ * Preprocess argument array entries and set the mandatory and maybe flags.
  *
- * Preprocess argument array entries and set the mandatory and maybe
- * flags.
- *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success or -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -1179,16 +1106,9 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 /*
  * static int string_to_value
  *
- * DESCRIPTION:
+ * Translate string value argument into a variable value depending on its type.
  *
- * Translate string value argument into a variable value depending on
- * its type.
- *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on Success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -1463,14 +1383,10 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
 /*
  * static int value_to_string
  *
- * DESCRIPTION:
- *
  * Translate value from variable depending on its type intoits string
  * represetnation in buffer.
  *
- * RETURNS:
- *
- * Number of characters added to the buffer.
+ * Returns the number of characters added to the buffer.
  *
  * ARGUMENTS:
  *
@@ -1715,13 +1631,7 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
 /*
  * static void display_variables
  *
- * DESCRIPTION:
- *
  * Display all of the variable values from our array.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -1841,16 +1751,10 @@ static	void	display_variables(const argv_t *args)
 /*
  * static int check_or
  *
- * DESCRIPTION:
- *
  * Check out if an argument has an ARGV_OR attached to it and both
  * variables have not been set.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -1932,16 +1836,10 @@ static	int	check_or(const argv_t *args, const argv_t *which_p)
 /*
  * static int check_xor
  *
- * DESCRIPTION:
- *
  * Check out if an argument has an ARGV_XOR attached to it and that at
  * least one but not both variables have been set.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -2028,16 +1926,9 @@ static	int	check_xor(const argv_t *args)
 /*
  * static int check_mand
  *
- * DESCRIPTION:
+ * Verify that all of the mandatory arguments in our array have been specified.
  *
- * Verify that all of the mandatory arguments in our array have been
- * specified.
- *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -2093,15 +1984,9 @@ static	int	check_mand(const argv_t *args)
 /*
  * static int check_opt
  *
- * DESCRIPTION:
- *
  * Check for any missing argument options.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -2132,16 +2017,10 @@ static	int	check_opt(const int queue_head, const int queue_tail)
 /*
  * static void file_args
  *
- * DESCRIPTION:
- *
  * Read in arguments from a file and process them like they were
  * specified on the command line.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -2271,14 +2150,8 @@ static	void	file_args(const char *path, argv_t *grid,
 /*
  * static void do_arg
  *
- * DESCRIPTION:
- *
  * Process an argument in MATCH_P which looking at GRID. sets okay_p
  * to FALSE if the argument was not okay.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -2363,16 +2236,12 @@ static	void	do_arg(argv_t *grid, argv_t *match_p, const char *close_p,
 /*
  * static int is_number
  *
- * DESCRIPTION:
- *
  * Examine an argument string to see if it really is a negative number
  * being passed into a previously specified argument.
  *
  * Thanks much to Nick Kisseberth for pointing out this oversight.
  *
- * RETURNS:
- *
- * 1 if a number otherwise 0.
+ * Returns 1 if a number otherwise 0.
  *
  * ARGUMENTS:
  *
@@ -2404,13 +2273,7 @@ static	int	is_number(const char *str)
 /*
  * static void do_list
  *
- * DESCRIPTION:
- *
  * Process a list of arguments with our array of argv_t structures
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -2821,15 +2684,9 @@ static	void	do_list(argv_t *grid, const int arg_c, char **argv,
 /*
  * static int do_env_args
  *
- * DESCRIPTION:
- *
  * Handle the args from the environmentatl variable.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -2893,19 +2750,9 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
 /*
  * static int process_env
  *
- * DESCRIPTION:
- *
  * Process the global env variables.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Faulure - -1
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 0 on success and -1 on failure.
  */
 static	int	process_env(void)
 {
@@ -3111,17 +2958,11 @@ static	int	process_env(void)
 /*
  * int argv_process_no_env
  *
- * DESCRIPTION:
- *
  * Process the user arguments with an argv_t structure array.  Like
  * argv_process_args but without the processing of the argv
  * environmental variables.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Failure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -3262,8 +3103,6 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
 /*
  * int argv_process
  *
- * DESCRIPTION:
- *
  * Processes a number of arguments depending on the argument array.
  * This routine will not modify the argv array in any way.
  *
@@ -3301,19 +3140,13 @@ int	argv_process(argv_t *args, const int argc, char **argv)
 /*
  * int argv_usage
  *
- * DESCRIPTION:
- *
  * Print the standard usage messages for our argument array.  You can
  * specify whether you want to see a short or long usage messages.
  *
  * NOTE: if this is called before argv_process then the program name
  * may be invalid.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Failure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -3354,13 +3187,9 @@ int	argv_usage(const argv_t *args, const int which)
 /*
  * int argv_was_used
  *
- * DESCRIPTION:
- *
  * See if an argument was used in a previous call to argv_process.
  *
- * RETURNS:
- *
- * 1 if yes it was used, else 0 if not.
+ * Returns 1 if yes it was used, else 0 if not.
  *
  * ARGUMENTS:
  *
@@ -3393,13 +3222,9 @@ int	argv_was_used(const argv_t *args, const char short_arg)
 /*
  * int argv_long_was_used
  *
- * DESCRIPTION:
- *
  * See if a long argument was used in a previous call to argv_process.
  *
- * RETURNS:
- *
- * 1 if yes it was used, else 0 if not.
+ * Returns 1 if yes it was used, else 0 if not.
  *
  * ARGUMENTS:
  *
@@ -3432,14 +3257,10 @@ int	argv_long_was_used(const argv_t *args, const char *long_arg)
 /*
  * int argv_entry_was_used
  *
- * DESCRIPTION:
- *
  * See if an entry in the argument array was used in a previous call
  * to argv_process.
  *
- * RETURNS:
- *
- * 1 if yes it was used, else 0 if not.
+ * Returns 1 if yes it was used, else 0 if not.
  *
  * ARGUMENTS:
  *
@@ -3458,15 +3279,9 @@ int	argv_entry_was_used(const argv_t *argv_entry_p)
 /*
  * void argv_cleanup
  *
- * DESCRIPTION:
- *
  * Frees up any allocations associated with the argument array during
  * argv_process.  This should be done at the end of the program or
  * after all the arguments have been referenced.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -3517,19 +3332,13 @@ void	argv_cleanup(const argv_t *args)
 /*
  * int argv_copy_args
  *
- * DESCRIPTION:
- *
  * Copy all the arguements (not including the 0th) one after the other
  * into the user specified buffer.
  *
  * NOTE: you can get the 0th argument from argv_argv[0] or
  * argv_program.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Failure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -3583,14 +3392,10 @@ int	argv_copy_args(char *buf, const int buf_size)
 /*
  * int argv_value_string
  *
- * DESCRIPTION:
- *
  * Convert the value of a RC entry to its string equivalent in the
  * buffer provided.
  *
- * RETURNS:
- *
- * Length of bytes copied into the buffer.
+ * Returns the length of bytes copied into the buffer.
  *
  * ARGUMENTS:
  *
@@ -3648,13 +3453,9 @@ int	argv_value_string(const argv_t *argv_entry_p, char *buf,
 /*
  * int argv_type_info
  *
- * DESCRIPTION:
- *
  * Get internal information about the type of the argument.
  *
- * RETURNS:
- *
- * The name of the type.
+ * Returns the name of the type.
  *
  * ARGUMENTS:
  *

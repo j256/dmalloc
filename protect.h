@@ -27,13 +27,7 @@
 /*
  * void _dmalloc_protect_set_read_only
  *
- * DESCRIPTION:
- *
  * Set the protections on a block to be read-only.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -47,13 +41,7 @@ void	_dmalloc_protect_set_read_only(void *mem, const int block_n);
 /*
  * void _dmalloc_protect_set_read_write
  *
- * DESCRIPTION:
- *
  * Set the protections on a block to be read-write.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -67,13 +55,7 @@ void	_dmalloc_protect_set_read_write(void *mem, const int block_n);
 /*
  * void _dmalloc_protect_set_no_access
  *
- * DESCRIPTION:
- *
  * Set the protections on a block to be no-access.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *

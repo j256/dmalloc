@@ -35,19 +35,9 @@ unsigned long		_dmalloc_alloc_total;
 /*
  * int _dmalloc_chunk_startup
  * 
- * DESCRIPTION:
- *
  * Startup the low level malloc routines.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 1 on success or 0 on failure.
  */
 extern
 int	_dmalloc_chunk_startup(void);
@@ -55,14 +45,9 @@ int	_dmalloc_chunk_startup(void);
 /*
  * char *_dmalloc_chunk_desc_pnt
  *
- * DESCRIPTION:
+ * Write into a buffer a pointer description with file and line-number.
  *
- * Write into a buffer a pointer description with file and
- * line-number.
- *
- * RETURNS:
- *
- * Pointer to buffer 1st argument.
+ * Returns a pointer to buffer 1st argument.
  *
  * ARGUMENTS:
  *
@@ -82,15 +67,9 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
 /*
  * int _dmalloc_chunk_read_info
  *
- * DESCRIPTION:
- *
  * Return some information associated with a pointer.
  *
- * RETURNS:
- *
- * Success - 1 pointer is okay
- *
- * Failure - 0 problem with pointer
+ * Returns 1 if the pointer is okay or 0 if a problem with pointer
  *
  * ARGUMENTS:
  *
@@ -137,19 +116,9 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
 /*
  * int _dmalloc_chunk_heap_check
  *
- * DESCRIPTION:
- *
  * Run extensive tests on the entire heap.
  *
- * RETURNS:
- *
- * Success - 1 if the heap is okay
- *
- * Failure - 0 if a problem was detected
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 1 if the heap is okay or 0 if a problem was detected
  */
 extern
 int	_dmalloc_chunk_heap_check(void);
@@ -157,15 +126,9 @@ int	_dmalloc_chunk_heap_check(void);
 /*
  * int _dmalloc_chunk_pnt_check
  *
- * DESCRIPTION:
- *
  * Run extensive tests on a pointer.
  *
- * RETURNS:
- *
- * Success - 1 if the pointer is okay
- *
- * Failure - 0 if not
+ * Returns 1 if the pointer is okay or 0 if not
  *
  * ARGUMENTS:
  *
@@ -190,15 +153,9 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
 /*
  * void *_dmalloc_chunk_malloc
  *
- * DESCRIPTION:
- *
  * Allocate a chunk of memory.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -221,15 +178,9 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
 /*
  * int _dmalloc_chunk_free
  *
- * DESCRIPTION:
- *
  * Free a user pointer from the heap.
  *
- * RETURNS:
- *
- * Success - FREE_NOERROR
- *
- * Failure - FREE_ERROR
+ * Returns FREE_NOERROR on success or FREE_ERROR on failure
  *
  * ARGUMENTS:
  *
@@ -248,15 +199,9 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 /*
  * void *_dmalloc_chunk_realloc
  *
- * DESCRIPTION:
- *
  * Re-allocate a chunk of memory either shrinking or expanding it.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Returns a valid pointer on success of NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -279,17 +224,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
 /*
  * void _dmalloc_chunk_log_stats
  *
- * DESCRIPTION:
- *
  * Log general statistics from the heap to the logfile.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 void	_dmalloc_chunk_log_stats(void);
@@ -297,13 +232,7 @@ void	_dmalloc_chunk_log_stats(void);
 /*
  * void _dmalloc_chunk_log_changed
  *
- * DESCRIPTION:
- *
  * Log the pointers that has changed since a pointer in time.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -326,13 +255,9 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 /*
  * unsigned long _dmalloc_chunk_count_changed
  *
- * DESCRIPTION:
- *
  * Return the pointers that has changed since a pointer in time.
  *
- * RETURNS:
- *
- * Number of bytes changed since mark.
+ * Returns the number of bytes changed since mark.
  *
  * ARGUMENTS:
  *
@@ -352,13 +277,7 @@ unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
 /*
  * void _dmalloc_chunk_get_stats
  *
- * DESCRIPTION:
- *
  * Return a number of statistics about the current heap.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *

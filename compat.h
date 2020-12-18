@@ -153,8 +153,6 @@ char	*strrchr(const char *str, const int ch);
 /*
  * char *strsep
  *
- * DESCRIPTION:
- *
  * This is a function which should be in libc in every Unix.  Grumble.
  * It basically replaces the strtok function because it is reentrant.
  * This tokenizes a string by returning the next token in a string and

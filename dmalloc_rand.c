@@ -45,17 +45,7 @@ static long	value = 0;			/* our random value */
 /*
  * static void auto_seed
  *
- * DESCRIPTION:
- *
  * Automatically seed the random number generation algorithm.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 static	void	auto_seed(void)
 {
@@ -66,13 +56,7 @@ static	void	auto_seed(void)
 /*
  * static void _dmalloc_srand
  *
- * DESCRIPTION:
- *
  * Seed the random number generator with the user argument.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -86,17 +70,9 @@ void	_dmalloc_srand(const long seed)
 /*
  * static long _dmalloc_rand
  *
- * DESCRIPTION:
- *
  * Get a pseudo-random number from the random algorithm.
  *
- * RETURNS:
- *
- * Random number.
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns a random number.
  */
 long	_dmalloc_rand(void)
 {

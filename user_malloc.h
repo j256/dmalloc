@@ -18,17 +18,7 @@ char		*dmalloc_logpath;
 /*
  * void dmalloc_shutdown
  *
- * DESCRIPTION:
- *
  * Shutdown the dmalloc library and provide statistics if necessary.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 void	dmalloc_shutdown(void);
@@ -37,20 +27,10 @@ void	dmalloc_shutdown(void);
 /*
  * void __fini_dmalloc
  *
- * DESCRIPTION:
- *
  * Automatic function to close dmalloc supported by some operating
  * systems.  Pretty cool OS/compiler hack.  By default it is not
  * necessary because we use atexit() and on_exit() to register the
  * close functions which are more portable.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 void	__fini_dmalloc(void);
@@ -59,15 +39,9 @@ void	__fini_dmalloc(void);
 /*
  * DMALLOC_PNT dmalloc_malloc
  *
- * DESCRIPTION:
- *
  * Allocate and return a memory block of a certain size.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -95,15 +69,9 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
 /*
  * DMALLOC_PNT dmalloc_realloc
  *
- * DESCRIPTION:
- *
  * Resizes and old pointer to a new number of bytes.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -130,15 +98,9 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
 /*
  * int dmalloc_free
  *
- * DESCRIPTION:
- *
  * Release a pointer back into the heap.
  *
- * RETURNS:
- *
- * Success - FREE_NOERROR
- *
- * Failure - FREE_ERROR
+ * Returns FREE_NOERROR on success or FREE_ERROR on failure.
  *
  * Note: many operating systems define free to return (void) so this
  * return value may be filtered.  Dumb.
@@ -161,16 +123,10 @@ int	dmalloc_free(const char *file, const int line, DMALLOC_PNT pnt,
 /*
  * DMALLOC_PNT dmalloc_strndup
  *
- * DESCRIPTION:
- *
  * Allocate and return an allocated block of memory holding a copy of
  * a string of a certain number of characters.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -193,16 +149,10 @@ char	*dmalloc_strndup(const char *file, const int line,
 /*
  * DMALLOC_PNT malloc
  *
- * DESCRIPTION:
- *
  * Overloading the malloc(3) function.  Allocate and return a memory
  * block of a certain size.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -214,15 +164,9 @@ DMALLOC_PNT	malloc(DMALLOC_SIZE size);
 /*
  * DMALLOC_PNT calloc
  *
- * DESCRIPTION:
- *
  * Overloading the calloc(3) function.  Returns a block of zeroed memory.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -236,16 +180,9 @@ DMALLOC_PNT	calloc(DMALLOC_SIZE num_elements, DMALLOC_SIZE size);
 /*
  * DMALLOC_PNT realloc
  *
- * DESCRIPTION:
+ * Overload of realloc(3).  Resizes and old pointer to a new number of bytes.
  *
- * Overload of realloc(3).  Resizes and old pointer to a new number of
- * bytes.
- *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -260,22 +197,15 @@ DMALLOC_PNT	realloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size);
 /*
  * DMALLOC_PNT recalloc
  *
- * DESCRIPTION:
- *
  * Overload of recalloc(3) which exists on some systems.  Resizes and
  * old pointer to a new number of bytes.  If we are expanding, then
  * any new bytes will be zeroed.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
- * old_pnt -> Pointer to an existing memory chunk that we are
- * resizing.
+ * old_pnt -> Pointer to an existing memory chunk that we are resizing.
  *
  * new_size -> New number of bytes requested for the old pointer.
  */
@@ -285,17 +215,11 @@ DMALLOC_PNT	recalloc(DMALLOC_PNT old_pnt, DMALLOC_SIZE new_size);
 /*
  * DMALLOC_PNT memalign
  *
- * DESCRIPTION:
- *
  * Overloading the memalign(3) function.  Allocate and return a memory
  * block of a certain size which have been aligned to a certain
  * alignment.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -311,17 +235,11 @@ DMALLOC_PNT	memalign(DMALLOC_SIZE alignment, DMALLOC_SIZE size);
 /*
  * DMALLOC_PNT valloc
  *
- * DESCRIPTION:
- *
  * Overloading the valloc(3) function.  Allocate and return a memory
  * block of a certain size which have been aligned to page boundaries
  * which are often 1k or 4k.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -334,16 +252,10 @@ DMALLOC_PNT	valloc(DMALLOC_SIZE size);
 /*
  * DMALLOC_PNT strdup
  *
- * DESCRIPTION:
- *
  * Overload of strdup(3).  Allocate and return an allocated block of
  * memory holding a copy of a string.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -357,16 +269,10 @@ char	*strdup(const char *string);
 /*
  * DMALLOC_PNT strndup
  *
- * DESCRIPTION:
- *
  * Overload of strndup(3).  Allocate and return an allocated block of
  * memory holding a copy of a string with a maximum length.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - 0L
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -381,11 +287,7 @@ char	*strndup(const char *string, const DMALLOC_SIZE max_len);
 /*
  * DMALLOC_FREE_RET free
  *
- * DESCRIPTION:
- *
  * Release a pointer back into the heap.
- *
- * RETURNS:
  *
  * Returns FREE_ERROR, FREE_NOERROR or void depending on whether STDC
  * is defined by your compiler.
@@ -400,11 +302,7 @@ DMALLOC_FREE_RET	free(DMALLOC_PNT pnt);
 /*
  * DMALLOC_FREE_RET cfree
  *
- * DESCRIPTION:
- *
  * Same as free.
- *
- * RETURNS:
  *
  * Returns FREE_ERROR, FREE_NOERROR or void depending on whether STDC
  * is defined by your compiler.
@@ -419,16 +317,10 @@ DMALLOC_FREE_RET	cfree(DMALLOC_PNT pnt);
 /*
  * int dmalloc_verify
  *
- * DESCRIPTION:
- *
  * Verify a pointer which has previously been allocated by the
  * library or check the entire heap.
  *
- * RETURNS:
- *
- * Success - MALLOC_VERIFY_NOERROR
- *
- * Failure - MALLOC_VERIFY_ERROR
+ * Returns MALLOC_VERIFY_NOERROR on success or MALLOC_VERIFY_ERROR on failure.
  *
  * ARGUMENTS:
  *
@@ -440,16 +332,10 @@ int	dmalloc_verify(const DMALLOC_PNT pnt);
 /*
  * int malloc_verify
  *
- * DESCRIPTION:
- *
  * Verify a pointer which has previously been allocated by the
  * library.  Same as dmalloc_verify.
  *
- * RETURNS:
- *
- * Success - MALLOC_VERIFY_NOERROR
- *
- * Failure - MALLOC_VERIFY_ERROR
+ * Returns MALLOC_VERIFY_NOERROR on success or MALLOC_VERIFY_ERROR on failure.
  *
  * ARGUMENTS:
  *
@@ -461,17 +347,11 @@ int	malloc_verify(const DMALLOC_PNT pnt);
 /*
  * int dmalloc_verify_pnt
  *
- * DESCRIPTION:
- *
  * This function is mainly used by the arg_check.c functions to verify
  * specific pointers.  This can be used by users to provide more fine
  * grained tests on pointers.
  *
- * RETURNS:
- *
- * Success - MALLOC_VERIFY_NOERROR
- *
- * Failure - MALLOC_VERIFY_ERROR
+ * Returns MALLOC_VERIFY_NOERROR on success or MALLOC_VERIFY_ERROR on failure.
  *
  * ARGUMENTS:
  *
@@ -505,17 +385,11 @@ int	dmalloc_verify_pnt_strsize(const char *file, const int line,
 /*
  * int dmalloc_verify_pnt
  *
- * DESCRIPTION:
- *
  * This function is mainly used by the arg_check.c functions to verify
  * specific pointers.  This can be used by users to provide more fine
  * grained tests on pointers.
  *
- * RETURNS:
- *
- * Success - MALLOC_VERIFY_NOERROR
- *
- * Failure - MALLOC_VERIFY_ERROR
+ * Returns MALLOC_VERIFY_NOERROR on success or MALLOC_VERIFY_ERROR on failure.
  *
  * ARGUMENTS:
  *
@@ -547,17 +421,13 @@ int	dmalloc_verify_pnt(const char *file, const int line, const char *func,
 /*
  * unsigned int dmalloc_debug
  *
- * DESCRIPTION:
- *
  * Set the global debug functionality flags.  You can also use
  * dmalloc_debug_setup.
  *
  * Note: you cannot add or remove certain flags such as signal
  * handlers since they are setup at initialization time only.
  *
- * RETURNS:
- *
- * The old debug flag value.
+ * Returns the old debug flag value.
  *
  * ARGUMENTS:
  *
@@ -569,18 +439,8 @@ unsigned int	dmalloc_debug(const unsigned int flags);
 /*
  * char *dmalloc_debug_current
  *
- * DESCRIPTION:
- *
  * Returns the current debug functionality flags.  This allows you to
  * save a dmalloc library state to be restored later.
- *
- * RETURNS:
- *
- * Current debug flags.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 unsigned int	dmalloc_debug_current(void);
@@ -588,15 +448,11 @@ unsigned int	dmalloc_debug_current(void);
 /*
  * char *dmalloc_debug_current_env
  *
- * DESCRIPTION:
- *
  * Returns the current debug environment.  This allows you to save a
  * dmalloc library state to be restored later with a call to
  * dmalloc_debug_setup().
  *
- * RETURNS:
- *
- * Current debug environment.
+ * Returns the current debug environment.
  *
  * ARGUMENTS:
  *
@@ -610,17 +466,11 @@ char	*dmalloc_debug_current_env(char *env_buf, const int env_buf_size);
 /*
  * void dmalloc_debug_setup
  *
- * DESCRIPTION:
- *
  * Set the global debugging functionality as an option string.
  * Normally this would be pased in in the DMALLOC_OPTIONS
  * environmental variable.  This is here to override the env or for
  * circumstances where modifying the environment is not possible or
  * does not apply such as servers or cgi-bin programs.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -632,18 +482,12 @@ void	dmalloc_debug_setup(const char *options_str);
 /*
  * int dmalloc_examine
  *
- * DESCRIPTION:
- *
  * Examine a pointer and pass back information on its allocation size
  * as well as the file and line-number where it was allocated.  If the
  * file and line number is not available, then it will pass back the
  * allocation location's return-address if available.
  *
- * RETURNS:
- *
- * Success - DMALLOC_NOERROR
- *
- * Failure - DMALLOC_ERROR
+ * Returns DMALLOC_NOERROR on success or DMALLOC_ERROR on failure.
  *
  * ARGUMENTS:
  *
@@ -683,14 +527,8 @@ int	dmalloc_examine(const DMALLOC_PNT pnt, DMALLOC_SIZE *user_size_p,
 /*
  * void dmalloc_track
  *
- * DESCRIPTION:
- *
  * Register an allocation tracking function which will be called each
  * time an allocation occurs.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -703,8 +541,6 @@ void	dmalloc_track(const dmalloc_track_t track_func);
 /*
  * unsigned long dmalloc_mark
  *
- * DESCRIPTION:
- *
  * Return to the caller the current "mark" which can be used later by
  * dmalloc_log_changed to log the changed pointers since this point.
  * Multiple marks can be saved and used.
@@ -713,14 +549,6 @@ void	dmalloc_track(const dmalloc_track_t track_func);
  * each memory transaction in the logfile with the LOG_ITERATION
  * define in settings.h and can be logged with each pointer with the
  * LOG_PNT_ITERATION define in settings.h.
- *
- * RETURNS:
- *
- * Current mark value
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 unsigned long	dmalloc_mark(void);
@@ -728,17 +556,7 @@ unsigned long	dmalloc_mark(void);
 /*
  * unsigned long dmalloc_memory_allocated
  *
- * DESCRIPTION:
- *
  * Return the total number of bytes allocated by the program so far.
- *
- * RETURNS:
- *
- * Total number of bytes allocated by the program so far.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 unsigned long	dmalloc_memory_allocated(void);
@@ -746,17 +564,7 @@ unsigned long	dmalloc_memory_allocated(void);
 /*
  * unsigned int dmalloc_page_size
  *
- * DESCRIPTION:
- *
  * Get the page-size being used by dmalloc.
- *
- * RETURNS:
- *
- * Page size.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 unsigned int	dmalloc_page_size(void);
@@ -764,13 +572,9 @@ unsigned int	dmalloc_page_size(void);
 /*
  * unsigned long dmalloc_count_changed
  *
- * DESCRIPTION:
- *
  * Count the changed memory bytes since a particular mark.
  *
- * RETURNS:
- *
- * Number of bytes since mark.
+ * Returns the number of bytes since mark.
  *
  * ARGUMENTS:
  *
@@ -790,17 +594,7 @@ unsigned long	dmalloc_count_changed(const unsigned long mark,
 /*
  * void dmalloc_log_status
  *
- * DESCRIPTION:
- *
  * Dump dmalloc statistics to logfile.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 void	dmalloc_log_stats(void);
@@ -808,17 +602,7 @@ void	dmalloc_log_stats(void);
 /*
  * void dmalloc_log_unfreed
  *
- * DESCRIPTION:
- *
  * Dump unfreed-memory info to logfile.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 void	dmalloc_log_unfreed(void);
@@ -826,11 +610,9 @@ void	dmalloc_log_unfreed(void);
 /*
  * void dmalloc_log_changed
  *
- * DESCRIPTION:
- *
  * Dump the pointers that have changed since a point in time.
  *
- * RETURNS:
+ * ARGUMENTS:
  *
  * mark -> Sets the point to compare against.  You can use
  * dmalloc_mark to get the current mark value which can later be
@@ -851,14 +633,8 @@ void	dmalloc_log_changed(const unsigned long mark, const int not_freed_b,
 /*
  * void dmalloc_vmessage
  *
- * DESCRIPTION:
- *
  * Message writer with vprintf like arguments which adds a line to the
  * dmalloc logfile.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -872,14 +648,8 @@ void	dmalloc_vmessage(const char *format, va_list args);
 /*
  * void dmalloc_message
  *
- * DESCRIPTION:
- *
  * Message writer with printf like arguments which adds a line to the
  * dmalloc logfile.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -897,13 +667,7 @@ void	dmalloc_message(const char *format, ...)
 /*
  * void dmalloc_get_stats
  *
- * DESCRIPTION:
- *
- * Return a number of statistics about the current heap.
- *
- * RETURNS:
- *
- * None.
+ * Get a number of statistics about the current heap.
  *
  * ARGUMENTS:
  *
@@ -953,15 +717,9 @@ void	dmalloc_get_stats(DMALLOC_PNT *heap_low_p,
 /*
  * const char *dmalloc_strerror
  *
- * DESCRIPTION:
- *
  * Convert a dmalloc error code into its string equivalent.
  *
- * RETURNS:
- *
- * Success - String version of the error
- *
- * Failure - The string "unknown error"
+ * Returns String version of the error on success or "unknown error" on failure.
  *
  * ARGUMENTS:
  *

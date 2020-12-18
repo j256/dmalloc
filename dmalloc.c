@@ -842,17 +842,7 @@ static	char	*local_strerror(const int error_num)
 /*
  * static void header
  *
- * DESCRIPTION:
- *
  * Print out a little usage header to the user.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 static	void	header(void)
 {

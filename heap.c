@@ -59,15 +59,7 @@ void		*_dmalloc_heap_high = NULL;	/* end of our heap */
 /*
  * static void *heap_extend
  *
- * DESCRIPTION:
- *
- * Get more bytes from the system functions.
- *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Get more bytes from the system functions.  Returns a valid pointer or NULL on error.
  *
  * ARGUMENTS:
  *
@@ -142,13 +134,7 @@ static	void	*heap_extend(const int incr)
 /*
  * static void heap_release
  *
- * DESCRIPTION:
- *
  * Release a memory chunk back to the sytem.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -180,19 +166,9 @@ static	void	heap_release(void *addr, const int size)
 /*
  * int _heap_startup
  *
- * DESCRIPTION:
- *
  * Initialize heap pointers.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 1 on success or 0 on failure.
  */
 int	_dmalloc_heap_startup(void)
 {
@@ -202,15 +178,9 @@ int	_dmalloc_heap_startup(void)
 /*
  * void *_dmalloc_heap_alloc
  *
- * DESCRIPTION:
- *
  * Function to get memory bytes from the heap.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *

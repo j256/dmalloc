@@ -27,13 +27,7 @@
 /*
  * static void _dmalloc_srand
  *
- * DESCRIPTION:
- *
  * Seed the random number generator with the user argument.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -45,17 +39,9 @@ void	_dmalloc_srand(const long seed);
 /*
  * static long _dmalloc_rand
  *
- * DESCRIPTION:
- *
  * Get a pseudo-random number from the random algorithm.
  *
- * RETURNS:
- *
- * Random number.
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns a random number.
  */
 extern
 long	_dmalloc_rand(void);

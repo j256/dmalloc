@@ -48,14 +48,8 @@ typedef struct {
 /*
  * void _dmalloc_table_init
  *
- * DESCRIPTION:
- *
  * Clear out the allocation information in our table.  We are going to
  * be loading it with other info.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -72,13 +66,7 @@ void	_dmalloc_table_init(mem_table_t *mem_table, mem_entry_t *mem_entries,
 /*
  * void _dmalloc_table_insert
  *
- * DESCRIPTION:
- *
  * Insert a pointer to the table.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -98,13 +86,7 @@ void	_dmalloc_table_insert(mem_table_t *mem_table,
 /*
  * void _dmalloc_table_delete
  *
- * DESCRIPTION:
- *
  * Remove a pointer from the table.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -125,13 +107,7 @@ void	_dmalloc_table_delete(mem_table_t *mem_table, const char *old_file,
 /*
  * void _dmalloc_table_log_info
  *
- * DESCRIPTION:
- *
  * Log information from the memory table to the log file.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *

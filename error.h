@@ -87,18 +87,7 @@ int		_dmalloc_aborting_b;
 /*
  * void _dmalloc_open_log
  *
- * DESCRIPTION:
- *
- * Open up our log file and write some version of settings
- * information.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
+ * Open up our log file and write some version of settings information.
  */
 extern
 void	_dmalloc_open_log(void);
@@ -106,19 +95,9 @@ void	_dmalloc_open_log(void);
 /*
  * void _dmalloc_reopen_log
  *
- * DESCRIPTION:
- *
  * Re-open our log file which basically calls close() on the
  * logfile-fd.  If we change the name of the log-file then we will
  * re-open the file.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 extern
 void	_dmalloc_reopen_log(void);
@@ -127,13 +106,9 @@ void	_dmalloc_reopen_log(void);
 /*
  * char *_dmalloc_ptimeval
  *
- * DESCRIPTION:
- *
  * Print the time into local buffer.
  *
- * RETURNS:
- *
- * Poiner to the buf argument.
+ * Returns a pointer to the buf argument.
  *
  * ARGUMENTS:
  *
@@ -154,13 +129,9 @@ char	*_dmalloc_ptimeval(const TIMEVAL_TYPE *timeval_p, char *buf,
 /*
  * char *_dmalloc_ptime
  *
- * DESCRIPTION:
- *
  * Print the time into local buffer.
  *
- * RETURNS:
- *
- * Poiner to the buf argument.
+ * Returns a Pointer to the buf argument.
  *
  * ARGUMENTS:
  *
@@ -180,17 +151,11 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
 /*
  * void _dmalloc_vmessage
  *
- * DESCRIPTION:
- *
  * Message writer with vprintf like arguments which adds a line to the
  * dmalloc logfile.
  *
  * NOTE: An internal snprintf has been implemented which doesn't support all
  * formats.  This was done to stop dmalloc from going recursive.  YMMV.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -204,13 +169,7 @@ void	_dmalloc_vmessage(const char *format, va_list args);
 /*
  * void _dmalloc_die
  *
- * DESCRIPTION:
- *
  * Kill the program because of an internal malloc error.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -222,13 +181,7 @@ void	_dmalloc_die(const int silent_b);
 /*
  * void dmalloc_error
  *
- * DESCRIPTION:
- *
  * Handler of error codes.  The caller should have set the errno already
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *

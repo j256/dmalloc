@@ -46,8 +46,6 @@
 /*
  * static unsigned int hash
  *
- * DESCRIPTION:
- *
  * Hash a variable-length key into a 32-bit value.  Every bit of the
  * key affects every bit of the return value.  Every 1-bit and 2-bit
  * delta achieves avalanche.  About (6 * len + 35) instructions.  The
@@ -61,8 +59,6 @@
  * http://ourworld.compuserve.com/homepages/bob_jenkins/evahash.htm
  * Use for hash table lookup, or anything where one collision in 2^^32
  * is acceptable.  Do NOT use for cryptographic purposes.
- *
- * RETURNS:
  *
  * Returns a 32-bit hash value.
  *
@@ -146,13 +142,9 @@ static	unsigned int	hash(const unsigned char *key,
 /*
  * static unsigned int which_bucket
  *
- * DESCRIPTION:
- *
  * Determine the bucket with our file/line and hash function.
  *
- * RETURNS:
- *
- * Bucket number.
+ * Returns a bucket number.
  *
  * ARGUMENTS:
  *
@@ -188,13 +180,9 @@ static	unsigned int	which_bucket(const int entry_n, const char *file,
 /*
  * static int entry_cmp
  *
- * DESCRIPTION:
- *
  * Compare two entries in the memory table for quicksort.
  *
- * RETURNS:
- *
- * -1, 0, or 1 depending if entry1_p is less-than, equal, or
+ * Returns -1, 0, or 1 depending if entry1_p is less-than, equal, or
  * greater-than entry2_p.
  *
  * ARGUMENTS:
@@ -239,13 +227,7 @@ static	int	entry_cmp(const void *entry1_p, const void *entry2_p)
 /*
  * static void swap_bytes
  *
- * DESCRIPTION:
- *
  * Swap the values between two items of a specified size.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -272,14 +254,8 @@ static	void	swap_bytes(unsigned char *item1_p, unsigned char *item2_p,
 /*
  * static void insert_sort
  *
- * DESCRIPTION:
- *
  * Do an insertion sort which is faster for small numbers of items and
  * better if the items are already sorted.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -324,14 +300,7 @@ static	void	insert_sort(unsigned char *first_p, unsigned char *last_p,
 /*
  * static void split
  *
- * DESCRIPTION:
- *
- * This sorts an array of longs via the quick sort algorithm (it's
- * pretty quick)
- *
- * RETURNS:
- *
- * None.
+ * This sorts an array of longs via the quick sort algorithm (it's pretty quick)
  *
  * ARGUMENTS:
  *
@@ -486,13 +455,7 @@ static	void	split(unsigned char *first_p, unsigned char *last_p,
 /*
  * static void log_slot
  *
- * DESCRIPTION:
- *
  * Log the information from the memory slot to the logfile.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -519,13 +482,7 @@ static	void	log_entry(const mem_entry_t *entry_p,
 /*
  * static void add_entry
  *
- * DESCRIPTION:
- *
  * Add a memory entry into our memory info total.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -545,14 +502,8 @@ static	void	add_entry(mem_entry_t *total_p, const mem_entry_t *entry_p)
 /*
  * void _dmalloc_table_init
  *
- * DESCRIPTION:
- *
  * Clear out the allocation information in our table.  We are going to
  * be loading it with other info.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -577,13 +528,7 @@ void	_dmalloc_table_init(mem_table_t *mem_table, mem_entry_t *mem_entries,
 /*
  * static mem_entry_t *table_find
  *
- * DESCRIPTION:
- *
  * Find an extry in the table.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -627,13 +572,7 @@ static mem_entry_t	*table_find(mem_table_t *mem_table,
 /*
  * void _dmalloc_table_insert
  *
- * DESCRIPTION:
- *
  * Insert a pointer to the table.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -674,13 +613,7 @@ void	_dmalloc_table_insert(mem_table_t *mem_table,
 /*
  * void _dmalloc_table_delete
  *
- * DESCRIPTION:
- *
  * Remove a pointer from the table.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -714,13 +647,7 @@ void	_dmalloc_table_delete(mem_table_t *mem_table, const char *old_file,
 /*
  * void _dmalloc_table_log_info
  *
- * DESCRIPTION:
- *
  * Log information from the memory table to the log file.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *

@@ -293,17 +293,11 @@ int	argv_env_after_b;
 /*
  * int argv_process_no_env
  *
- * DESCRIPTION:
- *
  * Process the user arguments with an argv_t structure array.  Like
  * argv_process_args but without the processing of the argv
  * environmental variables.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Failure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -318,8 +312,6 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv);
 
 /*
  * int argv_process
- *
- * DESCRIPTION:
  *
  * Processes a number of arguments depending on the argument array.
  * This routine will not modify the argv array in any way.
@@ -342,19 +334,13 @@ int	argv_process(argv_t *args, const int argc, char **argv);
 /*
  * int argv_usage
  *
- * DESCRIPTION:
- *
  * Print the standard usage messages for our argument array.  You can
  * specify whether you want to see a short or long usage messages.
  *
  * NOTE: if this is called before argv_process then the program name
  * may be invalid.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Failure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -371,13 +357,9 @@ int	argv_usage(const argv_t *args, const int which);
 /*
  * int argv_was_used
  *
- * DESCRIPTION:
- *
  * See if an argument was used in a previous call to argv_process.
  *
- * RETURNS:
- *
- * 1 if yes it was used, else 0 if not.
+ * Returns 1 if yes it was used, else 0 if not.
  *
  * ARGUMENTS:
  *
@@ -391,13 +373,9 @@ int	argv_was_used(const argv_t *args, const char short_arg);
 /*
  * int argv_long_was_used
  *
- * DESCRIPTION:
- *
  * See if a long argument was used in a previous call to argv_process.
  *
- * RETURNS:
- *
- * 1 if yes it was used, else 0 if not.
+ * Returns 1 if yes it was used, else 0 if not.
  *
  * ARGUMENTS:
  *
@@ -411,14 +389,10 @@ int	argv_long_was_used(const argv_t *args, const char *long_arg);
 /*
  * int argv_entry_was_used
  *
- * DESCRIPTION:
- *
  * See if an entry in the argument array was used in a previous call
  * to argv_process.
  *
- * RETURNS:
- *
- * 1 if yes it was used, else 0 if not.
+ * Returns 1 if yes it was used, else 0 if not.
  *
  * ARGUMENTS:
  *
@@ -430,15 +404,9 @@ int	argv_entry_was_used(const argv_t *argv_entry_p);
 /*
  * void argv_cleanup
  *
- * DESCRIPTION:
- *
  * Frees up any allocations associated with the argument array during
  * argv_process.  This should be done at the end of the program or
  * after all the arguments have been referenced.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -450,19 +418,13 @@ void	argv_cleanup(const argv_t *args);
 /*
  * int argv_copy_args
  *
- * DESCRIPTION:
- *
  * Copy all the arguements (not including the 0th) one after the other
  * into the user specified buffer.
  *
  * NOTE: you can get the 0th argument from argv_argv[0] or
  * argv_program.
  *
- * RETURNS:
- *
- * Success - 0
- *
- * Failure - -1
+ * Returns 0 on success and -1 on failure.
  *
  * ARGUMENTS:
  *
@@ -476,14 +438,10 @@ int	argv_copy_args(char *buf, const int buf_size);
 /*
  * int argv_value_string
  *
- * DESCRIPTION:
- *
  * Convert the value of a RC entry to its string equivalent in the
  * buffer provided.
  *
- * RETURNS:
- *
- * Length of bytes copied into the buffer.
+ * Returns the length of bytes copied into the buffer.
  *
  * ARGUMENTS:
  *
@@ -500,13 +458,9 @@ int	argv_value_string(const argv_t *argv_entry_p, char *buf,
 /*
  * int argv_type_info
  *
- * DESCRIPTION:
- *
  * Get internal information about the type of the argument.
  *
- * RETURNS:
- *
- * The name of the type.
+ * Returns the name of the type.
  *
  * ARGUMENTS:
  *

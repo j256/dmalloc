@@ -45,19 +45,9 @@ void		*_dmalloc_heap_high;	/* end of our heap */
 /*
  * int _heap_startup
  *
- * DESCRIPTION:
- *
  * Initialize heap pointers.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 1 on success or 0 on failure.
  */
 extern
 int	_dmalloc_heap_startup(void);
@@ -65,15 +55,9 @@ int	_dmalloc_heap_startup(void);
 /*
  * void *_dmalloc_heap_alloc
  *
- * DESCRIPTION:
- *
  * Function to get memory bytes from the heap.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *

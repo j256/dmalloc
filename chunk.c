@@ -167,13 +167,9 @@ static	unsigned long	func_delete_c = 0;	/* count the deletes */
 /*
  * static int random_level
  *
- * DESCRIPTION:
- *
  * Return a random level to be associated with a new free-list entry.
  *
- * RETURNS:
- *
- * Random level from 0 to max_level - 1.
+ * Returns random level from 0 to max_level - 1.
  *
  * ARGUMENTS:
  *
@@ -206,8 +202,6 @@ static	int	random_level(const int max_level)
 
 /*
  * static skip_alloc_t *find_address
- *
- * DESCRIPTION:
  *
  * Look for a specific address in the skip list.  If it exist then a
  * pointer to the matching slot is returned otherwise NULL.  Either
@@ -304,18 +298,13 @@ static	skip_alloc_t	*find_address(const void *address, const int free_b,
 /*
  * static skip_alloc_t *find_free_size
  *
- * DESCRIPTION:
- *
  * Look for a specific size in the free skip list.  If it exist then a
  * pointer to the matching slot is returned otherwise NULL.  Either
  * way, the links that were traversed to get there are set in the
  * update slot which has the maximum number of levels.
  *
- * RETURNS:
- *
- * Success - Pointer to the slot which matches the size pair.
- *
- * Failure - NULL
+ * Returns a pointer to the slot which matches the size pair on
+ * success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -384,15 +373,9 @@ static	skip_alloc_t	*find_free_size(const unsigned int size,
 /*
  * static int insert_slot
  *
- * DESCRIPTION:
- *
  * Insert an address entry into a skip list.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
+ * Returns 1 on success or 0 on failure.
  *
  * ARGUMENTS:
  *
@@ -445,18 +428,12 @@ static	int	insert_slot(skip_alloc_t *slot_p, const int free_b)
 /*
  * static int alloc_slots
  *
- * DESCRIPTION:
- *
  * Allocate a block of new slots of a certain size and add them to the
  * free list.  If there are none in the linked list then we will
  * allocate a block of the size.
  *
- * RETURNS:
- *
- * Success - Valid pointer to a single block that was allocated for
- * the slots.
- *
- * Failure - NULL
+ * Returns a valid pointer to a single block that was allocated for
+ * the slots on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -522,15 +499,9 @@ static	void	*alloc_slots(const int level_n)
 /*
  * static int remove_slot
  *
- * DESCRIPTION:
- *
  * Remove a slot from the skip list.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
+ * Returns 1 on success or 0 on failure.
  *
  * ARGUMENTS:
  *
@@ -588,21 +559,11 @@ static	int	remove_slot(skip_alloc_t *delete_p, skip_alloc_t *update_p)
 /*
  * static skip_alloc_t *get_slot
  *
- * DESCRIPTION:
- *
  * Get a new slot of a certain size.  This calls alloc_slot and then
  * does a whole bunch of things if alloc_slots generates the need for
  * two new slots.  Jumping through hoops to get this right.
  *
- * RETURNS:
- *
- * Success - Valid skip-alloc pointer.
- *
- * Failure - NULL
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns a valid skip-alloc pointer on success or NULL on failure.
  */
 static	skip_alloc_t	*get_slot(void)
 {
@@ -692,15 +653,9 @@ static	skip_alloc_t	*get_slot(void)
 /*
  * static skip_alloc_t *insert_address
  *
- * DESCRIPTION:
- *
  * Insert an address entry into a skip list.
  *
- * RETURNS:
- *
- * Success - Valid slot pointer.
- *
- * Failure - NULL
+ * Returns a valid slot pointer on sucess or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -746,16 +701,12 @@ static	skip_alloc_t	*insert_address(void *address, const int free_b,
 /*
  * static int expand_chars
  *
- * DESCRIPTION:
- *
  * Copies a buffer into a output buffer while translates
  * non-printables into %03o octal values.  If it can, it will also
  * translate certain \ characters (\r, \n, etc.) into \\%c.  The
  * routine is useful for printing out binary values.
  *
  * Note: It does _not_ add a \0 at the end of the output buffer.
- *
- * RETURNS:
  *
  * Returns the number of characters added to the output buffer.
  *
@@ -828,13 +779,7 @@ static	int	expand_chars(const void *buf, const int buf_size,
 /*
  * static void get_pnt_info
  *
- * DESCRIPTION:
- *
  * With a slot, set a number of pointers to places within the block.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -886,13 +831,9 @@ static	void	get_pnt_info(const skip_alloc_t *slot_p, pnt_info_t *info_p)
 /*
  * static char *display_pnt
  *
- * DESCRIPTION:
- *
  * Write into a buffer a discription of a pointer.
  *
- * RETURNS:
- *
- * Pointer to buffer 1st argument.
+ * Returns a pointer to buffer 1st argument.
  *
  * ARGUMENTS:
  *
@@ -967,14 +908,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
 /*
  * static void log_error_info
  *
- * DESCRIPTION:
- *
- * Logging information about a pointer, usually during an error
- * condition.
- *
- * RETURNS:
- *
- * None.
+ * Logging information about a pointer, usually during an error condition.
  *
  * ARGUMENTS:
  *
@@ -1157,15 +1091,9 @@ static	void	log_error_info(const char *now_file,
 /*
  * static int fence_read
  *
- * DESCRIPTION
- *
  * Check a pointer for fence-post magic numbers.
  *
- * RETURNS:
- *
- * Success - 1 if the fence posts are good.
- *
- * Failure - 0 if they are not.
+ * Returns 1 if the fence posts are good or 0 if they are not.
  *
  * ARGUMENTS:
  *
@@ -1191,16 +1119,10 @@ static	int	fence_read(const pnt_info_t *info_p)
 /*
  * static void clear_alloc
  *
- * DESCRIPTION
- *
  * Setup allocations by writing fence post and doing any necessary
  * clearing of memory.
  *
- * RETURNS:
- *
- * Success - 1 if the fence posts are good.
- *
- * Failure - 0 if they are not.
+ * Returns 1 if the fence posts are good or 0 if they are not.
  *
  * ARGUMENTS:
  *
@@ -1298,15 +1220,9 @@ static	void	clear_alloc(skip_alloc_t *slot_p, pnt_info_t *info_p,
 /*
  * static int create_divided_chunks
  *
- * DESCRIPTION:
- *
  * Get a divided-block from the free list or heap allocation.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
+ * Returns 1 on success or 0 on failure.
  *
  * ARGUMENTS:
  *
@@ -1347,16 +1263,10 @@ static	int	create_divided_chunks(const unsigned int div_size)
 /*
  * static skip_alloc_t *use_free_memory
  *
- * DESCRIPTION:
- *
  * Find a free memory chunk and remove it from the free list and put
  * it on the used list if available.
  *
- * RETURNS:
- *
- * Success - Valid slot pointer
- *
- * Failure - NULL
+ * Returns a valid slot pointer on sucess or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -1435,15 +1345,9 @@ static	skip_alloc_t	*use_free_memory(const unsigned int size,
 /*
  * static skip_alloc_t *get_divided_memory
  *
- * DESCRIPTION:
- *
  * Get a divided memory block from the free list or heap allocation.
  *
- * RETURNS:
- *
- * Success - Valid skip slot pointer.
- *
- * Failure - NULL
+ * Returns a valid skip slot pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -1489,15 +1393,9 @@ static	skip_alloc_t	*get_divided_memory(const unsigned int size)
 /*
  * static skip_alloc_t *get_memory
  *
- * DESCRIPTION:
- *
  * Get a block from the free list or heap allocation.
  *
- * RETURNS:
- *
- * Success - Valid skip slot pointer.
- *
- * Failure - NULL
+ * Returns a valid skip slot pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -1580,11 +1478,7 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
  *
  * Check out the pointer in a allocated slot to make sure it is good.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
+ * Returns 1 on success or 0 on failure.
  *
  * ARGUMENTS:
  *
@@ -1784,11 +1678,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
  *
  * Check out the pointer in a slot to make sure it is good.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
+ * Returns 1 on success or 0 on failure.
  *
  * ARGUMENTS:
  *
@@ -1835,19 +1725,9 @@ static	int	check_free_slot(const skip_alloc_t *slot_p)
 /*
  * int _dmalloc_chunk_startup
  * 
- * DESCRIPTION:
- *
  * Startup the low level malloc routines.
  *
- * RETURNS:
- *
- * Success - 1
- *
- * Failure - 0
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 1 on success or 0 on failure.
  */
 int	_dmalloc_chunk_startup(void)
 {
@@ -1904,14 +1784,9 @@ int	_dmalloc_chunk_startup(void)
 /*
  * char *_dmalloc_chunk_desc_pnt
  *
- * DESCRIPTION:
+ * Write into a buffer a pointer description with file and line-number.
  *
- * Write into a buffer a pointer description with file and
- * line-number.
- *
- * RETURNS:
- *
- * Pointer to buffer 1st argument.
+ * Returns a pointer to buffer 1st argument.
  *
  * ARGUMENTS:
  *
@@ -1946,15 +1821,9 @@ char	*_dmalloc_chunk_desc_pnt(char *buf, const int buf_size,
 /*
  * int _dmalloc_chunk_read_info
  *
- * DESCRIPTION:
- *
  * Return some information associated with a pointer.
  *
- * RETURNS:
- *
- * Success - 1 pointer is okay
- *
- * Failure - 0 problem with pointer
+ * Returns 1 if the pointer is okay or 0 if a problem with pointer
  *
  * ARGUMENTS:
  *
@@ -2054,19 +1923,9 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
 /*
  * int _dmalloc_chunk_heap_check
  *
- * DESCRIPTION:
- *
  * Run extensive tests on the entire heap.
  *
- * RETURNS:
- *
- * Success - 1 if the heap is okay
- *
- * Failure - 0 if a problem was detected
- *
- * ARGUMENTS:
- *
- * None.
+ * Returns 1 if the heap is okay or 0 if a problem was detected
  */
 int	_dmalloc_chunk_heap_check(void)
 {
@@ -2243,15 +2102,9 @@ int	_dmalloc_chunk_heap_check(void)
 /*
  * int _dmalloc_chunk_pnt_check
  *
- * DESCRIPTION:
- *
  * Run extensive tests on a pointer.
  *
- * RETURNS:
- *
- * Success - 1 if the pointer is okay
- *
- * Failure - 0 if not
+ * Returns 1 if the pointer is okay or 0 if not
  *
  * ARGUMENTS:
  *
@@ -2312,15 +2165,9 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
 /*
  * void *_dmalloc_chunk_malloc
  *
- * DESCRIPTION:
- *
  * Allocate a chunk of memory.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Returns a valid pointer on success or NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -2502,15 +2349,9 @@ void	*_dmalloc_chunk_malloc(const char *file, const unsigned int line,
 /*
  * int _dmalloc_chunk_free
  *
- * DESCRIPTION:
- *
  * Free a user pointer from the heap.
  *
- * RETURNS:
- *
- * Success - FREE_NOERROR
- *
- * Failure - FREE_ERROR
+ * Returns FREE_NOERROR on success or FREE_ERROR on failure
  *
  * ARGUMENTS:
  *
@@ -2712,15 +2553,9 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 /*
  * void *_dmalloc_chunk_realloc
  *
- * DESCRIPTION:
- *
  * Re-allocate a chunk of memory either shrinking or expanding it.
  *
- * RETURNS:
- *
- * Success - Valid pointer.
- *
- * Failure - NULL
+ * Returns a valid pointer on success of NULL on failure.
  *
  * ARGUMENTS:
  *
@@ -2890,17 +2725,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
 /*
  * void _dmalloc_chunk_log_stats
  *
- * DESCRIPTION:
- *
  * Log general statistics from the heap to the logfile.
- *
- * RETURNS:
- *
- * None.
- *
- * ARGUMENTS:
- *
- * None.
  */
 void	_dmalloc_chunk_log_stats(void)
 {
@@ -2965,13 +2790,7 @@ void	_dmalloc_chunk_log_stats(void)
 /*
  * void _dmalloc_chunk_log_changed
  *
- * DESCRIPTION:
- *
  * Log the pointers that has changed since a pointer in time.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
@@ -3131,13 +2950,9 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 /*
  * unsigned long _dmalloc_chunk_count_changed
  *
- * DESCRIPTION:
- *
  * Return the pointers that has changed since a pointer in time.
  *
- * RETURNS:
- *
- * Number of bytes changed since mark.
+ * Returns the number of bytes changed since mark.
  *
  * ARGUMENTS:
  *
@@ -3215,13 +3030,7 @@ unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
 /*
  * void _dmalloc_chunk_get_stats
  *
- * DESCRIPTION:
- *
  * Return a number of statistics about the current heap.
- *
- * RETURNS:
- *
- * None.
  *
  * ARGUMENTS:
  *
