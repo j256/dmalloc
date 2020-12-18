@@ -182,9 +182,9 @@ static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
   pnt_info_t	*this_p, *prev_p;
   
   if (verbose_b) {
-    (void)printf("%d: free'd %d bytes from slot %ld (%#lx)\n",
+    (void)printf("%d: free'd %d bytes from slot %ld (%p)\n",
 		 iter_c + 1, slot_p->pi_size, (long)(slot_p - pointer_grid),
-		 (long)slot_p->pi_pnt);
+		 slot_p->pi_pnt);
   }
   
   slot_p->pi_pnt = NULL;
@@ -291,9 +291,9 @@ static	int	do_random(const int iter_n)
       free_c++;
       
       if (verbose_b) {
-	(void)printf("%d: free'd %d bytes from slot %ld (%#lx)\n",
+	(void)printf("%d: free'd %d bytes from slot %ld (%p)\n",
 		     iter_c + 1, pnt_p->pi_size, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+		     pnt_p->pi_pnt);
       }
       
       max_avail += pnt_p->pi_size;
@@ -326,9 +326,9 @@ static	int	do_random(const int iter_n)
       pnt_p->pi_pnt = malloc(amount);
       
       if (verbose_b) {
-	(void)printf("%d: malloc %d of max %d into slot %ld.  got %#lx\n",
+	(void)printf("%d: malloc %d of max %d into slot %ld.  got %p\n",
 		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+		     pnt_p->pi_pnt);
       }
       break;
       
@@ -338,9 +338,9 @@ static	int	do_random(const int iter_n)
       pnt_p->pi_pnt = calloc(amount, sizeof(char));
       
       if (verbose_b) {
-	(void)printf("%d: calloc %d of max %d into slot %ld.  got %#lx\n",
+	(void)printf("%d: calloc %d of max %d into slot %ld.  got %p\n",
 		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+		     pnt_p->pi_pnt);
       }
       
       /* test the returned block to make sure that is has been cleared */
@@ -378,9 +378,9 @@ static	int	do_random(const int iter_n)
       max_avail += pnt_p->pi_size;
       
       if (verbose_b) {
-	(void)printf("%d: realloc %d from %d of max %d slot %ld.  got %#lx\n",
+	(void)printf("%d: realloc %d from %d of max %d slot %ld.  got %p\n",
 		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
-		     (long)(pnt_p - pointer_grid), (long)pnt_p->pi_pnt);
+		     (long)(pnt_p - pointer_grid), pnt_p->pi_pnt);
       }
       
       if (amount == 0) {
@@ -410,9 +410,9 @@ static	int	do_random(const int iter_n)
       max_avail += pnt_p->pi_size;
       
       if (verbose_b) {
-	(void)printf("%d: recalloc %d from %d of max %d slot %ld.  got %#lx\n",
+	(void)printf("%d: recalloc %d from %d of max %d slot %ld.  got %p\n",
 		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
-		     (long)(pnt_p - pointer_grid), (long)pnt_p->pi_pnt);
+		     (long)(pnt_p - pointer_grid), pnt_p->pi_pnt);
       }
       
       /* test the returned block to make sure that is has been cleared */
@@ -444,9 +444,9 @@ static	int	do_random(const int iter_n)
       pnt_p->pi_pnt = valloc(amount);
       
       if (verbose_b) {
-	(void)printf("%d: valloc %d of max %d into slot %ld.  got %#lx\n",
+	(void)printf("%d: valloc %d of max %d into slot %ld.  got %p\n",
 		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+		     pnt_p->pi_pnt);
       }
       break;
       
@@ -459,8 +459,8 @@ static	int	do_random(const int iter_n)
 	
 	mem = _dmalloc_heap_alloc(amount);
 	if (verbose_b) {
-	  (void)printf("%d: heap alloc %d of max %d bytes.  got %#lx\n",
-		       iter_c + 1, amount, max_avail, (long)mem);
+	  (void)printf("%d: heap alloc %d of max %d bytes.  got %p\n",
+		       iter_c + 1, amount, max_avail, mem);
 	}
 	iter_c++;
       }
@@ -498,9 +498,9 @@ static	int	do_random(const int iter_n)
 	
 	if (verbose_b) {
 	  /* the amount includes the \0 */
-	  (void)printf("%d: strdup %d of max %d into slot %ld.  got %#lx\n",
+	  (void)printf("%d: strdup %d of max %d into slot %ld.  got %p\n",
 		       iter_c + 1, amount + 1, max_avail, (long)(pnt_p - pointer_grid),
-		       (long)pnt_p->pi_pnt);
+		       pnt_p->pi_pnt);
 	}
       }
       break;
@@ -632,8 +632,8 @@ static	int	check_initial_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: free of realloc(malloc) pointer %lx failed.\n",
-		     (unsigned long)pnt);
+	(void)printf("   ERROR: free of realloc(malloc) pointer %p failed.\n",
+		     pnt);
       }
       final = 0;
     }
@@ -680,8 +680,8 @@ static	int	check_initial_special(void)
       if (dmalloc_free(__FILE__, __LINE__, pnts[iter_c],
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free of pointer %lx failed.\n",
-		       (unsigned long)pnts[iter_c]);
+	  (void)printf("   ERROR: free of pointer %p failed.\n",
+		       pnts[iter_c]);
 	}
 	final = 0;
       }
@@ -705,8 +705,8 @@ static	int	check_initial_special(void)
       for (check_c = 0; check_c < NEVER_REUSE_ITERS; check_c++) {
 	if (new_pnt == pnts[check_c]) {
 	  if (! silent_b) {
-	    (void)printf("   ERROR: pointer %lx was improperly reused.\n",
-			 (unsigned long)new_pnt);
+	    (void)printf("   ERROR: pointer %p was improperly reused.\n",
+			 new_pnt);
 	  }
 	  final = 0;
 	  break;
@@ -716,8 +716,8 @@ static	int	check_initial_special(void)
       if (dmalloc_free(__FILE__, __LINE__, new_pnt,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free of pointer %lx failed.\n",
-		       (unsigned long)new_pnt);
+	  (void)printf("   ERROR: free of pointer %p failed.\n",
+		       new_pnt);
 	}
 	final = 0;
       }
@@ -2053,8 +2053,8 @@ static	int	check_special(void)
 			  NULL /* no return address */, NULL /* no mark */,
 			  NULL /* no seen */) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining pointer %lx failed.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: examining pointer %p failed.\n",
+		       pnt);
 	}
 	final = 0;
 	break;
@@ -2200,8 +2200,8 @@ static	int	check_special(void)
 			  NULL /* no return address */, &ex_mark,
 			  &ex_seen) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining pointer %lx failed.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: examining pointer %p failed.\n",
+		       pnt);
 	}
 	final = 0;
       }
@@ -2253,8 +2253,8 @@ static	int	check_special(void)
       if (dmalloc_examine(pnt, &ex_user_size, NULL, NULL, NULL,
 			  NULL, &ex_mark, &ex_seen) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining pointer %lx failed.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: examining pointer %p failed.\n",
+		       pnt);
 	}
 	final = 0;
       }
@@ -2278,8 +2278,8 @@ static	int	check_special(void)
       if (dmalloc_examine(pnt, NULL, NULL, NULL, NULL, NULL, NULL,
 			  NULL) != DMALLOC_ERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining freed pointer %lx did not fail.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: examining freed pointer %p did not fail.\n",
+		       pnt);
 	}
 	final = 0;
       }
@@ -2719,8 +2719,8 @@ static	int	check_special(void)
     pnt = realloc(pnt, size - 1);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not realloc %#lx to %lu bytes.\n",
-		     (long)pnt, size - 1);
+	(void)printf("   ERROR: could not realloc %p to %lu bytes.\n",
+		     pnt, size - 1);
       }
       return 0;
     }
@@ -3058,8 +3058,8 @@ static	int	check_special(void)
       }
       if ((unsigned PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: valloc got %p which is not page aligned.\n",
+		       pnt);
 	}
 	final = 0;
       }
@@ -3085,8 +3085,8 @@ static	int	check_special(void)
       }
       if ((unsigned PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: valloc got %p which is not page aligned.\n",
+		       pnt);
 	}
 	final = 0;
       }
@@ -3158,8 +3158,8 @@ static	int	check_special(void)
       }
       if ((unsigned PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  (void)printf("   ERROR: valloc got %p which is not page aligned.\n",
+		       pnt);
 	}
 	final = 0;
       }
@@ -3391,8 +3391,8 @@ static	int	check_special(void)
     else if (dmalloc_examine(pnt, &user_size, NULL, NULL, NULL, NULL, NULL,
 			     NULL) != DMALLOC_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: examining pointer %lx failed.\n",
-		     (unsigned long)pnt);
+	(void)printf("   ERROR: examining pointer %p failed.\n",
+		     pnt);
       }
       final = 0;
     }
@@ -4002,7 +4002,7 @@ static	void	do_interactive(void)
 	break;
       }
       size = atoi(line);
-      (void)printf("malloc(%d) returned '%#lx'\n", size, (long)malloc(size));
+      (void)printf("malloc(%d) returned '%p'\n", size, malloc(size));
       continue;
     }
     
@@ -4014,8 +4014,8 @@ static	void	do_interactive(void)
 	break;
       }
       size = atoi(line);
-      (void)printf("calloc(%d) returned '%#lx'\n",
-		   size, (long)calloc(size, sizeof(char)));
+      (void)printf("calloc(%d) returned '%p'\n",
+		   size, calloc(size, sizeof(char)));
       continue;
     }
     
@@ -4030,8 +4030,8 @@ static	void	do_interactive(void)
       }
       size = atoi(line);
       
-      (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
-		   (long)pnt, size, (long)realloc(pnt, size));
+      (void)printf("realloc(%p, %d) returned '%p'\n",
+		   pnt, size, realloc(pnt, size));
       
       continue;
     }
@@ -4047,8 +4047,8 @@ static	void	do_interactive(void)
       }
       size = atoi(line);
       
-      (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
-		   (long)pnt, size, (long)recalloc(pnt, size));
+      (void)printf("realloc(%p, %d) returned '%p'\n",
+		   pnt, size, recalloc(pnt, size));
       
       continue;
     }
@@ -4066,8 +4066,8 @@ static	void	do_interactive(void)
 	break;
       }
       size = atoi(line);
-      (void)printf("memalign(%d, %d) returned '%#lx'\n",
-		   alignment, size, (long)memalign(alignment, size));
+      (void)printf("memalign(%d, %d) returned '%p'\n",
+		   alignment, size, memalign(alignment, size));
       continue;
     }
     
@@ -4079,7 +4079,7 @@ static	void	do_interactive(void)
 	break;
       }
       size = atoi(line);
-      (void)printf("valloc(%d) returned '%#lx'\n", size, (long)valloc(size));
+      (void)printf("valloc(%d) returned '%p'\n", size, valloc(size));
       continue;
     }
     
@@ -4088,7 +4088,7 @@ static	void	do_interactive(void)
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
-      (void)printf("strdup returned '%#lx'\n", (long)strdup(line));
+      (void)printf("strdup returned '%p'\n", strdup(line));
       continue;
     }
     
@@ -4177,8 +4177,8 @@ static	void	do_interactive(void)
       (void)printf("If the address is 0, verify will check the whole heap.\n");
       pnt = get_address();
       ret = dmalloc_verify(pnt);
-      (void)printf("dmalloc_verify(%#lx) returned '%s'\n",
-		   (long)pnt,
+      (void)printf("dmalloc_verify(%p) returned '%s'\n",
+		   pnt,
 		   (ret == DMALLOC_NOERROR ? "success" : "failure"));
       continue;
     }
@@ -4208,7 +4208,7 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
     strcpy(file_line, "unknown");
   }
   else if (line == 0) {
-    (void)loc_snprintf(file_line, sizeof(file_line), "ra=%#lx", (long)file);
+    (void)loc_snprintf(file_line, sizeof(file_line), "ra=%p", file);
   }
   else {
     (void)loc_snprintf(file_line, sizeof(file_line), "%s:%d", file, line);
@@ -4216,55 +4216,55 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
   
   switch (func_id) {
   case DMALLOC_FUNC_MALLOC:
-    (void)printf("%s malloc %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    (void)printf("%s malloc %ld bytes got %p\n",
+		 file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_CALLOC:
-    (void)printf("%s calloc %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    (void)printf("%s calloc %ld bytes got %p\n",
+		 file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_REALLOC:
-    (void)printf("%s realloc %ld bytes from %#lx got %#lx\n",
-		 file_line, (long)byte_size, (long)old_addr, (long)new_addr);
+    (void)printf("%s realloc %ld bytes from %p got %p\n",
+		 file_line, (long)byte_size, old_addr, new_addr);
     break;
   case DMALLOC_FUNC_RECALLOC:
-    (void)printf("%s recalloc %ld bytes from %#lx got %#lx\n",
-		 file_line, (long)byte_size, (long)old_addr, (long)new_addr);
+    (void)printf("%s recalloc %ld bytes from %p got %p\n",
+		 file_line, (long)byte_size, old_addr, new_addr);
     break;
   case DMALLOC_FUNC_MEMALIGN:
-    (void)printf("%s memalign %ld bytes alignment %ld got %#lx\n",
-		 file_line, (long)byte_size, (long)alignment, (long)new_addr);
+    (void)printf("%s memalign %ld bytes alignment %ld got %p\n",
+		 file_line, (long)byte_size, (long)alignment, new_addr);
     break;
   case DMALLOC_FUNC_VALLOC:
-    (void)printf("%s valloc %ld bytes alignment %ld got %#lx\n",
-		 file_line, (long)byte_size, (long)alignment, (long)new_addr);
+    (void)printf("%s valloc %ld bytes alignment %ld got %p\n",
+		 file_line, (long)byte_size, (long)alignment, new_addr);
     break;
   case DMALLOC_FUNC_STRDUP:
-    (void)printf("%s strdup %ld bytes ot %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    (void)printf("%s strdup %ld bytes ot %p\n",
+		 file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_FREE:
-    (void)printf("%s free %#lx\n", file_line, (long)old_addr);
+    (void)printf("%s free %p\n", file_line, old_addr);
     break;
   case DMALLOC_FUNC_NEW:
-    (void)printf("%s new %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    (void)printf("%s new %ld bytes got %p\n",
+		 file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_NEW_ARRAY:
-    (void)printf("%s new[] %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    (void)printf("%s new[] %ld bytes got %p\n",
+		 file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_DELETE:
-    (void)printf("%s delete %#lx\n", file_line, (long)old_addr);
+    (void)printf("%s delete %p\n", file_line, old_addr);
     break;
   case DMALLOC_FUNC_DELETE_ARRAY:
-    (void)printf("%s delete[] %#lx\n", file_line, (long)old_addr);
+    (void)printf("%s delete[] %p\n", file_line, old_addr);
     break;
   default:
-    (void)printf("%s unknown function %ld bytes, %ld alignment, %#lx old-addr "
-		 "%#lx new-addr\n",
-		 file_line, (long)byte_size, (long)alignment, (long)old_addr,
-		 (long)new_addr);
+    (void)printf("%s unknown function %ld bytes, %ld alignment, %p old-addr "
+		 "%p new-addr\n",
+		 file_line, (long)byte_size, (long)alignment, old_addr,
+		 new_addr);
     break;
   }
 }

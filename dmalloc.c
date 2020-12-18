@@ -733,11 +733,11 @@ static	void	dump_current(void)
   }
   else {
     if (addr_count == 0) {
-      (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
+      (void)fprintf(stderr, "Address      %p\n", addr);
     }
     else {
-      (void)fprintf(stderr, "Address      %#lx, count = %lu\n",
-		    (long)addr, addr_count);
+      (void)fprintf(stderr, "Address      %p, count = %lu\n",
+		    addr, addr_count);
     }
   }
   
