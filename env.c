@@ -71,9 +71,9 @@ static	char		start_file[512] = { '\0' }; /* file to start at */
 /*
  * Hexadecimal STR to int translation
  */
-static	long	hex_to_long(const char *str)
+static	unsigned PNT_ARITH_TYPE	hex_to_pnt(const char *str)
 {
-  long		ret;
+  unsigned PNT_ARITH_TYPE		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++) {
@@ -112,7 +112,7 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
 {
   char	*colon_p;
   
-  SET_POINTER(addr_p, (DMALLOC_PNT)hex_to_long(addr_all));
+  SET_POINTER(addr_p, (DMALLOC_PNT)hex_to_pnt(addr_all));
   if (addr_count_p != NULL) {
     colon_p = strchr(addr_all, ':');
     if (colon_p != NULL) {
@@ -230,7 +230,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, DEBUG_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      SET_POINTER(debug_p, hex_to_long(this_p));
+      SET_POINTER(debug_p, hex_to_pnt(this_p));
       continue;
     }
     

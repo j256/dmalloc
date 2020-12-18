@@ -1652,7 +1652,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
    */
   if (pnt_info.pi_valloc_b) {
     
-    if ((long)pnt_info.pi_user_start % BLOCK_SIZE != 0) {
+    if ((PNT_ARITH_TYPE)pnt_info.pi_user_start % BLOCK_SIZE != 0) {
       dmalloc_errno = DMALLOC_ERROR_NOT_ON_BLOCK;
       return 0;
     }

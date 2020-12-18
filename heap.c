@@ -219,7 +219,7 @@ int	_dmalloc_heap_startup(void)
 void	*_dmalloc_heap_alloc(const unsigned int size)
 {
   void	*heap_new, *heap_diff;
-  long	diff_size;
+  PNT_ARITH_TYPE	diff_size;
   
   if (size == 0) {
     dmalloc_errno = DMALLOC_ERROR_BAD_SIZE;
@@ -234,7 +234,7 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
   }
   
   /* calculate bytes needed to align to block boundary */
-  diff_size = (long)heap_new % BLOCK_SIZE;
+  diff_size = (PNT_ARITH_TYPE)heap_new % BLOCK_SIZE;
   if (diff_size == 0) {
     /* if we are already aligned then we are all set */
     return heap_new;
@@ -276,7 +276,7 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
   dmalloc_message("WARNING: had to extend heap by %d more bytes to get page aligned %p",
 		  new_size, heap_new);
   
-  diff_size = (long)heap_new % BLOCK_SIZE;
+  diff_size = (PNT_ARITH_TYPE)heap_new % BLOCK_SIZE;
   if (diff_size == 0) {
     return heap_new;
   } else {

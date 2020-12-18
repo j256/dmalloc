@@ -122,9 +122,9 @@ static	argv_t		arg_list[] = {
 /*
  * Hexadecimal STR to integer translation
  */
-static	long	hex_to_long(char *str)
+static	unsigned PNT_ARITH_TYPE	hex_to_pnt(const char *str)
 {
-  long		ret;
+  unsigned PNT_ARITH_TYPE		ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++) {
@@ -168,7 +168,7 @@ static	void	*get_address(void)
     }
   } while (line[0] == '\0');
   
-  pnt = (void *)hex_to_long(line);
+  pnt = (void *)hex_to_pnt(line);
   
   return pnt;
 }
@@ -3056,7 +3056,7 @@ static	int	check_special(void)
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      if ((unsigned PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
 		       (unsigned long)pnt);
@@ -3083,7 +3083,7 @@ static	int	check_special(void)
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      if ((unsigned PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
 		       (unsigned long)pnt);
@@ -3156,7 +3156,7 @@ static	int	check_special(void)
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      if ((unsigned PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
 	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
 		       (unsigned long)pnt);
@@ -3592,7 +3592,7 @@ static	int	check_special(void)
       }
       return 0;
     }
-    if ((unsigned long)pnt % BLOCK_SIZE != 0) {
+    if ((unsigned PNT_ARITH_TYPE)pnt % BLOCK_SIZE != 0) {
       if (! silent_b) {
 	(void)printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
 		     size);
@@ -3624,7 +3624,7 @@ static	int	check_special(void)
       }
       return 0;
     }
-    if ((unsigned long)pnt % BLOCK_SIZE != 0) {
+    if ((unsigned PNT_ARITH_TYPE)pnt % BLOCK_SIZE != 0) {
       if (! silent_b) {
 	(void)printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
 		     size);
