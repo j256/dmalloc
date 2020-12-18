@@ -54,7 +54,7 @@
 /*
  * Internal method to process a long or int number and write into a buffer.
  */
-static	char	*handle_decimal(char *buf, char *limit, const long num, const int base)
+static	char	*handle_decimal(char *buf, char *limit, const long long num, const int base)
 {
   char *buf_p = buf;
   buf_p = append_long(buf_p, limit, num, base);
@@ -145,13 +145,13 @@ char	*append_string(char *dest, const char *limit, const char *value)
  * character will be added.  Variant of itoa() written by Lukas
  * Chmela which is released under GPLv3.
  */
-char	*append_long(char *dest, char *limit, long value, int base)
+char	*append_long(char *dest, char *limit, long long value, int base)
 {
   char buf[30];
   char *ptr = buf;
   char *ptr1 = buf;
   char tmp_char;
-  long tmp_value;
+  long long tmp_value;
 
   /* letters that handle both negative and positive values */
   char *letters =
@@ -184,13 +184,13 @@ char	*append_long(char *dest, char *limit, long value, int base)
  * returned.  No \0 character will be added.  Variant of itoa()
  * written by Lukas Chmela. Released under GPLv3.
  */
-char	*append_ulong(char *dest, char *limit, unsigned long value, int base)
+char	*append_ulong(char *dest, char *limit, unsigned long long value, int base)
 {
   char buf[30];
   char *ptr = buf;
   char *ptr1 = buf;
   char tmp_char;
-  unsigned long tmp_value;
+  unsigned long long tmp_value;
 
   /* letters that handle both negative and positive values */
   char *letters =
@@ -324,7 +324,7 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	  }
 	}
       } else if (ch == 'l') {
-	long_arg = 1;
+	long_arg += 1;
       } else if (ch != 'c' && ch != 'd' && ch != 'f' && ch != 'o' && ch != 'p'
 		 && ch != 's' && ch != 'u' && ch != 'x') {
 	continue;
@@ -338,8 +338,10 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	value_buf[1] = '\0';
 	value = value_buf;
       } else if (ch == 'd') {
-	long num;
-	if (long_arg) {
+	long long num;
+	if (long_arg > 1) {
+	  num = va_arg(args, long long);
+	} else if (long_arg == 0) {
 	  num = va_arg(args, long);
 	} else {
 	  num = va_arg(args, int);
@@ -357,8 +359,10 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	/* special case here, the trunc length is really decimal precision */
 	trunc_len = -1;
       } else if (ch == 'o') {
-	long num;
-	if (long_arg) {
+	long long num;
+	if (long_arg > 1) {
+	  num = va_arg(args, long long);
+	} else if (long_arg == 0) {
 	  num = va_arg(args, long);
 	} else {
 	  num = va_arg(args, int);
@@ -380,8 +384,10 @@ char	*append_vformat(char *dest, char *limit, const char *format,
       } else if (ch == 's') {
 	value = va_arg(args, char *);
       } else if (ch == 'u') {
-	unsigned long num;
-	if (long_arg) {
+	unsigned long long num;
+	if (long_arg > 1) {
+	  num = va_arg(args, unsigned long long);
+	} else if (long_arg == 0) {
 	  num = va_arg(args, unsigned long);
 	} else {
 	  num = va_arg(args, unsigned int);
@@ -391,13 +397,17 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	append_null(value_buf_p, value_limit);
 	value = value_buf;
       } else if (ch == 'x') {
-	long num;
-	if (long_arg) {
-	  num = va_arg(args, long);
+	unsigned long long num;
+	if (long_arg > 1) {
+	  num = va_arg(args, unsigned long long);
+	} else if (long_arg) {
+	  num = va_arg(args, unsigned long);
 	} else {
 	  num = va_arg(args, int);
 	}
-	handle_decimal(value_buf, value_limit, num, 16);
+	char *value_buf_p = value_buf;
+	value_buf_p = append_ulong(value_buf_p, value_limit, num, 16);
+	append_null(value_buf_p, value_limit);
 	if (format_prefix) {
 	  prefix = "0x";
 	  prefix_len = 2;

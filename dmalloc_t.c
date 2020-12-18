@@ -3890,6 +3890,15 @@ static	int	check_special(void)
     
     buf_p = append_format(buf, max, "%f", 99.0001234);
     final = check_append_buf(buf, buf_p, "99.0001234", 10, final, "%f");
+    
+    buf_p = append_format(buf, max, "%lld", -1LL);
+    final = check_append_buf(buf, buf_p, "-1", 2, final, "%lld");
+    
+    buf_p = append_format(buf, max, "%llu", 0xffffffffffffffffULL);
+    final = check_append_buf(buf, buf_p, "18446744073709551615", 20, final, "%llu");
+    
+    buf_p = append_format(buf, max, "%llx", 18446744073709551615ULL);
+    final = check_append_buf(buf, buf_p, "ffffffffffffffff", 16, final, "%llx");
   }
   
   /********************/

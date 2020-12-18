@@ -45,7 +45,7 @@ char	*append_string(char *dest, const char *limit, const char *value);
  * Chmela which is released under GPLv3.
  */
 extern
-char	*append_long(char *dest, char *limit, long value, int base);
+char	*append_long(char *dest, char *limit, long long value, int base);
 
 /*
  * Append unsigned long value argument to destination up to limit
@@ -54,7 +54,7 @@ char	*append_long(char *dest, char *limit, long value, int base);
  * written by Lukas Chmela. Released under GPLv3.
  */
 extern
-char	*append_ulong(char *dest, char *limit, unsigned long value, int base);
+char	*append_ulong(char *dest, char *limit, unsigned long long value, int base);
 
 /*
  * Append pointer value argument to destination up to limit pointer.
