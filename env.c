@@ -342,13 +342,13 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
   }
   if (address != NULL) {
     if (addr_count > 0) {
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx:%lu,",
-			    ADDRESS_LABEL, ASSIGNMENT_CHAR, (long)address,
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%p:%lu,",
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address,
 			    addr_count);
     }
     else {
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%#lx,",
-			    ADDRESS_LABEL, ASSIGNMENT_CHAR, (long)address);
+      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%p,",
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address);
     }
   }
   if (interval > 0) {
