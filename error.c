@@ -25,8 +25,10 @@
  */
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
-#include <stdio.h>
 
+#if HAVE_STDIO_H
+# include <stdio.h>				/* for FILE */
+#endif
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for message vsprintf */
 #endif
@@ -266,8 +268,8 @@ void	_dmalloc_open_log(void)
   dmalloc_message("Dmalloc version '%s' from '%s'",
 		  dmalloc_version, DMALLOC_HOME);
   dmalloc_message("flags = %#x, logfile '%s'", _dmalloc_flags, log_path);
-  dmalloc_message("interval = %lu, addr = %#lx, seen # = %ld, limit = %ld",
-		  _dmalloc_check_interval, (unsigned long)_dmalloc_address,
+  dmalloc_message("interval = %lu, addr = %p, seen # = %ld, limit = %ld",
+		  _dmalloc_check_interval, _dmalloc_address,
 		  _dmalloc_address_seen_n, _dmalloc_memory_limit);
 #if LOCK_THREADS
   dmalloc_message("threads enabled, lock-on = %d, lock-init = %d",
