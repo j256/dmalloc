@@ -422,8 +422,10 @@ AC_MSG_RESULT([$ac_cv_page_size])
 #
 # data-alignment size...
 #
+AC_CHECK_SIZEOF([void *])
+AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF([long long])
 AC_MSG_CHECKING([data-alignment size])
 if test $ac_cv_sizeof_long = 4; then
 	# we have to make a special case for sun sparc idiocy
@@ -438,10 +440,12 @@ AC_MSG_RESULT([$ac_cv_data_align])
 # trying to find good type (64-bit?) for pointer arithmatic
 #
 AC_MSG_CHECKING([pointer arithmatic type])
-if test $ac_cv_sizeof_long -lt $ac_cv_sizeof_long_long; then
-	ac_cv_pnt_arith_type="long long"
+if test $ac_cv_sizeof_int = $ac_cv_sizeof_void_p; then
+	ac_cv_pnt_arith_type="int"
+elif test $ac_cv_sizeof_long = $ac_cv_sizeof_void_p; then
+	ac_cv_pnt_arith_type="long"
 else
-	ac_cv_pnt_arith_type="unsigned long"
+	ac_cv_pnt_arith_type="long long"
 fi
 AC_DEFINE_UNQUOTED([PNT_ARITH_TYPE],[$ac_cv_pnt_arith_type])
 AC_MSG_RESULT([$ac_cv_pnt_arith_type])
