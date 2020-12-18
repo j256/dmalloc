@@ -30,12 +30,13 @@
  * the user should therefore be send to stderr.
  */
 
-#include <stdio.h>				/* for stderr */
-
 #define DMALLOC_DISABLE
 
 #if HAVE_STRING_H
 # include <string.h>
+#endif
+#if HAVE_STDIO_H
+# include <stdio.h>
 #endif
 #if HAVE_STDLIB_H
 # include <stdlib.h>
@@ -733,11 +734,11 @@ static	void	dump_current(void)
   }
   else {
     if (addr_count == 0) {
-      (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
+      (void)fprintf(stderr, "Address      %p\n", addr);
     }
     else {
-      (void)fprintf(stderr, "Address      %#lx, count = %lu\n",
-		    (long)addr, addr_count);
+      (void)fprintf(stderr, "Address      %p, count = %lu\n",
+		    addr, addr_count);
     }
   }
   
