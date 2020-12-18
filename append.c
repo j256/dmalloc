@@ -24,10 +24,11 @@
  * function just in case your system does not have them.
  */
 
-#include <stdio.h>				/* for vsprintf */
-
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for ... */
+#endif
+#if HAVE_STDIO_H
+# include <stdio.h>				/* for FILE */
 #endif
 #if HAVE_STRING_H
 # include <string.h>                            /* for strlen */
@@ -516,4 +517,41 @@ int	loc_snprintf(char *buf, const int size, const char *format, ...)
   va_end(args);
   
   return len;
+}
+
+/*
+ * Local implementation of printf so we can use %p and other non-standard formats.
+ */
+void	loc_printf(const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  loc_vfprintf(stdout, format, args);
+  va_end(args);
+}
+
+/*
+ * Local implementation of fprintf so we can use %p and other non-standard formats.
+ */
+void	loc_fprintf(FILE *file, const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  loc_vfprintf(file, format, args);
+  va_end(args);
+}
+
+/*
+ * Local implementation of vfprintf so we can use %p and other non-standard formats.
+ */
+void	loc_vfprintf(FILE *file, const char *format, va_list args)
+{
+  char buf[256];
+  char *buf_p;
+  char *limit;
+
+  limit = buf + sizeof(buf);
+  buf_p = append_vformat(buf, limit, format, args);
+  append_null(buf_p, limit);
+  fprintf(file, "%s", buf);
 }

@@ -25,6 +25,9 @@
 #if HAVE_STDARG_H
 # include <stdarg.h>				/* for ... */
 #endif
+#if HAVE_STDIO_H
+# include <stdio.h>				/* for FILE */
+#endif
 
 #include "conf.h"
 
@@ -104,6 +107,24 @@ int	loc_vsnprintf(char *buf, const int size, const char *format,
  */
 extern
 int	loc_snprintf(char *buf, const int size, const char *format, ...);
+
+/*
+ * Local implementation of printf so we can use %p and other non-standard formats.
+ */
+extern
+void	loc_printf(const char *format, ...);
+
+/*
+ * Local implementation of fprintf so we can use %p and other non-standard formats.
+ */
+extern
+void	loc_fprintf(FILE *file, const char *format, ...);
+
+/*
+ * Local implementation of vfprintf so we can use %p and other non-standard formats.
+ */
+extern
+void	loc_vfprintf(FILE *file, const char *format, va_list args);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
