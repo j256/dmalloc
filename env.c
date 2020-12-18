@@ -343,8 +343,7 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
   if (address != NULL) {
     if (addr_count > 0) {
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%p:%lu,",
-			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address,
-			    addr_count);
+			    ADDRESS_LABEL, ASSIGNMENT_CHAR, address, addr_count);
     }
     else {
       buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s%c%p,",

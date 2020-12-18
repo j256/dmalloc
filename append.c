@@ -546,7 +546,8 @@ void	loc_fprintf(FILE *file, const char *format, ...)
  */
 void	loc_vfprintf(FILE *file, const char *format, va_list args)
 {
-  char buf[256];
+  // this is only test messages so this limit is ok
+  char buf[128];
   char *buf_p;
   char *limit;
 

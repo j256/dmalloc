@@ -287,14 +287,9 @@ static	int	do_random(const int iter_n)
       }
       
       free(pnt_p->pi_pnt);
+      // NOTE: free_slot logs verbose
       free_slot(iter_c, pnt_p, &used_p, &free_p);
       free_c++;
-      
-      if (verbose_b) {
-	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
-	loc_printf("%d: free'd %d bytes from slot %lu (%p)\n",
-		   iter_c + 1, pnt_p->pi_size, diff, pnt_p->pi_pnt);
-      }
       
       max_avail += pnt_p->pi_size;
       iter_c++;
