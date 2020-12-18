@@ -25,7 +25,9 @@
  * chunk.c which is the real heap manager.
  */
 
-#include <stdio.h>				/* for sprintf sometimes */
+#if HAVE_STDIO_H
+# include <stdio.h>				/* for FILE */
+#endif
 #if HAVE_STDLIB_H
 # include <stdlib.h>				/* for atexit */
 #endif
