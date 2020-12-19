@@ -374,7 +374,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
-	loc_printf("%d: realloc %d from %d of max %d slot %u.  got %p\n",
+	loc_printf("%d: realloc %d from %d of max %d slot %lu.  got %p\n",
 		   iter_c + 1, amount, pnt_p->pi_size, max_avail,
 		   diff, pnt_p->pi_pnt);
       }
@@ -407,7 +407,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
-	loc_printf("%d: recalloc %d from %d of max %d slot %ld.  got %p\n",
+	loc_printf("%d: recalloc %d from %d of max %d slot %lu.  got %p\n",
 		   iter_c + 1, amount, pnt_p->pi_size, max_avail, diff, pnt_p->pi_pnt);
       }
       
@@ -441,7 +441,7 @@ static	int	do_random(const int iter_n)
       
       if (verbose_b) {
 	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
-	loc_printf("%d: valloc %d of max %d into slot %ld.  got %p\n",
+	loc_printf("%d: valloc %d of max %d into slot %lu.  got %p\n",
 		   iter_c + 1, amount, max_avail, diff, pnt_p->pi_pnt);
       }
       break;
@@ -495,7 +495,7 @@ static	int	do_random(const int iter_n)
 	if (verbose_b) {
 	  /* the amount includes the \0 */
 	  unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
-	  loc_printf("%d: strdup %d of max %d into slot %ld.  got %p\n",
+	  loc_printf("%d: strdup %d of max %d into slot %lu.  got %p\n",
 		     iter_c + 1, amount + 1, max_avail, diff, pnt_p->pi_pnt);
 	}
       }
@@ -515,7 +515,7 @@ static	int	do_random(const int iter_n)
 	
 	if (verbose_b) {
 	  unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
-	  loc_printf("%d: strdup %d of max %d into slot %ld.  got %p\n",
+	  loc_printf("%d: strdup %d of max %d into slot %lu.  got %p\n",
 		     iter_c + 1, amount, max_avail, diff, pnt_p->pi_pnt);
 	}
       }
