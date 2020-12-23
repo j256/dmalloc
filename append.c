@@ -546,13 +546,11 @@ void	loc_fprintf(FILE *file, const char *format, ...)
  */
 void	loc_vfprintf(FILE *file, const char *format, va_list args)
 {
-  // this is only test messages so this limit is ok
-  char buf[128];
-  char *buf_p;
-  char *limit;
+  // these are simple messages so this limit is ok
+  char buf[256];
+  char *buf_p, *limit;
 
   limit = buf + sizeof(buf);
   buf_p = append_vformat(buf, limit, format, args);
-  append_null(buf_p, limit);
-  fprintf(file, "%s", buf);
+  fwrite(buf, 1, (buf_p - buf), file);
 }
