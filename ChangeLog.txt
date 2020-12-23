@@ -1,3 +1,6 @@
+Version 5.6.4 (12/??/2020):
+	* Better configuring of the pointer arithmetic type.
+
 Version 5.6.3 (12/23/2020):
 	* Fixed missing dmallocc.o <- dmalloc.h dependency.  Thanks to @ffontaine.
 	* Fixed more %p usage and issues around pointer arithmetic.  Thanks to aitap.
