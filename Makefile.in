@@ -424,6 +424,7 @@ chunk.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
 compat.o: compat.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h
 dmalloc.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h append.h \
   compat.h debug_tok.h dmalloc_loc.h env.h error_val.h version.h
+dmallocc.o: dmallocc.cc dmalloc.h return.h conf.h settings.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h append.h dmalloc_argv.h \
   dmalloc_argv_loc.h compat.h
 dmalloc_fc_t.o: dmalloc_fc_t.c conf.h settings.h dmalloc.h dmalloc_argv.h \
