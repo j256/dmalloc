@@ -2,7 +2,6 @@
 @c %**start of header
 @setfilename dmalloc.info
 @settitle Dmalloc Tutorial
-@setchapternewpage odd
 @headings double
 @c %**end of header
   
@@ -19,25 +18,12 @@
 @set dmalloc_copyright Copyright 1992 to @value{dmalloc_year} by Gray Watson.
 @c ----------------------------------------------------------------
 
-@ifinfo
-This manual is licensed by Gray Watson under the Creative Commons Attribution-Share Alike 3.0 License.
-
-Permission is granted to make and distribute verbatim copies of this manual provided this license
-notice and this permission notice are preserved on all copies.
-@end ifinfo
-
 @titlepage
 @headings off
 @title Debug Malloc Library
 @subtitle Version @value{dmalloc_version}
 @subtitle @value{dmalloc_date}
 @author Gray Watson
-
-@page
-@setfilename dmalloc.info
-@settitle Dmalloc Documentation
-@headings double
-@c %**end of header
 
 @page
 This manual is licensed by Gray Watson under the Creative Commons Attribution-Share Alike 3.0 License.
@@ -57,10 +43,9 @@ notice and this permission notice are preserved on all copies.
 
 @node Top, Copying, (dir), (dir)
 @top Debug Malloc Library
+@everyheading @thischapter @| @thispage @| @today{}
 
-@ifinfo
 Version @value{dmalloc_version} -- @value{dmalloc_date}
-@end ifinfo
 
 @cindex introduction
 @cindex author
@@ -3781,6 +3766,9 @@ system version/type, and the version of Dmalloc you are using.
 @unnumbered Index of Concepts
 
 @printindex cp
+
+@ifhtml
 @contents
+@end ifhtml
 
 @bye
