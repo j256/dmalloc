@@ -120,11 +120,11 @@ static	argv_t		arg_list[] = {
 };
 
 /*
- * Hexadecimal STR to integer translation
+ * Hexadecimal STR to address translation
  */
-static	long	hex_to_long(char *str)
+static	DMALLOC_PNT	hex_to_address(const char *str)
 {
-  long		ret;
+  PNT_ARITH_TYPE	ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++) {
@@ -150,16 +150,16 @@ static	long	hex_to_long(char *str)
     }
   }
   
-  return ret;
+  return (DMALLOC_PNT)ret;
 }
 
 /*
  * Read an address from the user
  */
-static	void	*get_address(void)
+static	DMALLOC_PNT	get_address(void)
 {
   char	line[80];
-  void	*pnt;
+  DMALLOC_PNT pnt;
   
   do {
     loc_printf("Enter a hex address: ");
@@ -168,7 +168,7 @@ static	void	*get_address(void)
     }
   } while (line[0] == '\0');
   
-  pnt = (void *)hex_to_long(line);
+  pnt = hex_to_address(line);
   
   return pnt;
 }
@@ -3915,7 +3915,7 @@ static	void	do_interactive(void)
 {
   int		len;
   char		line[128], *line_p;
-  void		*pnt;
+  DMALLOC_PNT	pnt;
   
   loc_printf("Malloc test program.  Type 'help' for assistance.\n");
   
