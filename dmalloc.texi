@@ -60,10 +60,9 @@ statistics.
 
 The library is reasonably portable having been run successfully on at
 least the following operating systems: AIX, DGUX, Free/Net/OpenBSD,
-GNU/Hurd, HPUX, Irix, Linux, Mac OSX, NeXT, OSF/DUX, SCO, Solaris,
-Ultrix, Unixware, MS Windows, and Unicos on a Cray T3E.  It also
-provides support for the debugging of threaded programs.  @xref{Using
-With Threads}.
+GNU/Hurd, HPUX, Irix, Linux, OSX, NeXT, OSF/DUX, SCO, Solaris, Ultrix,
+Unixware, Windows, and Unicos on a Cray T3E.  It also provides support
+for the debugging of threaded programs.  @xref{Using With Threads}.
 
 The package includes the library, configuration scripts, debug utility
 application, test program, and documentation.  Online documentation as
