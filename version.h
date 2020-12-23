@@ -35,6 +35,6 @@
  *
  * Make sure to also git tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.6.2" ;
+static	char	*dmalloc_version = "5.6.3" ;
 
 #endif /* ! __VERSION_H__ */
