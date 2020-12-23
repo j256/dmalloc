@@ -5290,10 +5290,10 @@ fi
 
 
 if test "x$getenv_safe" != "xyes" && test "x$have_getenvironmentvariablea" != "xyes" ; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Since getenv is not safe, you MUST add the following" >&5
-$as_echo "$as_me: WARNING: Since getenv is not safe, you MUST add the following" >&2;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: code to the front of main():" >&5
-$as_echo "$as_me: WARNING: code to the front of main():" >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Since getenv is not safe, you may want to add the" >&5
+$as_echo "$as_me: WARNING: Since getenv is not safe, you may want to add the" >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: following code to the front of main():" >&5
+$as_echo "$as_me: WARNING: following code to the front of main():" >&2;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:   #ifdef DMALLOC" >&5
 $as_echo "$as_me: WARNING:   #ifdef DMALLOC" >&2;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:     dmalloc_debug_setup(getenv(\"DMALLOC_OPTIONS\"));" >&5

@@ -613,8 +613,8 @@ int main() {
 )
 
 if test "x$getenv_safe" != "xyes" && test "x$have_getenvironmentvariablea" != "xyes" ; then
-  AC_MSG_WARN([Since getenv is not safe, you MUST add the following])
-  AC_MSG_WARN([code to the front of main():])
+  AC_MSG_WARN([Since getenv is not safe, you may want to add the])
+  AC_MSG_WARN([following code to the front of main():])
   AC_MSG_WARN([[  #ifdef DMALLOC]])
   AC_MSG_WARN([[    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
   AC_MSG_WARN([[  #endif]])
