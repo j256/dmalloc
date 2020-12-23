@@ -117,26 +117,16 @@
 /*************************************/
 
 /*
- * For DEC Mips machines running Ultrix
+ * For Mips machines running Linux
  */
 #if __mips
 
 /*
- * I have no idea how to get inline assembly with the default cc.
- * Anyone know how?
- */
-
-#if 0
-
-/*
  * NOTE: we assume here that file is global.
  *
- * $31 is the frame pointer.  $2 looks to be the return address but maybe
- * not consistently.
+ * $31 is the return address.
  */
-#define GET_RET_ADDR(file)	asm("sw $2, file")
-
-#endif
+#define GET_RET_ADDR(file)	asm("sw $31, %0" : "=m" (file))
 
 #endif /* __mips */
 
