@@ -429,11 +429,11 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(char *)
 AC_CHECK_SIZEOF(long long)
 AC_MSG_CHECKING([data-alignment size])
-if test $ac_cv_sizeof_long = 4; then
+if test $ac_cv_sizeof_char_p -lt 8; then
 	# we have to make a special case for sun sparc idiocy
 	ac_cv_data_align=8
 else
-	ac_cv_data_align=$ac_cv_sizeof_long
+	ac_cv_data_align=$ac_cv_sizeof_char_p
 fi
 AC_DEFINE_UNQUOTED([ALLOCATION_ALIGNMENT],[$ac_cv_data_align])
 AC_MSG_RESULT([$ac_cv_data_align])
