@@ -69,11 +69,11 @@ static	char		start_file[512] = { '\0' }; /* file to start at */
 /****************************** local utilities ******************************/
 
 /*
- * Hexadecimal STR to int translation
+ * Hexadecimal STR to long translation
  */
-static	long	hex_to_long(const char *str)
+static	unsigned int	hex_to_uint(const char *str)
 {
-  long		ret;
+  unsigned int	ret;
   
   /* strip off spaces */
   for (; *str == ' ' || *str == '\t'; str++) {
@@ -102,6 +102,40 @@ static	long	hex_to_long(const char *str)
   return ret;
 }
 
+/*
+ * Hexadecimal STR to address translation
+ */
+static	DMALLOC_PNT	hex_to_address(const char *str)
+{
+  PNT_ARITH_TYPE	ret;
+  
+  /* strip off spaces */
+  for (; *str == ' ' || *str == '\t'; str++) {
+  }
+  
+  /* skip a leading 0[xX] */
+  if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) {
+    str += 2;
+  }
+  
+  for (ret = 0;; str++) {
+    if (*str >= '0' && *str <= '9') {
+      ret = ret * 16 + (*str - '0');
+    }
+    else if (*str >= 'a' && *str <= 'f') {
+      ret = ret * 16 + (*str - 'a' + 10);
+    }
+    else if (*str >= 'A' && *str <= 'F') {
+      ret = ret * 16 + (*str - 'A' + 10);
+    }
+    else {
+      break;
+    }
+  }
+  
+  return (DMALLOC_PNT)ret;
+}
+
 /***************************** exported routines *****************************/
 
 /*
@@ -112,7 +146,7 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
 {
   char	*colon_p;
   
-  SET_POINTER(addr_p, (DMALLOC_PNT)hex_to_long(addr_all));
+  SET_POINTER(addr_p, hex_to_address(addr_all));
   if (addr_count_p != NULL) {
     colon_p = strchr(addr_all, ':');
     if (colon_p != NULL) {
@@ -230,7 +264,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, DEBUG_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      SET_POINTER(debug_p, hex_to_long(this_p));
+      SET_POINTER(debug_p, hex_to_uint(this_p));
       continue;
     }
     
