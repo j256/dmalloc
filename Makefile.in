@@ -404,7 +404,7 @@ depend :
 	sed -e '/dependencies ''are ''automatically/,$$d' Makefile > Makefile.t
 	@ echo '# These dependencies ''are ''automatically ''generated.  Do not edit by hand.' >> Makefile.t
 	@ echo '' >> Makefile.t
-	- $(CC) $(INCS) -MM *.c >> Makefile.t
+	- $(CC) $(INCS) -MM *.c *.cc >> Makefile.t
 	- $(CC) $(INCS) -MM chunk.c | sed -e 's/^chunk.o/chunk_th.o/' >> Makefile.t
 	- $(CC) $(INCS) -MM error.c | sed -e 's/^error.o/error_th.o/' >> Makefile.t
 	- $(CC) $(INCS) -MM user_malloc.c | sed -e 's/^user_malloc.o/user_malloc_th.o/' >> Makefile.t
@@ -425,7 +425,6 @@ chunk.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
 compat.o: compat.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h
 dmalloc.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h append.h \
   compat.h debug_tok.h dmalloc_loc.h env.h error_val.h version.h
-dmallocc.o: dmallocc.cc dmalloc.h return.h conf.h settings.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h append.h dmalloc_argv.h \
   dmalloc_argv_loc.h compat.h
 dmalloc_fc_t.o: dmalloc_fc_t.c conf.h settings.h dmalloc.h dmalloc_argv.h \
@@ -447,6 +446,7 @@ protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
 user_malloc.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
   compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
   user_malloc.h return.h
+dmallocc.o: dmallocc.cc dmalloc.h return.h conf.h settings.h
 chunk_th.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
   error.h error_val.h heap.h
