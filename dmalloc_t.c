@@ -162,7 +162,7 @@ static	void	*get_address(void)
   void	*pnt;
   
   do {
-    (void)printf("Enter a hex address: ");
+    loc_printf("Enter a hex address: ");
     if (fgets(line, sizeof(line), stdin) == NULL) {
       return NULL;
     }
@@ -182,9 +182,9 @@ static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
   pnt_info_t	*this_p, *prev_p;
   
   if (verbose_b) {
-    (void)printf("%d: free'd %d bytes from slot %ld (%#lx)\n",
-		 iter_c + 1, slot_p->pi_size, (long)(slot_p - pointer_grid),
-		 (long)slot_p->pi_pnt);
+    unsigned long diff = ((PNT_ARITH_TYPE)slot_p - (PNT_ARITH_TYPE)pointer_grid);
+    loc_printf("%d: free'd %d bytes from slot %lu (%p)\n",
+	       iter_c + 1, slot_p->pi_size, diff, slot_p->pi_pnt);
   }
   
   slot_p->pi_pnt = NULL;
@@ -228,8 +228,8 @@ static	int	do_random(const int iter_n)
   
   pointer_grid = (pnt_info_t *)malloc(sizeof(pnt_info_t) * max_pointers);
   if (pointer_grid == NULL) {
-    (void)printf("%s: problems allocating space for %ld pointer slots.\n",
-		 argv_program, max_pointers);
+    loc_printf("%s: problems allocating space for %ld pointer slots.\n",
+	       argv_program, max_pointers);
     return 0;
   }
   
@@ -249,8 +249,8 @@ static	int	do_random(const int iter_n)
     int		which_func, which;
     
     if (dmalloc_errno != prev_errno && ! silent_b) {
-      (void)printf("ERROR: iter %d, %s (err %d)\n",
-		   iter_c, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("ERROR: iter %d, %s (err %d)\n",
+		 iter_c, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       prev_errno = dmalloc_errno;
       final = 0;
     }
@@ -266,7 +266,7 @@ static	int	do_random(const int iter_n)
       new_flag = 1 << which;
       flags ^= new_flag;
       if (verbose_b) {
-	(void)printf("%d: debug flags = %#x\n", iter_c + 1, flags);
+	loc_printf("%d: debug flags = %#x\n", iter_c + 1, flags);
       }
       dmalloc_debug(flags);
     }
@@ -287,14 +287,9 @@ static	int	do_random(const int iter_n)
       }
       
       free(pnt_p->pi_pnt);
+      // NOTE: free_slot logs verbose
       free_slot(iter_c, pnt_p, &used_p, &free_p);
       free_c++;
-      
-      if (verbose_b) {
-	(void)printf("%d: free'd %d bytes from slot %ld (%#lx)\n",
-		     iter_c + 1, pnt_p->pi_size, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
-      }
       
       max_avail += pnt_p->pi_size;
       iter_c++;
@@ -303,8 +298,8 @@ static	int	do_random(const int iter_n)
     
     /* sanity check */
     if (free_p == NULL) {
-      (void)fprintf(stderr, "%s: problem with test program free list\n",
-		    argv_program);
+      loc_fprintf(stderr, "%s: problem with test program free list\n",
+		  argv_program);
       exit(1);
     }
     
@@ -326,9 +321,9 @@ static	int	do_random(const int iter_n)
       pnt_p->pi_pnt = malloc(amount);
       
       if (verbose_b) {
-	(void)printf("%d: malloc %d of max %d into slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	loc_printf("%d: malloc %d of max %d into slot %lu.  got %p\n",
+		   iter_c + 1, amount, max_avail, diff, pnt_p->pi_pnt);
       }
       break;
       
@@ -338,9 +333,9 @@ static	int	do_random(const int iter_n)
       pnt_p->pi_pnt = calloc(amount, sizeof(char));
       
       if (verbose_b) {
-	(void)printf("%d: calloc %d of max %d into slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	loc_printf("%d: calloc %d of max %d into slot %lu.  got %p\n",
+		   iter_c + 1, amount, max_avail, diff, pnt_p->pi_pnt);
       }
       
       /* test the returned block to make sure that is has been cleared */
@@ -350,8 +345,8 @@ static	int	do_random(const int iter_n)
 	     chunk_p++) {
 	  if (*chunk_p != '\0') {
 	    if (! silent_b) {
-	      (void)printf("calloc of %d was not fully zeroed on iteration #%d\n",
-			   amount, iter_c + 1);
+	      loc_printf("calloc of %d was not fully zeroed on iteration #%d\n",
+			 amount, iter_c + 1);
 	    }
 	    break;
 	  }
@@ -378,9 +373,10 @@ static	int	do_random(const int iter_n)
       max_avail += pnt_p->pi_size;
       
       if (verbose_b) {
-	(void)printf("%d: realloc %d from %d of max %d slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
-		     (long)(pnt_p - pointer_grid), (long)pnt_p->pi_pnt);
+	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	loc_printf("%d: realloc %d from %d of max %d slot %lu.  got %p\n",
+		   iter_c + 1, amount, pnt_p->pi_size, max_avail,
+		   diff, pnt_p->pi_pnt);
       }
       
       if (amount == 0) {
@@ -410,9 +406,9 @@ static	int	do_random(const int iter_n)
       max_avail += pnt_p->pi_size;
       
       if (verbose_b) {
-	(void)printf("%d: recalloc %d from %d of max %d slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, pnt_p->pi_size, max_avail,
-		     (long)(pnt_p - pointer_grid), (long)pnt_p->pi_pnt);
+	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	loc_printf("%d: recalloc %d from %d of max %d slot %lu.  got %p\n",
+		   iter_c + 1, amount, pnt_p->pi_size, max_avail, diff, pnt_p->pi_pnt);
       }
       
       /* test the returned block to make sure that is has been cleared */
@@ -422,8 +418,8 @@ static	int	do_random(const int iter_n)
 	     chunk_p++) {
 	  if (*chunk_p != '\0') {
 	    if (! silent_b) {
-	      (void)printf("recalloc %d from %d was not fully zeroed on iteration #%d\n",
-			   amount, pnt_p->pi_size, iter_c + 1);
+	      loc_printf("recalloc %d from %d was not fully zeroed on iteration #%d\n",
+			 amount, pnt_p->pi_size, iter_c + 1);
 	    }
 	    break;
 	  }
@@ -444,9 +440,9 @@ static	int	do_random(const int iter_n)
       pnt_p->pi_pnt = valloc(amount);
       
       if (verbose_b) {
-	(void)printf("%d: valloc %d of max %d into slot %ld.  got %#lx\n",
-		     iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		     (long)pnt_p->pi_pnt);
+	unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	loc_printf("%d: valloc %d of max %d into slot %lu.  got %p\n",
+		   iter_c + 1, amount, max_avail, diff, pnt_p->pi_pnt);
       }
       break;
       
@@ -459,8 +455,8 @@ static	int	do_random(const int iter_n)
 	
 	mem = _dmalloc_heap_alloc(amount);
 	if (verbose_b) {
-	  (void)printf("%d: heap alloc %d of max %d bytes.  got %#lx\n",
-		       iter_c + 1, amount, max_avail, (long)mem);
+	  loc_printf("%d: heap alloc %d of max %d bytes.  got %p\n",
+		     iter_c + 1, amount, max_avail, mem);
 	}
 	iter_c++;
       }
@@ -475,7 +471,7 @@ static	int	do_random(const int iter_n)
       if (which == 7) {
 	if (dmalloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
 	  if (! silent_b) {
-	    (void)printf("%d: ERROR dmalloc_verify failed\n", iter_c + 1);
+	    loc_printf("%d: ERROR dmalloc_verify failed\n", iter_c + 1);
 	  }
 	  final = 0;
 	}
@@ -498,9 +494,9 @@ static	int	do_random(const int iter_n)
 	
 	if (verbose_b) {
 	  /* the amount includes the \0 */
-	  (void)printf("%d: strdup %d of max %d into slot %ld.  got %#lx\n",
-		       iter_c + 1, amount + 1, max_avail, (long)(pnt_p - pointer_grid),
-		       (long)pnt_p->pi_pnt);
+	  unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	  loc_printf("%d: strdup %d of max %d into slot %lu.  got %p\n",
+		     iter_c + 1, amount + 1, max_avail, diff, pnt_p->pi_pnt);
 	}
       }
       break;
@@ -518,9 +514,9 @@ static	int	do_random(const int iter_n)
 	pnt_p->pi_pnt = strndup(str, amount);
 	
 	if (verbose_b) {
-	  (void)printf("%d: strdup %d of max %d into slot %ld.  got %#lx\n",
-		       iter_c + 1, amount, max_avail, (long)(pnt_p - pointer_grid),
-		       (long)pnt_p->pi_pnt);
+	  unsigned long diff = ((PNT_ARITH_TYPE)pnt_p - (PNT_ARITH_TYPE)pointer_grid);
+	  loc_printf("%d: strdup %d of max %d into slot %lu.  got %p\n",
+		     iter_c + 1, amount, max_avail, diff, pnt_p->pi_pnt);
 	}
       }
       break;
@@ -533,8 +529,7 @@ static	int	do_random(const int iter_n)
     
     if (pnt_p->pi_pnt == NULL) {
       if (! silent_b) {
-	(void)printf("%d: ERROR allocation of %d returned error\n",
-		     iter_c + 1, amount);
+	loc_printf("%d: ERROR allocation of %d returned error\n", iter_c + 1, amount);
       }
       final = 0;
       iter_c++;
@@ -592,7 +587,7 @@ static	int	check_initial_special(void)
      */
     
     if (! silent_b) {
-      (void)printf("  Checking realloc(malloc) seen count\n");
+      loc_printf("  Checking realloc(malloc) seen count\n");
     }
     
     do {
@@ -602,7 +597,7 @@ static	int	check_initial_special(void)
     pnt = malloc(amount);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
       }
       final = 0;
       break;
@@ -614,7 +609,7 @@ static	int	check_initial_special(void)
       pnt = realloc(pnt, amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not reallocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not reallocate %d bytes.\n", amount);
 	}
 	final = 0;
 	break;
@@ -632,8 +627,7 @@ static	int	check_initial_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: free of realloc(malloc) pointer %lx failed.\n",
-		     (unsigned long)pnt);
+	loc_printf("   ERROR: free of realloc(malloc) pointer %p failed.\n", pnt);
       }
       final = 0;
     }
@@ -641,7 +635,7 @@ static	int	check_initial_special(void)
     /* now check the heap to verify tha the freed slot is good */
     if (dmalloc_verify(NULL /* check all heap */) != DMALLOC_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_verify failed\n");
+	loc_printf("   ERROR: dmalloc_verify failed\n");
       }
       final = 0;
     }
@@ -656,7 +650,7 @@ static	int	check_initial_special(void)
     unsigned int	old_flags, amount, check_c;
     
     if (! silent_b) {
-      (void)printf("  Checking never-reuse token\n");
+      loc_printf("  Checking never-reuse token\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -668,7 +662,7 @@ static	int	check_initial_special(void)
       pnts[iter_c] = malloc(amount);
       if (pnts[iter_c] == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	break;
@@ -680,8 +674,7 @@ static	int	check_initial_special(void)
       if (dmalloc_free(__FILE__, __LINE__, pnts[iter_c],
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free of pointer %lx failed.\n",
-		       (unsigned long)pnts[iter_c]);
+	  loc_printf("   ERROR: free of pointer %p failed.\n", pnts[iter_c]);
 	}
 	final = 0;
       }
@@ -696,7 +689,7 @@ static	int	check_initial_special(void)
       new_pnt = malloc(amount);
       if (new_pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
       }
@@ -705,8 +698,7 @@ static	int	check_initial_special(void)
       for (check_c = 0; check_c < NEVER_REUSE_ITERS; check_c++) {
 	if (new_pnt == pnts[check_c]) {
 	  if (! silent_b) {
-	    (void)printf("   ERROR: pointer %lx was improperly reused.\n",
-			 (unsigned long)new_pnt);
+	    loc_printf("   ERROR: pointer %p was improperly reused.\n", new_pnt);
 	  }
 	  final = 0;
 	  break;
@@ -716,8 +708,7 @@ static	int	check_initial_special(void)
       if (dmalloc_free(__FILE__, __LINE__, new_pnt,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free of pointer %lx failed.\n",
-		       (unsigned long)new_pnt);
+	  loc_printf("   ERROR: free of pointer %p failed.\n", new_pnt);
 	}
 	final = 0;
       }
@@ -746,7 +737,7 @@ static	int	check_arg_check(void)
   old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
   old_flags = dmalloc_debug_current();
   if (! silent_b) {
-    (void)printf("  Checking arg-check functions\n");
+    loc_printf("  Checking arg-check functions\n");
   }
   
   /*
@@ -759,14 +750,14 @@ static	int	check_arg_check(void)
   pnt = malloc(size);
   if (pnt == NULL) {
     if (! silent_b) {
-      (void)printf("     ERROR: could not malloc %d bytes.\n", size);
+      loc_printf("     ERROR: could not malloc %d bytes.\n", size);
     }
     return 0;
   }
   pnt2 = malloc(size * 2);
   if (pnt2 == NULL) {
     if (! silent_b) {
-      (void)printf("     ERROR: could not malloc %d bytes.\n", size * 2);
+      loc_printf("     ERROR: could not malloc %d bytes.\n", size * 2);
     }
     return 0;
   }
@@ -776,7 +767,7 @@ static	int	check_arg_check(void)
 #if HAVE_ATOI
   func = "atoi";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -784,14 +775,14 @@ static	int	check_arg_check(void)
   memcpy(pnt, "1234", size);
   if (_dmalloc_atoi(__FILE__, __LINE__, pnt) != 1234) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -801,13 +792,13 @@ static	int	check_arg_check(void)
   memcpy(pnt, "12345", size);
   if (_dmalloc_atoi(__FILE__, __LINE__, pnt) != 12345) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -818,7 +809,7 @@ static	int	check_arg_check(void)
 #if HAVE_ATOL
   func = "atol";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -826,14 +817,14 @@ static	int	check_arg_check(void)
   memcpy(pnt, "1234", size);
   if (_dmalloc_atol(__FILE__, __LINE__, pnt) != 1234) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -843,13 +834,13 @@ static	int	check_arg_check(void)
   memcpy(pnt, "12345", size);
   if (_dmalloc_atol(__FILE__, __LINE__, pnt) != 12345) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -860,7 +851,7 @@ static	int	check_arg_check(void)
 #if HAVE_BCMP
   func = "bcmp";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -869,14 +860,14 @@ static	int	check_arg_check(void)
   memset(pnt2, 1, size);
   if (_dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -887,14 +878,14 @@ static	int	check_arg_check(void)
   memset(pnt2, 2, size);
   if (_dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size) == 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -904,8 +895,7 @@ static	int	check_arg_check(void)
   _dmalloc_bcmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload did not register overwrite\n",
-		   func);
+      loc_printf("     ERROR: %s overload did not register overwrite\n", func);
     }
     final = 0;
   }
@@ -916,7 +906,7 @@ static	int	check_arg_check(void)
 #if HAVE_BCOPY
   func = "bcopy";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this copies the right number of characters into buffer */
@@ -925,15 +915,15 @@ static	int	check_arg_check(void)
   _dmalloc_bcopy(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
   /* check to see if it worked */
   if (memcmp(pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
@@ -944,7 +934,7 @@ static	int	check_arg_check(void)
   _dmalloc_bcopy(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -955,7 +945,7 @@ static	int	check_arg_check(void)
 #if HAVE_BZERO
   func = "bzero";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this copies enough characters into buffer */
@@ -963,8 +953,8 @@ static	int	check_arg_check(void)
   _dmalloc_bzero(__FILE__, __LINE__, pnt, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -975,7 +965,7 @@ static	int	check_arg_check(void)
   _dmalloc_bzero(__FILE__, __LINE__, pnt, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -987,7 +977,7 @@ static	int	check_arg_check(void)
 #if HAVE_INDEX
   func = "index";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -995,14 +985,14 @@ static	int	check_arg_check(void)
   memcpy(pnt, "1234", size);
   if (_dmalloc_index(__FILE__, __LINE__, pnt, '4') != pnt + 3) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1013,13 +1003,13 @@ static	int	check_arg_check(void)
   memcpy(pnt, "12345", size);
   if (_dmalloc_index(__FILE__, __LINE__, pnt, '5') != pnt + 4) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1031,7 +1021,7 @@ static	int	check_arg_check(void)
 #if HAVE_MEMCCPY
   func = "memccpy";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this copies the right number of characters into buffer */
@@ -1040,8 +1030,8 @@ static	int	check_arg_check(void)
   _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1052,7 +1042,7 @@ static	int	check_arg_check(void)
   _dmalloc_memccpy(__FILE__, __LINE__, pnt2, pnt, 0, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1064,7 +1054,7 @@ static	int	check_arg_check(void)
 #if HAVE_MEMCHR
   func = "memchr";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this looks at the right number of characters in buffer */
@@ -1072,14 +1062,14 @@ static	int	check_arg_check(void)
   memset(pnt, 4, size);
   if (_dmalloc_memchr(__FILE__, __LINE__, pnt, 0, size) != NULL) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s should have failed\n", func);
+      loc_printf("     ERROR: %s should have failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1089,7 +1079,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_memchr(__FILE__, __LINE__, pnt, 0, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1100,7 +1090,7 @@ static	int	check_arg_check(void)
 #if HAVE_MEMCMP
   func = "memcmp";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this checks the right number of characters in buffer */
@@ -1109,14 +1099,14 @@ static	int	check_arg_check(void)
   memset(pnt2, 5, size);
   if (_dmalloc_memcmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s should have passed\n", func);
+      loc_printf("     ERROR: %s should have passed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1126,7 +1116,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_memcmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1137,7 +1127,7 @@ static	int	check_arg_check(void)
 #if HAVE_MEMCPY
   func = "memcpy";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this copies enough characters into buffer */
@@ -1146,14 +1136,14 @@ static	int	check_arg_check(void)
   _dmalloc_memcpy(__FILE__, __LINE__, pnt2, pnt, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
   if (memcmp(pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
@@ -1164,7 +1154,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_memcpy(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1176,7 +1166,7 @@ static	int	check_arg_check(void)
 #if HAVE_MEMMOVE
   func = "memmove";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this copies enough characters into buffer */
@@ -1185,14 +1175,14 @@ static	int	check_arg_check(void)
   _dmalloc_memmove(__FILE__, __LINE__, pnt2, pnt, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
   if (memcmp(pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
@@ -1203,7 +1193,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_memmove(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1215,7 +1205,7 @@ static	int	check_arg_check(void)
 #if HAVE_MEMSET
   func = "memset";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this sets the right number of characters in buffer */
@@ -1223,8 +1213,8 @@ static	int	check_arg_check(void)
   _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1235,7 +1225,7 @@ static	int	check_arg_check(void)
   _dmalloc_memset(__FILE__, __LINE__, pnt, 0, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1247,7 +1237,7 @@ static	int	check_arg_check(void)
 #if HAVE_RINDEX
   func = "rindex";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1255,14 +1245,14 @@ static	int	check_arg_check(void)
   memcpy(pnt, "1234", size);
   if (_dmalloc_rindex(__FILE__, __LINE__, pnt, '1') != pnt) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1272,13 +1262,13 @@ static	int	check_arg_check(void)
   memcpy(pnt, "12345", size);
   if (_dmalloc_rindex(__FILE__, __LINE__, pnt, '1') != pnt) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1289,7 +1279,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRCASECMP
   func = "strcasecmp";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1298,14 +1288,14 @@ static	int	check_arg_check(void)
   memcpy(pnt2, "ABCD", size);
   if (_dmalloc_strcasecmp(__FILE__, __LINE__, pnt, pnt2) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1318,7 +1308,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_strcasecmp(__FILE__, __LINE__, pnt, pnt2);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1329,7 +1319,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRCAT
   func = "strcat";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1338,14 +1328,14 @@ static	int	check_arg_check(void)
   memcpy(pnt2, "cd", 3);
   if (_dmalloc_strcat(__FILE__, __LINE__, pnt, pnt2) != pnt) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1357,13 +1347,13 @@ static	int	check_arg_check(void)
   hold_ch = *(pnt + size);
   if (_dmalloc_strcat(__FILE__, __LINE__, pnt, pnt2) != pnt) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1375,7 +1365,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRCHR
   func = "strchr";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1383,14 +1373,14 @@ static	int	check_arg_check(void)
   memcpy(pnt, "1234", size);
   if (_dmalloc_strchr(__FILE__, __LINE__, pnt, '4') != pnt + 3) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1400,13 +1390,13 @@ static	int	check_arg_check(void)
   memcpy(pnt, "12345", size);
   if (_dmalloc_strchr(__FILE__, __LINE__, pnt, '5') != pnt + 4) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1417,7 +1407,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRCMP
   func = "strcmp";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1426,14 +1416,14 @@ static	int	check_arg_check(void)
   memcpy(pnt2, "abcd", size);
   if (_dmalloc_strcmp(__FILE__, __LINE__, pnt, pnt2) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1446,7 +1436,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_strcmp(__FILE__, __LINE__, pnt, pnt2);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1457,7 +1447,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRCPY
   func = "strcpy";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1466,14 +1456,14 @@ static	int	check_arg_check(void)
   _dmalloc_strcpy(__FILE__, __LINE__, pnt, pnt2);
   if (memcmp(pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1485,13 +1475,13 @@ static	int	check_arg_check(void)
   _dmalloc_strcpy(__FILE__, __LINE__, pnt, pnt2);
   if (memcmp(pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1503,7 +1493,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRCSPN
   func = "strcspn";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* they should be the same */
@@ -1511,14 +1501,14 @@ static	int	check_arg_check(void)
   memcpy(pnt, "abcd", size);
   if (_dmalloc_strcspn(__FILE__, __LINE__, pnt, ".") != 4) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1531,7 +1521,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_strcspn(__FILE__, __LINE__, pnt, ".");
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1545,7 +1535,7 @@ static	int	check_arg_check(void)
   /* check strdup if it is running dmalloc code and isn't a macro */
   func = "strdup";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   {
@@ -1558,14 +1548,14 @@ static	int	check_arg_check(void)
     new_pnt = strdup(pnt);
     if (new_pnt == NULL) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload failed\n", func);
+	loc_printf("     ERROR: %s overload failed\n", func);
       }
       final = 0;
     }
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		     func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1576,7 +1566,7 @@ static	int	check_arg_check(void)
     new_pnt = strdup(pnt);
     if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should get error\n", func);
+	loc_printf("     ERROR: %s overload should get error\n", func);
       }
       final = 0;
     }
@@ -1589,7 +1579,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRNCASECMP
   func = "strncasecmp";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this compares enough characters from buffer */
@@ -1598,14 +1588,14 @@ static	int	check_arg_check(void)
   memset(pnt2, 'A', size);
   if (_dmalloc_strncasecmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1615,7 +1605,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_strncasecmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1626,7 +1616,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRNCAT
   func = "strncat";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this copies enough characters into buffer */
@@ -1643,8 +1633,8 @@ static	int	check_arg_check(void)
   _dmalloc_strncat(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1658,7 +1648,7 @@ static	int	check_arg_check(void)
   _dmalloc_strncat(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1670,7 +1660,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRNCMP
   func = "strncat";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this compares too many characters from buffer */
@@ -1679,14 +1669,14 @@ static	int	check_arg_check(void)
   memset(pnt2, 9, size);
   if (_dmalloc_strncmp(__FILE__, __LINE__, pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
@@ -1696,7 +1686,7 @@ static	int	check_arg_check(void)
   (void)_dmalloc_strncmp(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1707,7 +1697,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRNCPY
   func = "strncpy";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   /* this looks at enough characters into buffer */
@@ -1716,14 +1706,14 @@ static	int	check_arg_check(void)
   _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size);
   if (dmalloc_errno != DMALLOC_ERROR_NONE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should not get error: %s (%d)\n",
-		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+      loc_printf("     ERROR: %s overload should not get error: %s (%d)\n",
+		 func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
     final = 0;
   }
   if (memcmp(pnt, pnt2, size) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload failed\n", func);
+      loc_printf("     ERROR: %s overload failed\n", func);
     }
     final = 0;
   }
@@ -1734,7 +1724,7 @@ static	int	check_arg_check(void)
   _dmalloc_strncpy(__FILE__, __LINE__, pnt, pnt2, size + 1);
   if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
     if (! silent_b) {
-      (void)printf("     ERROR: %s overload should get error\n", func);
+      loc_printf("     ERROR: %s overload should get error\n", func);
     }
     final = 0;
   }
@@ -1747,7 +1737,7 @@ static	int	check_arg_check(void)
 #ifndef DMALLOC_STRNDUP_MACRO
   func = "strndup";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   {
@@ -1760,14 +1750,14 @@ static	int	check_arg_check(void)
     new_pnt = strndup(pnt, size);
     if (new_pnt == NULL) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload failed\n", func);
+	loc_printf("     ERROR: %s overload failed\n", func);
       }
       final = 0;
     }
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should not get error (size): %s (%d)\n",
-		     func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("     ERROR: %s overload should not get error (size): %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1777,14 +1767,14 @@ static	int	check_arg_check(void)
     new_pnt = strndup(pnt, size + 1);
     if (new_pnt == NULL) {
       if (! silent_b) {
-	(void)printf("     ERROR: strndup failed\n");
+	loc_printf("     ERROR: strndup failed\n");
       }
       final = 0;
     }
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("     ERROR: %s overload should not get error (size ++ 1): %s (%d)\n",
-		     func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("     ERROR: %s overload should not get error (size ++ 1): %s (%d)\n",
+		   func, dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -1798,7 +1788,7 @@ static	int	check_arg_check(void)
 #if HAVE_STRNLEN == 0
   func = "strnlen";
   if (! silent_b) {
-    (void)printf("    Checking %s\n", func);
+    loc_printf("    Checking %s\n", func);
   }
   
   char *str = "hello there";
@@ -1806,25 +1796,25 @@ static	int	check_arg_check(void)
   
   if (strnlen(str, len) != len) {
     if (! silent_b) {
-      (void)printf("     ERROR: strnlen failed\n");
+      loc_printf("     ERROR: strnlen failed\n");
     }
     final = 0;
   }
   if (strnlen(str, len - 1) != len - 1) {
     if (! silent_b) {
-      (void)printf("     ERROR: strnlen failed\n");
+      loc_printf("     ERROR: strnlen failed\n");
     }
     final = 0;
   }
   if (strnlen(str, 0) != 0) {
     if (! silent_b) {
-      (void)printf("     ERROR: strnlen failed\n");
+      loc_printf("     ERROR: strnlen failed\n");
     }
     final = 0;
   }
   if (strnlen(str, len + 1) != len) {
     if (! silent_b) {
-      (void)printf("     ERROR: strnlen failed\n");
+      loc_printf("     ERROR: strnlen failed\n");
     }
     final = 0;
   }
@@ -1847,15 +1837,15 @@ static	int	check_append_buf(char *buf, char *buf_p, char *expected, int expected
 				 int final, char *label) {
   if (buf_p != buf + expected_size) {
     if (! silent_b) {
-      (void)printf("   ERROR: %s: expecting buf_p to be %d chars ahead but was %d: %s\n",
-		   label, expected_size, (int)(buf_p - buf), buf);
+      loc_printf("   ERROR: %s: expecting buf_p to be %d chars ahead but was %d: %s\n",
+		 label, expected_size, (int)(buf_p - buf), buf);
     }
     return 0;
   }
   if (expected != 0L && strncmp(buf, expected, expected_size) != 0) {
     if (! silent_b) {
-      (void)printf("   ERROR: %s: expecting string '%s' but got '%.*s'\n",
-		   label, expected, (int)(buf_p - buf), buf);
+      loc_printf("   ERROR: %s: expecting string '%s' but got '%.*s'\n",
+		 label, expected, (int)(buf_p - buf), buf);
     }
     return 0;
   }
@@ -1887,20 +1877,20 @@ static	int	check_special(void)
     int	errno_hold = dmalloc_errno;
     
     if (! silent_b) {
-      (void)printf("  Trying to free 0L pointer.\n");
+      loc_printf("  Trying to free 0L pointer.\n");
     }
     free(NULL);
 #if ALLOW_FREE_NULL
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: free of 0L returned error.\n");
+	loc_printf("   ERROR: free of 0L returned error.\n");
       }
       final = 0;
     }
 #else
     if (dmalloc_errno == DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: free of 0L did not return error.\n");
+	loc_printf("   ERROR: free of 0L did not return error.\n");
       }
       final = 0;
     }
@@ -1910,7 +1900,7 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, NULL,
 		     DMALLOC_FUNC_FREE) != FREE_ERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: free of NULL should have failed.\n");
+	loc_printf("   ERROR: free of NULL should have failed.\n");
       }
       final = 0;
     }
@@ -1929,7 +1919,7 @@ static	int	check_special(void)
     int	errno_hold = dmalloc_errno;
     
     if (! silent_b) {
-      (void)printf("  Allocating a block of too-many bytes.\n");
+      loc_printf("  Allocating a block of too-many bytes.\n");
     }
     pnt = malloc(LARGEST_ALLOCATION + 1);
     if (pnt == NULL) {
@@ -1937,7 +1927,7 @@ static	int	check_special(void)
     }
     else {
       if (! silent_b) {
-	(void)printf("   ERROR: allocation of > largest allowed size did not return error.\n");
+	loc_printf("   ERROR: allocation of > largest allowed size did not return error.\n");
       }
       free(pnt);
       final = 0;
@@ -1963,7 +1953,7 @@ static	int	check_special(void)
     dmalloc_debug(old_flags | DMALLOC_DEBUG_FREE_BLANK);
     
     if (! silent_b) {
-      (void)printf("  Overwriting free memory.\n");
+      loc_printf("  Overwriting free memory.\n");
     }
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
@@ -1973,7 +1963,7 @@ static	int	check_special(void)
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -1990,7 +1980,7 @@ static	int	check_special(void)
       if (dmalloc_verify(pnt) == DMALLOC_NOERROR
 	  || dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: overwriting free memory not detected.\n");
+	  loc_printf("   ERROR: overwriting free memory not detected.\n");
 	}
 	final = 0;
       }
@@ -1998,8 +1988,8 @@ static	int	check_special(void)
       }
       else {
 	if (! silent_b) {
-	  (void)printf("   ERROR: verify of overwritten memory returned: %s (err %d)\n",
-		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("   ERROR: verify of overwritten memory returned: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -2029,7 +2019,7 @@ static	int	check_special(void)
     dmalloc_debug((old_flags | DMALLOC_DEBUG_ALLOC_BLANK) & (~DMALLOC_DEBUG_CHECK_FENCE));
     
     if (! silent_b) {
-      (void)printf("  Overwriting memory above allocation.\n");
+      loc_printf("  Overwriting memory above allocation.\n");
     }
     
     for (iter_c = 0; iter_c < 20; /* iter_c ++ below */) {
@@ -2039,7 +2029,7 @@ static	int	check_special(void)
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -2053,8 +2043,7 @@ static	int	check_special(void)
 			  NULL /* no return address */, NULL /* no mark */,
 			  NULL /* no seen */) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining pointer %lx failed.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: examining pointer %p failed.\n", pnt);
 	}
 	final = 0;
 	break;
@@ -2077,7 +2066,7 @@ static	int	check_special(void)
       if (dmalloc_verify(pnt) == DMALLOC_NOERROR
 	  || dmalloc_verify(NULL /* check all heap */) == DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: overwriting above allocated memory not detected.\n");
+	  loc_printf("   ERROR: overwriting above allocated memory not detected.\n");
 	}
 	final = 0;
       }
@@ -2085,8 +2074,8 @@ static	int	check_special(void)
       }
       else {
 	if (! silent_b) {
-	  (void)printf("   ERROR: verify of overwritten above allocated memory returned: %s (err %d)\n",
-		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("   ERROR: verify of overwritten above allocated memory returned: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -2109,7 +2098,7 @@ static	int	check_special(void)
     int	iter_c, amount, wrong;
     
     if (! silent_b) {
-      (void)printf("  Freeing invalid pointers\n");
+      loc_printf("  Freeing invalid pointers\n");
     }
     
     for (iter_c = 0; iter_c < 20; iter_c++) {
@@ -2119,7 +2108,7 @@ static	int	check_special(void)
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -2134,15 +2123,15 @@ static	int	check_special(void)
 	}
 	else {
 	  if (! silent_b) {
-	    (void)printf("   ERROR: free bad pointer produced: %s (err %d)\n",
-			 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	    loc_printf("   ERROR: free bad pointer produced: %s (err %d)\n",
+		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	  }
 	  final = 0;
 	}
       }
       else {
 	if (! silent_b) {
-	  (void)printf("   ERROR: no problem freeing bad pointer.\n");
+	  loc_printf("   ERROR: no problem freeing bad pointer.\n");
 	}
 	final = 0;
       }
@@ -2169,7 +2158,7 @@ static	int	check_special(void)
     unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
-      (void)printf("  Checking dmalloc_examine information\n");
+      loc_printf("  Checking dmalloc_examine information\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -2187,7 +2176,7 @@ static	int	check_special(void)
       pnt = malloc(amount); loc_file = __FILE__; loc_line = __LINE__;
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -2200,8 +2189,7 @@ static	int	check_special(void)
 			  NULL /* no return address */, &ex_mark,
 			  &ex_seen) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining pointer %lx failed.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: examining pointer %p failed.\n", pnt);
 	}
 	final = 0;
       }
@@ -2217,7 +2205,7 @@ static	int	check_special(void)
 #endif
 	       ) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examined pointer info invalid.\n");
+	  loc_printf("   ERROR: examined pointer info invalid.\n");
 	}
 	final = 0;
       }
@@ -2232,8 +2220,8 @@ static	int	check_special(void)
       new_pnt = realloc(pnt, amount - 1);
       if (new_pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
-		       amount + 1);
+	  loc_printf("   ERROR: could not reallocate %d bytes.\n",
+		     amount + 1);
 	}
 	final = 0;
 	continue;
@@ -2242,8 +2230,8 @@ static	int	check_special(void)
       /* should always get a new pointer */
       if (new_pnt != pnt) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
-		       amount + 1);
+	  loc_printf("   ERROR: could not reallocate %d bytes.\n",
+		     amount + 1);
 	}
 	final = 0;
 	continue;
@@ -2253,8 +2241,7 @@ static	int	check_special(void)
       if (dmalloc_examine(pnt, &ex_user_size, NULL, NULL, NULL,
 			  NULL, &ex_mark, &ex_seen) != DMALLOC_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining pointer %lx failed.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: examining pointer %p failed.\n", pnt);
 	}
 	final = 0;
       }
@@ -2267,7 +2254,7 @@ static	int	check_special(void)
 #endif
 	       ) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examined realloced pointer info invalid.\n");
+	  loc_printf("   ERROR: examined realloced pointer info invalid.\n");
 	}
 	final = 0;
       }
@@ -2278,8 +2265,7 @@ static	int	check_special(void)
       if (dmalloc_examine(pnt, NULL, NULL, NULL, NULL, NULL, NULL,
 			  NULL) != DMALLOC_ERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: examining freed pointer %lx did not fail.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: examining freed pointer %p did not fail.\n", pnt);
 	}
 	final = 0;
       }
@@ -2307,7 +2293,7 @@ static	int	check_special(void)
     dmalloc_errno = DMALLOC_ERROR_NONE;
     
     if (! silent_b) {
-      (void)printf("  Checking heap check start at file:line\n");
+      loc_printf("  Checking heap check start at file:line\n");
     }
     
 #define BUF_SIZE	64
@@ -2316,7 +2302,7 @@ static	int	check_special(void)
     pnts[0] = malloc(BUF_SIZE);
     if (pnts[0] == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2329,7 +2315,7 @@ static	int	check_special(void)
     pnts[1] = malloc(BUF_SIZE);
     if (pnts[1] == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2337,7 +2323,7 @@ static	int	check_special(void)
     /* it shouldn't generate an error */
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
+	loc_printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
       }
       return 0;
     }
@@ -2362,7 +2348,7 @@ static	int	check_special(void)
       loc_file= __FILE__; loc_line = __LINE__; pnts[iter_c] = malloc(BUF_SIZE);
       if (pnts[iter_c] == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	  loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
 	}
 	return 0;
       }
@@ -2391,7 +2377,7 @@ static	int	check_special(void)
        */
       if (dmalloc_errno != DMALLOC_ERROR_OVER_FENCE) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
+	  loc_printf("   ERROR: should have gotten over fence-post error after checking started.\n");
 	}
 	return 0;
       }
@@ -2428,7 +2414,7 @@ static	int	check_special(void)
     dmalloc_errno = DMALLOC_ERROR_NONE;
     
     if (! silent_b) {
-      (void)printf("  Checking heap check start at iteration count\n");
+      loc_printf("  Checking heap check start at iteration count\n");
     }
     
 #define BUF_SIZE	64
@@ -2437,7 +2423,7 @@ static	int	check_special(void)
     pnt = malloc(BUF_SIZE);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2450,7 +2436,7 @@ static	int	check_special(void)
     pnt2 = malloc(BUF_SIZE);
     if (pnt2 == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2458,7 +2444,7 @@ static	int	check_special(void)
     /* it shouldn't generate an error */
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
+	loc_printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
       }
       return 0;
     }
@@ -2481,7 +2467,7 @@ static	int	check_special(void)
     pnt2 = malloc(BUF_SIZE);
     if (pnt2 == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2489,7 +2475,7 @@ static	int	check_special(void)
     /* now we should see the error */
     if (dmalloc_errno != DMALLOC_ERROR_OVER_FENCE) {
       if (! silent_b) {
-	(void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
+	loc_printf("   ERROR: should have gotten over fence-post error after checking started.\n");
       }
       return 0;
     }
@@ -2521,7 +2507,7 @@ static	int	check_special(void)
     dmalloc_errno = DMALLOC_ERROR_NONE;
     
     if (! silent_b) {
-      (void)printf("  Checking heap check start at memory size\n");
+      loc_printf("  Checking heap check start at memory size\n");
     }
     
 #define BUF_SIZE	64
@@ -2530,7 +2516,7 @@ static	int	check_special(void)
     pnt = malloc(BUF_SIZE);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2543,7 +2529,7 @@ static	int	check_special(void)
     pnt2 = malloc(BUF_SIZE);
     if (pnt2 == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2551,7 +2537,7 @@ static	int	check_special(void)
     /* it shouldn't generate an error */
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
+	loc_printf("   ERROR: should not have gotten an error with no heap checking enabled.\n");
       }
       return 0;
     }
@@ -2573,7 +2559,7 @@ static	int	check_special(void)
     pnt2 = malloc(BUF_SIZE);
     if (pnt2 == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -2581,7 +2567,7 @@ static	int	check_special(void)
     /* now we should see the error */
     if (dmalloc_errno != DMALLOC_ERROR_OVER_FENCE) {
       if (! silent_b) {
-	(void)printf("   ERROR: should have gotten over fence-post error after checking started.\n");
+	loc_printf("   ERROR: should have gotten over fence-post error after checking started.\n");
       }
       return 0;
     }
@@ -2610,7 +2596,7 @@ static	int	check_special(void)
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
 
     if (! silent_b) {
-      (void)printf("  Checking per-pointer blanking flags\n");
+      loc_printf("  Checking per-pointer blanking flags\n");
     }
     
     /* disable alloc and check blanking */ 
@@ -2621,7 +2607,7 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
@@ -2632,8 +2618,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: per-pointer blanking flags failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2649,7 +2635,7 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
@@ -2665,8 +2651,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer blanking flags should have failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: per-pointer blanking flags should have failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2694,7 +2680,7 @@ static	int	check_special(void)
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
 
     if (! silent_b) {
-      (void)printf("  Checking per-pointer alloc flags and realloc\n");
+      loc_printf("  Checking per-pointer alloc flags and realloc\n");
     }
     
     /* enable alloc blanking without fence-posts */
@@ -2706,7 +2692,7 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
@@ -2719,8 +2705,7 @@ static	int	check_special(void)
     pnt = realloc(pnt, size - 1);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not realloc %#lx to %lu bytes.\n",
-		     (long)pnt, size - 1);
+	loc_printf("   ERROR: could not realloc %p to %lu bytes.\n", pnt, size - 1);
       }
       return 0;
     }
@@ -2733,8 +2718,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: per-pointer alloc flags should have failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: per-pointer alloc flags should have failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2757,13 +2742,13 @@ static	int	check_special(void)
     int		size = 10;
     
     if (! silent_b) {
-      (void)printf("  Checking double free error\n");
+      loc_printf("  Checking double free error\n");
     }
     
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", size);
       }
       return 0;
     }
@@ -2771,8 +2756,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: 1st of double free should not fail: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: 1st of double free should not fail: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2781,15 +2766,15 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: 2nd of double free should have failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: 2nd of double free should have failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
     else if (dmalloc_errno != DMALLOC_ERROR_ALREADY_FREE) {
       if (! silent_b) {
-	(void)printf("   ERROR: 2nd of double free should get DMALLOC_ERROR_ALREADY_FREE not: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: 2nd of double free should get DMALLOC_ERROR_ALREADY_FREE not: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2808,13 +2793,13 @@ static	int	check_special(void)
     int		size = 10, pnt_c;
     
     if (! silent_b) {
-      (void)printf("  Checking freed pointer delay\n");
+      loc_printf("  Checking freed pointer delay\n");
     }
     
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", size);
       }
       return 0;
     }
@@ -2822,7 +2807,7 @@ static	int	check_special(void)
       void	*pnt2 = malloc(size);
       if (pnt2 == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not malloc %d bytes.\n", size);
+	  loc_printf("   ERROR: could not malloc %d bytes.\n", size);
 	}
 	return 0;
       }
@@ -2834,8 +2819,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: 1st of double free should not fail: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: 1st of double free should not fail: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2843,15 +2828,15 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) == FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: 2nd of double free should have failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: 2nd of double free should have failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
     else if (dmalloc_errno != DMALLOC_ERROR_ALREADY_FREE) {
       if (! silent_b) {
-	(void)printf("   ERROR: 2nd of double free should get DMALLOC_ERROR_ALREADY_FREE not: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: 2nd of double free should get DMALLOC_ERROR_ALREADY_FREE not: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2876,7 +2861,7 @@ static	int	check_special(void)
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
 
     if (! silent_b) {
-      (void)printf("  Checking strndup\n");
+      loc_printf("  Checking strndup\n");
     }
     
     dmalloc_debug(old_flags | DMALLOC_DEBUG_CHECK_FUNCS);
@@ -2884,7 +2869,7 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", size);
       }
       return 0;
     }
@@ -2897,14 +2882,14 @@ static	int	check_special(void)
     
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     } else if (strcmp(ret, str) != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should have copied string: '%s' != '%s'\n",
-		     ret, str);
+	loc_printf("   ERROR: strndup should have copied string: '%s' != '%s'\n",
+		   ret, str);
       }
       final = 0;
     }
@@ -2916,14 +2901,14 @@ static	int	check_special(void)
     
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     } else if (strcmp(ret, str) != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should have copied string (size + 1): '%s' != '%s'\n",
-		     ret, str);
+	loc_printf("   ERROR: strndup should have copied string (size + 1): '%s' != '%s'\n",
+		   ret, str);
       }
       final = 0;
     }
@@ -2939,14 +2924,14 @@ static	int	check_special(void)
     
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: strndup shouldn't produce error: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     } else if (strcmp(ret, str) != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should have copied string: '%s' != '%s'\n",
-		     ret, str);
+	loc_printf("   ERROR: strndup should have copied string: '%s' != '%s'\n",
+		   ret, str);
       }
       final = 0;
     }
@@ -2957,8 +2942,8 @@ static	int	check_special(void)
     
     if (dmalloc_errno != DMALLOC_ERROR_WOULD_OVERWRITE) {
       if (! silent_b) {
-	(void)printf("   ERROR: strndup should produce overwrite error not: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: strndup should produce overwrite error not: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -2996,13 +2981,13 @@ static	int	check_special(void)
   
   {
     if (! silent_b) {
-      (void)printf("  Trying to realloc a 0L pointer.\n");
+      loc_printf("  Trying to realloc a 0L pointer.\n");
     }
     pnt = realloc(NULL, 10);
 #if ALLOW_REALLOC_NULL
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: re-allocation of 0L returned error.\n");
+	loc_printf("   ERROR: re-allocation of 0L returned error.\n");
       }
       final = 0;
     }
@@ -3015,7 +3000,7 @@ static	int	check_special(void)
     }
     else {
       if (! silent_b) {
-	(void)printf("   ERROR: re-allocation of 0L did not return error.\n");
+	loc_printf("   ERROR: re-allocation of 0L did not return error.\n");
       }
       free(pnt);
       final = 0;
@@ -3036,7 +3021,7 @@ static	int	check_special(void)
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     
     if (! silent_b) {
-      (void)printf("  Testing valloc()\n");
+      loc_printf("  Testing valloc()\n");
     }
     
     /*
@@ -3051,15 +3036,14 @@ static	int	check_special(void)
       pnt = valloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not valloc %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      if ((PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: valloc got %p which is not page aligned.\n", pnt);
 	}
 	final = 0;
       }
@@ -3078,15 +3062,14 @@ static	int	check_special(void)
       pnt = valloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not valloc %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      if ((PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: valloc got %p which is not page aligned.\n", pnt);
 	}
 	final = 0;
       }
@@ -3109,7 +3092,7 @@ static	int	check_special(void)
     unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
-      (void)printf("  Checking alloc blanking\n");
+      loc_printf("  Checking alloc blanking\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -3123,7 +3106,7 @@ static	int	check_special(void)
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -3131,7 +3114,7 @@ static	int	check_special(void)
       for (alloc_p = pnt; alloc_p < (char *)pnt + amount; alloc_p++) {
 	if (*alloc_p != ALLOC_BLANK_CHAR) {
 	  if (! silent_b) {
-	    (void)printf("   ERROR: allocation not fully blanked.\n");
+	    loc_printf("   ERROR: allocation not fully blanked.\n");
 	  }
 	  final = 0;
 	}
@@ -3151,15 +3134,14 @@ static	int	check_special(void)
       pnt = valloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not valloc %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not valloc %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
       }
-      if ((unsigned long)pnt % page_size != 0) {
+      if ((PNT_ARITH_TYPE)pnt % page_size != 0) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: valloc got %lx which is not page aligned.\n",
-		       (unsigned long)pnt);
+	  loc_printf("   ERROR: valloc got %p which is not page aligned.\n", pnt);
 	}
 	final = 0;
       }
@@ -3182,7 +3164,7 @@ static	int	check_special(void)
     unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
-      (void)printf("  Checking realloc_copy token\n");
+      loc_printf("  Checking realloc_copy token\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -3195,7 +3177,7 @@ static	int	check_special(void)
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -3205,8 +3187,8 @@ static	int	check_special(void)
       new_pnt = realloc(pnt, amount);
       if (new_pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
-		       amount + 10);
+	  loc_printf("   ERROR: could not reallocate %d bytes.\n",
+		     amount + 10);
 	}
 	final = 0;
 	continue;
@@ -3214,7 +3196,7 @@ static	int	check_special(void)
       
       if (new_pnt == pnt) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: realloc produced same pointer.\n");
+	  loc_printf("   ERROR: realloc produced same pointer.\n");
 	}
 	final = 0;
 	continue;
@@ -3223,8 +3205,8 @@ static	int	check_special(void)
       if (dmalloc_free(__FILE__, __LINE__, new_pnt,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free bad pointer produced: %s (err %d)\n",
-		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("   ERROR: free bad pointer produced: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -3246,7 +3228,7 @@ static	int	check_special(void)
     unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
-      (void)printf("  Checking never-reuse token\n");
+      loc_printf("  Checking never-reuse token\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -3259,7 +3241,7 @@ static	int	check_special(void)
       pnt = malloc(amount);
       if (pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not allocate %d bytes.\n", amount);
+	  loc_printf("   ERROR: could not allocate %d bytes.\n", amount);
 	}
 	final = 0;
 	continue;
@@ -3269,8 +3251,8 @@ static	int	check_special(void)
       new_pnt = realloc(pnt, amount);
       if (new_pnt == NULL) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: could not reallocate %d bytes.\n",
-		       amount + 10);
+	  loc_printf("   ERROR: could not reallocate %d bytes.\n",
+		     amount + 10);
 	}
 	final = 0;
 	continue;
@@ -3278,7 +3260,7 @@ static	int	check_special(void)
       
       if (new_pnt == pnt) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: realloc produced same pointer.\n");
+	  loc_printf("   ERROR: realloc produced same pointer.\n");
 	}
 	final = 0;
 	continue;
@@ -3287,8 +3269,8 @@ static	int	check_special(void)
       if (dmalloc_free(__FILE__, __LINE__, new_pnt,
 		       DMALLOC_FUNC_FREE) != FREE_NOERROR) {
 	if (! silent_b) {
-	  (void)printf("   ERROR: free bad pointer produced: %s (err %d)\n",
-		       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("   ERROR: free bad pointer produced: %s (err %d)\n",
+		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
 	final = 0;
       }
@@ -3309,7 +3291,7 @@ static	int	check_special(void)
     unsigned int	old_flags = dmalloc_debug_current();
     
     if (! silent_b) {
-      (void)printf("  Checking function checking of non-heap pointers\n");
+      loc_printf("  Checking function checking of non-heap pointers\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -3319,8 +3301,8 @@ static	int	check_special(void)
     _dmalloc_memset(__FILE__, __LINE__, buf, 0, sizeof(buf));
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: dmalloc_memset of non-heap pointer failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -3338,7 +3320,7 @@ static	int	check_special(void)
     unsigned int	new_flags;
     
     if (! silent_b) {
-      (void)printf("  Checking string tokens in dmalloc_debug_setup\n");
+      loc_printf("  Checking string tokens in dmalloc_debug_setup\n");
     }
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
@@ -3350,7 +3332,7 @@ static	int	check_special(void)
 	   && new_flags & DMALLOC_DEBUG_LOG_NONFREE
 	   && new_flags & DMALLOC_DEBUG_LOG_BAD_SPACE)) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_debug_setup didn't process comma separated tokens.\n");
+	loc_printf("   ERROR: dmalloc_debug_setup didn't process comma separated tokens.\n");
       }
       final = 0;
     }
@@ -3367,7 +3349,7 @@ static	int	check_special(void)
     DMALLOC_SIZE	user_size;
   
     if (! silent_b) {
-      (void)printf("  Checking calloc macro arguments\n");
+      loc_printf("  Checking calloc macro arguments\n");
     }
     
     /* notice that we do not have a () around this operation */
@@ -3382,8 +3364,8 @@ static	int	check_special(void)
     pnt = calloc(SIZE_ARG, COUNT_ARG);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not calloc %d bytes.\n",
-		     (SIZE_ARG) * (COUNT_ARG));
+	loc_printf("   ERROR: could not calloc %d bytes.\n",
+		   (SIZE_ARG) * (COUNT_ARG));
       }
       final = 0;
     }
@@ -3391,16 +3373,15 @@ static	int	check_special(void)
     else if (dmalloc_examine(pnt, &user_size, NULL, NULL, NULL, NULL, NULL,
 			     NULL) != DMALLOC_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: examining pointer %lx failed.\n",
-		     (unsigned long)pnt);
+	loc_printf("   ERROR: examining pointer %p failed.\n", pnt);
       }
       final = 0;
     }
     
     else if (user_size != (SIZE_ARG) * (COUNT_ARG)) {
       if (! silent_b) {
-	(void)printf("   ERROR: calloc size should be %d but was %ld.\n",
-		     (SIZE_ARG) * (COUNT_ARG), (long)user_size);
+	loc_printf("   ERROR: calloc size should be %d but was %ld.\n",
+		   (SIZE_ARG) * (COUNT_ARG), (long)user_size);
       }
       final = 0;
     }
@@ -3419,7 +3400,7 @@ static	int	check_special(void)
     dmalloc_debug(DMALLOC_DEBUG_CHECK_FUNCS);
     
     if (! silent_b) {
-      (void)printf("  Checking check-funcs with check-fence\n");
+      loc_printf("  Checking check-funcs with check-fence\n");
     }
     
 #define BUF_SIZE	64
@@ -3427,7 +3408,7 @@ static	int	check_special(void)
     pnt = malloc(BUF_SIZE);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -3436,8 +3417,8 @@ static	int	check_special(void)
     _dmalloc_memset(__FILE__, __LINE__, pnt, 0, BUF_SIZE);
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: memset on buf of %d bytes failed.\n",
-		     BUF_SIZE);
+	loc_printf("   ERROR: memset on buf of %d bytes failed.\n",
+		   BUF_SIZE);
       }
       final = 0;
     }
@@ -3450,7 +3431,7 @@ static	int	check_special(void)
     pnt = malloc(BUF_SIZE);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
+	loc_printf("   ERROR: could not malloc %d bytes.\n", BLOCK_SIZE);
       }
       return 0;
     }
@@ -3459,8 +3440,8 @@ static	int	check_special(void)
     _dmalloc_memset(__FILE__, __LINE__, pnt, 0, BUF_SIZE);
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
       if (! silent_b) {
-	(void)printf("   ERROR: memset of %d bytes with check-fence failed.\n",
-		     BUF_SIZE);
+	loc_printf("   ERROR: memset of %d bytes with check-fence failed.\n",
+		   BUF_SIZE);
       }
       final = 0;
     }
@@ -3483,7 +3464,7 @@ static	int	check_special(void)
     unsigned long	size, mem_count, loc_mark;
     
     if (! silent_b) {
-      (void)printf("  Checking dmalloc_count_changed function\n");
+      loc_printf("  Checking dmalloc_count_changed function\n");
     }
     
     /* get a mark */
@@ -3494,8 +3475,8 @@ static	int	check_special(void)
 				      1 /* freed */);
     if (mem_count != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: count-changed reported %lu bytes changed.\n",
-		     mem_count);
+	loc_printf("   ERROR: count-changed reported %lu bytes changed.\n",
+		   mem_count);
       }
       return 0;
     }
@@ -3505,7 +3486,7 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
@@ -3515,8 +3496,8 @@ static	int	check_special(void)
 				      0 /* no freed */);
     if (mem_count != size) {
       if (! silent_b) {
-	(void)printf("   ERROR: count-changed reported %lu bytes changed not %lu.\n",
-		     mem_count, size);
+	loc_printf("   ERROR: count-changed reported %lu bytes changed not %lu.\n",
+		   mem_count, size);
       }
       return 0;
     }
@@ -3525,8 +3506,8 @@ static	int	check_special(void)
 				      1 /* no freed */);
     if (mem_count != size) {
       if (! silent_b) {
-	(void)printf("   ERROR: count-changed reported %lu bytes changed not %lu.\n",
-		     mem_count, size);
+	loc_printf("   ERROR: count-changed reported %lu bytes changed not %lu.\n",
+		   mem_count, size);
       }
       return 0;
     }
@@ -3539,8 +3520,8 @@ static	int	check_special(void)
 				      0 /* no freed */);
     if (mem_count != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: count-changed reported %lu bytes changed.\n",
-		     mem_count);
+	loc_printf("   ERROR: count-changed reported %lu bytes changed.\n",
+		   mem_count);
       }
       return 0;
     }
@@ -3550,8 +3531,8 @@ static	int	check_special(void)
 				      1 /* no freed */);
     if (mem_count != size) {
       if (! silent_b) {
-	(void)printf("   ERROR: count-changed report %lu bytes changed not %lu.\n",
-		     mem_count, size);
+	loc_printf("   ERROR: count-changed report %lu bytes changed not %lu.\n",
+		   mem_count, size);
       }
       return 0;
     }
@@ -3560,8 +3541,8 @@ static	int	check_special(void)
 				      1 /* no freed */);
     if (mem_count != size) {
       if (! silent_b) {
-	(void)printf("   ERROR: count-changed report %lu bytes changed not %lu.\n",
-		     mem_count, size);
+	loc_printf("   ERROR: count-changed report %lu bytes changed not %lu.\n",
+		   mem_count, size);
       }
       return 0;
     }
@@ -3578,7 +3559,7 @@ static	int	check_special(void)
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     if (! silent_b) {
-      (void)printf("  Checking block-size alignment rounding\n");
+      loc_printf("  Checking block-size alignment rounding\n");
     }
     
     /* enable never-reuse and disable fence checking */
@@ -3588,14 +3569,14 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
-    if ((unsigned long)pnt % BLOCK_SIZE != 0) {
+    if ((PNT_ARITH_TYPE)pnt % BLOCK_SIZE != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
-		     size);
+	loc_printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
+		   size);
       }
       return 0;
     }
@@ -3611,7 +3592,7 @@ static	int	check_special(void)
     pnt = _dmalloc_heap_alloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not heap-alloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not heap-alloc %lu bytes.\n", size);
       }
       return 0;
     }
@@ -3620,14 +3601,14 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
-    if ((unsigned long)pnt % BLOCK_SIZE != 0) {
+    if ((PNT_ARITH_TYPE)pnt % BLOCK_SIZE != 0) {
       if (! silent_b) {
-	(void)printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
-		     size);
+	loc_printf("   ERROR: alloc of %lu bytes was not block aligned.\n",
+		   size);
       }
       return 0;
     }
@@ -3648,7 +3629,7 @@ static	int	check_special(void)
     
     old_env = dmalloc_debug_current_env(env_buf, sizeof(env_buf));
     if (! silent_b) {
-      (void)printf("  Checking free versus alloc blank\n");
+      loc_printf("  Checking free versus alloc blank\n");
     }
     
     /* enable free blank only without fence-post, alloc, or check blank */ 
@@ -3661,7 +3642,7 @@ static	int	check_special(void)
     pnt = malloc(size);
     if (pnt == NULL) {
       if (! silent_b) {
-	(void)printf("   ERROR: could not malloc %lu bytes.\n", size);
+	loc_printf("   ERROR: could not malloc %lu bytes.\n", size);
       }
       return 0;
     }
@@ -3673,8 +3654,8 @@ static	int	check_special(void)
     if (dmalloc_free(__FILE__, __LINE__, pnt,
 		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
       if (! silent_b) {
-	(void)printf("   ERROR: free versus alloc flags failed: %s (err %d)\n",
-		     dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	loc_printf("   ERROR: free versus alloc flags failed: %s (err %d)\n",
+		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
       }
       final = 0;
     }
@@ -3696,7 +3677,7 @@ static	int	check_special(void)
     int			amount;
     
     if (! silent_b) {
-      (void)printf("  Checking the dmalloc_get_stats function\n");
+      loc_printf("  Checking the dmalloc_get_stats function\n");
     }
     
     dmalloc_get_stats(NULL, NULL, NULL, NULL, &current_allocated,
@@ -3710,14 +3691,14 @@ static	int	check_special(void)
     
     if (current_allocated2 != current_allocated + amount) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_get_stats did not count alloc of %d\n",
-		     amount);
+	loc_printf("   ERROR: dmalloc_get_stats did not count alloc of %d\n",
+		   amount);
       }
       final = 0;
     }
     if (current_pnt_n2 != current_pnt_n + 1) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_get_stats did not count pnt alloc\n");
+	loc_printf("   ERROR: dmalloc_get_stats did not count pnt alloc\n");
       }
       final = 0;
     }
@@ -3729,14 +3710,14 @@ static	int	check_special(void)
     
     if (current_allocated2 != current_allocated) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_get_stats did not count free of %d\n",
-		     amount);
+	loc_printf("   ERROR: dmalloc_get_stats did not count free of %d\n",
+		   amount);
       }
       final = 0;
     }
     if (current_pnt_n2 != current_pnt_n) {
       if (! silent_b) {
-	(void)printf("   ERROR: dmalloc_get_stats did not count pnt free\n");
+	loc_printf("   ERROR: dmalloc_get_stats did not count pnt free\n");
       }
       final = 0;
     }
@@ -3745,7 +3726,7 @@ static	int	check_special(void)
   /********************/
   
   if (! silent_b) {
-    (void)printf("  Checking append_string and friends\n");
+    loc_printf("  Checking append_string and friends\n");
   }
   
   {
@@ -3936,10 +3917,10 @@ static	void	do_interactive(void)
   char		line[128], *line_p;
   void		*pnt;
   
-  (void)printf("Malloc test program.  Type 'help' for assistance.\n");
+  loc_printf("Malloc test program.  Type 'help' for assistance.\n");
   
   while (1) {
-    (void)printf("> ");
+    loc_printf("> ");
     if (fgets(line, sizeof(line), stdin) == NULL) {
       break;
     }
@@ -3955,29 +3936,29 @@ static	void	do_interactive(void)
     
     if (strncmp(line, "?", len) == 0
 	|| strncmp(line, "help", len) == 0) {
-      (void)printf("\thelp      - print this message\n\n");
+      loc_printf("\thelp      - print this message\n\n");
       
-      (void)printf("\tmalloc    - allocate memory\n");
-      (void)printf("\tcalloc    - allocate/clear memory\n");
-      (void)printf("\trealloc   - reallocate memory\n");
-      (void)printf("\trecalloc  - reallocate cleared memory\n");
-      (void)printf("\tmemalign  - allocate aligned memory\n");
-      (void)printf("\tvalloc    - allocate page-aligned memory\n");
-      (void)printf("\tstrdup    - allocate a string\n");
-      (void)printf("\tfree      - deallocate memory\n\n");
+      loc_printf("\tmalloc    - allocate memory\n");
+      loc_printf("\tcalloc    - allocate/clear memory\n");
+      loc_printf("\trealloc   - reallocate memory\n");
+      loc_printf("\trecalloc  - reallocate cleared memory\n");
+      loc_printf("\tmemalign  - allocate aligned memory\n");
+      loc_printf("\tvalloc    - allocate page-aligned memory\n");
+      loc_printf("\tstrdup    - allocate a string\n");
+      loc_printf("\tfree      - deallocate memory\n\n");
       
-      (void)printf("\tstats     - dump heap stats to the logfile\n");
-      (void)printf("\tunfreed   - list the unfree memory to the logfile\n");
-      (void)printf("\tmark      - display the current mark value\n");
-      (void)printf("\tchanged   - display what pointers have changed\n\n");
+      loc_printf("\tstats     - dump heap stats to the logfile\n");
+      loc_printf("\tunfreed   - list the unfree memory to the logfile\n");
+      loc_printf("\tmark      - display the current mark value\n");
+      loc_printf("\tchanged   - display what pointers have changed\n\n");
       
-      (void)printf("\tverify    - check out a memory address (or all heap)\n");
-      (void)printf("\toverwrite - overwrite some memory to test errors\n");
+      loc_printf("\tverify    - check out a memory address (or all heap)\n");
+      loc_printf("\toverwrite - overwrite some memory to test errors\n");
       
-      (void)printf("\trandom    - randomly execute a number of [de] allocs\n");
-      (void)printf("\tspecial   - run some special tests\n\n");
+      loc_printf("\trandom    - randomly execute a number of [de] allocs\n");
+      loc_printf("\tspecial   - run some special tests\n\n");
       
-      (void)printf("\tquit      - quit this test program\n");
+      loc_printf("\tquit      - quit this test program\n");
       continue;
     }
     
@@ -3988,25 +3969,25 @@ static	void	do_interactive(void)
     if (strncmp(line, "malloc", len) == 0) {
       int	size;
       
-      (void)printf("How much to malloc: ");
+      loc_printf("How much to malloc: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       size = atoi(line);
-      (void)printf("malloc(%d) returned '%#lx'\n", size, (long)malloc(size));
+      loc_printf("malloc(%d) returned '%p'\n", size, malloc(size));
       continue;
     }
     
     if (strncmp(line, "calloc", len) == 0) {
       int	size;
       
-      (void)printf("How much to calloc: ");
+      loc_printf("How much to calloc: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       size = atoi(line);
-      (void)printf("calloc(%d) returned '%#lx'\n",
-		   size, (long)calloc(size, sizeof(char)));
+      loc_printf("calloc(%d) returned '%p'\n",
+		 size, calloc(size, sizeof(char)));
       continue;
     }
     
@@ -4015,14 +3996,14 @@ static	void	do_interactive(void)
       
       pnt = get_address();
       
-      (void)printf("How much to realloc: ");
+      loc_printf("How much to realloc: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       size = atoi(line);
       
-      (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
-		   (long)pnt, size, (long)realloc(pnt, size));
+      loc_printf("realloc(%p, %d) returned '%p'\n",
+		 pnt, size, realloc(pnt, size));
       
       continue;
     }
@@ -4032,14 +4013,14 @@ static	void	do_interactive(void)
       
       pnt = get_address();
       
-      (void)printf("How much to recalloc: ");
+      loc_printf("How much to recalloc: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       size = atoi(line);
       
-      (void)printf("realloc(%#lx, %d) returned '%#lx'\n",
-		   (long)pnt, size, (long)recalloc(pnt, size));
+      loc_printf("realloc(%p, %d) returned '%p'\n",
+		 pnt, size, recalloc(pnt, size));
       
       continue;
     }
@@ -4047,39 +4028,39 @@ static	void	do_interactive(void)
     if (strncmp(line, "memalign", len) == 0) {
       int	alignment, size;
       
-      (void)printf("Alignment in bytes: ");
+      loc_printf("Alignment in bytes: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       alignment = atoi(line);
-      (void)printf("How much to memalign: ");
+      loc_printf("How much to memalign: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       size = atoi(line);
-      (void)printf("memalign(%d, %d) returned '%#lx'\n",
-		   alignment, size, (long)memalign(alignment, size));
+      loc_printf("memalign(%d, %d) returned '%p'\n",
+		 alignment, size, memalign(alignment, size));
       continue;
     }
     
     if (strncmp(line, "valloc", len) == 0) {
       int	size;
       
-      (void)printf("How much to valloc: ");
+      loc_printf("How much to valloc: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       size = atoi(line);
-      (void)printf("valloc(%d) returned '%#lx'\n", size, (long)valloc(size));
+      loc_printf("valloc(%d) returned '%p'\n", size, valloc(size));
       continue;
     }
     
     if (strncmp(line, "strdup", len) == 0) {
-      (void)printf("Enter a string to strdup: ");
+      loc_printf("Enter a string to strdup: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
-      (void)printf("strdup returned '%#lx'\n", (long)strdup(line));
+      loc_printf("strdup returned '%p'\n", strdup(line));
       continue;
     }
     
@@ -4091,28 +4072,28 @@ static	void	do_interactive(void)
     
     if (strncmp(line, "stats", len) == 0) {
       dmalloc_log_stats();
-      (void)printf("Done.\n");
+      loc_printf("Done.\n");
       continue;
     }
     
     if (strncmp(line, "unfreed", len) == 0) {
       dmalloc_log_unfreed();
-      (void)printf("Done.\n");
+      loc_printf("Done.\n");
       continue;
     }
     
     if (strncmp(line, "mark", len) == 0) {
-      (void)printf("Mark is %lu.\n", dmalloc_mark());
+      loc_printf("Mark is %lu.\n", dmalloc_mark());
       continue;
     }
     
     if (strncmp(line, "changed", len) == 0) {
-      (void)printf("Enter the mark: ");
+      loc_printf("Enter the mark: ");
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
       dmalloc_log_changed(atoi(line), 1, 1, 1);
-      (void)printf("Done.\n");
+      loc_printf("Done.\n");
       continue;
     }
     
@@ -4121,7 +4102,7 @@ static	void	do_interactive(void)
       
       pnt = get_address();
       memcpy((char *)pnt, overwrite, strlen(overwrite));
-      (void)printf("Done.\n");
+      loc_printf("Done.\n");
       continue;
     }
     
@@ -4129,7 +4110,7 @@ static	void	do_interactive(void)
     if (strncmp(line, "random", len) == 0) {
       int	iter_n;
       
-      (void)printf("How many iterations[%ld]: ", default_iter_n);
+      loc_printf("How many iterations[%ld]: ", default_iter_n);
       if (fgets(line, sizeof(line), stdin) == NULL) {
 	break;
       }
@@ -4141,10 +4122,10 @@ static	void	do_interactive(void)
       }
       
       if (do_random(iter_n)) {
-	(void)printf("It succeeded.\n");
+	loc_printf("It succeeded.\n");
       }
       else {
-	(void)printf("It failed.\n");
+	loc_printf("It failed.\n");
       }
       
       continue;
@@ -4153,10 +4134,10 @@ static	void	do_interactive(void)
     /* do special checks */
     if (strncmp(line, "special", len) == 0) {
       if (check_special()) {
-	(void)printf("It succeeded.\n");
+	loc_printf("It succeeded.\n");
       }
       else {
-	(void)printf("It failed.\n");
+	loc_printf("It failed.\n");
       }
       
       continue;
@@ -4165,16 +4146,15 @@ static	void	do_interactive(void)
     if (strncmp(line, "verify", len) == 0) {
       int	ret;
       
-      (void)printf("If the address is 0, verify will check the whole heap.\n");
+      loc_printf("If the address is 0, verify will check the whole heap.\n");
       pnt = get_address();
       ret = dmalloc_verify(pnt);
-      (void)printf("dmalloc_verify(%#lx) returned '%s'\n",
-		   (long)pnt,
-		   (ret == DMALLOC_NOERROR ? "success" : "failure"));
+      loc_printf("dmalloc_verify(%p) returned '%s'\n",
+		 pnt, (ret == DMALLOC_NOERROR ? "success" : "failure"));
       continue;
     }
     
-    (void)printf("Unknown command '%s'.  Type 'help' for assistance.\n", line);
+    loc_printf("Unknown command '%s'.  Type 'help' for assistance.\n", line);
   }
 }
 
@@ -4199,7 +4179,7 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
     strcpy(file_line, "unknown");
   }
   else if (line == 0) {
-    (void)loc_snprintf(file_line, sizeof(file_line), "ra=%#lx", (long)file);
+    (void)loc_snprintf(file_line, sizeof(file_line), "ra=%p", file);
   }
   else {
     (void)loc_snprintf(file_line, sizeof(file_line), "%s:%d", file, line);
@@ -4207,55 +4187,54 @@ static	void	track_alloc_trxn(const char *file, const unsigned int line,
   
   switch (func_id) {
   case DMALLOC_FUNC_MALLOC:
-    (void)printf("%s malloc %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    loc_printf("%s malloc %ld bytes got %p\n",
+	       file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_CALLOC:
-    (void)printf("%s calloc %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    loc_printf("%s calloc %ld bytes got %p\n",
+	       file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_REALLOC:
-    (void)printf("%s realloc %ld bytes from %#lx got %#lx\n",
-		 file_line, (long)byte_size, (long)old_addr, (long)new_addr);
+    loc_printf("%s realloc %ld bytes from %p got %p\n",
+	       file_line, (long)byte_size, old_addr, new_addr);
     break;
   case DMALLOC_FUNC_RECALLOC:
-    (void)printf("%s recalloc %ld bytes from %#lx got %#lx\n",
-		 file_line, (long)byte_size, (long)old_addr, (long)new_addr);
+    loc_printf("%s recalloc %ld bytes from %p got %p\n",
+	       file_line, (long)byte_size, old_addr, new_addr);
     break;
   case DMALLOC_FUNC_MEMALIGN:
-    (void)printf("%s memalign %ld bytes alignment %ld got %#lx\n",
-		 file_line, (long)byte_size, (long)alignment, (long)new_addr);
+    loc_printf("%s memalign %ld bytes alignment %ld got %p\n",
+	       file_line, (long)byte_size, (long)alignment, new_addr);
     break;
   case DMALLOC_FUNC_VALLOC:
-    (void)printf("%s valloc %ld bytes alignment %ld got %#lx\n",
-		 file_line, (long)byte_size, (long)alignment, (long)new_addr);
+    loc_printf("%s valloc %ld bytes alignment %ld got %p\n",
+	       file_line, (long)byte_size, (long)alignment, new_addr);
     break;
   case DMALLOC_FUNC_STRDUP:
-    (void)printf("%s strdup %ld bytes ot %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    loc_printf("%s strdup %ld bytes ot %p\n",
+	       file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_FREE:
-    (void)printf("%s free %#lx\n", file_line, (long)old_addr);
+    loc_printf("%s free %p\n", file_line, old_addr);
     break;
   case DMALLOC_FUNC_NEW:
-    (void)printf("%s new %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    loc_printf("%s new %ld bytes got %p\n",
+	       file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_NEW_ARRAY:
-    (void)printf("%s new[] %ld bytes got %#lx\n",
-		 file_line, (long)byte_size, (long)new_addr);
+    loc_printf("%s new[] %ld bytes got %p\n",
+	       file_line, (long)byte_size, new_addr);
     break;
   case DMALLOC_FUNC_DELETE:
-    (void)printf("%s delete %#lx\n", file_line, (long)old_addr);
+    loc_printf("%s delete %p\n", file_line, old_addr);
     break;
   case DMALLOC_FUNC_DELETE_ARRAY:
-    (void)printf("%s delete[] %#lx\n", file_line, (long)old_addr);
+    loc_printf("%s delete[] %p\n", file_line, old_addr);
     break;
   default:
-    (void)printf("%s unknown function %ld bytes, %ld alignment, %#lx old-addr "
-		 "%#lx new-addr\n",
-		 file_line, (long)byte_size, (long)alignment, (long)old_addr,
-		 (long)new_addr);
+    loc_printf("%s unknown function %ld bytes, %ld alignment, %p old-addr "
+	       "%p new-addr\n",
+	       file_line, (long)byte_size, (long)alignment, old_addr, new_addr);
     break;
   }
 }
@@ -4274,7 +4253,7 @@ int	main(int argc, char **argv)
   if (env_string != NULL) {
     dmalloc_debug_setup(env_string);
     if (! silent_b) {
-      (void)printf("Set dmalloc environment to: %s\n", env_string);
+      loc_printf("Set dmalloc environment to: %s\n", env_string);
     }
   }
   
@@ -4298,7 +4277,7 @@ int	main(int argc, char **argv)
   _dmalloc_srand(seed_random);
   
   if (! silent_b) {
-    (void)printf("Random seed is %u\n", seed_random);
+    loc_printf("Random seed is %u\n", seed_random);
   }
   
   dmalloc_message("random seed is %u\n", seed_random);
@@ -4315,28 +4294,28 @@ int	main(int argc, char **argv)
     
     /* some special tests to run first thing */
     if (! silent_b) {
-      (void)printf("Running initial tests...\n");
+      loc_printf("Running initial tests...\n");
     }
     if (check_initial_special()) {
       if (! silent_b) {
-	(void)printf("  Succeeded.\n");
+	loc_printf("  Succeeded.\n");
       }
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Initial tests failed.  ");
+	loc_printf("ERROR: Initial tests failed.  ");
 	if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-	  (void)printf("No dmalloc errno set.\n");
+	  loc_printf("No dmalloc errno set.\n");
 	} else {
-	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
       }
       else {
-	(void)printf("  Failed.  ");
+	loc_printf("  Failed.  ");
 	if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-	  (void)printf("No dmalloc errno set.\n");
+	  loc_printf("No dmalloc errno set.\n");
 	} else {
-	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
       }
       final = 1;
@@ -4350,31 +4329,31 @@ int	main(int argc, char **argv)
   }
   else {
     if (! silent_b) {
-      (void)printf("Running %ld tests (use -%c for interactive)...\n",
-		   default_iter_n, INTER_CHAR);
+      loc_printf("Running %ld tests (use -%c for interactive)...\n",
+		 default_iter_n, INTER_CHAR);
     }
     (void)fflush(stdout);
     
     if (do_random(default_iter_n)) {
       if (! silent_b) {
-	(void)printf("  Succeeded.\n");
+	loc_printf("  Succeeded.\n");
       }
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Random tests failed.  ");
+	loc_printf("ERROR: Random tests failed.  ");
 	if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-	  (void)printf("No dmalloc errno set.\n");
+	  loc_printf("No dmalloc errno set.\n");
 	} else {
-	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
       }
       else {
-	(void)printf("  Failed.  ");
+	loc_printf("  Failed.  ");
 	if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-	  (void)printf("No dmalloc errno set.\n");
+	  loc_printf("No dmalloc errno set.\n");
 	} else {
-	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
       }
       final = 1;
@@ -4388,28 +4367,28 @@ int	main(int argc, char **argv)
       && (! (silent_b
 	     && (dmalloc_debug_current() & DMALLOC_DEBUG_ERROR_ABORT)))) {
     if (! silent_b) {
-      (void)printf("Running special tests...\n");
+      loc_printf("Running special tests...\n");
     }
     if (check_special()) {
       if (! silent_b) {
-	(void)printf("  Succeeded.\n");
+	loc_printf("  Succeeded.\n");
       }
     }
     else {
       if (silent_b) {
-	(void)printf("ERROR: Running special tests failed.  ");
+	loc_printf("ERROR: Running special tests failed.  ");
 	if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-	  (void)printf("No dmalloc errno set.\n");
+	  loc_printf("No dmalloc errno set.\n");
 	} else {
-	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
       }
       else {
-	(void)printf("  Failed.  ");
+	loc_printf("  Failed.  ");
 	if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-	  (void)printf("No dmalloc errno set.\n");
+	  loc_printf("No dmalloc errno set.\n");
 	} else {
-	  (void)printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+	  loc_printf("Last dmalloc error: %s (err %d)\n", dmalloc_strerror(dmalloc_errno), dmalloc_errno);
 	}
       }
       final = 1;
@@ -4426,12 +4405,12 @@ int	main(int argc, char **argv)
      * the only way we can reproduce the problem.
      */
     if (silent_b) {
-      (void)printf("Random seed is %u.  ", seed_random);
+      loc_printf("Random seed is %u.  ", seed_random);
     }
     if (dmalloc_errno == DMALLOC_ERROR_NONE) {
-      (void)printf("No final dmalloc errno set.\n");
+      loc_printf("No final dmalloc errno set.\n");
     } else {
-      (void)printf("Final dmalloc error: %s (err %d)\n",
+      loc_printf("Final dmalloc error: %s (err %d)\n",
 		   dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }
@@ -4441,8 +4420,8 @@ int	main(int argc, char **argv)
   /* last thing is to verify the heap */
   ret = dmalloc_verify(NULL /* check all heap */);
   if (ret != DMALLOC_NOERROR) {
-    (void)printf("Final dmalloc_verify returned failure: %s (err %d)\n",
-		 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
+    loc_printf("Final dmalloc_verify returned failure: %s (err %d)\n",
+	       dmalloc_strerror(dmalloc_errno), dmalloc_errno);
   }
   
   /* you will need this if you can't auto-shutdown */

@@ -30,12 +30,13 @@
  * the user should therefore be send to stderr.
  */
 
-#include <stdio.h>				/* for stderr */
-
 #define DMALLOC_DISABLE
 
 #if HAVE_STRING_H
 # include <string.h>
+#endif
+#if HAVE_STDIO_H
+# include <stdio.h>
 #endif
 #if HAVE_STDLIB_H
 # include <stdlib.h>
@@ -278,29 +279,29 @@ static	void	dump_debug(const unsigned long val)
       BIT_CLEAR(work, attr_p->at_value);
       
       if (col_c == 0) {
-	(void)fprintf(stderr, "   ");
+	loc_fprintf(stderr, "   ");
 	col_c += 3;
       }
       
       if (very_verbose_b) {
-	(void)fprintf(stderr, "%s -- %s (%#lx)\n",
-		      attr_p->at_string, attr_p->at_desc, attr_p->at_value);
+	loc_fprintf(stderr, "%s -- %s (%#lx)\n",
+		   attr_p->at_string, attr_p->at_desc, attr_p->at_value);
 	col_c = 0;
       }
       else {
 	str = attr_p->at_string;
 	len = strlen(str);
 	if (col_c + len + 2 > LINE_WIDTH) {
-	  (void)fprintf(stderr, "\n");
-	  (void)fprintf(stderr, "   ");
+	  loc_fprintf(stderr, "\n");
+	  loc_fprintf(stderr, "   ");
 	  col_c = 3;
 	}
-	(void)fprintf(stderr, "%s", str);
+	loc_fprintf(stderr, "%s", str);
 	col_c += len;
 	
 	/* if we've got more to go then print the , */
 	if (work != 0) {
-	  (void)fprintf(stderr, ", ");
+	  loc_fprintf(stderr, ", ");
 	  col_c += 2;
 	}
       }
@@ -312,12 +313,12 @@ static	void	dump_debug(const unsigned long val)
   }
   
   if (col_c != 0) {
-    (void)fprintf(stderr, "\n");
+    loc_fprintf(stderr, "\n");
   }
   
   if (work != 0) {
-    (void)fprintf(stderr, "%s: warning, unknown debug flag(s): %#lx\n",
-		  argv_program, work);
+    loc_fprintf(stderr, "%s: warning, unknown debug flag(s): %#lx\n",
+		argv_program, work);
   }
 }
 
@@ -336,14 +337,14 @@ static	long	token_to_value(const char *tok)
   }
   
   if (attr_p->at_string == NULL) {
-    (void)fprintf(stderr, "%s: unknown token '%s'\n", argv_program, tok);
+    loc_fprintf(stderr, "%s: unknown token '%s'\n", argv_program, tok);
     return 0;
   }
   
   /* if we have a 0 value and not none then this is a disabled token */
   if (attr_p->at_value == 0 && strcmp(tok, "none") != 0) {
-    (void)fprintf(stderr, "%s: token '%s' has been disabled: %s\n",
-		  argv_program, tok, attr_p->at_desc);
+    loc_fprintf(stderr, "%s: token '%s' has been disabled: %s\n",
+		argv_program, tok, attr_p->at_desc);
     return 0;
   }
   
@@ -384,7 +385,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
 	continue;
       }
       if (*tok_p == '\0') {
-	(void)fprintf(stderr, "Invalid start of line: %s\n", buf_p);
+	loc_fprintf(stderr, "Invalid start of line: %s\n", buf_p);
 	continue;
       }
       
@@ -524,8 +525,8 @@ static	long	find_tag(const long debug_value, const char *tag_find,
       /* find our home directory */
       home_p = loc_getenv(HOME_ENVIRON, env_buf, sizeof(env_buf), 0);
       if (home_p == NULL) {
-	(void)fprintf(stderr, "%s: could not find variable '%s'\n",
-		      argv_program, HOME_ENVIRON);
+	loc_fprintf(stderr, "%s: could not find variable '%s'\n",
+		    argv_program, HOME_ENVIRON);
 	exit(1);
       }
       
@@ -556,8 +557,8 @@ static	long	find_tag(const long debug_value, const char *tag_find,
     }
     /* if the specified was not found, return error */
     if (ret != FILE_FOUND) {
-      (void)fprintf(stderr, "%s: could not read '%s': ",
-		    argv_program, inpath);
+      loc_fprintf(stderr, "%s: could not read '%s': ",
+		  argv_program, inpath);
       perror("");
       exit(1);
     }
@@ -596,12 +597,11 @@ static	long	find_tag(const long debug_value, const char *tag_find,
     /* did we not find the token? */
     if (def_p->de_string == NULL) {
       if (path_p == NULL) {
-	(void)fprintf(stderr, "%s: unknown tag '%s'\n",
-		      argv_program, tag_find);
+	loc_fprintf(stderr, "%s: unknown tag '%s'\n", argv_program, tag_find);
       }
       else {
-	(void)fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
-		      argv_program, tag_find, path_p);
+	loc_fprintf(stderr, "%s: could not find tag '%s' in '%s'\n",
+		    argv_program, tag_find, path_p);
       }
       exit(1);
     }
@@ -632,8 +632,8 @@ static	void	list_tags(void)
       /* if no file in current directory, try home directory */
       home_p = loc_getenv(HOME_ENVIRON, env_buf, sizeof(env_buf), 0);
       if (home_p == NULL) {
-	(void)fprintf(stderr, "%s: could not find variable '%s'\n",
-		      argv_program, HOME_ENVIRON);
+	loc_fprintf(stderr, "%s: could not find variable '%s'\n",
+		    argv_program, HOME_ENVIRON);
 	exit(1);
       }
       
@@ -653,8 +653,8 @@ static	void	list_tags(void)
     rc_file = fopen(inpath, "r");
     /* we assume that if the file was specified, it must be there */
     if (rc_file == NULL) {
-      (void)fprintf(stderr, "%s: could not read '%s': ",
-		    argv_program, inpath);
+      loc_fprintf(stderr, "%s: could not read '%s': ",
+		  argv_program, inpath);
       perror("");
       exit(1);
     }
@@ -662,32 +662,31 @@ static	void	list_tags(void)
   }
   
   if (rc_file != NULL) {
-    (void)fprintf(stderr, "Tags available from '%s':\n", path_p);
+    loc_fprintf(stderr, "Tags available from '%s':\n", path_p);
     
     while (read_next_token(rc_file, &new_debug, token, sizeof(token)) == 1) {
       if (verbose_b) {
-	(void)fprintf(stderr, "%s (%#lx):\n", token, new_debug);
+	loc_fprintf(stderr, "%s (%#lx):\n", token, new_debug);
 	dump_debug(new_debug);
       }
       else {
-	(void)fprintf(stderr, "%s\n", token);
+	loc_fprintf(stderr, "%s\n", token);
       }
     }
     
     (void)fclose(rc_file);
   }
   
-  (void)fprintf(stderr, "\n");
-  (void)fprintf(stderr, "Tags available by default:\n");
+  loc_fprintf(stderr, "\n");
+  loc_fprintf(stderr, "Tags available by default:\n");
   
   for (def_p = defaults; def_p->de_string != NULL; def_p++) {
     if (verbose_b) {
-      (void)fprintf(stderr, "%s (%#lx):\n",
-		    def_p->de_string, def_p->de_flags);
+      loc_fprintf(stderr, "%s (%#lx):\n", def_p->de_string, def_p->de_flags);
       dump_debug(def_p->de_flags);
     }
     else {
-      (void)fprintf(stderr, "%s\n", def_p->de_string);
+      loc_fprintf(stderr, "%s\n", def_p->de_string);
     }
   }
 }
@@ -717,77 +716,73 @@ static	void	dump_current(void)
 			   &loc_start_size, &limit_val);
   
   if (flags == 0) {
-    (void)fprintf(stderr, "Debug-Flags  not-set\n");
+    loc_fprintf(stderr, "Debug-Flags  not-set\n");
   }
   else {
     (void)find_tag(flags, NULL, token, sizeof(token));
-    (void)fprintf(stderr, "Debug-Flags %#x (%u) (%s)\n",
-		  flags, flags, token);
+    loc_fprintf(stderr, "Debug-Flags %#x (%u) (%s)\n", flags, flags, token);
     if (verbose_b) {
       dump_debug(flags);
     }
   }
   
   if (addr == NULL) {
-    (void)fprintf(stderr, "Address      not-set\n");
+    loc_fprintf(stderr, "Address      not-set\n");
   }
   else {
     if (addr_count == 0) {
-      (void)fprintf(stderr, "Address      %#lx\n", (long)addr);
+      loc_fprintf(stderr, "Address      %p\n", addr);
     }
     else {
-      (void)fprintf(stderr, "Address      %#lx, count = %lu\n",
-		    (long)addr, addr_count);
+      loc_fprintf(stderr, "Address      %p, count = %lu\n", addr, addr_count);
     }
   }
   
   if (inter == 0) {
-    (void)fprintf(stderr, "Interval     not-set\n");
+    loc_fprintf(stderr, "Interval     not-set\n");
   }
   else {
-    (void)fprintf(stderr, "Interval     %lu\n", inter);
+    loc_fprintf(stderr, "Interval     %lu\n", inter);
   }
   
   if (lock_on == 0) {
-    (void)fprintf(stderr, "Lock-On      not-set\n");
+    loc_fprintf(stderr, "Lock-On      not-set\n");
   }
   else {
-    (void)fprintf(stderr, "Lock-On      %d\n", lock_on);
+    loc_fprintf(stderr, "Lock-On      %d\n", lock_on);
   }
   
   if (log_path == NULL) {
-    (void)fprintf(stderr, "Logpath      not-set\n");
+    loc_fprintf(stderr, "Logpath      not-set\n");
   }
   else {
-    (void)fprintf(stderr, "Logpath      '%s'\n", log_path);
+    loc_fprintf(stderr, "Logpath      '%s'\n", log_path);
   }
   
   if (limit_val == 0) {
-    (void)fprintf(stderr, "Mem-Limit    not-set\n");
+    loc_fprintf(stderr, "Mem-Limit    not-set\n");
   }
   else {
-    (void)fprintf(stderr, "Mem-Limit    %lu\n", limit_val);
+    loc_fprintf(stderr, "Mem-Limit    %lu\n", limit_val);
   }
   
   if (loc_start_file != NULL) {
-    (void)fprintf(stderr, "Start-File   '%s', line = %d\n",
-		  loc_start_file, loc_start_line);
+    loc_fprintf(stderr, "Start-File   '%s', line = %d\n", loc_start_file, loc_start_line);
   }
   else if (loc_start_iter > 0) {
-    (void)fprintf(stderr, "Start-Count  %lu\n", loc_start_iter);
+    loc_fprintf(stderr, "Start-Count  %lu\n", loc_start_iter);
   }
   else if (loc_start_size > 0) {
-    (void)fprintf(stderr, "Start-Size   %lu\n", loc_start_size);
+    loc_fprintf(stderr, "Start-Size   %lu\n", loc_start_size);
   }
   else {
-    (void)fprintf(stderr, "Start        not-set\n");
+    loc_fprintf(stderr, "Start        not-set\n");
   }
   
-  (void)fprintf(stderr, "\n");
-  (void)fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
-  (void)fprintf(stderr,
-		"  For a list of the command-line options enter: %s --usage\n",
-		argv_argv[0]);
+  loc_fprintf(stderr, "\n");
+  loc_fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
+  loc_fprintf(stderr, "  For a list of the command-line options enter: %s --usage\n",
+	      argv_argv[0]);
 }
 
 /*
@@ -818,8 +813,8 @@ static	void    set_variable(const char *var, const char *value)
     (void)printf("%s", comm);
   }
   if ((! make_changes_b) || verbose_b) {
-    (void)fprintf(stderr, "Outputed:\n");
-    (void)fprintf(stderr, "%s", comm);
+    loc_fprintf(stderr, "Outputed:\n");
+    loc_fprintf(stderr, "%s", comm);
   }
 }
 
@@ -846,10 +841,9 @@ static	char	*local_strerror(const int error_num)
  */
 static	void	header(void)
 {
-  (void)fprintf(stderr,
-		"Debug Malloc Utility: http://dmalloc.com/\n");
-  (void)fprintf(stderr,
-		"  This utility helps set the Debug Malloc environment variables.\n");
+  loc_fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
+  loc_fprintf(stderr,
+	      "  This utility helps set the Debug Malloc environment variables.\n");
 }
 
 int	main(int argc, char **argv)
@@ -875,9 +869,8 @@ int	main(int argc, char **argv)
   
   if (help_b) {
     header();
-    (void)fprintf(stderr,
-		  "  For a list of the command-line options enter: %s --usage\n",
-		  argv_argv[0]);
+    loc_fprintf(stderr, "  For a list of the command-line options enter: %s --usage\n",
+		argv_argv[0]);
     exit(0);
   }
   if (usage_b) {
@@ -886,12 +879,11 @@ int	main(int argc, char **argv)
     exit(0);
   }
   if (version_b) {
-    (void)fprintf(stderr, "Dmalloc utility version string is: %s\n",
-		  argv_version_string);
-    (void)fprintf(stderr,
-		  "  NOTE: Library linked with your application may be a different version.\n");
-    (void)fprintf(stderr,
-		  "        Check top of logfile after application is run for library version.\n");
+    loc_fprintf(stderr, "Dmalloc utility version string is: %s\n", argv_version_string);
+    loc_fprintf(stderr,
+		"  NOTE: Library linked with your application may be a different version.\n");
+    loc_fprintf(stderr,
+		"        Check top of logfile after application is run for library version.\n");
     exit(0);
   }
   
@@ -934,8 +926,8 @@ int	main(int argc, char **argv)
   }
   else {
     if (argv_was_used(args, DEBUG_ARG)) {
-      (void)fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
-		    argv_program, tag);
+      loc_fprintf(stderr, "%s: warning -d ignored, processing tag '%s'\n",
+		  argv_program, tag);
     }
     set_b = 1;
     debug = find_tag(0L, tag, NULL, 0);
@@ -1029,9 +1021,8 @@ int	main(int argc, char **argv)
   }
   
   if (errno_to_print > 0) {
-    (void)fprintf(stderr, "%s: dmalloc_errno value '%d' = \n",
-		  argv_program, errno_to_print);
-    (void)fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
+    loc_fprintf(stderr, "%s: dmalloc_errno value '%d' = \n", argv_program, errno_to_print);
+    loc_fprintf(stderr, "   '%s'\n", local_strerror(errno_to_print));
   }
   
   if (list_tags_b) {
@@ -1042,7 +1033,7 @@ int	main(int argc, char **argv)
     attr_t		*attr_p;
     unsigned int	left = 0x7fffffff;
     
-    (void)fprintf(stderr, "Debug Tokens:\n");
+    loc_fprintf(stderr, "Debug Tokens:\n");
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
       /* skip any disabled tokens */
       if (attr_p->at_value == 0 && strcmp(attr_p->at_string, "none") != 0) {
@@ -1053,15 +1044,14 @@ int	main(int argc, char **argv)
 	continue;
       }
       if (very_verbose_b) {
-	(void)fprintf(stderr, "%s -- %s (%#lx)\n",
+	loc_fprintf(stderr, "%s -- %s (%#lx)\n",
 		      attr_p->at_string, attr_p->at_desc, attr_p->at_value);
       }
       else if (verbose_b) {
-	(void)fprintf(stderr, "%s -- %s\n",
-		      attr_p->at_string, attr_p->at_desc);
+	loc_fprintf(stderr, "%s -- %s\n", attr_p->at_string, attr_p->at_desc);
       }
       else {
-	(void)fprintf(stderr, "%s\n", attr_p->at_string);
+	loc_fprintf(stderr, "%s\n", attr_p->at_string);
       }
       BIT_CLEAR(left, attr_p->at_value);
     }

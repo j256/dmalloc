@@ -19,8 +19,9 @@
  * The author may be contacted via http://dmalloc.com/
  */
 
-#include <stdio.h>				/* for stdin */
-
+#if HAVE_STDIO_H
+# include <stdio.h>				/* for FILE */
+#endif
 #if HAVE_STDLIB_H
 # include <stdlib.h>				/* for exit... */
 #endif

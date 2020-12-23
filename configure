@@ -644,6 +644,7 @@ HAVE_SYS_TYPES_H
 HAVE_UNISTD_H
 HAVE_STRING_H
 HAVE_STDLIB_H
+HAVE_STDIO_H
 HAVE_STDARG_H
 EGREP
 GREP
@@ -4207,6 +4208,18 @@ if test "x$ac_cv_header_stdarg_h" = xyes; then :
 else
   $as_echo "#define HAVE_STDARG_H 0" >>confdefs.h
  HAVE_STDARG_H=0
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "stdio.h" "ac_cv_header_stdio_h" "$ac_includes_default"
+if test "x$ac_cv_header_stdio_h" = xyes; then :
+  $as_echo "#define HAVE_STDIO_H 1" >>confdefs.h
+ HAVE_STDIO_H=1
+
+else
+  $as_echo "#define HAVE_STDIO_H 0" >>confdefs.h
+ HAVE_STDIO_H=0
 
 fi
 

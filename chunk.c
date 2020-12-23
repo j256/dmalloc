@@ -749,7 +749,7 @@ static	int	expand_chars(const void *buf, const int buf_size,
       if (out_p + 2 >= bounds_p) {
 	break;
       }
-      out_p += loc_snprintf(out_p, bounds_p - out_p, "\\%c", *(spec_p - 1));
+      out_p = append_format(out_p, bounds_p, "\\%c", *(spec_p - 1));
       continue;
     }
     
@@ -765,7 +765,7 @@ static	int	expand_chars(const void *buf, const int buf_size,
       if (out_p + 4 >= bounds_p) {
 	break;
       }
-      out_p += loc_snprintf(out_p, bounds_p - out_p, "\\%03o", *buf_p);
+      out_p = append_format(out_p, bounds_p, "\\%03o", *buf_p);
     }
   }
   /* try to punch the null if we have space in case the %.*s doesn't work */
@@ -855,15 +855,14 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
   buf_p = buf;
   bounds_p = buf_p + buf_size;
   
-  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%p", user_pnt);
+  buf_p = append_format(buf_p, bounds_p, "%p", user_pnt);
   
 #if LOG_PNT_SEEN_COUNT
-  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|s%lu", alloc_p->sa_seen_c);
+  buf_p = append_format(buf_p, bounds_p, "|s%lu", alloc_p->sa_seen_c);
 #endif
   
 #if LOG_PNT_ITERATION
-  buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|i%lu",
-			alloc_p->sa_iteration);
+  buf_p = append_format(buf_p, bounds_p, "|i%lu", alloc_p->sa_iteration);
 #endif
   
   if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_ELAPSED_TIME)) {
@@ -876,7 +875,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
 #if LOG_PNT_TIMEVAL
     {
       char	time_buf[64];
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
+      buf_p = append_format(buf_p, bounds_p, "|w%s",
 			    _dmalloc_ptimeval(&alloc_p->sa_timeval, time_buf,
 					      sizeof(time_buf), elapsed_b));
     }
@@ -884,7 +883,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
 #if LOG_PNT_TIME
     {
       char	time_buf[64];
-      buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|w%s",
+      buf_p = append_format(buf_p, bounds_p, "|w%s",
 			    _dmalloc_ptime(&alloc_p->sa_time, time_buf,
 					   sizeof(time_buf), elapsed_b));
     }
@@ -896,11 +895,12 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
   {
     char	thread_id[256];
     
-    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "|t");
+    buf_p = append_string(buf_p, bounds_p, "|t");
     THREAD_ID_TO_STRING(thread_id, sizeof(thread_id), alloc_p->sa_thread_id);
-    buf_p += loc_snprintf(buf_p, bounds_p - buf_p, "%s", thread_id);
+    buf_p = append_string(buf_p, bounds_p, thread_id);
   }
 #endif
+  append_null(buf_p, bounds_p);
   
   return buf;
 }
@@ -1546,7 +1546,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
    */
   if (pnt_info.pi_valloc_b) {
     
-    if ((long)pnt_info.pi_user_start % BLOCK_SIZE != 0) {
+    if ((PNT_ARITH_TYPE)pnt_info.pi_user_start % BLOCK_SIZE != 0) {
       dmalloc_errno = DMALLOC_ERROR_NOT_ON_BLOCK;
       return 0;
     }
@@ -2742,10 +2742,10 @@ void	_dmalloc_chunk_log_stats(void)
 		  BLOCK_SIZE, ALLOCATION_ALIGNMENT);
   
   /* general heap information with blocks */
-  dmalloc_message("heap address range: %p to %p, %ld bytes",
-		  _dmalloc_heap_low, _dmalloc_heap_high,
-		  (unsigned long)_dmalloc_heap_high -
-		  (unsigned long)_dmalloc_heap_low);
+  unsigned long diff = (PNT_ARITH_TYPE)_dmalloc_heap_high -
+    (PNT_ARITH_TYPE)_dmalloc_heap_low;
+  dmalloc_message("heap address range: %p to %p, %lu bytes",
+		  _dmalloc_heap_low, _dmalloc_heap_high, diff);
   dmalloc_message("    user blocks: %ld blocks, %ld bytes (%ld%%)",
 		  user_block_c, user_space,
 		  (tot_space < 100 ? 0 : user_space / (tot_space / 100)));
