@@ -1,6 +1,7 @@
 Version 5.6.4 (12/??/2020):
 	* Fixed shared libary creation.  Thanks to @ffontaine and Alex Suykov.
 	* Fixed one more pointer arithmetic issue.  Thanks to aitap.
+	* Better configuring of the pointer arithmetic type.
 
 Version 5.6.3 (12/23/2020):
 	* Fixed missing dmallocc.o <- dmalloc.h dependency.  Thanks to @ffontaine.
