@@ -5296,18 +5296,16 @@ fi
 
 
 if test "x$getenv_safe" != "xyes" && test "x$have_getenvironmentvariablea" != "xyes" ; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Since getenv is not safe, you may want to add the" >&5
-$as_echo "$as_me: WARNING: Since getenv is not safe, you may want to add the" >&2;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: following code to the front of main():" >&5
-$as_echo "$as_me: WARNING: following code to the front of main():" >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Since getenv allocates memory, it is not safe for dmalloc to use." >&5
+$as_echo "$as_me: WARNING: Since getenv allocates memory, it is not safe for dmalloc to use." >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You may want to add the following code to the front of main():" >&5
+$as_echo "$as_me: WARNING: You may want to add the following code to the front of main():" >&2;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:   #ifdef DMALLOC" >&5
 $as_echo "$as_me: WARNING:   #ifdef DMALLOC" >&2;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:     dmalloc_debug_setup(getenv(\"DMALLOC_OPTIONS\"));" >&5
 $as_echo "$as_me: WARNING:     dmalloc_debug_setup(getenv(\"DMALLOC_OPTIONS\"));" >&2;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:   #endif" >&5
 $as_echo "$as_me: WARNING:   #endif" >&2;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You will need to compile your program with: -DDMALLOC" >&5
-$as_echo "$as_me: WARNING: You will need to compile your program with: -DDMALLOC" >&2;}
 fi
 
 ############
