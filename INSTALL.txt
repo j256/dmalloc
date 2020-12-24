@@ -22,8 +22,8 @@ To configure, compile, and install the library, follow these steps carefully.
      `--disable-cxx' option if you do not want the Makefile to build the C++ version of dmalloc.
      You may want to use the `--enable-threads' option to build the threaded version of dmalloc.
      You may want to use the `--enable-shlib' option to build the shared versions of the dmalloc
-     libraries.  `sh ./configure --help' lists the available options to configure.  Configure should
-     generate the `Makefile' and configuration files automatically.
+     libraries.  `sh ./configure --help' lists the available options to configure.  Configure
+     should generate the `Makefile' and configuration files automatically.
 
   5. You may want to examine the `Makefile' and `conf.h' files created by configure to make sure it
      did its job correctly.
@@ -67,8 +67,8 @@ To configure, compile, and install the library, follow these steps carefully.
      you can build it by typing `make cxx'.  You should link this library into your C++ programs
      instead of `libdmalloc.a'.  See the `dmallocc.cc' C++ file which contains basic code to
      overload the `new', `new[]', `delete', and `delete[]' C++ operators.  My apologies on the
-     minimal C++ support.  I am still living in a mostly C world.  Any help improving this
-     interface without sacrificing portability would be appreciated.
+     minimal C++ support.  I am still living in a mostly C world.  Any help improving this interface
+     without sacrificing portability would be appreciated.
 
  11. Typing `make light' should build and run the `dmalloc_t' test program through a set of light
      trials.  By default this will execute `dmalloc_t' 5 times - each time will execute 10,000
@@ -126,7 +126,7 @@ following things to make use of the library:
      If your shell does not support the `command' function then try:
 
           function dmalloc { eval `\dmalloc -b $*`; }
-     or
+     or use a full path to where the dmalloc binary is installed:
           function dmalloc { eval `/usr/local/bin/dmalloc -b $*`; }
 
      If you are still using csh or tcsh, you should add the following to your `.cshrc' file (notice
@@ -163,7 +163,7 @@ following things to make use of the library:
   8. Enable the debugging features by typing `dmalloc -l logfile -i 100 low' (for example).  You
      should not see any messages printed by the dmalloc utility (see NOTE below).  This will:
 
-        * Set the malloc logfile name to `logfile' (`-l logfile').  For programs which change
+        * Set the malloc logfile name to `logfile' (`-l logfile'). For programs which change
           directories, you may want to specify the full path to your logfile.
 
         * Have the library check itself every 100 iterations (`-i 100').  This controls how fast
@@ -233,8 +233,8 @@ fixed and a new release can be published before people encounter them.
 
        3. Make sure that your program has been compiled correctly with the dmalloc library.  The
           `ident' program should show chunk.c and other dmalloc files compiled into your program.
-          You can also do `strings -a your-program | grep chunk.c' and look for something like `$Id:
-          chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $' with different versions and date
+          You can also do `strings -a your-program | grep chunk.c' and look for something like
+          `$Id: chunk.c,v 1.152 1999/08/25 12:37:01 gray Exp $' with different versions and date
           information.  If this doesn't show up then chances are dmalloc was not linked into your
           program.
 
