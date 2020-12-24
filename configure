@@ -642,6 +642,7 @@ shlibdir
 HAVE_SYS_MMAN_H
 HAVE_SYS_TYPES_H
 HAVE_UNISTD_H
+HAVE_STRINGS_H
 HAVE_STRING_H
 HAVE_STDLIB_H
 HAVE_STDIO_H
@@ -4244,6 +4245,18 @@ if test "x$ac_cv_header_string_h" = xyes; then :
 else
   $as_echo "#define HAVE_STRING_H 0" >>confdefs.h
  HAVE_STRING_H=0
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "strings.h" "ac_cv_header_strings_h" "$ac_includes_default"
+if test "x$ac_cv_header_strings_h" = xyes; then :
+  $as_echo "#define HAVE_STRINGS_H 1" >>confdefs.h
+ HAVE_STRINGS_H=1
+
+else
+  $as_echo "#define HAVE_STRINGS_H 0" >>confdefs.h
+ HAVE_STRINGS_H=0
 
 fi
 
