@@ -28,6 +28,9 @@
 #if HAVE_STRING_H
 # include <string.h>				/* for string funcs */
 #endif
+#if HAVE_STRINGS_H
+# include <strings.h>				/* for bcopy funcs */
+#endif
 #if HAVE_UNISTD_H
 # include <unistd.h>				/* for getpid */
 #endif
