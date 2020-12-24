@@ -32,9 +32,7 @@
  *	dmalloc.spec
  *	dmalloc.texi
  *	dmalloc.h.3 (DMALLOC_VERSION defines at top of file)
- *
- * Make sure to also git tag the release.  dmalloc_release_X_X_X
  */
-static	char	*dmalloc_version = "5.6.3" ;
+static	char	*dmalloc_version = "5.6.4" ;
 
 #endif /* ! __VERSION_H__ */
