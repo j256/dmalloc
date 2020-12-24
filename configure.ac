@@ -82,6 +82,9 @@ AC_CHECK_HEADER([stdlib.h],
 AC_CHECK_HEADER([string.h],
 		[AC_DEFINE(HAVE_STRING_H,1) AC_SUBST([HAVE_STRING_H],1)],
 		[AC_DEFINE(HAVE_STRING_H,0) AC_SUBST([HAVE_STRING_H],0)])
+AC_CHECK_HEADER([strings.h],
+		[AC_DEFINE(HAVE_STRINGS_H,1) AC_SUBST([HAVE_STRINGS_H],1)],
+		[AC_DEFINE(HAVE_STRINGS_H,0) AC_SUBST([HAVE_STRINGS_H],0)])
 AC_CHECK_HEADER([unistd.h],
 		[AC_DEFINE(HAVE_UNISTD_H,1) AC_SUBST([HAVE_UNISTD_H],1)],
 		[AC_DEFINE(HAVE_UNISTD_H,0) AC_SUBST([HAVE_UNISTD_H],0)])
@@ -619,11 +622,12 @@ int main() {
 )
 
 if test "x$getenv_safe" != "xyes" && test "x$have_getenvironmentvariablea" != "xyes" ; then
-  AC_MSG_WARN([Since getenv allocates memory, it is not safe for dmalloc to use.])
-  AC_MSG_WARN([You may want to add the following code to the front of main():])
+  AC_MSG_WARN([Since getenv is not safe, you may want to add the])
+  AC_MSG_WARN([following code to the front of main():])
   AC_MSG_WARN([[  #ifdef DMALLOC]])
   AC_MSG_WARN([[    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));]])
   AC_MSG_WARN([[  #endif]])
+  AC_MSG_WARN([You will need to compile your program with: -DDMALLOC])
 fi
 
 ############
