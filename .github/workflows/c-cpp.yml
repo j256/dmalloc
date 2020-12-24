@@ -16,8 +16,18 @@ jobs:
     - name: configure
       run: ./configure
     - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make heavy
-      run: make heavy
+      run: make clean all tests
+    - name: run utility
+      run: ./dmalloc
+    - name: run tests
+      run: make light heavy
+    - name: make distclean
+      run: make distclean
+    - name: configure in subdir
+      run: mkdir x ; cd x ; ../configure
+    -name: make in subdir
+      run: cd x ; make clean all tests
+    - name: run utility in subdir
+      run: cd x ; ./dmalloc
+    - name: run tests in subdir
+      run: cd x ; make light heavy
