@@ -15,33 +15,23 @@ programs.
 
 The package includes the library, configuration scripts, debug utility application, test program, and
 documentation.  Online documentation as well as the full source is available at the [dmalloc home
-page](http://dmalloc.com/).   Details on the library's mailing list are available there as well.
+page](http://dmalloc.com/).
 
 Enjoy, Gray Watson
 
 ## Documentation
 
-See the INSTALL file for building, installation, and quick-start notes.
+See the INSTALL.txt file for building, installation, and quick-start notes.
 
 Examine the dmalloc.html file which contains the user-documentation for the dmalloc subsystem.  The source of
 all documation is the dmalloc.texi texinfo file which also can generate PDF hardcopy output with the help of
 the texinfo.tex file.  You can download the full documentation package or read it
 [online from the repository](http://dmalloc.com/).
 
-## Argv Library
-
-My argv library should have been included with this package (argv.[ch], argv_loc.h).  I use it with all my
-binaries.  It functions similar to the getopt routines in that it provides a standardized way of processing
-arguments.  However, that is where the similarity ends.  You have to write no C code to do the actual
-processing, it handles short -l and long --logfile style options, gives standard short and long usage
-messages, and many other features while trying to comply with POSIX specs.
-
-The newest versions of the [argv library are available online](http://256stuff.com/sources/argv/).
-
 ## Thanks
 
 The initial idea of this library came from Doug Balog.  He and many other net folk contributed to the design,
-development, and overall library and my thanks goes out to them all.
+development, and continued maintenence of the library.  My thanks goes out to them all.
 
 # ChangeLog Release Notes
 
