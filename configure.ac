@@ -265,6 +265,9 @@ int main() { DMALLOC_SIZE x = -1; if (x >= 0) return 0; else return 1; }
 AC_MSG_CHECKING([strdup macro])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
+#if HAVE_STRING_H
 #  include <string.h>
 #endif
 
@@ -286,6 +289,9 @@ AC_MSG_RESULT([$ac_cv_strdup_macro])
 AC_MSG_CHECKING([strndup macro])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
+#if HAVE_STRING_H
 #  include <string.h>
 #endif
 
@@ -876,6 +882,7 @@ fi
 # initialization commands
 ac_cv_c_const=$ac_cv_c_const
 ac_cv_strdup_macro=$ac_cv_strdup_macro
+ac_cv_strndup_macro=$ac_cv_strndup_macro
 ac_cv_type_size_t=$ac_cv_type_size_t
 ac_cv_header_stdarg_h=$ac_cv_header_stdarg_h
 ])
