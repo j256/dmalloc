@@ -43,8 +43,6 @@ The newest versions of the [argv library are available online](http://256stuff.c
 The initial idea of this library came from Doug Balog.  He and many other net folk contributed to the design,
 development, and overall library and my thanks goes out to them all.
 
-## Author
+# ChangeLog Release Notes
 
-If you have any questions, comments, or problems, please use github issues to submit a question.
-
-[Gray Watson](http://256stuff.com/gray/)
+See the [ChangeLog.txt file](ChangeLog.txt).
