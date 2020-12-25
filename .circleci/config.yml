@@ -28,6 +28,12 @@ jobs:
           name: configure in subdir
           command: mkdir x ; cd x ; ../configure --prefix /tmp
       - run:
+          name: TMP 1
+          command: cd x ; cat Makefile
+      - run:
+          name: TMP 2
+          command: cd x ; make dmalloc.html
+      - run:
           name: make in subdir
           command: cd x ; make clean all tests installdocs
       - run:
