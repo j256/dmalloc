@@ -11,7 +11,7 @@ jobs:
           command: sudo apt-get install texinfo
       - run:
           name: configure
-          command: ./configure
+          command: ./configure --prefix /tmp
       - run:
           name: make
           command: make clean all tests installdocs
