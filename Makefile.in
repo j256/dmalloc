@@ -173,7 +173,7 @@ distclean : clean
 	rm -f confdefs.h config.status config.log config.cache conf.h
 	rm -f configure.lineno
 	rm -rf autom4te.cache
-	rm -f Makefile settings.h dmalloc.h dmalloc.h.2
+	rm -f Makefile settings.h dmalloc.h dmalloc.h.2 dmalloc.info
 #	rm -f configure
 
 docs : $(DOCS)
@@ -228,10 +228,10 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installdocs : $(srcdir)/$(HTMLFILE) $(srcdir)/$(INFOFILE)
+installdocs : $(srcdir)/$(HTMLFILE) $(INFOFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
 	$(INSTALL_DATA) $(srcdir)/$(HTMLFILE) $(docdir)
-	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(docdir)
+	$(INSTALL_DATA) $(INFOFILE) $(docdir)
 
 install : installincs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
@@ -252,7 +252,7 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 $(srcdir)/us
 	cat $(srcdir)/dmalloc.h.5 >> $@.t
 	mv $@.t $@
 
-$(INFOFILE) : $(srcdir)/dmalloc.texi
+$(INFOFILE) : $(srcdir)/$(TEXIFILE)
 	rm -f $@ $@.t
 	makeinfo -o $@.t --fill-column=100 --no-split $<
 	mv $@.t $@
