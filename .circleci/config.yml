@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: install texinfo
-          command: sudo apt-get install texinfo
+          command: sudo apt-get install texinfo texi2html
       - run:
           name: configure
           command: ./configure --prefix /tmp
