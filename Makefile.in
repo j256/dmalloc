@@ -226,9 +226,9 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installdocs : $(HTMLFILE) $(INFOFILE)
+installdocs : ./$(HTMLFILE) $(INFOFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
-	$(INSTALL_DATA) $(HTMLFILE) $(docdir)
+	$(INSTALL_DATA) ./$(HTMLFILE) $(docdir)
 	$(INSTALL_DATA) $(INFOFILE) $(docdir)
 
 install : installincs installlib $(UTIL)
@@ -255,7 +255,7 @@ $(INFOFILE) : $(srcdir)/$(TEXIFILE)
 	makeinfo -o $@.t --fill-column=100 --no-split $<
 	mv $@.t $@
 
-$(HTMLFILE) : $(srcdir)/$(TEXIFILE)
+./$(HTMLFILE) : $(srcdir)/$(TEXIFILE)
 	rm -f $@ $@.t
 	texi2html  --output=$@.t -number -monolithic $<
 	mv $@.t $@
