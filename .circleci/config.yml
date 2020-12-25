@@ -32,7 +32,7 @@ jobs:
           command: cd x ; cat Makefile
       - run:
           name: TMP 2
-          command: cd x ; make ./dmalloc.html
+          command: cd x ; make dmalloc.html2
       - run:
           name: make in subdir
           command: cd x ; make clean all tests installdocs
