@@ -14,7 +14,7 @@ jobs:
           command: ./configure --prefix /tmp
       - run:
           name: make
-          command: make clean all tests installdocs
+          command: make clean all tests
       - run:
           name: run utility
           command: ./dmalloc
@@ -22,23 +22,23 @@ jobs:
           name: run tests
           command: make light heavy
       - run:
+          name: make installdocs
+          command: make installdocs
+      - run:
           name: make distclean
           command: make distclean
       - run:
           name: configure in subdir
           command: mkdir x ; cd x ; ../configure --prefix /tmp
       - run:
-          name: TMP 1
-          command: cd x ; cat Makefile
-      - run:
-          name: TMP 2
-          command: cd x ; make dmalloc.html2
-      - run:
           name: make in subdir
-          command: cd x ; make clean all tests installdocs
+          command: cd x ; make clean all tests
       - run:
           name: run utility in subdir
           command: cd x ; ./dmalloc
       - run:
           name: run tests in subdir
           command: cd x ; make light heavy
+      - run:
+          name: make installdocs in subdir
+          command: cd x ; make installdocs
