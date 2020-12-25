@@ -36,8 +36,6 @@ DEFS = -DHAVE_STDARG_H=@HAVE_STDARG_H@ \
 INCS = -I. -I$(srcdir) $(INCLUDES)
 LIBS = -L. @LIBS@
 A_OUT = aout@EXEEXT@
-INFOFILE = dmalloc.info
-DOCS = INSTALL.txt dmalloc.html
 
 MODULE	= dmalloc
 LIBRARY	= lib$(MODULE).a
@@ -128,10 +126,10 @@ INSTALL_SL = $(LIB_SL) \
 	$(INSTALL_SL_9)
 
 UTIL = $(MODULE)
-HTMLFILE = $(MODULE).html
 TEXIFILE = $(MODULE).texi
-PDFFILE = $(MODULE).pdf
-DOCFILES = $(HTMLFILE) $(TEXIFILE) $(PDFFILE)
+HTMLFILE = $(MODULE).html
+INFOFILE = $(MODULE).info
+DOCS = INSTALL.txt $(HTMLFILE) $(INFOFILE)
 
 CCFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -173,7 +171,7 @@ distclean : clean
 	rm -f confdefs.h config.status config.log config.cache conf.h
 	rm -f configure.lineno
 	rm -rf autom4te.cache
-	rm -f Makefile settings.h dmalloc.h dmalloc.h.2
+	rm -f Makefile settings.h dmalloc.h dmalloc.h.2 $(INFOFILE) $(HTMLFILE)2
 #	rm -f configure
 
 docs : $(DOCS)
@@ -228,15 +226,16 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-installdocs : $(srcdir)/$(HTMLFILE) $(srcdir)/$(INFOFILE)
+# see notes about $(HTMLFILE)2 below
+installdocs : $(HTMLFILE)2 $(INFOFILE)
 	$(srcdir)/mkinstalldirs $(docdir)
-	$(INSTALL_DATA) $(srcdir)/$(HTMLFILE) $(docdir)
-	$(INSTALL_DATA) $(srcdir)/$(INFOFILE) $(docdir)
+	$(INSTALL_DATA) $(HTMLFILE)2 $(docdir)/$(HTMLFILE)
+	$(INSTALL_DATA) $(INFOFILE) $(docdir)
 
 install : installincs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
-	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(docdir)"
+	@echo "Enter 'make installdocs' to install $(DOCS) in $(docdir)"
 
 dmalloc.h.2 conf.h settings.h : $(srcdir)/configure $(srcdir)/settings.dist $(srcdir)/conf.h.in
 	$(SHELL) $(srcdir)/configure
@@ -252,9 +251,20 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 $(srcdir)/us
 	cat $(srcdir)/dmalloc.h.5 >> $@.t
 	mv $@.t $@
 
-$(INFOFILE) : $(srcdir)/dmalloc.texi
+$(INFOFILE) : $(srcdir)/$(TEXIFILE)
 	rm -f $@ $@.t
 	makeinfo -o $@.t --fill-column=100 --no-split $<
+	mv $@.t $@
+
+$(HTMLFILE) : $(srcdir)/$(TEXIFILE)
+	rm -f $@ $@.t
+	texi2html --output=$@.t -number -monolithic $<
+	mv $@.t $@
+
+# we need this because html is also checked in an make gets confused by ../dmalloc.html
+$(HTMLFILE)2 : $(srcdir)/$(TEXIFILE)
+	rm -f $@ $@.t
+	texi2html --output=$@.t -number -monolithic $<
 	mv $@.t $@
 
 INSTALL.txt : $(INFOFILE)
@@ -272,11 +282,6 @@ INSTALL.txt : $(INFOFILE)
 		-e '/,  Node: Index of Concepts/,$$d' \
 		< $(INFOFILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
-	mv $@.t $@
-
-dmalloc.html : $(srcdir)/dmalloc.texi
-	rm -f $@ $@.t
-	texi2html  --output=$@.t -number -monolithic $(srcdir)/dmalloc.texi
 	mv $@.t $@
 
 shlib : $(BUILD_SL)

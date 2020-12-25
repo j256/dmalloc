@@ -7,8 +7,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: install packages
+          command: sudo apt-get install texinfo texi2html
+      - run:
           name: configure
-          command: ./configure
+          command: ./configure --prefix /tmp
       - run:
           name: make
           command: make clean all tests
@@ -19,11 +22,14 @@ jobs:
           name: run tests
           command: make light heavy
       - run:
+          name: make installdocs
+          command: make installdocs
+      - run:
           name: make distclean
           command: make distclean
       - run:
           name: configure in subdir
-          command: mkdir x ; cd x ; ../configure
+          command: mkdir x ; cd x ; ../configure --prefix /tmp
       - run:
           name: make in subdir
           command: cd x ; make clean all tests
@@ -33,3 +39,6 @@ jobs:
       - run:
           name: run tests in subdir
           command: cd x ; make light heavy
+      - run:
+          name: make installdocs in subdir
+          command: cd x ; make installdocs
