@@ -887,8 +887,6 @@ echo "#define DMALLOC_VERSION_MAJOR ${dmalloc_version_major} /* X.0.0 */" >> $ne
 echo "#define DMALLOC_VERSION_MINOR ${dmalloc_version_minor} /* 0.X.0 */" >> $newfile.t
 echo "#define DMALLOC_VERSION_PATCH ${dmalloc_version_patch} /* 0.0.X */" >> $newfile.t
 echo '' >> $newfile.t
-echo "static char *dmalloc_version = \"${dmalloc_version}\";" >> $newfile.t
-echo '' >> $newfile.t
 if cmp -s $newfile $newfile.t 2>/dev/null; then
 	AC_MSG_NOTICE([$newfile is unchanged])
 	rm -f $newfile.t
@@ -898,12 +896,38 @@ else
 fi
 ],
 [
-# initialization commands
+# dmalloc.h.2 initialization commands
 ac_cv_c_const=$ac_cv_c_const
 ac_cv_strdup_macro=$ac_cv_strdup_macro
 ac_cv_strndup_macro=$ac_cv_strndup_macro
 ac_cv_type_size_t=$ac_cv_type_size_t
 ac_cv_header_stdarg_h=$ac_cv_header_stdarg_h
+])
+AC_CONFIG_COMMANDS([version.h],
+[
+newfile="version.h"
+rm -f $newfile.t
+cat > $newfile.t<<EOF
+/* this is produced by configure */
+#ifndef __VERSION_H__
+#define __VERSION_H__
+static char *dmalloc_version = "${dmalloc_version}";
+#endif /* ! __VERSION_H__ */
+EOF
+if cmp -s $newfile $newfile.t 2>/dev/null; then
+	AC_MSG_NOTICE([$newfile is unchanged])
+	rm -f $newfile.t
+else
+	rm -f $newfile
+	mv $newfile.t $newfile
+fi
+],
+[
+# version.h initialization commands
+dmalloc_version_major=$dmalloc_version_major
+dmalloc_version_minor=$dmalloc_version_minor
+dmalloc_version_patch=$dmalloc_version_patch
+dmalloc_version=$dmalloc_version
 ])
 
 AC_CONFIG_COMMANDS([settings.h],

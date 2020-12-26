@@ -174,7 +174,7 @@ distclean : clean
 	rm -f confdefs.h config.status config.log config.cache conf.h
 	rm -f configure.lineno
 	rm -rf autom4te.cache
-	rm -f Makefile settings.h dmalloc.h dmalloc.h.2
+	rm -f Makefile settings.h dmalloc.h dmalloc.h.2 version.h
 	rm -f $(INFO_FILE) $(HTML_FILE2) $(INSTALL_FILE2)
 #	rm -f configure
 
@@ -242,9 +242,9 @@ install : installincs installlib $(UTIL)
 	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
 	@echo "Enter 'make installdocs' to install $(DOCS) in $(docdir)"
 
-dmalloc.h.2 conf.h settings.h : $(srcdir)/configure $(srcdir)/settings.dist $(srcdir)/conf.h.in
+dmalloc.h.2 conf.h settings.h version.h : $(srcdir)/configure $(srcdir)/settings.dist $(srcdir)/conf.h.in
 	$(SHELL) $(srcdir)/configure
-	-touch dmalloc.h.2 conf.h settings.h
+	-touch dmalloc.h.2 conf.h settings.h version.h
 
 dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 $(srcdir)/user_malloc.h \
 		$(srcdir)/dmalloc.h.4 $(srcdir)/arg_check.h $(srcdir)/dmalloc.h.5
@@ -431,7 +431,7 @@ chunk.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
   error.h error_val.h heap.h
 compat.o: compat.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h
 dmalloc.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h append.h \
-  compat.h debug_tok.h dmalloc_loc.h env.h error_val.h
+  compat.h debug_tok.h dmalloc_loc.h env.h error_val.h version.h
 dmalloc_argv.o: dmalloc_argv.c conf.h settings.h append.h dmalloc_argv.h \
   dmalloc_argv_loc.h compat.h
 dmalloc_fc_t.o: dmalloc_fc_t.c conf.h settings.h dmalloc.h dmalloc_argv.h \
@@ -445,7 +445,7 @@ dmalloc_tab.o: dmalloc_tab.c conf.h settings.h append.h chunk.h compat.h \
 env.o: env.c conf.h settings.h dmalloc.h append.h compat.h dmalloc_loc.h \
   debug_tok.h env.h error.h
 error.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
-  debug_tok.h dmalloc_loc.h env.h error.h error_val.h
+  debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
 heap.o: heap.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
   debug_tok.h dmalloc_loc.h error.h error_val.h heap.h
 protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
@@ -458,7 +458,7 @@ chunk_th.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
   error.h error_val.h heap.h
 error_th.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
-  debug_tok.h dmalloc_loc.h env.h error.h error_val.h
+  debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
 user_malloc_th.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
   compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
   user_malloc.h return.h

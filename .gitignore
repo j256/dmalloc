@@ -22,3 +22,4 @@ dmalloc_fc_t
 *.a
 dmalloc.info
 .project
+version.h
