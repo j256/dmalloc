@@ -52,7 +52,6 @@
 #include "env.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
-#include "version.h"
 
 #define HOME_ENVIRON	"HOME"			/* home directory */
 #define SHELL_ENVIRON	"SHELL"			/* for the type of shell */

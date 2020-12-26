@@ -2,11 +2,16 @@
 
 The following set of tasks should be performed when the dmalloc library gets released.
 
-1) Update the version number in version.h and where else it lists.
-2) Update the ChangeLog file.
-3) Update doc files: make docs
-4) Consider updating the copyright heads in all files and in chunk.c strings.
-5) Run autoconf to make sure configure up to date.
+1) Update the ChangeLog file with the release date.
+2) Run autoconf to make sure configure up to date.
+3) Update the version numbers in the following files:
+	Changlog
+	README.md
+	configure.ac (in AC_INIT)
+	dmalloc.spec
+	dmalloc.texi
+4) Update doc files: make docs
+5) Consider updating the copyright heads in all files and in chunk.c strings.
 6) Check in all files.
 7) Run tests:
 	- [ maybe mkdir x ; cd x ]
@@ -20,12 +25,12 @@ The following set of tasks should be performed when the dmalloc library gets rel
 8) Clone on linux and others and run tests: git clone git@github.com:j256/dmalloc.git
 9) Run release.sh script.  It will run tests on repo.
 11) git tag the release:
-    git tag dmalloc_release_X_X_X
-    git push origin dmalloc_release_X_X_X
+	git tag dmalloc_release_X_X_X
+	git push origin dmalloc_release_X_X_X
 12) create release on github for X.X.X from that tag
 13) Upload tgz file as part of that release
-14) Install the tgz file and html file in the dmalloc.com repo
+14) Install the tgz file in the dmalloc.com repo
 15) Edit releases/index.html to include the new version
-16) Go to the /docs dir and run the explode-docs.sh script.
+16) Go to the docs subdir and run the explode-docs.sh script.
 
 -------------------------------------------------------------------------------
