@@ -4,7 +4,6 @@ Debug Malloc Library
 Version 5.6.4 -- 12/23/2020
 
 [![CircleCI](https://circleci.com/gh/j256/dmalloc.svg?style=svg)](https://circleci.com/gh/j256/dmalloc)
-![CI](https://github.com/j256/dmalloc/workflows/CI/badge.svg)
 
 The debug memory allocation or "dmalloc" library has been designed as a drop in replacement for the system's
 `malloc`, `realloc`, `calloc`, `free` and other memory management routines while providing powerful debugging
