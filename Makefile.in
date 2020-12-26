@@ -126,10 +126,13 @@ INSTALL_SL = $(LIB_SL) \
 	$(INSTALL_SL_9)
 
 UTIL = $(MODULE)
-TEXIFILE = $(MODULE).texi
-HTMLFILE = $(MODULE).html
-INFOFILE = $(MODULE).info
-DOCS = INSTALL.txt $(HTMLFILE) $(INFOFILE)
+TEXI_FILE = $(MODULE).texi
+INFO_FILE = $(MODULE).info
+HTML_FILE = $(MODULE).html
+HTML_FILE2 = $(MODULE).html2
+INSTALL_FILE = INSTALL.txt
+INSTALL_FILE2 = INSTALL.txt2
+DOCS = $(INSTALL_FILE) $(HTML_FILE) $(INFO_FILE)
 
 CCFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -171,7 +174,8 @@ distclean : clean
 	rm -f confdefs.h config.status config.log config.cache conf.h
 	rm -f configure.lineno
 	rm -rf autom4te.cache
-	rm -f Makefile settings.h dmalloc.h dmalloc.h.2 $(INFOFILE) $(HTMLFILE)2
+	rm -f Makefile settings.h dmalloc.h dmalloc.h.2
+	rm -f $(INFO_FILE) $(HTML_FILE2) $(INSTALL_FILE2)
 #	rm -f configure
 
 docs : $(DOCS)
@@ -226,11 +230,12 @@ installlib : $(INSTALL_LIB)
 @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
 @TH_OFF@	@echo "Enter 'make installth' to install thread library"
 
-# see notes about $(HTMLFILE)2 below
-installdocs : $(HTMLFILE)2 $(INFOFILE)
+# see notes about why we need the FILE2 entries below
+installdocs : $(INSTALL_FILE2) $(HTML_FILE2) $(INFO_FILE)
 	$(srcdir)/mkinstalldirs $(docdir)
-	$(INSTALL_DATA) $(HTMLFILE)2 $(docdir)/$(HTMLFILE)
-	$(INSTALL_DATA) $(INFOFILE) $(docdir)
+	$(INSTALL_DATA) $(INSTALL_FILE2) $(docdir)/$(INSTALL_FILE)
+	$(INSTALL_DATA) $(HTML_FILE2) $(docdir)/$(HTML_FILE)
+	$(INSTALL_DATA) $(INFO_FILE) $(docdir)
 
 install : installincs installlib $(UTIL)
 	$(srcdir)/mkinstalldirs $(bindir)
@@ -251,36 +256,32 @@ dmalloc.h : $(srcdir)/dmalloc.h.1 dmalloc.h.2 $(srcdir)/dmalloc.h.3 $(srcdir)/us
 	cat $(srcdir)/dmalloc.h.5 >> $@.t
 	mv $@.t $@
 
-$(INFOFILE) : $(srcdir)/$(TEXIFILE)
+$(INFO_FILE) : $(srcdir)/$(TEXI_FILE)
 	rm -f $@ $@.t
 	makeinfo -o $@.t --fill-column=100 --no-split $<
 	mv $@.t $@
 
-$(HTMLFILE) : $(srcdir)/$(TEXIFILE)
+# we need the FILE2 this because make gets confused by ../dmalloc.html
+$(HTML_FILE) $(HTML_FILE2) : $(srcdir)/$(TEXI_FILE)
 	rm -f $@ $@.t
 	texi2html --output=$@.t -number -monolithic $<
 	mv $@.t $@
 
-# we need this because html is also checked in an make gets confused by ../dmalloc.html
-$(HTMLFILE)2 : $(srcdir)/$(TEXIFILE)
-	rm -f $@ $@.t
-	texi2html --output=$@.t -number -monolithic $<
-	mv $@.t $@
-
-INSTALL.txt : $(INFOFILE)
+# we need the FILE2 this because make gets confused by ../INSTALL.txt
+$(INSTALL_FILE) $(INSTALL_FILE2) : $(INFO_FILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- > $@.t
 	sed -e '1,/,  Node: Installation/d' \
 		-e '/,  Node: Getting Started/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $@.t
+		< $(INFO_FILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
 	sed -e '1,/,  Node: Getting Started/d' \
 		-e '/,  Node: Allocation Basics/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $@.t
+		< $(INFO_FILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
 	sed -e '1,/,  Node: Troubleshooting/d' \
 		-e '/,  Node: Index of Concepts/,$$d' \
-		< $(INFOFILE) | tr -d '\037'  >> $@.t
+		< $(INFO_FILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
 	mv $@.t $@
 
@@ -398,7 +399,7 @@ heavy : $(TEST) light
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
 
 #
-# .cc.o auto-target doesn't work on some systems. 
+# .cc.o auto-target doesn't work on some systems.
 # also, $? did not work on OSF for the -c, grrr
 #
 dmallocc.o : $(srcdir)/dmallocc.cc
