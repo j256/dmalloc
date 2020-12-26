@@ -3,11 +3,30 @@
 # Shell script if you are going to package the library up for release
 #
 
-set -e
-
 cwd=`pwd`
-version=`grep dmalloc_version version.h | cut -f2 -d\"`
+version=`grep dmalloc_version dmalloc.h.2 | cut -f2 -d\"`
 dir=dmalloc-$version
+
+head -1 ChangeLog.txt | grep -q $version
+if [ $? -ne 0 ]; then
+    echo "First line of ChangeLog.txt does not include version $version"
+    head -1 ChangeLog.txt
+    exit 1
+fi
+grep -q "dmalloc_version Version $version" dmalloc.texi
+if [ $? -ne 0 ]; then
+    echo "dmalloc.texi does not include version $version"
+    grep -q "dmalloc_version " dmalloc.texi
+    exit 1
+fi
+grep -q "Version: $version" dmalloc.spec
+if [ $? -ne 0 ]; then
+    echo "dmalloc.spec does not include version $version"
+    grep "Version: " dmalloc.spec
+    exit 1
+fi
+
+set -e
 
 # run tests
 echo "Running tests"

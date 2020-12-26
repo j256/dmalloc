@@ -18,11 +18,21 @@
 #
 # The author may be contacted via http://dmalloc.com/
 #
+
 AC_INIT(dmalloc, 5.6.4, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
-AC_MSG_NOTICE([configurations for the dmalloc library])
+dmalloc_version_major=`echo $PACKAGE_VERSION | sed -e '[s/\.[0-9][0-9]*\.[0-9][0-9]*$//]'`
+export dmalloc_version_major
+export dmalloc_version_minor=`echo $PACKAGE_VERSION | sed -e '[s/^[0-9][0-9]*\.//]' | sed -e '[s/\.[0-9][0-9]*$//]'`
+export dmalloc_version_minor
+export dmalloc_version_patch=`echo $PACKAGE_VERSION | sed -e '[s/^[0-9][0-9]*\.[0-9][0-9]*\.//]'`
+export dmalloc_version_patch
+dmalloc_version="${dmalloc_version_major}.${dmalloc_version_minor}.${dmalloc_version_patch}"
+export dmalloc_version
+
+AC_MSG_NOTICE([configurations for the dmalloc library version $dmalloc_version])
 
 ##############################################################################
 # arguments
@@ -871,6 +881,13 @@ else
 	echo "/* no stdarg.h available */" >> $newfile.t
 	echo "#define DMALLOC_STDARG 0" >> $newfile.t
 fi
+echo '' >> $newfile.t
+echo '/* dmalloc version defines */' >> $newfile.t
+echo "#define DMALLOC_VERSION_MAJOR ${dmalloc_version_major} /* X.0.0 */" >> $newfile.t
+echo "#define DMALLOC_VERSION_MINOR ${dmalloc_version_minor} /* 0.X.0 */" >> $newfile.t
+echo "#define DMALLOC_VERSION_PATCH ${dmalloc_version_patch} /* 0.0.X */" >> $newfile.t
+echo '' >> $newfile.t
+echo "static char *dmalloc_version = \"${dmalloc_version}\";" >> $newfile.t
 echo '' >> $newfile.t
 if cmp -s $newfile $newfile.t 2>/dev/null; then
 	AC_MSG_NOTICE([$newfile is unchanged])

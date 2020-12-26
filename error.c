@@ -72,7 +72,6 @@
 #include "error.h"
 #include "error_val.h"
 #include "dmalloc_loc.h"
-#include "version.h"
 
 #if LOCK_THREADS
 #if IDENT_WORKS
