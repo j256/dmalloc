@@ -1,3 +1,6 @@
+Version 5.6.5 (12/28/2020):
+	* Fixed the installdocs target... Again.  Thanks to matthewluckie.
+
 Version 5.6.4 (12/24/2020):
 	* Fixed shared libary creation.  Thanks to @ffontaine and Alex Suykov.
 	* Fixed one more pointer arithmetic issue.  Thanks to aitap.

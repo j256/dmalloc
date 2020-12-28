@@ -1,7 +1,7 @@
 Debug Malloc Library
 ====================
 
-Version 5.6.4 -- 12/23/2020
+Version 5.6.5 -- 12/28/2020
 
 [![CircleCI](https://circleci.com/gh/j256/dmalloc.svg?style=svg)](https://circleci.com/gh/j256/dmalloc)
 

@@ -19,7 +19,7 @@
 # The author may be contacted via http://dmalloc.com/
 #
 
-AC_INIT(dmalloc, 5.6.4, [http://dmalloc.com/])
+AC_INIT(dmalloc, 5.6.5, [http://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 
