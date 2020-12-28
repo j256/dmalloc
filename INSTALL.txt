@@ -16,13 +16,13 @@ To configure, compile, and install the library, follow these steps carefully.
      features of the library.  The `configure' script will copy this file to `settings.h' which is
      where you should be adding per-architecture settings.
 
-  4. Type `sh ./configure' to configure the library.  You may want to first examine the
-     `config.help' file for some information about configure.  You may want to use the
-     `--disable-cxx' option if you do not want the Makefile to build the C++ version of dmalloc.
-     You may want to use the `--enable-threads' option to build the threaded version of dmalloc.
-     You may want to use the `--enable-shlib' option to build the shared versions of the dmalloc
-     libraries.  `sh ./configure --help' lists the available options to configure.  Configure
-     should generate the `Makefile' and configuration files automatically.
+  4. Type `sh ./configure' to configure the library.  You may want to first examine `sh ./configure
+     --help' output for some information about configure.  You may want to use the `--disable-cxx'
+     option if you do not want the Makefile to build the C++ version of dmalloc.  You may want to
+     use the `--enable-threads' option to build the threaded version of dmalloc.  You may want to
+     use the `--enable-shlib' option to build the shared versions of the dmalloc libraries.  `sh
+     ./configure --help' lists the available options to configure.  Configure should generate the
+     `Makefile' and configuration files automatically.
 
   5. You may want to examine the `Makefile' and `conf.h' files created by configure to make sure it
      did its job correctly.
@@ -38,10 +38,8 @@ To configure, compile, and install the library, follow these steps carefully.
      things to stop complaining when you go to compile about the size arguments to malloc routines.
      Comments on this please.
 
-  8. Typing `make' should be enough to build `libdmalloc.a', and `dmalloc' program.  If it does not
-     work, please see if there are any notes in the contrib directory about your system-type.  If
-     not and you figure your problem out, please send me some notes so future users can profit from
-     your experiences.
+  8. Typing `make' should be enough to build `libdmalloc.a', and `dmalloc' program.  If you figure
+     your problem out, please send me some notes so future users can profit from your experiences.
 
      _NOTE_: You may experience some errors compiling some of the `return.h' assembly macros which
      attempt to determine the callers address for logging purposes.  *Note Portability::.  You may
@@ -142,7 +140,7 @@ following things to make use of the library:
   6. Although not necessary, you may want to include `dmalloc.h' in your C files and recompile.
      This will allow the library to report the file/line numbers of calls that generate problems.
      *Note Allocation Macros::.  It should be inserted at the _bottom_ of your include files as to
-     not conflict with wother includes.  You may want to ifdef it as well and compile with `cc
+     not conflict with other includes.  You may want to ifdef it as well and compile with `cc
      -DDMALLOC ...':
 
           /* other includes above ^^^ */
@@ -152,7 +150,7 @@ following things to make use of the library:
           #endif
 
   7. Another optional task is to compile all of your source with the `dmalloc.h' with the
-     `DMALLOC_FUNC_CHECK' compilation flag.  This willallow the library to check all of the
+     `DMALLOC_FUNC_CHECK' compilation flag.  This will allow the library to check all of the
      arguments of a number of common string and utility routines.  *Note Argument Checking::.
 
           cc -DDMALLOC -DDMALLOC_FUNC_CHECK file.c

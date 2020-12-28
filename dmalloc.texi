@@ -150,8 +150,8 @@ per-architecture settings.
 @cindex --enable-shlib
 @cindex conf.h file
 
-@item Type @kbd{sh ./configure} to configure the library.  You may want to first examine the @file{config.help} file
-for some information about configure.  You may want to use the @kbd{--disable-cxx} option if you do not want the
+@item Type @kbd{sh ./configure} to configure the library.  You may want to first examine @kbd{sh ./configure --help}
+output for some information about configure.  You may want to use the @kbd{--disable-cxx} option if you do not want the
 Makefile to build the C++ version of dmalloc.  You may want to use the @kbd{--enable-threads} option to build the
 threaded version of dmalloc.  You may want to use the @kbd{--enable-shlib} option to build the shared versions of the
 dmalloc libraries.  @kbd{sh ./configure --help} lists the available options to configure.  Configure should generate the
@@ -174,8 +174,7 @@ settings should made to the @file{settings.dist} file.  You then can run @file{c
 settings for all systems.  You may have to alter the definitions in this file to get things to stop complaining when you
 go to compile about the size arguments to malloc routines.  Comments on this please.
 
-@item Typing @kbd{make} should be enough to build @file{libdmalloc.a}, and @file{dmalloc} program.  If it does not
-work, please see if there are any notes in the contrib directory about your system-type.  If not and you figure your
+@item Typing @kbd{make} should be enough to build @file{libdmalloc.a}, and @file{dmalloc} program.  If you figure your
 problem out, please send me some notes so future users can profit from your experiences.
 
 @cindex USE_RETURN_MACROS conf.h option
@@ -314,7 +313,7 @@ fn dmalloc @{eval `@{/usr/local/bin/dmalloc $*@}@}
 
 @item Although not necessary, you may want to include @file{dmalloc.h} in your C files and recompile.  This will allow
 the library to report the file/line numbers of calls that generate problems.  @xref{Allocation Macros}.  It should be
-inserted at the @emph{bottom} of your include files as to not conflict with wother includes.  You may want to ifdef it
+inserted at the @emph{bottom} of your include files as to not conflict with other includes.  You may want to ifdef it
 as well and compile with @kbd{cc -DDMALLOC @dots{}}:
 
 @example
@@ -327,7 +326,7 @@ as well and compile with @kbd{cc -DDMALLOC @dots{}}:
 
 @cindex DMALLOC_FUNC_CHECK
 @item Another optional task is to compile all of your source with the @file{dmalloc.h} with the
-@code{DMALLOC_FUNC_CHECK} compilation flag.  This willallow the library to check all of the arguments of a number of
+@code{DMALLOC_FUNC_CHECK} compilation flag.  This will allow the library to check all of the arguments of a number of
 common string and utility routines.  @xref{Argument Checking}.
 
 @example
@@ -490,7 +489,7 @@ The malloc routine is the basic memory allocation routine.  It allocates an area
 pointer to the space requested.
 
 @end deftypefun
-@deftypefun void *calloc ( unsigned int @var{number}, unsigned int@var{size} )
+@deftypefun void *calloc ( unsigned int @var{number}, unsigned int @var{size} )
 @cindex calloc
 @cindex Allocation of zeros
 @cindex zeros, allocation of

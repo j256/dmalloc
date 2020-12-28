@@ -218,8 +218,8 @@ per-architecture settings.
 <a name="index-_002d_002denable_002dshlib"></a>
 <a name="index-conf_002eh-file"></a>
 
-</li><li> Type <kbd>sh ./configure</kbd> to configure the library.  You may want to first examine the &lsquo;<tt>config.help</tt>&rsquo; file
-for some information about configure.  You may want to use the <kbd>--disable-cxx</kbd> option if you do not want the
+</li><li> Type <kbd>sh ./configure</kbd> to configure the library.  You may want to first examine <kbd>sh ./configure --help</kbd>
+output for some information about configure.  You may want to use the <kbd>--disable-cxx</kbd> option if you do not want the
 Makefile to build the C++ version of dmalloc.  You may want to use the <kbd>--enable-threads</kbd> option to build the
 threaded version of dmalloc.  You may want to use the <kbd>--enable-shlib</kbd> option to build the shared versions of the
 dmalloc libraries.  <kbd>sh ./configure --help</kbd> lists the available options to configure.  Configure should generate the
@@ -242,8 +242,7 @@ settings should made to the &lsquo;<tt>settings.dist</tt>&rsquo; file.  You then
 settings for all systems.  You may have to alter the definitions in this file to get things to stop complaining when you
 go to compile about the size arguments to malloc routines.  Comments on this please.
 
-</li><li> Typing <kbd>make</kbd> should be enough to build &lsquo;<tt>libdmalloc.a</tt>&rsquo;, and &lsquo;<tt>dmalloc</tt>&rsquo; program.  If it does not
-work, please see if there are any notes in the contrib directory about your system-type.  If not and you figure your
+</li><li> Typing <kbd>make</kbd> should be enough to build &lsquo;<tt>libdmalloc.a</tt>&rsquo;, and &lsquo;<tt>dmalloc</tt>&rsquo; program.  If you figure your
 problem out, please send me some notes so future users can profit from your experiences.
 
 <a name="index-USE_005fRETURN_005fMACROS-conf_002eh-option"></a>
@@ -393,7 +392,7 @@ rc-shell output):
 
 </li><li> Although not necessary, you may want to include &lsquo;<tt>dmalloc.h</tt>&rsquo; in your C files and recompile.  This will allow
 the library to report the file/line numbers of calls that generate problems.  See section <a href="#Allocation-Macros">Macros Providing File and Line Information</a>.  It should be
-inserted at the <em>bottom</em> of your include files as to not conflict with wother includes.  You may want to ifdef it
+inserted at the <em>bottom</em> of your include files as to not conflict with other includes.  You may want to ifdef it
 as well and compile with <kbd>cc -DDMALLOC &hellip;</kbd>:
 
 <table><tr><td>&nbsp;</td><td><pre class="example">/* other includes above ^^^ */
@@ -405,7 +404,7 @@ as well and compile with <kbd>cc -DDMALLOC &hellip;</kbd>:
 
 <a name="index-DMALLOC_005fFUNC_005fCHECK"></a>
 </li><li> Another optional task is to compile all of your source with the &lsquo;<tt>dmalloc.h</tt>&rsquo; with the
-<code>DMALLOC_FUNC_CHECK</code> compilation flag.  This willallow the library to check all of the arguments of a number of
+<code>DMALLOC_FUNC_CHECK</code> compilation flag.  This will allow the library to check all of the arguments of a number of
 common string and utility routines.  See section <a href="#Argument-Checking">Checking of Function Arguments</a>.
 
 <table><tr><td>&nbsp;</td><td><pre class="example">cc -DDMALLOC -DDMALLOC_FUNC_CHECK file.c
@@ -618,7 +617,7 @@ pointer to the space requested.
 </p>
 </dd></dl>
 <dl>
-<dt><a name="index-_002acalloc"></a><u>Function:</u> void <b>*calloc</b><i> ( unsigned int <var>number</var>, unsigned int<var>size</var> )</i></dt>
+<dt><a name="index-_002acalloc"></a><u>Function:</u> void <b>*calloc</b><i> ( unsigned int <var>number</var>, unsigned int <var>size</var> )</i></dt>
 <dd><a name="index-calloc"></a>
 <a name="index-Allocation-of-zeros"></a>
 <a name="index-zeros_002c-allocation-of"></a>
