@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on December 24, 2020 by texi2html 1.82
+<!-- Created on December 28, 2020 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -76,7 +76,7 @@ and the value of the DMALLOC_OPTIONS environment variable.
 <p>Gray Watson.
 </p>
 <table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                     Library copying and licensing conditions.
+<tr><td align="left" valign="top"><a href="#License">1. Library License and Copying Information</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                     Library license and copying information.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Overview">2. Description of Features and How to Get Started</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                    Description of features and how to get started.
 </td></tr>
@@ -94,7 +94,7 @@ and the value of the DMALLOC_OPTIONS environment variable.
 
 
 <hr size="1">
-<a name="Copying"></a>
+<a name="License"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Top" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Overview" title="Next section in reading order"> &gt; </a>]</td>
@@ -111,8 +111,8 @@ and the value of the DMALLOC_OPTIONS environment variable.
 <td valign="middle" align="left">[<a href="#Index-of-Concepts" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<a name="Library-Copying-and-Licensing-Conditions"></a>
-<h1 class="chapter">1. Library Copying and Licensing Conditions</h1>
+<a name="Library-License-and-Copying-Information"></a>
+<h1 class="chapter">1. Library License and Copying Information</h1>
 
 <a name="index-copying"></a>
 <a name="index-license"></a>
@@ -136,10 +136,10 @@ THIS SOFTWARE.
 <hr size="6">
 <a name="Overview"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#Copying" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#License" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Installation" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="#Copying" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#License" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Top" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[<a href="#Programming" title="Next chapter"> &gt;&gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
@@ -200,8 +200,7 @@ THIS SOFTWARE.
 <p>To configure, compile, and install the library, follow these steps carefully.
 </p>
 <ol>
-<li> Make sure you have downloaded the latest version of the library available from the home page at URL
-<a href="http://dmalloc.com/">http://dmalloc.com/</a>.
+<li> Download the latest version of the library available from <a href="http://dmalloc.com/">http://dmalloc.com/</a>.
 
 </li><li> The release files have a &lsquo;<tt>.tgz</tt>&rsquo; file extension which means that they are a tar&rsquo;d gzip&rsquo;d directory of files.
 You will need to ungzip and then untar the release file into your source work directory.  You may have to rename the
@@ -328,11 +327,14 @@ replaced with &lsquo;<samp>PATH</samp>&rsquo;.
 use of the library:
 </p>
 <ol>
-<li> Make sure you have downloaded the latest version of the library available from the home page at URL
-<a href="http://dmalloc.com/">http://dmalloc.com/</a>.
+<li> Download the latest version of the library from <a href="http://dmalloc.com/">http://dmalloc.com/</a>.
 
-</li><li> Follow the installation instructions on how to configure, make, and install the library (i.e. type:
-<kbd>make install</kbd>).  See section <a href="#Installation">How to Install the Library</a>.
+<a name="index-configure-script-1"></a>
+
+</li><li> Run <kbd>./configure</kbd> to configure the library.  Follow the installation instructions on how to
+configure, make, and install the library (i.e. type: <kbd>make install</kbd>).  See section <a href="#Installation">How to Install the Library</a>.
+
+</li><li> Run <kbd>./make install</kbd> to install the library on your system.
 
 <a name="index-automatic-shutdown"></a>
 <a name="index-shutdown_002c-automatic"></a>
@@ -517,7 +519,7 @@ int numbers[10];
 
 main()
 {
-        &hellip;
+   &hellip;
 }
 </pre></td></tr></table>
 
@@ -528,14 +530,14 @@ system in the space called stack space.
 </p>
 <table><tr><td>&nbsp;</td><td><pre class="example">void foo()
 {
-        /* this local variable is stored on the stack */
-        float total;
-        &hellip;
+   /* this local variable is stored on the stack */
+   float total;
+   &hellip;
 }
 
 main()
 {
-        foo();
+   foo();
 }
 </pre></td></tr></table>
 
@@ -545,20 +547,20 @@ main()
 </p>
 <table><tr><td>&nbsp;</td><td><pre class="example">main()
 {
-        /* the address is stored on the stack */
-        char * string;
-        &hellip;
+   /* the address is stored on the stack */
+   char * string;
+   &hellip;
 
-        /*
-         * Allocate a string of 10 bytes on the heap.  Store the
-         * address in string which is on the stack.
-         */
-        string = (char *)malloc(10);
-        &hellip;
+   /*
+    * Allocate a string of 10 bytes on the heap.  Store the
+    * address in string which is on the stack.
+    */
+   string = (char *)malloc(10);
+   &hellip;
 
-        /* de-allocate the heap memory now that we're done with it */
-        (void)free(string);
-        &hellip;
+   /* de-allocate the heap memory now that we're done with it */
+   (void)free(string);
+   &hellip;
 }
 </pre></td></tr></table>
 
@@ -1110,7 +1112,7 @@ in &lsquo;<tt>settings.dist</tt>&rsquo;.
 </p>
 <table><tr><td>&nbsp;</td><td><pre class="example">main()
 {
-  abort();
+   abort();
 }
 </pre></td></tr></table>
 
@@ -1192,9 +1194,9 @@ be called right before <code>exit()</code> or as the last function in <code>main
 </p>
 <table><tr><td>&nbsp;</td><td><pre class="example">main()
 {
-        &hellip;
-        dmalloc_shutdown();
-        exit(0);
+   &hellip;
+   dmalloc_shutdown();
+   exit(0);
 }
 </pre></td></tr></table>
 </dd></dl>
@@ -1892,17 +1894,17 @@ problem, pointer overflow, or some other corruption.
 <p>If you would like to disable the library&rsquo;s detailed checking features during a particularly allocation intensive section
 of code, you can do something like the following:
 </p>
-<table><tr><td>&nbsp;</td><td><pre class="example">        unsigned int dmalloc_flags;
-        &hellip;
-        /* turn off all debug flags and save a copy of old value */
-        dmalloc_flags = dmalloc_debug(0);
+<table><tr><td>&nbsp;</td><td><pre class="example">   unsigned int dmalloc_flags;
+   &hellip;
+   /* turn off all debug flags and save a copy of old value */
+   dmalloc_flags = dmalloc_debug(0);
 
-        /* section of a lot of allocations */
-        &hellip;
-        /* end of section */
+   /* section of a lot of allocations */
+   &hellip;
+   /* end of section */
 
-        /* restore the dmalloc flag setting */
-        dmalloc_debug(dmalloc_flags);
+   /* restore the dmalloc flag setting */
+   dmalloc_debug(dmalloc_flags);
 </pre></td></tr></table>
 
 <p>When you are finished with the development and debugging sessions, you may want to disable the dmalloc library and put
@@ -1931,12 +1933,12 @@ DMALLOC</code> and then just remove the -DDMALLOC.
 
 main()
 {
-  &hellip;
+   &hellip;
 
 #ifdef DMALLOC
-  dmalloc_verify(0L);
+   dmalloc_verify(0L);
 #endif
-  return 0;
+   return 0;
 }
 </pre></td></tr></table>
 
@@ -2420,15 +2422,15 @@ code into the <code>main</code> function in your program to initialize the dmall
 <table><tr><td>&nbsp;</td><td><pre class="example">main(int argc, char **argv)
 {
 #ifdef DMALLOC
-  /*
-   * Get environ variable DMALLOC_OPTIONS and pass the settings string
-   * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
-   */
-  dmalloc_debug_setup(getenv(&quot;DMALLOC_OPTIONS&quot;));
+   /*
+    * Get environ variable DMALLOC_OPTIONS and pass the settings string
+    * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
+    */
+   dmalloc_debug_setup(getenv(&quot;DMALLOC_OPTIONS&quot;));
 #endif
 
-  /* rest of code in main starts here */
-  &hellip;
+   /* rest of code in main starts here */
+   &hellip;
 }
 </pre></td></tr></table>
 
@@ -2505,10 +2507,10 @@ with an <code>#ifdef DMALLOC</code> so you&rsquo;ll have to compile using the <c
 <table><tr><td>&nbsp;</td><td><pre class="example">main()
 {
 #ifdef DMALLOC
-  /* set the 'high' flags */
-  dmalloc_debug_setup(&quot;debug=0x4f47d03,log=logfile&quot;);
+   /* set the 'high' flags */
+   dmalloc_debug_setup(&quot;debug=0x4f47d03,log=logfile&quot;);
 #endif
-  &hellip;
+   &hellip;
 }
 </pre></td></tr></table>
 
@@ -2530,10 +2532,10 @@ export DMALLOC_OPTIONS
 <table><tr><td>&nbsp;</td><td><pre class="example">main()
 {
 #ifdef DMALLOC
-  /* set the 'high' flags */
-  dmalloc_debug(0x4f4ed03);
+   /* set the 'high' flags */
+   dmalloc_debug(0x4f4ed03);
 #endif
-  &hellip;
+   &hellip;
 }
 </pre></td></tr></table>
 
@@ -3766,12 +3768,12 @@ building a hack for your box.
 
 a()
 {
-        x = __builtin_return_address(0);
+   x = __builtin_return_address(0);
 }
 
 main()
 {
-        a();
+   a();
 }
 </pre></td></tr></table>
 
@@ -4143,9 +4145,10 @@ using.
 <tr><td></td><td valign="top"><a href="#index-conf_002eh-file">conf.h file</a></td><td valign="top"><a href="#Installation">2.1 How to Install the Library</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-configuration-file">configuration file</a></td><td valign="top"><a href="#RC-File">4.5 Format of the Runtime Configuration File</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-configure-script">configure script</a></td><td valign="top"><a href="#Installation">2.1 How to Install the Library</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-configure-script-1">configure script</a></td><td valign="top"><a href="#Getting-Started">2.2 Getting Started with the Library</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-configuring-the-library">configuring the library</a></td><td valign="top"><a href="#Installation">2.1 How to Install the Library</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-constancy-verification">constancy verification</a></td><td valign="top"><a href="#Features">2.4 General Features of the Library</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-copying">copying</a></td><td valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-copying">copying</a></td><td valign="top"><a href="#License">1. Library License and Copying Information</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-core-dump">core dump</a></td><td valign="top"><a href="#Features">2.4 General Features of the Library</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-core-dump-1">core dump</a></td><td valign="top"><a href="#Dumping-Core">3.4 Generating a Core File on Errors</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-core-dump-2">core dump</a></td><td valign="top"><a href="#Debug-Tokens">4.4 Description of the Debugging Tokens</a></td></tr>
@@ -4358,7 +4361,7 @@ using.
 <tr><td></td><td valign="top"><a href="#index-INVALID_005fERROR">INVALID_ERROR</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-is-found-error">is found error</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-is-null-error">is null error</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-isc-license">isc license</a></td><td valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-isc-license">isc license</a></td><td valign="top"><a href="#License">1. Library License and Copying Information</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-iteration-count">iteration count</a></td><td valign="top"><a href="#How-It-Works">2.5 How the Library Checks Your Program</a></td></tr>
 <tr><td colspan="3"> <hr></td></tr>
 <tr><th><a name="Index-of-Concepts-1_cp_letter-J">J</a></th><td></td><td></td></tr>
@@ -4376,10 +4379,10 @@ using.
 <tr><td></td><td valign="top"><a href="#index-leaking-memory">leaking memory</a></td><td valign="top"><a href="#Features">2.4 General Features of the Library</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-leaking-memory-1">leaking memory</a></td><td valign="top"><a href="#Memory-Leaks">3.9.2 Tracking Down Non-Freed Memory</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-libdmallocxx_002ea">libdmallocxx.a</a></td><td valign="top"><a href="#Using-With-C_002b_002b">3.8 Using the Library with C++</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-library-permissions">library permissions</a></td><td valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-library-permissions">library permissions</a></td><td valign="top"><a href="#License">1. Library License and Copying Information</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-library-utility">library utility</a></td><td valign="top"><a href="#Dmalloc-Program">4. Dmalloc Utility Program</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-library-version">library version</a></td><td valign="top"><a href="#Utility-Usage">4.2 How to Use the Dmalloc Program</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-license">license</a></td><td valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-license">license</a></td><td valign="top"><a href="#License">1. Library License and Copying Information</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-lock-on">lock on</a></td><td valign="top"><a href="#Using-With-Threads">3.10 Using the Library with a Thread Package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-lock-on-1">lock on</a></td><td valign="top"><a href="#Utility-Usage">4.2 How to Use the Dmalloc Program</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-lock_002don">lock-on</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
@@ -4456,7 +4459,7 @@ using.
 <tr><td></td><td valign="top"><a href="#index-octal-337-character">octal 337 character</a></td><td valign="top"><a href="#Debug-Tokens">4.4 Description of the Debugging Tokens</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-on_005fexit">on_exit</a></td><td valign="top"><a href="#Getting-Started">2.2 Getting Started with the Library</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-on_005fexit-function">on_exit function</a></td><td valign="top"><a href="#Extensions">3.5 Additional Non-standard Routines</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-open-source-license">open source license</a></td><td valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-open-source-license">open source license</a></td><td valign="top"><a href="#License">1. Library License and Copying Information</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-other-hints">other hints</a></td><td valign="top"><a href="#Other-Hints">3.14 Various Other Hints That May Help</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-over-fence-error">over fence error</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-over-limit-error">over limit error</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
@@ -4469,7 +4472,7 @@ using.
 <tr><td colspan="3"> <hr></td></tr>
 <tr><th><a name="Index-of-Concepts-1_cp_letter-P">P</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-page-size">page size</a></td><td valign="top"><a href="#Extensions">3.5 Additional Non-standard Routines</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-permissions-of-the-library">permissions of the library</a></td><td valign="top"><a href="#Copying">1. Library Copying and Licensing Conditions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-permissions-of-the-library">permissions of the library</a></td><td valign="top"><a href="#License">1. Library License and Copying Information</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-pid-in-logfile-path">pid in logfile path</a></td><td valign="top"><a href="#Utility-Usage">4.2 How to Use the Dmalloc Program</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-pointer-information">pointer information</a></td><td valign="top"><a href="#Extensions">3.5 Additional Non-standard Routines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-pointer-is-not-on-block-boundary">pointer is not on block boundary</a></td><td valign="top"><a href="#Error-Codes">3.6 Description of the Internal Error Codes</a></td></tr>
@@ -4709,7 +4712,7 @@ using.
 <div class="contents">
 
 <ul class="toc">
-  <li><a name="toc-Library-Copying-and-Licensing-Conditions" href="#Copying">1. Library Copying and Licensing Conditions</a></li>
+  <li><a name="toc-Library-License-and-Copying-Information" href="#License">1. Library License and Copying Information</a></li>
   <li><a name="toc-Description-of-Features-and-How-to-Get-Started" href="#Overview">2. Description of Features and How to Get Started</a>
   <ul class="toc">
     <li><a name="toc-How-to-Install-the-Library" href="#Installation">2.1 How to Install the Library</a></li>
@@ -4772,7 +4775,7 @@ using.
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>Gray Watson</em> on <em>December 24, 2020</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Gray Watson</em> on <em>December 28, 2020</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -4874,7 +4877,7 @@ using.
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>Gray Watson</em> on <em>December 24, 2020</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Gray Watson</em> on <em>December 28, 2020</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 

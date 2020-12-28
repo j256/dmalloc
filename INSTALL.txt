@@ -5,8 +5,7 @@
 
 To configure, compile, and install the library, follow these steps carefully.
 
-  1. Make sure you have downloaded the latest version of the library available from the home page
-     at URL `http://dmalloc.com/'.
+  1. Download the latest version of the library available from `http://dmalloc.com/'.
 
   2. The release files have a `.tgz' file extension which means that they are a tar'd gzip'd
      directory of files.  You will need to ungzip and then untar the release file into your source
@@ -96,20 +95,21 @@ Started::.
 This section should give you a quick idea on how to get going.  Basically, you need to do the
 following things to make use of the library:
 
-  1. Make sure you have downloaded the latest version of the library available from the home page
-     at URL `http://dmalloc.com/'.
+  1. Download the latest version of the library from `http://dmalloc.com/'.
 
-  2. Follow the installation instructions on how to configure, make, and install the library (i.e.
-     type: `make install').  *Note Installation::.
+  2. Run `./configure' to configure the library.  Follow the installation instructions on how to
+     configure, make, and install the library (i.e. type: `make install').  *Note Installation::.
 
-  3. You need to make sure that the library configuration and build process above was able to
+  3. Run `./make install' to install the library on your system.
+
+  4. You need to make sure that the library configuration and build process above was able to
      locate one of the `on_exit' function, `atexit' function, or had compiler destructor support.
      If one of these functions or support is available then the dmalloc library should be able to
      automatically shut itself down when the program exits.  This causes the memory statistics and
      unfreed information to be dumped to the log file.  However, if your system has none of the
      above, then you will need to call `dmalloc_shutdown' yourself before your program exits.
 
-  4. To get the dmalloc utility to work you need to add an alias for dmalloc to your shell's
+  5. To get the dmalloc utility to work you need to add an alias for dmalloc to your shell's
      runtime configuration file if supported.  The idea is to have the shell capture the dmalloc
      program's output and adjust the environment.
 
@@ -139,7 +139,7 @@ following things to make use of the library:
 
           fn dmalloc {eval `{/usr/local/bin/dmalloc $*}}
 
-  5. Although not necessary, you may want to include `dmalloc.h' in your C files and recompile.
+  6. Although not necessary, you may want to include `dmalloc.h' in your C files and recompile.
      This will allow the library to report the file/line numbers of calls that generate problems.
      *Note Allocation Macros::.  It should be inserted at the _bottom_ of your include files as to
      not conflict with wother includes.  You may want to ifdef it as well and compile with `cc
@@ -151,16 +151,16 @@ following things to make use of the library:
           #include "dmalloc.h"
           #endif
 
-  6. Another optional task is to compile all of your source with the `dmalloc.h' with the
+  7. Another optional task is to compile all of your source with the `dmalloc.h' with the
      `DMALLOC_FUNC_CHECK' compilation flag.  This willallow the library to check all of the
      arguments of a number of common string and utility routines.  *Note Argument Checking::.
 
           cc -DDMALLOC -DDMALLOC_FUNC_CHECK file.c
 
-  7. Link the dmalloc library into your program.  The dmalloc library should probably be placed at
+  8. Link the dmalloc library into your program.  The dmalloc library should probably be placed at
      or near the end of the library list.
 
-  8. Enable the debugging features by typing `dmalloc -l logfile -i 100 low' (for example).  You
+  9. Enable the debugging features by typing `dmalloc -l logfile -i 100 low' (for example).  You
      should not see any messages printed by the dmalloc utility (see NOTE below).  This will:
 
         * Set the malloc logfile name to `logfile' (`-l logfile'). For programs which change
@@ -191,7 +191,7 @@ following things to make use of the library:
      created above is not working and he environmental variables are not being set.  Make sure
      you've logged out and back in to have the alias take effect.
 
-  9. Run your program, examine the logfile that should have been created by `dmalloc_shutdown', and
+ 10. Run your program, examine the logfile that should have been created by `dmalloc_shutdown', and
      use its information to help debug your program.
 
 

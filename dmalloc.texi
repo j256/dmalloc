@@ -41,7 +41,7 @@ permission notice are preserved on all copies.
 
 @c --------------------------------
 
-@node Top, Copying, (dir), (dir)
+@node Top, License, (dir), (dir)
 @top Debug Malloc Library
 @everyheading @thischapter @| @thispage @| @today{}
 
@@ -70,7 +70,7 @@ and the value of the DMALLOC_OPTIONS environment variable.
 Gray Watson.
 
 @menu
-* Copying::                     Library copying and licensing conditions.
+* License::                     Library license and copying information.
 * Overview::                    Description of features and how to get started.
 * Programming::                 How to program with the library.
 * Dmalloc Program::             How to use the library's utility.
@@ -81,8 +81,8 @@ Gray Watson.
 
 @c ----------------------------------------------------------------------------
 
-@node Copying, Overview, Top, Top
-@chapter Library Copying and Licensing Conditions
+@node License, Overview, Top, Top
+@chapter Library License and Copying Information
 
 @cindex copying
 @cindex license
@@ -104,7 +104,7 @@ THIS SOFTWARE.
 
 @c ----------------------------------------------------------------------------
 
-@node Overview, Programming, Copying, Top
+@node Overview, Programming, License, Top
 @chapter Description of Features and How to Get Started
 
 @cindex overview
@@ -408,7 +408,7 @@ int numbers[10];
 
 main()
 @{
-        @dots{}
+   @dots{}
 @}
 @end example
 
@@ -420,14 +420,14 @@ system in the space called stack space.
 @example
 void foo()
 @{
-        /* this local variable is stored on the stack */
-        float total;
-        @dots{}
+   /* this local variable is stored on the stack */
+   float total;
+   @dots{}
 @}
 
 main()
 @{
-        foo();
+   foo();
 @}
 @end example
 
@@ -438,20 +438,20 @@ Heap data is also allocated at runtime and provides a programmer with dynamic me
 @example
 main()
 @{
-        /* the address is stored on the stack */
-        char * string;
-        @dots{}
+   /* the address is stored on the stack */
+   char * string;
+   @dots{}
 
-        /*
-         * Allocate a string of 10 bytes on the heap.  Store the
-         * address in string which is on the stack.
-         */
-        string = (char *)malloc(10);
-        @dots{}
+   /*
+    * Allocate a string of 10 bytes on the heap.  Store the
+    * address in string which is on the stack.
+    */
+   string = (char *)malloc(10);
+   @dots{}
 
-        /* de-allocate the heap memory now that we're done with it */
-        (void)free(string);
-        @dots{}
+   /* de-allocate the heap memory now that we're done with it */
+   (void)free(string);
+   @dots{}
 @}
 @end example
 
@@ -851,7 +851,7 @@ in @file{settings.dist}.
 @example
 main()
 @{
-  abort();
+   abort();
 @}
 @end example
 
@@ -919,9 +919,9 @@ be called right before @code{exit()} or as the last function in @code{main()}.
 @example
 main()
 @{
-        @dots{}
-        dmalloc_shutdown();
-        exit(0);
+   @dots{}
+   dmalloc_shutdown();
+   exit(0);
 @}
 @end example
 @end deftypefun
@@ -1589,17 +1589,17 @@ If you would like to disable the library's detailed checking features during a p
 of code, you can do something like the following:
 
 @example
-        unsigned int dmalloc_flags;
-        @dots{}
-        /* turn off all debug flags and save a copy of old value */
-        dmalloc_flags = dmalloc_debug(0);
+   unsigned int dmalloc_flags;
+   @dots{}
+   /* turn off all debug flags and save a copy of old value */
+   dmalloc_flags = dmalloc_debug(0);
 
-        /* section of a lot of allocations */
-        @dots{}
-        /* end of section */
+   /* section of a lot of allocations */
+   @dots{}
+   /* end of section */
 
-        /* restore the dmalloc flag setting */
-        dmalloc_debug(dmalloc_flags);
+   /* restore the dmalloc flag setting */
+   dmalloc_debug(dmalloc_flags);
 @end example
 
 When you are finished with the development and debugging sessions, you may want to disable the dmalloc library and put
@@ -1630,12 +1630,12 @@ DMALLOC} and then just remove the -DDMALLOC.
 
 main()
 @{
-  @dots{}
+   @dots{}
 
 #ifdef DMALLOC
-  dmalloc_verify(0L);
+   dmalloc_verify(0L);
 #endif
-  return 0;
+   return 0;
 @}
 @end example
 
@@ -1988,15 +1988,15 @@ code into the @code{main} function in your program to initialize the dmalloc fla
 main(int argc, char **argv)
 @{
 #ifdef DMALLOC
-  /*
-   * Get environ variable DMALLOC_OPTIONS and pass the settings string
-   * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
-   */
-  dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
+   /*
+    * Get environ variable DMALLOC_OPTIONS and pass the settings string
+    * on to dmalloc_debug_setup to setup the dmalloc debugging flags.
+    */
+   dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
 #endif
 
-  /* rest of code in main starts here */
-  @dots{}
+   /* rest of code in main starts here */
+   @dots{}
 @}
 @end example
 
@@ -2059,10 +2059,10 @@ with an @code{#ifdef DMALLOC} so you'll have to compile using the @code{-DDMALLO
 main()
 @{
 #ifdef DMALLOC
-  /* set the 'high' flags */
-  dmalloc_debug_setup("debug=0x4f47d03,log=logfile");
+   /* set the 'high' flags */
+   dmalloc_debug_setup("debug=0x4f47d03,log=logfile");
 #endif
-  @dots{}
+   @dots{}
 @}
 @end example
 
@@ -2086,10 +2086,10 @@ You can then take the @code{0x4f4ed03} hexadecimal number and call @code{dmalloc
 main()
 @{
 #ifdef DMALLOC
-  /* set the 'high' flags */
-  dmalloc_debug(0x4f4ed03);
+   /* set the 'high' flags */
+   dmalloc_debug(0x4f4ed03);
 #endif
-  @dots{}
+   @dots{}
 @}
 @end example
 
@@ -3075,12 +3075,12 @@ static char * x;
 
 a()
 @{
-        x = __builtin_return_address(0);
+   x = __builtin_return_address(0);
 @}
 
 main()
 @{
-        a();
+   a();
 @}
 @end example
 

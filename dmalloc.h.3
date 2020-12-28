@@ -51,6 +51,10 @@
 extern "C" {
 #endif
 
+/*
+ * Tracking function that can be registered by calling dmalloc_track(...).  This callback function will
+ * be called each time an allocation occurs.
+ */
 typedef void  (*dmalloc_track_t)(const char *file, const unsigned int line,
 				 const int func_id,
 				 const DMALLOC_SIZE byte_size,
