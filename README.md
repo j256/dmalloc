@@ -25,10 +25,11 @@ Enjoy, Gray Watson
 
 See the INSTALL.txt file for building, installation, and quick-start notes.
 
-Examine the dmalloc.html file which contains the user-documentation for the dmalloc subsystem.  The source of
-all documation is the dmalloc.texi texinfo file which also can generate PDF hardcopy output with the help of
-the texinfo.tex file.  You can download the full documentation package or read it
-[online from the repository](http://dmalloc.com/).
+Examine the [html
+documentation](https://htmlpreview.github.io/?https://raw.githubusercontent.com/j256/dmalloc/master/dmalloc.html) for
+dmalloc.  The source of all documation is the dmalloc.texi texinfo file which also can generate PDF hardcopy output with
+the help of the texinfo.tex file.  You can download the full documentation package or read it [online from the
+repository](http://dmalloc.com/).
 
 ## Quick Getting Started
 
