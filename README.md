@@ -37,9 +37,9 @@ following things to make use of the library.  See the documentation for mmore de
 
   1. Downloaded the latest version of the library available from `http://dmalloc.com/'.
 
-  2. Run `./configure' to configure the library.
+  2. Run `./configure` to configure the library.
 
-  3. Run `make install' to install the library on your system.
+  3. Run `make install` to install the library on your system.
 
   4. Add an alias for the dmalloc utility.  The idea is to have the shell capture the dmalloc
      program's output and adjust the environment.
@@ -54,11 +54,10 @@ following things to make use of the library.  See the documentation for mmore de
 
   5. Link the dmalloc library into your program and the end of the library list.
 
-  8. Enable the debugging features by typing `dmalloc -l logfile -i 100 low' (for example).
-     Use `dmalloc --usage' to see other arguments to the dmalloc program.
+  8. Enable the debugging features by (for example) typing `dmalloc -l logfile -i 100 low`.
+     Use `dmalloc --usage` to see other arguments to the dmalloc program.
 
-  9. Run your program, examine the logfile that should have been created by `dmalloc_shutdown', and
-     use its information to help debug your program.
+  9. Run your program, examine the logfile, and use its information to help debug your program.
 
 ## Thanks
 
