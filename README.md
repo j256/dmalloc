@@ -33,8 +33,8 @@ repository](http://dmalloc.com/).
 
 ## Quick Getting Started
 
-This section should give you a quick idea on how to get going.  You need to do the following things to make
-use of the library.  See the documentation for more details.
+This section should give you an idea on how to get going.  See the more complete [getting started
+documentation](https://dmalloc.com/docs/getting-started) for more details.
 
   1. Download the latest version of the library available from http://dmalloc.com/.
 
