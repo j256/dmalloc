@@ -32,10 +32,10 @@ the texinfo.tex file.  You can download the full documentation package or read i
 
 ## Quick Getting Started
 
-This section should give you a quick idea on how to get going.  Basically, you need to do the
-following things to make use of the library.  See the documentation for mmore details.
+This section should give you a quick idea on how to get going.  You need to do the following things to make
+use of the library.  See the documentation for more details.
 
-  1. Downloaded the latest version of the library available from `http://dmalloc.com/'.
+  1. Download the latest version of the library available from http://dmalloc.com/.
 
   2. Run `./configure` to configure the library.
 

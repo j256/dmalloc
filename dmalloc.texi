@@ -132,8 +132,7 @@ To configure, compile, and install the library, follow these steps carefully.
 
 @enumerate
 
-@item Make sure you have downloaded the latest version of the library available from the home page at URL
-@uref{http://dmalloc.com/}.
+@item Download the latest version of the library available from @uref{http://dmalloc.com/}.
 
 @item The release files have a @file{.tgz} file extension which means that they are a tar'd gzip'd directory of files.
 You will need to ungzip and then untar the release file into your source work directory.  You may have to rename the
@@ -244,11 +243,14 @@ use of the library:
 
 @enumerate
 
-@item Make sure you have downloaded the latest version of the library available from the home page at URL
-@uref{http://dmalloc.com/}.
+@item Download the latest version of the library from @uref{http://dmalloc.com/}.
 
-@item Follow the installation instructions on how to configure, make, and install the library (i.e. type:
-@kbd{make install}).  @xref{Installation}.
+@cindex configure script
+
+@item Run @kbd{./configure} to configure the library.  Follow the installation instructions on how to
+configure, make, and install the library (i.e. type: @kbd{make install}).  @xref{Installation}.
+
+@item Run @kbd{./make install} to install the library on your system.
 
 @cindex automatic shutdown
 @cindex shutdown, automatic
