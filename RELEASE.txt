@@ -3,19 +3,21 @@
 The following set of tasks should be performed when the dmalloc library gets released.
 
 1) Update the ChangeLog file with the release date.
-2) Run autoconf to make sure configure up to date.
-3) Update the version numbers in the following files:
+2) Update the version numbers in the following files:
 	Changlog
 	README.md
 	configure.ac (in AC_INIT)
 	dmalloc.spec
 	dmalloc.texi
-4) Update doc files: make docs
-5) Consider updating the copyright heads in all files and in chunk.c strings.  Watch for
+3) Run autoconf to make sure configure up to date with new version.
+4) Run configure and make now that autoconf updated:
+	./configure ; make heavy
+5) Update doc files: make docs
+6) Consider updating the copyright heads in all files and in chunk.c strings.  Watch for
    .in, .cc, .dist files:
 	cat * | grep Copyright | sort -u
-6) Check in all files.
-7) Run tests:
+7) Check in all files.
+8) Run tests:
 	- [ maybe mkdir x ; cd x ]
 	- ./configure or ../configure
 	- make all heavy
@@ -24,9 +26,9 @@ The following set of tasks should be performed when the dmalloc library gets rel
 	- make heavy
 	- examine the log file, check version, look for exceptions
 	- [ maybe dmalloc_t -r ] to check for wierd flag conditions
-8) Clone on linux and others and run tests:
+9) Clone on linux and others and run tests:
 	git clone git@github.com:j256/dmalloc.git
-9) Run release.sh script.  It will run tests on repo.
+10) Run release.sh script.  It will run tests on repo.
 11) git tag the release:
 	git tag dmalloc_release_X_X_X
 	git push origin dmalloc_release_X_X_X

@@ -4,7 +4,7 @@
 #
 
 cwd=`pwd`
-version=`grep dmalloc_version dmalloc.h.2 | cut -f2 -d\"`
+version=`grep dmalloc_version version.h | cut -f2 -d\"`
 dir=dmalloc-$version
 
 head -1 ChangeLog.txt | grep -q $version
