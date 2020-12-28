@@ -46,11 +46,11 @@ following things to make use of the library.  See the documentation for mmore de
 
      Bash, ksh, and zsh users should add the following to their dot files:
 
-          function dmalloc { eval `command dmalloc -b $*`; }
+         function dmalloc { eval `command dmalloc -b $*`; }
 
      Csh or tcsh users  should add the following to their dot files:
 
-          alias dmalloc 'eval `\dmalloc -C \!*`'
+         alias dmalloc 'eval `\dmalloc -C \!*`'
 
   5. Link the dmalloc library into your program and the end of the library list.
 
