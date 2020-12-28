@@ -132,6 +132,7 @@ HTML_FILE = $(MODULE).html
 HTML_FILE2 = $(MODULE).html2
 INSTALL_FILE = INSTALL.txt
 INSTALL_FILE2 = INSTALL.txt2
+LICENSE_FILE = LICENSE.txt
 DOCS = $(INSTALL_FILE) $(HTML_FILE) $(INFO_FILE)
 
 CCFLAGS = @CFLAGS@
@@ -178,7 +179,7 @@ distclean : clean
 	rm -f $(INFO_FILE) $(HTML_FILE2) $(INSTALL_FILE2)
 #	rm -f configure
 
-docs : $(DOCS)
+docs : $(DOCS) LICENSE.txt
 
 installdirs :
 	$(srcdir)/mkinstalldirs $(includedir) $(libdir) $(bindir)
@@ -271,18 +272,23 @@ $(HTML_FILE) $(HTML_FILE2) : $(srcdir)/$(TEXI_FILE)
 $(INSTALL_FILE) $(INSTALL_FILE2) : $(INFO_FILE)
 	rm -f $@ $@.t
 	echo ------------------------------------------------------------------------------- > $@.t
-	sed -e '1,/,  Node: Installation/d' \
-		-e '/,  Node: Getting Started/,$$d' \
+	sed -e '1,/,  Node: Installation/d' -e '/,  Node: Getting Started/,$$d' \
 		< $(INFO_FILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
-	sed -e '1,/,  Node: Getting Started/d' \
-		-e '/,  Node: Allocation Basics/,$$d' \
+	sed -e '1,/,  Node: Getting Started/d' -e '/,  Node: Allocation Basics/,$$d' \
 		< $(INFO_FILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
-	sed -e '1,/,  Node: Troubleshooting/d' \
-		-e '/,  Node: Index of Concepts/,$$d' \
+	sed -e '1,/,  Node: Troubleshooting/d' -e '/,  Node: Index of Concepts/,$$d' \
 		< $(INFO_FILE) | tr -d '\037'  >> $@.t
 	echo ------------------------------------------------------------------------------- >> $@.t
+	mv $@.t $@
+
+# we need the FILE2 this because make gets confused by ../INSTALL.txt
+$(LICENSE_FILE) : $(INFO_FILE)
+	rm -f $@ $@.t
+	sed -e '1,/,  Node: License/d' -e '/,  Node: Overview/,$$d' < $(INFO_FILE) \
+		| sed -e '1,4d' \
+		| tr -d '\037'  >> $@.t
 	mv $@.t $@
 
 shlib : $(BUILD_SL)
@@ -417,6 +423,8 @@ depend :
 	- $(CC) $(INCS) -MM user_malloc.c | sed -e 's/^user_malloc.o/user_malloc_th.o/' >> Makefile.t
 	@ echo 'Dependencies in Makefile.t'
 	diff Makefile Makefile.t
+	# this won't be done unless they are the same
+	rm -f Makefile.t
 
 ###############################################################################
 #
