@@ -11,7 +11,9 @@ The following set of tasks should be performed when the dmalloc library gets rel
 	dmalloc.spec
 	dmalloc.texi
 4) Update doc files: make docs
-5) Consider updating the copyright heads in all files and in chunk.c strings.
+5) Consider updating the copyright heads in all files and in chunk.c strings.  Watch for
+   .in, .cc, .dist files:
+	cat * | grep Copyright | sort -u
 6) Check in all files.
 7) Run tests:
 	- [ maybe mkdir x ; cd x ]
