@@ -54,25 +54,16 @@
 
 /* argument variables */
 static	char		*env_string = NULL;		/* env options */
-static	int		log_trans_b = ARGV_FALSE;	/* log transactions */
-static	int		random_debug_b = ARGV_FALSE;	/* random flag */
 static	int		silent_b = ARGV_FALSE;		/* silent flag */
 static	unsigned int	seed_random = 0;		/* random seed */
-static	int		verbose_b = ARGV_FALSE;		/* verbose flag */
 
 static	argv_t		arg_list[] = {
   { 'e',	"env-string",		ARGV_CHAR_P,		&env_string,
     "string",			"string of env commands to set" },
-  { 'l',	"log-trans",		ARGV_BOOL_INT,		&log_trans_b,
-    NULL,			"log transactions via tracking-func" },
-  { 'r',	"random-debug",		ARGV_BOOL_INT,	       &random_debug_b,
-    NULL,			"randomly change debug flag" },
   { 's',	"silent",		ARGV_BOOL_INT,		&silent_b,
     NULL,			"do not display messages" },
   { 'S',	"seed-random",		ARGV_U_INT,		&seed_random,
     "number",			"seed for random function" },
-  { 'v',	"verbose",		ARGV_BOOL_INT,		&verbose_b,
-    NULL,			"enables verbose messages" },
   { ARGV_LAST }
 };
 
@@ -1151,10 +1142,6 @@ int	main(int argc, char **argv) {
   int	ret, final = 0;
   
   argv_process(arg_list, argc, argv);
-  
-  if (silent_b && verbose_b) {
-    silent_b = ARGV_FALSE;
-  }
   
   if (env_string != NULL) {
     dmalloc_debug_setup(env_string);
