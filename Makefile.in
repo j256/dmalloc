@@ -369,7 +369,7 @@ user_malloc_th.o : $(srcdir)/user_malloc.c
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -DLOCK_THREADS=1 -c $(srcdir)/user_malloc.c -o ./$@
 
-tests : $(TEST) $(TEST_FC)
+test tests : check light heavy
 
 $(TEST) : $(TEST).o dmalloc_argv.o $(LIBRARY)
 	rm -f $@

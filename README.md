@@ -19,7 +19,8 @@ The package includes the library, configuration scripts, debug utility applicati
 documentation.  Online documentation as well as the full source is available at the [dmalloc home
 page](http://dmalloc.com/).
 
-Enjoy, Gray Watson
+Enjoy,
+Gray Watson
 
 ## Documentation
 

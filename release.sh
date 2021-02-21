@@ -48,7 +48,7 @@ rm -rf $dir
 # clone our repo
 git clone git@github.com:j256/dmalloc.git $dir
 # clear our dot files not suitable for release
-rm -rf $dir/.git $dir/.gitignore $dir/.circleci
+rm -rf $dir/.??*
 
 dest=$dir.tgz
 rm -f $dest

@@ -14,13 +14,13 @@ jobs:
           command: ./configure --prefix /tmp
       - run:
           name: make
-          command: make clean all tests threads cxx threadscxx
+          command: make clean all threads cxx threadscxx
       - run:
           name: run utility
           command: ./dmalloc
       - run:
           name: run tests
-          command: make light heavy
+          command: make tests
       - run:
           name: make installdocs
           command: make installdocs
@@ -32,13 +32,13 @@ jobs:
           command: mkdir x ; cd x ; ../configure --prefix /tmp
       - run:
           name: make in subdir
-          command: cd x ; make clean all tests threads cxx threadscxx
+          command: cd x ; make clean all threads cxx threadscxx
       - run:
           name: run utility in subdir
           command: cd x ; ./dmalloc
       - run:
           name: run tests in subdir
-          command: cd x ; make light heavy
+          command: cd x ; make tests
       - run:
           name: make installdocs in subdir
           command: cd x ; make installdocs
