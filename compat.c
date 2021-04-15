@@ -468,14 +468,16 @@ char	*strsep(char **string_p, const char *delim)
 /*
  * Local getenv which handles some portability stuff.
  */
-char	*loc_getenv(const char *var, char *buf, const int buf_size,
-		    const int stay_safe)
-{
+#undef loc_getenv
 #if defined(__CYGWIN__) && HAVE_GETENVIRONMENTVARIABLEA
-  /* use this function instead of getenv */
-  GetEnvironmentVariableA(var, buf, buf_size);
-  return buf;
-#else /* ! __CYGWIN__ */
+char	*loc_getenv(const char *var, char *buf, const int buf_size)
+{
+  int ret = GetEnvironmentVariableA(var, buf, buf_size);
+  return ret > 0 && ret < buf_size ? buf : NULL;
+}
+#else
+char	*loc_getenv(const char *var, const int stay_safe)
+{
 #if GETENV_SAFE == 0
   if (stay_safe) {
     /* oh, well.  no idea how to get the environmental variables */
@@ -484,5 +486,5 @@ char	*loc_getenv(const char *var, char *buf, const int buf_size,
 #endif /* GETENV_SAFE == 0 */
   /* get the options flag */
   return getenv(var);
-#endif /* ! __CYGWIN__ */
 }
+#endif /* ! __CYGWIN__ */
