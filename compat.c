@@ -354,8 +354,8 @@ char	*strncpy(char *str1, const char *str2, const int len)
   int		len_c;
   
   for (len_c = 0, str1_p = str1; len_c < len; len_c++, str1_p++, str2++) {
-    if (null_reached || *str2 == '\0') {
-      null_reached = 1;
+    if (null_reached_b || *str2 == '\0') {
+      null_reached_b = 1;
       *str1_p = '\0';
     }
     else {
