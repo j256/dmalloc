@@ -2709,7 +2709,7 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
 			    int *queue_head_p, int *queue_tail_p, int *okay_bp)
 {
   int	env_c, env_n;
-  char	**vect_p, env_name[1024], *environ_p;
+  char	**vect_p, env_name[256], *environ_p;
   char	env_buf[256];
   
   /* create the env variable */

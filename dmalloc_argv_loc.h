@@ -60,7 +60,7 @@
 #define SPECIAL_CHARS		"e\033^^\"\"''\\\\n\nr\rt\tb\bf\fa\007"
 #define DUMP_SPACE_BUF		128		/* space for memory dump */
 #define ARG_MALLOC_INCR		20		/* alloc in 10 increments */
-#define FILE_LINE_SIZE		1024		/* max size of file lines */
+#define FILE_LINE_SIZE		256	/* max size of file lines */
 
 /* internal flags set in the ar_type field */
 /* NOTE: other external flags defined in argv.h */
