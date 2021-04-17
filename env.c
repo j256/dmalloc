@@ -158,7 +158,7 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
 /*
  * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
  */
-void	_dmalloc_start_break(char *start_all, char **start_file_p,
+void	_dmalloc_start_break(const char *start_all, char **start_file_p,
 			     int *start_line_p, unsigned long *start_iter_p,
 			     unsigned long *start_size_p)
 {
@@ -208,8 +208,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 				 unsigned long *start_size_p,
 				 unsigned long *limit_p)
 {
-  char		*env_p, *this_p;
-  char		buf[1024];
+  const char	*env_p, *this_p;
   int		len, done_b = 0;
   unsigned int	flags = 0;
   attr_t	*attr_p;
@@ -226,12 +225,8 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
   SET_POINTER(start_size_p, 0);
   SET_POINTER(limit_p, 0);
   
-  /* make a copy */
-  (void)strncpy(buf, env_str, sizeof(buf));
-  buf[sizeof(buf) - 1] = '\0';
-  
   /* handle each of tokens, in turn */
-  for (env_p = buf, this_p = buf; ! done_b; env_p++, this_p = env_p) {
+  for (env_p = env_str, this_p = env_str; ! done_b; env_p++, this_p = env_p) {
     
     /* find the comma of end */
     for (;; env_p++) {
@@ -239,7 +234,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 	done_b = 1;
 	break;
       }
-      if (*env_p == ',' && (env_p == buf || *(env_p - 1) != '\\')) {
+      if (*env_p == ',' && (env_p == env_str || *(env_p - 1) != '\\')) {
 	break;
       }
     }
@@ -249,8 +244,6 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (this_p == env_p) {
       continue;
     }
-    
-    *env_p = '\0';
     
     len = strlen(ADDRESS_LABEL);
     if (strncmp(this_p, ADDRESS_LABEL, len) == 0
@@ -289,8 +282,9 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, LOGFILE_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      (void)strncpy(log_path, this_p, sizeof(log_path));
-      log_path[sizeof(log_path) - 1] = '\0';
+      len = MIN(env_p - this_p, sizeof(log_path));
+      (void)strncpy(log_path, this_p, len);
+      log_path[len - 1] = '\0';
       SET_POINTER(logpath_p, log_path);
       continue;
     }
@@ -318,8 +312,10 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     }
     
     /* need to check the short/long debug options */
+    len = env_p - this_p;
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
-      if (strcmp(this_p, attr_p->at_string) == 0) {
+      if (len == strlen(attr_p->at_string) &&
+          strncmp(this_p, attr_p->at_string, len) == 0) {
 	flags |= attr_p->at_value;
 	break;
       }

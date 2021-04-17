@@ -35,7 +35,7 @@ void	_dmalloc_address_break(const char *addr_all, DMALLOC_PNT *addr_p,
  * Break up START_ALL into SFILE_P, SLINE_P, and SCOUNT_P
  */
 extern
-void	_dmalloc_start_break(char *start_all, char **start_file_p,
+void	_dmalloc_start_break(const char *start_all, char **start_file_p,
 			     int *start_line_p, unsigned long *start_iter_p,
 			     unsigned long *start_size_p);
 
