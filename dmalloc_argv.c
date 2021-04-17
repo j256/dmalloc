@@ -47,7 +47,7 @@ static	void	do_list(argv_t *grid, const int arg_c, char **argv,
  * exported variables
  */
 /* This is a processed version of argv[0], pre-path removed: /bin/ls -> ls */
-char	argv_program[PROGRAM_NAME + 1] = "Unknown";
+const char	*argv_program = "Unknown";
 
 /* A global value of argv from main after argv_process has been called */
 char	**argv_argv = NULL;
@@ -3032,7 +3032,7 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
   }
   
   /* so we can step on the environmental space */
-  (void)strncpy(argv_program, prog_p, PROGRAM_NAME);
+  argv_program = prog_p;
   
   /* count the args */
   entry_c = 0;
