@@ -1661,7 +1661,7 @@ static	void	display_variables(const argv_t *args)
     col_c = 0;
     if (arg_p->ar_short_arg == '\0') {
       if (arg_p->ar_long_arg != NULL) {
-	len = COMMENT_COLUMN - col_c - (LONG_PREFIX_LENGTH + 1);
+	len = LONG_COLUMN - col_c - (LONG_PREFIX_LENGTH + 1);
 	if (arg_p->ar_short_arg != '\0') {
 	  (void)fprintf(argv_error_stream, "%s", LONG_LABEL);
 	  col_c += LONG_LABEL_LENGTH;
@@ -1674,7 +1674,7 @@ static	void	display_variables(const argv_t *args)
       }
     }
     else if (arg_p->ar_short_arg == ARGV_MAND) {
-      display_arg(argv_error_stream, arg_p, COMMENT_COLUMN, &col_c);
+      display_arg(argv_error_stream, arg_p, LONG_COLUMN, &col_c);
     }
     else {
       /* ARGV_MAYBE handled here */
