@@ -1147,15 +1147,15 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
     arr_p = (argv_array_t *)var;
     
     if (arr_p->aa_entry_n == 0) {
-      arr_p->aa_entries = (char *)malloc(ARRAY_INCR *size);
+      var = (char *)malloc(ARRAY_INCR *size);
     }
     else if (arr_p->aa_entry_n % ARRAY_INCR == 0) {
-      arr_p->aa_entries =
+      var =
 	(char *)realloc(arr_p->aa_entries, (arr_p->aa_entry_n + ARRAY_INCR) *
 			size);
     }
     
-    if (arr_p->aa_entries == NULL) {
+    if (var == NULL) {
       if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: memory error during argument processing\n",
@@ -1167,6 +1167,7 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
       return ERROR;
     }
     
+    arr_p->aa_entries = var;
     var = (char *)(arr_p->aa_entries) + arr_p->aa_entry_n * size;
     arr_p->aa_entry_n++;
   }
