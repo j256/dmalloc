@@ -182,7 +182,7 @@ typedef struct {
 
 /* This is a processed version of argv[0], pre-path removed: /bin/ls -> ls */
 extern
-char	*argv_program;
+const char	*argv_program;
 
 /* A global value of argv from main after argv_process has been called */
 extern
