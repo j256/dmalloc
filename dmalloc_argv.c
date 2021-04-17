@@ -1295,7 +1295,7 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
       if (*arg_p == 'b' || *arg_p == 'B') {
 	val *= 1;
       }
-      else if (*arg_p == 'k' || *arg_p == 'B') {
+      else if (*arg_p == 'k' || *arg_p == 'K') {
 	val *= 1024;
       }
       else if (*arg_p == 'm' || *arg_p == 'M') {
@@ -1323,7 +1323,7 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
       if (*arg_p == 'b' || *arg_p == 'B') {
 	val *= 1;
       }
-      else if (*arg_p == 'k' || *arg_p == 'B') {
+      else if (*arg_p == 'k' || *arg_p == 'K') {
 	val *= 1024;
       }
       else if (*arg_p == 'm' || *arg_p == 'M') {
