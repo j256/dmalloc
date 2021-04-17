@@ -1589,18 +1589,18 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
       }
       else if (val % (1024 * 1024 * 1024) == 0) {
 	morf = val / (1024 * 1024 * 1024);
-	(void)loc_snprintf(buf, buf_size, "%ldg (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%lug (%lu)", morf, val);
       }
       else if (val % (1024 * 1024) == 0) {
 	morf = val / (1024 * 1024);
-	(void)loc_snprintf(buf, buf_size, "%ldm (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%lum (%lu)", morf, val);
       }
       else if (val % 1024 == 0) {
 	morf = val / 1024;
-	(void)loc_snprintf(buf, buf_size, "%ldk (%ld)", morf, val);
+	(void)loc_snprintf(buf, buf_size, "%luk (%lu)", morf, val);
       }
       else {
-	(void)loc_snprintf(buf, buf_size, "%ld", val);
+	(void)loc_snprintf(buf, buf_size, "%lu", val);
       }
       
       len = strlen(buf);
