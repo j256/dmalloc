@@ -152,7 +152,7 @@ typedef struct {
 static	argv_type_t	argv_types[] = {
   { ARGV_BOOL,		"flag",			sizeof(char),
     "if option used, set variable to 1" },
-  { ARGV_BOOL_NEG,	"negative flag",	sizeof(int),
+  { ARGV_BOOL_NEG,	"negative flag",	sizeof(char),
     "if option used, set variable to 0" },
   { ARGV_BOOL_ARG,	"flag with arg",	sizeof(char),
     "like boolean but with an argument, true/yes/1 sets var to 1" },
