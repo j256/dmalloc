@@ -1785,8 +1785,8 @@ static	int	check_or(const argv_t *args, const argv_t *which_p)
   if (match_p == NULL) {
     /* NOTE: we assume that which_p is not pointing now to ARGV_LAST */
     for (arg_p = which_p + 2;
-	 arg_p->ar_short_arg != ARGV_LAST
-	 && (arg_p - 1)->ar_short_arg != ARGV_LAST;
+	 (arg_p - 1)->ar_short_arg != ARGV_LAST
+	 && arg_p->ar_short_arg != ARGV_LAST;
 	 arg_p += 2) {
       if ((arg_p - 1)->ar_short_arg != ARGV_OR
 	  && (arg_p - 1)->ar_short_arg != ARGV_XOR) {
