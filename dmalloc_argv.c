@@ -3412,7 +3412,6 @@ int	argv_value_string(const argv_t *argv_entry_p, char *buf,
 {
   argv_array_t	*arr_p;
   int		ret, len;
-  char		details[128];
   
   if (! enabled_b) {
     argv_startup();
@@ -3436,10 +3435,8 @@ int	argv_value_string(const argv_t *argv_entry_p, char *buf,
 	ret = len;
       }
       else {
-	(void)loc_snprintf(details, sizeof(details), " (1st of %d entries)",
-			   arr_p->aa_entry_n);
-	strncpy(buf + len, details, buf_size - len);
-	buf[buf_size - 1] = '\0';
+	(void)loc_snprintf(buf + len, buf_size - len,
+			   " (1st of %d entries)", arr_p->aa_entry_n);
 	ret = strlen(buf);
       }
     }
