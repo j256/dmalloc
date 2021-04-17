@@ -2982,6 +2982,10 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
   argv_t	*arg_p;
   argv_t	**queue_list = NULL;
   int		queue_head = 0, queue_tail = 0;
+
+  if (! enabled_b) {
+    argv_startup();
+  }
   
   if (args == NULL) {
     args = empty;
