@@ -74,7 +74,6 @@
  * settings to vary the output of the argument routines
  */
 
-#define PROGRAM_NAME		256		/* max size of program name */
 #define EXIT_CODE		1		/* argv exit code for errors */
 
 /* global env settings */
