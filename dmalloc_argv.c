@@ -3056,6 +3056,9 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
   if (argv_process_env_b && (! argv_env_after_b)) {
     if (do_env_args(args, queue_list, &queue_head, &queue_tail,
 		    &okay_b) != NOERROR) {
+      if (arg_n > 0) {
+        free(queue_list);
+      }
       return ERROR;
     }
   }
@@ -3068,6 +3071,9 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
   if (argv_process_env_b && argv_env_after_b) {
     if (do_env_args(args, queue_list, &queue_head, &queue_tail,
 		    &okay_b) != NOERROR) {
+      if (arg_n > 0) {
+        free(queue_list);
+      }
       return ERROR;
     }
   }
