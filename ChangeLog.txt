@@ -1,3 +1,9 @@
+Version 5.6.6 (?/?/2021):
+	* Reduced the size of a number of internal buffers for small stack systems.  Thanks to Xiang Xiao.
+	* Fixed a bug in heap when using an internal buffer.  Thanks to Xiang Xiao.
+	* Fixed a typo in string_to_value().  Thanks to Xiang Xiao.
+	* Fixed a typo error in strncpy().  Thanks to Xiang Xiao.
+
 Version 5.6.5 (12/28/2020):
 	* Fixed the installdocs target... Again.  Thanks to matthewluckie.
 

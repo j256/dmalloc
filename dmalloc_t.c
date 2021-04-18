@@ -213,7 +213,8 @@ static	void	free_slot(const int iter_c, pnt_info_t *slot_p,
  */
 static	int	do_random(const int iter_n)
 {
-  char		*old_env, env_buf[256];
+  char		*old_env;
+  static char	env_buf[256];
   unsigned int	flags;
   int		iter_c, prev_errno, amount, max_avail, free_c;
   int		final = 1;
@@ -572,7 +573,8 @@ static	int	check_initial_special(void)
 {
   void	*pnt;
   int	final = 1, iter_c;
-  char	*old_env, env_buf[256];
+  char	*old_env;
+  static char	env_buf[256];
   
   /********************/
   
@@ -727,7 +729,8 @@ static	int	check_initial_special(void)
  */
 static	int	check_arg_check(void)
 {
-  char		*old_env, env_buf[256];
+  char		*old_env;
+  static char	env_buf[256];
   unsigned int	old_flags;
   char		*func;
   int		our_errno_hold = dmalloc_errno;
@@ -1860,8 +1863,9 @@ static	int	check_special(void)
   void	*pnt;
   int	page_size;
   int	final = 1;
-  char	*old_env, env_buf[256];
-  
+  char	*old_env;
+  static char	env_buf[256];
+
   /* get our page size */
   page_size = dmalloc_page_size();
   

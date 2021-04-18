@@ -233,7 +233,7 @@ static	void	build_logfile_path(char *buf, const int buf_len)
  */
 void	_dmalloc_open_log(void)
 {
-  char	log_path[1024];
+  char	log_path[256];
   
   /* if it's already open or if we don't have a log file configured */
   if (outfile_fd >= 0

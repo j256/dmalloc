@@ -202,7 +202,7 @@ char	*strsep(char **string_p, const char *delim);
  */
 extern
 char	*loc_getenv(const char *var, char *buf, const int buf_size,
-		    const int stay_safe);
+		    const int stay_safe, const int copy_to_buf);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
