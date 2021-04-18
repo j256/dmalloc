@@ -35,7 +35,7 @@
 # include <string.h>				/* for strlen */
 #endif
 #if HAVE_UNISTD_H
-# include <unistd.h>				/* for write */
+# include <unistd.h>				/* for _exit */
 #endif
 
 /*
@@ -767,13 +767,12 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
   }
   
   if (xalloc_b && new_p == NULL) {
-    char	mess[1024], desc[128];
-    (void)loc_snprintf(mess, sizeof(mess),
-		       "Out of memory while allocating %d bytes from '%s'\n",
-		       size,
-		       _dmalloc_chunk_desc_pnt(desc, sizeof(desc),
-					       file, line));
-    (void)write(STDERR, mess, strlen(mess));
+    char	 desc[128];
+    loc_dprintf(STDERR,
+		"Out of memory while allocating %d bytes from '%s'\n",
+		size,
+		_dmalloc_chunk_desc_pnt(desc, sizeof(desc),
+					file, line));
     _exit(1);
   }
   
@@ -869,12 +868,11 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
   }
   
   if (xalloc_b && new_p == NULL) {
-    char	mess[1024], desc[128];
-    (void)loc_snprintf(mess, sizeof(mess),
-		       "Out of memory while reallocating %d bytes from '%s'\n",
-		       new_size, _dmalloc_chunk_desc_pnt(desc, sizeof(desc),
-							 file, line));
-    (void)write(STDERR, mess, strlen(mess));
+    char	desc[128];
+    loc_dprintf(STDERR,
+		"Out of memory while reallocating %d bytes from '%s'\n",
+		new_size, _dmalloc_chunk_desc_pnt(desc, sizeof(desc),
+						  file, line));
     _exit(1);
   }
   

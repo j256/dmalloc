@@ -126,6 +126,18 @@ void	loc_fprintf(FILE *file, const char *format, ...);
 extern
 void	loc_vfprintf(FILE *file, const char *format, va_list args);
 
+/*
+ * Local implementation of dprintf so we can use %p and other non-standard formats.
+ */
+extern
+void	loc_dprintf(int fd, const char *format, ...);
+
+/*
+ * Local implementation of vdprintf so we can use %p and other non-standard formats.
+ */
+extern
+void	loc_vdprintf(int fd, const char *format, va_list args);
+
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
 #endif /* ! __APPENDER_H__ */

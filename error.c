@@ -36,7 +36,7 @@
 # include <stdlib.h>				/* for abort */
 #endif
 #if HAVE_UNISTD_H
-# include <unistd.h>				/* for write */
+# include <unistd.h>				/* for _exit */
 #endif
 
 #include "conf.h"				/* up here for _INCLUDE */
@@ -128,7 +128,6 @@ int		_dmalloc_aborting_b = 0;
 /* local variables */
 static	int	outfile_fd = -1;		/* output file descriptor */
 /* the following are here to reduce stack overhead */
-static	char	error_str[1024];		/* error string buffer */
 static	char	message_str[1024];		/* message string buffer */
 
 /*
@@ -139,7 +138,6 @@ static	char	message_str[1024];		/* message string buffer */
 static	void	build_logfile_path(char *buf, const int buf_len)
 {
   char	*bounds_p, *path_p, *buf_p;
-  int	len;
   
   if (dmalloc_logpath == NULL) {
     buf[0] = '\0';
@@ -220,10 +218,9 @@ static	void	build_logfile_path(char *buf, const int buf_len)
   
   if (buf_p >= bounds_p - 1) {
     /* NOTE: we can't use dmalloc_message of course so do it the hard way */
-    len = loc_snprintf(error_str, sizeof(error_str),
-		       "debug-malloc library: logfile path too large '%s'\r\n",
-		       dmalloc_logpath);
-    (void)write(STDERR, error_str, len);
+    loc_dprintf(STDERR,
+		"debug-malloc library: logfile path too large '%s'\r\n",
+		dmalloc_logpath);
   }
   
   append_null(buf_p, bounds_p);
@@ -237,7 +234,6 @@ static	void	build_logfile_path(char *buf, const int buf_len)
 void	_dmalloc_open_log(void)
 {
   char	log_path[1024];
-  int	len;
   
   /* if it's already open or if we don't have a log file configured */
   if (outfile_fd >= 0
@@ -251,10 +247,9 @@ void	_dmalloc_open_log(void)
   outfile_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if (outfile_fd < 0) {
     /* NOTE: we can't use dmalloc_message of course so do it the hardway */
-    len = loc_snprintf(error_str, sizeof(error_str),
-		       "debug-malloc library: could not open '%s'\r\n",
-		       log_path);
-    (void)write(STDERR, error_str, len);
+    loc_dprintf(STDERR,
+		"debug-malloc library: could not open '%s'\r\n",
+		log_path);
     /* disable log_path */
     dmalloc_logpath = NULL;
     return;
@@ -569,7 +564,6 @@ void	_dmalloc_vmessage(const char *format, va_list args)
 void	_dmalloc_die(const int silent_b)
 {
   char	*stop_str;
-  int	len;
   
   if (! silent_b) {
     if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_ERROR_ABORT)) {
@@ -580,15 +574,13 @@ void	_dmalloc_die(const int silent_b)
     }
     
     /* print a message that we are going down */
-    len = loc_snprintf(error_str, sizeof(error_str),
-		       "debug-malloc library: %s program, fatal error\r\n",
-		       stop_str);
-    (void)write(STDERR, error_str, len);
+    loc_dprintf(STDERR,
+		"debug-malloc library: %s program, fatal error\r\n",
+		stop_str);
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
-      len = loc_snprintf(error_str, sizeof(error_str),
-			 "   Error: %s (err %d)\r\n",
-			 dmalloc_strerror(dmalloc_errno), dmalloc_errno);
-      (void)write(STDERR, error_str, len);
+      loc_dprintf(STDERR,
+		  "   Error: %s (err %d)\r\n",
+		  dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }
   

@@ -24,9 +24,6 @@
  * heap as well as reporting the current position of the heap.
  */
 
-#if HAVE_UNISTD_H
-# include <unistd.h>				/* for write */
-#endif
 #if HAVE_SYS_TYPES_H
 #  include <sys/types.h>
 #endif
@@ -104,11 +101,8 @@ static	void	*heap_extend(const int incr)
   
   if (ret == SBRK_ERROR) {
     if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CATCH_NULL)) {
-      char	str[128];
-      int	len;
-      len = loc_snprintf(str, sizeof(str),
-			 "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
-      (void)write(STDERR, str, len);
+      loc_dprintf(STDERR,
+		  "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
       _dmalloc_die(0);
     }
     dmalloc_errno = DMALLOC_ERROR_ALLOC_FAILED;

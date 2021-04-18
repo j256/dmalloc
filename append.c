@@ -33,6 +33,9 @@
 #if HAVE_STRING_H
 # include <string.h>                            /* for strlen */
 #endif
+#if HAVE_UNISTD_H
+# include <unistd.h>				/* for write */
+#endif
 
 #define DMALLOC_DISABLE
 
@@ -553,4 +556,29 @@ void	loc_vfprintf(FILE *file, const char *format, va_list args)
   limit = buf + sizeof(buf);
   buf_p = append_vformat(buf, limit, format, args);
   fwrite(buf, 1, (buf_p - buf), file);
+}
+
+/*
+ * Local implementation of dprintf so we can use %p and other non-standard formats.
+ */
+void	loc_dprintf(int fd, const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  loc_vdprintf(fd, format, args);
+  va_end(args);
+}
+
+/*
+ * Local implementation of vdprintf so we can use %p and other non-standard formats.
+ */
+void	loc_vdprintf(int fd, const char *format, va_list args)
+{
+  // these are simple messages so this limit is ok
+  char buf[256];
+  char *buf_p, *limit;
+
+  limit = buf + sizeof(buf);
+  buf_p = append_vformat(buf, limit, format, args);
+  (void)!write(fd, buf, buf_p - buf);
 }
