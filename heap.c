@@ -214,6 +214,7 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
   /* shift the heap a bit to account for non block alignment */
   heap_diff = heap_extend(diff_size);
   if (heap_diff == SBRK_ERROR) {
+    heap_release(heap_new, size);
     return HEAP_ALLOC_ERROR;
   }
   
