@@ -533,8 +533,7 @@ static	long	find_tag(const long debug_value, const char *tag_find,
       }
 
       // add on to end of home environ
-      loc_snprintf(buf + strlen(buf), sizeof(buf), "/%s",
-		   DEFAULT_CONFIG);
+      loc_snprintf(buf + strlen(buf), sizeof(buf), "/%s", DEFAULT_CONFIG);
       
       /* read in the file from our home directory */
       ret = read_rc_file(buf, debug_value, tag_find, &new_debug,
@@ -642,8 +641,7 @@ static	void	list_tags(void)
       }
 
       // add on to end of home environ
-      loc_snprintf(buf + strlen(buf), sizeof(buf), "/%s",
-		   DEFAULT_CONFIG);
+      loc_snprintf(buf + strlen(buf), sizeof(buf), "/%s", DEFAULT_CONFIG);
       path_p = buf;
       
       rc_file = fopen(path_p, "r");
