@@ -76,7 +76,7 @@ static	void	*heap_extend(const int incr)
     static char *bounds_p = block_o_bytes + sizeof(block_o_bytes);
     static char *block_p = block_o_bytes;
     
-    if (block_p + incr >= bounds_p) {
+    if (block_p + incr > bounds_p) {
       ret = SBRK_ERROR;
     }
     else {
@@ -214,6 +214,7 @@ void	*_dmalloc_heap_alloc(const unsigned int size)
   /* shift the heap a bit to account for non block alignment */
   heap_diff = heap_extend(diff_size);
   if (heap_diff == SBRK_ERROR) {
+    heap_release(heap_new, size);
     return HEAP_ALLOC_ERROR;
   }
   
