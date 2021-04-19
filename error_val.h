@@ -78,7 +78,7 @@ typedef struct {
 } error_str_t;
 
 /* string error codes which apply to error codes in error_val.h */
-static	error_str_t	error_list[]
+static	const error_str_t	error_list[]
 #ifdef __GNUC__
 __attribute__ ((unused))
 #endif

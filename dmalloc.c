@@ -97,7 +97,7 @@ typedef struct {
 			 DMALLOC_DEBUG_NEVER_REUSE)
 /* NOTE: print-messages is not in this list because it is special */
 
-static	default_t	defaults[] = {
+static	const default_t	defaults[] = {
   { "none",		0 },
   { "runtime",		RUNTIME_FLAGS },
   { "run",		RUNTIME_FLAGS },
@@ -217,7 +217,7 @@ static	argv_t	args[] = {
 /*
  * list of bourne shells
  */
-static	char	*sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
+static	char	* const sh_shells[] = { "sh", "ash", "bash", "ksh", "zsh", NULL };
 
 /*
  * try a check out the shell env variable to see what form of shell
@@ -267,7 +267,7 @@ static	void	choose_shell(void)
  */
 static	void	dump_debug(const unsigned long val)
 {
-  attr_t	*attr_p;
+  const attr_t	*attr_p;
   char		*str;
   unsigned long	work = val;
   int		col_c = 0, len;
@@ -327,7 +327,7 @@ static	void	dump_debug(const unsigned long val)
  */
 static	long	token_to_value(const char *tok)
 {
-  attr_t	*attr_p;
+  const attr_t	*attr_p;
   
   /* find the matching attribute string */
   for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
@@ -499,12 +499,12 @@ static	int	read_rc_file(const char *path, const long debug_value,
 static	long	find_tag(const long debug_value, const char *tag_find,
 			 char *token, const int token_size)
 {
-  char		path[1024], *path_p;
-  default_t	*def_p;
-  const char	*home_p;
-  int		ret;
-  long		new_debug = 0;
-  char		env_buf[256];
+  char			path[1024], *path_p;
+  const default_t	*def_p;
+  const char		*home_p;
+  int			ret;
+  long			new_debug = 0;
+  char			env_buf[256];
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -615,12 +615,12 @@ static	long	find_tag(const long debug_value, const char *tag_find,
  */
 static	void	list_tags(void)
 {
-  char		path[1024], *path_p, token[80];
-  default_t	*def_p;
-  const char	*home_p;
-  long		new_debug = 0;
-  FILE		*rc_file;
-  char		env_buf[256];
+  char			path[1024], *path_p, token[80];
+  const default_t	*def_p;
+  const char		*home_p;
+  long			new_debug = 0;
+  FILE			*rc_file;
+  char			env_buf[256];
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -823,7 +823,7 @@ static	void    set_variable(const char *var, const char *value)
  */
 static	char	*local_strerror(const int error_num)
 {
-  error_str_t	*err_p;
+  const error_str_t	*err_p;
   
   for (err_p = error_list; err_p->es_error != 0; err_p++) {
     if (err_p->es_error == error_num) {
@@ -1030,7 +1030,7 @@ int	main(int argc, char **argv)
   }
   
   if (debug_tokens_b) {
-    attr_t		*attr_p;
+    const attr_t	*attr_p;
     unsigned int	left = 0x7fffffff;
     
     loc_fprintf(stderr, "Debug Tokens:\n");

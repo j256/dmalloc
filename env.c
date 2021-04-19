@@ -211,7 +211,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
   const char	*next_p, *this_p;
   int		len, done_b = 0;
   unsigned int	flags = 0;
-  attr_t	*attr_p;
+  const attr_t	*attr_p;
   
   SET_POINTER(addr_p, NULL);
   SET_POINTER(addr_count_p, 0);
@@ -356,7 +356,7 @@ void	_dmalloc_environ_set(char *buf, const int buf_size,
   
   if (debug > 0) {
     if (long_tokens_b) {
-      attr_t	*attr_p;
+      const attr_t	*attr_p;
       
       for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
 	if (debug & attr_p->at_value) {
