@@ -1123,9 +1123,9 @@ static	int	preprocess_array(argv_t *args, const int arg_n)
 static	int	string_to_value(const char *arg, ARGV_PNT var,
 				const unsigned int type)
 {
-  argv_array_t	*arr_p;
-  argv_type_t	*type_p;
-  unsigned int	val_type = ARGV_TYPE(type), size = 0;
+  argv_array_t		*arr_p;
+  const argv_type_t	*type_p;
+  unsigned int		val_type = ARGV_TYPE(type), size = 0;
   
   /* find the type and the size for array */
   for (type_p = argv_types; type_p->at_value != 0; type_p++) {
@@ -1642,11 +1642,11 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
  */
 static	void	display_variables(const argv_t *args)
 {
-  const argv_t	*arg_p;
-  argv_type_t	*type_p;
-  char		buf[256];
-  int		len, col_c;
-  unsigned int	val_type;
+  const argv_t		*arg_p;
+  const argv_type_t	*type_p;
+  char			buf[256];
+  int			len, col_c;
+  unsigned int		val_type;
   
   /* run through the argument structure */
   for (arg_p = args; arg_p->ar_short_arg != ARGV_LAST; arg_p++) {
@@ -3473,8 +3473,8 @@ int	argv_value_string(const argv_t *argv_entry_p, char *buf,
 const char	*argv_type_info(const unsigned int type, unsigned int *size_p,
 				const char **desc_p)
 {
-  unsigned int	val_type;
-  argv_type_t	*type_p;
+  unsigned int		val_type;
+  const argv_type_t	*type_p;
   
   val_type = ARGV_TYPE(type);
   

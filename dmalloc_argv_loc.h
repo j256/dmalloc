@@ -148,7 +148,7 @@ typedef struct {
   const char	*at_desc;		/* description of the type */
 } argv_type_t;
 
-static	argv_type_t	argv_types[] = {
+static	const argv_type_t	argv_types[] = {
   { ARGV_BOOL,		"flag",			sizeof(char),
     "if option used, set variable to 1" },
   { ARGV_BOOL_NEG,	"negative flag",	sizeof(char),

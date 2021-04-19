@@ -1027,7 +1027,7 @@ static	int	do_strtok(void) {
 }
 #endif
 
-static	int	(*test_funcs[])() = {
+static	int	(*const test_funcs[])() = {
 #if HAVE_ATOI
   do_atoi,
 #endif
