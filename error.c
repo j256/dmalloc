@@ -25,6 +25,7 @@
  */
 
 #include <fcntl.h>				/* for O_WRONLY, etc. */
+#include <limits.h>				/* for PATH_MAX */
 
 #if HAVE_STDIO_H
 # include <stdio.h>				/* for FILE */
@@ -233,7 +234,7 @@ static	void	build_logfile_path(char *buf, const int buf_len)
  */
 void	_dmalloc_open_log(void)
 {
-  char	log_path[1024];
+  char	log_path[PATH_MAX];
   
   /* if it's already open or if we don't have a log file configured */
   if (outfile_fd >= 0
