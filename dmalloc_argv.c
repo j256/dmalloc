@@ -2722,15 +2722,10 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
     }
   }
   
-  environ_p = loc_getenv(env_name, env_buf, sizeof(env_buf), 0);
+  environ_p = loc_getenv(env_name, env_buf, sizeof(env_buf), 0,
+			 1 /* copy buf */);
   if (environ_p == NULL) {
     return NOERROR;
-  }
-  
-  /* break the list into tokens and do the list */
-  environ_p = string_copy(environ_p);
-  if (environ_p == NULL) {
-    return ERROR;
   }
   
   vect_p = vectorize(environ_p, " \t", &env_n);
@@ -2744,7 +2739,6 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
     }
     free(vect_p);
   }
-  free(environ_p);
   
   return NOERROR;
 }
@@ -2771,17 +2765,11 @@ static	int	process_env(void)
   done_b = ARGV_TRUE;
   
   /* get the argv information */
-  env_val = loc_getenv(GLOBAL_NAME, env_buf, sizeof(env_buf), 0);
+  env_val = loc_getenv(GLOBAL_NAME, env_buf, sizeof(env_buf), 0,
+		       1 /* copy buf */);
   if (env_val == NULL) {
     return NOERROR;
   }
-  
-  /* save a copy of it */
-  env_val = string_copy(env_val);
-  if (env_val == NULL) {
-    return ERROR;
-  }
-  
   env_p = env_val;
   
   for (;;) {
@@ -2951,7 +2939,6 @@ static	int	process_env(void)
     }
   }
   
-  free(env_val);
   return NOERROR;
 }
 

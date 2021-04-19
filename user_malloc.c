@@ -337,7 +337,8 @@ static	int	dmalloc_startup(const char *debug_str)
 {
   static int	some_up_b = 0;
   const char	*env_str;
-  char		env_buf[256];
+  // static to lower stack usage
+  static char	env_buf[256];
   
   /* have we started already? */
   if (enabled_b) {
@@ -358,7 +359,7 @@ static	int	dmalloc_startup(const char *debug_str)
     
     if (debug_str == NULL) {
       env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf),
-			   1 /* stay safe */);
+			   1 /* stay safe */, 0 /* copy buf */);
     }
     else {
       env_str = debug_str;
@@ -1519,7 +1520,7 @@ char	*dmalloc_debug_current_env(char *env_buf, const int env_buf_size)
   if (! enabled_b) {
     (void)dmalloc_startup(NULL /* no options string */);
   }
-  return loc_getenv(OPTIONS_ENVIRON, env_buf, env_buf_size, 0);
+  return loc_getenv(OPTIONS_ENVIRON, env_buf, env_buf_size, 0, 1 /* copy buf */);
 }
 
 /*

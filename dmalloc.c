@@ -229,7 +229,8 @@ static	void	choose_shell(void)
   int		shell_c;
   char		env_buf[256];
   
-  shell = loc_getenv(SHELL_ENVIRON, env_buf, sizeof(env_buf), 0);
+  shell = loc_getenv(SHELL_ENVIRON, env_buf, sizeof(env_buf), 0,
+		     0 /* copy buf */);
   if (shell == NULL) {
     /* oh well, we just guess on c-shell */
     cshell_b = 1;
@@ -361,7 +362,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
 {
   int	cont_b = 0, found_b = 0;
   long	new_debug = 0;
-  char	buf[1024], *tok_p, *buf_p;
+  char	buf[256], *tok_p, *buf_p;
   
   while (fgets(buf, sizeof(buf), infile) != NULL) {
     
@@ -499,12 +500,12 @@ static	int	read_rc_file(const char *path, const long debug_value,
 static	long	find_tag(const long debug_value, const char *tag_find,
 			 char *token, const int token_size)
 {
-  char		path[1024], *path_p;
+  char		*path_p;
   default_t	*def_p;
   const char	*home_p;
   int		ret;
   long		new_debug = 0;
-  char		env_buf[256];
+  char		buf[256];
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -523,24 +524,26 @@ static	long	find_tag(const long debug_value, const char *tag_find,
     }
     else {
       /* find our home directory */
-      home_p = loc_getenv(HOME_ENVIRON, env_buf, sizeof(env_buf), 0);
+      home_p = loc_getenv(HOME_ENVIRON, buf, sizeof(buf), 0,
+			  1 /* copy buf */);
       if (home_p == NULL) {
 	loc_fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
 	exit(1);
       }
-      
-      (void)loc_snprintf(path, sizeof(path), "%s/%s", home_p, DEFAULT_CONFIG);
+
+      // add on to end of home environ
+      loc_snprintf(buf + strlen(buf), sizeof(buf), "/%s", DEFAULT_CONFIG);
       
       /* read in the file from our home directory */
-      ret = read_rc_file(path, debug_value, tag_find, &new_debug,
+      ret = read_rc_file(buf, debug_value, tag_find, &new_debug,
 			 token, token_size);
       /* did we find the correct value in the file? */
       if (ret == TOKEN_FOUND) {
 	return new_debug;
       }
       if (ret == FILE_FOUND) {
-	path_p = path;
+	path_p = buf;
       }
       else {
 	path_p = NULL;
@@ -615,12 +618,12 @@ static	long	find_tag(const long debug_value, const char *tag_find,
  */
 static	void	list_tags(void)
 {
-  char		path[1024], *path_p, token[80];
+  char		*path_p, token[80];
   default_t	*def_p;
   const char	*home_p;
   long		new_debug = 0;
   FILE		*rc_file;
-  char		env_buf[256];
+  char		buf[256];
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -630,17 +633,18 @@ static	void	list_tags(void)
     if (rc_file == NULL) {
       
       /* if no file in current directory, try home directory */
-      home_p = loc_getenv(HOME_ENVIRON, env_buf, sizeof(env_buf), 0);
+      home_p = loc_getenv(HOME_ENVIRON, buf, sizeof(buf), 0, 1 /* copy buf */);
       if (home_p == NULL) {
 	loc_fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
 	exit(1);
       }
+
+      // add on to end of home environ
+      loc_snprintf(buf + strlen(buf), sizeof(buf), "/%s", DEFAULT_CONFIG);
+      path_p = buf;
       
-      (void)loc_snprintf(path, sizeof(path), "%s/%s", home_p, DEFAULT_CONFIG);
-      path_p = path;
-      
-      rc_file = fopen(path, "r");
+      rc_file = fopen(path_p, "r");
       /* we don't check for error right here */
     }
     else {
@@ -706,7 +710,8 @@ static	void	dump_current(void)
   char		env_buf[256];
   
   /* get the options flag */
-  env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0);
+  env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0,
+		       0 /* copy buf */);
   if (env_str == NULL) {
     env_str = "";
   }
@@ -790,7 +795,7 @@ static	void	dump_current(void)
  */
 static	void    set_variable(const char *var, const char *value)
 {
-  char	comm[1024];
+  static char	comm[1024];
   
   if (value == NULL || *value == '\0') {
     (void)loc_snprintf(comm, sizeof(comm), "unset %s\n", var);
@@ -897,7 +902,8 @@ int	main(int argc, char **argv)
   }
   
   /* get the current debug information from the env variable */
-  env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0);
+  env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0,
+		       0 /* copy buf */);
   if (env_str == NULL) {
     env_str = "";
   }

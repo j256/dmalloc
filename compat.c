@@ -30,6 +30,9 @@
 #if HAVE_STDIO_H
 # include <stdio.h>
 #endif
+#if HAVE_STRING_H
+# include <string.h>
+#endif
 
 #if HAVE_STDLIB_H
 # include <stdlib.h>				/* for getenv */
@@ -469,7 +472,7 @@ char	*strsep(char **string_p, const char *delim)
  * Local getenv which handles some portability stuff.
  */
 char	*loc_getenv(const char *var, char *buf, const int buf_size,
-		    const int stay_safe)
+		    const int stay_safe, const int copy_to_buf)
 {
 #if defined(__CYGWIN__) && HAVE_GETENVIRONMENTVARIABLEA
   /* use this function instead of getenv */
@@ -479,10 +482,24 @@ char	*loc_getenv(const char *var, char *buf, const int buf_size,
 #if GETENV_SAFE == 0
   if (stay_safe) {
     /* oh, well.  no idea how to get the environmental variables */
-    return "";
+    if (copy_to_buf) {
+      buf[0] = '\0';
+      return buf;
+    } else {
+      return "";
+    }
   }
 #endif /* GETENV_SAFE == 0 */
   /* get the options flag */
-  return getenv(var);
+  char *env = getenv(var);
+  if (env == NULL) {
+    return NULL;
+  } else if (copy_to_buf) {
+    strncpy(buf, env, buf_size);
+    buf[buf_size - 1] = '\0';
+    return buf;
+  } else {
+    return env;
+  }
 #endif /* ! __CYGWIN__ */
 }
