@@ -208,7 +208,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
 				 unsigned long *start_size_p,
 				 unsigned long *limit_p)
 {
-  const char	*env_p, *this_p;
+  const char	*next_p, *this_p;
   int		len, done_b = 0;
   unsigned int	flags = 0;
   attr_t	*attr_p;
@@ -226,22 +226,22 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
   SET_POINTER(limit_p, 0);
   
   /* handle each of tokens, in turn */
-  for (env_p = env_str, this_p = env_str; ! done_b; env_p++, this_p = env_p) {
+  for (next_p = env_str, this_p = env_str; ! done_b; next_p++, this_p = next_p) {
     
     /* find the comma of end */
-    for (;; env_p++) {
-      if (*env_p == '\0') {
+    for (;; next_p++) {
+      if (*next_p == '\0') {
 	done_b = 1;
 	break;
       }
-      if (*env_p == ',' && (env_p == env_str || *(env_p - 1) != '\\')) {
+      if (*next_p == ',' && (next_p == env_str || *(next_p - 1) != '\\')) {
 	break;
       }
     }
     
     /* should we strip ' ' or '\t' here? */
     
-    if (this_p == env_p) {
+    if (this_p == next_p) {
       continue;
     }
     
@@ -282,9 +282,9 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, LOGFILE_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      len = MIN(env_p - this_p, sizeof(log_path));
+      len = MIN(next_p - this_p, sizeof(log_path));
       (void)strncpy(log_path, this_p, len);
-      log_path[len - 1] = '\0';
+      log_path[sizeof(log_path) - 1] = '\0';
       SET_POINTER(logpath_p, log_path);
       continue;
     }
@@ -312,7 +312,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     }
     
     /* need to check the short/long debug options */
-    len = env_p - this_p;
+    len = next_p - this_p;
     for (attr_p = attributes; attr_p->at_string != NULL; attr_p++) {
       if (len == strlen(attr_p->at_string) &&
           strncmp(this_p, attr_p->at_string, len) == 0) {
