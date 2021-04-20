@@ -101,8 +101,8 @@ static	void	*heap_extend(const int incr)
   
   if (ret == SBRK_ERROR) {
     if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_CATCH_NULL)) {
-      loc_dprintf(STDERR,
-		  "\r\ndmalloc: critical error: could not extend heap %u more bytes\r\n", incr);
+      loc_message(STDERR,
+		  "dmalloc: critical error: could not extend heap %u more bytes", incr);
       _dmalloc_die(0);
     }
     dmalloc_errno = DMALLOC_ERROR_ALLOC_FAILED;
