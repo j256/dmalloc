@@ -429,9 +429,12 @@ static	int	read_next_token(FILE *infile, long *debug_p,
   if (found_b) {
     return 1;
   }
-  else {
-    return 0;
+  
+  if (token != NULL) {
+    token[0] = '\0';
   }
+  
+  return 0;
 }
 
 /*
