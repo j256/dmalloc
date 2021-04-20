@@ -561,18 +561,18 @@ void	loc_vfprintf(FILE *file, const char *format, va_list args)
 /*
  * Local implementation of dprintf so we can use %p and other non-standard formats.
  */
-void	loc_dprintf(int fd, const char *format, ...)
+void	loc_message(int fd, const char *format, ...)
 {
   va_list args;
   va_start(args, format);
-  loc_vdprintf(fd, format, args);
+  loc_vmessage(fd, format, args);
   va_end(args);
 }
 
 /*
  * Local implementation of vdprintf so we can use %p and other non-standard formats.
  */
-void	loc_vdprintf(int fd, const char *format, va_list args)
+void	loc_vmessage(int fd, const char *format, va_list args)
 {
   // these are simple messages so this limit is ok
   char buf[256];
@@ -580,5 +580,12 @@ void	loc_vdprintf(int fd, const char *format, va_list args)
 
   limit = buf + sizeof(buf);
   buf_p = append_vformat(buf, limit, format, args);
+  if (buf_p != buf && *(buf_p - 1) != '\n') {
+    if (buf_p == limit) {
+      buf_p--;
+    }
+    *buf_p++ = '\n';
+  }
+
   (void)!write(fd, buf, buf_p - buf);
 }

@@ -218,8 +218,8 @@ static	void	build_logfile_path(char *buf, const int buf_len)
   
   if (buf_p >= bounds_p - 1) {
     /* NOTE: we can't use dmalloc_message of course so do it the hard way */
-    loc_dprintf(STDERR,
-		"debug-malloc library: logfile path too large '%s'\r\n",
+    loc_message(STDERR,
+		"debug-malloc library: logfile path too large '%s'",
 		dmalloc_logpath);
   }
   
@@ -247,8 +247,8 @@ void	_dmalloc_open_log(void)
   outfile_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if (outfile_fd < 0) {
     /* NOTE: we can't use dmalloc_message of course so do it the hardway */
-    loc_dprintf(STDERR,
-		"debug-malloc library: could not open '%s'\r\n",
+    loc_message(STDERR,
+		"debug-malloc library: could not open '%s'",
 		log_path);
     /* disable log_path */
     dmalloc_logpath = NULL;
@@ -574,12 +574,12 @@ void	_dmalloc_die(const int silent_b)
     }
     
     /* print a message that we are going down */
-    loc_dprintf(STDERR,
-		"debug-malloc library: %s program, fatal error\r\n",
+    loc_message(STDERR,
+		"debug-malloc library: %s program, fatal error",
 		stop_str);
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
-      loc_dprintf(STDERR,
-		  "   Error: %s (err %d)\r\n",
+      loc_message(STDERR,
+		  "   Error: %s (err %d)",
 		  dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }

@@ -768,8 +768,8 @@ DMALLOC_PNT	dmalloc_malloc(const char *file, const int line,
   
   if (xalloc_b && new_p == NULL) {
     char	 desc[128];
-    loc_dprintf(STDERR,
-		"Out of memory while allocating %d bytes from '%s'\n",
+    loc_message(STDERR,
+		"Out of memory while allocating %d bytes from '%s'",
 		size,
 		_dmalloc_chunk_desc_pnt(desc, sizeof(desc),
 					file, line));
@@ -869,8 +869,8 @@ DMALLOC_PNT	dmalloc_realloc(const char *file, const int line,
   
   if (xalloc_b && new_p == NULL) {
     char	desc[128];
-    loc_dprintf(STDERR,
-		"Out of memory while reallocating %d bytes from '%s'\n",
+    loc_message(STDERR,
+		"Out of memory while reallocating %d bytes from '%s'",
 		new_size, _dmalloc_chunk_desc_pnt(desc, sizeof(desc),
 						  file, line));
     _exit(1);
