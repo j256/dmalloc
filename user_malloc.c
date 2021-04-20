@@ -341,7 +341,7 @@ static	int	dmalloc_startup(const char *debug_str)
   
   /* have we started already? */
   if (enabled_b) {
-    return 0;
+    return 1;
   }
   
   if (! some_up_b) {
