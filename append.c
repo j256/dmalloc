@@ -375,8 +375,13 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	}
       } else if (ch == 'p') {
 	DMALLOC_PNT pnt = va_arg(*args, DMALLOC_PNT);
-	PNT_ARITH_TYPE num = (PNT_ARITH_TYPE)pnt;
-	handle_pointer(value_buf, value_limit, num, 16);
+	if (*format_p == 'V') {
+	  struct va_format *vaf = (struct va_format *)pnt;
+	  dest_p = append_vformat(dest_p, limit, vaf->fmt, vaf->va);
+	  format_p++;
+	  break;
+	}
+	handle_pointer(value_buf, value_limit, (PNT_ARITH_TYPE)pnt, 16);
 	value = value_buf;
 	// because %#p throws a gcc warning, I've decreed that %p has a 0x hex prefix
 	prefix = "0x";
