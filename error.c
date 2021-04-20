@@ -173,7 +173,7 @@ static	void	build_logfile_path(char *buf, const int buf_len)
     /* dump the thread-id */
     if (*path_p == 'i') {
 #if LOG_PNT_THREAD_ID
-      char		id_str[256];
+      char		id_str[64];
       THREAD_TYPE	id;
       
       id = THREAD_GET_ID();
