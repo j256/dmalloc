@@ -435,7 +435,7 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  *
  * args -> Already converted pointer to a stdarg list.
  */
-void	_dmalloc_vmessage(const char *format, va_list args)
+void	_dmalloc_vmessage(const char *format, va_list *args)
 {
   char	*str_p, *bounds_p;
   int	len;

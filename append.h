@@ -74,7 +74,7 @@ char	*append_pointer(char *dest, char *limit, PNT_ARITH_TYPE value, int base);
  */
 extern
 char	*append_vformat(char *dest, char *limit, const char *format,
-			va_list args);
+			va_list *args);
 
 /*
  * Append a varargs format to destination.  Pointer to the end of the
@@ -98,7 +98,7 @@ char    *append_null(char *dest, char *limit);
  */
 extern
 int	loc_vsnprintf(char *buf, const int size, const char *format,
-		      va_list args);
+		      va_list *args);
 
 /*
  * Local implementation of snprintf.  We are doing this trying to not
@@ -124,7 +124,7 @@ void	loc_fprintf(FILE *file, const char *format, ...);
  * Local implementation of vfprintf so we can use %p and other non-standard formats.
  */
 extern
-void	loc_vfprintf(FILE *file, const char *format, va_list args);
+void	loc_vfprintf(FILE *file, const char *format, va_list *args);
 
 /*
  * Local implementation of dprintf so we can use %p and other non-standard formats.
@@ -136,7 +136,7 @@ void	loc_dprintf(int fd, const char *format, ...);
  * Local implementation of vdprintf so we can use %p and other non-standard formats.
  */
 extern
-void	loc_vdprintf(int fd, const char *format, va_list args);
+void	loc_vdprintf(int fd, const char *format, va_list *args);
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
