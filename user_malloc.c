@@ -127,7 +127,7 @@ static	char		*start_file = NULL;	/* file to start at */
 static	int		start_line = 0;		/* line to start */
 static	unsigned long	start_iter = 0;		/* start after X iterations */
 static	unsigned long	start_size = 0;		/* start after X bytes */
-static	int		thread_lock_c = 0;	/* lock counter */
+static	int		thread_lock_c = -1;	/* lock counter */
 
 /****************************** thread locking *******************************/
 
@@ -191,6 +191,10 @@ static THREAD_MUTEX_T dmalloc_mutex;
  */
 static	void	lock_thread(void)
 {
+  if (thread_lock_c < 0) {
+    thread_lock_c = _dmalloc_lock_on;
+  }
+
   /* we only lock if the lock-on counter has reached 0 */
   if (thread_lock_c == 0) {
 #if HAVE_PTHREAD_MUTEX_LOCK
@@ -289,7 +293,6 @@ static	void	process_environ(const char *option_str)
 			   &_dmalloc_check_interval, &_dmalloc_lock_on,
 			   &dmalloc_logpath, &start_file, &start_line,
 			   &start_iter, &start_size, &_dmalloc_memory_limit);
-  thread_lock_c = _dmalloc_lock_on;
   
   /* if we set the start stuff, then check-heap comes on later */
   if (start_iter > 0 || start_size > 0) {
