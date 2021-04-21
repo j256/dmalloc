@@ -169,7 +169,7 @@ static	unsigned int	which_bucket(const int entry_n, const char *file,
     }
   }
   else {
-    bucket = hash((unsigned char *)file, strlen(file), 0);
+    bucket = hash((unsigned char *)&file, sizeof(char *), 0);
     bucket = hash((unsigned char *)&line, sizeof(line), bucket);
   }
   
