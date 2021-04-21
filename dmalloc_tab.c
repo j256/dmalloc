@@ -701,7 +701,7 @@ void	_dmalloc_table_log_info(mem_table_t *mem_table, const int log_n,
       add_entry(&total, entry_p);
     }
   }
-  if (mem_table->mt_in_use_c >= MEMORY_TABLE_SIZE) {
+  if (mem_table->mt_other_pointers.me_total_c) {
     strncpy(source, "Other pointers", sizeof(source));
     source[sizeof(source) - 1] = '\0';
     log_entry(&mem_table->mt_other_pointers, in_use_column_b, source);
