@@ -591,15 +591,18 @@ void	_dmalloc_table_insert(mem_table_t *mem_table,
   mem_entry_t	*entry_p;
   
   entry_p = table_find(mem_table, file, line);
-  if (entry_p->me_file == NULL
-      && mem_table->mt_in_use_c > mem_table->mt_entry_n / 2) {
-    /* do we have too many entries in the table?  then put in other bucket. */
-    entry_p = &mem_table->mt_other_pointers;
-  } else if (entry_p != &mem_table->mt_other_pointers) {
-    /* we found an open slot so update the file/line */
-    entry_p->me_file = file;
-    entry_p->me_line = line;
-    mem_table->mt_in_use_c++;
+  if (entry_p->me_file == NULL) {
+    if (mem_table->mt_in_use_c > mem_table->mt_entry_n / 2) {
+      /* do we have too many entries in the table?  then put in other bucket. */
+      entry_p = &mem_table->mt_other_pointers;
+    }
+    else {
+      /* we found an open slot so update the file/line */
+      entry_p->me_file = file;
+      entry_p->me_line = line;
+      entry_p->me_entry_pos_p = entry_p;
+      mem_table->mt_in_use_c++;
+      }
   }
   
   /* update the info for the entry */
@@ -607,7 +610,6 @@ void	_dmalloc_table_insert(mem_table_t *mem_table,
   entry_p->me_total_c++;
   entry_p->me_in_use_size += size;
   entry_p->me_in_use_c++;
-  entry_p->me_entry_pos_p = entry_p;
 }
 
 /*
