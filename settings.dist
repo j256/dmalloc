@@ -348,6 +348,20 @@
 #define FREED_POINTER_DELAY 20
 
 /*
+ * Maximum number of splits.  This should mean that these routines can
+ * handle at least 2^128 different values (that's _quite_ a few).  And
+ * then you can always increase the value.
+ */
+#define MAX_QSORT_SPLITS 128
+
+/*
+ * Maximum number of entries that must be in list for it to be
+ * partitioned.  If there are fewer elements then just do our
+ * insertion sort.
+ */
+#define MAX_QSORT_PARTITION 8
+
+/*
  * Size of the table of file and line number memory entries.  This
  * memory table records the top locations by file/line or
  * return-address of all pointers allocated.  It also tabulates the
