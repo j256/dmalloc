@@ -189,14 +189,16 @@ static THREAD_MUTEX_T dmalloc_mutex;
 /*
  * mutex lock the malloc library
  */
-static	void	lock_thread(void)
+static	int	lock_thread(void)
 {
   /* we only lock if the lock-on counter has reached 0 */
   if (thread_lock_c == 0) {
 #if HAVE_PTHREAD_MUTEX_LOCK
-    pthread_mutex_lock(&dmalloc_mutex);
+    return pthread_mutex_lock(&dmalloc_mutex) == 0;
 #endif
   }
+
+  return 1;
 }
 
 /*
@@ -483,7 +485,9 @@ static	int	dmalloc_in(const char *file, const int line,
   }
   
 #if LOCK_THREADS
-  lock_thread();
+  if (! lock_thread()) {
+    return 0;
+  }
 #endif
   
   if (in_alloc_b) {
