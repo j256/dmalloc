@@ -2404,8 +2404,10 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
     
 #if ALLOW_FREE_NULL == 0
     dmalloc_errno = DMALLOC_ERROR_IS_NULL;
-#endif
     return FREE_ERROR;
+#else
+    return FREE_NOERROR;
+#endif
   }
   
   update_p = skip_update;

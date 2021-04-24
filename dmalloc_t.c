@@ -1897,8 +1897,13 @@ static	int	check_special(void)
 #endif
     
     /* now test the dmalloc_free function */
+#if ALLOW_FREE_NULL
+    if (dmalloc_free(__FILE__, __LINE__, NULL,
+		     DMALLOC_FUNC_FREE) != FREE_NOERROR) {
+#else
     if (dmalloc_free(__FILE__, __LINE__, NULL,
 		     DMALLOC_FUNC_FREE) != FREE_ERROR) {
+#endif
       if (! silent_b) {
 	loc_printf("   ERROR: free of NULL should have failed.\n");
       }
