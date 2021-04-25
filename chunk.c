@@ -1892,18 +1892,14 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   /* write info back to user space */
   SET_POINTER(user_size_p, slot_p->sa_user_size);
   SET_POINTER(alloc_size_p, slot_p->sa_total_size);
-  if (slot_p->sa_file == DMALLOC_DEFAULT_FILE) {
-    SET_POINTER(file_p, NULL);
-  }
-  else {
-    SET_POINTER(file_p, (char *)slot_p->sa_file);
-  }
   SET_POINTER(line_p, slot_p->sa_line);
   /* if the line is blank then the file will be 0 or the return address */
   if (slot_p->sa_line == DMALLOC_DEFAULT_LINE) {
+    SET_POINTER(file_p, NULL);
     SET_POINTER(ret_attr_p, (char *)slot_p->sa_file);
   }
   else {
+    SET_POINTER(file_p, (char *)slot_p->sa_file);
     SET_POINTER(ret_attr_p, NULL);
   }
 #if LOG_PNT_SEEN_COUNT
