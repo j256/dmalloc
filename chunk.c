@@ -128,10 +128,12 @@ static	char		fence_top[FENCE_TOP_SIZE];
 static	int		bit_sizes[BASIC_BLOCK]; /* number bits for div-blocks*/
 
 /* memory tables */
+#if MEMORY_TABLE_TOP_LOG
 static	mem_table_t	mem_table_alloc;
 static	mem_entry_t	mem_table_alloc_entries[MEM_ALLOC_ENTRIES];
+#endif
 static	mem_table_t	mem_table_changed;
-static	mem_entry_t	mem_table_changed_entries[MEM_ALLOC_ENTRIES];
+static	mem_entry_t	mem_table_changed_entries[MEM_CHANGED_ENTRIES];
 
 /* memory stats */
 static	unsigned long	alloc_current = 0;	/* current memory usage */
@@ -1771,9 +1773,11 @@ int	_dmalloc_chunk_startup(void)
   skip_free_list->sa_flags = ALLOC_FLAG_ADMIN;
   skip_address_list->sa_flags = ALLOC_FLAG_ADMIN;
   
+#if MEMORY_TABLE_TOP_LOG
   _dmalloc_table_init(&mem_table_alloc, mem_table_alloc_entries,
 		      sizeof(mem_table_alloc_entries) /
 		      sizeof(*mem_table_alloc_entries));
+#endif
   
   return 1;
 }
