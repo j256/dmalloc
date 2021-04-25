@@ -777,6 +777,30 @@ static	int	expand_chars(const void *buf, const int buf_size,
 }
 
 /*
+ * static void *get_pnt_start
+ *
+ * With a slot, return the user start pointer.
+ *
+ * ARGUMENTS:
+ *
+ * slot_p -> Pointer to a slot structure that we are getting info on.
+ */
+static	void	*get_pnt_start(const skip_alloc_t *slot_p)
+{
+  if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FENCE)) {
+    if (BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_VALLOC)) {
+      return (char *)slot_p->sa_mem + BLOCK_SIZE;
+    }
+    else {
+      return (char *)slot_p->sa_mem + FENCE_BOTTOM_SIZE;
+    }
+  }
+  else {
+    return slot_p->sa_mem;
+  }
+}
+
+/*
  * static void get_pnt_info
  *
  * With a slot, set a number of pointers to places within the block.
@@ -941,7 +965,6 @@ static	void	log_error_info(const char *now_file,
   const void	*start_user;
   unsigned int	prev_line, user_size;
   skip_alloc_t	*other_p;
-  pnt_info_t	pnt_info;
   int		out_len, dump_size, offset;
   
   if (slot_p == NULL) {
@@ -955,8 +978,7 @@ static	void	log_error_info(const char *now_file,
     prev_line = slot_p->sa_line;
     user_size = slot_p->sa_user_size;
     if (user_pnt == NULL) {
-      get_pnt_info(slot_p, &pnt_info);
-      start_user = pnt_info.pi_user_start;
+      start_user = get_pnt_start(slot_p);
     }
     else {
       start_user = user_pnt;
@@ -2423,9 +2445,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 	 del_p = del_p->sa_next_p[0]) {
       if (del_p->sa_mem <= user_pnt
 	  && (char *)del_p->sa_mem + del_p->sa_total_size > (char *)user_pnt) {
-	pnt_info_t	info;
-	get_pnt_info(del_p, &info);
-	if (info.pi_user_start == user_pnt) {
+	if (user_pnt == get_pnt_start(del_p)) {
 	  dmalloc_errno = DMALLOC_ERROR_ALREADY_FREE;
 	}
 	else {
@@ -2810,7 +2830,7 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 				   const int log_freed_b, const int details_b)
 {
   skip_alloc_t	*slot_p;
-  pnt_info_t	pnt_info;
+  void		*pnt_start;
   int		known_b, freed_b, used_b;
   char		out[DUMP_SPACE * 4], *which_str;
   char		where_buf[MAX_FILE_LENGTH + 64], disp_buf[64];
@@ -2901,13 +2921,13 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
       known_b = 1;
     }
     
-    get_pnt_info(slot_p, &pnt_info);
+    pnt_start = get_pnt_start(slot_p);
     
     if (known_b || (! BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_KNOWN))) {
       if (details_b) {
 	dmalloc_message(" %s freed: '%s' (%u bytes) from '%s'",
 			(freed_b ? "   " : "not"),
-			display_pnt(pnt_info.pi_user_start, slot_p, disp_buf,
+			display_pnt(pnt_start, slot_p, disp_buf,
 				    sizeof(disp_buf)),
 			slot_p->sa_user_size,
 			_dmalloc_chunk_desc_pnt(where_buf, sizeof(where_buf),
@@ -2916,10 +2936,10 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
 	
 	if ((! freed_b)
 	    && BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_NONFREE_SPACE)) {
-	  out_len = expand_chars((char *)pnt_info.pi_user_start, DUMP_SPACE,
+	  out_len = expand_chars((char *)pnt_start, DUMP_SPACE,
 				 out, sizeof(out));
 	  dmalloc_message("  dump of '%p': '%.*s'",
-			  pnt_info.pi_user_start, out_len, out);
+			  pnt_start, out_len, out);
 	}
       }
       _dmalloc_table_insert(&mem_table_changed, slot_p->sa_file,
