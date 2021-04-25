@@ -1032,9 +1032,9 @@ static	void	log_error_info(const char *now_file,
       offset = -FENCE_BOTTOM_SIZE;
     }
     else {
-      dump_size = DUMP_SPACE;
+      dump_size = DUMP_SPACE + FENCE_TOP_SIZE;
       /* we will go backwards possibly up to FENCE_BOTTOM_SIZE offset */
-      offset = user_size + FENCE_TOP_SIZE - DUMP_SPACE;
+      offset = user_size - DUMP_SPACE;
     }
   }
   else {
