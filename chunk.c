@@ -445,7 +445,7 @@ static	void	*alloc_slots(const int level_n)
   skip_alloc_t	*new_p;
   entry_block_t	*block_p;
   unsigned int	*magic3_p, magic3;
-  int		size, new_c;
+  int		size;
   
   if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_ADMIN)) {
     dmalloc_message("need a block of slots for level %d", level_n);
@@ -482,14 +482,12 @@ static	void	*alloc_slots(const int level_n)
   size = SKIP_SLOT_SIZE(level_n);
   
   /* add in all of the unused slots to the linked list */
-  new_c = 1;
   for (new_p = &block_p->eb_first_slot;
        (char *)new_p + size < (char *)magic3_p;
        new_p = (skip_alloc_t *)((char *)new_p + size)) {
     new_p->sa_level_n = level_n;
     new_p->sa_next_p[0] = entry_free_list[level_n];
     entry_free_list[level_n] = new_p;
-    new_c++;
   }
   
   /* extern pointer information set in _dmalloc_heap_alloc */
