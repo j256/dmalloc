@@ -1774,9 +1774,6 @@ int	_dmalloc_chunk_startup(void)
   _dmalloc_table_init(&mem_table_alloc, mem_table_alloc_entries,
 		      sizeof(mem_table_alloc_entries) /
 		      sizeof(*mem_table_alloc_entries));
-  _dmalloc_table_init(&mem_table_changed, mem_table_changed_entries,
-		      sizeof(mem_table_changed_entries) /
-		      sizeof(*mem_table_changed_entries));
   
   return 1;
 }
