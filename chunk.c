@@ -484,7 +484,7 @@ static	void	*alloc_slots(const int level_n)
   /* add in all of the unused slots to the linked list */
   new_c = 1;
   for (new_p = &block_p->eb_first_slot;
-       (char *)new_p + size < (char *)magic3_p;
+       (char *)new_p + size <= (char *)magic3_p;
        new_p = (skip_alloc_t *)((char *)new_p + size)) {
     new_p->sa_level_n = level_n;
     new_p->sa_next_p[0] = entry_free_list[level_n];
@@ -746,7 +746,7 @@ static	int	expand_chars(const void *buf, const int buf_size,
     
     /* did we find one? */
     if (*(spec_p - 1) != '\0') {
-      if (out_p + 2 >= bounds_p) {
+      if (out_p + 2 > bounds_p) {
 	break;
       }
       out_p = append_format(out_p, bounds_p, "\\%c", *(spec_p - 1));
@@ -755,14 +755,14 @@ static	int	expand_chars(const void *buf, const int buf_size,
     
     /* print out any 7-bit printable characters */
     if (*buf_p < 128 && isprint(*buf_p)) {
-      if (out_p + 1 >= bounds_p) {
+      if (out_p + 1 > bounds_p) {
 	break;
       }
       *out_p = *(char *)buf_p;
       out_p += 1;
     }
     else {
-      if (out_p + 4 >= bounds_p) {
+      if (out_p + 4 > bounds_p) {
 	break;
       }
       out_p = append_format(out_p, bounds_p, "\\%03o", *buf_p);
