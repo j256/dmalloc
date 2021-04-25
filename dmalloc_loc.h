@@ -70,6 +70,9 @@
 #undef MIN
 #define MIN(a,b)	(((a) < (b)) ? (a) : (b))
 
+#undef DIVUP
+#define DIVUP(a,b)	(((a) + (b) - 1) / (b))
+
 /*
  * bitflag tools for Variable and a Flag
  */
