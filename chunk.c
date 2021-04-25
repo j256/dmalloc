@@ -1658,8 +1658,7 @@ static	int	check_used_slot(const skip_alloc_t *slot_p,
       }
     }
     /* mem_p can == bounds_p (if equals-ok) if we hit the min_size but can't >= user_bounds */ 
-    if (mem_p > (char *)pnt_info.pi_user_bounds
-	|| ((! equals_okay_b) && mem_p == (char *)pnt_info.pi_user_bounds)) {
+    if ((! equals_okay_b) && mem_p == bounds_p) {
       dmalloc_errno = DMALLOC_ERROR_WOULD_OVERWRITE;
       return 0;
     }
