@@ -788,33 +788,33 @@ static	void	dump_current(void)
 /*
  * output the code to set env VAR to VALUE
  */
-static	void    set_variable(const char *var, const char *value)
+static	void    set_variable_with_file(FILE *file, const char *var, const char *value)
 {
-  char	comm[1024];
-  
   if (value == NULL || *value == '\0') {
-    (void)loc_snprintf(comm, sizeof(comm), "unset %s\n", var);
+    (void)loc_fprintf(file, "unset %s\n", var);
   }
   else if (bourne_b) {
-    (void)loc_snprintf(comm, sizeof(comm), "export %s=%s\n",
-		       var, value, var);
+    (void)loc_fprintf(file, "export %s=%s\n", var, value);
   }
   else if (rcshell_b) {
-    (void)loc_snprintf(comm, sizeof(comm), "%s='%s'\n", var, value);
+    (void)loc_fprintf(file, "%s='%s'\n", var, value);
   }
   else if (gdb_b) {
-    (void)loc_snprintf(comm, sizeof(comm), "set env %s %s\n", var, value);
+    (void)loc_fprintf(file, "set env %s %s\n", var, value);
   }
   else {
-    (void)loc_snprintf(comm, sizeof(comm), "setenv %s %s\n", var, value);
+    (void)loc_fprintf(file, "setenv %s %s\n", var, value);
   }
-  
+}
+
+static	void    set_variable(const char *var, const char *value)
+{
   if (make_changes_b) {
-    (void)printf("%s", comm);
+    set_variable_with_file(stdout, var, value);
   }
   if ((! make_changes_b) || verbose_b) {
     loc_fprintf(stderr, "Outputed:\n");
-    loc_fprintf(stderr, "%s", comm);
+    set_variable_with_file(stderr, var, value);
   }
 }
 
