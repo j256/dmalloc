@@ -820,10 +820,7 @@ static	void	usage_long(const argv_t *args)
       col_c++;
     }
     else {
-      if (arg_p->ar_short_arg == '\0') {
-	;
-      }
-      else if (arg_p->ar_short_arg == ARGV_MAND) {
+      if (arg_p->ar_short_arg == ARGV_MAND) {
 	display_arg(argv_error_stream, arg_p, COMMENT_COLUMN, &col_c);
       }
       else {
@@ -1662,11 +1659,6 @@ static	void	display_variables(const argv_t *args)
     if (arg_p->ar_short_arg == '\0') {
       if (arg_p->ar_long_arg != NULL) {
 	len = COMMENT_COLUMN - col_c - (LONG_PREFIX_LENGTH + 1);
-	if (arg_p->ar_short_arg != '\0') {
-	  (void)fprintf(argv_error_stream, "%s", LONG_LABEL);
-	  col_c += LONG_LABEL_LENGTH;
-	  len -= LONG_LABEL_LENGTH;
-	}
 	(void)fprintf(argv_error_stream, "%s%-.*s",
 		      LONG_PREFIX, len, arg_p->ar_long_arg);
 	col_c += LONG_PREFIX_LENGTH + MIN(len,
@@ -2223,12 +2215,6 @@ static	void	do_arg(argv_t *grid, argv_t *match_p, const char *close_p,
       *okay_bp = ARGV_FALSE;
     }
   }
-  else if (argv_close_enable_b && close_p != NULL) {
-    if (string_to_value(close_p, match_p->ar_variable,
-			match_p->ar_type) != NOERROR) {
-      *okay_bp = ARGV_FALSE;
-    }
-  }
   else {
     queue_list[*queue_head_p] = match_p;
     (*queue_head_p)++;
@@ -2412,8 +2398,7 @@ static	void	do_list(argv_t *grid, const int arg_c, char **argv,
       }
       
       /* check for special usage value */
-      if (strncmp(USAGE_ARG, *arg_p + LONG_PREFIX_LENGTH, len) == 0
-	  || strncmp(HELP_ARG, *arg_p + LONG_PREFIX_LENGTH, len) == 0) {
+      if (strncmp(USAGE_ARG, *arg_p + LONG_PREFIX_LENGTH, len) == 0) {
 	if (argv_interactive) {
 	  do_usage(grid, argv_usage_type);
 	  (void)exit(0);
