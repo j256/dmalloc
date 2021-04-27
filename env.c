@@ -26,6 +26,7 @@
 
 #define DMALLOC_DISABLE
 
+#include <limits.h>
 #if HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
@@ -63,8 +64,8 @@
 #define ASSIGNMENT_CHAR		'='
 
 /* local variables */
-static	char		log_path[512]	= { '\0' }; /* storage for env path */
-static	char		start_file[512] = { '\0' }; /* file to start at */
+static	char		log_path[PATH_MAX]   = { '\0' }; /* storage for env path */
+static	char		start_file[PATH_MAX] = { '\0' }; /* file to start at */
 
 /****************************** local utilities ******************************/
 
