@@ -707,9 +707,6 @@ static	void	dump_current(void)
   
   /* get the options flag */
   env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0);
-  if (env_str == NULL) {
-    env_str = "";
-  }
   _dmalloc_environ_process(env_str, &addr, &addr_count, &flags,
 			   &inter, &lock_on, &log_path,
 			   &loc_start_file, &loc_start_line, &loc_start_iter,
@@ -898,9 +895,6 @@ int	main(int argc, char **argv)
   
   /* get the current debug information from the env variable */
   env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0);
-  if (env_str == NULL) {
-    env_str = "";
-  }
   _dmalloc_environ_process(env_str, &addr, &addr_count, &flags, &inter,
 			   &lock_on, &log_path, &loc_start_file,
 			   &loc_start_line, &loc_start_iter, &loc_start_size,
