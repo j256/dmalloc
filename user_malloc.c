@@ -341,7 +341,7 @@ static	int	dmalloc_startup(const char *debug_str)
   
   /* have we started already? */
   if (enabled_b) {
-    return 0;
+    return 1;
   }
   
   if (! some_up_b) {
@@ -1918,7 +1918,7 @@ void	dmalloc_get_stats(DMALLOC_PNT *heap_low_p,
  */
 const char	*dmalloc_strerror(const int error_num)
 {
-  error_str_t	*err_p;
+  const error_str_t	*err_p;
   
   /* should not dmalloc_in here because _dmalloc_error calls this */
   

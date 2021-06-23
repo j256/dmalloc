@@ -79,7 +79,7 @@ typedef struct {
   char		*at_desc;		/* description string */
 } attr_t;
 
-static	attr_t		attributes[]
+static	const attr_t		attributes[]
 #ifdef __GNUC__
 __attribute__ ((unused))
 #endif
