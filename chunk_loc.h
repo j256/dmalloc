@@ -48,12 +48,6 @@
 /* log-bad-space info */
 #define SPECIAL_CHARS		"\"\"''\\\\n\nr\rt\tb\bf\fa\007"
 
-/*
- * Maximum level in the skip list.  This implies that we can only
- * store 2^32 entries optimally.  Needless to say this is plenty.
- */
-#define MAX_SKIP_LEVEL		32
-
 /* memory table settings */
 #define MEM_ALLOC_ENTRIES	(MEMORY_TABLE_SIZE * 2)
 #define MEM_CHANGED_ENTRIES	(MEMORY_TABLE_SIZE * 2)
