@@ -227,9 +227,8 @@ static	void	choose_shell(void)
 {
   const char	*shell, *shell_p;
   int		shell_c;
-  char		env_buf[256];
   
-  shell = loc_getenv(SHELL_ENVIRON, env_buf, sizeof(env_buf), 0);
+  loc_getenv(SHELL_ENVIRON, 0, &shell);
   if (shell == NULL) {
     /* oh well, we just guess on c-shell */
     cshell_b = 1;
@@ -504,7 +503,6 @@ static	long	find_tag(const long debug_value, const char *tag_find,
   const char		*home_p;
   int			ret;
   long			new_debug = 0;
-  char			env_buf[256];
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -523,7 +521,7 @@ static	long	find_tag(const long debug_value, const char *tag_find,
     }
     else {
       /* find our home directory */
-      home_p = loc_getenv(HOME_ENVIRON, env_buf, sizeof(env_buf), 0);
+      loc_getenv(HOME_ENVIRON, 0, &home_p);
       if (home_p == NULL) {
 	loc_fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
@@ -620,7 +618,6 @@ static	void	list_tags(void)
   const char		*home_p;
   long			new_debug = 0;
   FILE			*rc_file;
-  char			env_buf[256];
   
   /* do we need to have a home variable? */
   if (inpath == NULL) {
@@ -630,7 +627,7 @@ static	void	list_tags(void)
     if (rc_file == NULL) {
       
       /* if no file in current directory, try home directory */
-      home_p = loc_getenv(HOME_ENVIRON, env_buf, sizeof(env_buf), 0);
+      loc_getenv(HOME_ENVIRON, 0, &home_p);
       if (home_p == NULL) {
 	loc_fprintf(stderr, "%s: could not find variable '%s'\n",
 		    argv_program, HOME_ENVIRON);
@@ -703,10 +700,9 @@ static	void	dump_current(void)
   unsigned long	addr_count;
   int		lock_on, loc_start_line;
   unsigned int	flags;
-  char		env_buf[256];
   
   /* get the options flag */
-  env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0);
+  loc_getenv(OPTIONS_ENVIRON, 0, &env_str);
   if (env_str == NULL) {
     env_str = "";
   }
@@ -858,7 +854,6 @@ int	main(int argc, char **argv)
   int		lock_on;
   int		loc_start_line;
   unsigned int	flags;
-  char		env_buf[256];
   
   argv_help_string = "Sets dmalloc library env variables.  Also try --usage.";
   argv_version_string = dmalloc_version;
@@ -897,7 +892,7 @@ int	main(int argc, char **argv)
   }
   
   /* get the current debug information from the env variable */
-  env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf), 0);
+  loc_getenv(OPTIONS_ENVIRON, 0, &env_str);
   if (env_str == NULL) {
     env_str = "";
   }
