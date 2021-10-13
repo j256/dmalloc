@@ -268,24 +268,9 @@ static	void	check_pnt(const char *file, const int line, const void *pnt,
 
 static	void	process_environ(const char *option_str)
 {
-  /*
-   * we have a static here so we can store the string without getting
-   * into problems
-   */
-  static char	options[1024];
-  
-  /* process the options flag */
-  if (option_str == NULL) {
-    options[0] = '\0';
-  }
-  else {
-    strncpy(options, option_str, sizeof(options));
-    options[sizeof(options) - 1] = '\0';
-  }
-  
   char *previous_logpath = dmalloc_logpath;
-  _dmalloc_environ_process(options, &_dmalloc_address,
-			   (unsigned long *)&_dmalloc_address_seen_n, &_dmalloc_flags,
+  _dmalloc_environ_process(option_str, &_dmalloc_address,
+			   &_dmalloc_address_seen_n, &_dmalloc_flags,
 			   &_dmalloc_check_interval, &_dmalloc_lock_on,
 			   &dmalloc_logpath, &start_file, &start_line,
 			   &start_iter, &start_size, &_dmalloc_memory_limit);
