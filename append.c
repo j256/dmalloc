@@ -261,7 +261,7 @@ char	*append_pointer(char *dest, char *limit, PNT_ARITH_TYPE value, int base)
  * characters added will be returned.  No \0 character will be added.
  */
 char	*append_vformat(char *dest, char *limit, const char *format,
-			va_list args)
+			va_list *args)
 {
   const char *format_p = format;
   char value_buf[64];
@@ -309,9 +309,9 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	trunc = 1;
       } else if (ch == '*') {
 	if (trunc) {
-	  trunc_len = va_arg(args, int);
+	  trunc_len = va_arg(*args, int);
 	} else {
-	  width_len = va_arg(args, int);
+	  width_len = va_arg(*args, int);
 	}
       } else if (ch >= '0' && ch <= '9') {
 	if (trunc) {
@@ -338,20 +338,20 @@ char	*append_vformat(char *dest, char *limit, const char *format,
       
       const char *value;
       if (ch == 'c') {
-	value_buf[0] = (char)va_arg(args, int);
+	value_buf[0] = (char)va_arg(*args, int);
 	value_buf[1] = '\0';
 	value = value_buf;
       } else if (ch == 'd') {
 	long num;
 	if (long_arg) {
-	  num = va_arg(args, long);
+	  num = va_arg(*args, long);
 	} else {
-	  num = va_arg(args, int);
+	  num = va_arg(*args, int);
 	}
 	handle_decimal(value_buf, value_limit, num, 10);
 	value = value_buf;
       } else if (ch == 'f') {
-	double num = va_arg(args, double);
+	double num = va_arg(*args, double);
 	if (trunc_len < 0) {
 	  handle_float(value_buf, value_limit, num, DEFAULT_DECIMAL_PRECISION, 1);
 	} else {
@@ -363,9 +363,9 @@ char	*append_vformat(char *dest, char *limit, const char *format,
       } else if (ch == 'o') {
 	long num;
 	if (long_arg) {
-	  num = va_arg(args, long);
+	  num = va_arg(*args, long);
 	} else {
-	  num = va_arg(args, int);
+	  num = va_arg(*args, int);
 	}
 	handle_decimal(value_buf, value_limit, num, 8);
 	value = value_buf;
@@ -374,21 +374,26 @@ char	*append_vformat(char *dest, char *limit, const char *format,
 	  prefix_len = 1;
 	}
       } else if (ch == 'p') {
-	DMALLOC_PNT pnt = va_arg(args, DMALLOC_PNT);
-	PNT_ARITH_TYPE num = (PNT_ARITH_TYPE)pnt;
-	handle_pointer(value_buf, value_limit, num, 16);
+	DMALLOC_PNT pnt = va_arg(*args, DMALLOC_PNT);
+	if (*format_p == 'V') {
+	  struct va_format *vaf = (struct va_format *)pnt;
+	  dest_p = append_vformat(dest_p, limit, vaf->fmt, vaf->va);
+	  format_p++;
+	  break;
+	}
+	handle_pointer(value_buf, value_limit, (PNT_ARITH_TYPE)pnt, 16);
 	value = value_buf;
 	// because %#p throws a gcc warning, I've decreed that %p has a 0x hex prefix
 	prefix = "0x";
 	prefix_len = 2;
       } else if (ch == 's') {
-	value = va_arg(args, char *);
+	value = va_arg(*args, char *);
       } else if (ch == 'u') {
 	unsigned long num;
 	if (long_arg) {
-	  num = va_arg(args, unsigned long);
+	  num = va_arg(*args, unsigned long);
 	} else {
-	  num = va_arg(args, unsigned int);
+	  num = va_arg(*args, unsigned int);
 	}
 	char *value_buf_p = value_buf;
 	value_buf_p = append_ulong(value_buf_p, value_limit, num, 10);
@@ -397,9 +402,9 @@ char	*append_vformat(char *dest, char *limit, const char *format,
       } else if (ch == 'x') {
 	long num;
 	if (long_arg) {
-	  num = va_arg(args, long);
+	  num = va_arg(*args, long);
 	} else {
-	  num = va_arg(args, int);
+	  num = va_arg(*args, int);
 	}
 	handle_decimal(value_buf, value_limit, num, 16);
 	if (format_prefix) {
@@ -469,7 +474,7 @@ char	*append_format(char *dest, char *limit, const char *format, ...)
   char *dest_p;
   
   va_start(args, format);
-  dest_p = append_vformat(dest, limit, format, args);
+  dest_p = append_vformat(dest, limit, format, &args);
   va_end(args);
   
   return dest_p;
@@ -496,7 +501,7 @@ char    *append_null(char *dest, char *limit)
  * causing the library to go recursive.
  */
 int	loc_vsnprintf(char *buf, const int size, const char *format,
-		      va_list args)
+		      va_list *args)
 {
   char *limit, *buf_p;
   limit = buf + size;
@@ -516,7 +521,7 @@ int	loc_snprintf(char *buf, const int size, const char *format, ...)
   int len;
   
   va_start(args, format);
-  len = loc_vsnprintf(buf, size, format, args);
+  len = loc_vsnprintf(buf, size, format, &args);
   va_end(args);
   
   return len;
@@ -529,7 +534,7 @@ void	loc_printf(const char *format, ...)
 {
   va_list args;
   va_start(args, format);
-  loc_vfprintf(stdout, format, args);
+  loc_vfprintf(stdout, format, &args);
   va_end(args);
 }
 
@@ -540,14 +545,14 @@ void	loc_fprintf(FILE *file, const char *format, ...)
 {
   va_list args;
   va_start(args, format);
-  loc_vfprintf(file, format, args);
+  loc_vfprintf(file, format, &args);
   va_end(args);
 }
 
 /*
  * Local implementation of vfprintf so we can use %p and other non-standard formats.
  */
-void	loc_vfprintf(FILE *file, const char *format, va_list args)
+void	loc_vfprintf(FILE *file, const char *format, va_list *args)
 {
   // these are simple messages so this limit is ok
   char buf[256];
@@ -561,18 +566,18 @@ void	loc_vfprintf(FILE *file, const char *format, va_list args)
 /*
  * Local implementation of dprintf so we can use %p and other non-standard formats.
  */
-void	loc_dprintf(int fd, const char *format, ...)
+void	loc_message(int fd, const char *format, ...)
 {
   va_list args;
   va_start(args, format);
-  loc_vdprintf(fd, format, args);
+  loc_vmessage(fd, format, &args);
   va_end(args);
 }
 
 /*
  * Local implementation of vdprintf so we can use %p and other non-standard formats.
  */
-void	loc_vdprintf(int fd, const char *format, va_list args)
+void	loc_vmessage(int fd, const char *format, va_list *args)
 {
   // these are simple messages so this limit is ok
   char buf[256];
@@ -580,5 +585,12 @@ void	loc_vdprintf(int fd, const char *format, va_list args)
 
   limit = buf + sizeof(buf);
   buf_p = append_vformat(buf, limit, format, args);
+  if (buf_p != buf && *(buf_p - 1) != '\n') {
+    if (buf_p == limit) {
+      buf_p--;
+    }
+    *buf_p++ = '\n';
+  }
+
   (void)!write(fd, buf, buf_p - buf);
 }

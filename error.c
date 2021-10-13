@@ -127,8 +127,6 @@ int		_dmalloc_aborting_b = 0;
 
 /* local variables */
 static	int	outfile_fd = -1;		/* output file descriptor */
-/* the following are here to reduce stack overhead */
-static	char	message_str[1024];		/* message string buffer */
 
 /*
  * void _dmalloc_open_log
@@ -218,8 +216,8 @@ static	void	build_logfile_path(char *buf, const int buf_len)
   
   if (buf_p >= bounds_p - 1) {
     /* NOTE: we can't use dmalloc_message of course so do it the hard way */
-    loc_dprintf(STDERR,
-		"debug-malloc library: logfile path too large '%s'\r\n",
+    loc_message(STDERR,
+		"debug-malloc library: logfile path too large '%s'",
 		dmalloc_logpath);
   }
   
@@ -247,8 +245,8 @@ void	_dmalloc_open_log(void)
   outfile_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if (outfile_fd < 0) {
     /* NOTE: we can't use dmalloc_message of course so do it the hardway */
-    loc_dprintf(STDERR,
-		"debug-malloc library: could not open '%s'\r\n",
+    loc_message(STDERR,
+		"debug-malloc library: could not open '%s'",
 		log_path);
     /* disable log_path */
     dmalloc_logpath = NULL;
@@ -435,13 +433,15 @@ char	*_dmalloc_ptime(const TIME_TYPE *time_p, char *buf, const int buf_size,
  *
  * args -> Already converted pointer to a stdarg list.
  */
-void	_dmalloc_vmessage(const char *format, va_list args)
+void	_dmalloc_vmessage(const char *format, va_list *args)
 {
-  char	*str_p, *bounds_p;
-  int	len;
+  char			*str_p, *bounds_p;
+  char			buf[64];
+  int			len;
+  struct va_format	vaf;
   
-  str_p = message_str;
-  bounds_p = str_p + sizeof(message_str);
+  str_p = buf;
+  bounds_p = str_p + sizeof(buf);
   
   /* no logpath and no print then no workie */
   if (dmalloc_logpath == NULL
@@ -525,30 +525,20 @@ void	_dmalloc_vmessage(const char *format, va_list args)
    * specifications if necessary.
    */
   
-  /* write the format + info into str */
-  char *start_p = str_p;
-  str_p = append_vformat(str_p, bounds_p, format, args);
-  
-  /* was it an empty format? */
-  if (str_p == start_p) {
-    return;
-  }
-  
-  /* tack on a '\n' if necessary */
-  if (*(str_p - 1) != '\n') {
-    *str_p++ = '\n';
-    *str_p = '\0';
-  }
-  len = str_p - message_str;
+  /* write the format + info into file */
+  append_null(str_p, bounds_p);
+
+  vaf.fmt = format;
+  vaf.va  = args;
   
   /* do we need to write the message to the logfile */
   if (dmalloc_logpath != NULL) {
-    (void)write(outfile_fd, message_str, len);
+    loc_message(outfile_fd, "%s%pV", buf, &vaf);
   }
   
   /* do we need to print the message? */
   if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_PRINT_MESSAGES)) {
-    (void)write(STDERR, message_str, len);
+    loc_message(STDERR, "%s%pV", buf, &vaf);
   }
 }
 
@@ -574,12 +564,12 @@ void	_dmalloc_die(const int silent_b)
     }
     
     /* print a message that we are going down */
-    loc_dprintf(STDERR,
-		"debug-malloc library: %s program, fatal error\r\n",
+    loc_message(STDERR,
+		"debug-malloc library: %s program, fatal error",
 		stop_str);
     if (dmalloc_errno != DMALLOC_ERROR_NONE) {
-      loc_dprintf(STDERR,
-		  "   Error: %s (err %d)\r\n",
+      loc_message(STDERR,
+		  "   Error: %s (err %d)",
 		  dmalloc_strerror(dmalloc_errno), dmalloc_errno);
     }
   }

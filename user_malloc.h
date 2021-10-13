@@ -643,7 +643,7 @@ void	dmalloc_log_changed(const unsigned long mark, const int not_freed_b,
  * args -> Already converted pointer to a stdarg list.
  */
 extern
-void	dmalloc_vmessage(const char *format, va_list args);
+void	dmalloc_vmessage(const char *format, va_list *args);
 
 /*
  * void dmalloc_message
