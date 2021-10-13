@@ -111,9 +111,6 @@ static	skip_alloc_t	*skip_free_list = skip_free_alloc;
 static	skip_alloc_t	skip_address_alloc[MAX_SKIP_LEVEL /* read note ^^ */];
 static	skip_alloc_t	*skip_address_list = skip_address_alloc;
 
-/* update slots which we use to update the skip lists */
-static	skip_alloc_t	skip_update[MAX_SKIP_LEVEL /* read note ^^ */];
-
 /* linked list of slots of various sizes */
 static	skip_alloc_t	*entry_free_list[MAX_SKIP_LEVEL];
 /* linked list of blocks of the sizes */
@@ -229,7 +226,7 @@ static	int	random_level(const int max_level)
  */
 static	skip_alloc_t	*find_address(const void *address, const int free_b,
 				      const int exact_b,
-				      skip_alloc_t *update_p)
+				      skip_alloc_t *update_p[])
 {
   int		level_c;
   skip_alloc_t 	*slot_p, *found_p = NULL, *next_p;
@@ -285,7 +282,9 @@ static	skip_alloc_t	*find_address(const void *address, const int free_b,
     
     /* we are lowering the level */
     
-    update_p->sa_next_p[level_c] = slot_p;
+    if (update_p != NULL) {
+      update_p[level_c] = slot_p;
+    }
     if (level_c == 0) {
       break;
     }
@@ -314,7 +313,7 @@ static	skip_alloc_t	*find_address(const void *address, const int free_b,
  * the update pointers.
  */
 static	skip_alloc_t	*find_free_size(const unsigned int size,
-					skip_alloc_t *update_p)
+					skip_alloc_t *update_p[])
 {
   int		level_c, cmp;
   skip_alloc_t 	*slot_p, *found_p = NULL, *next_p;
@@ -352,7 +351,9 @@ static	skip_alloc_t	*find_free_size(const unsigned int size,
     
     /* we are lowering the level */
     
-    update_p->sa_next_p[level_c] = slot_p;
+    if (update_p != NULL) {
+      update_p[level_c] = slot_p;
+    }
     if (level_c == 0) {
       break;
     }
@@ -386,10 +387,8 @@ static	skip_alloc_t	*find_free_size(const unsigned int size,
  */
 static	int	insert_slot(skip_alloc_t *slot_p, const int free_b)
 {
-  skip_alloc_t	*adjust_p, *update_p;
+  skip_alloc_t	*adjust_p, *update_p[MAX_SKIP_LEVEL];
   int		level_c;
-  
-  update_p = skip_update;
   
   if (free_b) {
     (void)find_free_size(slot_p->sa_total_size, update_p);
@@ -417,7 +416,7 @@ static	int	insert_slot(skip_alloc_t *slot_p, const int free_b)
      * adjusting, we take it's next pointers and set them in the new
      * slot, and we point its next pointers to the new slot.
      */
-    adjust_p = update_p->sa_next_p[level_c];
+    adjust_p = update_p[level_c];
     slot_p->sa_next_p[level_c] = adjust_p->sa_next_p[level_c];
     adjust_p->sa_next_p[level_c] = slot_p;
   }
@@ -510,7 +509,7 @@ static	void	*alloc_slots(const int level_n)
  * update_p -> Pointer to the skip_alloc entry we are using to hold
  * the update pointers.
  */
-static	int	remove_slot(skip_alloc_t *delete_p, skip_alloc_t *update_p)
+static	int	remove_slot(skip_alloc_t *delete_p, skip_alloc_t *update_p[])
 {
   skip_alloc_t	*adjust_p;
   int		level_c;
@@ -523,7 +522,7 @@ static	int	remove_slot(skip_alloc_t *delete_p, skip_alloc_t *update_p)
      * to the one we want since we need to update those pointers
      * ahead.
      */
-    adjust_p = update_p->sa_next_p[level_c];
+    adjust_p = update_p[level_c];
     
     /*
      * If the pointer in question is not pointing to the deleted slot
@@ -1059,7 +1058,7 @@ static	void	log_error_info(const char *now_file,
   if (dmalloc_errno == DMALLOC_ERROR_UNDER_FENCE && start_user != NULL) {
     other_p = find_address((char *)start_user - FENCE_BOTTOM_SIZE - 1,
 			   0 /* used list */, 1 /* not exact pointer */,
-			   skip_update);
+			   NULL);
     if (other_p != NULL) {
       dmalloc_message("  prev pointer '%p' (size %u) may have run over from '%s'",
 		      other_p->sa_mem, other_p->sa_user_size,
@@ -1074,7 +1073,7 @@ static	void	log_error_info(const char *now_file,
 	   && slot_p != NULL) {
     other_p = find_address((char *)slot_p->sa_mem + slot_p->sa_total_size,
 			   0 /* used list */, 1 /* not exact pointer */,
-			   skip_update);
+			   NULL);
     if (other_p != NULL) {
       dmalloc_message("  next pointer '%p' (size %u) may have run under from '%s'",
 		      other_p->sa_mem, other_p->sa_user_size,
@@ -1271,14 +1270,10 @@ static	int	create_divided_chunks(const unsigned int div_size)
  * ARGUMENTS:
  *
  * size -> Size of the block that we are looking for.
- *
- * update_p -> Pointer to the skip_alloc entry we are using to hold
- * the update pointers.
  */
-static	skip_alloc_t	*use_free_memory(const unsigned int size,
-					 skip_alloc_t *update_p)
+static	skip_alloc_t	*use_free_memory(const unsigned int size)
 {
-  skip_alloc_t	*slot_p;
+  skip_alloc_t	*slot_p, *update_p[MAX_SKIP_LEVEL];
   
 #if FREED_POINTER_DELAY
   /*
@@ -1367,7 +1362,7 @@ static	skip_alloc_t	*get_divided_memory(const unsigned int size)
   need_size = *bits_p;
   
   /* find a free block which matches the size */ 
-  slot_p = use_free_memory(need_size, skip_update);
+  slot_p = use_free_memory(need_size);
   if (slot_p != NULL) {
     return slot_p;
   }
@@ -1379,7 +1374,7 @@ static	skip_alloc_t	*get_divided_memory(const unsigned int size)
   }
   
   /* now we ask again for the free memory */
-  slot_p = use_free_memory(need_size, skip_update);
+  slot_p = use_free_memory(need_size);
   if (slot_p == NULL) {
     /* huh?  This isn't right. */
     dmalloc_errno = DMALLOC_ERROR_ADDRESS_LIST;
@@ -1403,7 +1398,7 @@ static	skip_alloc_t	*get_divided_memory(const unsigned int size)
  */
 static	skip_alloc_t	*get_memory(const unsigned int size)
 {
-  skip_alloc_t	*slot_p, *update_p;
+  skip_alloc_t	*slot_p;
   void		*mem;
   unsigned int	need_size, block_n;
   
@@ -1430,29 +1425,10 @@ static	skip_alloc_t	*get_memory(const unsigned int size)
   block_n = need_size / BLOCK_SIZE;
   need_size = block_n * BLOCK_SIZE;
   
-  update_p = skip_update;
-  
   /* find a free block which matches the size */ 
-  slot_p = use_free_memory(need_size, update_p);
+  slot_p = use_free_memory(need_size);
   if (slot_p != NULL) {
     return slot_p;
-  }
-  
-  /* if there are blocks that are larger than this */
-  slot_p = update_p->sa_next_p[0];
-  if (slot_p != NULL && slot_p->sa_total_size > size) {
-    
-    /*
-     * now we ask again for the memory because we need to reset the
-     * update pointer list
-     */
-    slot_p = use_free_memory(need_size, update_p);
-    if (slot_p != NULL) {
-      /* huh?  This isn't right. */
-      dmalloc_errno = DMALLOC_ERROR_ADDRESS_LIST;
-      dmalloc_error("get_memory");
-      return NULL;
-    }
   }
   
   /* allocate the memory necessary for the new blocks */
@@ -1874,7 +1850,7 @@ int	_dmalloc_chunk_read_info(const void *user_pnt, const char *where,
   
   /* find the pointer with loose checking for fence */
   slot_p = find_address(user_pnt, 0 /* used list */, 0 /* not exact pointer */,
-			skip_update);
+			NULL);
   if (slot_p == NULL) {
     dmalloc_errno = DMALLOC_ERROR_NOT_FOUND;
     log_error_info(NULL, 0, user_pnt, NULL, "finding address in heap", where);
@@ -1982,7 +1958,7 @@ int	_dmalloc_chunk_heap_check(void)
       
       /* now we look up the block and make sure it exists and is valid */
       slot_p = find_address(block_p, 0 /* used list */, 1 /* exact */,
-			    skip_update);
+			    NULL);
       if (slot_p == NULL) {
 	dmalloc_errno = DMALLOC_ERROR_ADMIN_LIST;
 	dmalloc_error("_dmalloc_chunk_heap_check");
@@ -2047,7 +2023,7 @@ int	_dmalloc_chunk_heap_check(void)
      * in a valid block
      */
     block_slot_p = find_address(slot_p, 0 /* used list */,
-				0 /* not exact pointer */, skip_update);
+				0 /* not exact pointer */, NULL);
     if (block_slot_p == NULL) {
       dmalloc_errno = DMALLOC_ERROR_ADMIN_LIST;
       dmalloc_error("_dmalloc_chunk_heap_check");
@@ -2138,7 +2114,7 @@ int	_dmalloc_chunk_pnt_check(const char *func, const void *user_pnt,
   
   /* try to find the address */
   slot_p = find_address(user_pnt, 0 /* used list */, 0 /* not exact pointer */,
-			skip_update);
+			NULL);
   if (slot_p == NULL) {
     if (exact_b) {
       dmalloc_errno = DMALLOC_ERROR_NOT_FOUND;
@@ -2368,7 +2344,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 {
   char		where_buf[MAX_FILE_LENGTH + 64];
   char		where_buf2[MAX_FILE_LENGTH + 64], disp_buf[64];
-  skip_alloc_t	*slot_p, *update_p;
+  skip_alloc_t	*slot_p, *update_p[MAX_SKIP_LEVEL];
   
   /* counts calls to free */
   if (func_id == DMALLOC_FUNC_DELETE) {
@@ -2408,11 +2384,9 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
     return FREE_ERROR;
   }
   
-  update_p = skip_update;
-  
   /* try to find the address with loose match */
   slot_p = find_address(user_pnt, 0 /* used list */, 0 /* not exact pointer */,
-			skip_update);
+			update_p);
   if (slot_p == NULL) {
 #if FREED_POINTER_DELAY
     skip_alloc_t	*del_p;
@@ -2438,7 +2412,7 @@ int	_dmalloc_chunk_free(const char *file, const unsigned int line,
 #endif
       /* not in the used list so check the free list */
       if (find_address(user_pnt, 1 /* free list */, 0 /* not exact pointer */,
-		       skip_update) == NULL) {
+		       update_p) == NULL) {
 	dmalloc_errno = DMALLOC_ERROR_NOT_FOUND;
       }
       else {
@@ -2607,7 +2581,7 @@ void	*_dmalloc_chunk_realloc(const char *file, const unsigned int line,
   
   /* find the old pointer with loose checking for fence post stuff */
   slot_p = find_address(old_user_pnt, 0 /* used list */,
-			0 /* not exact pointer */, skip_update);
+			0 /* not exact pointer */, NULL);
   if (slot_p == NULL) {
     dmalloc_errno = DMALLOC_ERROR_NOT_FOUND;
     log_error_info(file, line, old_user_pnt, NULL, "finding address in heap",
