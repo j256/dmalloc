@@ -32,6 +32,7 @@
 
 #define DMALLOC_DISABLE
 
+#include <limits.h>
 #if HAVE_STRING_H
 # include <string.h>
 #endif
@@ -499,7 +500,7 @@ static	int	read_rc_file(const char *path, const long debug_value,
 static	long	find_tag(const long debug_value, const char *tag_find,
 			 char *token, const int token_size)
 {
-  char			path[1024], *path_p;
+  char			path[PATH_MAX], *path_p;
   const default_t	*def_p;
   const char		*home_p;
   int			ret;
@@ -615,7 +616,7 @@ static	long	find_tag(const long debug_value, const char *tag_find,
  */
 static	void	list_tags(void)
 {
-  char			path[1024], *path_p, token[80];
+  char			path[PATH_MAX], *path_p, token[80];
   const default_t	*def_p;
   const char		*home_p;
   long			new_debug = 0;
