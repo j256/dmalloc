@@ -2737,11 +2737,6 @@ static	int	do_env_args(argv_t *args, argv_t **queue_list,
   if (vect_p != NULL) {
     do_list(args, env_n, vect_p, queue_list, queue_head_p, queue_tail_p,
 	    okay_bp);
-    
-    /* free token list */
-    for (env_c = 0; env_c < env_n; env_c++) {
-      free(vect_p[env_c]);
-    }
     free(vect_p);
   }
   free(environ_p);
