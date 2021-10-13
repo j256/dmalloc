@@ -361,7 +361,7 @@ static	int	read_next_token(FILE *infile, long *debug_p,
 {
   int	cont_b = 0, found_b = 0;
   long	new_debug = 0;
-  char	buf[1024], *tok_p, *buf_p;
+  char	buf[256], *tok_p, *buf_p;
   
   while (fgets(buf, sizeof(buf), infile) != NULL) {
     
@@ -848,7 +848,7 @@ static	void	header(void)
 
 int	main(int argc, char **argv)
 {
-  char		buf[1024];
+  char		buf[256];
   int		set_b = 0;
   char		*log_path, *loc_start_file;
   const char	*env_str;
