@@ -7,6 +7,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: update packages
+          command: sudo apt-get update
+      - run:
           name: install packages
           command: sudo apt-get install texinfo texi2html
       - run:
