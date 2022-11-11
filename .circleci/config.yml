@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/buildpack-deps:stable
+      - image: cimg/base:2022.09
     steps:
       - checkout
       - run:
