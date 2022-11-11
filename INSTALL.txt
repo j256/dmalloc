@@ -5,7 +5,7 @@
 
 To configure, compile, and install the library, follow these steps carefully.
 
-  1. Download the latest version of the library available from `http://dmalloc.com/'.
+  1. Download the latest version of the library available from `https://dmalloc.com/'.
 
   2. The release files have a `.tgz' file extension which means that they are a tar'd gzip'd
      directory of files.  You will need to ungzip and then untar the release file into your source
@@ -93,7 +93,7 @@ Started::.
 This section should give you a quick idea on how to get going.  Basically, you need to do the
 following things to make use of the library:
 
-  1. Download the latest version of the library from `http://dmalloc.com/'.
+  1. Download the latest version of the library from `https://dmalloc.com/'.
 
   2. Run `./configure' to configure the library.  Follow the installation instructions on how to
      configure, make, and install the library (i.e. type: `make install').  *Note Installation::.
@@ -116,7 +116,7 @@ following things to make use of the library:
      After you setup the alias, if you enter `dmalloc runtime' and see any output with
      DMALLOC_OPTIONS in it then the alias did not take effect.
 
-     Bash, ksh, and zsh (`http://www.zsh.org/') users should add the following to their `.bashrc',
+     Bash, ksh, and zsh (`https://zsh.org/') users should add the following to their `.bashrc',
      `.profile', or `.zshrc' file respectively (notice the `-b' option for bourne shell output):
 
           function dmalloc { eval `command dmalloc -b $*`; }
@@ -204,7 +204,7 @@ any additions to this list - either problems you are still having or tips that y
 pass on.
 
    When diagnosing a problem, if possible, always make sure you are running the most up to date
-version of Dmalloc available from the home page at URL `http://dmalloc.com/'.  Problems are often
+version of Dmalloc available from the home page at URL `https://dmalloc.com/'.  Problems are often
 fixed and a new release can be published before people encounter them.
 
 `Why does my program run so slow?'

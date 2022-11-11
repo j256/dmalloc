@@ -17,7 +17,7 @@ programs.
 
 The package includes the library, configuration scripts, debug utility application, test program, and
 documentation.  Online documentation as well as the full source is available at the [dmalloc home
-page](http://dmalloc.com/).
+page](https://dmalloc.com/).
 
 Enjoy.  Gray Watson
 
@@ -29,14 +29,14 @@ Examine the [html
 documentation](https://htmlpreview.github.io/?https://raw.githubusercontent.com/j256/dmalloc/master/dmalloc.html) for
 dmalloc.  The source of all documation is the dmalloc.texi texinfo file which also can generate PDF hardcopy output with
 the help of the texinfo.tex file.  You can download the full documentation package or read it [online from the
-repository](http://dmalloc.com/).
+repository](https://dmalloc.com/).
 
 ## Quick Getting Started
 
 This section should give you an idea on how to get going.  See the more complete [getting started
 documentation](https://dmalloc.com/docs/getting-started) for more details.
 
-  1. Download the latest version of the library available from http://dmalloc.com/.
+  1. Download the latest version of the library available from https://dmalloc.com/.
 
   2. Run `./configure` to configure the library.
 

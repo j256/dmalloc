@@ -7,8 +7,8 @@ Version: 5.6.5
 Release: 1
 Group: Development/Libraries
 Copyright: public domain
-URL: http://dmalloc.com/
-Source: http://dmalloc.com/releases/%{name}-%{version}.tgz
+URL: https://dmalloc.com/
+Source: https://dmalloc.com/releases/%{name}-%{version}.tgz
 BuildRoot: /var/tmp/%{name}-buildroot
 Prefix: /usr
 
@@ -21,7 +21,7 @@ include such things as memory-leak tracking, fence-post write
 detection, file/line number reporting, and general logging of
 statistics.  It also provides support for the debugging of threaded
 programs.  Releases and documentation available online. 
-http://dmalloc.com/
+https://dmalloc.com/
 
 %prep
 %setup

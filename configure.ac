@@ -16,10 +16,10 @@
 # software described herein for any purpose.  It is provided "as is"
 # without express or implied warranty.
 #
-# The author may be contacted via http://dmalloc.com/
+# The author may be contacted via https://dmalloc.com/
 #
 
-AC_INIT(dmalloc, 5.6.5, [http://dmalloc.com/])
+AC_INIT(dmalloc, 5.6.5, [https://dmalloc.com/])
 AC_CONFIG_SRCDIR(dmalloc.c)
 AC_CONFIG_HEADER(conf.h)
 

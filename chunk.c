@@ -16,7 +16,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://dmalloc.com/
+ * The author may be contacted via https://dmalloc.com/
  */
 
 /*
@@ -68,12 +68,12 @@
  */
 #if IDENT_WORKS
 #ident "@(#) $Copyright: Dmalloc package Copyright 2020 by Gray Watson $"
-#ident "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $"
+#ident "@(#) $URL: Source for dmalloc available from https://dmalloc.com/ $"
 #else
 static	char	*copyright =
   "@(#) $Copyright: Dmalloc package Copyright 2020 by Gray Watson $";
 static	char	*source_url =
-  "@(#) $URL: Source for dmalloc available from http://dmalloc.com/ $";
+  "@(#) $URL: Source for dmalloc available from https://dmalloc.com/ $";
 #endif
 
 #if LOCK_THREADS

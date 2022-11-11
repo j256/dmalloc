@@ -16,7 +16,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://dmalloc.com/
+ * The author may be contacted via https://dmalloc.com/
  */
 
 /*
@@ -780,7 +780,7 @@ static	void	dump_current(void)
   }
   
   loc_fprintf(stderr, "\n");
-  loc_fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
+  loc_fprintf(stderr, "Debug Malloc Utility: https://dmalloc.com/\n");
   loc_fprintf(stderr, "  For a list of the command-line options enter: %s --usage\n",
 	      argv_argv[0]);
 }
@@ -841,7 +841,7 @@ static	char	*local_strerror(const int error_num)
  */
 static	void	header(void)
 {
-  loc_fprintf(stderr, "Debug Malloc Utility: http://dmalloc.com/\n");
+  loc_fprintf(stderr, "Debug Malloc Utility: https://dmalloc.com/\n");
   loc_fprintf(stderr,
 	      "  This utility helps set the Debug Malloc environment variables.\n");
 }

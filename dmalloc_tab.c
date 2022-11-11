@@ -16,7 +16,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted via http://dmalloc.com/
+ * The author may be contacted via https://dmalloc.com/
  */
 
 /*
@@ -56,7 +56,7 @@
  *
  * By Bob Jenkins, 1996.  You may use this code any way you wish,
  * private, educational, or commercial.  It's free.  See
- * http://ourworld.compuserve.com/homepages/bob_jenkins/evahash.htm
+ * https://burtleburtle.net/bob/hash/evahash.html
  * Use for hash table lookup, or anything where one collision in 2^^32
  * is acceptable.  Do NOT use for cryptographic purposes.
  *

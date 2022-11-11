@@ -14,7 +14,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author of dmalloc may be contacted via http://dmalloc.com/
+ * The author of dmalloc may be contacted via https://dmalloc.com/
  */
 
 /*
