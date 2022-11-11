@@ -4250,7 +4250,9 @@ int	main(int argc, char **argv)
     silent_b = ARGV_FALSE;
   }
   
-  if (env_string != NULL) {
+  if (env_string == NULL) {
+    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
+  } else {
     dmalloc_debug_setup(env_string);
     if (! silent_b) {
       loc_printf("Set dmalloc environment to: %s\n", env_string);

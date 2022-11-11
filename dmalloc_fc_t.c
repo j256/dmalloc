@@ -1143,7 +1143,9 @@ int	main(int argc, char **argv) {
   
   argv_process(arg_list, argc, argv);
   
-  if (env_string != NULL) {
+  if (env_string == NULL) {
+    dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
+  } else {
     dmalloc_debug_setup(env_string);
     if (! silent_b) {
       (void)printf("Set dmalloc environment to: %s\n", env_string);
