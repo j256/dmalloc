@@ -4251,7 +4251,10 @@ int	main(int argc, char **argv)
   }
   
   if (env_string == NULL) {
+#if GETENV_SAFE == 0
+    // we have to do this if the library can't call getenv without going recursive
     dmalloc_debug_setup(getenv("DMALLOC_OPTIONS"));
+#endif
   } else {
     dmalloc_debug_setup(env_string);
     if (! silent_b) {
