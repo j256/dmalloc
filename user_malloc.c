@@ -337,7 +337,6 @@ static	int	dmalloc_startup(const char *debug_str)
 {
   static int	some_up_b = 0;
   const char	*env_str;
-  char		env_buf[256];
   
   /* have we started already? */
   if (enabled_b) {
@@ -356,15 +355,14 @@ static	int	dmalloc_startup(const char *debug_str)
 #endif
 #endif
     
+    /* process the environmental variable(s) */
     if (debug_str == NULL) {
-      env_str = loc_getenv(OPTIONS_ENVIRON, env_buf, sizeof(env_buf),
-			   1 /* stay safe */);
+      loc_getenv(OPTIONS_ENVIRON, 1 /* stay safe */, &env_str);
+      process_environ(env_str);
     }
     else {
-      env_str = debug_str;
+      process_environ(debug_str);
     }
-    /* process the environmental variable(s) */
-    process_environ(env_str);
     
     /*
      * Tune the environment here.  If we have a start-file,
@@ -1516,10 +1514,22 @@ unsigned int	dmalloc_debug_current(void)
  */
 char	*dmalloc_debug_current_env(char *env_buf, const int env_buf_size)
 {
+  const char	*env_str;
+
   if (! enabled_b) {
     (void)dmalloc_startup(NULL /* no options string */);
   }
-  return loc_getenv(OPTIONS_ENVIRON, env_buf, env_buf_size, 0);
+
+  loc_getenv(OPTIONS_ENVIRON, 0, &env_str);
+  if (env_str) {
+    strncpy(env_buf, env_str, env_buf_size);
+    env_buf[env_buf_size - 1] = '\0';
+  }
+  else {
+    env_buf[0] = '\0';
+  }
+
+  return env_buf;
 }
 
 /*
