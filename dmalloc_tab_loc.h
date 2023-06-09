@@ -25,23 +25,6 @@
 #include "conf.h"
 
 /*
- * Maximum number of splits.  This should mean that these routines can
- * handle at least 2^128 different values (that's _quite_ a few).  And
- * then you can always increase the value.
- */
-#define MAX_QSORT_SPLITS	128
-
-/*
- * Maximum number of entries that must be in list for it to be
- * partitioned.  If there are fewer elements then just do our
- * insertion sort.
- */
-#define MAX_QSORT_PARTITION	8
-
-/* comparison function */
-typedef int	(*compare_t)(const void *element1_p, const void *element2_p);
-
-/*
  * void HASH_MIX
  *
  * DESCRIPTION:
