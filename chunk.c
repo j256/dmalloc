@@ -2890,6 +2890,9 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
       continue;
     }
     
+    block_c++;
+    size_c += slot_p->sa_user_size;
+    
     /* unknown pointer? */
     if (slot_p->sa_file == DMALLOC_DEFAULT_FILE
 	|| slot_p->sa_line == DMALLOC_DEFAULT_LINE) {
