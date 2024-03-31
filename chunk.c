@@ -2016,23 +2016,18 @@ int	_dmalloc_chunk_heap_check(void)
      * switch to the free list in the middle after we've checked the
      * used pointer slots
      */
-    if (slot_p == NULL) {
-      checking_list_c++;
-      if (checking_list_c == 1) {
-	slot_p = skip_free_list->sa_next_p[0];
-      }
+    if (slot_p == NULL && checking_list_c == 0) {
+      slot_p = skip_free_list->sa_next_p[0];
+      checking_list_c = 1;
+    }
 #if FREED_POINTER_DELAY
-      else if (checking_list_c == 2) {
-	slot_p = free_wait_list_head;
-      }
+    if (slot_p == NULL && checking_list_c == 1) {
+      slot_p = free_wait_list_head;
+      checking_list_c = 2;
+    }
 #endif
-      else {
-	/* we are done */
-	break;
-      }
-      if (slot_p == NULL) {
-	break;
-      }
+    if (slot_p == NULL) {
+      break;
     }
     
     /* better be in the heap */
@@ -2852,23 +2847,18 @@ void	_dmalloc_chunk_log_changed(const unsigned long mark,
      * switch to the free list in the middle after we've checked the
      * used pointer slots
      */
-    if (slot_p == NULL) {
-      checking_list_c++;
-      if (checking_list_c == 1) {
-	slot_p = skip_free_list->sa_next_p[0];
-      }
+    if (slot_p == NULL && checking_list_c == 0) {
+      slot_p = skip_free_list->sa_next_p[0];
+      checking_list_c = 1;
+    }
 #if FREED_POINTER_DELAY
-      else if (checking_list_c == 2) {
-	slot_p = free_wait_list_head;
-      }
+    if (slot_p == NULL && checking_list_c == 1) {
+      slot_p = free_wait_list_head;
+      checking_list_c = 2;
+    }
 #endif
-      else {
-	/* we are done */
-	break;
-      }
-      if (slot_p == NULL) {
-	break;
-      }
+    if (slot_p == NULL) {
+      break;
     }
     
     freed_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FREE);
@@ -2982,23 +2972,18 @@ unsigned long	_dmalloc_chunk_count_changed(const unsigned long mark,
      * switch to the free list in the middle after we've checked the
      * used pointer slots
      */
-    if (slot_p == NULL) {
-      checking_list_c++;
-      if (checking_list_c == 1) {
-	slot_p = skip_free_list->sa_next_p[0];
-      }
+    if (slot_p == NULL && checking_list_c == 0) {
+      slot_p = skip_free_list->sa_next_p[0];
+      checking_list_c = 1;
+    }
 #if FREED_POINTER_DELAY
-      else if (checking_list_c == 2) {
-	slot_p = free_wait_list_head;
-      }
+    if (slot_p == NULL && checking_list_c == 1) {
+      slot_p = free_wait_list_head;
+      checking_list_c = 2;
+    }
 #endif
-      else {
-	/* we are done */
-	break;
-      }
-      if (slot_p == NULL) {
-	break;
-      }
+    if (slot_p == NULL) {
+      break;
     }
     
     freed_b = BIT_IS_SET(slot_p->sa_flags, ALLOC_FLAG_FREE);
