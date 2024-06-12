@@ -291,8 +291,15 @@ static	void	process_environ(const char *option_str)
 			   &start_iter, &start_size, &_dmalloc_memory_limit);
   thread_lock_c = _dmalloc_lock_on;
   
-  /* if we set the start stuff, then check-heap comes on later */
-  if (start_iter > 0 || start_size > 0) {
+  /*
+   * Tune the environment here.  If we have a start-file,
+   * start-count, or interval enabled then make sure the check-heap
+   * flag is cleared.
+   */
+  if (start_file != NULL
+      || start_iter > 0
+      || start_size > 0
+      || _dmalloc_check_interval > 0) {
     BIT_CLEAR(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
   }
   
@@ -365,18 +372,6 @@ static	int	dmalloc_startup(const char *debug_str)
     }
     /* process the environmental variable(s) */
     process_environ(env_str);
-    
-    /*
-     * Tune the environment here.  If we have a start-file,
-     * start-count, or interval enabled then make sure the check-heap
-     * flag is cleared.
-     */ 
-    if (start_file != NULL
-	|| start_iter > 0
-	|| start_size > 0
-	|| _dmalloc_check_interval > 0) {
-      BIT_CLEAR(_dmalloc_flags, DMALLOC_DEBUG_CHECK_HEAP);
-    }
     
     /* startup heap code */
     if (! _dmalloc_heap_startup()) {
