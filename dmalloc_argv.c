@@ -1485,15 +1485,14 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
   case ARGV_BIN:
     {
       int	bit_c, bit, first_b = ARGV_FALSE;
-      char	binary[2 + 128 + 1], *bin_bounds_p, *bin_p = binary;
+      char	binary[2 + sizeof(int) * BITS_IN_BYTE + 1];
+      char	*bin_p = binary;
       
       if (*(int *)var == 0) {
 	strncpy(buf, "0", buf_size);
+	buf[buf_size - 1] = '\0';
       }
       else {
-	
-	bin_bounds_p = binary + sizeof(binary);
-	
 	/* initially write binary number into tmp buffer, then copy into out */
 	*bin_p++ = '0';
 	*bin_p++ = 'b';
@@ -1511,18 +1510,10 @@ static	int	value_to_string(const ARGV_PNT var, const unsigned int type,
 	    first_b = ARGV_TRUE;
 	  }
 	}
-	
-	/* add on the decimal equivalent */ 
-	(void)loc_snprintf(bin_p, bin_bounds_p - bin_p, " (%d)", *(int *)var);
-	/* find the \0 at end */ 
-	for (; *bin_p != '\0'; bin_p++) {
-	}
-	
-	/* now we copy from the binary buffer to the output */
-	strncpy(buf, binary, buf_size);
+
+	*bin_p++ = '\0';
+	(void)loc_snprintf(buf, buf_size, "%s (%d)", binary, *(int *)var);
       }
-      
-      buf[buf_size - 1] = '\0';
       len = strlen(buf);
     }
     break;
