@@ -102,13 +102,13 @@ unsigned long		_dmalloc_alloc_total = 0;
  * here.  Basically we cannot do a alloc for the structure and we'd
  * like it to be static storage so we allocate an array of them to
  * make sure we have enough forward pointers, when all we need is
- * SKIP_SLOT_SIZE(MAX_SKIP_LEVEL + 1) bytes.
+ * SKIP_SLOT_SIZE(MAX_SKIP_LEVEL - 1) bytes.
  */
-static	skip_alloc_t	skip_free_alloc[MAX_SKIP_LEVEL /* read note ^^ */];
+static	skip_alloc_t	skip_free_alloc[SKIP_SLOT_COUNT(MAX_SKIP_LEVEL - 1)];
 static	skip_alloc_t	*skip_free_list = skip_free_alloc;
 
 /* skip list of all of our allocated blocks sorted by address */
-static	skip_alloc_t	skip_address_alloc[MAX_SKIP_LEVEL /* read note ^^ */];
+static	skip_alloc_t	skip_address_alloc[SKIP_SLOT_COUNT(MAX_SKIP_LEVEL - 1)];
 static	skip_alloc_t	*skip_address_list = skip_address_alloc;
 
 /* update slots which we use to update the skip lists */
