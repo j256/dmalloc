@@ -55,7 +55,7 @@
 #define MAX_SKIP_LEVEL		32
 
 /* memory table settings */
-#define MEM_ALLOC_ENTRIES	(MEMORY_TABLE_SIZE * 2)
+#define MEM_ALLOC_ENTRIES	(MEMORY_TABLE_TOP_LOG * 2)
 #define MEM_CHANGED_ENTRIES	(MEMORY_TABLE_SIZE * 2)
 
 /* NOTE: FENCE_BOTTOM_SIZE and FENCE_TOP_SIZE defined in settings.h */
