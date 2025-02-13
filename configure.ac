@@ -345,7 +345,31 @@ AC_MSG_NOTICE([important functionality])
 
 AC_CHECK_FUNCS(mmap munmap sbrk)
 
-if test "x$ac_cv_func_mmap" != "xyes" && test "x$ac_cv_func_sbrk" != "xyes"; then
+ac_cv_target_win32=no
+AC_MSG_CHECKING([for VirtualAlloc in <windows.h> (Windows)])
+AC_CHECK_DECLS(
+ [[VirtualAlloc(LPVOID, SIZE_T, DWORD, DWORD)],
+  [VirtualFree(LPVOID, SIZE_T, DWORD)]],
+ [ ac_cv_target_win32=yes; AC_DEFINE(HAVE_VIRTUALALLOC_WINDOWS_H) ],
+ [
+  AC_MSG_CHECKING([for VirtualAlloc in <windows.h>, <memoryapi.h> (Windows)])
+  AC_CHECK_DECLS(
+   [[VirtualAlloc(LPVOID, SIZE_T, DWORD, DWORD)],
+    [VirtualFree(LPVOID, SIZE_T, DWORD)]],
+   [ ac_cv_target_win32=yes; AC_DEFINE(HAVE_VIRTUALALLOC_MEMORYAPI_H) ],
+   [ ac_cv_target_win32=no ],
+   [[#define WIN32_LEAN_AND_MEAN
+     #include <windows.h>
+     #include <memoryapi.h>]]
+  )
+ ],
+ [[#define WIN32_LEAN_AND_MEAN
+   #include <windows.h>]]
+)
+
+if test "x$ac_cv_func_mmap" != "xyes" && test "x$ac_cv_func_sbrk" != "xyes" && \
+	test "x$ac_cv_target_win32" != "xyes";
+then
 	AC_MSG_WARN()
 	AC_MSG_WARN(no mmap nor sbrk function.  See INTERNAL_MEMORY_SPACE in settings.dist.)
 	AC_MSG_WARN()

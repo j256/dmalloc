@@ -61,6 +61,16 @@
 #define HAVE_MUNMAP 0
 
 /*
+ * On Windows, use VirtualAlloc() to allocate memory and use VirtualFree
+ * to deallocate it. To be absolutely sure, try to find it in one of the
+ * two sets of header files.
+ */
+#define HAVE_DECL_VIRTUALALLOC 0
+#define HAVE_DECL_VIRTUALFREE 0
+#define HAVE_VIRTUALALLOC_MEMORYAPI_H 0
+#define HAVE_VIRTUALALLOC_WINDOWS_H 0
+
+/*
  * This is the basic block size in bits.  If possible, the configure
  * script will set this to be the value returned by the getpagesize()
  * function.  If not then some sort of best guess will be necessary.
