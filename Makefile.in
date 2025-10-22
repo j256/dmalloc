@@ -154,6 +154,8 @@ NORMAL_OBJS = chunk.o error.o user_malloc.o
 THREAD_OBJS = chunk_th.o error_th.o user_malloc_th.o
 CXX_OBJS = dmallocc.o
 
+$(OBJS) $(NORMAL_OBJS) $(THREAD_OBJS) $(CXX_OBJS): dmalloc.h
+
 CFLAGS = $(CCFLAGS)
 TEST = $(MODULE)_t
 TEST_FC = $(MODULE)_fc_t
