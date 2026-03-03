@@ -1,0 +1,37 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install tools
+      run: sudo apt-get install texinfo texi2html
+    - name: configure
+      run: ./configure
+    - name: make
+      run: make clean all threads cxx threadscxx
+    - name: make tests
+      run: make tests
+    - name: make installdocs
+      run: make installdocs
+    - name: make distclean
+      run: make distclean
+    - name: configure in subdir
+      run: mkdir x ; cd x ; ../configure --prefix /tmp
+    - name: make in subdir
+      run: cd x ; make clean all threads cxx threadscxx
+    - name: run utility in subdir
+      run: cd x ; ./dmalloc
+    - name: run tests in subdir
+      run: cd x ; make tests
+    - name: make installdocs in subdir
+      run: cd x ; make installdocs
