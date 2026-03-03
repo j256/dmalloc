@@ -67,4 +67,4 @@ development, and continued maintenence of the library.  My thanks goes out to th
 
 # ChangeLog Release Notes
 
-See the [ChangeLog.txt file](ChangeLog.txt).
+See the [ChangeLog file](ChangeLog.txt).
