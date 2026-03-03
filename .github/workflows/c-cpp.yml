@@ -16,7 +16,7 @@ jobs:
     - name: install tools
       run: sudo apt-get install texinfo texi2html
     - name: configure
-      run: ./configure
+      run: ./configure --prefix /tmp
     - name: make
       run: make clean all threads cxx threadscxx
     - name: make tests
