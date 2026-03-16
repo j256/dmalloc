@@ -130,6 +130,9 @@ typedef struct skip_alloc_st {
 #define SKIP_SLOT_SIZE(next_n)	\
 	(sizeof(skip_alloc_t) + sizeof(skip_alloc_t *) * (next_n))
 
+#define SKIP_SLOT_COUNT(next_n)	\
+	DIVUP(SKIP_SLOT_SIZE(next_n), sizeof(skip_alloc_t))
+
 /* entry block magic numbers */
 #define ENTRY_BLOCK_MAGIC1	0xEBEB1111	/* for the eb_magic1 field */
 #define ENTRY_BLOCK_MAGIC2	0xEBEB2222	/* for the eb_magic2 field */
