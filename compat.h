@@ -200,9 +200,20 @@ char	*strsep(char **string_p, const char *delim);
 /*
  * Local getenv which handles some portability stuff.
  */
+#if defined(__CYGWIN__) && HAVE_GETENVIRONMENTVARIABLEA
 extern
-char	*loc_getenv(const char *var, char *buf, const int buf_size,
-		    const int stay_safe);
+char	*loc_getenv(const char *var, char *buf, const int buf_size);
+
+#define loc_getenv(var, stay_safe, val)         \
+          char buf##__LINE__[256];              \
+          *(val) = loc_getenv(var, buf##__LINE__, sizeof(buf##__LINE__))
+#else
+extern
+char	*loc_getenv(const char *var, const int stay_safe);
+
+#define loc_getenv(var, stay_safe, val)         \
+          *(val) = loc_getenv(var, stay_safe)
+#endif /* ! __CYGWIN__ */
 
 /*<<<<<<<<<<   This is end of the auto-generated output from fillproto. */
 
