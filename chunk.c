@@ -895,9 +895,8 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
   {
     char	thread_id[256];
     
-    buf_p = append_string(buf_p, bounds_p, "|t");
     THREAD_ID_TO_STRING(thread_id, sizeof(thread_id), alloc_p->sa_thread_id);
-    buf_p = append_string(buf_p, bounds_p, thread_id);
+    buf_p = append_format(buf_p, bounds_p, "|t%s", thread_id);
   }
 #endif
   append_null(buf_p, bounds_p);
