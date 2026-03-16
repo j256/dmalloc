@@ -69,11 +69,8 @@
 #endif
 
 #if LOCK_THREADS
-#if HAVE_PTHREAD_H
-#include <pthread.h>
-#endif
-#if HAVE_PTHREADS_H
-#include <pthreads.h>
+#ifdef THREAD_INCLUDE
+#include THREAD_INCLUDE
 #endif
 #endif
 
