@@ -282,9 +282,9 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     if (strncmp(this_p, LOGFILE_LABEL, len) == 0
 	&& *(this_p + len) == ASSIGNMENT_CHAR) {
       this_p += len + 1;
-      len = MIN(next_p - this_p, sizeof(log_path));
+      len = MIN(next_p - this_p, sizeof(log_path) - 1);
       (void)strncpy(log_path, this_p, len);
-      log_path[sizeof(log_path) - 1] = '\0';
+      log_path[len] = '\0';
       SET_POINTER(logpath_p, log_path);
       continue;
     }
