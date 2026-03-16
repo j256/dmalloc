@@ -1147,15 +1147,15 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
     arr_p = (argv_array_t *)var;
     
     if (arr_p->aa_entry_n == 0) {
-      arr_p->aa_entries = (char *)malloc(ARRAY_INCR *size);
+      var = (char *)malloc(ARRAY_INCR *size);
     }
     else if (arr_p->aa_entry_n % ARRAY_INCR == 0) {
-      arr_p->aa_entries =
+      var =
 	(char *)realloc(arr_p->aa_entries, (arr_p->aa_entry_n + ARRAY_INCR) *
 			size);
     }
     
-    if (arr_p->aa_entries == NULL) {
+    if (var == NULL) {
       if (argv_error_stream != NULL) {
 	(void)fprintf(argv_error_stream,
 		      "%s: memory error during argument processing\n",
@@ -1167,6 +1167,7 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
       return ERROR;
     }
     
+    arr_p->aa_entries = var;
     var = (char *)(arr_p->aa_entries) + arr_p->aa_entry_n * size;
     arr_p->aa_entry_n++;
   }
@@ -2106,7 +2107,7 @@ static	void	file_args(const char *path, argv_t *grid,
     *argv_p = string_copy(line);
     if (*argv_p == NULL) {
       *okay_bp = ARGV_FALSE;
-      return;
+      goto out;
     }
     
     argv_p++;
@@ -2115,12 +2116,9 @@ static	void	file_args(const char *path, argv_t *grid,
     /* do we need to grow the array of pointers? */
     if (arg_c == max) {
       max += ARRAY_INCR;
-      argv = realloc(argv, sizeof(char *) * max);
-      if (argv == NULL) {
+      argv_p = realloc(argv, sizeof(char *) * max);
+      if (argv_p == NULL) {
 	*okay_bp = ARGV_FALSE;
-	if (infile != stdin) {
-	  (void)fclose(infile);
-	}
 	if (argv_error_stream != NULL) {
 	  (void)fprintf(argv_error_stream,
 			"%s: memory error during argument processing\n",
@@ -2129,8 +2127,9 @@ static	void	file_args(const char *path, argv_t *grid,
 	if (argv_interactive) {
 	  (void)exit(argv_error_code);
 	}
-	return;
+	goto out;
       }
+      argv = argv_p;
       argv_p = argv + arg_c;
     }
   }
@@ -2138,6 +2137,7 @@ static	void	file_args(const char *path, argv_t *grid,
   /* now do the list */
   do_list(grid, arg_c, argv, queue_list, queue_head_p, queue_tail_p, okay_bp);
   
+out:
   /* now free up the list */
   for (argv_p = argv; argv_p < argv + arg_c; argv_p++) {
     free(*argv_p);
@@ -3060,6 +3060,9 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
   if (argv_process_env_b && (! argv_env_after_b)) {
     if (do_env_args(args, queue_list, &queue_head, &queue_tail,
 		    &okay_b) != NOERROR) {
+      if (arg_n > 0) {
+        free(queue_list);
+      }
       return ERROR;
     }
   }
@@ -3072,6 +3075,9 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
   if (argv_process_env_b && argv_env_after_b) {
     if (do_env_args(args, queue_list, &queue_head, &queue_tail,
 		    &okay_b) != NOERROR) {
+      if (arg_n > 0) {
+        free(queue_list);
+      }
       return ERROR;
     }
   }
