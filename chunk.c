@@ -937,7 +937,7 @@ static	void	log_error_info(const char *now_file,
   char		where_buf[MAX_FILE_LENGTH + 64];
   char		where_buf2[MAX_FILE_LENGTH + 64];
   const char	*prev_file;
-  const void	*dump_pnt = user_pnt;
+  const void	*dump_pnt;
   const void	*start_user;
   unsigned int	prev_line, user_size;
   skip_alloc_t	*other_p;
@@ -1014,8 +1014,7 @@ static	void	log_error_info(const char *now_file,
       dump_size = user_size + FENCE_OVERHEAD_SIZE;
     }
   }
-  else if (dmalloc_errno == DMALLOC_ERROR_OVER_FENCE
-	   && user_size > 0) {
+  else if (dmalloc_errno == DMALLOC_ERROR_OVER_FENCE) {
     /* NOTE: only dump out the proper fence-post area once */
     if (! dump_top_b) {
       out_len = expand_chars(fence_top, FENCE_TOP_SIZE, out, sizeof(out));
