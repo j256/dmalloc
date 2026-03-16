@@ -230,7 +230,7 @@ void	_dmalloc_environ_process(const char *env_str, DMALLOC_PNT *addr_p,
     
     /* find the comma of end */
     for (;; next_p++) {
-      if (*next_p == '\0') {
+      if (next_p == NULL || *next_p == '\0') {
 	done_b = 1;
 	break;
       }
