@@ -387,7 +387,7 @@
  * HAVE_MMAP are 0.  Please send me email with any problems or
  * comments on this feature.
  */
-#if HAVE_SBRK == 0 && HAVE_MMAP == 0
+#if HAVE_SBRK == 0 && HAVE_MMAP == 0 && (HAVE_DECL_VIRTUALALLOC == 0 || HAVE_DECL_VIRTUALFREE == 0)
 #define INTERNAL_MEMORY_SPACE (1024 * 1024)
 #endif
 
