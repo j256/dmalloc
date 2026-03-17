@@ -871,7 +871,7 @@ static	char	*display_pnt(const void *user_pnt, const skip_alloc_t *alloc_p,
   else {
     elapsed_b = 0;
   }
-  if (elapsed_b || BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_CURRENT_TIME)) {
+  if (BIT_IS_SET(_dmalloc_flags, DMALLOC_DEBUG_LOG_CURRENT_TIME)) {
 #if LOG_PNT_TIMEVAL
     {
       char	time_buf[64];
